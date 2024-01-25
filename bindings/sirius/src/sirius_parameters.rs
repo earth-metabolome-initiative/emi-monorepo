@@ -1,12 +1,12 @@
+use crate::prelude::*;
+
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub(crate) enum SiriusParameters {
     MaximalMz(f64),
     IsotopeSettingsFilter(bool),
-    //FormulaSearchDB(String),
-    TimeoutSecondsPerTree(u32),
-    //FormulaSettingsEnforced(String),
-    TimeoutSecondsPerInstance(u32),
-    //AdductSettingsDetectable(String),
+    FormulaSearchDB(FormulaSearchDB),
+    TimeoutSecondsPerTree(u64),
+    // FormulaSettingsEnforced(FormulaSettingsEnforced),
 }
 
 impl ToString for SiriusParameters {
@@ -18,6 +18,17 @@ impl ToString for SiriusParameters {
             SiriusParameters::IsotopeSettingsFilter(isotope_settings_filter) => {
                 format!("--IsotopeSettings.filter={}", isotope_settings_filter)
             }
+            SiriusParameters::FormulaSearchDB(formula_search_db) => {
+                format!("--FormulaSearchDB={}", formula_search_db)
+            }
+            SiriusParameters::TimeoutSecondsPerTree(timeout_seconds_per_tree) => {
+                format!("--Timeout.secondsPerTree={}", timeout_seconds_per_tree)
+            } // SiriusParameters::FormulaSettingsEnforced(formula_settings_enforced) => {
+              //     format!(
+              //         "--FormulaSettings.enforced={}",
+              //         formula_settings_enforced.to_string()
+              //     )
+              // }
         }
     }
 }
@@ -28,6 +39,12 @@ impl SiriusParameters {
             SiriusParameters::MaximalMz(_) => SiriusParameters::MaximalMz(800.0),
             SiriusParameters::IsotopeSettingsFilter(_) => {
                 SiriusParameters::IsotopeSettingsFilter(true)
+            }
+            SiriusParameters::FormulaSearchDB(_) => {
+                SiriusParameters::FormulaSearchDB(FormulaSearchDB::Bio)
+            }
+            SiriusParameters::TimeoutSecondsPerTree(_) => {
+                SiriusParameters::TimeoutSecondsPerTree(0)
             }
         }
     }

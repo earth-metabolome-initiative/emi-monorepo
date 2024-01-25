@@ -1,4 +1,5 @@
 use crate::sirius_config::SiriusConfig;
+use std::path::Path;
 use std::process::Command;
 
 pub struct Sirius {
@@ -12,7 +13,7 @@ impl From<SiriusConfig> for Sirius {
 }
 
 impl Sirius {
-    pub fn run(&self, input_file_path:Path, output_file_path:Path) -> Result<(), String> {
+    pub fn run(&self, input_file_path: &Path, output_file_path: &Path) -> Result<(), String> {
         Command::new("sirius")
             .args(self.config.args())
             .spawn()
