@@ -28,6 +28,6 @@ futures = "0.3.8"
 lazy_static = "1.4"
 r2d2 = "0.8"
 rust-argon2 = "1.0"
-sparkpost = "0.5"
-uuid = { version = "0.8", features = ["serde", "v4"] }
+uuid = { version = "1.7", features = ["serde", "v4", "js"] }
 time = "0.3"
+actix-cors = "0.7.0"
