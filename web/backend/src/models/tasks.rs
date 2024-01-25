@@ -1,4 +1,4 @@
-use crate::repository::schema::*;
+use crate::models::schema::*;
 use diesel::backend::Backend;
 use diesel::deserialize::FromSqlRow;
 use diesel::deserialize::{self, FromSql};

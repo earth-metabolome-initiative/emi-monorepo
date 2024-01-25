@@ -1,9 +1,10 @@
+use crate::models::schema::*;
 use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
 
 // Define the Taxon model
 #[derive(Debug, Serialize, Deserialize, Queryable, Identifiable)]
-#[diesel(table_name = crate::repository::schema::taxons)]
+#[diesel(table_name = taxons)]
 pub struct Taxon {
     pub id: i32,
     pub name: String,
@@ -15,7 +16,7 @@ pub struct Taxon {
 
 // Define the Taxon model for insert
 #[derive(Debug, Insertable)]
-#[diesel(table_name = crate::repository::schema::taxons)]
+#[diesel(table_name = taxons)]
 pub struct NewTaxon<'a> {
     pub name: &'a str,
     pub description: &'a str,

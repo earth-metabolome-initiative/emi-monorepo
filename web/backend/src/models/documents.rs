@@ -1,8 +1,9 @@
+use crate::models::schema::*;
 use diesel::prelude::*;
 
 // Define the Document model
 #[derive(Debug, Queryable, Identifiable)]
-#[diesel(table_name = crate::repository::schema::documents)]
+#[diesel(table_name = documents)]
 pub struct Document {
     pub id: i32,
     pub name: String,
@@ -15,7 +16,7 @@ pub struct Document {
 
 // Define the Document model for insert
 #[derive(Debug, Insertable)]
-#[diesel(table_name = crate::repository::schema::documents)]
+#[diesel(table_name = documents)]
 pub struct NewDocument<'a> {
     pub name: &'a str,
     pub description: &'a str,

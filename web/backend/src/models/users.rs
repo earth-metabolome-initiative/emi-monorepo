@@ -1,8 +1,9 @@
+use crate::models::schema::*;
 use serde::{Deserialize, Serialize};
 use diesel::{Queryable, Insertable, AsChangeset};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Queryable, Insertable, AsChangeset)]
-#[diesel(table_name = crate::repository::schema::users)]
+#[diesel(table_name = users)]
 pub struct User {
     #[serde(default)]
     pub id: i32,

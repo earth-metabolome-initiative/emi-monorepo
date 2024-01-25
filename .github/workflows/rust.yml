@@ -1,5 +1,6 @@
 name: Rust
 
+
 on:
   push:
     branches: ["main"]
@@ -29,3 +30,4 @@ jobs:
       #   run: cargo test --release --features=std
       - name: Run clippy
         run: cargo clippy
+

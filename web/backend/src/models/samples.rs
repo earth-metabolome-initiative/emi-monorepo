@@ -1,8 +1,9 @@
+use crate::models::schema::*;
 use diesel::{Identifiable, Insertable, Queryable};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Queryable, Identifiable)]
-#[diesel(table_name = crate::repository::schema::samples)]
+#[diesel(table_name = samples)]
 pub struct Sample {
     pub id: i32,
     pub taxon_id: i32,
@@ -18,7 +19,7 @@ pub struct Sample {
 }
 
 #[derive(Insertable)]
-#[diesel(table_name = crate::repository::schema::samples)]
+#[diesel(table_name = samples)]
 pub struct NewSample<'a> {
     pub taxon_id: i32,
     pub name: &'a str,
