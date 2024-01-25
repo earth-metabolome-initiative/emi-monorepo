@@ -72,10 +72,11 @@ diesel::table! {
 }
 
 diesel::table! {
+    use diesel::sql_types::*;
     tasks (id) {
         id -> Int4,
         user_id -> Int4,
-        status -> crate::models::tasks::TaskStatus,
+        status -> SmallInt,
         task_type_id -> Int4,
         created_at -> Timestamp,
         started_at -> Nullable<Timestamp>,
