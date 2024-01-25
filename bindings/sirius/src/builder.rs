@@ -1,22 +1,39 @@
 //! A builder is a type of struct that will collect configurations and once build, prodiuces a complete struct.
 //! 
+use crate::sirius_config::SiriusConfig;
 
+#[derive(Default)]
 pub struct SiriusBuilder {
-    /// This is the maximal m/z ratio on which Sirius calculation will be carried.
-    maximal_mz: Option<f64>,
+    config: SiriusConfig,
 }
 
-impl Default for SiriusBuilder {
-    fn default() -> Self {
-        SiriusBuilder {
-            maximal_mz: Some(800),
-        }
-    }
-}
 
 impl SiriusBuilder {
 
-    pub fn maximal_mz(self, maximal_mz: f64) -> Result<Self, String>{
+    /// Set the maximal value of m/z ratio on which Sirius calculation will be carried.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `maximal_mz` - The maximal m/z ratio.
+    /// 
+    /// # Example
+    /// 
+    /// ```
+    /// use sirius::prelude::*;
+    /// 
+    /// let sirius = SiriusBuilder::default()
+    ///    .maximal_mz(1000.0).unwrap()
+    ///   .build();
+    /// 
+    /// assert!(SiriusBuilder::default().maximal_mz(-67.0).is_err()); 
+    /// assert!(SiriusBuilder::default().maximal_mz(0.0).is_err());
+    /// assert!(SiriusBuilder::default().maximal_mz(std::f64::NAN).is_err());
+    /// assert!(SiriusBuilder::default().maximal_mz(std::f64::INFINITY).is_err());
+    /// 
+    /// ```
+    /// 
+    /// 
+    pub fn maximal_mz(mut self, maximal_mz: f64) -> Result<Self, String>{
 
         if maximal_mz < 0.0 {
             return Err(format!(
@@ -33,9 +50,20 @@ impl SiriusBuilder {
         if maximal_mz.is_nan() {
             return Err("Maximal m/z ratio cannot be NaN".to_string());
         }
+        if maximal_mz.is_infinite() {
+            return Err("Maximal m/z ratio cannot be infinite".to_string());
+        }
+
 
         self.maximal_mz = Some(maximal_mz);
         Ok(self)
     }
+
+    pub fn isotope_settings_filter(mut self, isotope_settings_filter: bool) -> Self {
+        self.isotope_settings_filter = Some(isotope_settings_filter);
+        self
+    }
+
+
 
 }
