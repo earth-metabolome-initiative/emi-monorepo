@@ -2,12 +2,10 @@ use crate::repository::schema::*;
 use diesel::backend::Backend;
 use diesel::deserialize::FromSqlRow;
 use diesel::deserialize::{self, FromSql};
-use diesel::pg::{Pg, PgValue};
 use diesel::prelude::*;
-use diesel::serialize::{self, IsNull, Output, ToSql};
+use diesel::serialize::{self, Output, ToSql};
 use diesel::sql_types::SmallInt;
 use diesel::*;
-use std::io::Write;
 
 #[derive(Debug, Queryable, Identifiable)]
 #[table_name = "tasks"]
