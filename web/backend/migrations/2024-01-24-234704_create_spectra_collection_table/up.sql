@@ -1,0 +1,11 @@
+-- Your SQL goes here
+CREATE TABLE spectra_collection (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT NOT NULL,
+    sample_id INTEGER REFERENCES samples(id) ON DELETE CASCADE NOT NULL,
+    user_id INTEGER REFERENCES users(id) NOT NULL,
+    updated_by_id INTEGER REFERENCES users(id) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL
+);
