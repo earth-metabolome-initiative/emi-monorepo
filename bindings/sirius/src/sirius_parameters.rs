@@ -1,4 +1,4 @@
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub(crate) enum SiriusParameters {
     MaximalMz(f64),
     IsotopeSettingsFilter(bool),
@@ -21,7 +21,38 @@ impl SiriusParameters {
     pub fn get_default(self) -> Self {
         match self {
             SiriusParameters::MaximalMz(_) => SiriusParameters::MaximalMz(800.0),
-            SiriusParameters::IsotopeSettingsFilter(_) => SiriusParameters::IsotopeSettingsFilter(true),
+            SiriusParameters::IsotopeSettingsFilter(_) => {
+                SiriusParameters::IsotopeSettingsFilter(true)
+            }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_default_maximal_mz() {
+        assert_eq!(
+            SiriusParameters::MaximalMz(800.0),
+            SiriusParameters::MaximalMz(5858.0).get_default()
+        );
+        assert_ne!(
+            SiriusParameters::MaximalMz(5858.0),
+            SiriusParameters::MaximalMz(5858.0).get_default()
+        );
+    }
+
+    #[test]
+    fn test_default_isotope_settings_filter() {
+        assert_eq!(
+            SiriusParameters::IsotopeSettingsFilter(true),
+            SiriusParameters::IsotopeSettingsFilter(false).get_default()
+        );
+        assert_ne!(
+            SiriusParameters::IsotopeSettingsFilter(false),
+            SiriusParameters::IsotopeSettingsFilter(false).get_default()
+        );
     }
 }

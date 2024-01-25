@@ -1,0 +1,22 @@
+use crate::sirius_config::SiriusConfig;
+use std::process::Command;
+
+pub struct Sirius {
+    config: SiriusConfig,
+}
+
+impl From<SiriusConfig> for Sirius {
+    fn from(config: SiriusConfig) -> Self {
+        Sirius { config }
+    }
+}
+
+impl Sirius {
+    pub fn run(&self) -> Result<(), String> {
+        Command::new("sirius")
+            .args(self.config.args())
+            .spawn()
+            .expect("Sirius failed to start");
+        Ok(())
+    }
+}
