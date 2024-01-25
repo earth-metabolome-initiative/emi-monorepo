@@ -342,4 +342,9 @@ from the command line.
                            afterwards including the remaining.
 
 
-                           
+# Sirius options
+
+--FormulaSearchDB=BIO,METACYC,CHEBI,COCONUT,ECOCYCMINE,GNPS,HMDB,HSDB,KEGG,KEGGMINE,KNAPSACK,MACONDA,MESH,NORMAN,UNDP,PLANTCYC,PUBCHEM,PUBMED,YMDB,YMDBMINE,ZINCBIO 
+
+
+
