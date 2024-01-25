@@ -12,7 +12,7 @@ impl From<SiriusConfig> for Sirius {
 }
 
 impl Sirius {
-    pub fn run(&self) -> Result<(), String> {
+    pub fn run(&self, input_file_path:Path, output_file_path:Path) -> Result<(), String> {
         Command::new("sirius")
             .args(self.config.args())
             .spawn()
