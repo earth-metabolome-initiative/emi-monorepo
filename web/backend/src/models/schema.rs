@@ -95,4 +95,3 @@ diesel::table! {
         updated_at -> Timestamp,
     }
 }
-

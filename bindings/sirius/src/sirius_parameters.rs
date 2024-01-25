@@ -2,6 +2,11 @@
 pub(crate) enum SiriusParameters {
     MaximalMz(f64),
     IsotopeSettingsFilter(bool),
+    //FormulaSearchDB(String),
+    TimeoutSecondsPerTree(u32),
+    //FormulaSettingsEnforced(String),
+    TimeoutSecondsPerInstance(u32),
+    //AdductSettingsDetectable(String),
 }
 
 impl ToString for SiriusParameters {
