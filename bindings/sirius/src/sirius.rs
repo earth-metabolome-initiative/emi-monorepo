@@ -1,6 +1,7 @@
 use crate::sirius_config::SiriusConfig;
 use std::path::Path;
 use std::process::Command;
+use std::path::Path;
 
 pub struct Sirius {
     config: SiriusConfig,
