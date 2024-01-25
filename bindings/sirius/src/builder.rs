@@ -92,9 +92,7 @@ impl SiriusBuilder {
     ///
     pub fn maximal_mz_default(mut self) -> Result<Self, String> {
         self.config
-            .add_parameter(SiriusParameters::get_default(SiriusParameters::MaximalMz(
-                f64::default(),
-            )))?;
+            .add_parameter(SiriusParameters::MaximalMz(f64::default()).to_default())?;
         Ok(self)
     }
 }

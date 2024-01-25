@@ -18,7 +18,7 @@ impl ToString for SiriusParameters {
 }
 
 impl SiriusParameters {
-    pub fn get_default(self) -> Self {
+    pub fn to_default(self) -> Self {
         match self {
             SiriusParameters::MaximalMz(_) => SiriusParameters::MaximalMz(800.0),
             SiriusParameters::IsotopeSettingsFilter(_) => {
@@ -36,11 +36,11 @@ mod tests {
     fn test_default_maximal_mz() {
         assert_eq!(
             SiriusParameters::MaximalMz(800.0),
-            SiriusParameters::MaximalMz(5858.0).get_default()
+            SiriusParameters::MaximalMz(5858.0).to_default()
         );
         assert_ne!(
             SiriusParameters::MaximalMz(5858.0),
-            SiriusParameters::MaximalMz(5858.0).get_default()
+            SiriusParameters::MaximalMz(5858.0).to_default()
         );
     }
 
@@ -48,11 +48,11 @@ mod tests {
     fn test_default_isotope_settings_filter() {
         assert_eq!(
             SiriusParameters::IsotopeSettingsFilter(true),
-            SiriusParameters::IsotopeSettingsFilter(false).get_default()
+            SiriusParameters::IsotopeSettingsFilter(false).to_default()
         );
         assert_ne!(
             SiriusParameters::IsotopeSettingsFilter(false),
-            SiriusParameters::IsotopeSettingsFilter(false).get_default()
+            SiriusParameters::IsotopeSettingsFilter(false).to_default()
         );
     }
 }
