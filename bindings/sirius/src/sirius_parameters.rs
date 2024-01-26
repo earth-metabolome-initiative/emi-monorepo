@@ -1,7 +1,7 @@
 use crate::prelude::*;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub(crate) enum SiriusParameters {
+pub enum SiriusParametersVersion5 {
     MaximalMz(f64),
     IsotopeSettingsFilter(bool),
     FormulaSearchDB(FormulaSearchDB),
@@ -9,21 +9,21 @@ pub(crate) enum SiriusParameters {
     // FormulaSettingsEnforced(FormulaSettingsEnforced),
 }
 
-impl ToString for SiriusParameters {
+impl ToString for SiriusParametersVersion5 {
     fn to_string(&self) -> String {
         match self {
-            SiriusParameters::MaximalMz(maximal_mz) => {
+            SiriusParametersVersion5::MaximalMz(maximal_mz) => {
                 format!("--maxmz={}", maximal_mz)
             }
-            SiriusParameters::IsotopeSettingsFilter(isotope_settings_filter) => {
+            SiriusParametersVersion5::IsotopeSettingsFilter(isotope_settings_filter) => {
                 format!("--IsotopeSettings.filter={}", isotope_settings_filter)
             }
-            SiriusParameters::FormulaSearchDB(formula_search_db) => {
+            SiriusParametersVersion5::FormulaSearchDB(formula_search_db) => {
                 format!("--FormulaSearchDB={}", formula_search_db)
             }
-            SiriusParameters::TimeoutSecondsPerTree(timeout_seconds_per_tree) => {
+            SiriusParametersVersion5::TimeoutSecondsPerTree(timeout_seconds_per_tree) => {
                 format!("--Timeout.secondsPerTree={}", timeout_seconds_per_tree)
-            } // SiriusParameters::FormulaSettingsEnforced(formula_settings_enforced) => {
+            } // SiriusParametersVersion5::FormulaSettingsEnforced(formula_settings_enforced) => {
               //     format!(
               //         "--FormulaSettings.enforced={}",
               //         formula_settings_enforced.to_string()
@@ -33,18 +33,18 @@ impl ToString for SiriusParameters {
     }
 }
 
-impl SiriusParameters {
+impl SiriusParametersVersion5 {
     pub fn to_default(self) -> Self {
         match self {
-            SiriusParameters::MaximalMz(_) => SiriusParameters::MaximalMz(800.0),
-            SiriusParameters::IsotopeSettingsFilter(_) => {
-                SiriusParameters::IsotopeSettingsFilter(true)
+            SiriusParametersVersion5::MaximalMz(_) => SiriusParametersVersion5::MaximalMz(800.0),
+            SiriusParametersVersion5::IsotopeSettingsFilter(_) => {
+                SiriusParametersVersion5::IsotopeSettingsFilter(true)
             }
-            SiriusParameters::FormulaSearchDB(_) => {
-                SiriusParameters::FormulaSearchDB(FormulaSearchDB::Bio)
+            SiriusParametersVersion5::FormulaSearchDB(_) => {
+                SiriusParametersVersion5::FormulaSearchDB(FormulaSearchDB::Bio)
             }
-            SiriusParameters::TimeoutSecondsPerTree(_) => {
-                SiriusParameters::TimeoutSecondsPerTree(0)
+            SiriusParametersVersion5::TimeoutSecondsPerTree(_) => {
+                SiriusParametersVersion5::TimeoutSecondsPerTree(0)
             }
         }
     }
@@ -57,24 +57,24 @@ mod tests {
     #[test]
     fn test_default_maximal_mz() {
         assert_eq!(
-            SiriusParameters::MaximalMz(800.0),
-            SiriusParameters::MaximalMz(5858.0).to_default()
+            SiriusParametersVersion5::MaximalMz(800.0),
+            SiriusParametersVersion5::MaximalMz(5858.0).to_default()
         );
         assert_ne!(
-            SiriusParameters::MaximalMz(5858.0),
-            SiriusParameters::MaximalMz(5858.0).to_default()
+            SiriusParametersVersion5::MaximalMz(5858.0),
+            SiriusParametersVersion5::MaximalMz(5858.0).to_default()
         );
     }
 
     #[test]
     fn test_default_isotope_settings_filter() {
         assert_eq!(
-            SiriusParameters::IsotopeSettingsFilter(true),
-            SiriusParameters::IsotopeSettingsFilter(false).to_default()
+            SiriusParametersVersion5::IsotopeSettingsFilter(true),
+            SiriusParametersVersion5::IsotopeSettingsFilter(false).to_default()
         );
         assert_ne!(
-            SiriusParameters::IsotopeSettingsFilter(false),
-            SiriusParameters::IsotopeSettingsFilter(false).to_default()
+            SiriusParametersVersion5::IsotopeSettingsFilter(false),
+            SiriusParametersVersion5::IsotopeSettingsFilter(false).to_default()
         );
     }
 }

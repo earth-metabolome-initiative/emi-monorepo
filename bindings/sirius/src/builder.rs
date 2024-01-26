@@ -1,15 +1,16 @@
 //! A builder is a type of struct that will collect configurations and once build, prodiuces a complete struct.
 //!
+use crate::prelude::{Version, Version5};
 use crate::sirius::Sirius;
 use crate::sirius_config::SiriusConfig;
-use crate::sirius_parameters::SiriusParameters;
+use crate::sirius_parameters::SiriusParametersVersion5;
 
 #[derive(Default)]
-pub struct SiriusBuilder {
-    config: SiriusConfig,
+pub struct SiriusBuilder<V: Version> {
+    config: SiriusConfig<V>,
 }
 
-impl SiriusBuilder {
+impl SiriusBuilder<Version5> {
     /// Set the maximal value of m/z ratio on which Sirius calculation will be carried.
     ///
     /// # Arguments
@@ -51,7 +52,7 @@ impl SiriusBuilder {
         }
 
         self.config
-            .add_parameter(SiriusParameters::MaximalMz(maximal_mz))?;
+            .add_parameter(SiriusParametersVersion5::MaximalMz(maximal_mz))?;
         Ok(self)
     }
 
@@ -60,18 +61,28 @@ impl SiriusBuilder {
         isotope_settings_filter: bool,
     ) -> Result<Self, String> {
         self.config
-            .add_parameter(SiriusParameters::IsotopeSettingsFilter(
+            .add_parameter(SiriusParametersVersion5::IsotopeSettingsFilter(
                 isotope_settings_filter,
             ))?;
         Ok(self)
     }
 
-    pub fn build(self) -> Sirius {
+    pub fn formula_search_db(
+        mut self,
+        formula_search_db: crate::sirius_types::FormulaSearchDB,
+    ) -> Result<Self, String> {
+        self.config
+            .add_parameter(SiriusParametersVersion5::FormulaSearchDB(formula_search_db))?;
+        Ok(self)
+    }
+}
+impl<V: Version> SiriusBuilder<V> {
+    pub fn build(self) -> Sirius<V> {
         Sirius::from(self.config)
     }
 }
 
-impl SiriusBuilder {
+impl SiriusBuilder<Version5> {
     /// Set the default maximal value of m/z ratio on which Sirius calculation will be carried.
     ///
     /// # Example
@@ -92,7 +103,14 @@ impl SiriusBuilder {
     ///
     pub fn maximal_mz_default(mut self) -> Result<Self, String> {
         self.config
-            .add_parameter(SiriusParameters::MaximalMz(f64::default()).to_default())?;
+            .add_parameter(SiriusParametersVersion5::MaximalMz(f64::default()).to_default())?;
+        Ok(self)
+    }
+
+    pub fn isotope_settings_filter_default(mut self) -> Result<Self, String> {
+        self.config.add_parameter(
+            SiriusParametersVersion5::IsotopeSettingsFilter(bool::default()).to_default(),
+        )?;
         Ok(self)
     }
 }
