@@ -75,9 +75,24 @@ mod tests {
         config
             .add_parameter(SiriusParametersVersion5::IsotopeSettingsFilter(true))
             .unwrap();
+        config
+            .add_parameter(SiriusParametersVersion5::FormulaSearchDB(
+                FormulaSearchDB::Bio,
+            ))
+            .unwrap();
 
         assert!(config
             .add_parameter(SiriusParametersVersion5::MaximalMz(1002.0))
+            .is_err());
+
+        assert!(config
+            .add_parameter(SiriusParametersVersion5::IsotopeSettingsFilter(true))
+            .is_err());
+
+        assert!(config
+            .add_parameter(SiriusParametersVersion5::FormulaSearchDB(
+                FormulaSearchDB::Bio
+            ))
             .is_err());
     }
 }

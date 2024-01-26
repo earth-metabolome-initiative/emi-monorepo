@@ -100,7 +100,6 @@ impl SiriusBuilder<Version5> {
     ///
     ///
     /// ```
-    ///
     pub fn maximal_mz_default(mut self) -> Result<Self, String> {
         self.config
             .add_parameter(SiriusParametersVersion5::MaximalMz(f64::default()).to_default())?;
@@ -110,6 +109,13 @@ impl SiriusBuilder<Version5> {
     pub fn isotope_settings_filter_default(mut self) -> Result<Self, String> {
         self.config.add_parameter(
             SiriusParametersVersion5::IsotopeSettingsFilter(bool::default()).to_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn formula_search_db_default(mut self) -> Result<Self, String> {
+        self.config.add_parameter(
+            SiriusParametersVersion5::FormulaSearchDB(crate::sirius_types::FormulaSearchDB::default()).to_default(),
         )?;
         Ok(self)
     }

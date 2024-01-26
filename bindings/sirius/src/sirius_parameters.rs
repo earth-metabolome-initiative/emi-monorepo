@@ -77,4 +77,16 @@ mod tests {
             SiriusParametersVersion5::IsotopeSettingsFilter(false).to_default()
         );
     }
+
+    #[test]
+    fn test_default_formula_search_db() {
+        assert_eq!(
+            SiriusParametersVersion5::FormulaSearchDB(FormulaSearchDB::Bio),
+            SiriusParametersVersion5::FormulaSearchDB(FormulaSearchDB::Gnps).to_default()
+        );
+        assert_ne!(
+            SiriusParametersVersion5::FormulaSearchDB(FormulaSearchDB::Gnps),
+            SiriusParametersVersion5::FormulaSearchDB(FormulaSearchDB::Gnps).to_default()
+        );
+    }
 }

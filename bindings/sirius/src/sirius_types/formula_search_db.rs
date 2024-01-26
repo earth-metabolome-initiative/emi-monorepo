@@ -1,7 +1,8 @@
 use std::fmt::Display;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum FormulaSearchDB {
+    #[default]
     Bio,
     Metacyc,
     Chebi,
