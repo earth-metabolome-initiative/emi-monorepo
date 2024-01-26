@@ -37,6 +37,8 @@ This wil not
 
 ```bash
 
+/Applications/sirius.app/Contents/MacOS/sirius -i tests/data/input_sirius.mgf --output tests/data/output_sirius --maxmz 1000 config --IsotopeSettings.filter=true --FormulaSearchDB=BIO canopus write-summaries
+
 ```bash
 ```
 

@@ -41,6 +41,43 @@ impl<V: Version> Sirius<V> {
             )
         ))?;
 
+        // Fetch the SIRIUS_USERNAME and the SIRIUS_PASSWORD from environment variables
+        // in order to login before launching the sirius command
+
+        let sirius_username = env::var("SIRIUS_USERNAME").map_err(|_| format!(
+            concat!(
+                "The environment variable SIRIUS_USERNAME is not set. ",
+                "We expected there to exist a .env file in the current directory ",
+                "with the SIRIUS_USERNAME variable set to the username of the sirius account. ",
+                "The variable may also be set in the environment directly, for instance ",
+                "in the .bashrc file."
+            )
+        ))?;
+
+        let sirius_password = env::var("SIRIUS_PASSWORD").map_err(|_| format!(
+            concat!(
+                "The environment variable SIRIUS_PASSWORD is not set. ",
+                "We expected there to exist a .env file in the current directory ",
+                "with the SIRIUS_PASSWORD variable set to the password of the sirius account. ",
+                "The variable may also be set in the environment directly, for instance ",
+                "in the .bashrc file."
+            )
+        ))?;
+
+        // Prepare and execute the login command
+        let login_command_status = Command::new(&sirius_path)
+            .args(&["login", "--user-env", &sirius_username, "--password-env", &sirius_password]);
+            // .status()
+            // .map_err(|e| format!("Failed to execute Sirius login command: {}", e))?;
+
+        // We make sure to print the login command status for debugging
+
+        println!("Sirius login command status: {}", login_command_status.);
+
+        if !login_command_status.success() {
+            return Err("Sirius login command failed".to_string());
+        }
+
         // Prepare the command
         let mut command = Command::new(sirius_path);
 
@@ -57,14 +94,14 @@ impl<V: Version> Sirius<V> {
         args.extend(self.config.args().iter().cloned());
 
         // Add specific command arguments
-        args.extend(vec!["formula", "zodiac", "fingerprint", "structure", "canopus"].iter().map(|&s| s.to_string()));
+        args.extend(vec!["write-summaries"].iter().map(|&s| s.to_string()));
 
         // Print the command and its arguments for debugging
         println!("Running command: sirius {:?}", args);
 
-        // Add arguments and spawn the command
-        command.args(&args).spawn()
-            .expect("Sirius failed to start");
+        // // Add arguments and spawn the command
+        // command.args(&args).spawn()
+        //     .expect("Sirius failed to start");
 
         Ok(())
     }
