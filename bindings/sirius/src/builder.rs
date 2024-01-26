@@ -1,9 +1,8 @@
 //! A builder is a type of struct that will collect configurations and once build, prodiuces a complete struct.
 //!
-use crate::prelude::{Version, Version5};
-use crate::sirius::Sirius;
+use crate::prelude::*;
 use crate::sirius_config::SiriusConfig;
-use crate::sirius_parameters::SiriusParametersVersion5;
+use crate::traits::IntoDefault;
 
 #[derive(Default)]
 pub struct SiriusBuilder<V: Version> {
@@ -52,7 +51,7 @@ impl SiriusBuilder<Version5> {
         }
 
         self.config
-            .add_parameter(SiriusParametersVersion5::MaximalMz(maximal_mz))?;
+            .add_core_parameter(CoreV5::MaximalMz(maximal_mz))?;
         Ok(self)
     }
 
@@ -61,7 +60,7 @@ impl SiriusBuilder<Version5> {
         isotope_settings_filter: bool,
     ) -> Result<Self, String> {
         self.config
-            .add_parameter(SiriusParametersVersion5::IsotopeSettingsFilter(
+            .add_config_parameter(ConfigV5::IsotopeSettingsFilter(
                 isotope_settings_filter,
             ))?;
         Ok(self)
@@ -72,7 +71,7 @@ impl SiriusBuilder<Version5> {
         formula_search_db: crate::sirius_types::FormulaSearchDB,
     ) -> Result<Self, String> {
         self.config
-            .add_parameter(SiriusParametersVersion5::FormulaSearchDB(formula_search_db))?;
+            .add_config_parameter(ConfigV5::FormulaSearchDB(formula_search_db))?;
         Ok(self)
     }
 }
@@ -102,20 +101,20 @@ impl SiriusBuilder<Version5> {
     /// ```
     pub fn maximal_mz_default(mut self) -> Result<Self, String> {
         self.config
-            .add_parameter(SiriusParametersVersion5::MaximalMz(f64::default()).to_default())?;
+            .add_core_parameter(CoreV5::MaximalMz(f64::default()).into_default())?;
         Ok(self)
     }
 
     pub fn isotope_settings_filter_default(mut self) -> Result<Self, String> {
-        self.config.add_parameter(
-            SiriusParametersVersion5::IsotopeSettingsFilter(bool::default()).to_default(),
+        self.config.add_config_parameter(
+            ConfigV5::IsotopeSettingsFilter(bool::default()).into_default(),
         )?;
         Ok(self)
     }
 
     pub fn formula_search_db_default(mut self) -> Result<Self, String> {
-        self.config.add_parameter(
-            SiriusParametersVersion5::FormulaSearchDB(crate::sirius_types::FormulaSearchDB::default()).to_default(),
+        self.config.add_config_parameter(
+            ConfigV5::FormulaSearchDB(crate::sirius_types::FormulaSearchDB::default()).into_default(),
         )?;
         Ok(self)
     }

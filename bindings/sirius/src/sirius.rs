@@ -31,8 +31,15 @@ impl<V: Version> Sirius<V> {
         dotenv().ok();
 
         // Fetch the path of the sirius command from environment variables
-        let sirius_path = env::var("SIRIUS_PATH")
-            .expect("SIRIUS_PATH environment variable not found");
+        let sirius_path = env::var("SIRIUS_PATH").map_err(|_| format!(
+            concat!(
+                "The environment variable SIRIUS_PATH is not set. ",
+                "We expected there to exist a .env file in the current directory ",
+                "with the SIRIUS_PATH variable set to the path of the sirius executable. ",
+                "The variable may also be set in the environment directly, for instance ",
+                "in the .bashrc file."
+            )
+        ))?;
 
         // Prepare the command
         let mut command = Command::new(sirius_path);
