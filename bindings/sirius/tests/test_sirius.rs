@@ -7,6 +7,7 @@ use std::fs;
 fn test_run_sirius() -> Result<(), String> {
     let sirius = SiriusBuilder::default()
         .maximal_mz(1000.0)?
+        .formula_search_db(FormulaSearchDB::Bio)?
         .isotope_settings_filter(false)?
         .build();
 

@@ -3,6 +3,7 @@ use crate::prelude::*;
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum SiriusParametersVersion5 {
     MaximalMz(f64),
+    ConfigurationOption(bool),
     IsotopeSettingsFilter(bool),
     FormulaSearchDB(FormulaSearchDB),
     TimeoutSecondsPerTree(u64),
@@ -14,6 +15,13 @@ impl ToString for SiriusParametersVersion5 {
         match self {
             SiriusParametersVersion5::MaximalMz(maximal_mz) => {
                 format!("--maxmz={}", maximal_mz)
+            }
+            SiriusParametersVersion5::ConfigurationOption(configuration_option) => {
+                if *configuration_option {
+                    "config".to_string()
+                } else {
+                    "".to_string()
+                }
             }
             SiriusParametersVersion5::IsotopeSettingsFilter(isotope_settings_filter) => {
                 format!("--IsotopeSettings.filter={}", isotope_settings_filter)
@@ -37,6 +45,9 @@ impl SiriusParametersVersion5 {
     pub fn to_default(self) -> Self {
         match self {
             SiriusParametersVersion5::MaximalMz(_) => SiriusParametersVersion5::MaximalMz(800.0),
+            SiriusParametersVersion5::ConfigurationOption(_) => {
+                SiriusParametersVersion5::ConfigurationOption(true)
+            }
             SiriusParametersVersion5::IsotopeSettingsFilter(_) => {
                 SiriusParametersVersion5::IsotopeSettingsFilter(true)
             }
@@ -63,6 +74,18 @@ mod tests {
         assert_ne!(
             SiriusParametersVersion5::MaximalMz(5858.0),
             SiriusParametersVersion5::MaximalMz(5858.0).to_default()
+        );
+    }
+
+    #[test]
+    fn test_default_configuration_option() {
+        assert_eq!(
+            SiriusParametersVersion5::ConfigurationOption(true),
+            SiriusParametersVersion5::ConfigurationOption(false).to_default()
+        );
+        assert_ne!(
+            SiriusParametersVersion5::ConfigurationOption(false),
+            SiriusParametersVersion5::ConfigurationOption(false).to_default()
         );
     }
 
