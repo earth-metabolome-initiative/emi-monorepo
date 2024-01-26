@@ -81,18 +81,12 @@ impl SiriusBuilder<Version5> {
 
     /// Set whether to display the help of Canopus.
     pub fn canopus_help(mut self) -> Result<Self, String> {
-        // We do not check if the enabled parameter is already present in the vector,
-        // we solely make sure that we have added it to the vector by trying to add it.
-        let _ = self.config.add_canopus_parameter(CanopusV5::Enabled);
         self.config.add_canopus_parameter(CanopusV5::Help)?;
         Ok(self)
     }
 
     /// Set whether to display the version of Canopus.
     pub fn canopus_version(mut self) -> Result<Self, String> {
-        // We do not check if the enabled parameter is already present in the vector,
-        // we solely make sure that we have added it to the vector by trying to add it.
-        let _ = self.config.add_canopus_parameter(CanopusV5::Enabled);
         self.config.add_canopus_parameter(CanopusV5::Version)?;
         Ok(self)
     }

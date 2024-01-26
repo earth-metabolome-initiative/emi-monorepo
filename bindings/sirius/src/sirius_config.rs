@@ -1,6 +1,5 @@
-use std::vec;
-
 use crate::prelude::*;
+use crate::traits::Enablable;
 
 /// Struct providing the configuration for Sirius.
 ///
@@ -77,17 +76,23 @@ impl<V: Version> SiriusConfig<V> {
                 parameter, existing_parameter
             ))
         } else {
+            if !parameter.is_enabler() {
+                // If the current parameter is not an enabler, we make sure that the enabler variant
+                // is present in the vector by trying to insert it without checking if it is already
+                // present.
+                let _ = self.add_config_parameter(V::Config::enabler());
+            }
             self.config_parameters.push(parameter);
             Ok(())
         }
     }
 
     /// Add a parameter to the canopus configuration.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `parameter` - The parameter to add.
-    /// 
+    ///
     pub fn add_canopus_parameter(&mut self, parameter: V::Canopus) -> Result<(), String> {
         // We check if the parameter is already present in the vector
         // If it is, we return an error
@@ -105,26 +110,22 @@ impl<V: Version> SiriusConfig<V> {
                 parameter, existing_parameter
             ))
         } else {
+            if !parameter.is_enabler() {
+                // If the current parameter is not an enabler, we make sure that the enabler variant
+                // is present in the vector by trying to insert it without checking if it is already
+                // present.
+                let _ = self.add_canopus_parameter(V::Canopus::enabler());
+            }
             self.canopus_parameters.push(parameter);
             Ok(())
         }
     }
 
     pub fn args(&self) -> Vec<String> {
-        let config_prefix = if self.config_parameters.is_empty() {
-            vec![]
-        } else {
-            vec!["config".to_string()]
-        };
-
         self.core_parameters
             .iter()
             .map(|p| p.to_string())
-            .chain(
-                config_prefix
-                    .into_iter()
-                    .chain(self.config_parameters.iter().map(|p| p.to_string())),
-            )
+            .chain(self.config_parameters.iter().map(|p| p.to_string()))
             .collect::<Vec<String>>()
     }
 }

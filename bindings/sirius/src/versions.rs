@@ -1,12 +1,14 @@
 use std::fmt::Debug;
 
 use crate::traits::IntoDefault;
+use crate::traits::NamedParametersSet;
+use crate::traits::Enablable;
 
 pub trait Version: Default {
     const VERSION: usize;
     type Core: ToString + Debug + IntoDefault;
-    type Config: ToString + Debug + IntoDefault;
-    type Canopus: ToString + Debug + IntoDefault;
+    type Config: ToString + Debug + IntoDefault + NamedParametersSet + Enablable;
+    type Canopus: ToString + Debug + IntoDefault + NamedParametersSet + Enablable;
 }
 #[derive(Default)]
 pub struct Version5;

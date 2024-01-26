@@ -1,8 +1,9 @@
 use crate::prelude::*;
-use crate::traits::IntoDefault;
+use crate::traits::{IntoDefault, NamedParametersSet, Enablable};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum ConfigV5 {
+    Enabled,
     IsotopeSettingsFilter(bool),
     FormulaSearchDB(FormulaSearchDB),
     TimeoutSecondsPerTree(u64),
@@ -11,6 +12,7 @@ pub enum ConfigV5 {
 impl ToString for ConfigV5 {
     fn to_string(&self) -> String {
         match self {
+            ConfigV5::Enabled => Self::parameter_set_name().to_string(),
             ConfigV5::IsotopeSettingsFilter(isotope_settings_filter) => {
                 format!("--IsotopeSettings.filter={}", isotope_settings_filter)
             }
@@ -27,6 +29,7 @@ impl ToString for ConfigV5 {
 impl IntoDefault for ConfigV5 {
     fn into_default(self) -> Self {
         match self {
+            ConfigV5::Enabled => ConfigV5::Enabled,
             ConfigV5::IsotopeSettingsFilter(_) => {
                 ConfigV5::IsotopeSettingsFilter(true)
             }
@@ -37,6 +40,25 @@ impl IntoDefault for ConfigV5 {
                 ConfigV5::TimeoutSecondsPerTree(0)
             }
         }
+    }
+}
+
+impl Enablable for ConfigV5 {
+    fn is_enabler(&self) -> bool {
+        match self {
+            ConfigV5::Enabled => true,
+            _ => false,
+        }
+    }
+    
+    fn enabler() -> Self {
+        ConfigV5::Enabled
+    }
+}
+
+impl NamedParametersSet for ConfigV5 {
+    fn parameter_set_name() -> &'static str {
+        "config"
     }
 }
 
