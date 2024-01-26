@@ -8,9 +8,10 @@ fn test_run_sirius() -> Result<(), String> {
         .isotope_settings_filter(false)?
         .build();
 
-    let input_file_path = Path::new("tests/data/pos.mzML");
-    let output_file_path = Path::new("tests/data/pos.sirius.sqlite");
+    let input_file_path = Path::new("tests/data/input_sirius.mgf");
+    let output_file_path = Path::new("tests/data/output_sirius");
 
     sirius.run(input_file_path, output_file_path).unwrap();
+
     Ok(())
 }

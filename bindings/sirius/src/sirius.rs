@@ -13,12 +13,57 @@ impl<V: Version> From<SiriusConfig<V>> for Sirius<V> {
     }
 }
 
+// impl<V: Version> Sirius<V> {
+//     pub fn run(&self, input_file_path: &Path, output_file_path: &Path) -> Result<(), String> {
+//         Command::new("sirius")
+//             .args(self.config.args())
+//             .spawn()
+//             .expect("Sirius failed to start");
+//         Ok(())
+//     }
+// }
+
+
 impl<V: Version> Sirius<V> {
     pub fn run(&self, input_file_path: &Path, output_file_path: &Path) -> Result<(), String> {
-        Command::new("sirius")
-            .args(self.config.args())
-            .spawn()
+        // Prepare the command
+        let mut command = Command::new("/Applications/sirius.app/Contents/MacOS/sirius");
+
+        // Start building the argument list
+        let mut args = Vec::new();
+
+        // Add input and output file paths with their respective flags
+        args.push("-i".to_string());
+        args.push(input_file_path.to_str().unwrap().to_string());
+        args.push("--output".to_string());
+        args.push(output_file_path.to_str().unwrap().to_string());
+
+        // Assuming --maxmz=1000 is part of the config and should come before 'config'
+        let config_args = self.config.args();
+        if let Some(pos) = config_args.iter().position(|arg| arg == "--maxmz=1000") {
+            args.push(config_args[pos].clone());
+        }
+
+        // Add the 'config' keyword
+        args.push("config".to_string());
+
+        // Add the remaining config arguments after 'config'
+        for arg in config_args.into_iter().filter(|arg| arg != "--maxmz=1000") {
+            args.push(arg);
+        }
+
+
+        // Add specific command arguments
+        args.extend(vec!["formula", "zodiac", "fingerprint", "structure", "canopus"].iter().map(|&s| s.to_string()));
+
+
+        // Print the command and its arguments for debugging
+        println!("Running command: sirius {:?}", args);
+
+        // Add arguments and spawn the command
+        command.args(&args).spawn()
             .expect("Sirius failed to start");
+
         Ok(())
     }
 }
