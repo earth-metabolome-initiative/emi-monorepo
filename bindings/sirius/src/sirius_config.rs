@@ -126,6 +126,7 @@ impl<V: Version> SiriusConfig<V> {
             .iter()
             .map(|p| p.to_string())
             .chain(self.config_parameters.iter().map(|p| p.to_string()))
+            .chain(self.canopus_parameters.iter().map(|p| p.to_string()))
             .collect::<Vec<String>>()
     }
 }
