@@ -60,9 +60,7 @@ impl SiriusBuilder<Version5> {
         isotope_settings_filter: bool,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::IsotopeSettingsFilter(
-                isotope_settings_filter,
-            ))?;
+            .add_config_parameter(ConfigV5::IsotopeSettingsFilter(isotope_settings_filter))?;
         Ok(self)
     }
 
@@ -72,6 +70,30 @@ impl SiriusBuilder<Version5> {
     ) -> Result<Self, String> {
         self.config
             .add_config_parameter(ConfigV5::FormulaSearchDB(formula_search_db))?;
+        Ok(self)
+    }
+
+    /// Whether to enable the Canopus module.
+    pub fn enable_canopus(mut self) -> Result<Self, String> {
+        self.config.add_canopus_parameter(CanopusV5::Enabled)?;
+        Ok(self)
+    }
+
+    /// Set whether to display the help of Canopus.
+    pub fn canopus_help(mut self) -> Result<Self, String> {
+        // We do not check if the enabled parameter is already present in the vector,
+        // we solely make sure that we have added it to the vector by trying to add it.
+        let _ = self.config.add_canopus_parameter(CanopusV5::Enabled);
+        self.config.add_canopus_parameter(CanopusV5::Help)?;
+        Ok(self)
+    }
+
+    /// Set whether to display the version of Canopus.
+    pub fn canopus_version(mut self) -> Result<Self, String> {
+        // We do not check if the enabled parameter is already present in the vector,
+        // we solely make sure that we have added it to the vector by trying to add it.
+        let _ = self.config.add_canopus_parameter(CanopusV5::Enabled);
+        self.config.add_canopus_parameter(CanopusV5::Version)?;
         Ok(self)
     }
 }
@@ -114,7 +136,8 @@ impl SiriusBuilder<Version5> {
 
     pub fn formula_search_db_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::FormulaSearchDB(crate::sirius_types::FormulaSearchDB::default()).into_default(),
+            ConfigV5::FormulaSearchDB(crate::sirius_types::FormulaSearchDB::default())
+                .into_default(),
         )?;
         Ok(self)
     }

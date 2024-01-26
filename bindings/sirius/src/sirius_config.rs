@@ -1,3 +1,5 @@
+use std::vec;
+
 use crate::prelude::*;
 
 /// Struct providing the configuration for Sirius.
@@ -10,6 +12,7 @@ use crate::prelude::*;
 pub(crate) struct SiriusConfig<V: Version> {
     core_parameters: Vec<V::Core>,
     config_parameters: Vec<V::Config>,
+    canopus_parameters: Vec<V::Canopus>,
 }
 
 impl<V: Version> Default for SiriusConfig<V> {
@@ -17,6 +20,7 @@ impl<V: Version> Default for SiriusConfig<V> {
         SiriusConfig {
             core_parameters: Vec::new(),
             config_parameters: Vec::new(),
+            canopus_parameters: Vec::new(),
         }
     }
 }
@@ -51,11 +55,11 @@ impl<V: Version> SiriusConfig<V> {
     }
 
     /// Add a parameter to the config configuration.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `parameter` - The parameter to add.
-    /// 
+    ///
     pub fn add_config_parameter(&mut self, parameter: V::Config) -> Result<(), String> {
         // We check if the parameter is already present in the vector
         // If it is, we return an error
@@ -78,12 +82,46 @@ impl<V: Version> SiriusConfig<V> {
         }
     }
 
+    /// Add a parameter to the canopus configuration.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `parameter` - The parameter to add.
+    /// 
+    pub fn add_canopus_parameter(&mut self, parameter: V::Canopus) -> Result<(), String> {
+        // We check if the parameter is already present in the vector
+        // If it is, we return an error
+        if let Some(existing_parameter) = self
+            .canopus_parameters
+            .iter()
+            .find(|&p| std::mem::discriminant(p) == std::mem::discriminant(&parameter))
+        {
+            Err(format!(
+                concat!(
+                    "The canopus parameter {:?} cannot be added to the configuration. ",
+                    "There is already an existing parameter which is {:?}. ",
+                    "You cannot add it twice."
+                ),
+                parameter, existing_parameter
+            ))
+        } else {
+            self.canopus_parameters.push(parameter);
+            Ok(())
+        }
+    }
+
     pub fn args(&self) -> Vec<String> {
+        let config_prefix = if self.config_parameters.is_empty() {
+            vec![]
+        } else {
+            vec!["config".to_string()]
+        };
+
         self.core_parameters
             .iter()
             .map(|p| p.to_string())
             .chain(
-                ["config".to_string()]
+                config_prefix
                     .into_iter()
                     .chain(self.config_parameters.iter().map(|p| p.to_string())),
             )
@@ -109,9 +147,7 @@ mod tests {
             .add_config_parameter(ConfigV5::IsotopeSettingsFilter(true))
             .unwrap();
         config
-            .add_config_parameter(ConfigV5::FormulaSearchDB(
-                FormulaSearchDB::Bio,
-            ))
+            .add_config_parameter(ConfigV5::FormulaSearchDB(FormulaSearchDB::Bio))
             .unwrap();
 
         assert!(config
@@ -119,9 +155,7 @@ mod tests {
             .is_err());
 
         assert!(config
-            .add_config_parameter(ConfigV5::FormulaSearchDB(
-                FormulaSearchDB::Bio
-            ))
+            .add_config_parameter(ConfigV5::FormulaSearchDB(FormulaSearchDB::Bio))
             .is_err());
     }
 }
