@@ -128,6 +128,25 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// Wether to enable the Fingerprint module.
+    pub fn enable_fingerprint(mut self) -> Result<Self, String> {
+        self.config.add_fingerprint_parameter(FingerprintV5::Enabled)?;
+        Ok(self)
+    }
+
+    /// Set whether to display the help of Fingerprint.
+    pub fn fingerprint_help(mut self) -> Result<Self, String> {
+        self.config.add_fingerprint_parameter(FingerprintV5::Help)?;
+        Ok(self)
+    }
+
+    /// Set whether to display the version of Fingerprint.
+    pub fn fingerprint_version(mut self) -> Result<Self, String> {
+        self.config.add_fingerprint_parameter(FingerprintV5::Version)?;
+        Ok(self)
+    }
+
+
 
 
 

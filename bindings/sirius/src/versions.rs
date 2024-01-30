@@ -12,6 +12,7 @@ pub trait Version: Default {
     type Canopus: ToString + Debug + IntoDefault + NamedParametersSet + Enablable;
     type Formula: ToString + Debug + IntoDefault + NamedParametersSet + Enablable;
     type Zodiac: ToString + Debug + IntoDefault + NamedParametersSet + Enablable;
+    type Fingerprint: ToString + Debug + IntoDefault + NamedParametersSet + Enablable;
 }
 #[derive(Default)]
 pub struct Version5;
@@ -23,4 +24,5 @@ impl Version for Version5 {
     type Canopus = crate::parameters::canopus::CanopusV5;
     type Formula = crate::parameters::formula::FormulaV5;
     type Zodiac = crate::parameters::zodiac::ZodiacV5;
+    type Fingerprint = crate::parameters::fingerprint::FingerprintV5;
 }
