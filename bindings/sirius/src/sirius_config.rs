@@ -15,6 +15,7 @@ pub(crate) struct SiriusConfig<V: Version> {
     formula_parameters: Vec<V::Formula>,
     zodiac_parameters: Vec<V::Zodiac>,
     fingerprint_parameters: Vec<V::Fingerprint>,
+    structure_parameters: Vec<V::Structure>,
 }
 
 impl<V: Version> Default for SiriusConfig<V> {
@@ -26,6 +27,7 @@ impl<V: Version> Default for SiriusConfig<V> {
             formula_parameters: Vec::new(),
             zodiac_parameters: Vec::new(),
             fingerprint_parameters: Vec::new(),
+            structure_parameters: Vec::new(),
         }
     }
 }
@@ -229,6 +231,40 @@ impl<V: Version> SiriusConfig<V> {
         }
     }
 
+    /// Add a parameter to the structure configuration.
+    ///
+    /// # Arguments
+    ///
+    /// * `parameter` - The parameter to add.
+    ///
+    pub fn add_structure_parameter(&mut self, parameter: V::Structure) -> Result<(), String> {
+        // We check if the parameter is already present in the vector
+        // If it is, we return an error
+        if let Some(existing_parameter) = self
+            .structure_parameters
+            .iter()
+            .find(|&p| std::mem::discriminant(p) == std::mem::discriminant(&parameter))
+        {
+            Err(format!(
+                concat!(
+                    "The structure parameter {:?} cannot be added to the configuration. ",
+                    "There is already an existing parameter which is {:?}. ",
+                    "You cannot add it twice."
+                ),
+                parameter, existing_parameter
+            ))
+        } else {
+            if !parameter.is_enabler() {
+                // If the current parameter is not an enabler, we make sure that the enabler variant
+                // is present in the vector by trying to insert it without checking if it is already
+                // present.
+                let _ = self.add_structure_parameter(V::Structure::enabler());
+            }
+            self.structure_parameters.push(parameter);
+            Ok(())
+        }
+    }
+
     pub fn args(&self) -> Vec<String> {
         self.core_parameters
             .iter()
@@ -238,6 +274,7 @@ impl<V: Version> SiriusConfig<V> {
             .chain(self.formula_parameters.iter().map(|p| p.to_string()))
             .chain(self.zodiac_parameters.iter().map(|p| p.to_string()))
             .chain(self.fingerprint_parameters.iter().map(|p| p.to_string()))
+            .chain(self.structure_parameters.iter().map(|p| p.to_string()))
             .collect::<Vec<String>>()
     }
 }

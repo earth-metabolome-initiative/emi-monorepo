@@ -146,6 +146,24 @@ impl SiriusBuilder<Version5> {
             .add_fingerprint_parameter(FingerprintV5::Version)?;
         Ok(self)
     }
+
+    /// Wether to enable the Structure module.
+    pub fn enable_structure(mut self) -> Result<Self, String> {
+        self.config.add_structure_parameter(StructureV5::Enabled)?;
+        Ok(self)
+    }
+
+    /// Set whether to display the help of Structure.
+    pub fn structure_help(mut self) -> Result<Self, String> {
+        self.config.add_structure_parameter(StructureV5::Help)?;
+        Ok(self)
+    }
+
+    /// Set whether to display the version of Structure.
+    pub fn structure_version(mut self) -> Result<Self, String> {
+        self.config.add_structure_parameter(StructureV5::Version)?;
+        Ok(self)
+    }
 }
 impl<V: Version> SiriusBuilder<V> {
     pub fn build(self) -> Sirius<V> {
