@@ -87,34 +87,33 @@ impl<V: Version> Sirius<V> {
 
         println!("Sirius login command status: {:#?}", login_command_status);
 
-        // if !login_command_status.success() {
-        //     return Err("Sirius login command failed".to_string());
-        // }
+        if !login_command_status.success() {
+            return Err("Sirius login command failed".to_string());
+        }
 
-        // // Prepare the command
-        // let mut command = Command::new(sirius_path);
+        // Prepare the command
+        let mut command = Command::new(sirius_path);
 
-        // // Start building the argument list
-        // let mut args = Vec::new();
+        // Start building the argument list
+        let mut args = Vec::new();
 
-        // // Add input and output file paths with their respective flags
-        // args.push("-i".to_string());
-        // args.push(input_file_path.to_str().unwrap().to_string());
-        // args.push("--output".to_string());
-        // args.push(output_file_path.to_str().unwrap().to_string());
+        // Add input and output file paths with their respective flags
+        args.push("-i".to_string());
+        args.push(input_file_path.to_str().unwrap().to_string());
+        args.push("--output".to_string());
+        args.push(output_file_path.to_str().unwrap().to_string());
 
-        // // Add arguments from config directly
-        // args.extend(self.config.args().iter().cloned());
+        // Add arguments from config directly
+        args.extend(self.config.args().iter().cloned());
 
-        // // Add specific command arguments
-        // args.extend(vec!["write-summaries"].iter().map(|&s| s.to_string()));
+        // Add specific command arguments
+        args.extend(vec!["write-summaries"].iter().map(|&s| s.to_string()));
 
-        // // Print the command and its arguments for debugging
-        // println!("Running command: sirius {:?}", args);
+        // Print the command and its arguments for debugging
+        println!("Running command: sirius {:?}", args);
 
-        // // Add arguments and spawn the command
-        // command.args(&args).spawn()
-        //     .expect("Sirius failed to start");
+        // Add arguments and spawn the command
+        command.args(&args).spawn().expect("Sirius failed to start");
 
         Ok(())
     }

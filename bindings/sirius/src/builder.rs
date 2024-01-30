@@ -73,24 +73,6 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
-    /// Whether to enable the Canopus module.
-    pub fn enable_canopus(mut self) -> Result<Self, String> {
-        self.config.add_canopus_parameter(CanopusV5::Enabled)?;
-        Ok(self)
-    }
-
-    /// Set whether to display the help of Canopus.
-    pub fn canopus_help(mut self) -> Result<Self, String> {
-        self.config.add_canopus_parameter(CanopusV5::Help)?;
-        Ok(self)
-    }
-
-    /// Set whether to display the version of Canopus.
-    pub fn canopus_version(mut self) -> Result<Self, String> {
-        self.config.add_canopus_parameter(CanopusV5::Version)?;
-        Ok(self)
-    }
-
     /// Wether to enable the Formula module.
     pub fn enable_formula(mut self) -> Result<Self, String> {
         self.config.add_formula_parameter(FormulaV5::Enabled)?;
@@ -162,6 +144,24 @@ impl SiriusBuilder<Version5> {
     /// Set whether to display the version of Structure.
     pub fn structure_version(mut self) -> Result<Self, String> {
         self.config.add_structure_parameter(StructureV5::Version)?;
+        Ok(self)
+    }
+
+    /// Whether to enable the Canopus module.
+    pub fn enable_canopus(mut self) -> Result<Self, String> {
+        self.config.add_canopus_parameter(CanopusV5::Enabled)?;
+        Ok(self)
+    }
+
+    /// Set whether to display the help of Canopus.
+    pub fn canopus_help(mut self) -> Result<Self, String> {
+        self.config.add_canopus_parameter(CanopusV5::Help)?;
+        Ok(self)
+    }
+
+    /// Set whether to display the version of Canopus.
+    pub fn canopus_version(mut self) -> Result<Self, String> {
+        self.config.add_canopus_parameter(CanopusV5::Version)?;
         Ok(self)
     }
 }

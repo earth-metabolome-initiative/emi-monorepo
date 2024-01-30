@@ -42,6 +42,6 @@ impl Enablable for ZodiacV5 {
 
 impl NamedParametersSet for ZodiacV5 {
     fn parameter_set_name() -> &'static str {
-        "Zodiac"
+        "zodiac"
     }
 }

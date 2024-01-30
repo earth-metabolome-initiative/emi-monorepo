@@ -42,6 +42,6 @@ impl Enablable for FormulaV5 {
 
 impl NamedParametersSet for FormulaV5 {
     fn parameter_set_name() -> &'static str {
-        "Formula"
+        "formula"
     }
 }

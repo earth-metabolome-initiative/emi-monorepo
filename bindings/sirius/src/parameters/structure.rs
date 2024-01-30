@@ -42,6 +42,6 @@ impl Enablable for StructureV5 {
 
 impl NamedParametersSet for StructureV5 {
     fn parameter_set_name() -> &'static str {
-        "Structure"
+        "structure"
     }
 }

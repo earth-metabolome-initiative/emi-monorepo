@@ -11,11 +11,11 @@ use crate::traits::Enablable;
 pub(crate) struct SiriusConfig<V: Version> {
     core_parameters: Vec<V::Core>,
     config_parameters: Vec<V::Config>,
-    canopus_parameters: Vec<V::Canopus>,
     formula_parameters: Vec<V::Formula>,
     zodiac_parameters: Vec<V::Zodiac>,
     fingerprint_parameters: Vec<V::Fingerprint>,
     structure_parameters: Vec<V::Structure>,
+    canopus_parameters: Vec<V::Canopus>,
 }
 
 impl<V: Version> Default for SiriusConfig<V> {
@@ -23,11 +23,11 @@ impl<V: Version> Default for SiriusConfig<V> {
         SiriusConfig {
             core_parameters: Vec::new(),
             config_parameters: Vec::new(),
-            canopus_parameters: Vec::new(),
             formula_parameters: Vec::new(),
             zodiac_parameters: Vec::new(),
             fingerprint_parameters: Vec::new(),
             structure_parameters: Vec::new(),
+            canopus_parameters: Vec::new(),
         }
     }
 }
@@ -91,40 +91,6 @@ impl<V: Version> SiriusConfig<V> {
                 let _ = self.add_config_parameter(V::Config::enabler());
             }
             self.config_parameters.push(parameter);
-            Ok(())
-        }
-    }
-
-    /// Add a parameter to the canopus configuration.
-    ///
-    /// # Arguments
-    ///
-    /// * `parameter` - The parameter to add.
-    ///
-    pub fn add_canopus_parameter(&mut self, parameter: V::Canopus) -> Result<(), String> {
-        // We check if the parameter is already present in the vector
-        // If it is, we return an error
-        if let Some(existing_parameter) = self
-            .canopus_parameters
-            .iter()
-            .find(|&p| std::mem::discriminant(p) == std::mem::discriminant(&parameter))
-        {
-            Err(format!(
-                concat!(
-                    "The canopus parameter {:?} cannot be added to the configuration. ",
-                    "There is already an existing parameter which is {:?}. ",
-                    "You cannot add it twice."
-                ),
-                parameter, existing_parameter
-            ))
-        } else {
-            if !parameter.is_enabler() {
-                // If the current parameter is not an enabler, we make sure that the enabler variant
-                // is present in the vector by trying to insert it without checking if it is already
-                // present.
-                let _ = self.add_canopus_parameter(V::Canopus::enabler());
-            }
-            self.canopus_parameters.push(parameter);
             Ok(())
         }
     }
@@ -265,16 +231,50 @@ impl<V: Version> SiriusConfig<V> {
         }
     }
 
+    /// Add a parameter to the canopus configuration.
+    ///
+    /// # Arguments
+    ///
+    /// * `parameter` - The parameter to add.
+    ///
+    pub fn add_canopus_parameter(&mut self, parameter: V::Canopus) -> Result<(), String> {
+        // We check if the parameter is already present in the vector
+        // If it is, we return an error
+        if let Some(existing_parameter) = self
+            .canopus_parameters
+            .iter()
+            .find(|&p| std::mem::discriminant(p) == std::mem::discriminant(&parameter))
+        {
+            Err(format!(
+                concat!(
+                    "The canopus parameter {:?} cannot be added to the configuration. ",
+                    "There is already an existing parameter which is {:?}. ",
+                    "You cannot add it twice."
+                ),
+                parameter, existing_parameter
+            ))
+        } else {
+            if !parameter.is_enabler() {
+                // If the current parameter is not an enabler, we make sure that the enabler variant
+                // is present in the vector by trying to insert it without checking if it is already
+                // present.
+                let _ = self.add_canopus_parameter(V::Canopus::enabler());
+            }
+            self.canopus_parameters.push(parameter);
+            Ok(())
+        }
+    }
+
     pub fn args(&self) -> Vec<String> {
         self.core_parameters
             .iter()
             .map(|p| p.to_string())
             .chain(self.config_parameters.iter().map(|p| p.to_string()))
-            .chain(self.canopus_parameters.iter().map(|p| p.to_string()))
             .chain(self.formula_parameters.iter().map(|p| p.to_string()))
             .chain(self.zodiac_parameters.iter().map(|p| p.to_string()))
             .chain(self.fingerprint_parameters.iter().map(|p| p.to_string()))
             .chain(self.structure_parameters.iter().map(|p| p.to_string()))
+            .chain(self.canopus_parameters.iter().map(|p| p.to_string()))
             .collect::<Vec<String>>()
     }
 }

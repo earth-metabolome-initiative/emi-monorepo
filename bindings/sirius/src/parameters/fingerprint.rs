@@ -42,6 +42,6 @@ impl Enablable for FingerprintV5 {
 
 impl NamedParametersSet for FingerprintV5 {
     fn parameter_set_name() -> &'static str {
-        "Fingerprint"
+        "fingerprint"
     }
 }
