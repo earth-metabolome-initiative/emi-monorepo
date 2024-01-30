@@ -128,11 +128,11 @@ impl<V: Version> SiriusConfig<V> {
     }
 
     /// Add a parameter to the formula configuration.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `parameter` - The parameter to add.
-    /// 
+    ///
     pub fn add_formula_parameter(&mut self, parameter: V::Formula) -> Result<(), String> {
         // We check if the parameter is already present in the vector
         // If it is, we return an error
@@ -162,11 +162,11 @@ impl<V: Version> SiriusConfig<V> {
     }
 
     /// Add a parameter to the zodiac configuration.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `parameter` - The parameter to add.
-    /// 
+    ///
     pub fn add_zodiac_parameter(&mut self, parameter: V::Zodiac) -> Result<(), String> {
         // We check if the parameter is already present in the vector
         // If it is, we return an error
@@ -196,11 +196,11 @@ impl<V: Version> SiriusConfig<V> {
     }
 
     /// Add a parameter to the fingerprint configuration.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `parameter` - The parameter to add.
-    /// 
+    ///
     pub fn add_fingerprint_parameter(&mut self, parameter: V::Fingerprint) -> Result<(), String> {
         // We check if the parameter is already present in the vector
         // If it is, we return an error
@@ -228,7 +228,6 @@ impl<V: Version> SiriusConfig<V> {
             Ok(())
         }
     }
-
 
     pub fn args(&self) -> Vec<String> {
         self.core_parameters

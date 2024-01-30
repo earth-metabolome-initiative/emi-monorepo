@@ -109,7 +109,6 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
-
     /// Wether to enable the Zodiac module.
     pub fn enable_zodiac(mut self) -> Result<Self, String> {
         self.config.add_zodiac_parameter(ZodiacV5::Enabled)?;
@@ -130,7 +129,8 @@ impl SiriusBuilder<Version5> {
 
     /// Wether to enable the Fingerprint module.
     pub fn enable_fingerprint(mut self) -> Result<Self, String> {
-        self.config.add_fingerprint_parameter(FingerprintV5::Enabled)?;
+        self.config
+            .add_fingerprint_parameter(FingerprintV5::Enabled)?;
         Ok(self)
     }
 
@@ -142,14 +142,10 @@ impl SiriusBuilder<Version5> {
 
     /// Set whether to display the version of Fingerprint.
     pub fn fingerprint_version(mut self) -> Result<Self, String> {
-        self.config.add_fingerprint_parameter(FingerprintV5::Version)?;
+        self.config
+            .add_fingerprint_parameter(FingerprintV5::Version)?;
         Ok(self)
     }
-
-
-
-
-
 }
 impl<V: Version> SiriusBuilder<V> {
     pub fn build(self) -> Sirius<V> {
