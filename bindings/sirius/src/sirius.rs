@@ -66,15 +66,22 @@ impl<V: Version> Sirius<V> {
 
         // Prepare and execute the login command
         let mut binding = Command::new(&sirius_path);
-        let login_command_status = binding.args(&[
-            "login",
-            "--user-env",
-            &sirius_username,
-            "--password-env",
-            &sirius_password,
-        ]);
-        // .status()
-        // .map_err(|e| format!("Failed to execute Sirius login command: {}", e))?;
+
+        // Set both SIRIUS_PASSWORD and SIRIUS_USERNAME environment variables
+        binding
+            .env("SIRIUS_USERNAME", &sirius_username)
+            .env("SIRIUS_PASSWORD", &sirius_password);
+
+        let login_command_status = binding
+            .args(&[
+                "login",
+                "--user-env",
+                "SIRIUS_USERNAME",
+                "--password-env",
+                "SIRIUS_PASSWORD",
+            ])
+            .status()
+            .map_err(|e| format!("Failed to execute Sirius login command: {}", e))?;
 
         // We make sure to print the login command status for debugging
 
@@ -105,9 +112,9 @@ impl<V: Version> Sirius<V> {
         // Print the command and its arguments for debugging
         println!("Running command: sirius {:?}", args);
 
-        // // Add arguments and spawn the command
-        // command.args(&args).spawn()
-        //     .expect("Sirius failed to start");
+        // Add arguments and spawn the command
+        command.args(&args).spawn()
+            .expect("Sirius failed to start");
 
         Ok(())
     }

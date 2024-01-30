@@ -14,6 +14,10 @@ Example of a minimal sirius command line
 sirius -i tests/data/input_sirius.mgf --output tests/data/output_sirius --maxmz=1000 config --IsotopeSettings.filter=False formula zodiac fingerprint structure canopus
 ```
 
+sirius -i tests/data/input_sirius.mgf --output tests/data/output_sirius --maxmz=802.2 config --IsotopeSettings.filter=False --FormulaSearchDB=BIO canopus write-summaries
+
+
+
 Example of a typical sirius command line see https://github.com/enpkg/enpkg_full/blob/c8e649290ee72f000c3385e7669b5da2215abad8/params/user.yml#L60
 
 ```bash
