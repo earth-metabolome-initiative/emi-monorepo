@@ -108,6 +108,29 @@ impl SiriusBuilder<Version5> {
         self.config.add_formula_parameter(FormulaV5::Version)?;
         Ok(self)
     }
+
+
+    /// Wether to enable the Zodiac module.
+    pub fn enable_zodiac(mut self) -> Result<Self, String> {
+        self.config.add_zodiac_parameter(ZodiacV5::Enabled)?;
+        Ok(self)
+    }
+
+    /// Set whether to display the help of Zodiac.
+    pub fn zodiac_help(mut self) -> Result<Self, String> {
+        self.config.add_zodiac_parameter(ZodiacV5::Help)?;
+        Ok(self)
+    }
+
+    /// Set whether to display the version of Zodiac.
+    pub fn zodiac_version(mut self) -> Result<Self, String> {
+        self.config.add_zodiac_parameter(ZodiacV5::Version)?;
+        Ok(self)
+    }
+
+
+
+
 }
 impl<V: Version> SiriusBuilder<V> {
     pub fn build(self) -> Sirius<V> {

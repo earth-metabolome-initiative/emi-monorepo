@@ -1,5 +1,6 @@
 use std::fmt::Debug;
 
+use crate::sirius_types;
 use crate::traits::Enablable;
 use crate::traits::IntoDefault;
 use crate::traits::NamedParametersSet;
@@ -10,6 +11,7 @@ pub trait Version: Default {
     type Config: ToString + Debug + IntoDefault + NamedParametersSet + Enablable;
     type Canopus: ToString + Debug + IntoDefault + NamedParametersSet + Enablable;
     type Formula: ToString + Debug + IntoDefault + NamedParametersSet + Enablable;
+    type Zodiac: ToString + Debug + IntoDefault + NamedParametersSet + Enablable;
 }
 #[derive(Default)]
 pub struct Version5;
@@ -20,4 +22,5 @@ impl Version for Version5 {
     type Config = crate::parameters::config::ConfigV5;
     type Canopus = crate::parameters::canopus::CanopusV5;
     type Formula = crate::parameters::formula::FormulaV5;
+    type Zodiac = crate::parameters::zodiac::ZodiacV5;
 }
