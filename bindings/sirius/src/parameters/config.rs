@@ -43,6 +43,11 @@ pub enum ConfigV5 {
     MS2MassDeviationAllowedMassDeviation(MassDeviation),
     MS2MassDeviationStandardMassDeviation(MassDeviation),
     FormulaSettingsDetectable(AtomVector),
+    FormulaSettingsEnforced(AtomVector),
+    FormulaSettingsFallback(AtomVector),
+    ForbidRecalibration(ForbidRecalibration),
+    UseHeuristicMZToUseHeuristic(u32),
+    UseHeuristicMZToUseHeuristicOnly(u32),
 }
 
 impl ToString for ConfigV5 {
@@ -221,6 +226,27 @@ impl ToString for ConfigV5 {
                 "--FormulaSettings.detectable={}",
                 formula_settings_detectable
             ),
+            ConfigV5::FormulaSettingsEnforced(formula_settings_enforced) => {
+                format!("--FormulaSettings.enforced={}", formula_settings_enforced)
+            }
+            ConfigV5::FormulaSettingsFallback(formula_settings_fallback) => {
+                format!("--FormulaSettings.fallback={}", formula_settings_fallback)
+            }
+            ConfigV5::ForbidRecalibration(forbid_recalibration) => {
+                format!("--ForbidRecalibration={}", forbid_recalibration)
+            }
+            ConfigV5::UseHeuristicMZToUseHeuristic(use_heuristic_mz_to_use_heuristic) => {
+                format!(
+                    "--UseHeuristic.mzToUseHeuristic={}",
+                    use_heuristic_mz_to_use_heuristic
+                )
+            }
+            ConfigV5::UseHeuristicMZToUseHeuristicOnly(use_heuristic_mz_to_use_heuristic_only) => {
+                format!(
+                    "--UseHeuristic.mzToUseHeuristicOnly={}",
+                    use_heuristic_mz_to_use_heuristic_only
+                )
+            }
         }
     }
 }
@@ -306,6 +332,27 @@ impl IntoDefault for ConfigV5 {
                     Atoms::B,
                     Atoms::Se,
                 ]))
+            }
+            ConfigV5::FormulaSettingsEnforced(_) => {
+                ConfigV5::FormulaSettingsEnforced(AtomVector::new(vec![
+                    Atoms::C,
+                    Atoms::H,
+                    Atoms::N,
+                    Atoms::O,
+                    Atoms::P,
+                ]))
+            }
+            ConfigV5::FormulaSettingsFallback(_) => {
+                ConfigV5::FormulaSettingsFallback(AtomVector::new(vec![Atoms::S]))
+            }
+            ConfigV5::ForbidRecalibration(_) => {
+                ConfigV5::ForbidRecalibration(ForbidRecalibration::Allowed)
+            }
+            ConfigV5::UseHeuristicMZToUseHeuristic(_) => {
+                ConfigV5::UseHeuristicMZToUseHeuristic(300)
+            }
+            ConfigV5::UseHeuristicMZToUseHeuristicOnly(_) => {
+                ConfigV5::UseHeuristicMZToUseHeuristicOnly(650)
             }
         }
     }

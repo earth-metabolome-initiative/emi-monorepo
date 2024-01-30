@@ -495,5 +495,9 @@ mod tests {
                 Atoms::Ne
             ])
         );
+        assert_eq!(
+            AtomVector::try_from("N").unwrap(),
+            AtomVector::new(vec![Atoms::N])
+        )
     }
 }
