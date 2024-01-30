@@ -9,6 +9,7 @@ pub trait Version: Default {
     type Core: ToString + Debug + IntoDefault;
     type Config: ToString + Debug + IntoDefault + NamedParametersSet + Enablable;
     type Canopus: ToString + Debug + IntoDefault + NamedParametersSet + Enablable;
+    type Formula: ToString + Debug + IntoDefault + NamedParametersSet + Enablable;
 }
 #[derive(Default)]
 pub struct Version5;
@@ -18,4 +19,5 @@ impl Version for Version5 {
     type Core = crate::parameters::core::CoreV5;
     type Config = crate::parameters::config::ConfigV5;
     type Canopus = crate::parameters::canopus::CanopusV5;
+    type Formula = crate::parameters::formula::FormulaV5;
 }

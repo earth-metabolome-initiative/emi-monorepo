@@ -12,6 +12,7 @@ pub(crate) struct SiriusConfig<V: Version> {
     core_parameters: Vec<V::Core>,
     config_parameters: Vec<V::Config>,
     canopus_parameters: Vec<V::Canopus>,
+    formula_parameters: Vec<V::Formula>,
 }
 
 impl<V: Version> Default for SiriusConfig<V> {
@@ -20,6 +21,7 @@ impl<V: Version> Default for SiriusConfig<V> {
             core_parameters: Vec::new(),
             config_parameters: Vec::new(),
             canopus_parameters: Vec::new(),
+            formula_parameters: Vec::new(),
         }
     }
 }
@@ -117,6 +119,40 @@ impl<V: Version> SiriusConfig<V> {
                 let _ = self.add_canopus_parameter(V::Canopus::enabler());
             }
             self.canopus_parameters.push(parameter);
+            Ok(())
+        }
+    }
+
+    /// Add a parameter to the formula configuration.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `parameter` - The parameter to add.
+    /// 
+    pub fn add_formula_parameter(&mut self, parameter: V::Formula) -> Result<(), String> {
+        // We check if the parameter is already present in the vector
+        // If it is, we return an error
+        if let Some(existing_parameter) = self
+            .formula_parameters
+            .iter()
+            .find(|&p| std::mem::discriminant(p) == std::mem::discriminant(&parameter))
+        {
+            Err(format!(
+                concat!(
+                    "The formula parameter {:?} cannot be added to the configuration. ",
+                    "There is already an existing parameter which is {:?}. ",
+                    "You cannot add it twice."
+                ),
+                parameter, existing_parameter
+            ))
+        } else {
+            if !parameter.is_enabler() {
+                // If the current parameter is not an enabler, we make sure that the enabler variant
+                // is present in the vector by trying to insert it without checking if it is already
+                // present.
+                let _ = self.add_formula_parameter(V::Formula::enabler());
+            }
+            self.formula_parameters.push(parameter);
             Ok(())
         }
     }
