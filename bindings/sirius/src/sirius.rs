@@ -1,9 +1,9 @@
 use crate::sirius_config::SiriusConfig;
 use crate::versions::Version;
-use std::path::Path;
-use std::process::Command;
 use dotenvy::dotenv;
 use std::env;
+use std::path::Path;
+use std::process::Command;
 
 pub struct Sirius<V: Version> {
     config: SiriusConfig<V>,
@@ -31,52 +31,58 @@ impl<V: Version> Sirius<V> {
         dotenv().ok();
 
         // Fetch the path of the sirius command from environment variables
-        let sirius_path = env::var("SIRIUS_PATH").map_err(|_| format!(
-            concat!(
+        let sirius_path = env::var("SIRIUS_PATH").map_err(|_| {
+            format!(concat!(
                 "The environment variable SIRIUS_PATH is not set. ",
                 "We expected there to exist a .env file in the current directory ",
                 "with the SIRIUS_PATH variable set to the path of the sirius executable. ",
                 "The variable may also be set in the environment directly, for instance ",
                 "in the .bashrc file."
-            )
-        ))?;
+            ))
+        })?;
 
         // Fetch the SIRIUS_USERNAME and the SIRIUS_PASSWORD from environment variables
         // in order to login before launching the sirius command
 
-        let sirius_username = env::var("SIRIUS_USERNAME").map_err(|_| format!(
-            concat!(
+        let sirius_username = env::var("SIRIUS_USERNAME").map_err(|_| {
+            format!(concat!(
                 "The environment variable SIRIUS_USERNAME is not set. ",
                 "We expected there to exist a .env file in the current directory ",
                 "with the SIRIUS_USERNAME variable set to the username of the sirius account. ",
                 "The variable may also be set in the environment directly, for instance ",
                 "in the .bashrc file."
-            )
-        ))?;
+            ))
+        })?;
 
-        let sirius_password = env::var("SIRIUS_PASSWORD").map_err(|_| format!(
-            concat!(
+        let sirius_password = env::var("SIRIUS_PASSWORD").map_err(|_| {
+            format!(concat!(
                 "The environment variable SIRIUS_PASSWORD is not set. ",
                 "We expected there to exist a .env file in the current directory ",
                 "with the SIRIUS_PASSWORD variable set to the password of the sirius account. ",
                 "The variable may also be set in the environment directly, for instance ",
                 "in the .bashrc file."
-            )
-        ))?;
+            ))
+        })?;
 
         // Prepare and execute the login command
-        let login_command_status = Command::new(&sirius_path)
-            .args(&["login", "--user-env", &sirius_username, "--password-env", &sirius_password]);
-            // .status()
-            // .map_err(|e| format!("Failed to execute Sirius login command: {}", e))?;
+        let mut binding = Command::new(&sirius_path);
+        let login_command_status = binding.args(&[
+            "login",
+            "--user-env",
+            &sirius_username,
+            "--password-env",
+            &sirius_password,
+        ]);
+        // .status()
+        // .map_err(|e| format!("Failed to execute Sirius login command: {}", e))?;
 
         // We make sure to print the login command status for debugging
 
-        println!("Sirius login command status: {}", login_command_status.);
+        println!("Sirius login command status: {:#?}", login_command_status);
 
-        if !login_command_status.success() {
-            return Err("Sirius login command failed".to_string());
-        }
+        // if !login_command_status.success() {
+        //     return Err("Sirius login command failed".to_string());
+        // }
 
         // Prepare the command
         let mut command = Command::new(sirius_path);

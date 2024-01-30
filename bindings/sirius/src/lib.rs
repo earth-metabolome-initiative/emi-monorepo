@@ -1,15 +1,15 @@
 mod builder;
+mod parameters;
 mod sirius;
 mod sirius_config;
-mod parameters;
 mod sirius_types;
-mod versions;
 mod traits;
+mod versions;
 
 pub mod prelude {
     pub use crate::builder::SiriusBuilder;
+    pub use crate::parameters::*;
     pub use crate::sirius::Sirius;
     pub use crate::sirius_types::*;
     pub use crate::versions::*;
-    pub use crate::parameters::*;
 }

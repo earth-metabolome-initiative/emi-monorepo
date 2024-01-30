@@ -18,9 +18,7 @@ impl ToString for CoreV5 {
 impl IntoDefault for CoreV5 {
     fn into_default(self) -> Self {
         match self {
-            CoreV5::MaximalMz(_) => {
-                CoreV5::MaximalMz(800.0)
-            }
+            CoreV5::MaximalMz(_) => CoreV5::MaximalMz(800.0),
         }
     }
 }

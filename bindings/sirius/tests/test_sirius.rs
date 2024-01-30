@@ -2,7 +2,6 @@ use sirius::prelude::*;
 use std::path::Path;
 // use std::fs;
 
-
 #[test]
 fn test_run_sirius() -> Result<(), String> {
     let sirius = SiriusBuilder::default()
@@ -20,7 +19,7 @@ fn test_run_sirius() -> Result<(), String> {
     //     fs::remove_file(output_file_path)
     //         .map_err(|e| format!("Failed to remove output file: {}", e))?;
     // }
-    
+
     sirius.run(input_file_path, output_file_path).unwrap();
 
     Ok(())

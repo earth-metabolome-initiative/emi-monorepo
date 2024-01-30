@@ -1,8 +1,8 @@
 use std::fmt::Debug;
 
+use crate::traits::Enablable;
 use crate::traits::IntoDefault;
 use crate::traits::NamedParametersSet;
-use crate::traits::Enablable;
 
 pub trait Version: Default {
     const VERSION: usize;

@@ -1,10 +1,10 @@
-use crate::traits::{IntoDefault, NamedParametersSet, Enablable};
+use crate::traits::{Enablable, IntoDefault, NamedParametersSet};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum CanopusV5 {
     Enabled,
     Version,
-    Help
+    Help,
 }
 
 impl ToString for CanopusV5 {
@@ -12,7 +12,7 @@ impl ToString for CanopusV5 {
         match self {
             CanopusV5::Enabled => Self::parameter_set_name().to_string(),
             CanopusV5::Help => "--help".to_string(),
-            CanopusV5::Version => "--version".to_string()
+            CanopusV5::Version => "--version".to_string(),
         }
     }
 }
@@ -22,7 +22,7 @@ impl IntoDefault for CanopusV5 {
         match self {
             CanopusV5::Enabled => CanopusV5::Enabled,
             CanopusV5::Help => CanopusV5::Help,
-            CanopusV5::Version => CanopusV5::Version
+            CanopusV5::Version => CanopusV5::Version,
         }
     }
 }
@@ -31,7 +31,7 @@ impl Enablable for CanopusV5 {
     fn is_enabler(&self) -> bool {
         match self {
             CanopusV5::Enabled => true,
-            _ => false
+            _ => false,
         }
     }
 
