@@ -1,6 +1,8 @@
 // this file sets all the parameters of the `sirius config` command
 // TODO verify if some parameters must be float, int or unsigned integers
 
+use std::ops::Add;
+
 use crate::prelude::*;
 use crate::traits::{Enablable, IntoDefault, NamedParametersSet};
 
@@ -9,6 +11,7 @@ pub enum ConfigV5 {
     Enabled,
     IsotopeSettingsFilter(bool),
     FormulaSearchDB(FormulaSearchDB),
+    StructureSearchDB(FormulaSearchDB),
     TimeoutSecondsPerTree(u32),
     NumberOfCandidatesPerIon(u32), // can this be equal to zero ?
     NumberOfStructureCandidates(u32),
@@ -48,6 +51,10 @@ pub enum ConfigV5 {
     ForbidRecalibration(ForbidRecalibration),
     UseHeuristicMZToUseHeuristic(u32),
     UseHeuristicMZToUseHeuristicOnly(u32),
+    AdductSettingsDetectable(AdductsVector),
+    AdductSettingsFallback(AdductsVector),
+    AlgorithmProfile(Instruments),
+    CompoundQuality(CompoundQuality),
 }
 
 impl ToString for ConfigV5 {
@@ -59,6 +66,9 @@ impl ToString for ConfigV5 {
             }
             ConfigV5::FormulaSearchDB(formula_search_db) => {
                 format!("--FormulaSearchDB={}", formula_search_db)
+            }
+            ConfigV5::StructureSearchDB(structure_search_db) => {
+                format!("--StructureSearchDB={}", structure_search_db)
             }
             ConfigV5::TimeoutSecondsPerTree(timeout_seconds_per_tree) => {
                 format!("--Timeout.secondsPerTree={}", timeout_seconds_per_tree)
@@ -247,6 +257,18 @@ impl ToString for ConfigV5 {
                     use_heuristic_mz_to_use_heuristic_only
                 )
             }
+            ConfigV5::AdductSettingsDetectable(adduct_settings_detectable) => {
+                format!("--AdductSettings.detectable={}", adduct_settings_detectable)
+            }
+            ConfigV5::AdductSettingsFallback(adduct_settings_fallback) => {
+                format!("--AdductSettings.fallback={}", adduct_settings_fallback)
+            }
+            ConfigV5::AlgorithmProfile(algorithm_profile) => {
+                format!("--AlgorithmProfile={}", algorithm_profile)
+            }
+            ConfigV5::CompoundQuality(compound_quality) => {
+                format!("--CompoundQuality={}", compound_quality)
+            }
         }
     }
 }
@@ -257,6 +279,7 @@ impl IntoDefault for ConfigV5 {
             ConfigV5::Enabled => ConfigV5::Enabled,
             ConfigV5::IsotopeSettingsFilter(_) => ConfigV5::IsotopeSettingsFilter(true),
             ConfigV5::FormulaSearchDB(_) => ConfigV5::FormulaSearchDB(FormulaSearchDB::Bio),
+            ConfigV5::StructureSearchDB(_) => ConfigV5::StructureSearchDB(FormulaSearchDB::Bio),
             ConfigV5::TimeoutSecondsPerTree(_) => ConfigV5::TimeoutSecondsPerTree(0),
             ConfigV5::NumberOfCandidatesPerIon(_) => ConfigV5::NumberOfCandidatesPerIon(1),
             ConfigV5::NumberOfStructureCandidates(_) => {
@@ -354,6 +377,30 @@ impl IntoDefault for ConfigV5 {
             ConfigV5::UseHeuristicMZToUseHeuristicOnly(_) => {
                 ConfigV5::UseHeuristicMZToUseHeuristicOnly(650)
             }
+            ConfigV5::AdductSettingsDetectable(_) => {
+                ConfigV5::AdductSettingsDetectable(AdductsVector::new(vec![
+                    Adducts::H,
+                    Adducts::K,
+                    Adducts::Na,
+                    Adducts::MPlusHMinusH2O,
+                    Adducts::MPlusHMinusTwoH2O,
+                    Adducts::Nh4,
+                    Adducts::MMinusH,
+                    Adducts::Cl,
+                    Adducts::MMinusH20MinusH,
+                    Adducts::MPlusBromide,
+                ]))
+            }
+            ConfigV5::AdductSettingsFallback(_) => {
+                ConfigV5::AdductSettingsFallback(AdductsVector::new(vec![
+                    Adducts::H,
+                    Adducts::MMinusH,
+                    Adducts::K,
+                    Adducts::Na,
+                ]))
+            }
+            ConfigV5::AlgorithmProfile(_) => ConfigV5::AlgorithmProfile(Instruments::Default),
+            ConfigV5::CompoundQuality(_) => ConfigV5::CompoundQuality(CompoundQuality::Unknown),
         }
     }
 }
@@ -455,5 +502,39 @@ mod tests {
                 Atoms::Fe,
             ]))
         );
+    }
+    #[test]
+    fn test_adducts_settings_detectable_to_string() {
+        assert_ne!(
+            "--AdductSettings.detectable=H,K,Na,M-H2O+H,M+H-2H2O,NH4,M-H,Cl,M-H2O-H,M+Br",
+            ConfigV5::AdductSettingsDetectable(AdductsVector::new(vec![
+                Adducts::H,
+                Adducts::K,
+                Adducts::Na,
+                Adducts::MPlusHMinusH2O,
+                Adducts::MPlusHMinusTwoH2O,
+                Adducts::Nh4,
+                Adducts::MMinusH,
+                Adducts::Cl,
+                Adducts::MMinusH20MinusH,
+                Adducts::MPlusBromide,
+            ]))
+            .to_string()
+        );
+        assert_eq!(
+            "--AdductSettings.detectable=[M+H]+,[M+K]+,[M+Na]+",
+            ConfigV5::AdductSettingsDetectable(AdductsVector::new(vec![
+                Adducts::H,
+                Adducts::K,
+                Adducts::Na,
+            ]))
+            .to_string()
+        );
+        assert_eq!(
+            "--AdductSettings.detectable=[M+H]+,[M+K]+,[M+Na]+,[M+H-H2O]+,[M+H-H4O2]+,[M+NH4]+,[M-H]-,[M+Cl]-,[M-H2O-H]-,[M+Br]-",
+            ConfigV5::AdductSettingsDetectable(AdductsVector::new(vec![Adducts::H]))
+                .into_default()
+                .to_string()
+        )
     }
 }

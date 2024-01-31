@@ -11,7 +11,7 @@ sirius login --user-env SIRIUS_USERNAME --password-env SIRIUS_PASSWORD
 Example of a minimal sirius command line 
 
 ```bash
-sirius -i tests/data/input_sirius.mgf --output tests/data/output_sirius --maxmz=1000 config --IsotopeSettings.filter=False formula zodiac fingerprint structure canopus
+sirius -i tests/data/input_sirius.mgf --output tests/data/output_sirius --maxmz=1000 config --IsotopeSettings.filter=False formula zodiac fingerprint structure canopus write-summaries
 ```
 
 sirius -i tests/data/input_sirius.mgf --output tests/data/output_sirius --maxmz=802.2 config --IsotopeSettings.filter=False --FormulaSearchDB=BIO canopus write-summaries

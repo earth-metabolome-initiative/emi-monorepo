@@ -410,10 +410,17 @@ impl<'a> TryFrom<&'a str> for AtomVector {
     type Error = String;
 
     fn try_from(s: &'a str) -> Result<Self, Self::Error> {
-        let mut atoms = Vec::new();
-        for atom in s.split(",") {
-            atoms.push(Atoms::try_from(atom)?);
-        }
+        let atoms = s
+            .split(',')
+            .map(|atom| {
+                Atoms::try_from(atom).map_err(|e| {
+                    format!(
+                        "Cannot parse atom: {} ({}). Maybe forgot to put a comma between atoms ?",
+                        atom, e
+                    )
+                })
+            })
+            .collect::<Result<Vec<_>, _>>()?;
         Ok(AtomVector(atoms))
     }
 }
@@ -460,7 +467,7 @@ mod tests {
         assert_eq!(Atoms::try_from("Fe").unwrap(), Atoms::Fe);
     }
     #[test]
-    #[should_panic(expected = "Unknown atom: H He Li Be B C N O F Ne")]
+    #[should_panic]
     fn test_from_string_fail() {
         assert_eq!(
             AtomVector::try_from("H He Li Be B C N O F Ne").unwrap(),
