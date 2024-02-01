@@ -29,10 +29,7 @@ impl IntoDefault for CanopusV5 {
 
 impl Enablable for CanopusV5 {
     fn is_enabler(&self) -> bool {
-        match self {
-            CanopusV5::Enabled => true,
-            _ => false,
-        }
+        matches!(self, CanopusV5::Enabled)
     }
 
     fn enabler() -> Self {

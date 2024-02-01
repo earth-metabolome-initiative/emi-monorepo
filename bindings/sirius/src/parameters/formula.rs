@@ -29,10 +29,7 @@ impl IntoDefault for FormulaV5 {
 
 impl Enablable for FormulaV5 {
     fn is_enabler(&self) -> bool {
-        match self {
-            FormulaV5::Enabled => true,
-            _ => false,
-        }
+        matches!(self, FormulaV5::Enabled)
     }
 
     fn enabler() -> Self {

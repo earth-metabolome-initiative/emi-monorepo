@@ -29,10 +29,7 @@ impl IntoDefault for StructureV5 {
 
 impl Enablable for StructureV5 {
     fn is_enabler(&self) -> bool {
-        match self {
-            StructureV5::Enabled => true,
-            _ => false,
-        }
+        matches!(self, StructureV5::Enabled)
     }
 
     fn enabler() -> Self {

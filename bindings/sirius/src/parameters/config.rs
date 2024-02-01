@@ -1,8 +1,6 @@
 // this file sets all the parameters of the `sirius config` command
 // TODO verify if some parameters must be float, int or unsigned integers
 
-use std::ops::Add;
-
 use crate::prelude::*;
 use crate::traits::{Enablable, IntoDefault, NamedParametersSet};
 
@@ -55,6 +53,15 @@ pub enum ConfigV5 {
     AdductSettingsFallback(AdductsVector),
     AlgorithmProfile(Instruments),
     CompoundQuality(CompoundQuality),
+    AdductSettingsEnforced(AdductSettingsEnforced),
+    CandidateFormulas(CandidateFormulas),
+    FormulaResultRankingScore(FormulaResultRankingScore),
+    IsotopeMS2Settings(IsotopeMS2Settings),
+    IsotopeSettingsMultiplier(u32),
+    NoiseThresholdSettingsAbsoluteThreshold(u32),
+    NoiseThresholdSettingsBasePeak(BasePeak),
+    StructurePredictors(StructurePredictors),
+    PossibleAdductSwitches(PossibleAdductSwitches),
 }
 
 impl ToString for ConfigV5 {
@@ -269,6 +276,45 @@ impl ToString for ConfigV5 {
             ConfigV5::CompoundQuality(compound_quality) => {
                 format!("--CompoundQuality={}", compound_quality)
             }
+            ConfigV5::AdductSettingsEnforced(adduct_settings_enforced) => {
+                format!("--AdductSettings.enforced={}", adduct_settings_enforced)
+            }
+            ConfigV5::CandidateFormulas(candidate_formulas) => {
+                format!("--CandidateFormulas={}", candidate_formulas)
+            }
+            ConfigV5::FormulaResultRankingScore(formula_result_ranking_score) => {
+                format!(
+                    "--FormulaResultRankingScore={}",
+                    formula_result_ranking_score
+                )
+            }
+            ConfigV5::IsotopeMS2Settings(isotope_ms2_settings) => {
+                format!("--IsotopeMs2Settings={}", isotope_ms2_settings)
+            }
+            ConfigV5::IsotopeSettingsMultiplier(isotope_settings_multiplier) => {
+                format!(
+                    "--IsotopeSettings.multiplier={}",
+                    isotope_settings_multiplier
+                )
+            }
+            ConfigV5::NoiseThresholdSettingsAbsoluteThreshold(
+                noise_threshold_settings_absolute_threshold,
+            ) => format!(
+                "--NoiseThresholdSettings.absoluteThreshold={}",
+                noise_threshold_settings_absolute_threshold
+            ),
+            ConfigV5::NoiseThresholdSettingsBasePeak(noise_threshold_settings_base_peak) => {
+                format!(
+                    "--NoiseThresholdSettings.basePeak={}",
+                    noise_threshold_settings_base_peak
+                )
+            }
+            ConfigV5::StructurePredictors(structure_predictors) => {
+                format!("--StructurePredictors={}", structure_predictors)
+            }
+            ConfigV5::PossibleAdductSwitches(possible_adduct_switches) => {
+                format!("--PossibleAdductSwitches={}", possible_adduct_switches)
+            }
         }
     }
 }
@@ -278,7 +324,7 @@ impl IntoDefault for ConfigV5 {
         match self {
             ConfigV5::Enabled => ConfigV5::Enabled,
             ConfigV5::IsotopeSettingsFilter(_) => ConfigV5::IsotopeSettingsFilter(true),
-            ConfigV5::FormulaSearchDB(_) => ConfigV5::FormulaSearchDB(FormulaSearchDB::Bio),
+            ConfigV5::FormulaSearchDB(_) => ConfigV5::FormulaSearchDB(FormulaSearchDB::default()),
             ConfigV5::StructureSearchDB(_) => ConfigV5::StructureSearchDB(FormulaSearchDB::Bio),
             ConfigV5::TimeoutSecondsPerTree(_) => ConfigV5::TimeoutSecondsPerTree(0),
             ConfigV5::NumberOfCandidatesPerIon(_) => ConfigV5::NumberOfCandidatesPerIon(1),
@@ -379,38 +425,58 @@ impl IntoDefault for ConfigV5 {
             }
             ConfigV5::AdductSettingsDetectable(_) => {
                 ConfigV5::AdductSettingsDetectable(AdductsVector::new(vec![
-                    Adducts::H,
-                    Adducts::K,
-                    Adducts::Na,
-                    Adducts::MPlusHMinusH2O,
-                    Adducts::MPlusHMinusTwoH2O,
-                    Adducts::Nh4,
-                    Adducts::MMinusH,
-                    Adducts::Cl,
-                    Adducts::MMinusH20MinusH,
-                    Adducts::MPlusBromide,
+                    Adducts::MplusHplus,
+                    Adducts::MplusKplus,
+                    Adducts::MplusNaplus,
+                    Adducts::MplusHminusH2Oplus,
+                    Adducts::MplusHminusTwoH2Oplus,
+                    Adducts::MplusNH4plus,
+                    Adducts::MminusHminus,
+                    Adducts::MplusClminus,
+                    Adducts::MminusH20minusHminus,
+                    Adducts::MplusBromideminus,
                 ]))
             }
             ConfigV5::AdductSettingsFallback(_) => {
                 ConfigV5::AdductSettingsFallback(AdductsVector::new(vec![
-                    Adducts::H,
-                    Adducts::MMinusH,
-                    Adducts::K,
-                    Adducts::Na,
+                    Adducts::MplusHplus,
+                    Adducts::MminusHminus,
+                    Adducts::MplusKplus,
+                    Adducts::MplusNaplus,
                 ]))
             }
             ConfigV5::AlgorithmProfile(_) => ConfigV5::AlgorithmProfile(Instruments::Default),
             ConfigV5::CompoundQuality(_) => ConfigV5::CompoundQuality(CompoundQuality::Unknown),
+            ConfigV5::AdductSettingsEnforced(_) => {
+                ConfigV5::AdductSettingsEnforced(AdductSettingsEnforced::Comma)
+            }
+            ConfigV5::CandidateFormulas(_) => ConfigV5::CandidateFormulas(CandidateFormulas::Comma),
+            ConfigV5::FormulaResultRankingScore(_) => {
+                ConfigV5::FormulaResultRankingScore(FormulaResultRankingScore::Auto)
+            }
+            ConfigV5::IsotopeMS2Settings(_) => {
+                ConfigV5::IsotopeMS2Settings(IsotopeMS2Settings::Ignore)
+            }
+            ConfigV5::IsotopeSettingsMultiplier(_) => ConfigV5::IsotopeSettingsMultiplier(1),
+            ConfigV5::NoiseThresholdSettingsAbsoluteThreshold(_) => {
+                ConfigV5::NoiseThresholdSettingsAbsoluteThreshold(0)
+            }
+            ConfigV5::NoiseThresholdSettingsBasePeak(_) => {
+                ConfigV5::NoiseThresholdSettingsBasePeak(BasePeak::NotPrecursor)
+            }
+            ConfigV5::StructurePredictors(_) => {
+                ConfigV5::StructurePredictors(StructurePredictors::CsiFingerId)
+            }
+            ConfigV5::PossibleAdductSwitches(_) => {
+                ConfigV5::PossibleAdductSwitches(PossibleAdductSwitches::DefaultAdductsSwitches)
+            }
         }
     }
 }
 
 impl Enablable for ConfigV5 {
     fn is_enabler(&self) -> bool {
-        match self {
-            ConfigV5::Enabled => true,
-            _ => false,
-        }
+        matches!(self, ConfigV5::Enabled)
     }
 
     fn enabler() -> Self {
@@ -445,6 +511,10 @@ mod tests {
         assert_eq!(
             ConfigV5::FormulaSearchDB(FormulaSearchDB::Bio),
             ConfigV5::FormulaSearchDB(FormulaSearchDB::Gnps).into_default()
+        );
+        assert_eq!(
+            ConfigV5::FormulaSearchDB(FormulaSearchDB::default()),
+            ConfigV5::FormulaSearchDB(FormulaSearchDB::Bio)
         );
         assert_ne!(
             ConfigV5::FormulaSearchDB(FormulaSearchDB::Gnps),
@@ -508,31 +578,31 @@ mod tests {
         assert_ne!(
             "--AdductSettings.detectable=H,K,Na,M-H2O+H,M+H-2H2O,NH4,M-H,Cl,M-H2O-H,M+Br",
             ConfigV5::AdductSettingsDetectable(AdductsVector::new(vec![
-                Adducts::H,
-                Adducts::K,
-                Adducts::Na,
-                Adducts::MPlusHMinusH2O,
-                Adducts::MPlusHMinusTwoH2O,
-                Adducts::Nh4,
-                Adducts::MMinusH,
-                Adducts::Cl,
-                Adducts::MMinusH20MinusH,
-                Adducts::MPlusBromide,
+                Adducts::MplusH2OplusHplus,
+                Adducts::MplusHplus,
+                Adducts::MplusClminus,
+                Adducts::MplusHminusH2Oplus,
+                Adducts::MplusHminusTwoH2Oplus,
+                Adducts::MplusNH4plus,
+                Adducts::MminusHminus,
+                Adducts::MplusClminus,
+                Adducts::MminusH20minusHminus,
+                Adducts::MplusBromideminus,
             ]))
             .to_string()
         );
         assert_eq!(
             "--AdductSettings.detectable=[M+H]+,[M+K]+,[M+Na]+",
             ConfigV5::AdductSettingsDetectable(AdductsVector::new(vec![
-                Adducts::H,
-                Adducts::K,
-                Adducts::Na,
+                Adducts::MplusHplus,
+                Adducts::MplusKplus,
+                Adducts::MplusNaplus,
             ]))
             .to_string()
         );
         assert_eq!(
             "--AdductSettings.detectable=[M+H]+,[M+K]+,[M+Na]+,[M+H-H2O]+,[M+H-H4O2]+,[M+NH4]+,[M-H]-,[M+Cl]-,[M-H2O-H]-,[M+Br]-",
-            ConfigV5::AdductSettingsDetectable(AdductsVector::new(vec![Adducts::H]))
+            ConfigV5::AdductSettingsDetectable(AdductsVector::new(vec![Adducts::MplusHplus]))
                 .into_default()
                 .to_string()
         )

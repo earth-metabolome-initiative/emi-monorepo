@@ -29,10 +29,7 @@ impl IntoDefault for FingerprintV5 {
 
 impl Enablable for FingerprintV5 {
     fn is_enabler(&self) -> bool {
-        match self {
-            FingerprintV5::Enabled => true,
-            _ => false,
-        }
+        matches!(self, FingerprintV5::Enabled)
     }
 
     fn enabler() -> Self {

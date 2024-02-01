@@ -29,10 +29,7 @@ impl IntoDefault for ZodiacV5 {
 
 impl Enablable for ZodiacV5 {
     fn is_enabler(&self) -> bool {
-        match self {
-            ZodiacV5::Enabled => true,
-            _ => false,
-        }
+        matches!(self, ZodiacV5::Enabled)
     }
 
     fn enabler() -> Self {

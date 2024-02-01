@@ -1,8 +1,7 @@
 use std::fmt::Display;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Atoms {
-    #[default]
     H,
     He,
     Li,
