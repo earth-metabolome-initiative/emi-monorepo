@@ -16,3 +16,5 @@ Cargo.lock
 
 # Ingnoring .vscode folder
 .vscode/
+
+.DS_Store
