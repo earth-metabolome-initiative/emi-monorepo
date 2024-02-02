@@ -132,6 +132,12 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    pub fn number_of_candidates(mut self, number_of_candidates: u32) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV5::NumberOfCandidates(number_of_candidates))?;
+        Ok(self)
+    }
+
     pub fn number_of_candidates_per_ion(
         mut self,
         number_of_candidates_per_ion: u32,
@@ -889,6 +895,12 @@ impl SiriusBuilder<Version5> {
     pub fn timeout_seconds_per_tree_default(mut self) -> Result<Self, String> {
         self.config
             .add_config_parameter(ConfigV5::TimeoutSecondsPerTree(u32::default()).into_default())?;
+        Ok(self)
+    }
+
+    pub fn number_of_candidates_default(mut self) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV5::NumberOfCandidates(u32::default()).into_default())?;
         Ok(self)
     }
 

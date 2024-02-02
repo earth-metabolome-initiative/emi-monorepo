@@ -11,6 +11,7 @@ pub enum ConfigV5 {
     FormulaSearchDB(FormulaSearchDB),
     StructureSearchDB(FormulaSearchDB),
     TimeoutSecondsPerTree(u32),
+    NumberOfCandidates(u32),
     NumberOfCandidatesPerIon(u32), // can this be equal to zero ?
     NumberOfStructureCandidates(u32),
     RecomputeResults(bool),
@@ -24,7 +25,6 @@ pub enum ConfigV5 {
     MS1RelativeIntensityError(f32),
     NoiseThresholdSettingsIntensityThreshold(f32),
     NoiseThresholdSettingsMaximalNumberOfPeaks(u32),
-    NumberOfCandidates(u32),
     ZodiacClusterCompounds(bool),
     ZodiacEdgeFilterThresholdsMinLocalCandidates(u32),
     ZodiacEdgeFilterThresholdsMinLocalConnections(u32),
