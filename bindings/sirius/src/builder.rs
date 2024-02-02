@@ -878,4 +878,393 @@ impl SiriusBuilder<Version5> {
         )?;
         Ok(self)
     }
+    pub fn structure_search_db_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::StructureSearchDB(crate::sirius_types::FormulaSearchDB::default())
+                .into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn timeout_seconds_per_tree_default(mut self) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV5::TimeoutSecondsPerTree(u32::default()).into_default())?;
+        Ok(self)
+    }
+
+    pub fn number_of_candidates_per_ion_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::NumberOfCandidatesPerIon(u32::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn number_of_structure_candidates_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::NumberOfStructureCandidates(u32::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn recompute_results_default(mut self) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV5::RecomputeResults(bool::default()).into_default())?;
+        Ok(self)
+    }
+
+    pub fn print_citations_default(mut self) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV5::PrintCitations(bool::default()).into_default())?;
+        Ok(self)
+    }
+
+    pub fn timeout_seconds_per_instance_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::TimeoutSecondsPerInstance(u32::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn formula_result_threshold_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::FormulaResultThreshold(bool::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn inject_el_gordo_compounds_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::InjectElGordoCompounds(bool::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn median_noise_intensity_default(mut self) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV5::MedianNoiseIntensity(f32::default()).into_default())?;
+        Ok(self)
+    }
+
+    pub fn ms1_absolute_intensity_error_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::MS1AbsoluteIntensityError(f32::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn ms1_minimal_intensity_to_consider_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::MS1MinimalIntensityToConsider(f32::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn ms1_relative_intensity_error_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::MS1RelativeIntensityError(f32::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn noise_threshold_settings_intensity_threshold_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::NoiseThresholdSettingsIntensityThreshold(f32::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn noise_threshold_settings_maximal_number_of_peaks_default(
+        mut self,
+    ) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::NoiseThresholdSettingsMaximalNumberOfPeaks(u32::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn zodiac_cluster_compounds_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::ZodiacClusterCompounds(bool::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn zodiac_edge_filter_thresholds_min_local_candidates_default(
+        mut self,
+    ) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::ZodiacEdgeFilterThresholdsMinLocalCandidates(u32::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn zodiac_edge_filter_thresholds_min_local_connections_default(
+        mut self,
+    ) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::ZodiacEdgeFilterThresholdsMinLocalConnections(u32::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn zodiac_edge_filter_thresholds_threshold_filter_default(
+        mut self,
+    ) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::ZodiacEdgeFilterThresholdsThresholdFilter(f32::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn zodiac_epochs_burn_in_period_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::ZodiacEpochsBurnInPeriod(u32::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn zodiac_epochs_iterations_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::ZodiacEpochsIterations(u32::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn zodiac_epochs_number_of_markov_chains_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::ZodiacEpochsNumberOfMarkovChains(u32::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn zodiac_library_scoring_lambda_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::ZodiacLibraryScoringLambda(u32::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn zodiac_library_scoring_min_cosine_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::ZodiacLibraryScoringMinCosine(f32::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn zodiac_number_of_considered_candidates_at_300_mz_default(
+        mut self,
+    ) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::ZodiacNumberOfConsideredCandidatesAt300Mz(i32::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn zodiac_number_of_considered_candidates_at_800_mz_default(
+        mut self,
+    ) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::ZodiacNumberOfConsideredCandidatesAt800Mz(i32::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn zodiac_ratio_of_considered_candidates_per_ionization_default(
+        mut self,
+    ) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::ZodiacRatioOfConsideredCandidatesPerIonization(f32::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn zodiac_run_in_two_steps_default(mut self) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV5::ZodiacRunInTwoSteps(bool::default()).into_default())?;
+        Ok(self)
+    }
+
+    pub fn ms1_mass_deviation_allowed_mass_deviation_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::MS1MassDeviationAllowedMassDeviation(
+                MassDeviation::Ppm(f32::default()).must_be_positive()?,
+            )
+            .into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn ms1_mass_deviation_mass_difference_deviation_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::MS1MassDeviationMassDifferenceDeviation(
+                MassDeviation::Ppm(f32::default()).must_be_positive()?,
+            )
+            .into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn ms1_mass_deviation_standard_mass_deviation_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::MS1MassDeviationStandardMassDeviation(
+                MassDeviation::Ppm(f32::default()).must_be_positive()?,
+            )
+            .into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn ms2_mass_deviation_standard_mass_deviation_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::MS2MassDeviationStandardMassDeviation(
+                MassDeviation::Ppm(f32::default()).must_be_positive()?,
+            )
+            .into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn ms2_mass_deviation_allowed_mass_deviation_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::MS2MassDeviationAllowedMassDeviation(
+                MassDeviation::Ppm(f32::default()).must_be_positive()?,
+            )
+            .into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn formula_settings_detectable_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::FormulaSettingsDetectable(AtomVector::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn formula_settings_enforced_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::FormulaSettingsEnforced(AtomVector::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn formula_settings_fallback_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::FormulaSettingsFallback(AtomVector::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn forbid_recalibration_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::ForbidRecalibration(ForbidRecalibration::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn use_heuristic_mz_to_use_heuristic_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::UseHeuristicMZToUseHeuristic(u32::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn use_heuristic_mz_to_use_heuristic_only_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::UseHeuristicMZToUseHeuristicOnly(u32::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn adduct_settings_detectable_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::AdductSettingsDetectable(AdductsVector::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn adduct_settings_fallback_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::AdductSettingsFallback(AdductsVector::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn algorithm_profile_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::AlgorithmProfile(Instruments::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn compound_quality_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::CompoundQuality(CompoundQuality::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn adduct_settings_enforced_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::AdductSettingsEnforced(AdductSettingsEnforced::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn candidate_formulas_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::CandidateFormulas(CandidateFormulas::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn formula_result_ranking_score_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::FormulaResultRankingScore(FormulaResultRankingScore::default())
+                .into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn isotope_ms2_settings_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::IsotopeMS2Settings(IsotopeMS2Settings::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn isotope_settings_multiplier_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::IsotopeSettingsMultiplier(u32::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn noise_threshold_settings_absolute_threshold_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::NoiseThresholdSettingsAbsoluteThreshold(u32::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn noise_threshold_settings_base_peak_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::NoiseThresholdSettingsBasePeak(BasePeak::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn structure_predictors_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::StructurePredictors(StructurePredictors::default()).into_default(),
+        )?;
+        Ok(self)
+    }
+
+    pub fn possible_adduct_switches_default(mut self) -> Result<Self, String> {
+        self.config.add_config_parameter(
+            ConfigV5::PossibleAdductSwitches(PossibleAdductSwitches::default()).into_default(),
+        )?;
+        Ok(self)
+    }
 }
