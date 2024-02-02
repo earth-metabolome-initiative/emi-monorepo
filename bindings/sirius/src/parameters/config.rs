@@ -34,8 +34,8 @@ pub enum ConfigV5 {
     ZodiacEpochsNumberOfMarkovChains(u32),
     ZodiacLibraryScoringLambda(u32),
     ZodiacLibraryScoringMinCosine(f32),
-    ZodiacNumberOfConsideredCandidatesAt300Mz(u32),
-    ZodiacNumberOfConsideredCandidatesAt800Mz(u32),
+    ZodiacNumberOfConsideredCandidatesAt300Mz(i32),
+    ZodiacNumberOfConsideredCandidatesAt800Mz(i32),
     ZodiacRatioOfConsideredCandidatesPerIonization(f32), //can't be negative, higher than 1 or NaN
     ZodiacRunInTwoSteps(bool),
     MS1MassDeviationAllowedMassDeviation(MassDeviation),
@@ -379,19 +379,19 @@ impl IntoDefault for ConfigV5 {
             }
             ConfigV5::ZodiacRunInTwoSteps(_) => ConfigV5::ZodiacRunInTwoSteps(true),
             ConfigV5::MS1MassDeviationAllowedMassDeviation(_) => {
-                ConfigV5::MS1MassDeviationAllowedMassDeviation(MassDeviation::Ppm(10.0))
+                ConfigV5::MS1MassDeviationAllowedMassDeviation(MassDeviation::ppm(10.0))
             }
             ConfigV5::MS1MassDeviationMassDifferenceDeviation(_) => {
-                ConfigV5::MS1MassDeviationMassDifferenceDeviation(MassDeviation::Ppm(5.0))
+                ConfigV5::MS1MassDeviationMassDifferenceDeviation(MassDeviation::ppm(5.0))
             }
             ConfigV5::MS1MassDeviationStandardMassDeviation(_) => {
-                ConfigV5::MS1MassDeviationStandardMassDeviation(MassDeviation::Ppm(10.0))
+                ConfigV5::MS1MassDeviationStandardMassDeviation(MassDeviation::ppm(10.0))
             }
             ConfigV5::MS2MassDeviationAllowedMassDeviation(_) => {
-                ConfigV5::MS2MassDeviationAllowedMassDeviation(MassDeviation::Ppm(10.0))
+                ConfigV5::MS2MassDeviationAllowedMassDeviation(MassDeviation::ppm(10.0))
             }
             ConfigV5::MS2MassDeviationStandardMassDeviation(_) => {
-                ConfigV5::MS2MassDeviationStandardMassDeviation(MassDeviation::Ppm(10.0))
+                ConfigV5::MS2MassDeviationStandardMassDeviation(MassDeviation::ppm(10.0))
             }
             ConfigV5::FormulaSettingsDetectable(_) => {
                 ConfigV5::FormulaSettingsDetectable(AtomVector::new(vec![
@@ -606,5 +606,10 @@ mod tests {
                 .into_default()
                 .to_string()
         )
+    }
+    #[test]
+    fn check_negative_mass_deviation_panics() {
+        assert!(std::panic::catch_unwind(|| MassDeviation::ppm(-1.0)).is_err());
+        assert!(std::panic::catch_unwind(|| MassDeviation::da(-1.0)).is_err());
     }
 }

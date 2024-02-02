@@ -132,16 +132,32 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
-    pub fn number_of_candidates_per_ion() {
-        todo!()
+    pub fn number_of_candidates_per_ion(
+        mut self,
+        number_of_candidates_per_ion: u32,
+    ) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV5::NumberOfCandidatesPerIon(
+                number_of_candidates_per_ion,
+            ))?;
+        Ok(self)
     }
 
-    pub fn number_of_candidates() {
-        todo!()
+    pub fn number_of_structure_candidates(
+        mut self,
+        number_of_structure_candidates: u32,
+    ) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV5::NumberOfStructureCandidates(
+                number_of_structure_candidates,
+            ))?;
+        Ok(self)
     }
 
-    pub fn recompute_results() {
-        todo!()
+    pub fn recompute_results(mut self, recompute_results: bool) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV5::RecomputeResults(recompute_results))?;
+        Ok(self)
     }
 
     pub fn print_citations(mut self, print_citations: bool) -> Result<Self, String> {
@@ -379,6 +395,344 @@ impl SiriusBuilder<Version5> {
             .add_config_parameter(ConfigV5::ZodiacLibraryScoringLambda(
                 zodiac_library_scoring_lambda,
             ))?;
+        Ok(self)
+    }
+
+    /// Set the minimal cosine value
+    /// # Arguments
+    /// * `zodiac_library_scoring_min_cosine` - The minimal cosine value.
+    /// # Example
+    /// ```
+    /// use sirius::prelude::*;
+    /// let sirius = SiriusBuilder::default()
+    /// .zodiac_library_scoring_min_cosine(0.5).unwrap()
+    /// .build();
+    /// ```
+    /// # Errors
+    /// If the value is not in the range [0,1].
+    /// # Example
+    /// ```
+    /// use sirius::prelude::*;
+    /// assert!(SiriusBuilder::default().zodiac_library_scoring_min_cosine(1.1).is_err());
+    /// assert!(SiriusBuilder::default().zodiac_library_scoring_min_cosine(-0.1).is_err());
+    /// ```
+    pub fn zodiac_library_scoring_min_cosine(
+        mut self,
+        zodiac_library_scoring_min_cosine: f32,
+    ) -> Result<Self, String> {
+        // Value must be in [0,1].
+        if !(0.0..=1.0).contains(&zodiac_library_scoring_min_cosine) {
+            // fast and easy way to check interval of values in Rust. Then add the "!" to negate the condition.
+            return Err(format!(
+                concat!(
+                    "Zodiac library scoring min cosine must be in [0,1]. ",
+                    "You provided {}."
+                ),
+                zodiac_library_scoring_min_cosine
+            ));
+        }
+        self.config
+            .add_config_parameter(ConfigV5::ZodiacLibraryScoringMinCosine(
+                zodiac_library_scoring_min_cosine,
+            ))?;
+        Ok(self)
+    }
+
+    pub fn zodiac_number_of_considered_candidates_at_300_mz(
+        mut self,
+        zodiac_number_of_considered_candidates_at_300_mz: i32,
+    ) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV5::ZodiacNumberOfConsideredCandidatesAt300Mz(
+                zodiac_number_of_considered_candidates_at_300_mz,
+            ))?;
+        Ok(self)
+    }
+
+    pub fn zodiac_number_of_considered_candidates_at_800_mz(
+        mut self,
+        zodiac_number_of_considered_candidates_at_800_mz: i32,
+    ) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV5::ZodiacNumberOfConsideredCandidatesAt800Mz(
+                zodiac_number_of_considered_candidates_at_800_mz,
+            ))?;
+        Ok(self)
+    }
+
+    pub fn zodiac_ratio_of_considered_candidates_per_ionization(
+        mut self,
+        zodiac_ratio_of_considered_candidates_per_ionization: f32,
+    ) -> Result<Self, String> {
+        if !(0.0..=1.0).contains(&zodiac_ratio_of_considered_candidates_per_ionization) {
+            return Err(format!(
+                concat!(
+                    "Zodiac ratio of considered candidates per ionization must be in [0,1]. ",
+                    "You provided {}."
+                ),
+                zodiac_ratio_of_considered_candidates_per_ionization
+            ));
+        }
+        self.config.add_config_parameter(
+            ConfigV5::ZodiacRatioOfConsideredCandidatesPerIonization(
+                zodiac_ratio_of_considered_candidates_per_ionization,
+            ),
+        )?;
+        Ok(self)
+    }
+
+    pub fn zodiac_run_in_two_steps(
+        mut self,
+        zodiac_run_in_two_steps: bool,
+    ) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV5::ZodiacRunInTwoSteps(zodiac_run_in_two_steps))?;
+        Ok(self)
+    }
+
+    /// This function return the allowed mass deviation for MS1.
+    /// It should get a float and then we should also know the unit of the mass deviation.
+    /// Mass deviation enum is defined as :
+    /// ```rust
+    /// pub enum MassDeviation {
+    /// Ppm(f32),
+    /// Da(f32),
+    /// }
+    /// ```
+    ///
+    pub fn ms1_mass_deviation_allowed_mass_deviation(
+        mut self,
+        ms1_mass_deviation_allowed_mass_deviation: MassDeviation,
+    ) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV5::MS1MassDeviationAllowedMassDeviation(
+                ms1_mass_deviation_allowed_mass_deviation.must_be_positive()?,
+            ))?;
+        Ok(self)
+    }
+
+    pub fn ms1_mass_deviation_mass_difference_deviation(
+        mut self,
+        ms1_mass_deviation_mass_difference_deviation: MassDeviation,
+    ) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV5::MS1MassDeviationMassDifferenceDeviation(
+                ms1_mass_deviation_mass_difference_deviation.must_be_positive()?,
+            ))?;
+        Ok(self)
+    }
+
+    pub fn ms1_mass_deviation_standard_mass_deviation(
+        mut self,
+        ms1_mass_deviation_standard_mass_deviation: MassDeviation,
+    ) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV5::MS1MassDeviationStandardMassDeviation(
+                ms1_mass_deviation_standard_mass_deviation.must_be_positive()?,
+            ))?;
+        Ok(self)
+    }
+
+    pub fn ms2_mass_deviation_standard_mass_deviation(
+        mut self,
+        ms2_mass_deviation_standard_mass_deviation: MassDeviation,
+    ) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV5::MS2MassDeviationStandardMassDeviation(
+                ms2_mass_deviation_standard_mass_deviation.must_be_positive()?,
+            ))?;
+        Ok(self)
+    }
+
+    pub fn ms2_mass_deviation_allowed_mass_deviation(
+        mut self,
+        ms2_mass_deviation_allowed_mass_deviation: MassDeviation,
+    ) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV5::MS2MassDeviationAllowedMassDeviation(
+                ms2_mass_deviation_allowed_mass_deviation.must_be_positive()?,
+            ))?;
+        Ok(self)
+    }
+
+    pub fn formula_settings_detectable(
+        mut self,
+        formula_settings_detectable: AtomVector,
+    ) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV5::FormulaSettingsDetectable(
+                formula_settings_detectable,
+            ))?;
+        Ok(self)
+    }
+
+    pub fn formula_settings_enforced(
+        mut self,
+        formula_settings_enforced: AtomVector,
+    ) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV5::FormulaSettingsEnforced(formula_settings_enforced))?;
+        Ok(self)
+    }
+
+    pub fn formula_settings_fallback(
+        mut self,
+        formula_settings_fallback: AtomVector,
+    ) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV5::FormulaSettingsFallback(formula_settings_fallback))?;
+        Ok(self)
+    }
+
+    pub fn forbid_recalibration(
+        mut self,
+        forbid_recalibration: ForbidRecalibration,
+    ) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV5::ForbidRecalibration(forbid_recalibration))?;
+        Ok(self)
+    }
+
+    pub fn use_heuristic_mz_to_use_heuristic(
+        mut self,
+        use_heuristic_mz_to_use_heuristic: u32,
+    ) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV5::UseHeuristicMZToUseHeuristic(
+                use_heuristic_mz_to_use_heuristic,
+            ))?;
+        Ok(self)
+    }
+
+    pub fn use_heuristic_mz_to_use_heuristic_only(
+        mut self,
+        use_heuristic_mz_to_use_heuristic: u32,
+    ) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV5::UseHeuristicMZToUseHeuristicOnly(
+                use_heuristic_mz_to_use_heuristic,
+            ))?;
+        Ok(self)
+    }
+
+    pub fn adduct_settings_detectable(
+        mut self,
+        adduct_settings_detectable: AdductsVector,
+    ) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV5::AdductSettingsDetectable(
+                adduct_settings_detectable,
+            ))?;
+        Ok(self)
+    }
+
+    pub fn adduct_settings_fallback(
+        mut self,
+        adduct_settings_fallback: AdductsVector,
+    ) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV5::AdductSettingsFallback(adduct_settings_fallback))?;
+        Ok(self)
+    }
+
+    pub fn algorithm_profile(mut self, algorithm_profile: Instruments) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV5::AlgorithmProfile(algorithm_profile))?;
+        Ok(self)
+    }
+
+    pub fn compound_quality(mut self, compound_quality: CompoundQuality) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV5::CompoundQuality(compound_quality))?;
+        Ok(self)
+    }
+
+    pub fn adduct_settings_enforced(
+        mut self,
+        adduct_settings_enforced: AdductSettingsEnforced,
+    ) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV5::AdductSettingsEnforced(adduct_settings_enforced))?;
+        Ok(self)
+    }
+
+    pub fn candidate_formulas(
+        mut self,
+        candidate_formulas: CandidateFormulas,
+    ) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV5::CandidateFormulas(candidate_formulas))?;
+        Ok(self)
+    }
+
+    pub fn formula_result_ranking_score(
+        mut self,
+        formula_result_ranking_score: FormulaResultRankingScore,
+    ) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV5::FormulaResultRankingScore(
+                formula_result_ranking_score,
+            ))?;
+        Ok(self)
+    }
+
+    pub fn isotope_ms2_settings(
+        mut self,
+        isotope_ms2_settings: IsotopeMS2Settings,
+    ) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV5::IsotopeMS2Settings(isotope_ms2_settings))?;
+        Ok(self)
+    }
+
+    pub fn isotope_settings_multiplier(
+        mut self,
+        isotope_settings_multiplier: u32,
+    ) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV5::IsotopeSettingsMultiplier(
+                isotope_settings_multiplier,
+            ))?;
+        Ok(self)
+    }
+
+    pub fn noise_threshold_settings_absolute_threshold(
+        mut self,
+        noise_threshold_settings_absolute_threshold: u32,
+    ) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV5::NoiseThresholdSettingsAbsoluteThreshold(
+                noise_threshold_settings_absolute_threshold,
+            ))?;
+        Ok(self)
+    }
+
+    pub fn noise_threshold_settings_base_peak(
+        mut self,
+        noise_threshold_settings_base_peak: BasePeak,
+    ) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV5::NoiseThresholdSettingsBasePeak(
+                noise_threshold_settings_base_peak,
+            ))?;
+        Ok(self)
+    }
+
+    pub fn structure_predictors(
+        mut self,
+        structure_predictors: StructurePredictors,
+    ) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV5::StructurePredictors(structure_predictors))?;
+        Ok(self)
+    }
+
+    pub fn possible_adduct_switches(
+        mut self,
+        possible_adduct_switches: PossibleAdductSwitches,
+    ) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV5::PossibleAdductSwitches(possible_adduct_switches))?;
         Ok(self)
     }
 

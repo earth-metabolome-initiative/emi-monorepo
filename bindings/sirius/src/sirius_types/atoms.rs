@@ -504,6 +504,10 @@ mod tests {
         assert_eq!(
             AtomVector::try_from("N").unwrap(),
             AtomVector::new(vec![Atoms::N])
-        )
+        );
+        assert_eq!(
+            AtomVector::try_from("N,O").unwrap(),
+            AtomVector::new(vec![Atoms::N, Atoms::O])
+        );
     }
 }

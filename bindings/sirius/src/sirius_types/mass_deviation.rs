@@ -8,11 +8,38 @@ pub enum MassDeviation {
 
 impl MassDeviation {
     pub fn ppm(value: f32) -> Self {
+        // ppm can't be negative
+        if value < 0.0 {
+            panic!("ppm value can't be negative");
+        }
         MassDeviation::Ppm(value)
     }
 
     pub fn da(value: f32) -> Self {
+        // Da can't be negative
+        if value < 0.0 {
+            panic!("Da value can't be negative");
+        }
         MassDeviation::Da(value)
+    }
+
+    pub fn must_be_positive(&self) -> Result<Self, String> {
+        match self {
+            MassDeviation::Ppm(value) => {
+                if *value < 0.0 {
+                    Err("ppm value can't be negative".to_string())
+                } else {
+                    Ok(*self)
+                }
+            }
+            MassDeviation::Da(value) => {
+                if *value < 0.0 {
+                    Err("Da value can't be negative".to_string())
+                } else {
+                    Ok(*self)
+                }
+            }
+        }
     }
 }
 
@@ -56,5 +83,38 @@ impl TryFrom<String> for MassDeviation {
 
     fn try_from(s: String) -> Result<Self, Self::Error> {
         MassDeviation::try_from(s.as_str())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn test_mass_deviation_display() {
+        let ppm = MassDeviation::Ppm(10.0);
+        assert_eq!(format!("{}", ppm), "10 ppm");
+
+        let da = MassDeviation::Da(0.1);
+        assert_eq!(format!("{}", da), "0.1 Da");
+    }
+    #[test]
+    fn test_error_if_negative_value_with_funtion_call() {
+        let error = std::panic::catch_unwind(|| MassDeviation::ppm(-10.0)).unwrap_err();
+        assert_eq!(
+            error.downcast_ref::<&str>(),
+            Some(&"ppm value can't be negative")
+        );
+
+        let error = std::panic::catch_unwind(|| MassDeviation::da(-0.1)).unwrap_err();
+        assert_eq!(
+            error.downcast_ref::<&str>(),
+            Some(&"Da value can't be negative")
+        );
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_error_if_negative_value_with_enum() {
+        let _ = MassDeviation::Ppm(-10.0).must_be_positive().unwrap();
     }
 }
