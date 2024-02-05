@@ -1,6 +1,3 @@
-// this file sets all the parameters of the `sirius config` command
-// TODO verify if some parameters must be float, int or unsigned integers
-
 use crate::prelude::*;
 use crate::traits::{Enablable, IntoDefault, NamedParametersSet};
 

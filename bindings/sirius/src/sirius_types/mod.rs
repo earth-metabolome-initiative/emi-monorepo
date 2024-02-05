@@ -14,7 +14,7 @@ mod possible_adduct_switches;
 mod structure_predictors;
 
 pub use adduct_settings_enforced::AdductSettingsEnforced;
-pub(crate) use adducts::Adducts;
+pub use adducts::Adducts;
 pub use adducts::AdductsVector;
 pub use atoms::AtomVector;
 pub use atoms::Atoms;

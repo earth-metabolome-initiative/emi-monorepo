@@ -7,3 +7,7 @@ edition = "2021"
 
 [dependencies]
 dotenvy = "0.15.7"
+arbitrary = { version = "1", optional = true, features = ["derive"] }
+# we only require the arbitrary derivable crate when fuzz is enabled
+[features]
+fuzz = ["dep:arbitrary"]

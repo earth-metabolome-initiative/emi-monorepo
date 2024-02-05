@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub(crate) enum Adducts {
+pub enum Adducts {
     /// [M+H]+
     MplusHplus,
 
@@ -122,7 +122,7 @@ impl Display for AdductsVector {
 }
 
 impl AdductsVector {
-    pub(crate) fn new(adducts: Vec<Adducts>) -> Self {
+    pub fn new(adducts: Vec<Adducts>) -> Self {
         AdductsVector(adducts)
     }
 }

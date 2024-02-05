@@ -98,13 +98,13 @@ impl<V: Version> Sirius<V> {
         let mut command = Command::new(sirius_path);
 
         // Start building the argument list
-        let mut args = Vec::new();
-
         // Add input and output file paths with their respective flags
-        args.push("-i".to_string());
-        args.push(input_file_path.to_str().unwrap().to_string());
-        args.push("--output".to_string());
-        args.push(output_file_path.to_str().unwrap().to_string());
+        let mut args = vec![
+            "-i".to_string(),
+            input_file_path.to_str().unwrap().to_string(),
+            "--output".to_string(),
+            output_file_path.to_str().unwrap().to_string(),
+        ];
 
         // Add arguments from config directly
         args.extend(self.config.args().iter().cloned());

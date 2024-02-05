@@ -160,6 +160,9 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// Specify if the results should be recomputed.
+    /// # Arguments
+    /// * `recompute_results` - Whether to recompute the results.
     pub fn recompute_results(mut self, recompute_results: bool) -> Result<Self, String> {
         self.config
             .add_config_parameter(ConfigV5::RecomputeResults(recompute_results))?;
@@ -404,7 +407,7 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
-    /// Set the minimal cosine value
+    /// Set the minimal cosine value. Values must be between 0 and 1.
     /// # Arguments
     /// * `zodiac_library_scoring_min_cosine` - The minimal cosine value.
     /// # Example
@@ -415,7 +418,7 @@ impl SiriusBuilder<Version5> {
     /// .build();
     /// ```
     /// # Errors
-    /// If the value is not in the range [0,1].
+    /// If the value is not in the range 0 and 1.
     /// # Example
     /// ```
     /// use sirius::prelude::*;
@@ -444,6 +447,9 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// Maximum number of candidate molecular formulas (fragmentation trees computed by SIRIUS) per compound which are considered by ZODIAC.
+    /// This is the threshold used for all compounds with mz below 300 m/z and is used to interpolate the number of candidates for larger compounds.
+    /// If lower than 0, all available candidates are considered.
     pub fn zodiac_number_of_considered_candidates_at_300_mz(
         mut self,
         zodiac_number_of_considered_candidates_at_300_mz: i32,
@@ -496,16 +502,8 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
-    /// This function return the allowed mass deviation for MS1.
-    /// It should get a float and then we should also know the unit of the mass deviation.
-    /// Mass deviation enum is defined as :
-    /// ```rust
-    /// pub enum MassDeviation {
-    /// Ppm(f32),
-    /// Da(f32),
-    /// }
-    /// ```
-    ///
+    /// Maximal mass deviation allowed for MS1.
+    /// If the value is not positive, an error is returned.
     pub fn ms1_mass_deviation_allowed_mass_deviation(
         mut self,
         ms1_mass_deviation_allowed_mass_deviation: MassDeviation,
