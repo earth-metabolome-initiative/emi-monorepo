@@ -109,9 +109,6 @@ impl<V: Version> Sirius<V> {
         // Add arguments from config directly
         args.extend(self.config.args().iter().cloned());
 
-        // Add specific command arguments
-        args.extend(["write-summaries"].iter().map(|&s| s.to_string()));
-
         // Print the command and its arguments for debugging
         println!("Running command: sirius {:?}", args);
 

@@ -73,6 +73,7 @@ fn test_run_sirius_default() -> Result<(), String> {
         .enable_fingerprint()?
         .enable_structure()?
         .enable_canopus()?
+        .enable_write_summaries()?
         .build();
     let input_file_path = Path::new("tests/data/input_sirius.mgf");
     let output_file_path = Path::new("tests/data/output_sirius_default");

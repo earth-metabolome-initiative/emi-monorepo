@@ -834,6 +834,24 @@ impl SiriusBuilder<Version5> {
         self.config.add_canopus_parameter(CanopusV5::Version)?;
         Ok(self)
     }
+
+    /// Whether to enable the WriteSummaries module.
+    pub fn enable_write_summaries(mut self) -> Result<Self, String> {
+        self.config.add_write_summaries_parameter(WriteSummariesV5::Enabled)?;
+        Ok(self)
+    }
+
+    /// Set whether to display the help of WriteSummaries.
+    pub fn write_summaries_help(mut self) -> Result<Self, String> {
+        self.config.add_write_summaries_parameter(WriteSummariesV5::Help)?;
+        Ok(self)
+    }
+
+    /// Set whether to display the version of WriteSummaries.
+    pub fn write_summaries_version(mut self) -> Result<Self, String> {
+        self.config.add_write_summaries_parameter(WriteSummariesV5::Version)?;
+        Ok(self)
+    }
 }
 impl<V: Version> SiriusBuilder<V> {
     pub fn build(self) -> Sirius<V> {

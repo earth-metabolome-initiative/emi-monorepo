@@ -1,5 +1,6 @@
 use std::fmt::Debug;
 
+use crate::sirius_types;
 // use crate::sirius_types;
 use crate::traits::Enablable;
 use crate::traits::IntoDefault;
@@ -14,6 +15,7 @@ pub trait Version: Default {
     type Zodiac: ToString + Debug + IntoDefault + NamedParametersSet + Enablable;
     type Fingerprint: ToString + Debug + IntoDefault + NamedParametersSet + Enablable;
     type Structure: ToString + Debug + IntoDefault + NamedParametersSet + Enablable;
+    type WriteSummaries: ToString + Debug + IntoDefault + NamedParametersSet + Enablable;
 }
 #[derive(Default)]
 pub struct Version5;
@@ -27,4 +29,5 @@ impl Version for Version5 {
     type Zodiac = crate::parameters::zodiac::ZodiacV5;
     type Fingerprint = crate::parameters::fingerprint::FingerprintV5;
     type Structure = crate::parameters::structure::StructureV5;
+    type WriteSummaries = crate::parameters::write_summaries::WriteSummariesV5;
 }

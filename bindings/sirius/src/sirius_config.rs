@@ -16,6 +16,7 @@ pub(crate) struct SiriusConfig<V: Version> {
     fingerprint_parameters: Vec<V::Fingerprint>,
     structure_parameters: Vec<V::Structure>,
     canopus_parameters: Vec<V::Canopus>,
+    write_summaries_parameters: Vec<V::WriteSummaries>,
 }
 
 impl<V: Version> Default for SiriusConfig<V> {
@@ -28,6 +29,7 @@ impl<V: Version> Default for SiriusConfig<V> {
             fingerprint_parameters: Vec::new(),
             structure_parameters: Vec::new(),
             canopus_parameters: Vec::new(),
+            write_summaries_parameters: Vec::new(),
         }
     }
 }
@@ -265,6 +267,40 @@ impl<V: Version> SiriusConfig<V> {
         }
     }
 
+    /// Add a parameter to the write_summaries configuration.
+    ///
+    /// # Arguments
+    ///
+    /// * `parameter` - The parameter to add.
+    ///
+    pub fn add_write_summaries_parameter(&mut self, parameter: V::WriteSummaries) -> Result<(), String> {
+        // We check if the parameter is already present in the vector
+        // If it is, we return an error
+        if let Some(existing_parameter) = self
+            .write_summaries_parameters
+            .iter()
+            .find(|&p| std::mem::discriminant(p) == std::mem::discriminant(&parameter))
+        {
+            Err(format!(
+                concat!(
+                    "The write_summaries parameter {:?} cannot be added to the configuration. ",
+                    "There is already an existing parameter which is {:?}. ",
+                    "You cannot add it twice."
+                ),
+                parameter, existing_parameter
+            ))
+        } else {
+            if !parameter.is_enabler() {
+                // If the current parameter is not an enabler, we make sure that the enabler variant
+                // is present in the vector by trying to insert it without checking if it is already
+                // present.
+                let _ = self.add_write_summaries_parameter(V::WriteSummaries::enabler());
+            }
+            self.write_summaries_parameters.push(parameter);
+            Ok(())
+        }
+    }
+
     pub fn args(&self) -> Vec<String> {
         self.core_parameters
             .iter()
@@ -275,6 +311,7 @@ impl<V: Version> SiriusConfig<V> {
             .chain(self.fingerprint_parameters.iter().map(|p| p.to_string()))
             .chain(self.structure_parameters.iter().map(|p| p.to_string()))
             .chain(self.canopus_parameters.iter().map(|p| p.to_string()))
+            .chain(self.write_summaries_parameters.iter().map(|p| p.to_string()))
             .collect::<Vec<String>>()
     }
 }
