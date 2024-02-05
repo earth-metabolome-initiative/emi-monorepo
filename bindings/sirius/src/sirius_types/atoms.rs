@@ -1,5 +1,5 @@
 use std::fmt::Display;
-
+#[cfg_attr(feature = "fuzz", derive(arbitrary::Arbitrary))]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Atoms {
     H,
@@ -383,6 +383,7 @@ impl TryFrom<String> for Atoms {
     }
 }
 
+#[cfg_attr(feature = "fuzz", derive(arbitrary::Arbitrary))]
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 pub struct AtomVector(Vec<Atoms>);
 

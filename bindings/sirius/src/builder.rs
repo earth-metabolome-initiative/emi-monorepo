@@ -80,14 +80,14 @@ impl SiriusBuilder<Version5> {
     /// ```
     /// use sirius::prelude::*;
     /// let sirius = SiriusBuilder::default()
-    ///  .formula_search_db(FormulaSearchDB::Hmdb).unwrap()
+    ///  .formula_search_db(SearchDB::Hmdb).unwrap()
     /// .build();
     ///
-    /// assert!(SiriusBuilder::default().formula_search_db(FormulaSearchDB::Hmdb).is_ok());
+    /// assert!(SiriusBuilder::default().formula_search_db(SearchDB::Hmdb).is_ok());
     /// ```
     pub fn formula_search_db(
         mut self,
-        formula_search_db: crate::sirius_types::FormulaSearchDB,
+        formula_search_db: crate::sirius_types::SearchDB,
     ) -> Result<Self, String> {
         self.config
             .add_config_parameter(ConfigV5::FormulaSearchDB(formula_search_db))?;
@@ -101,13 +101,10 @@ impl SiriusBuilder<Version5> {
     /// ```
     /// use sirius::prelude::*;
     /// let sirius = SiriusBuilder::default()
-    /// .structure_search_db(FormulaSearchDB::Zincbio).unwrap()
+    /// .structure_search_db(SearchDB::Zincbio).unwrap()
     /// .build();
     /// ```
-    pub fn structure_search_db(
-        mut self,
-        structure_search_db: FormulaSearchDB,
-    ) -> Result<Self, String> {
+    pub fn structure_search_db(mut self, structure_search_db: SearchDB) -> Result<Self, String> {
         self.config
             .add_config_parameter(ConfigV5::StructureSearchDB(structure_search_db))?;
         Ok(self)
@@ -877,15 +874,13 @@ impl SiriusBuilder<Version5> {
 
     pub fn formula_search_db_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::FormulaSearchDB(crate::sirius_types::FormulaSearchDB::default())
-                .into_default(),
+            ConfigV5::FormulaSearchDB(crate::sirius_types::SearchDB::default()).into_default(),
         )?;
         Ok(self)
     }
     pub fn structure_search_db_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::StructureSearchDB(crate::sirius_types::FormulaSearchDB::default())
-                .into_default(),
+            ConfigV5::StructureSearchDB(crate::sirius_types::SearchDB::default()).into_default(),
         )?;
         Ok(self)
     }

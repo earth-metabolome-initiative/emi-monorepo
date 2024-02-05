@@ -1,6 +1,7 @@
 use std::fmt::Display;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[cfg_attr(feature = "fuzz", derive(arbitrary::Arbitrary))]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Default, Copy)]
 pub enum ForbidRecalibration {
     #[default]
     Allowed,

@@ -1,5 +1,6 @@
 use std::fmt::Display;
 
+#[cfg_attr(feature = "fuzz", derive(arbitrary::Arbitrary))]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum MassDeviation {
     Ppm(f32),

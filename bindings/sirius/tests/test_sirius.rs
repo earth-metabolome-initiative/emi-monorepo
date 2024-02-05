@@ -7,11 +7,11 @@ fn test_failing_sirius() {
     let sirius = SiriusBuilder::default()
         .maximal_mz(802.2)
         .unwrap()
-        .formula_search_db(FormulaSearchDB::Bio)
+        .formula_search_db(SearchDB::Bio)
         .unwrap()
         .isotope_settings_filter(false)
         .unwrap()
-        .structure_search_db(FormulaSearchDB::Coconut)
+        .structure_search_db(SearchDB::Coconut)
         .unwrap()
         .timeout_seconds_per_tree_default()
         .unwrap()
@@ -68,6 +68,11 @@ fn test_failing_sirius() {
 fn test_run_sirius_default() -> Result<(), String> {
     let sirius = SiriusBuilder::<Version5>::default()
         .maximal_mz_default()?
+        .enable_formula()?
+        .enable_zodiac()?
+        .enable_fingerprint()?
+        .enable_structure()?
+        .enable_canopus()?
         .build();
     let input_file_path = Path::new("tests/data/input_sirius.mgf");
     let output_file_path = Path::new("tests/data/output_sirius_default");
@@ -86,7 +91,7 @@ fn test_run_sirius_with_enpkg_params() -> Result<(), String> {
     let sirius = SiriusBuilder::default()
         .maximal_mz(800.0)?
         .isotope_settings_filter(true)?
-        .formula_search_db(FormulaSearchDB::Bio)?
+        .formula_search_db(SearchDB::Bio)?
         .timeout_seconds_per_tree(0)?
         .formula_settings_enforced(AtomVector::new(vec![
             Atoms::H,
@@ -133,8 +138,13 @@ fn test_run_sirius_with_enpkg_params() -> Result<(), String> {
         ]))?
         .formula_result_threshold(true)?
         .inject_el_gordo_compounds(true)?
-        .structure_search_db(FormulaSearchDB::Bio)?
+        .structure_search_db(SearchDB::Bio)?
         .recompute_results(false)?
+        .enable_formula()?
+        .enable_zodiac()?
+        .enable_fingerprint()?
+        .enable_structure()?
+        .enable_canopus()?
         .build();
 
     let input_file_path = Path::new("tests/data/input_sirius.mgf");

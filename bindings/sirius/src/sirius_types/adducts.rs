@@ -1,5 +1,5 @@
 use std::fmt::Display;
-
+#[cfg_attr(feature = "fuzz", derive(arbitrary::Arbitrary))]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Adducts {
     /// [M+H]+
@@ -106,6 +106,7 @@ impl TryFrom<String> for Adducts {
     }
 }
 
+#[cfg_attr(feature = "fuzz", derive(arbitrary::Arbitrary))]
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 pub struct AdductsVector(Vec<Adducts>);
 impl Display for AdductsVector {

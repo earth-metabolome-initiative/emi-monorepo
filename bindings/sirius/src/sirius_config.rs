@@ -297,7 +297,7 @@ mod tests {
             .add_config_parameter(ConfigV5::IsotopeSettingsFilter(true))
             .unwrap();
         config
-            .add_config_parameter(ConfigV5::FormulaSearchDB(FormulaSearchDB::Bio))
+            .add_config_parameter(ConfigV5::FormulaSearchDB(SearchDB::Bio))
             .unwrap();
 
         assert!(config
@@ -305,7 +305,7 @@ mod tests {
             .is_err());
 
         assert!(config
-            .add_config_parameter(ConfigV5::FormulaSearchDB(FormulaSearchDB::Bio))
+            .add_config_parameter(ConfigV5::FormulaSearchDB(SearchDB::Bio))
             .is_err());
     }
 }

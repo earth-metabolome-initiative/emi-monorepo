@@ -5,8 +5,8 @@ use crate::traits::{Enablable, IntoDefault, NamedParametersSet};
 pub enum ConfigV5 {
     Enabled,
     IsotopeSettingsFilter(bool),
-    FormulaSearchDB(FormulaSearchDB),
-    StructureSearchDB(FormulaSearchDB),
+    FormulaSearchDB(SearchDB),
+    StructureSearchDB(SearchDB),
     TimeoutSecondsPerTree(u32),
     NumberOfCandidates(u32),
     NumberOfCandidatesPerIon(u32), // can this be equal to zero ?
@@ -321,8 +321,8 @@ impl IntoDefault for ConfigV5 {
         match self {
             ConfigV5::Enabled => ConfigV5::Enabled,
             ConfigV5::IsotopeSettingsFilter(_) => ConfigV5::IsotopeSettingsFilter(true),
-            ConfigV5::FormulaSearchDB(_) => ConfigV5::FormulaSearchDB(FormulaSearchDB::default()),
-            ConfigV5::StructureSearchDB(_) => ConfigV5::StructureSearchDB(FormulaSearchDB::Bio),
+            ConfigV5::FormulaSearchDB(_) => ConfigV5::FormulaSearchDB(SearchDB::default()),
+            ConfigV5::StructureSearchDB(_) => ConfigV5::StructureSearchDB(SearchDB::Bio),
             ConfigV5::TimeoutSecondsPerTree(_) => ConfigV5::TimeoutSecondsPerTree(0),
             ConfigV5::NumberOfCandidatesPerIon(_) => ConfigV5::NumberOfCandidatesPerIon(1),
             ConfigV5::NumberOfStructureCandidates(_) => {
@@ -506,16 +506,16 @@ mod tests {
     #[test]
     fn test_default_formula_search_db() {
         assert_eq!(
-            ConfigV5::FormulaSearchDB(FormulaSearchDB::Bio),
-            ConfigV5::FormulaSearchDB(FormulaSearchDB::Gnps).into_default()
+            ConfigV5::FormulaSearchDB(SearchDB::Bio),
+            ConfigV5::FormulaSearchDB(SearchDB::Gnps).into_default()
         );
         assert_eq!(
-            ConfigV5::FormulaSearchDB(FormulaSearchDB::default()),
-            ConfigV5::FormulaSearchDB(FormulaSearchDB::Bio)
+            ConfigV5::FormulaSearchDB(SearchDB::default()),
+            ConfigV5::FormulaSearchDB(SearchDB::Bio)
         );
         assert_ne!(
-            ConfigV5::FormulaSearchDB(FormulaSearchDB::Gnps),
-            ConfigV5::FormulaSearchDB(FormulaSearchDB::Gnps).into_default()
+            ConfigV5::FormulaSearchDB(SearchDB::Gnps),
+            ConfigV5::FormulaSearchDB(SearchDB::Gnps).into_default()
         );
     }
 
