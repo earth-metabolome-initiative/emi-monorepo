@@ -2,27 +2,27 @@ use std::fmt::Display;
 #[cfg_attr(feature = "fuzz", derive(arbitrary::Arbitrary))]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Adducts {
-    /// [M+H]+
+    /// \[M+H\]+
     MplusHplus,
 
-    /// [M+K]+
+    /// \[M+K\]+
     MplusKplus,
-    /// [M+Na]+
+    /// \[M+Na\]+
     MplusNaplus,
 
-    /// [M+NH4]+
+    /// \[M+NH4\]+
     MplusNH4plus,
 
-    /// [M+Cl]-
+    /// \[M+Cl\]-
     MplusClminus,
 
-    /// [M]+
+    /// \[M\]+
     Mplus,
 
-    /// [M+H-H2O]+
+    /// \[M+H-H2O\]+
     MplusHminusH2Oplus,
 
-    /// [M+H3N+H]+
+    /// \[M+H3N+H\]+
     MplusH3NplusHplus,
     MplusH2OplusHplus,
     MplusCH4OplusHplus,

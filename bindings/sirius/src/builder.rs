@@ -9,6 +9,8 @@ pub struct SiriusBuilder<V: Version> {
     config: SiriusConfig<V>,
 }
 
+/// The functions in this block are used to set the parameters of the SiriusBuilder.
+/// Most of the functions come from the `sirius config` command. The comments in the functions are usually a copy-paste from the `sirius config --help` command.
 impl SiriusBuilder<Version5> {
     /// Set the maximal value of m/z ratio on which Sirius calculation will be carried.
     ///
@@ -129,12 +131,18 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// Set the number of candidates.
+    /// # Arguments
+    /// * `number_of_candidates` - The number of candidates.
     pub fn number_of_candidates(mut self, number_of_candidates: u32) -> Result<Self, String> {
         self.config
             .add_config_parameter(ConfigV5::NumberOfCandidates(number_of_candidates))?;
         Ok(self)
     }
 
+    /// Set the number of candidates per ion.
+    /// # Arguments
+    /// * `number_of_candidates_per_ion` - The number of candidates per ion.
     pub fn number_of_candidates_per_ion(
         mut self,
         number_of_candidates_per_ion: u32,
@@ -146,6 +154,9 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// Sets the number of structure candidates.
+    /// # Arguments
+    /// * `number_of_structure_candidates` - The number of structure candidates.
     pub fn number_of_structure_candidates(
         mut self,
         number_of_structure_candidates: u32,
@@ -166,12 +177,22 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// Whether to print citations we Sirius has finished running.
+    /// # Arguments
+    /// * `print_citations` - Whether to print citations.
     pub fn print_citations(mut self, print_citations: bool) -> Result<Self, String> {
         self.config
             .add_config_parameter(ConfigV5::PrintCitations(print_citations))?;
         Ok(self)
     }
 
+    /// This configurations define a timeout for the tree computation.
+    /// As the underlying problem is NP-hard, it might take forever to compute trees for very challenging (e.g. large mass) compounds.
+    /// Setting a time constraint allow the program to continue with other instances and just skip the challenging ones.
+    /// Note that, due to multithreading, this time constraints are not absolutely accurate.
+    /// Set the maximum number of seconds for computing a single compound. Set to 0 to disable the time constraint.
+    /// # Arguments
+    /// * `timeout_seconds_per_instance` - The maximum number of seconds for computing a single compound.
     pub fn timeout_seconds_per_instance(
         mut self,
         timeout_seconds_per_instance: u32,
@@ -183,6 +204,10 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// Specifies if the list of Molecular Formula Identifications is filtered by a soft threshold (calculateThreshold)
+    /// before CSI:FingerID predictions are calculated.
+    /// # Arguments
+    /// * `formula_settings_filter` - Whether to filter the list of Molecular Formula Identifications.
     pub fn formula_result_threshold(
         mut self,
         formula_result_threshold: bool,
@@ -192,6 +217,12 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// Candidates matching the lipid class estimated by El Gordo will be tagged.
+    /// The lipid class will only be available if El Gordo predicts that the MS/MS is a lipid spectrum.
+    /// If this parameter is set to 'false' El Gordo will still be executed and e.g. improve the fragmentation tree,
+    /// but the matching candidates will not be tagged as lipid class.
+    /// # Arguments
+    /// * `inject_el_gordo_compounds` - Whether to inject El Gordo compounds.
     pub fn inject_el_gordo_compounds(
         mut self,
         inject_el_gordo_compounds: bool,
@@ -201,6 +232,9 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// Sets the median noise intensity.
+    /// # Arguments
+    /// * `median_noise_intensity` - The median noise intensity.
     pub fn median_noise_intensity(mut self, median_noise_intensity: f32) -> Result<Self, String> {
         if median_noise_intensity < 0.0 {
             return Err(format!(
@@ -216,6 +250,13 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// The average absolute deviation between theoretical and measured intensity of isotope peaks.
+    ///
+    /// Do not change this parameter without a good reason!    
+    ///
+    /// Ideally use the `ms1_absolute_intensity_error_default()` function.
+    /// # Arguments
+    /// * `ms1_absolute_intensity_error` - The average absolute deviation between theoretical and measured intensity of isotope peaks.
     pub fn ms1_absolute_intensity_error(
         mut self,
         ms1_absolute_intensity_error: f32,
@@ -236,6 +277,12 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// Ignore isotope peaks below this intensity.
+    /// This value should reflect the smallest relative intensive which is still above noise level.
+    /// Obviously, this is hard to judge without having absolute values.
+    /// Keeping this value around 1 percent is fine for most settings. Set it to smaller values if you trust your small intensities.
+    /// # Arguments
+    /// * `ms1_minimal_intensity_to_consider` - The minimal intensity to consider.
     pub fn ms1_minimal_intensity_to_consider(
         mut self,
         ms1_minimal_intensity_to_consider: f32,
@@ -256,6 +303,13 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// The average relative deviation between theoretical and measured intensity of isotope peaks.
+    ///
+    /// Do not change this parameter without a good reason!
+    ///
+    /// Ideally use the `ms1_relative_intensity_error_default()` function.
+    /// # Arguments
+    /// * `ms1_relative_intensity_error` - The average relative deviation between theoretical and measured intensity of isotope peaks.
     pub fn ms1_relative_intensity_error(
         mut self,
         ms1_relative_intensity_error: f32,
@@ -276,6 +330,9 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// Sets the noise threshold settings absolute threshold.
+    /// # Arguments
+    /// * `noise_threshold_settings_absolute_threshold` - The noise threshold settings absolute threshold.
     pub fn noise_threshold_settings_intensity_threshold(
         mut self,
         noise_threshold_settings_intensity_threshold: f32,
@@ -296,6 +353,9 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// Sets the noise threshold settings maximal number of peaks.
+    /// # Arguments
+    /// * `noise_threshold_settings_maximal_number_of_peaks` - The noise threshold settings maximal number of peaks.
     pub fn noise_threshold_settings_maximal_number_of_peaks(
         mut self,
         noise_threshold_settings_maximal_number_of_peaks: u32,
@@ -307,6 +367,9 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// Sets if you want to cluster compounds before running ZODIAC.
+    /// # Arguments
+    /// * `zodiac_cluster_compounds` - Whether to cluster compounds before running ZODIAC.
     pub fn zodiac_cluster_compounds(
         mut self,
         zodiac_cluster_compounds: bool,
@@ -316,6 +379,10 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// Minimum number of candidates per compound which are forced to have at least \[minLocalConnections\] connections to other compounds.
+    /// E.g. 2 candidates per compound must have at least 10 connections to other compounds.
+    /// # Arguments
+    /// * `zodiac_edge_filter_thresholds_min_local_candidates` - The minimum number of candidates per compound.
     pub fn zodiac_edge_filter_thresholds_min_local_candidates(
         mut self,
         zodiac_edge_filter_thresholds_min_local_candidates: u32,
@@ -328,6 +395,10 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    ///  Minimum number of connections per candidate which are forced for at least \[minLocalCandidates\] candidates to other compounds.
+    /// E.g. 2 candidates per compound must have at least 10 connections to other compounds.
+    /// # Arguments
+    /// * `zodiac_edge_filter_thresholds_min_local_connections` - The minimum number of connections per candidate.
     pub fn zodiac_edge_filter_thresholds_min_local_connections(
         mut self,
         zodiac_edge_filter_thresholds_min_local_connections: u32,
@@ -340,6 +411,9 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// Defines the proportion of edges of the complete network which will be ignored.
+    /// # Arguments
+    /// * `zodiac_edge_filter_thresholds_threshold_filter` - The proportion of edges of the complete network which will be ignored.
     pub fn zodiac_edge_filter_thresholds_threshold_filter(
         mut self,
         zodiac_edge_filter_thresholds_threshold_filter: f32,
@@ -360,6 +434,10 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// Number of epochs considered as 'burn-in period'.
+    /// Samples from the beginning of a Markov chain do not accurately represent the desired distribution of candidates and are not used to estimate the ZODIAC score.
+    /// # Arguments
+    /// * `zodiac_epochs_burn_in_period` - The number of epochs considered as 'burn-in period'.
     pub fn zodiac_epochs_burn_in_period(
         mut self,
         zodiac_epochs_burn_in_period: u32,
@@ -371,6 +449,9 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// Number of epochs to run the Gibbs sampling. When multiple Markov chains are computed, all chains' iterations sum up to this value.
+    /// # Arguments
+    /// * `zodiac_epochs_iterations` - The number of epochs to run the Gibbs sampling.
     pub fn zodiac_epochs_iterations(
         mut self,
         zodiac_epochs_number_of_epochs: u32,
@@ -382,6 +463,9 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// Number of separate Gibbs sampling runs.
+    /// # Arguments
+    /// * `zodiac_epochs_number_of_markov_chains` - The number of separate Gibbs sampling runs.
     pub fn zodiac_epochs_number_of_markov_chains(
         mut self,
         zodiac_epochs_number_of_markov_chains: u32,
@@ -393,6 +477,9 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// Lambda used in the scoring function of spectral library hits. The higher this value the higher are librar hits weighted in ZODIAC scoring.
+    /// # Arguments
+    /// * `zodiac_library_scoring_lambda` - The lambda used in the scoring function of spectral library hits.
     pub fn zodiac_library_scoring_lambda(
         mut self,
         zodiac_library_scoring_lambda: u32,
@@ -447,6 +534,8 @@ impl SiriusBuilder<Version5> {
     /// Maximum number of candidate molecular formulas (fragmentation trees computed by SIRIUS) per compound which are considered by ZODIAC.
     /// This is the threshold used for all compounds with mz below 300 m/z and is used to interpolate the number of candidates for larger compounds.
     /// If lower than 0, all available candidates are considered.
+    /// # Arguments
+    /// * `zodiac_number_of_considered_candidates_at_300_mz` - The maximum number of candidate molecular formulas.
     pub fn zodiac_number_of_considered_candidates_at_300_mz(
         mut self,
         zodiac_number_of_considered_candidates_at_300_mz: i32,
@@ -458,6 +547,11 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// Maximum number of candidate molecular formulas (fragmentation trees computed by SIRIUS) per compound which are considered by ZODIAC.
+    /// This is the threshold used for all compounds with mz below 800 m/z and is used to interpolate the number of candidates for larger compounds.
+    /// If lower than 0, all available candidates are considered.
+    /// # Arguments
+    /// * `zodiac_number_of_considered_candidates_at_800_mz` - The maximum number of candidate molecular formulas.
     pub fn zodiac_number_of_considered_candidates_at_800_mz(
         mut self,
         zodiac_number_of_considered_candidates_at_800_mz: i32,
@@ -469,6 +563,12 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// Ratio of candidate molecular formulas (fragmentation trees computed by SIRIUS) per compound which are forced for each ionization to be
+    /// considered by ZODIAC. This depends on the number of candidates ZODIAC considers.
+    /// E.g. if 50 candidates are considered and a ratio of 0.2 is set,
+    /// at least 10 candidates per ionization will be considered, which might increase the number of candidates above 50.
+    /// # Arguments
+    /// * `zodiac_ratio_of_considered_candidates_per_ionization` - The ratio of candidate molecular formulas.
     pub fn zodiac_ratio_of_considered_candidates_per_ionization(
         mut self,
         zodiac_ratio_of_considered_candidates_per_ionization: f32,
@@ -490,6 +590,9 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// As default ZODIAC runs a 2-step approach. First running 'good quality compounds' only, and afterwards including the remaining.
+    /// # Arguments
+    /// * `zodiac_run_in_two_steps` - Whether to run ZODIAC in two steps.
     pub fn zodiac_run_in_two_steps(
         mut self,
         zodiac_run_in_two_steps: bool,
@@ -499,8 +602,12 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
-    /// Maximal mass deviation allowed for MS1.
-    /// If the value is not positive, an error is returned.
+    /// Mass accuracy setting for MS1 spectra. Mass accuracies are always written as "X ppm (Y Da)"
+    /// with X and Y are numerical values. The ppm is a relative measure
+    /// (parts per million), Da is an absolute measure. For each mass, the
+    /// maximum of relative and absolute is used.
+    /// # Arguments
+    /// * `ms1_mass_deviation_allowed_mass_deviation` - The mass accuracy setting for MS1 spectra.
     pub fn ms1_mass_deviation_allowed_mass_deviation(
         mut self,
         ms1_mass_deviation_allowed_mass_deviation: MassDeviation,
@@ -545,6 +652,12 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// Mass accuracy setting for MS2 spectra. Mass accuracies are always written as "X ppm (Y Da)"
+    /// with X and Y are numerical values. The ppm is a relative measure
+    /// (parts per million), Da is an absolute measure. For each mass, the
+    /// maximum of relative and absolute is used.
+    /// # Arguments
+    /// * `ms2_mass_deviation_allowed_mass_deviation` - The mass accuracy setting for MS2 spectra.
     pub fn ms2_mass_deviation_allowed_mass_deviation(
         mut self,
         ms2_mass_deviation_allowed_mass_deviation: MassDeviation,
@@ -556,6 +669,9 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// Detectable elements are added to the chemical alphabet, if there are indications for them (e.g. in isotope pattern)
+    /// # Arguments
+    /// * `formula_settings_detectable` - The detectable elements.
     pub fn formula_settings_detectable(
         mut self,
         formula_settings_detectable: AtomVector,
@@ -567,6 +683,13 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// These configurations hold the information how to
+    /// autodetect elements based on the given formula constraints.
+    /// Note: If the compound is already assigned to a
+    /// specific molecular formula, this annotation is
+    /// ignored. Enforced elements are always considered.
+    /// # Arguments
+    /// * `formula_settings_enforced` - The enforced elements.
     pub fn formula_settings_enforced(
         mut self,
         formula_settings_enforced: AtomVector,
@@ -576,6 +699,9 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// Fallback elements are used, if the auto-detection fails (e.g. no isotope pattern available)
+    /// # Arguments
+    /// * `formula_settings_fallback` - The fallback elements.
     pub fn formula_settings_fallback(
         mut self,
         formula_settings_fallback: AtomVector,
@@ -585,6 +711,10 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// Enable/Disable the hypothesen driven recalibration of MS/MS spectra.
+    /// Must be either 'ALLOWED' or FORBIDDEN'.
+    /// # Arguments
+    /// * `forbid_recalibration` - Whether to forbid recalibration.
     pub fn forbid_recalibration(
         mut self,
         forbid_recalibration: ForbidRecalibration,
@@ -594,6 +724,10 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// Set minimum m/z to enable heuristic preprocessing. The heuristic will be used to initially rank the formula candidates.
+    /// The Top (NumberOfCandidates) candidates will then be computed exactly by solving the ILP.
+    /// # Arguments
+    /// * `use_heuristic_mz_to_use_heuristic` - The minimum m/z to enable heuristic preprocessing.
     pub fn use_heuristic_mz_to_use_heuristic(
         mut self,
         use_heuristic_mz_to_use_heuristic: u32,
@@ -605,6 +739,9 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// Set minimum m/z to only use heuristic tree computation. No exact tree computation (ILP) will be performed for this compounds.
+    /// # Arguments
+    /// * `use_heuristic_mz_to_use_heuristic_only` - The minimum m/z to only use heuristic tree computation.
     pub fn use_heuristic_mz_to_use_heuristic_only(
         mut self,
         use_heuristic_mz_to_use_heuristic: u32,
@@ -616,6 +753,7 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    ///  Detectable ion modes which are only considered if there is an indication in the MS1 scan (e.g. correct mass delta).
     pub fn adduct_settings_detectable(
         mut self,
         adduct_settings_detectable: AdductsVector,
@@ -627,6 +765,9 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// Fallback ion modes which are considered if the auto detection did not find any indication for an ion mode.
+    /// # Arguments
+    /// * `adduct_settings_fallback` - The fallback ion modes.
     pub fn adduct_settings_fallback(
         mut self,
         adduct_settings_fallback: AdductsVector,
@@ -636,18 +777,28 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// Configuration profile to store instrument specific algorithm properties. Some of the default profiles are: 'qtof', 'orbitrap', 'fticr'.
+    /// # Arguments
+    /// * `algorithm_profile` - The algorithm profile.
     pub fn algorithm_profile(mut self, algorithm_profile: Instruments) -> Result<Self, String> {
         self.config
             .add_config_parameter(ConfigV5::AlgorithmProfile(algorithm_profile))?;
         Ok(self)
     }
 
+    /// Keywords that can be assigned to a input spectrum to judge its quality.
+    /// Available keywords are: Good, LowIntensity, NoMS1Peak, FewPeaks, Chimeric, NotMonoisotopicPeak, PoorlyExplained
+    /// # Arguments
+    /// * `compound_quality` - The compound quality.
     pub fn compound_quality(mut self, compound_quality: CompoundQuality) -> Result<Self, String> {
         self.config
             .add_config_parameter(ConfigV5::CompoundQuality(compound_quality))?;
         Ok(self)
     }
 
+    /// Enforced ion modes that are always considered.
+    /// # Arguments
+    /// * `adduct_settings_enforced` - The enforced ion modes.
     pub fn adduct_settings_enforced(
         mut self,
         adduct_settings_enforced: AdductSettingsEnforced,
@@ -657,6 +808,11 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// This configuration holds a set of user given formulas to be used as candidates for SIRIUS
+    /// Note: This set might be merged with other sources like formulas from databases
+    /// Set of Molecular Formulas to be used as candidates for molecular formula estimation with SIRIUS
+    /// # Arguments
+    /// * `candidate_formulas` - The candidate formulas.
     pub fn candidate_formulas(
         mut self,
         candidate_formulas: CandidateFormulas,
@@ -666,6 +822,10 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// Allows the USER to Specify the ScoreType that is used to rank the list of Molecular Formula Identifications
+    /// before CSI:FingerID predictions are calculated. Auto means that this ScoreType is automatically set depending on the executed workflow.
+    /// # Arguments
+    /// * `formula_result_ranking_score` - The score type that is used to rank the list of Molecular Formula Identifications.
     pub fn formula_result_ranking_score(
         mut self,
         formula_result_ranking_score: FormulaResultRankingScore,
@@ -686,6 +846,10 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// multiplier for the isotope score. Set to 0 to disable isotope scoring. Otherwise, the score from isotope pattern analysis is multiplied with this coefficient.
+    /// Set to a value larger than one if your isotope pattern data is of much better quality than your MS/MS data.
+    /// # Arguments
+    /// * `isotope_settings_multiplier` - The multiplier for the isotope score.
     pub fn isotope_settings_multiplier(
         mut self,
         isotope_settings_multiplier: u32,
@@ -728,6 +892,13 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// An adduct switch is a switch of the ionization mode within a spectrum, e.g. an ion replaces an
+    /// sodium adduct with a protonation during fragmentation. Such adduct switches heavily increase the
+    /// complexity of the analysis, but for certain adducts they might happen
+    /// regularly. Adduct switches are written in the form  {@literal a -> b, a -> c, d -> c} where a, b,
+    /// c, and d are adducts and  {@literal a -> b} denotes an allowed switch from a to b within the MS/MS spectrum.
+    /// # Arguments
+    /// * `possible_adduct_switches` - The possible adduct switches.
     pub fn possible_adduct_switches(
         mut self,
         possible_adduct_switches: PossibleAdductSwitches,
@@ -837,19 +1008,22 @@ impl SiriusBuilder<Version5> {
 
     /// Whether to enable the WriteSummaries module.
     pub fn enable_write_summaries(mut self) -> Result<Self, String> {
-        self.config.add_write_summaries_parameter(WriteSummariesV5::Enabled)?;
+        self.config
+            .add_write_summaries_parameter(WriteSummariesV5::Enabled)?;
         Ok(self)
     }
 
     /// Set whether to display the help of WriteSummaries.
     pub fn write_summaries_help(mut self) -> Result<Self, String> {
-        self.config.add_write_summaries_parameter(WriteSummariesV5::Help)?;
+        self.config
+            .add_write_summaries_parameter(WriteSummariesV5::Help)?;
         Ok(self)
     }
 
     /// Set whether to display the version of WriteSummaries.
     pub fn write_summaries_version(mut self) -> Result<Self, String> {
-        self.config.add_write_summaries_parameter(WriteSummariesV5::Version)?;
+        self.config
+            .add_write_summaries_parameter(WriteSummariesV5::Version)?;
         Ok(self)
     }
 }

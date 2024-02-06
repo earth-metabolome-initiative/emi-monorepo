@@ -273,7 +273,10 @@ impl<V: Version> SiriusConfig<V> {
     ///
     /// * `parameter` - The parameter to add.
     ///
-    pub fn add_write_summaries_parameter(&mut self, parameter: V::WriteSummaries) -> Result<(), String> {
+    pub fn add_write_summaries_parameter(
+        &mut self,
+        parameter: V::WriteSummaries,
+    ) -> Result<(), String> {
         // We check if the parameter is already present in the vector
         // If it is, we return an error
         if let Some(existing_parameter) = self
@@ -311,7 +314,11 @@ impl<V: Version> SiriusConfig<V> {
             .chain(self.fingerprint_parameters.iter().map(|p| p.to_string()))
             .chain(self.structure_parameters.iter().map(|p| p.to_string()))
             .chain(self.canopus_parameters.iter().map(|p| p.to_string()))
-            .chain(self.write_summaries_parameters.iter().map(|p| p.to_string()))
+            .chain(
+                self.write_summaries_parameters
+                    .iter()
+                    .map(|p| p.to_string()),
+            )
             .collect::<Vec<String>>()
     }
 }
