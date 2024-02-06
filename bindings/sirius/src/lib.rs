@@ -1,3 +1,5 @@
+#![deny(missing_docs)]
+
 mod builder;
 mod parameters;
 mod sirius;
