@@ -503,7 +503,7 @@ impl TryFrom<String> for Atoms {
     }
 }
 
-/// A vector of atoms that can be read from a string or written to a string
+/// Create a vector of atoms
 #[cfg_attr(feature = "fuzz", derive(arbitrary::Arbitrary))]
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 pub struct AtomVector(Vec<Atoms>);

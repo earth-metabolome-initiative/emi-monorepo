@@ -22,7 +22,7 @@ impl<V: Version> Sirius<V> {
     /// The sirius executable is expected to be available in the environment variable SIRIUS_PATH.
     /// The username and password for the sirius account are expected to be available in the environment variables SIRIUS_USERNAME and SIRIUS_PASSWORD.
     ///
-    /// This function get the parameters that where set in building the SiriusConfig struct and runs the sirius command with the given input and output file paths.
+    /// This function gets the parameters that where set in the SiriusBuilder struct and runs the sirius command with the given input and output file paths.
     ///
     /// # Arguments
     /// * `input_file_path` - The path to the input file
@@ -114,7 +114,12 @@ impl<V: Version> Sirius<V> {
         println!("Running command: sirius {:?}", args);
 
         // Add arguments and spawn the command
-        command.args(&args).spawn().expect("Sirius failed to start");
+        let mut child = command.args(&args).spawn().expect("Sirius failed to start");
+        let status = child.wait().expect("Failed to wait on child");
+
+        if !status.success() {
+            return Err("Sirius failed".to_string());
+        }
 
         Ok(())
     }

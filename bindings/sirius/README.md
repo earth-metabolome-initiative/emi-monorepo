@@ -1,55 +1,134 @@
+# Sirius
+SIRIUS is a Java software for analyzing metabolites from tandem mass spectrometry data. 
+It combines the analysis of isotope patterns in MS spectra with the analysis of fragmentation patterns in MS/MS spectra,
+and uses CSI:FingerID as a web service to search in molecular structure databases.
+Further it integrates CANOPUS for de novo compound class prediction.
 
+SIRIUS requires **high mass accuracy data**. The mass deviation of your MS and MS/MS spectra should be within 20 ppm. Mass Spectrometry instruments such as TOF, Orbitrap and FT-ICR usually provide high mass accuracy data, as well as coupled instruments like Q-TOF, IT-TOF or IT-Orbitrap. Spectra measured with a quadrupole or linear trap do not provide the high mass accuracy that is required for our method.
+
+SIRIUS expects MS and MS/MS spectra as input. It is possible to omit the MS data, but it will make the analysis more time consuming and might give you worse results. In this case, you should consider limiting the candidate molecular formulas to those found in PubChem.
+# Sirius binding
+## Usage
+Add this to your `Cargo.toml`:
+```toml
+[dependencies]
+sirius = "0.1"
+```
+and this to your crate root:
+```rust
+use sirius::prelude::*;
+```
+
+## Examples
+In case you have an MGF file you can run Sirius as follows:
+```rust
+use sirius::prelude::*;
+use std::path::Path;
+let sirius = SiriusBuilder::<Version5>::default()
+    .maximal_mz_default().unwrap()
+    .enable_formula().unwrap()
+    .enable_zodiac().unwrap()
+    .enable_fingerprint().unwrap()
+    .enable_structure().unwrap()
+    .enable_canopus().unwrap()
+    .enable_write_summaries().unwrap()
+    .build();
+let input_file_path = Path::new("tests/data/input_sirius.mgf");
+let output_file_path = Path::new("tests/data/output_sirius_default");
+// Check if the path exists before attempting to remove it
+if output_file_path.exists() {
+    let _ = std::fs::remove_dir_all(output_file_path);
+}
+sirius.run(input_file_path, output_file_path).unwrap();
+```
+
+Or with more options/parameters (the example below uses the parameters used for the ENPKG pipeline):
+```rust
+use sirius::prelude::*;
+use std::path::Path;
+let sirius = SiriusBuilder::default()
+    .maximal_mz(800.0).unwrap()
+    .isotope_settings_filter(true).unwrap()
+    .formula_search_db(SearchDB::Bio).unwrap()
+    .timeout_seconds_per_tree(0).unwrap()
+    .formula_settings_enforced(AtomVector::from(vec![
+        Atoms::H,
+        Atoms::C,
+        Atoms::N,
+        Atoms::O,
+        Atoms::P,
+    ])).unwrap()
+    .timeout_seconds_per_instance(0).unwrap()
+    .adduct_settings_detectable(AdductsVector::from(vec![
+        Adducts::MplusHplus,
+        Adducts::MplusHminusTwoH2Oplus,
+        Adducts::MplusNaplus,
+        Adducts::MplusKplus,
+        Adducts::MplusH3NplusHplus,
+        Adducts::MplusHminusH2Oplus,
+    ])).unwrap()
+    .use_heuristic_mz_to_use_heuristic_only(650).unwrap()
+    .algorithm_profile(Instruments::Orbitrap).unwrap()
+    .isotope_ms2_settings(IsotopeMS2Settings::Ignore).unwrap()
+    .ms2_mass_deviation_allowed_mass_deviation(MassDeviation::Ppm(5.0)).unwrap()
+    .number_of_candidates_per_ion(1).unwrap()
+    .use_heuristic_mz_to_use_heuristic(300).unwrap()
+    .formula_settings_detectable(AtomVector::from(vec![
+        Atoms::B,
+        Atoms::Cl,
+        Atoms::Se,
+        Atoms::S,
+    ])).unwrap()
+    .number_of_candidates(10).unwrap()
+    .zodiac_number_of_considered_candidates_at_300_mz(10).unwrap()
+    .zodiac_run_in_two_steps(true).unwrap()
+    .zodiac_edge_filter_thresholds_min_local_connections(10).unwrap()
+    .zodiac_edge_filter_thresholds_threshold_filter(0.95).unwrap()
+    .zodiac_epochs_burn_in_period(2000).unwrap()
+    .zodiac_epochs_number_of_markov_chains(10).unwrap()
+    .zodiac_number_of_considered_candidates_at_800_mz(50).unwrap()
+    .zodiac_epochs_iterations(20000).unwrap()
+    .adduct_settings_enforced_default().unwrap()
+    .adduct_settings_fallback(AdductsVector::from(vec![
+        Adducts::MplusHplus,
+        Adducts::MplusNaplus,
+        Adducts::MplusKplus,
+    ])).unwrap()
+    .formula_result_threshold(true).unwrap()
+    .inject_el_gordo_compounds(true).unwrap()
+    .structure_search_db(SearchDB::Bio).unwrap()
+    .recompute_results(false).unwrap()
+    .enable_formula().unwrap()
+    .enable_zodiac().unwrap()
+    .enable_fingerprint().unwrap()
+    .enable_structure().unwrap()
+    .enable_canopus().unwrap()
+    .build();
+
+let input_file_path = Path::new("tests/data/input_sirius.mgf");
+let output_file_path = Path::new("tests/data/output_sirius");
+// Check if the path exists before attempting to remove it
+if output_file_path.exists() {
+    let _ = std::fs::remove_dir_all(output_file_path);
+}
+sirius.run(input_file_path, output_file_path).unwrap();
+```
+
+You can replace the `input_file_path` and `output_file_path` with your own paths.
+
+<!--begin cite-->
+# Citing Sirius
+
+Kai Dührkop, Markus Fleischauer, Marcus Ludwig, Alexander A. Aksenov, Alexey V. Melnik, Marvin Meusel, Pieter C. Dorrestein, Juho Rousu, and Sebastian Böcker, 
+[SIRIUS 4: Turning tandem mass spectra into metabolite structure information.](https://doi.org/10.1038/s41592-019-0344-8)
+*Nature Methods* 16, 299–302, 2019.
+<!--end cite-->
 
 ## Sirius config 
 
-Usage: sirius config [-hV] [--AdductSettings.detectable=[M+H]+,[M+K]+,[M+Na]+,
-                     [M+H-H2O]+,[M+H-H4O2]+,[M+NH4]+,[M-H]-,[M+Cl]-,[M-H2O-H]-,
-                     [M+Br]-] [--AdductSettings.enforced=,] [--AdductSettings.
-                     fallback=[M+H]+,[M-H]-,[M+Na]+,[M+K]+]
-                     [--AlgorithmProfile=default] [--CandidateFormulas=,]
-                     [--CompoundQuality=UNKNOWN]
-                     [--ForbidRecalibration=ALLOWED]
-                     [--FormulaResultRankingScore=AUTO]
-                     [--FormulaResultThreshold=true] [--FormulaSearchDB=none]
-                     [--FormulaSettings.detectable=S,Br,Cl,B,Se]
-                     [--FormulaSettings.enforced=C,H,N,O,P] [--FormulaSettings.
-                     fallback=S] [--InjectElGordoCompounds=True]
-                     [--IsotopeMs2Settings=IGNORE] [--IsotopeSettings.
-                     filter=True] [--IsotopeSettings.multiplier=1]
-                     [--MedianNoiseIntensity=0.015] [--MotifDbFile=none] [--ms1.
-                     absoluteIntensityError=0.02] [--ms1.
-                     minimalIntensityToConsider=0.01] [--ms1.
-                     relativeIntensityError=0.08] [--MS1MassDeviation.
-                     allowedMassDeviation=10.0 ppm] [--MS1MassDeviation.
-                     massDifferenceDeviation=5.0 ppm] [--MS1MassDeviation.
-                     standardMassDeviation=10.0 ppm] [--MS2MassDeviation.
-                     allowedMassDeviation=10.0 ppm] [--MS2MassDeviation.
-                     standardMassDeviation=10.0 ppm] [--NoiseThresholdSettings.
-                     absoluteThreshold=0] [--NoiseThresholdSettings.
-                     basePeak=NOT_PRECURSOR] [--NoiseThresholdSettings.
-                     intensityThreshold=0.005] [--NoiseThresholdSettings.
-                     maximalNumberOfPeaks=60] [--NumberOfCandidates=10]
-                     [--NumberOfCandidatesPerIon=1]
-                     [--NumberOfStructureCandidates=10000]
-                     [--PossibleAdductSwitches=[M+Na]+:[M+H]+,[M+K]+:[M+H]+,
-                     [M+Cl]-:[M-H]-] [--PrintCitations=True]
-                     [--RecomputeResults=False]
-                     [--StructurePredictors=CSI_FINGERID]
-                     [--StructureSearchDB=BIO] [--Timeout.secondsPerInstance=0]
-                     [--Timeout.secondsPerTree=0] [--UseHeuristic.
-                     mzToUseHeuristic=300] [--UseHeuristic.
-                     mzToUseHeuristicOnly=650] [--ZodiacClusterCompounds=false]
-                     [--ZodiacEdgeFilterThresholds.minLocalCandidates=1]
-                     [--ZodiacEdgeFilterThresholds.minLocalConnections=10]
-                     [--ZodiacEdgeFilterThresholds.thresholdFilter=0.95]
-                     [--ZodiacEpochs.burnInPeriod=2000] [--ZodiacEpochs.
-                     iterations=20000] [--ZodiacEpochs.numberOfMarkovChains=10]
-                     [--ZodiacLibraryScoring.lambda=1000]
-                     [--ZodiacLibraryScoring.minCosine=0.5]
-                     [--ZodiacNumberOfConsideredCandidatesAt300Mz=10]
-                     [--ZodiacNumberOfConsideredCandidatesAt800Mz=50]
-                     [--ZodiacRatioOfConsideredCandidatesPerIonization=0.2]
-                     [--ZodiacRunInTwoSteps=true] [COMMAND]
+```bash
+Usage: sirius config [-hV]
+                     [COMMAND]
 <CONFIGURATION> Override all possible default configurations of this toolbox
 from the command line.
       --AdductSettings.detectable=[M+H]+,[M+K]+,[M+Na]+,[M+H-H2O]+,[M+H-H4O2]+,
@@ -340,7 +419,7 @@ from the command line.
                            As default ZODIAC runs a 2-step approach. First
                              running 'good quality compounds' only, and
                            afterwards including the remaining.
-
+```
 
 # Sirius options
 

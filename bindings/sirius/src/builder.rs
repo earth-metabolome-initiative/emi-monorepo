@@ -1053,7 +1053,7 @@ impl<V: Version> SiriusBuilder<V> {
     /// # Example
     /// ```
     /// use sirius::prelude::*;
-    /// let sirius = SiriusBuilder::default().build();
+    /// let sirius = SiriusBuilder::<Version5>::default().build();
     /// ```
     pub fn build(self) -> Sirius<V> {
         Sirius::from(self.config)

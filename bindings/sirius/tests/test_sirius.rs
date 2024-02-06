@@ -94,7 +94,7 @@ fn test_run_sirius_with_enpkg_params() -> Result<(), String> {
         .isotope_settings_filter(true)?
         .formula_search_db(SearchDB::Bio)?
         .timeout_seconds_per_tree(0)?
-        .formula_settings_enforced(AtomVector::new(vec![
+        .formula_settings_enforced(AtomVector::from(vec![
             Atoms::H,
             Atoms::C,
             Atoms::N,
@@ -116,7 +116,7 @@ fn test_run_sirius_with_enpkg_params() -> Result<(), String> {
         .ms2_mass_deviation_allowed_mass_deviation(MassDeviation::Ppm(5.0))?
         .number_of_candidates_per_ion(1)?
         .use_heuristic_mz_to_use_heuristic(300)?
-        .formula_settings_detectable(AtomVector::new(vec![
+        .formula_settings_detectable(AtomVector::from(vec![
             Atoms::B,
             Atoms::Cl,
             Atoms::Se,
