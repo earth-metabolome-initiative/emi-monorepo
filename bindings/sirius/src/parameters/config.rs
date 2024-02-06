@@ -1,63 +1,175 @@
 use crate::prelude::*;
 use crate::traits::{Enablable, IntoDefault, NamedParametersSet};
 
+/// The possible config settings
 #[derive(Debug, Clone, PartialEq)]
 pub enum ConfigV5 {
+    /// If the config is enabled
     Enabled,
+
+    /// The isotope settings filter
     IsotopeSettingsFilter(bool),
+
+    /// The formula search db
     FormulaSearchDB(SearchDB),
+
+    /// The structure search db
     StructureSearchDB(SearchDB),
+
+    /// The timeout seconds per tree
     TimeoutSecondsPerTree(u32),
+
+    /// The number of candidates per ion
     NumberOfCandidates(u32),
-    NumberOfCandidatesPerIon(u32), // can this be equal to zero ?
+
+    /// The number of candidates per ion
+    NumberOfCandidatesPerIon(u32),
+
+    /// The number of structure candidates
     NumberOfStructureCandidates(u32),
+
+    /// Whether to recompute results
     RecomputeResults(bool),
+
+    /// Whether to print citations
     PrintCitations(bool),
+
+    /// The timeout seconds per instance
     TimeoutSecondsPerInstance(u32),
+
+    /// Whether to use formula result threshold
     FormulaResultThreshold(bool),
+
+    /// Candidates matching the lipid class estimated by El Gordo will be tagged.
     InjectElGordoCompounds(bool),
+
+    /// The median noise intensity
     MedianNoiseIntensity(f32),
+
+    /// The MS1 absolute intensity error
     MS1AbsoluteIntensityError(f32),
+
+    /// The MS1 minimal intensity to consider
     MS1MinimalIntensityToConsider(f32),
+
+    /// The MS1 relative intensity error
     MS1RelativeIntensityError(f32),
+
+    /// The noise threshold settings intensity threshold
     NoiseThresholdSettingsIntensityThreshold(f32),
+
+    /// The noise threshold settings maximal number of peaks
     NoiseThresholdSettingsMaximalNumberOfPeaks(u32),
+
+    /// Whether to cluster compounds before running zodiac
     ZodiacClusterCompounds(bool),
+
+    /// The zodiac edge filter thresholds min local candidates
     ZodiacEdgeFilterThresholdsMinLocalCandidates(u32),
+
+    /// The zodiac edge filter thresholds min local connections
     ZodiacEdgeFilterThresholdsMinLocalConnections(u32),
+
+    /// The zodiac edge filter thresholds threshold filter
     ZodiacEdgeFilterThresholdsThresholdFilter(f32),
+
+    /// The zodiac epochs burn in period
     ZodiacEpochsBurnInPeriod(u32),
+
+    /// The zodiac epochs iterations
     ZodiacEpochsIterations(u32),
+
+    /// The number of markov chains for zodiac
     ZodiacEpochsNumberOfMarkovChains(u32),
+
+    /// The zodiac library scoring lambda
     ZodiacLibraryScoringLambda(u32),
+
+    /// The zodiac library scoring min cosine
     ZodiacLibraryScoringMinCosine(f32),
+
+    /// The zodiac number of considered candidates at 300 mz
     ZodiacNumberOfConsideredCandidatesAt300Mz(i32),
+
+    /// The zodiac number of considered candidates at 800 mz
     ZodiacNumberOfConsideredCandidatesAt800Mz(i32),
+
+    /// The zodiac ratio of considered candidates per ionization
     ZodiacRatioOfConsideredCandidatesPerIonization(f32), //can't be negative, higher than 1 or NaN
+
+    /// Whether to run zodiac in two steps
     ZodiacRunInTwoSteps(bool),
+
+    /// The MS1 mass deviation allowed mass deviation
     MS1MassDeviationAllowedMassDeviation(MassDeviation),
+
+    /// The MS1 mass deviation mass difference deviation
     MS1MassDeviationMassDifferenceDeviation(MassDeviation),
+
+    /// The MS1 mass deviation standard mass deviation
     MS1MassDeviationStandardMassDeviation(MassDeviation),
+
+    /// The MS2 mass deviation allowed mass deviation
     MS2MassDeviationAllowedMassDeviation(MassDeviation),
+
+    /// The MS2 mass deviation standard mass deviation
     MS2MassDeviationStandardMassDeviation(MassDeviation),
+
+    /// The formula settings detectable
     FormulaSettingsDetectable(AtomVector),
+
+    /// The formula settings enforced
     FormulaSettingsEnforced(AtomVector),
+
+    /// The formula settings fallback
     FormulaSettingsFallback(AtomVector),
+
+    /// Whether to forbid recalibration
     ForbidRecalibration(ForbidRecalibration),
+
+    /// The use heuristic mz to use heuristic
     UseHeuristicMZToUseHeuristic(u32),
+
+    /// The use heuristic mz to use heuristic only
     UseHeuristicMZToUseHeuristicOnly(u32),
+
+    /// The detectable adducts
     AdductSettingsDetectable(AdductsVector),
+
+    /// The fallback adducts
     AdductSettingsFallback(AdductsVector),
+
+    /// The algorithm profile
     AlgorithmProfile(Instruments),
+
+    /// The compound quality
     CompoundQuality(CompoundQuality),
+
+    /// The enforced adducts
     AdductSettingsEnforced(AdductSettingsEnforced),
+
+    /// The candidate formulas
     CandidateFormulas(CandidateFormulas),
+
+    /// The formula result ranking score
     FormulaResultRankingScore(FormulaResultRankingScore),
+
+    /// The isotope ms2 settings
     IsotopeMS2Settings(IsotopeMS2Settings),
+
+    /// The isotope settings multiplier
     IsotopeSettingsMultiplier(u32),
+
+    /// The noise threshold settings absolute threshold
     NoiseThresholdSettingsAbsoluteThreshold(u32),
+
+    /// The noise threshold settings base peak
     NoiseThresholdSettingsBasePeak(BasePeak),
+
+    /// The structure predictors
     StructurePredictors(StructurePredictors),
+
+    /// The possible adduct switches
     PossibleAdductSwitches(PossibleAdductSwitches),
 }
 
@@ -391,7 +503,7 @@ impl IntoDefault for ConfigV5 {
                 ConfigV5::MS2MassDeviationStandardMassDeviation(MassDeviation::ppm(10.0))
             }
             ConfigV5::FormulaSettingsDetectable(_) => {
-                ConfigV5::FormulaSettingsDetectable(AtomVector::new(vec![
+                ConfigV5::FormulaSettingsDetectable(AtomVector::from(vec![
                     Atoms::S,
                     Atoms::Br,
                     Atoms::Cl,
@@ -400,7 +512,7 @@ impl IntoDefault for ConfigV5 {
                 ]))
             }
             ConfigV5::FormulaSettingsEnforced(_) => {
-                ConfigV5::FormulaSettingsEnforced(AtomVector::new(vec![
+                ConfigV5::FormulaSettingsEnforced(AtomVector::from(vec![
                     Atoms::C,
                     Atoms::H,
                     Atoms::N,
@@ -409,7 +521,7 @@ impl IntoDefault for ConfigV5 {
                 ]))
             }
             ConfigV5::FormulaSettingsFallback(_) => {
-                ConfigV5::FormulaSettingsFallback(AtomVector::new(vec![Atoms::S]))
+                ConfigV5::FormulaSettingsFallback(AtomVector::from(vec![Atoms::S]))
             }
             ConfigV5::ForbidRecalibration(_) => {
                 ConfigV5::ForbidRecalibration(ForbidRecalibration::Allowed)
@@ -421,7 +533,7 @@ impl IntoDefault for ConfigV5 {
                 ConfigV5::UseHeuristicMZToUseHeuristicOnly(650)
             }
             ConfigV5::AdductSettingsDetectable(_) => {
-                ConfigV5::AdductSettingsDetectable(AdductsVector::new(vec![
+                ConfigV5::AdductSettingsDetectable(AdductsVector::from(vec![
                     Adducts::MplusHplus,
                     Adducts::MplusKplus,
                     Adducts::MplusNaplus,
@@ -435,7 +547,7 @@ impl IntoDefault for ConfigV5 {
                 ]))
             }
             ConfigV5::AdductSettingsFallback(_) => {
-                ConfigV5::AdductSettingsFallback(AdductsVector::new(vec![
+                ConfigV5::AdductSettingsFallback(AdductsVector::from(vec![
                     Adducts::MplusHplus,
                     Adducts::MminusHminus,
                     Adducts::MplusKplus,
@@ -523,7 +635,7 @@ mod tests {
     fn test_formula_settings_detectable_to_string() {
         assert_eq!(
             "--FormulaSettings.detectable=S,Br,Cl,B,Se",
-            ConfigV5::FormulaSettingsDetectable(AtomVector::new(vec![
+            ConfigV5::FormulaSettingsDetectable(AtomVector::from(vec![
                 Atoms::S,
                 Atoms::Br,
                 Atoms::Cl,
@@ -537,14 +649,14 @@ mod tests {
     #[test]
     fn test_default_settings_detectable() {
         assert_eq!(
-            ConfigV5::FormulaSettingsDetectable(AtomVector::new(vec![
+            ConfigV5::FormulaSettingsDetectable(AtomVector::from(vec![
                 Atoms::S,
                 Atoms::Br,
                 Atoms::Cl,
                 Atoms::B,
                 Atoms::Se,
             ])),
-            ConfigV5::FormulaSettingsDetectable(AtomVector::new(vec![
+            ConfigV5::FormulaSettingsDetectable(AtomVector::from(vec![
                 Atoms::S,
                 Atoms::Br,
                 Atoms::Cl,
@@ -554,14 +666,14 @@ mod tests {
             .into_default()
         );
         assert_ne!(
-            ConfigV5::FormulaSettingsDetectable(AtomVector::new(vec![
+            ConfigV5::FormulaSettingsDetectable(AtomVector::from(vec![
                 Atoms::S,
                 Atoms::Br,
                 Atoms::Cl,
                 Atoms::B,
                 Atoms::Se,
             ])),
-            ConfigV5::FormulaSettingsDetectable(AtomVector::new(vec![
+            ConfigV5::FormulaSettingsDetectable(AtomVector::from(vec![
                 Atoms::S,
                 Atoms::Br,
                 Atoms::Cl,
@@ -574,7 +686,7 @@ mod tests {
     fn test_adducts_settings_detectable_to_string() {
         assert_ne!(
             "--AdductSettings.detectable=H,K,Na,M-H2O+H,M+H-2H2O,NH4,M-H,Cl,M-H2O-H,M+Br",
-            ConfigV5::AdductSettingsDetectable(AdductsVector::new(vec![
+            ConfigV5::AdductSettingsDetectable(AdductsVector::from(vec![
                 Adducts::MplusH2OplusHplus,
                 Adducts::MplusHplus,
                 Adducts::MplusClminus,
@@ -590,7 +702,7 @@ mod tests {
         );
         assert_eq!(
             "--AdductSettings.detectable=[M+H]+,[M+K]+,[M+Na]+",
-            ConfigV5::AdductSettingsDetectable(AdductsVector::new(vec![
+            ConfigV5::AdductSettingsDetectable(AdductsVector::from(vec![
                 Adducts::MplusHplus,
                 Adducts::MplusKplus,
                 Adducts::MplusNaplus,
@@ -599,7 +711,7 @@ mod tests {
         );
         assert_eq!(
             "--AdductSettings.detectable=[M+H]+,[M+K]+,[M+Na]+,[M+H-H2O]+,[M+H-H4O2]+,[M+NH4]+,[M-H]-,[M+Cl]-,[M-H2O-H]-,[M+Br]-",
-            ConfigV5::AdductSettingsDetectable(AdductsVector::new(vec![Adducts::MplusHplus]))
+            ConfigV5::AdductSettingsDetectable(AdductsVector::from(vec![Adducts::MplusHplus]))
                 .into_default()
                 .to_string()
         )

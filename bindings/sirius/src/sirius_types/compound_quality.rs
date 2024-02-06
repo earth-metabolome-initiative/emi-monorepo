@@ -1,16 +1,32 @@
 use std::fmt::Display;
 
+/// The possible compound qualities if known
 #[cfg_attr(feature = "fuzz", derive(arbitrary::Arbitrary))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum CompoundQuality {
+    /// The default compound quality: unknown
     #[default]
     Unknown,
+
+    /// Is good
     Good,
+
+    /// Is low intensity
     LowIntensity,
+
+    /// Has no MS1 peak
     NoMS1Peak,
+
+    /// Has few peaks
     FewPeaks,
+
+    /// Is chimeric
     Chimeric,
+
+    /// Is not a monoisotopic peak
     NotMonoisotopicPeak,
+
+    /// Is poorly explained
     PoorlyExplained,
 }
 

@@ -102,7 +102,7 @@ fn test_run_sirius_with_enpkg_params() -> Result<(), String> {
             Atoms::P,
         ]))?
         .timeout_seconds_per_instance(0)?
-        .adduct_settings_detectable(AdductsVector::new(vec![
+        .adduct_settings_detectable(AdductsVector::from(vec![
             Adducts::MplusHplus,
             Adducts::MplusHminusTwoH2Oplus,
             Adducts::MplusNaplus,
@@ -132,7 +132,7 @@ fn test_run_sirius_with_enpkg_params() -> Result<(), String> {
         .zodiac_number_of_considered_candidates_at_800_mz(50)?
         .zodiac_epochs_iterations(20000)?
         .adduct_settings_enforced_default()?
-        .adduct_settings_fallback(AdductsVector::new(vec![
+        .adduct_settings_fallback(AdductsVector::from(vec![
             Adducts::MplusHplus,
             Adducts::MplusNaplus,
             Adducts::MplusKplus,

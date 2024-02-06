@@ -1,9 +1,15 @@
 use crate::traits::{Enablable, IntoDefault, NamedParametersSet};
 
+/// The possible canopus settings
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum CanopusV5 {
+    /// If the canopus is enabled
     Enabled,
+
+    /// The version for `canopus`
     Version,
+
+    /// The help for `canopus`
     Help,
 }
 

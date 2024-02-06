@@ -1,29 +1,71 @@
 use std::fmt::Display;
 
+/// The databases to search structures and formulas
 #[cfg_attr(feature = "fuzz", derive(arbitrary::Arbitrary))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum SearchDB {
+    /// The BIO search db. This is the default
     #[default]
     Bio,
+
+    /// The METACYC search db
     Metacyc,
+
+    /// The CHEBI search db
     Chebi,
+
+    /// The COCONUT search db
     Coconut,
+
+    /// The ECOCYCMINE search db
     Ecocycmine,
+
+    /// The GNPS search db
     Gnps,
+
+    /// The HMDB search db
     Hmdb,
+
+    /// The HSDB search db
     Hsdb,
+
+    /// The KEGG search db
     Kegg,
+
+    /// The KEGGMINE search db
     Keggmine,
+
+    /// The KNAPSACK search db
     Knapsack,
+
+    /// The MACONDA search db
     Maconda,
+
+    /// The MESH search db
     Mesh,
+
+    /// The NORMAN search db
     Norman,
+
+    /// The UNDP search db
     Undp,
+
+    /// The PLANTCYC search db
     Plantcyc,
+
+    /// The PUBCHEM search db
     Pubchem,
+
+    /// The PUBMED search db
     Pubmed,
+
+    /// The YMDB search db
     Ymdb,
+
+    /// The YMDBMINE search db
     Ymdbmine,
+
+    /// The ZINCBIO search db
     Zincbio,
 }
 

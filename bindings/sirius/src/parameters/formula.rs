@@ -1,9 +1,15 @@
 use crate::traits::{Enablable, IntoDefault, NamedParametersSet};
 
+/// The possible formula settings
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum FormulaV5 {
+    /// If the formula is enabled
     Enabled,
+
+    /// The version for `formula`
     Version,
+
+    /// The help for `formula`
     Help,
 }
 

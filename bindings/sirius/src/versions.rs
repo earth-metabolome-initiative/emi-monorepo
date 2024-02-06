@@ -4,17 +4,37 @@ use crate::traits::Enablable;
 use crate::traits::IntoDefault;
 use crate::traits::NamedParametersSet;
 
+/// Trait for the different versions of Sirius
 pub trait Version: Default {
+    /// The version number
     const VERSION: usize;
+
+    /// The core parameters
     type Core: ToString + Debug + IntoDefault;
+
+    /// The config parameters
     type Config: ToString + Debug + IntoDefault + NamedParametersSet + Enablable;
+
+    /// The Canopus parameters
     type Canopus: ToString + Debug + IntoDefault + NamedParametersSet + Enablable;
+
+    /// The Formula parameters
     type Formula: ToString + Debug + IntoDefault + NamedParametersSet + Enablable;
+
+    /// The Zodiac parameters
     type Zodiac: ToString + Debug + IntoDefault + NamedParametersSet + Enablable;
+
+    /// The Fingerprint parameters
     type Fingerprint: ToString + Debug + IntoDefault + NamedParametersSet + Enablable;
+
+    /// The Structure parameters
     type Structure: ToString + Debug + IntoDefault + NamedParametersSet + Enablable;
+
+    /// Whether to write summaries
     type WriteSummaries: ToString + Debug + IntoDefault + NamedParametersSet + Enablable;
 }
+
+/// Implementation of the Sirius version 5
 #[derive(Default)]
 pub struct Version5;
 

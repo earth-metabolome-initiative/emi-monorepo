@@ -1,8 +1,10 @@
 use std::fmt::Display;
 
+/// The possible formula result ranking score
 #[cfg_attr(feature = "fuzz", derive(arbitrary::Arbitrary))]
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default, Copy)]
 pub enum FormulaResultRankingScore {
+    /// The default formula result ranking score
     #[default]
     Auto,
 }

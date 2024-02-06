@@ -1,12 +1,20 @@
 use std::fmt::Display;
 
+/// The possible instruments for the mass spectrometry
 #[cfg_attr(feature = "fuzz", derive(arbitrary::Arbitrary))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum Instruments {
+    /// The default instrument
     #[default]
     Default,
+
+    /// The qtof instrument
     Qtof,
+
+    /// The orbitrap instrument
     Orbitrap,
+
+    /// The fticr instrument
     Fticr,
 }
 

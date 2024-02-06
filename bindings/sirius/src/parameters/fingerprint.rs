@@ -1,9 +1,15 @@
 use crate::traits::{Enablable, IntoDefault, NamedParametersSet};
 
+/// The possible fingerprint settings
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum FingerprintV5 {
+    /// If the fingerprint is enabled
     Enabled,
+
+    /// The version for `fingerprint`
     Version,
+
+    /// The help for `fingerprint`
     Help,
 }
 

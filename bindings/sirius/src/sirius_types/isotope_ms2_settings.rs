@@ -1,8 +1,10 @@
 use std::fmt::Display;
 
+/// The possible isotope MS2 settings
 #[cfg_attr(feature = "fuzz", derive(arbitrary::Arbitrary))]
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default, Copy)]
 pub enum IsotopeMS2Settings {
+    /// Ignore the isotope MS2 settings (default)
     #[default]
     Ignore,
 }

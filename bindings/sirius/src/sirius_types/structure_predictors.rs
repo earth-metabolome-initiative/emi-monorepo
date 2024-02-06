@@ -1,9 +1,11 @@
 use std::fmt::Display;
 
+/// The structure predictors. For now, only CSI_FINGERID is supported.
 #[cfg_attr(feature = "fuzz", derive(arbitrary::Arbitrary))]
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default, Copy)]
 pub enum StructurePredictors {
     #[default]
+    /// The CSI_FINGERID structure predictor
     CsiFingerId,
 }
 

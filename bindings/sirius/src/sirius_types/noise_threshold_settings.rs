@@ -1,8 +1,10 @@
 use std::fmt::Display;
 
+/// Noise threshold settings
 #[cfg_attr(feature = "fuzz", derive(arbitrary::Arbitrary))]
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default, Copy)]
 pub enum BasePeak {
+    /// Default noise threshold settings
     #[default]
     NotPrecursor,
 }

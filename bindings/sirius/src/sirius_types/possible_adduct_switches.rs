@@ -1,8 +1,10 @@
 use std::fmt::Display;
 
+/// The possible adduct switches. For now only the default adducts switches are supported.
 #[cfg_attr(feature = "fuzz", derive(arbitrary::Arbitrary))]
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default, Copy)]
 pub enum PossibleAdductSwitches {
+    /// The default adducts switches.
     #[default]
     DefaultAdductsSwitches,
 }

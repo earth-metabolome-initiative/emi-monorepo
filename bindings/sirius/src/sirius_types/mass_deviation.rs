@@ -1,13 +1,31 @@
 use std::fmt::Display;
 
+/// The possible mass deviations
 #[cfg_attr(feature = "fuzz", derive(arbitrary::Arbitrary))]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum MassDeviation {
+    /// The mass deviation in ppm
     Ppm(f32),
+
+    /// The mass deviation in Da
     Da(f32),
 }
 
 impl MassDeviation {
+    /// Create a new mass deviation in ppm
+    /// # Panics
+    /// If the value is negative
+    /// # Example
+    /// ```
+    /// use sirius_types::MassDeviation;
+    /// let ppm = MassDeviation::ppm(10.0);
+    /// ```
+    /// # Panics
+    /// If the value is negative
+    /// ```
+    /// use sirius_types::MassDeviation;
+    /// let ppm = MassDeviation::ppm(-10.0);
+    /// ```
     pub fn ppm(value: f32) -> Self {
         // ppm can't be negative
         if value < 0.0 {
@@ -16,6 +34,20 @@ impl MassDeviation {
         MassDeviation::Ppm(value)
     }
 
+    /// Create a new mass deviation in Da
+    /// # Panics
+    /// If the value is negative
+    /// # Example
+    /// ```
+    /// use sirius_types::MassDeviation;
+    /// let da = MassDeviation::da(0.1);
+    /// ```
+    /// # Panics
+    /// If the value is negative
+    /// ```
+    /// use sirius_types::MassDeviation;
+    /// let da = MassDeviation::da(-0.1);
+    /// ```
     pub fn da(value: f32) -> Self {
         // Da can't be negative
         if value < 0.0 {
@@ -24,6 +56,22 @@ impl MassDeviation {
         MassDeviation::Da(value)
     }
 
+    /// Check if the value is positive
+    /// # Errors
+    /// If the value is negative
+    /// # Example
+    /// ```
+    /// use sirius_types::MassDeviation;
+    /// let ppm = MassDeviation::ppm(10.0);
+    /// assert_eq!(ppm.must_be_positive().unwrap(), MassDeviation::Ppm(10.0));
+    /// ```
+    /// # Errors
+    /// If the value is negative
+    /// ```
+    /// use sirius_types::MassDeviation;
+    /// let ppm = MassDeviation::Ppm(-10.0);
+    /// assert!(ppm.must_be_positive().is_err());
+    /// ```
     pub fn must_be_positive(&self) -> Result<Self, String> {
         match self {
             MassDeviation::Ppm(value) => {

@@ -1,8 +1,10 @@
 use std::fmt::Display;
 
+/// The possible candidate formulas
 #[cfg_attr(feature = "fuzz", derive(arbitrary::Arbitrary))]
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default, Copy)]
 pub enum CandidateFormulas {
+    /// The default candidate formulas
     #[default]
     Comma,
 }

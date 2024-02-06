@@ -1,8 +1,10 @@
 use std::fmt::Display;
 
+/// The possible adduct settings enforced
 #[cfg_attr(feature = "fuzz", derive(arbitrary::Arbitrary))]
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default, Copy)]
 pub enum AdductSettingsEnforced {
+    /// The default adduct settings enforced
     #[default]
     Comma,
 }

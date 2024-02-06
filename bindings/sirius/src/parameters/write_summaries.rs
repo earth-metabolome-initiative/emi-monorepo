@@ -1,9 +1,15 @@
 use crate::traits::{Enablable, IntoDefault, NamedParametersSet};
 
+/// The possible write summaries settings
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum WriteSummariesV5 {
+    /// If the write summaries is enabled
     Enabled,
+
+    /// The version of the write summaries
     Version,
+
+    /// The help for the write summaries
     Help,
 }
 

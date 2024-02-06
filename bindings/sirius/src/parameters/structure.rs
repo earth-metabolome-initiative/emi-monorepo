@@ -1,9 +1,15 @@
 use crate::traits::{Enablable, IntoDefault, NamedParametersSet};
 
+/// The possible structure settings
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum StructureV5 {
+    /// If the structure is enabled
     Enabled,
+
+    /// The version for `structure``
     Version,
+
+    /// The help  for `structure``
     Help,
 }
 

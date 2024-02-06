@@ -1,10 +1,14 @@
 use std::fmt::Display;
 
+/// Allow or forbid recalibration
 #[cfg_attr(feature = "fuzz", derive(arbitrary::Arbitrary))]
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default, Copy)]
 pub enum ForbidRecalibration {
+    /// The default recalibration setting : ALLOWED
     #[default]
     Allowed,
+
+    /// Forbid recalibration
     Forbidden,
 }
 

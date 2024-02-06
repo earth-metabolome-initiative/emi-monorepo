@@ -1,7 +1,9 @@
 use crate::traits::IntoDefault;
 
+/// The possible core settings
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum CoreV5 {
+    /// The maximal mz is in the core parameters
     MaximalMz(f64),
 }
 

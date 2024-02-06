@@ -5,6 +5,7 @@ use std::env;
 use std::path::Path;
 use std::process::Command;
 
+/// The main struct for the Sirius bindings
 pub struct Sirius<V: Version> {
     config: SiriusConfig<V>,
 }
@@ -15,17 +16,17 @@ impl<V: Version> From<SiriusConfig<V>> for Sirius<V> {
     }
 }
 
-// impl<V: Version> Sirius<V> {
-//     pub fn run(&self, input_file_path: &Path, output_file_path: &Path) -> Result<(), String> {
-//         Command::new("sirius")
-//             .args(self.config.args())
-//             .spawn()
-//             .expect("Sirius failed to start");
-//         Ok(())
-//     }
-// }
-
 impl<V: Version> Sirius<V> {
+    /// Run the sirius command with the given input and output file paths.
+    ///
+    /// The sirius executable is expected to be available in the environment variable SIRIUS_PATH.
+    /// The username and password for the sirius account are expected to be available in the environment variables SIRIUS_USERNAME and SIRIUS_PASSWORD.
+    ///
+    /// This function get the parameters that where set in building the SiriusConfig struct and runs the sirius command with the given input and output file paths.
+    ///
+    /// # Arguments
+    /// * `input_file_path` - The path to the input file
+    /// * `output_file_path` - The path to the output file
     pub fn run(&self, input_file_path: &Path, output_file_path: &Path) -> Result<(), String> {
         // Load environment variables from .env file
         dotenv().ok();

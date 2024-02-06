@@ -1,4 +1,6 @@
 use std::fmt::Display;
+
+/// The possible adducts
 #[cfg_attr(feature = "fuzz", derive(arbitrary::Arbitrary))]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Adducts {
@@ -24,18 +26,44 @@ pub enum Adducts {
 
     /// \[M+H3N+H\]+
     MplusH3NplusHplus,
+
+    /// \[M+H2O+H\]+
     MplusH2OplusHplus,
+
+    /// \[M+CH4O+H\]+
     MplusCH4OplusHplus,
+
+    /// \[M+C2H3N+H\]+
     MplusC2H3NplusHplus,
+
+    /// \[M+C4H6N2+H\]+
     MplusC4H6N2plusHplus,
+
+    /// \[M+C3H8O+H\]+
     MplusC3H8OplusHplus,
+
+    /// \[M+C2H6OS+H\]+
     MplusC2H6OSplusHplus,
+
+    /// \[M-H+K+K\]+
     MminusHplusKKplus,
+
+    /// \[M-H+Na+Na\]+
     MminusHplusNaNaplus,
+
+    /// \[M+C2H3N+Na\]+
     MplusC2H3NplusNaplus,
+
+    /// \[M-H\]-
     MminusHminus,
+
+    /// \[M+H-H4O2\]+
     MplusHminusTwoH2Oplus,
+
+    /// \[M-H2O-H\]-
     MminusH20minusHminus,
+
+    /// \[M+Br\]-
     MplusBromideminus,
 }
 
@@ -106,9 +134,11 @@ impl TryFrom<String> for Adducts {
     }
 }
 
+/// Creates a vector of adducts
 #[cfg_attr(feature = "fuzz", derive(arbitrary::Arbitrary))]
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 pub struct AdductsVector(Vec<Adducts>);
+
 impl Display for AdductsVector {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut adducts_string = self.0.iter();
@@ -122,8 +152,8 @@ impl Display for AdductsVector {
     }
 }
 
-impl AdductsVector {
-    pub fn new(adducts: Vec<Adducts>) -> Self {
+impl From<Vec<Adducts>> for AdductsVector {
+    fn from(adducts: Vec<Adducts>) -> Self {
         AdductsVector(adducts)
     }
 }

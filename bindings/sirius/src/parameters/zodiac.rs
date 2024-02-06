@@ -1,9 +1,15 @@
 use crate::traits::{Enablable, IntoDefault, NamedParametersSet};
 
+/// The possible zodiac settings
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum ZodiacV5 {
+    /// If the zodiac is enabled
     Enabled,
+
+    /// The version of the zodiac
     Version,
+
+    /// The help for the zodiac
     Help,
 }
 
