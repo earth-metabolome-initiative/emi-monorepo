@@ -4,8 +4,11 @@ use std::fmt::Display;
 #[cfg_attr(feature = "fuzz", derive(arbitrary::Arbitrary))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum SearchDB {
-    /// The BIO search db. This is the default
+    /// No search db, the default
     #[default]
+    None,
+
+    /// The BIO search db
     Bio,
 
     /// The METACYC search db
@@ -72,6 +75,7 @@ pub enum SearchDB {
 impl Display for SearchDB {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            SearchDB::None => write!(f, "none"),
             SearchDB::Bio => write!(f, "BIO"),
             SearchDB::Metacyc => write!(f, "METACYC"),
             SearchDB::Chebi => write!(f, "CHEBI"),
@@ -102,6 +106,7 @@ impl<'a> TryFrom<&'a str> for SearchDB {
 
     fn try_from(s: &'a str) -> Result<Self, Self::Error> {
         match s {
+            "none" => Ok(SearchDB::None),
             "BIO" => Ok(SearchDB::Bio),
             "METACYC" => Ok(SearchDB::Metacyc),
             "CHEBI" => Ok(SearchDB::Chebi),

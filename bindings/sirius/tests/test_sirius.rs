@@ -146,6 +146,7 @@ fn test_run_sirius_with_enpkg_params() -> Result<(), String> {
         .enable_fingerprint()?
         .enable_structure()?
         .enable_canopus()?
+        .enable_write_summaries()?
         .build();
 
     let input_file_path = Path::new("tests/data/input_sirius.mgf");
