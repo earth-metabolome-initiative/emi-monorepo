@@ -12,7 +12,14 @@ Additionally, you can install Sirius via their [GitHub repository](https://githu
 Here we present a binding for Sirius in [Rust](https://www.rust-lang.org/). This binding is a wrapper around the Sirius command line interface (CLI) and provides a more user-friendly interface for running Sirius. It also provides a safer way to run Sirius by using type safety and error handling before running the Sirius CLI.
 
 ## Usage
-Add this to your `Cargo.toml`:
+First you need to have Sirius installed in your system. Then you also need the following variables in your `.env` file: 
+```bash
+SIRIUS_PATH=/path/to/sirius_executable (on macOS it should be something like `/Applications/sirius.app/Contents/MacOS/sirius`)
+SIRIUS_USERNAME=your_username
+SIRIUS_PASSWORD=your_password
+```
+
+Then you can use the Sirius binding in your Rust project. To do so add this to your `Cargo.toml`:
 ```toml
 [dependencies]
 sirius = "0.1"
