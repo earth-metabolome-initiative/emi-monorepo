@@ -1,0 +1,38 @@
+name: Sirius
+
+
+on:
+  push:
+    paths:
+      - "bindings/sirius/**"
+    branches: ["main"]
+  pull_request:
+    paths:
+      - "bindings/sirius/**"
+    branches: ["main"]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Retrieve Sirius install script
+        run:
+          wget https://raw.githubusercontent.com/enpkg/enpkg_full/main/src/install_sirius.sh
+          chmod +x install_sirius.sh
+      - name: Install Sirius
+        run:
+          ./install_sirius.sh
+          chmod +x ./sirius/bin
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          override: true
+      - name: Run tests
+        run: cargo test --test test_sirius_panic
+
