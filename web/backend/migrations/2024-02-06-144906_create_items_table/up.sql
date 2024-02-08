@@ -1,0 +1,6 @@
+-- SQL defining the items table.
+-- An item is a physical or digital object that can be tracked and managed.
+-- Items can be associated with one or more projects, and can be part of other items.
+-- The ownership of an item may change over time, and an item may be associated with
+-- one or more users. An item may have a parent item, and may be a container of other
+-- items. This table defines the items that are tracked and managed by the system.
