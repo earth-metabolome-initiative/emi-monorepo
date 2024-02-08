@@ -1,3 +1,4 @@
+//! Module providing traits for the Sirius bindings library.
 mod enablable;
 mod into_default;
 mod named_parameters_set;

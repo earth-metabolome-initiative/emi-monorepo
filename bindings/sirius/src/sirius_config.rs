@@ -8,6 +8,7 @@ use crate::traits::Enablable;
 /// build the [`Sirius`](crate::sirius::Sirius) struct, and through the builder we can evaluate all of the provided
 /// parameters. If we make this struct public, we would allow the user to create a [`Sirius`](crate::sirius::Sirius)
 /// struct with invalid parameters. DO NOT MAKE THIS STRUCT PUBLIC.
+/// 
 pub(crate) struct SiriusConfig<V: Version> {
     core_parameters: Vec<V::Core>,
     config_parameters: Vec<V::Config>,
