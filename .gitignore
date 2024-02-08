@@ -17,5 +17,5 @@ Cargo.lock
 # Ingnoring .vscode folder
 .vscode
 
-# don't keep .DS_Store
+# Ignore .DS_Store
 .DS_Store

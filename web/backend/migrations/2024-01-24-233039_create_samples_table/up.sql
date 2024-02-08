@@ -2,11 +2,6 @@
 CREATE TABLE samples (
     id SERIAL PRIMARY KEY,
     taxon_id INTEGER NOT NULL REFERENCES taxons(id) ON DELETE CASCADE,
-    name VARCHAR(255) NOT NULL,
-    description VARCHAR(512) NOT NULL,
-    latitude DOUBLE PRECISION,
-    longitude DOUBLE PRECISION,
-    altitude DOUBLE PRECISION,
     sample_type_id INTEGER NOT NULL REFERENCES sample_types(id) ON DELETE CASCADE,
     derived_from INTEGER REFERENCES samples(id) ON DELETE SET NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
