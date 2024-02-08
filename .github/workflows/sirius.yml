@@ -35,7 +35,7 @@ jobs:
           override: true
       - name: Run tests
         run: | 
-          export SIRIUS_PATH=../../sirius/bin
+          export SIRIUS_PATH=../sirius/bin
           export SIRIUS_USERNAME=${{vars.SIRIUS_USERNAME}}
           export SIRIUS_PASSWORD=${{vars.SIRIUS_PASSWORD}}
           cargo test --test test_sirius
