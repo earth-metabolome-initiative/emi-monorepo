@@ -19,3 +19,6 @@ Cargo.lock
 
 # Ignore .DS_Store
 .DS_Store
+
+# Ignore pychache
+__pycache__/
