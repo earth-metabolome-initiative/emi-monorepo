@@ -22,3 +22,7 @@ Cargo.lock
 
 # Ignore pychache
 __pycache__/
+
+
+# Ignore .idea folder
+.idea
