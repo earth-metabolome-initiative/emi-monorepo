@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Retrieve Sirius install script
         run: |
-          wget https://raw.githubusercontent.com/enpkg/enpkg_full/main/src/install_sirius.sh 
+          wget https://raw.githubusercontent.com/enpkg/enpkg_full/emikg-adapt/src/install_sirius.sh
           chmod +x install_sirius.sh
       - name: Install Sirius
         run: |
