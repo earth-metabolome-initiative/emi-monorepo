@@ -2,12 +2,12 @@ pub mod schema;
 
 mod documents;
 mod samples;
-mod users;
-mod spectra_collection;
 mod spectra;
+mod spectra_collection;
 mod task_type;
 mod tasks;
 mod taxons;
+mod users;
 
 // models.rs
 use diesel::{r2d2::ConnectionManager, PgConnection};

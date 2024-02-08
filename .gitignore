@@ -14,10 +14,11 @@ Cargo.lock
 *.pdb
 .env
 
-bindings/sirius/tests/data/*
-
-# Ignore vs code files
+# Ingnoring .vscode folder
 .vscode
 
 # Ignore .DS_Store
 .DS_Store
+
+# Ignore pychache
+__pycache__/

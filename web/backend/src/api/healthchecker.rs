@@ -178,4 +178,3 @@ async fn health_checker_handler() -> impl Responder {
 
 //     HttpResponse::NoContent().finish()
 // }
-
