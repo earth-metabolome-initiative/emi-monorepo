@@ -26,7 +26,7 @@ jobs:
           chmod +x install_sirius.sh
       - name: Install Sirius
         run: |
-          ./install_sirius.sh
+          bash ./install_sirius.sh
           chmod +x ./sirius/bin
       - name: Set up Rust
         uses: actions-rs/toolchain@v1
