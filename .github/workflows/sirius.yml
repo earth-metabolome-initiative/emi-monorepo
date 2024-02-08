@@ -34,5 +34,7 @@ jobs:
           toolchain: nightly
           override: true
       - name: Run tests
-        run: cargo test --test test_sirius
+        run: | 
+          export SIRIUS_PATH=vars.SIRIUS_PATH
+          cargo test --test test_sirius
 
