@@ -19,4 +19,3 @@ Cargo.lock
 
 # don't keep .DS_Store
 .DS_Store
-bindings/sirius/tests/data/*
