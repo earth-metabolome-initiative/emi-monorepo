@@ -156,7 +156,7 @@ fn test_run_sirius_with_enpkg_params() -> Result<(), String> {
     if output_file_path.exists() {
         let _ = std::fs::remove_dir_all(output_file_path);
     }
-    // Start running siriu
+    // Start running sirius
     sirius.run(input_file_path, output_file_path).unwrap();
 
     Ok(())
