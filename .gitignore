@@ -15,8 +15,8 @@ Cargo.lock
 .env
 
 # Ingnoring .vscode folder
-.vscode/
+.vscode
 
 # don't keep .DS_Store
 .DS_Store
-
+bindings/sirius/tests/data/*
