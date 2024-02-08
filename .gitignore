@@ -16,4 +16,8 @@ Cargo.lock
 
 bindings/sirius/tests/data/*
 
+# Ignore vs code files
 .vscode
+
+# Ignore .DS_Store
+.DS_Store
