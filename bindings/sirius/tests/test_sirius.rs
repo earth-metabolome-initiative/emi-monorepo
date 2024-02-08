@@ -1,3 +1,4 @@
+//! # Test for the Sirius bindings
 use sirius::prelude::*;
 use std::path::Path;
 
