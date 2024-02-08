@@ -36,6 +36,7 @@ jobs:
       - name: Run tests
         run: | 
           export SIRIUS_PATH=vars.SIRIUS_PATH
+          echo $SIRIUS_PATH
           export SIRIUS_USERNAME=vars.SIRIUS_USERNAME
           export SIRIUS_PASSWORD=vars.SIRIUS_PASSWORD
           cargo test --test test_sirius
