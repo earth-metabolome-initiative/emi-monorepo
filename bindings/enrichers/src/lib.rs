@@ -3,10 +3,8 @@
 #![doc = include_str!("../README.md")]
 #![deny(missing_docs)]
 
-mod classyfire;
-mod np_classifier;
+mod molecule_classifiers;
 /// Prelude module
 pub mod prelude {
-    pub use crate::classyfire::*;
-    pub use crate::np_classifier::*;
+    pub use crate::molecule_classifiers::*;
 }
