@@ -27,7 +27,7 @@ jobs:
       - name: Install Sirius
         run: |
           bash ./install_sirius.sh
-          chmod +x ./sirius/bin
+          sudo chmod -R 755 $GITHUB_WORKSPACE/sirius
       - name: Set up Rust
         uses: actions-rs/toolchain@v1
         with:
