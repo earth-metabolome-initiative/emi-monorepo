@@ -1,3 +1,4 @@
+//! # Sirius
 use crate::sirius_config::SiriusConfig;
 use crate::versions::Version;
 use dotenvy::dotenv;
