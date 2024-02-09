@@ -93,18 +93,17 @@ impl<V: Version> Sirius<V> {
         })?;
 
         // We check that the provided sirius username and password are not empty
-        // if sirius_username.is_empty() {
-        // return Err(format!(
-        // concat!(
-        // "The sirius username provided in the environment variable SIRIUS_USERNAME is empty. ",
-        // "We expected there to exist a .env file in the current directory ",
-        // "with the SIRIUS_USERNAME variable set to the username of the sirius account. ",
-        // "The variable may also be set in the environment directly, for instance ",
-        // "in the .bashrc file."
-        // )));
-        // }
+        if sirius_username.is_empty() {
+            return Err(concat!(
+                "The sirius username provided in the environment variable SIRIUS_USERNAME is empty. ",
+                "We expected there to exist a .env file in the current directory ",
+                "with the SIRIUS_USERNAME variable set to the username of the sirius account. ",
+                "The variable may also be set in the environment directly, for instance ",
+                "in the .bashrc file."
+            ).to_string());
+        }
 
-        if sirius_password.len() == 0 {
+        if sirius_password.is_empty() {
             return Err(concat!(
                 "The sirius password provided in the environment variable SIRIUS_PASSWORD is empty. ",
                 "We expected there to exist a .env file in the current directory ",
