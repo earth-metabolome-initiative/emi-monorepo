@@ -37,6 +37,7 @@ jobs:
         run: | 
           export SIRIUS_PATH=${{vars.SIRIUS_PATH}}
           export SIRIUS_USERNAME=${{vars.SIRIUS_USERNAME}}
+          if [ -z ${SIRIUS_USERNAME+x} ]; then echo "username is NOT set"; else echo "username is set"; fi
           export SIRIUS_PASSWORD=${{vars.SIRIUS_PASSWORD}}
           cargo test --test test_sirius
 

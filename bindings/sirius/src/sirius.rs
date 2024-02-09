@@ -92,7 +92,7 @@ impl<V: Version> Sirius<V> {
             .to_string()
         })?;
 
-        // We check that the provided sirius username and password are not empty.
+        // We check that the provided sirius username and password are not empty
         if sirius_username.is_empty() {
             return Err(format!(
                 concat!(
@@ -142,13 +142,19 @@ impl<V: Version> Sirius<V> {
 
         // We now check that the input file exists and is a file and not a directory
         if !input_file_path.exists() {
-            return Err(format!("The input file {:?} does not exist", input_file_path));
+            return Err(format!(
+                "The input file {:?} does not exist",
+                input_file_path
+            ));
         }
 
         if !input_file_path.is_file() {
-            return Err(format!("The input file {:?} is not a file", input_file_path));
+            return Err(format!(
+                "The input file {:?} is not a file",
+                input_file_path
+            ));
         }
-        
+
         // Prepare the command
         let mut command = Command::new(sirius_path);
 
