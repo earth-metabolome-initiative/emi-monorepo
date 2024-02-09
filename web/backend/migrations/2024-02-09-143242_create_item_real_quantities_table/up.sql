@@ -15,4 +15,5 @@ CREATE TABLE item_real_quantities (
     created_by INTEGER NOT NULL REFERENCES users(id),
     updated_by INTEGER NOT NULL REFERENCES users(id),
     FOREIGN KEY (item_id, unit_id) REFERENCES items(item_id, unit_id),
+    FOREIGN KEY (unit_id) REFERENCES real_units(id)
 );
