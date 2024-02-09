@@ -1,2 +1,2 @@
 -- This file should undo anything in `up.sql`
-DROP TABLE continuous_units;
+DROP TABLE item_category_units;
