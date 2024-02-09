@@ -93,16 +93,15 @@ impl<V: Version> Sirius<V> {
         })?;
 
         // We check that the provided sirius username and password are not empty
-        // if sirius_username.is_empty() {
-        // return Err(format!(
-        // concat!(
-        // "The sirius username provided in the environment variable SIRIUS_USERNAME is empty. ",
-        // "We expected there to exist a .env file in the current directory ",
-        // "with the SIRIUS_USERNAME variable set to the username of the sirius account. ",
-        // "The variable may also be set in the environment directly, for instance ",
-        // "in the .bashrc file."
-        // )));
-        // }
+        if sirius_username.is_empty() {
+            return Err(format!(concat!(
+                "The sirius username provided in the environment variable SIRIUS_USERNAME is empty. ",
+                "We expected there to exist a .env file in the current directory ",
+                "with the SIRIUS_USERNAME variable set to the username of the sirius account. ",
+                "The variable may also be set in the environment directly, for instance ",
+                "in the .bashrc file."
+            )));
+        }
 
         if sirius_password.clone().is_empty() {
             return Err(format!(
@@ -154,6 +153,22 @@ impl<V: Version> Sirius<V> {
                 input_file_path
             ));
         }
+
+        // We check that the extension of the input file is MGF, in either upper or lower case
+        let input_file_extension = input_file_path
+            .extension()
+            .ok_or_else(|| format!(concat!(
+                "The input file {:?} does not have an extension. ",
+                "We expected the input file to have the extension .mgf"
+            ), input_file_path))?;
+
+        if input_file_extension.to_string_lossy().to_lowercase() != "mgf" {
+            return Err(format!(
+                "The input file {:?} does not have the extension .mgf",
+                input_file_path
+            ));
+        }
+
 
         // Prepare the command
         let mut command = Command::new(sirius_path);

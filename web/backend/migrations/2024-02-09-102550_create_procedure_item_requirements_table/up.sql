@@ -12,4 +12,4 @@ CREATE TABLE procedure_item_requirements (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (procedure_id, item_category_id),
   FOREIGN KEY (item_category_id, unit_id) REFERENCES item_units(item_id, unit_id)
-);  
+);
