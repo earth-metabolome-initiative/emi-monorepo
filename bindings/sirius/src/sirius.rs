@@ -104,19 +104,18 @@ impl<V: Version> Sirius<V> {
         // )));
         // }
 
-        if sirius_password.clone().is_empty() {
-            return Err(format!(
-                concat!(
+        if sirius_password.len() == 0 {
+            return Err(concat!(
                 "The sirius password provided in the environment variable SIRIUS_PASSWORD is empty. ",
                 "We expected there to exist a .env file in the current directory ",
                 "with the SIRIUS_PASSWORD variable set to the password of the sirius account. ",
                 "The variable may also be set in the environment directly, for instance ",
                 "in the .bashrc file."
-            )));
+            ).to_string());
         }
 
         // Prepare and execute the login command
-        let mut binding = Command::new(&sirius_path);
+        let mut binding = Command::new(sirius_path);
 
         // Set both SIRIUS_PASSWORD and SIRIUS_USERNAME environment variables
         binding
