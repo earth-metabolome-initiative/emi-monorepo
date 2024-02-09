@@ -23,6 +23,8 @@ CREATE TABLE locations (
   longitude DECIMAL(9,6),
   altitude DECIMAL(9,3),
   address TEXT,
+  geolocalization_device_id INTEGER REFERENCES items(id),
+  altitude_device_id INTEGER REFERENCES items(id),
   parent_location_id INTEGER REFERENCES locations(id),
   state INTEGER NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,

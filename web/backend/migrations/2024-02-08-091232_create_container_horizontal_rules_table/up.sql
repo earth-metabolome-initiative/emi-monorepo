@@ -9,8 +9,8 @@
 -- defined in the container rules.
 CREATE TABLE container_horizontal_rules (
   id SERIAL PRIMARY KEY,
-  item_type_id INTEGER REFERENCES item_types(id),
-  other_item_type_id INTEGER REFERENCES item_types(id),
+  item_type_id INTEGER REFERENCES item_categories(id),
+  other_item_type_id INTEGER REFERENCES item_categories(id),
   temperature INTERVAL DEFAULT NULL,
   humidity INTERVAL DEFAULT NULL,
   pressure INTERVAL DEFAULT NULL,

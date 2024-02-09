@@ -8,8 +8,8 @@
 -- or pressure range. These constraints are also defined in the container rules.
 CREATE TABLE container_vertical_rules (
   id SERIAL PRIMARY KEY,
-  container_item_type_id INTEGER REFERENCES item_types(id),
-  contained_item_type_id INTEGER REFERENCES item_types(id),
+  container_item_type_id INTEGER REFERENCES item_categories(id),
+  contained_item_type_id INTEGER REFERENCES item_categories(id),
   temperature INTERVAL DEFAULT NULL,
   humidity INTERVAL DEFAULT NULL,
   pressure INTERVAL DEFAULT NULL,

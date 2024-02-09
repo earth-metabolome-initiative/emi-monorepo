@@ -5,3 +5,5 @@
 -- one or more users. An item may have a parent item, and may be a container of other
 -- items. This table defines the items that are tracked and managed by the system.
 -- An item can be movable or immovable.
+-- An example of an Item may be a measurement device, a tube potentially containing a sample,
+-- or a sample itself.

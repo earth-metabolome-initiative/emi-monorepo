@@ -1,10 +1,10 @@
--- SQL defining the manufactured_item_types table.
+-- SQL defining the manufactured_item_categories table.
 -- A manufactured type is an item type that can be manufactured, sold, and bought. As such it
 -- has a cost, its currency, and a cost per day for renting and the current of the renting
 -- cost.
-CREATE TABLE manufactured_item_types (
+CREATE TABLE manufactured_item_categories (
   id SERIAL PRIMARY KEY,
-  item_type_id INTEGER REFERENCES item_types(id),
+  item_type_id INTEGER REFERENCES item_categories(id),
   cost DECIMAL(10, 2) NOT NULL,
   cost_per_day DECIMAL(10, 2) NOT NULL,
   currency VARCHAR(3) NOT NULL,
