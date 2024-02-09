@@ -6,7 +6,7 @@
 -- While these quantities are discrete, in order to facilitate the semantics of
 -- the system, we will still allow for the user to specify the counter unit for 
 -- the item. For example, a counter unit may be a box, a tube, or a vial.
-CREATE TABLE item_quantities (
+CREATE TABLE item_discrete_quantities (
     id SERIAL PRIMARY KEY,
     item_id INTEGER REFERENCES items(id),
     quantity INTEGER NOT NULL,
