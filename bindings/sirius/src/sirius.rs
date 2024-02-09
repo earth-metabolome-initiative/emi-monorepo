@@ -104,7 +104,7 @@ impl<V: Version> Sirius<V> {
         // )));
         // }
 
-        if sirius_password.is_empty() {
+        if sirius_password.clone().is_empty() {
             return Err(format!(
                 concat!(
                 "The sirius password provided in the environment variable SIRIUS_PASSWORD is empty. ",
