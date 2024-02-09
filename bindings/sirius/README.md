@@ -184,7 +184,7 @@ Error: "The core parameter MaximalMz(70.6) cannot be added to the configuration.
 ## Limitations
 For now some *config* parameters are not fully implemented and only the default values are used. 
 
-If you are interested in looking at the default values you can either run `sirius config --help`. Here we prensent is a non-exhaustive list of the parameters where only the default values are used:
+If you are interested in looking at the default values you can either run `sirius config --help`. Here we present is a non-exhaustive list of the parameters where only the default values are used:
 * **PossibleAdductsSwitches** default is `[M+Na]+:[M+H]+,[M+K]+:[M+H]+,[M+Cl]-:[M-H]-`
 * **AdductSettingsEnforced** default is `,`
 * **FormulaResultRankingScore** default is `AUTO`
