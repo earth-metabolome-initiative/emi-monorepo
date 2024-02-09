@@ -20,9 +20,15 @@ async fn get_classyfire_response(
     };
     let client = reqwest::Client::new();
     let response = client.get(&url).send().await?;
-    let body = response.text().await?;
 
-    Ok(body)
+    // once we have the response, we check if it was an error
+    // the error_for_status_ref() method will turn a response into an error if the server returned an error.
+    match response.error_for_status_ref() {
+        Ok(_) => return Ok(response.text().await?),
+        Err(e) => {
+            return Err(e);
+        }
+    }
 }
 
 fn read_json(raw_json: &str) -> Result<Value, serde_json::Error> {
@@ -52,6 +58,13 @@ mod tests {
             url["kingdom"]["url"],
             "http://classyfire.wishartlab.com/tax_nodes/C0000000"
         );
+    }
+
+    #[tokio::test]
+    async fn test_with_incorrect_molecule() {
+        let molecule = "CCZ";
+        let result = get_classyfire_response(molecule, ChemicalIdentifier::Smiles).await;
+        assert_eq!(result.is_err(), true);
     }
 }
 
