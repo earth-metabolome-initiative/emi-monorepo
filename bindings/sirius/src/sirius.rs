@@ -92,17 +92,17 @@ impl<V: Version> Sirius<V> {
             .to_string()
         })?;
 
-        // We check that the provided sirius username and password are not empty.
-        if sirius_username.is_empty() {
-            return Err(format!(
-                concat!(
-                "The sirius username provided in the environment variable SIRIUS_USERNAME is empty. ",
-                "We expected there to exist a .env file in the current directory ",
-                "with the SIRIUS_USERNAME variable set to the username of the sirius account. ",
-                "The variable may also be set in the environment directly, for instance ",
-                "in the .bashrc file."
-            )));
-        }
+        // We check that the provided sirius username and password are not empty
+        // if sirius_username.is_empty() {
+        // return Err(format!(
+        // concat!(
+        // "The sirius username provided in the environment variable SIRIUS_USERNAME is empty. ",
+        // "We expected there to exist a .env file in the current directory ",
+        // "with the SIRIUS_USERNAME variable set to the username of the sirius account. ",
+        // "The variable may also be set in the environment directly, for instance ",
+        // "in the .bashrc file."
+        // )));
+        // }
 
         if sirius_password.is_empty() {
             return Err(format!(
@@ -142,13 +142,19 @@ impl<V: Version> Sirius<V> {
 
         // We now check that the input file exists and is a file and not a directory
         if !input_file_path.exists() {
-            return Err(format!("The input file {:?} does not exist", input_file_path));
+            return Err(format!(
+                "The input file {:?} does not exist",
+                input_file_path
+            ));
         }
 
         if !input_file_path.is_file() {
-            return Err(format!("The input file {:?} is not a file", input_file_path));
+            return Err(format!(
+                "The input file {:?} is not a file",
+                input_file_path
+            ));
         }
-        
+
         // Prepare the command
         let mut command = Command::new(sirius_path);
 
