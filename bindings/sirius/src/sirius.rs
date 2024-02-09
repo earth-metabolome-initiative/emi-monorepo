@@ -2,10 +2,10 @@
 use crate::sirius_config::SiriusConfig;
 use crate::versions::Version;
 use dotenvy::dotenv;
+use is_executable::IsExecutable;
 use std::env;
 use std::path::Path;
 use std::process::Command;
-use is_executable::IsExecutable;
 
 /// The main struct for the Sirius bindings
 pub struct Sirius<V: Version> {
@@ -50,17 +50,11 @@ impl<V: Version> Sirius<V> {
         let sirius_path = Path::new(&sirius_path);
 
         if !sirius_path.exists() {
-            return Err(format!(
-                "The sirius path {:?} does not exist",
-                sirius_path
-            ));
+            return Err(format!("The sirius path {:?} does not exist", sirius_path));
         }
 
         if !sirius_path.is_file() {
-            return Err(format!(
-                "The sirius path {:?} is not a file",
-                sirius_path
-            ));
+            return Err(format!("The sirius path {:?} is not a file", sirius_path));
         }
 
         // We also need to check whether the file is executable, but this will be different
@@ -98,6 +92,29 @@ impl<V: Version> Sirius<V> {
             .to_string()
         })?;
 
+        // We check that the provided sirius username and password are not empty.
+        if sirius_username.is_empty() {
+            return Err(format!(
+                concat!(
+                "The sirius username provided in the environment variable SIRIUS_USERNAME is empty. ",
+                "We expected there to exist a .env file in the current directory ",
+                "with the SIRIUS_USERNAME variable set to the username of the sirius account. ",
+                "The variable may also be set in the environment directly, for instance ",
+                "in the .bashrc file."
+            )));
+        }
+
+        if sirius_password.is_empty() {
+            return Err(format!(
+                concat!(
+                "The sirius password provided in the environment variable SIRIUS_PASSWORD is empty. ",
+                "We expected there to exist a .env file in the current directory ",
+                "with the SIRIUS_PASSWORD variable set to the password of the sirius account. ",
+                "The variable may also be set in the environment directly, for instance ",
+                "in the .bashrc file."
+            )));
+        }
+
         // Prepare and execute the login command
         let mut binding = Command::new(&sirius_path);
 
@@ -119,12 +136,19 @@ impl<V: Version> Sirius<V> {
 
         // We make sure to print the login command status for debugging
 
-        println!("Sirius login command status: {:#?}", login_command_status);
-
         if !login_command_status.success() {
             return Err("Sirius login command failed".to_string());
         }
 
+        // We now check that the input file exists and is a file and not a directory
+        if !input_file_path.exists() {
+            return Err(format!("The input file {:?} does not exist", input_file_path));
+        }
+
+        if !input_file_path.is_file() {
+            return Err(format!("The input file {:?} is not a file", input_file_path));
+        }
+        
         // Prepare the command
         let mut command = Command::new(sirius_path);
 
@@ -139,9 +163,6 @@ impl<V: Version> Sirius<V> {
 
         // Add arguments from config directly
         args.extend(self.config.args().iter().cloned());
-
-        // Print the command and its arguments for debugging
-        println!("Running command: sirius {:?}", args);
 
         // Add arguments and spawn the command
         let mut child = command.args(&args).spawn().expect("Sirius failed to start");
