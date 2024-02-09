@@ -5,6 +5,7 @@ use dotenvy::dotenv;
 use std::env;
 use std::path::Path;
 use std::process::Command;
+use is_executable::IsExecutable;
 
 /// The main struct for the Sirius bindings
 pub struct Sirius<V: Version> {
@@ -43,6 +44,34 @@ impl<V: Version> Sirius<V> {
             )
             .to_string()
         })?;
+
+        // We need to verify that the SIRIUS_PATH is a valid path to a file, and not a directory.
+
+        let sirius_path = Path::new(&sirius_path);
+
+        if !sirius_path.exists() {
+            return Err(format!(
+                "The sirius path {:?} does not exist",
+                sirius_path
+            ));
+        }
+
+        if !sirius_path.is_file() {
+            return Err(format!(
+                "The sirius path {:?} is not a file",
+                sirius_path
+            ));
+        }
+
+        // We also need to check whether the file is executable, but this will be different
+        // depending on the operating system. Fortunately, the complexity of this is hidden
+        // behind the is_executable crate.
+        if !sirius_path.is_executable() {
+            return Err(format!(
+                "The sirius executable at {:?} is not executable",
+                sirius_path
+            ));
+        }
 
         // Fetch the SIRIUS_USERNAME and the SIRIUS_PASSWORD from environment variables
         // in order to login before launching the sirius command
