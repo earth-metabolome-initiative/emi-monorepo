@@ -11,9 +11,9 @@ use sirius::prelude::*;
 struct FuzzCase {
     random_state: u64,
     maximal_mz: f64,
-    formula_search_db: SearchDB,
+    formula_search_db: DBVector,
     isotope_settings_filter: bool,
-    structure_search_db: SearchDB,
+    structure_search_db: DBVector,
     timeout_seconds_per_tree: u32,
     number_of_candidates: u32,
     number_of_candidates_per_ion: u32,
@@ -93,7 +93,7 @@ fn router(
         2 => {
             router(
                 random_state,
-                builder.formula_search_db(params.formula_search_db)?,
+                builder.formula_search_db(params.formula_search_db.clone())?,
                 params,
             )?;
         }
@@ -117,7 +117,7 @@ fn router(
         6 => {
             router(
                 random_state,
-                builder.structure_search_db(params.structure_search_db)?,
+                builder.structure_search_db(params.structure_search_db.clone())?,
                 params,
             )?;
         }

@@ -169,8 +169,12 @@ impl<V: Version> Sirius<V> {
         args.extend(self.config.args().iter().cloned());
 
         // Add arguments and spawn the command
-        let mut child = command.args(&args).spawn().expect("Sirius failed to start");
-        let status = child.wait().expect("Failed to wait on child");
+        // let mut child = command.args(&args).spawn().expect("Sirius failed to start");
+        // let status = child.wait().expect("Failed to wait on child");
+        let status = command
+            .args(&args)
+            .status()
+            .expect("Sirius failed to start");
 
         if !status.success() {
             return Err("Sirius failed".to_string());

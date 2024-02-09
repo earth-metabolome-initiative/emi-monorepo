@@ -10,11 +10,11 @@ pub enum ConfigV5 {
     /// The isotope settings filter
     IsotopeSettingsFilter(bool),
 
-    /// The formula search db
-    FormulaSearchDB(SearchDB),
+    /// The formula search db, this can consist of one or more search databases
+    FormulaSearchDB(DBVector),
 
     /// The structure search db
-    StructureSearchDB(SearchDB),
+    StructureSearchDB(DBVector),
 
     /// The timeout seconds per tree
     TimeoutSecondsPerTree(u32),
@@ -433,8 +433,12 @@ impl IntoDefault for ConfigV5 {
         match self {
             ConfigV5::Enabled => ConfigV5::Enabled,
             ConfigV5::IsotopeSettingsFilter(_) => ConfigV5::IsotopeSettingsFilter(true),
-            ConfigV5::FormulaSearchDB(_) => ConfigV5::FormulaSearchDB(SearchDB::None),
-            ConfigV5::StructureSearchDB(_) => ConfigV5::StructureSearchDB(SearchDB::Bio),
+            ConfigV5::FormulaSearchDB(_) => {
+                ConfigV5::FormulaSearchDB(DBVector::from(vec![SearchDB::None]))
+            }
+            ConfigV5::StructureSearchDB(_) => {
+                ConfigV5::StructureSearchDB(DBVector::from(vec![SearchDB::Bio]))
+            }
             ConfigV5::TimeoutSecondsPerTree(_) => ConfigV5::TimeoutSecondsPerTree(0),
             ConfigV5::NumberOfCandidatesPerIon(_) => ConfigV5::NumberOfCandidatesPerIon(1),
             ConfigV5::NumberOfStructureCandidates(_) => {
@@ -618,16 +622,16 @@ mod tests {
     #[test]
     fn test_default_formula_search_db() {
         assert_eq!(
-            ConfigV5::FormulaSearchDB(SearchDB::None),
-            ConfigV5::FormulaSearchDB(SearchDB::Gnps).into_default()
+            ConfigV5::FormulaSearchDB(DBVector::from(vec![SearchDB::None])),
+            ConfigV5::FormulaSearchDB(DBVector::from(vec![SearchDB::Gnps])).into_default()
         );
         assert_eq!(
-            ConfigV5::FormulaSearchDB(SearchDB::default()),
-            ConfigV5::FormulaSearchDB(SearchDB::None)
+            ConfigV5::FormulaSearchDB(DBVector::from(vec![SearchDB::default()])),
+            ConfigV5::FormulaSearchDB(DBVector::from(vec![SearchDB::None]))
         );
         assert_ne!(
-            ConfigV5::FormulaSearchDB(SearchDB::Gnps),
-            ConfigV5::FormulaSearchDB(SearchDB::Gnps).into_default()
+            ConfigV5::FormulaSearchDB(DBVector::from(vec![SearchDB::Gnps])),
+            ConfigV5::FormulaSearchDB(DBVector::from(vec![SearchDB::Gnps])).into_default()
         );
     }
 
