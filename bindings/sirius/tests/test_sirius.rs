@@ -8,11 +8,11 @@ fn test_failing_sirius() {
     let sirius = SiriusBuilder::default()
         .maximal_mz(802.2)
         .unwrap()
-        .formula_search_db(SearchDB::Bio)
+        .formula_search_db(DBVector::from(vec![SearchDB::Bio]))
         .unwrap()
         .isotope_settings_filter(false)
         .unwrap()
-        .structure_search_db(SearchDB::Coconut)
+        .structure_search_db(DBVector::from(vec![SearchDB::Coconut]))
         .unwrap()
         .timeout_seconds_per_tree_default()
         .unwrap()
@@ -93,7 +93,7 @@ fn test_run_sirius_with_enpkg_params() -> Result<(), String> {
     let sirius = SiriusBuilder::default()
         .maximal_mz(800.0)?
         .isotope_settings_filter(true)?
-        .formula_search_db(SearchDB::Bio)?
+        .formula_search_db(DBVector::from(vec![SearchDB::Bio]))?
         .timeout_seconds_per_tree(0)?
         .formula_settings_enforced(AtomVector::from(vec![
             Atoms::H,
@@ -140,7 +140,7 @@ fn test_run_sirius_with_enpkg_params() -> Result<(), String> {
         ]))?
         .formula_result_threshold(true)?
         .inject_el_gordo_compounds(true)?
-        .structure_search_db(SearchDB::Bio)?
+        .structure_search_db(DBVector::from(vec![SearchDB::Bio]))?
         .recompute_results(false)?
         .enable_formula()?
         .enable_zodiac()?

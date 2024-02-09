@@ -7,14 +7,16 @@ pub enum ConfigV5 {
     /// If the config is enabled
     Enabled,
 
-    /// The isotope settings filter
+    /// This configurations define how to deal with isotope patterns in MS1.
+    /// When filtering is enabled, molecular formulas are excluded if their theoretical isotope
+    /// pattern does not match the theoretical one, even if their MS/MS pattern has high score.
     IsotopeSettingsFilter(bool),
 
-    /// The formula search db
-    FormulaSearchDB(SearchDB),
+    /// The database from which to search formulas. This can consist of one or more search databases.
+    FormulaSearchDB(DBVector),
 
-    /// The structure search db
-    StructureSearchDB(SearchDB),
+    /// The database from which to search structures. This can consist of one or more search databases.
+    StructureSearchDB(DBVector),
 
     /// The timeout seconds per tree
     TimeoutSecondsPerTree(u32),
@@ -37,10 +39,17 @@ pub enum ConfigV5 {
     /// The timeout seconds per instance
     TimeoutSecondsPerInstance(u32),
 
-    /// Whether to use formula result threshold
+    /// Specifies if the list of Molecular Formula Identifications is filtered by
+    /// a soft threshold (calculateThreshold) before CSI:FingerID predictions are calculated.
     FormulaResultThreshold(bool),
 
     /// Candidates matching the lipid class estimated by El Gordo will be tagged.
+    /// The lipid class will only be available if El Gordo predicts that the MS/MS is a lipid spectrum.
+    ///
+    /// If this parameter is set to 'false' El Gordo will still be executed and e.g. improve the fragmentation
+    /// tree, but the matching candidates will not be tagged as lipid class.
+    ///
+    /// Default: `true`
     InjectElGordoCompounds(bool),
 
     /// The median noise intensity
@@ -115,16 +124,29 @@ pub enum ConfigV5 {
     /// The MS2 mass deviation standard mass deviation
     MS2MassDeviationStandardMassDeviation(MassDeviation),
 
-    /// The formula settings detectable
+    /// Detectable elements are added to the chemical alphabet, if there are indications for them (e.g. in isotope pattern)
+    ///
+    /// Default: `S,Br,Cl,B,Se`
     FormulaSettingsDetectable(AtomVector),
 
-    /// The formula settings enforced
+    ///These configurations hold the information how to autodetect elements based on the given
+    /// formula constraints.
+    /// Note: If the compound is already assigned to a specific molecular formula, this annotation is ignored.
+    ///
+    /// Enforced elements are always considered.
+    ///
+    /// Default: `C,H,N,O,P`
     FormulaSettingsEnforced(AtomVector),
 
-    /// The formula settings fallback
+    /// Fallback elements are used, if the auto-detection fails (e.g. no isotope pattern available)
+    ///
+    /// Default: `S`
     FormulaSettingsFallback(AtomVector),
 
-    /// Whether to forbid recalibration
+    /// Enable/Disable the hypothesen driven recalibration of MS/MS spectra.
+    /// Must be either `ALLOWED` or `FORBIDDEN`
+    ///
+    /// Default: `ALLOWED`
     ForbidRecalibration(ForbidRecalibration),
 
     /// The use heuristic mz to use heuristic
@@ -133,31 +155,67 @@ pub enum ConfigV5 {
     /// The use heuristic mz to use heuristic only
     UseHeuristicMZToUseHeuristicOnly(u32),
 
-    /// The detectable adducts
+    ///  Detectable ion modes which are only considered if there is an indication in the MS1 scan (e.g. correct mass delta).
+    ///
+    /// The default is `[M+H]+,[M+K]+,[M+Na]+,[M+H-H2O]+,[M+H-H4O2]+,[M+NH4]+,[M-H]-,[M+Cl]-,[M-H2O-H]-,[M+Br]-`.
     AdductSettingsDetectable(AdductsVector),
 
-    /// The fallback adducts
+    /// Fallback ion modes which are considered if the auto
+    /// detection did not find any indication for an ion mode.
+    /// ATTENTION: Expanding adducts from ionizations (e.g. `[M+H]+` to `[M+H-H2O]+``)
+    /// does not respect databases that were selected in the
+    /// formulas annotation step.
     AdductSettingsFallback(AdductsVector),
 
-    /// The algorithm profile
+    /// Configuration profile to store instrument specific algorithm properties.
+    /// Some of the default profiles are: 'qtof', 'orbitrap', 'fticr'.
+    /// Default: `default`
     AlgorithmProfile(Instruments),
 
-    /// The compound quality
+    /// Keywords that can be assigned to a input spectrum to judge its quality. Available keywords
+    /// are: Good, LowIntensity, NoMS1Peak, FewPeaks, Chimeric, NotMonoisotopicPeak, PoorlyExplained
+    ///
+    /// Default: `UNKNOWN`
     CompoundQuality(CompoundQuality),
 
-    /// The enforced adducts
+    /// Describes how to deal with Adducts:
+    ///
+    /// Pos Examples:
+    /// `[M+H]+,[M]+,[M+K]+,[M+Na]+,[M+H-H2O]+,[M+Na2-H]+,[M+2K-H]+,[M+NH4]+,[M+H3O]+,[M+MeOH+H]+,[M+ACN+H]+,[M+2ACN+H]+,[M+IPA+H]+,[M+ACN+Na]+,[M+DMSO+H]+`
+    ///
+    /// Neg Examples:
+    /// `[M-H]-,[M]-,[M+K-2H]-,[M+Cl]-,[M-H2O-H]-,[M+Na-2H]-,[M+FA-H]-,[M+Br]-,[M+HAc-H]-,[M+TFA-H]-,[M+ACN-H]-`
+    ///
+    /// Default: `,`
+    ///
+    /// Enforced ion modes that are always considered.
     AdductSettingsEnforced(AdductSettingsEnforced),
 
-    /// The candidate formulas
+    ///  This configuration holds a set of user given formulas to be used as candidates for SIRIUS.
+    /// Note: This set might be merged with other sources like formulas from databases
+    /// Set of Molecular Formulas to be used as candidates for molecular formula estimation with SIRIUS
+    ///
+    /// Currently only the default value is supported.
+    ///
+    /// Default: `,`
     CandidateFormulas(CandidateFormulas),
 
-    /// The formula result ranking score
+    /// Allows the USER to Specify the ScoreType that is used to rank the list of Molecular Formula Identifications
+    /// before CSI:FingerID predictions are calculated. Auto means that this ScoreType is automatically set depending on the executed workflow.
+    ///
+    /// Currently only the default value is supported.
+    ///
+    /// Default: `AUTO`
     FormulaResultRankingScore(FormulaResultRankingScore),
 
     /// The isotope ms2 settings
     IsotopeMS2Settings(IsotopeMS2Settings),
 
-    /// The isotope settings multiplier
+    ///   multiplier for the isotope score. Set to 0 to disable isotope scoring. Otherwise, the score from isotope
+    /// pattern analysis is multiplied with this coefficient. Set to a value larger than one if
+    ///  your isotope pattern data is of much better quality than your MS/MS data.
+    ///
+    /// Default: `1`
     IsotopeSettingsMultiplier(u32),
 
     /// The noise threshold settings absolute threshold
@@ -433,8 +491,12 @@ impl IntoDefault for ConfigV5 {
         match self {
             ConfigV5::Enabled => ConfigV5::Enabled,
             ConfigV5::IsotopeSettingsFilter(_) => ConfigV5::IsotopeSettingsFilter(true),
-            ConfigV5::FormulaSearchDB(_) => ConfigV5::FormulaSearchDB(SearchDB::None),
-            ConfigV5::StructureSearchDB(_) => ConfigV5::StructureSearchDB(SearchDB::Bio),
+            ConfigV5::FormulaSearchDB(_) => {
+                ConfigV5::FormulaSearchDB(DBVector::from(vec![SearchDB::None]))
+            }
+            ConfigV5::StructureSearchDB(_) => {
+                ConfigV5::StructureSearchDB(DBVector::from(vec![SearchDB::Bio]))
+            }
             ConfigV5::TimeoutSecondsPerTree(_) => ConfigV5::TimeoutSecondsPerTree(0),
             ConfigV5::NumberOfCandidatesPerIon(_) => ConfigV5::NumberOfCandidatesPerIon(1),
             ConfigV5::NumberOfStructureCandidates(_) => {
@@ -618,16 +680,16 @@ mod tests {
     #[test]
     fn test_default_formula_search_db() {
         assert_eq!(
-            ConfigV5::FormulaSearchDB(SearchDB::None),
-            ConfigV5::FormulaSearchDB(SearchDB::Gnps).into_default()
+            ConfigV5::FormulaSearchDB(DBVector::from(vec![SearchDB::None])),
+            ConfigV5::FormulaSearchDB(DBVector::from(vec![SearchDB::Gnps])).into_default()
         );
         assert_eq!(
-            ConfigV5::FormulaSearchDB(SearchDB::default()),
-            ConfigV5::FormulaSearchDB(SearchDB::None)
+            ConfigV5::FormulaSearchDB(DBVector::from(vec![SearchDB::default()])),
+            ConfigV5::FormulaSearchDB(DBVector::from(vec![SearchDB::None]))
         );
         assert_ne!(
-            ConfigV5::FormulaSearchDB(SearchDB::Gnps),
-            ConfigV5::FormulaSearchDB(SearchDB::Gnps).into_default()
+            ConfigV5::FormulaSearchDB(DBVector::from(vec![SearchDB::Gnps])),
+            ConfigV5::FormulaSearchDB(DBVector::from(vec![SearchDB::Gnps])).into_default()
         );
     }
 

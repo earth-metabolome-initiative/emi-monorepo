@@ -84,7 +84,7 @@ use std::path::Path;
 let sirius = SiriusBuilder::default()
     .maximal_mz(800.0).unwrap()
     .isotope_settings_filter(true).unwrap()
-    .formula_search_db(SearchDB::Bio).unwrap()
+    .formula_search_db(DBVector::from(vec![SearchDB::Bio])).unwrap()
     .timeout_seconds_per_tree(0).unwrap()
     .formula_settings_enforced(AtomVector::from(vec![
         Atoms::H,
@@ -131,7 +131,7 @@ let sirius = SiriusBuilder::default()
     ])).unwrap()
     .formula_result_threshold(true).unwrap()
     .inject_el_gordo_compounds(true).unwrap()
-    .structure_search_db(SearchDB::Bio).unwrap()
+    .structure_search_db(DBVector::from(vec![SearchDB::Bio])).unwrap()
     .recompute_results(false).unwrap()
     .enable_formula().unwrap()
     .enable_zodiac().unwrap()
@@ -184,7 +184,7 @@ Error: "The core parameter MaximalMz(70.6) cannot be added to the configuration.
 ## Limitations
 For now some *config* parameters are not fully implemented and only the default values are used. 
 
-If you are interested in looking at the default values you can either run `sirius config --help`. Here we prensent is a non-exhaustive list of the parameters where only the default values are used:
+If you are interested in looking at the default values you can either run `sirius config --help`. Here we present is a non-exhaustive list of the parameters where only the default values are used:
 * **PossibleAdductsSwitches** default is `[M+Na]+:[M+H]+,[M+K]+:[M+H]+,[M+Cl]-:[M-H]-`
 * **AdductSettingsEnforced** default is `,`
 * **FormulaResultRankingScore** default is `AUTO`
@@ -194,6 +194,11 @@ If you are interested in looking at the default values you can either run `siriu
 
 In the future, we will add the possibility to add custom values for these parameters. In case you need to add custom values for these parameters, do not hesitate to open an issue or a pull request.
 
+## Documentation
+You can find the documentation for the Sirius binding by running the following command in the root of the repository:
+```bash
+cargo doc --open
+```
 
 ## Fuzzing
 Fuzzing is a technique for finding security vulnerabilities and bugs in software by providing random input to the code. It can be an effective way of uncovering issues that might not be discovered through other testing methods. In our library, we take fuzzing seriously, and we use the [cargo fuzz](https://github.com/rust-fuzz/cargo-fuzz) tool to ensure our code is robust and secure. cargo fuzz automates the process of generating and running randomized test inputs, and it can help identify obscure bugs that would be difficult to detect through traditional testing methods. We make sure that our fuzz targets are continuously updated and run against the latest versions of the library to ensure that any vulnerabilities or bugs are quickly identified and addressed. 

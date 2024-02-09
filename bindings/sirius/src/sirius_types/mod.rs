@@ -27,5 +27,6 @@ pub use isotope_ms2_settings::IsotopeMS2Settings;
 pub use mass_deviation::MassDeviation;
 pub use noise_threshold_settings::BasePeak;
 pub use possible_adduct_switches::PossibleAdductSwitches;
+pub use search_db::DBVector;
 pub use search_db::SearchDB;
 pub use structure_predictors::StructurePredictors;

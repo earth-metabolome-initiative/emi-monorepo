@@ -83,14 +83,14 @@ impl SiriusBuilder<Version5> {
     /// ```
     /// use sirius::prelude::*;
     /// let sirius = SiriusBuilder::default()
-    ///  .formula_search_db(SearchDB::Hmdb).unwrap()
+    ///  .formula_search_db(DBVector::from(vec![SearchDB::Hmdb])).unwrap()
     /// .build();
     ///
-    /// assert!(SiriusBuilder::default().formula_search_db(SearchDB::Hmdb).is_ok());
+    /// assert!(SiriusBuilder::default().formula_search_db(DBVector::from(vec![SearchDB::Hmdb])).is_ok());
     /// ```
     pub fn formula_search_db(
         mut self,
-        formula_search_db: crate::sirius_types::SearchDB,
+        formula_search_db: crate::sirius_types::DBVector,
     ) -> Result<Self, String> {
         self.config
             .add_config_parameter(ConfigV5::FormulaSearchDB(formula_search_db))?;
@@ -104,10 +104,13 @@ impl SiriusBuilder<Version5> {
     /// ```
     /// use sirius::prelude::*;
     /// let sirius = SiriusBuilder::default()
-    /// .structure_search_db(SearchDB::Zincbio).unwrap()
+    /// .structure_search_db(DBVector::from(vec![SearchDB::Zincbio])).unwrap()
     /// .build();
     /// ```
-    pub fn structure_search_db(mut self, structure_search_db: SearchDB) -> Result<Self, String> {
+    pub fn structure_search_db(
+        mut self,
+        structure_search_db: crate::sirius_types::DBVector,
+    ) -> Result<Self, String> {
         self.config
             .add_config_parameter(ConfigV5::StructureSearchDB(structure_search_db))?;
         Ok(self)
@@ -1095,7 +1098,7 @@ impl SiriusBuilder<Version5> {
     /// Set to default isotope settings intensity threshold.
     pub fn formula_search_db_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::FormulaSearchDB(crate::sirius_types::SearchDB::default()).into_default(),
+            ConfigV5::FormulaSearchDB(crate::sirius_types::DBVector::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1103,7 +1106,7 @@ impl SiriusBuilder<Version5> {
     /// Set to default structure search db.
     pub fn structure_search_db_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::StructureSearchDB(crate::sirius_types::SearchDB::default()).into_default(),
+            ConfigV5::StructureSearchDB(crate::sirius_types::DBVector::default()).into_default(),
         )?;
         Ok(self)
     }
