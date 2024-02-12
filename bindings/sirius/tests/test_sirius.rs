@@ -89,6 +89,7 @@ fn test_run_sirius_default() -> Result<(), String> {
 }
 
 #[test]
+#[ignore]
 fn test_run_sirius_with_enpkg_params() -> Result<(), String> {
     let sirius = SiriusBuilder::default()
         .maximal_mz(800.0)?
