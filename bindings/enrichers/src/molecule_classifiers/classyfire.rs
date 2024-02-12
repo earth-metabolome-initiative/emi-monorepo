@@ -1,6 +1,6 @@
-use crate::prelude::Molecule;
 use reqwest;
 use serde_json::Value;
+use crate::prelude::Molecule;
 
 const URL: &str = "https://structure.gnps2.org/classyfire?";
 
