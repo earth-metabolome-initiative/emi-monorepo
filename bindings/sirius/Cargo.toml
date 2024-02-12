@@ -13,6 +13,7 @@ description = "Wrapper around SIRIUS CLI. "
 
 [dependencies]
 dotenvy = "0.15.7"
+is_executable = "1.0.1"
 arbitrary = { version = "1", optional = true, features = ["derive"] }
 # we only require the arbitrary derivable crate when fuzz is enabled
 [features]
