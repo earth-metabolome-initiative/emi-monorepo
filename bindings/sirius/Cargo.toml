@@ -8,7 +8,7 @@ keywords = ["metabolomics", "SIRIUS", "LC-MS/MS"]
 authors = ["Earth Metabolome Initiative"]
 repository = "https://github.com/earth-metabolome-initiative/emi-monorepo/tree/main/bindings/sirius"
 description = "Wrapper around SIRIUS CLI. "
-exclude = ["CONTRIB.md", ".DS_Store", "tests/.DS_Store"]
+exclude = ["CONTRIB.md", ".DS_Store", "tests/.DS_Store", ".cargo_vcs_info.json"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
