@@ -9,7 +9,7 @@ Since version 5.7.0 SIRIUS is officially available via conda ([conda-forge](http
 Additionally, you can install Sirius via their [GitHub repository](https://github.com/boecker-lab/sirius). 
 
 # Sirius binding
-Here we present a binding for Sirius in [Rust](https://www.rust-lang.org/). This binding is a wrapper around the Sirius command line interface (CLI) and provides a more user-friendly interface for running Sirius. It also provides a safer way to run Sirius by using type safety and error handling before running the Sirius CLI.
+Here we present a binding for Sirius in [Rust](https://www.rust-lang.org/). This binding is a wrapper around the Sirius command line interface (CLI) and provides a more user-friendly interface for running Sirius. It also provides a safer way to run Sirius by using type safety and error handling before running Sirius executable.
 
 ## Usage
 First you need to have Sirius installed in your system. Then you also need the following variables in your `.env` file: 
@@ -184,7 +184,7 @@ Error: "The core parameter MaximalMz(70.6) cannot be added to the configuration.
 ## Limitations
 For now some *config* parameters are not fully implemented and only the default values are used. 
 
-If you are interested in looking at the default values you can either run `sirius config --help`. Here we present is a non-exhaustive list of the parameters where only the default values are used:
+If you are interested in looking at the default values you can either run `sirius config --help`. Here we present is a non-exhaustive list of the parameters where only the default values can be used:
 * **PossibleAdductsSwitches** default is `[M+Na]+:[M+H]+,[M+K]+:[M+H]+,[M+Cl]-:[M-H]-`
 * **AdductSettingsEnforced** default is `,`
 * **FormulaResultRankingScore** default is `AUTO`
