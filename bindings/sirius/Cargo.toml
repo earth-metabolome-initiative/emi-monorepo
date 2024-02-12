@@ -2,14 +2,18 @@
 name = "sirius"
 version = "0.1.0"
 edition = "2021"
+license = "GPL-3.0"
+readme = "README.md"
+keywords = ["metabolomics", "SIRIUS", "LC-MS/MS"]
+authors = ["Earth Metabolome Initiative"]
+repository = "https://github.com/earth-metabolome-initiative/emi-monorepo/tree/main/bindings/sirius"
+description = "Wrapper around SIRIUS CLI. "
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 dotenvy = "0.15.7"
-is_executable = "1.0.1"
 arbitrary = { version = "1", optional = true, features = ["derive"] }
-
 # we only require the arbitrary derivable crate when fuzz is enabled
 [features]
 fuzz = ["dep:arbitrary"]
