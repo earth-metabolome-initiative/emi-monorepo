@@ -11,6 +11,6 @@ CREATE TABLE procedure_continuous_requirements (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (procedure_id, item_category_id),
-  FOREIGN KEY (item_category_id, unit_id) REFERENCES item_units(item_id, unit_id)
+  FOREIGN KEY (item_category_id, unit_id) REFERENCES item_category_units(item_id, unit_id)
   FOREIGN KEY (unit_id) REFERENCES continuous_units(id)
 );

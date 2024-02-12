@@ -19,7 +19,6 @@ CREATE TABLE item_locations (
   item_id INTEGER REFERENCES items(id),
   location_id INTEGER REFERENCES locations(id),
   previous_location_id INTEGER REFERENCES item_locations(id),
-  state INTEGER NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   created_by INTEGER REFERENCES users(id),
