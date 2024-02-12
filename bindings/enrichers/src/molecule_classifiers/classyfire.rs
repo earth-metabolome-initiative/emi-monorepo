@@ -1,6 +1,5 @@
+use crate::molecule_classifiers::ChemicalIdentifier;
 use reqwest;
-
-use super::molecules::ChemicalIdentifier;
 use serde_json::Value;
 
 const URL: &str = "https://structure.gnps2.org/classyfire?";
