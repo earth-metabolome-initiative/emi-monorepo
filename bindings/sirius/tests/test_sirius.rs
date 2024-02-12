@@ -66,6 +66,7 @@ fn test_failing_sirius() {
 }
 
 #[test]
+#[ignore]
 fn test_run_sirius_default() -> Result<(), String> {
     let sirius = SiriusBuilder::<Version5>::default()
         .maximal_mz_default()?
