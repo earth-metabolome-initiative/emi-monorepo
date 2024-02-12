@@ -8,4 +8,3 @@ CREATE TABLE sampled_individual_taxa (
   taxon_id INTEGER NOT NULL REFERENCES taxa(id) ON DELETE CASCADE,
   PRIMARY KEY (sampled_individual_id, taxon_id)
 );
-```
