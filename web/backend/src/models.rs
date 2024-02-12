@@ -6,7 +6,7 @@ mod spectra;
 mod spectra_collection;
 mod task_type;
 mod tasks;
-mod taxons;
+mod taxa;
 mod users;
 
 // models.rs

@@ -29,7 +29,7 @@ diesel::table! {
 }
 
 diesel::table! {
-    taxons (id) {
+    taxa (id) {
         id -> Int4,
         name -> Varchar,
         description -> Text,
