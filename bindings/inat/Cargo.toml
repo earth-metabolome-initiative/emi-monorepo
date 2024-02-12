@@ -1,5 +1,5 @@
 [package]
-name = "inaturalist"
+name = "inat"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,5 +7,4 @@ edition = "2021"
 
 [dependencies]
 inaturalist = "0.5.0"
-tokio = { version = "1.36.0", features = ["full"] }
-dotenvy = "0.15.7"
+tokio = { version = "1", features = ["full"] }

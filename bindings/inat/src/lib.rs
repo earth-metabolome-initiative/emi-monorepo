@@ -3,14 +3,7 @@ use inaturalist::apis::observations_api::observations_id_get;
 use inaturalist::apis::observations_api::ObservationsIdGetError;
 use inaturalist::apis::observations_api::ObservationsIdGetParams;
 use inaturalist::models::observations_show_response::ObservationsShowResponse;
-use tokio;
 
-fn main() {
-    let out = get_observation(1573655).unwrap();
-    println!("{:#?}", out);
-}
-
-#[tokio::main]
 async fn get_observation(
     id: i32,
 ) -> Result<ObservationsShowResponse, inaturalist::apis::Error<ObservationsIdGetError>> {
@@ -23,5 +16,17 @@ async fn get_observation(
     match result {
         Ok(response) => Ok(response),
         Err(error) => Err(error),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tokio;
+
+    #[tokio::test]
+    async fn test_get_observation() {
+        let out = get_observation(1573655).await;
+        assert!(out.is_ok());
     }
 }
