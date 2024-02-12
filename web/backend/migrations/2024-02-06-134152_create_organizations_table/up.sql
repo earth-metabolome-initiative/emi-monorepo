@@ -1,5 +1,5 @@
 -- SQL defining the organizations table.
--- An organization represents a real-world organization such as a University, or a company.
+-- An organization represents a continuous-world organization such as a University, or a company.
 -- Users, projects and teams can be associated to one or more organizations.
 -- An organization has a unique name, description, and may have a parent organization.
 -- Furthermore, an organization may have one or more child organizations.
