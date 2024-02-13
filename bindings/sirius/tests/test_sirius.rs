@@ -66,7 +66,6 @@ fn test_failing_sirius() {
 }
 
 #[test]
-#[ignore]
 fn test_run_sirius_default() -> Result<(), String> {
     let sirius = SiriusBuilder::<Version5>::default()
         .maximal_mz_default()?
@@ -76,6 +75,7 @@ fn test_run_sirius_default() -> Result<(), String> {
         .enable_structure()?
         .enable_canopus()?
         .enable_write_summaries()?
+        .max_cpus_default()?
         .build();
     let input_file_path = Path::new("tests/data/input_sirius.mgf");
     let output_file_path = Path::new("tests/data/output_sirius_default");
@@ -90,10 +90,10 @@ fn test_run_sirius_default() -> Result<(), String> {
 }
 
 #[test]
-#[ignore]
 fn test_run_sirius_with_enpkg_params() -> Result<(), String> {
     let sirius = SiriusBuilder::default()
         .maximal_mz(800.0)?
+        .max_cpus_default()?
         .isotope_settings_filter(true)?
         .formula_search_db(DBVector::from(vec![SearchDB::Bio]))?
         .timeout_seconds_per_tree(0)?

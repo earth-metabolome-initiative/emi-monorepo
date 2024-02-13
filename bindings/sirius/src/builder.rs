@@ -56,6 +56,21 @@ impl SiriusBuilder<Version5> {
         Ok(self)
     }
 
+    /// Set the number of cores to use for the calculation.
+    /// # Arguments
+    /// * `n_cores` - The number of cores to use.
+    /// # Example
+    /// ```
+    /// use sirius::prelude::*;
+    /// let sirius = SiriusBuilder::default()
+    ///  .max_cpus(4).unwrap()
+    /// .build();
+    /// ```
+    pub fn max_cpus(mut self, n_cores: usize) -> Result<Self, String> {
+        self.config.add_core_parameter(CoreV5::NCpus(n_cores))?;
+        Ok(self)
+    }
+
     /// Activate the use of the isotope settings filter.
     /// # Arguments
     /// * `isotope_settings_filter` - Whether to enable the isotope settings filter.
@@ -1084,6 +1099,13 @@ impl SiriusBuilder<Version5> {
     pub fn maximal_mz_default(mut self) -> Result<Self, String> {
         self.config
             .add_core_parameter(CoreV5::MaximalMz(f64::default()).into_default())?;
+        Ok(self)
+    }
+
+    /// Set to default the number of CPUs to use. By default, all available CPUs are used.
+    pub fn max_cpus_default(mut self) -> Result<Self, String> {
+        self.config
+            .add_core_parameter(CoreV5::NCpus(usize::default()).into_default())?;
         Ok(self)
     }
 

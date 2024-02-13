@@ -41,6 +41,7 @@ use sirius::prelude::*;
 use std::path::Path;
 let sirius = SiriusBuilder::<Version5>::default()
     .maximal_mz_default().unwrap()
+    .max_cpus_default().unwrap()
     .enable_formula().unwrap()
     .enable_zodiac().unwrap()
     .enable_fingerprint().unwrap()
@@ -83,6 +84,7 @@ use sirius::prelude::*;
 use std::path::Path;
 let sirius = SiriusBuilder::default()
     .maximal_mz(800.0).unwrap()
+    .max_cpus_default().unwrap()
     .isotope_settings_filter(true).unwrap()
     .formula_search_db(DBVector::from(vec![SearchDB::Bio])).unwrap()
     .timeout_seconds_per_tree(0).unwrap()
