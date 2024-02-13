@@ -213,7 +213,7 @@ You can learn more about fuzzing [here](https://github.com/earth-metabolome-init
 
 ## Citing Sirius
 
-```bash
+```bib
 Kai Dührkop, Markus Fleischauer, Marcus Ludwig, Alexander A. Aksenov, Alexey V. Melnik, Marvin Meusel, Pieter C. Dorrestein, Juho Rousu, and Sebastian Böcker, 
 [SIRIUS 4: Turning tandem mass spectra into metabolite structure information.](https://doi.org/10.1038/s41592-019-0344-8)
 *Nature Methods* 16, 299–302, 2019.
