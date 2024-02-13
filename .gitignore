@@ -26,3 +26,4 @@ __pycache__/
 
 # Ignore .idea folder
 .idea
+.DS_Store

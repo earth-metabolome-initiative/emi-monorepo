@@ -1,4 +1,8 @@
 # Sirius
+[![Build status](https://github.com/earth-metabolome-initiative/sirius-rs/actions/workflows/sirius.yml/badge.svg)](https://github.com/earth-metabolome-initiative/sirius-rs/actions)
+[![Crates.io](https://img.shields.io/crates/v/sirius-rs.svg)](https://crates.io/crates/sirius-rs)
+[![Documentation](https://docs.rs/sirius-rs/badge.svg)](https://docs.rs/sirius-rs)
+
 SIRIUS is a java-based software framework for the analysis of LC-MS/MS data of metabolites and other "small molecules of biological interest". SIRIUS integrates a collection of tools, including CSI:FingerID (with [COSMIC](https://bio.informatik.uni-jena.de/software/cosmic/), [ZODIAC](https://bio.informatik.uni-jena.de/software/zodiac/) and [CANOPUS](https://bio.informatik.uni-jena.de/software/canopus/). In particular, both the graphical user interface and the command line version of SIRIUS seamlessly integrate the CSI:FingerID and CANOPUS web services.
 
 For further reading we recommend you to refer to the official [Sirius website](https://bio.informatik.uni-jena.de/software/sirius/). 
@@ -207,12 +211,10 @@ Fuzzing is a technique for finding security vulnerabilities and bugs in software
 
 You can learn more about fuzzing [here](https://github.com/earth-metabolome-initiative/emi-monorepo/tree/sirius-bindings/bindings/sirius/fuzz). 
 
-<!--begin cite-->
-# Citing Sirius
+## Citing Sirius
 
+```bash
 Kai Dührkop, Markus Fleischauer, Marcus Ludwig, Alexander A. Aksenov, Alexey V. Melnik, Marvin Meusel, Pieter C. Dorrestein, Juho Rousu, and Sebastian Böcker, 
 [SIRIUS 4: Turning tandem mass spectra into metabolite structure information.](https://doi.org/10.1038/s41592-019-0344-8)
 *Nature Methods* 16, 299–302, 2019.
-<!--end cite-->
-
-
+```
