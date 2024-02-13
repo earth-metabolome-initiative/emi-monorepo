@@ -4,11 +4,11 @@ name: Sirius
 on:
   push:
     paths:
-      - "bindings/sirius/**"
+      - "bindings/sirius-bindings/**"
     branches: ["main"]
   pull_request:
     paths:
-      - "bindings/sirius/**"
+      - "bindings/sirius-bindings/**"
     branches: ["main"]
 
 env:
