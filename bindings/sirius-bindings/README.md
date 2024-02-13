@@ -1,7 +1,7 @@
 # Sirius
-[![Build status](https://github.com/earth-metabolome-initiative/sirius-rs/actions/workflows/sirius.yml/badge.svg)](https://github.com/earth-metabolome-initiative/sirius-rs/actions)
-[![Crates.io](https://img.shields.io/crates/v/sirius-rs.svg)](https://crates.io/crates/sirius-rs)
-[![Documentation](https://docs.rs/sirius-rs/badge.svg)](https://docs.rs/sirius-rs)
+[![Build status](https://github.com/earth-metabolome-initiative/sirius-bindings/actions/workflows/sirius.yml/badge.svg)](https://github.com/earth-metabolome-initiative/sirius-bindings/actions)
+[![Crates.io](https://img.shields.io/crates/v/sirius-bindings.svg)](https://crates.io/crates/sirius-bindings)
+[![Documentation](https://docs.rs/sirius-bindings/badge.svg)](https://docs.rs/sirius-bindings)
 
 SIRIUS is a java-based software framework for the analysis of LC-MS/MS data of metabolites and other "small molecules of biological interest". SIRIUS integrates a collection of tools, including CSI:FingerID (with [COSMIC](https://bio.informatik.uni-jena.de/software/cosmic/), [ZODIAC](https://bio.informatik.uni-jena.de/software/zodiac/) and [CANOPUS](https://bio.informatik.uni-jena.de/software/canopus/). In particular, both the graphical user interface and the command line version of SIRIUS seamlessly integrate the CSI:FingerID and CANOPUS web services.
 
