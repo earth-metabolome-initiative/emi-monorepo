@@ -1,9 +1,9 @@
 -- Your SQL goes here
-CREATE TABLE spectra (
+CREATE TABLE tasks (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    description VARCHAR(512) NOT NULL,
-    spectra_collection_id INTEGER REFERENCES spectra_collection(id) ON DELETE CASCADE NOT NULL,
+    status INTEGER NOT NULL,
+    parent_task_id INTEGER REFERENCES tasks(id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    started_at TIMESTAMP NULL,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL
 );
