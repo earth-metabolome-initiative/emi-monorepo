@@ -1,5 +1,5 @@
 # Sirius
-[![Build status](https://github.com/earth-metabolome-initiative/sirius-bindings/actions/workflows/sirius.yml/badge.svg)](https://github.com/earth-metabolome-initiative/sirius-bindings/actions)
+[![Build status](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/sirius.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions)
 [![Crates.io](https://img.shields.io/crates/v/sirius-bindings.svg)](https://crates.io/crates/sirius-bindings)
 [![Documentation](https://docs.rs/sirius-bindings/badge.svg)](https://docs.rs/sirius-bindings)
 
@@ -30,7 +30,7 @@ sirius = "0.1"
 ```
 and this to your crate root:
 ```rust
-use sirius::prelude::*;
+use sirius_bindings::prelude::*;
 ```
 
 ## Examples
@@ -41,7 +41,7 @@ sirius -i tests/data/input_sirius.mgf --output tests/data/output_sirius_default 
 
 The equivalent Rust code is:
 ```rust
-use sirius::prelude::*;
+use sirius_bindings::prelude::*;
 use std::path::Path;
 let sirius = SiriusBuilder::<Version5>::default()
     .maximal_mz_default().unwrap()
@@ -84,7 +84,7 @@ config --IsotopeSettings.filter=true --FormulaSearchDB=BIO --Timeout.secondsPerT
 
 The equivalent Rust code is:
 ```rust
-use sirius::prelude::*;
+use sirius_bindings::prelude::*;
 use std::path::Path;
 let sirius = SiriusBuilder::default()
     .maximal_mz(800.0).unwrap()
@@ -161,7 +161,7 @@ This binding also provides error handling before running the Sirius CLI.
 
 The following example will throw an error because the `maximal_mz` is added twice:
 ```should_panic
-use sirius::prelude::*;
+use sirius_bindings::prelude::*;
 use std::path::Path;
 let sirius = SiriusBuilder::<Version5>::default()
     .maximal_mz_default().unwrap()

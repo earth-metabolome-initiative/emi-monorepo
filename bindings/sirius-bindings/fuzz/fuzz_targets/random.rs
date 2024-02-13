@@ -5,7 +5,7 @@ use libfuzzer_sys::fuzz_target;
 use rand::rngs::SmallRng;
 use rand::Rng;
 use rand::SeedableRng;
-use sirius::prelude::*;
+use sirius_bindings::prelude::*;
 
 #[derive(Arbitrary, Debug)]
 struct FuzzCase {

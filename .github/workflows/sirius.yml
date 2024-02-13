@@ -39,5 +39,5 @@ jobs:
           SIRIUS_PASSWORD: ${{secrets.SIRIUS_PASSWORD}}
         run: | 
           export SIRIUS_PATH=${{vars.SIRIUS_PATH}}
-          cargo test --test test_sirius
+          cargo test
 

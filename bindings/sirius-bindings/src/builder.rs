@@ -22,7 +22,7 @@ impl SiriusBuilder<Version5> {
     /// # Example
     ///
     /// ```
-    /// use sirius::prelude::*;
+    /// use sirius_bindings::prelude::*;
     ///
     /// let sirius = SiriusBuilder::default()
     ///    .maximal_mz(1000.0).unwrap()
@@ -61,7 +61,7 @@ impl SiriusBuilder<Version5> {
     /// * `n_cores` - The number of cores to use.
     /// # Example
     /// ```
-    /// use sirius::prelude::*;
+    /// use sirius_bindings::prelude::*;
     /// let sirius = SiriusBuilder::default()
     ///  .max_cpus(4).unwrap()
     /// .build();
@@ -77,7 +77,7 @@ impl SiriusBuilder<Version5> {
     ///
     /// # Example
     /// ```
-    /// use sirius::prelude::*;
+    /// use sirius_bindings::prelude::*;
     /// let sirius = SiriusBuilder::default()
     ///   .isotope_settings_filter(true).unwrap()
     ///   .build();
@@ -96,7 +96,7 @@ impl SiriusBuilder<Version5> {
     /// * `formula_search_db` - The database to be used for formula search.
     /// # Example
     /// ```
-    /// use sirius::prelude::*;
+    /// use sirius_bindings::prelude::*;
     /// let sirius = SiriusBuilder::default()
     ///  .formula_search_db(DBVector::from(vec![SearchDB::Hmdb])).unwrap()
     /// .build();
@@ -117,7 +117,7 @@ impl SiriusBuilder<Version5> {
     /// * `structure_search_db` - The database to be used for the structure search.
     /// # Example
     /// ```
-    /// use sirius::prelude::*;
+    /// use sirius_bindings::prelude::*;
     /// let sirius = SiriusBuilder::default()
     /// .structure_search_db(DBVector::from(vec![SearchDB::Zincbio])).unwrap()
     /// .build();
@@ -136,7 +136,7 @@ impl SiriusBuilder<Version5> {
     /// * `timeout_seconds_per_tree` - The timeout seconds for each tree.
     /// # Example
     /// ```
-    /// use sirius::prelude::*;
+    /// use sirius_bindings::prelude::*;
     /// let sirius = SiriusBuilder::default()
     /// .timeout_seconds_per_tree(100).unwrap()
     /// .build();
@@ -515,7 +515,7 @@ impl SiriusBuilder<Version5> {
     /// * `zodiac_library_scoring_min_cosine` - The minimal cosine value.
     /// # Example
     /// ```
-    /// use sirius::prelude::*;
+    /// use sirius_bindings::prelude::*;
     /// let sirius = SiriusBuilder::default()
     /// .zodiac_library_scoring_min_cosine(0.5).unwrap()
     /// .build();
@@ -524,7 +524,7 @@ impl SiriusBuilder<Version5> {
     /// If the value is not in the range 0 and 1.
     /// # Example
     /// ```
-    /// use sirius::prelude::*;
+    /// use sirius_bindings::prelude::*;
     /// assert!(SiriusBuilder::default().zodiac_library_scoring_min_cosine(1.1).is_err());
     /// assert!(SiriusBuilder::default().zodiac_library_scoring_min_cosine(-0.1).is_err());
     /// ```
@@ -1070,7 +1070,7 @@ impl<V: Version> SiriusBuilder<V> {
     /// Build the Sirius instance from the configuration.
     /// # Example
     /// ```
-    /// use sirius::prelude::*;
+    /// use sirius_bindings::prelude::*;
     /// let sirius = SiriusBuilder::<Version5>::default().build();
     /// ```
     pub fn build(self) -> Sirius<V> {
@@ -1084,7 +1084,7 @@ impl SiriusBuilder<Version5> {
     /// # Example
     ///
     /// ```
-    /// use sirius::prelude::*;
+    /// use sirius_bindings::prelude::*;
     ///
     /// let sirius = SiriusBuilder::default()
     ///    .maximal_mz_default().unwrap()

@@ -17,13 +17,13 @@ impl MassDeviation {
     /// If the value is negative
     /// # Example
     /// ```
-    /// use sirius::prelude::*;
+    /// use sirius_bindings::prelude::*;
     /// let ppm = MassDeviation::ppm(10.0);
     /// ```
     /// # Panics
     /// If the value is negative
     /// ```should_panic
-    /// use sirius::prelude::*;
+    /// use sirius_bindings::prelude::*;
     /// let ppm = MassDeviation::ppm(-10.0);
     /// ```
     pub fn ppm(value: f32) -> Self {
@@ -39,13 +39,13 @@ impl MassDeviation {
     /// If the value is negative
     /// # Example
     /// ```
-    /// use sirius::prelude::*;
+    /// use sirius_bindings::prelude::*;
     /// let da = MassDeviation::da(0.1);
     /// ```
     /// # Panics
     /// If the value is negative
     /// ```should_panic
-    /// use sirius::prelude::*;
+    /// use sirius_bindings::prelude::*;
     /// let x = MassDeviation::da(-0.1);
     /// ```
     pub fn da(value: f32) -> Self {
@@ -61,14 +61,14 @@ impl MassDeviation {
     /// If the value is negative
     /// # Example
     /// ```
-    /// use sirius::prelude::*;
+    /// use sirius_bindings::prelude::*;
     /// let ppm = MassDeviation::ppm(10.0);
     /// assert_eq!(ppm.must_be_positive().unwrap(), MassDeviation::Ppm(10.0));
     /// ```
     /// # Errors
     /// If the value is negative
     /// ```
-    /// use sirius::prelude::*;
+    /// use sirius_bindings::prelude::*;
     /// let ppm = MassDeviation::Ppm(-10.0);
     /// assert!(ppm.must_be_positive().is_err());
     /// ```
