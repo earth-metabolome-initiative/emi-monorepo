@@ -5,14 +5,14 @@
 
 SIRIUS is a computational mass spectrometry Java-based software framework for the analysis of LC-MS/MS metabolomics data sets and the annotation of metabolites and other small molecules of biological interest. SIRIUS integrates a collection of tools, including CSI:FingerID (with [COSMIC](https://bio.informatik.uni-jena.de/software/cosmic/), [ZODIAC](https://bio.informatik.uni-jena.de/software/zodiac/) and [CANOPUS](https://bio.informatik.uni-jena.de/software/canopus/).
 
-For further reading please refer to the official [Sirius website](https://bio.informatik.uni-jena.de/software/sirius/). 
+For further reading we recommend you to refer to the official [Sirius website](https://bio.informatik.uni-jena.de/software/sirius/). 
 
 ## Installation
 Since version 5.7.0 SIRIUS is officially available via conda ([conda-forge](https://conda-forge.org/)) under the package name [sirius-ms](https://anaconda.org/conda-forge/sirius-ms). Native MacOS arm64 (Apple Silicon) builds are solely available via conda.
 
 Additionally, you can install Sirius via their [GitHub repository](https://github.com/boecker-lab/sirius). 
 
-# Sirius bindings
+# Sirius binding
 Here we present a binding for Sirius in [Rust](https://www.rust-lang.org/). This binding is a wrapper around the Sirius command line interface (CLI) and provides a more user-friendly interface for running Sirius. It also provides a safer way to run Sirius by using type safety and error handling before running Sirius executable.
 
 ## Usage
