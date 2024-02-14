@@ -1,10 +1,4 @@
 [workspace]
 resolver = "2"
 
-members = [
-    "bindings/inat",
-    "bindings/sirius",
-    "web/backend",
-    "web/portal",
-    "web/web_common",
-]
+members = ["bindings/sirius-bindings", "bindings/inat"]
