@@ -1,0 +1,43 @@
+name: Sirius
+
+
+on:
+  push:
+    paths:
+      - "bindings/sirius-bindings/**"
+    branches: ["main"]
+  pull_request:
+    paths:
+      - "bindings/sirius-bindings/**"
+    branches: ["main"]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  sirius:
+    runs-on: ubuntu-latest
+    environment: Sirius
+    steps:
+      - uses: actions/checkout@v2
+      - name: Retrieve Sirius install script
+        run: |
+          wget https://raw.githubusercontent.com/enpkg/enpkg_full/emikg-adapt/src/install_sirius.sh
+          chmod +x install_sirius.sh
+      - name: Install Sirius
+        run: |
+          bash ./install_sirius.sh
+          chmod +x ./sirius/bin
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          override: true
+      - name: Run tests
+        env:
+          SIRIUS_USERNAME: ${{secrets.SIRIUS_USERNAME}}
+          SIRIUS_PASSWORD: ${{secrets.SIRIUS_PASSWORD}}
+        run: | 
+          export SIRIUS_PATH=${{vars.SIRIUS_PATH}}
+          cargo test --package sirius-bindings
+

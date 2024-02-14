@@ -15,8 +15,15 @@ Cargo.lock
 .env
 
 # Ingnoring .vscode folder
-.vscode/
+.vscode
 
-# don't keep .DS_Store
+# Ignore .DS_Store
 .DS_Store
 
+# Ignore pychache
+__pycache__/
+
+
+# Ignore .idea folder
+.idea
+.DS_Store
