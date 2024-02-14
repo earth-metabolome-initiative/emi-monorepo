@@ -67,10 +67,22 @@ impl SiriusBuilder<Version5> {
     /// .build();
     /// ```
     pub fn max_cpus(mut self, n_cores: usize) -> Result<Self, String> {
-        self.config.add_core_parameter(CoreV5::NCpus(n_cores))?;
+        self.config.add_core_parameter(CoreV5::NCPUs(n_cores))?;
         Ok(self)
     }
 
+    /// Recompute results of ALL tools where results are
+    /// already present. Per default already present
+    /// results will be preserved and the instance will
+    /// be skipped for the corresponding Task/Tool
+    ///
+    /// # Arguments
+    /// * `recompute` - Whether to recompute the whole task or not
+    pub fn recompute_all(mut self, recompute: bool) -> Result<Self, String> {
+        self.config
+            .add_core_parameter(CoreV5::Recompute(recompute))?;
+        Ok(self)
+    }
     /// Activate the use of the isotope settings filter.
     /// # Arguments
     /// * `isotope_settings_filter` - Whether to enable the isotope settings filter.
@@ -1105,7 +1117,14 @@ impl SiriusBuilder<Version5> {
     /// Set to default the number of CPUs to use. By default, all available CPUs are used.
     pub fn max_cpus_default(mut self) -> Result<Self, String> {
         self.config
-            .add_core_parameter(CoreV5::NCpus(usize::default()).into_default())?;
+            .add_core_parameter(CoreV5::NCPUs(usize::default()).into_default())?;
+        Ok(self)
+    }
+
+    /// Whether to recompute all tools. By default, it is set to `false`.
+    pub fn recompute_all_default(mut self) -> Result<Self, String> {
+        self.config
+            .add_core_parameter(CoreV5::Recompute(bool::default()).into_default())?;
         Ok(self)
     }
 

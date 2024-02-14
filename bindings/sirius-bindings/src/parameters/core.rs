@@ -9,7 +9,10 @@ pub enum CoreV5 {
     /// The maximal number of logical cpus to use.
     NCPUs(usize),
 
-    /// Weather to recompute the whole task or not
+    /// Recompute results of ALL tools where results are
+    /// already present. Per default already present
+    /// results will be preserved and the instance will
+    /// be skipped for the corresponding Task/Tool
     Recompute(bool),
 }
 
