@@ -55,10 +55,10 @@ let sirius = SiriusBuilder::<Version5>::default()
     .build();
 let input_file_path = Path::new("tests/data/input_sirius.mgf");
 let output_file_path = Path::new("tests/data/output_sirius_default");
-// Check if the path exists before attempting to remove it
-if output_file_path.exists() {
-    let _ = std::fs::remove_dir_all(output_file_path);
-}
+// In case you need to remove the output directory, uncomment the lines below
+// if output_file_path.exists() {
+//     let _ = std::fs::remove_dir_all(output_file_path);
+// }
 sirius.run(input_file_path, output_file_path).unwrap();
 ```
 
@@ -149,10 +149,10 @@ let sirius = SiriusBuilder::default()
 
 let input_file_path = Path::new("tests/data/input_sirius.mgf");
 let output_file_path = Path::new("tests/data/output_sirius");
-// Check if the path exists before attempting to remove it
-if output_file_path.exists() {
-    let _ = std::fs::remove_dir_all(output_file_path);
-}
+// In case you need to remove the output directory, uncomment the lines below
+// if output_file_path.exists() {
+//     let _ = std::fs::remove_dir_all(output_file_path);
+// }
 sirius.run(input_file_path, output_file_path).unwrap();
 ```
 
@@ -175,10 +175,10 @@ let sirius = SiriusBuilder::<Version5>::default()
     .build();
 let input_file_path = Path::new("tests/data/input_sirius.mgf");
 let output_file_path = Path::new("tests/data/output_sirius_default");
-// Check if the path exists before attempting to remove it
-if output_file_path.exists() {
-    let _ = std::fs::remove_dir_all(output_file_path);
-}
+// In case you need to remove the output directory, uncomment the lines below
+// if output_file_path.exists() {
+//    let _ = std::fs::remove_dir_all(output_file_path);
+// }
 sirius.run(input_file_path, output_file_path).unwrap();
 ```
 
