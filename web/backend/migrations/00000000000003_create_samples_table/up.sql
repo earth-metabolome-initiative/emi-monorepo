@@ -2,6 +2,5 @@
 CREATE TABLE samples (
     id SERIAL PRIMARY KEY,
     derived_from INTEGER REFERENCES samples(id) ON DELETE SET NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created_by INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE
+    editable_id INTEGER NOT NULL REFERENCES editables(id),
 );

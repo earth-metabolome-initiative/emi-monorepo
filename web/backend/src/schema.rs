@@ -1,13 +1,12 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
-    users (id) {
+    tasks (id) {
         id -> Int4,
-        first_name -> Varchar,
-        middle_name -> Nullable<Varchar>,
-        last_name -> Varchar,
-        email -> Varchar,
+        status -> Int4,
+        parent_task_id -> Nullable<Int4>,
         created_at -> Timestamp,
-        updated_at -> Timestamp,
+        started_at -> Nullable<Timestamp>,
+        completed_at -> Nullable<Timestamp>,
     }
 }

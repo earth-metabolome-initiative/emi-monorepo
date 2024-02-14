@@ -22,22 +22,15 @@ CREATE TABLE projects (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description TEXT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    -- When a project is read-only, it means that it cannot be modified
-    -- by the users, and is typically used to prevent accidental modifications
-    -- of a project that is in a "completed" or "archived" state.
-    is_read_only BOOLEAN DEFAULT FALSE,
     public BOOLEAN DEFAULT FALSE,
-    state INTEGER NOT NULL,
-    parent_project_id INTEGER,
+    state_id INTEGER NOT NULL REFERENCES project_states(id),
+    parent_project_id INTEGER REFERENCES projects(id) ON DELETE CASCADE,
     budget DECIMAL(10, 2) DEFAULT NULL,
+    expenses DECIMAL(10, 2) DEFAULT NULL,
     currency VARCHAR(3) DEFAULT NULL,
-    predicted_end_date TIMESTAMP WITH TIME ZONE DEFAULT NULL,
-    creator_id INTEGER NOT NULL,
+    expected_end_date TIMESTAMP WITH TIME ZONE DEFAULT NULL,
+    end_date TIMESTAMP WITH TIME ZONE DEFAULT NULL,
     website_url VARCHAR(255) DEFAULT NULL,
     logo_path VARCHAR(255) DEFAULT NULL,
-    FOREIGN KEY (state_id) REFERENCES project_states(id),
-    FOREIGN KEY (parent_project_id) REFERENCES projects(id) ON DELETE CASCADE,
-    FOREIGN KEY (creator_id) REFERENCES users(id),
+    editable_id INTEGER NOT NULL REFERENCES editables(id),
 );
