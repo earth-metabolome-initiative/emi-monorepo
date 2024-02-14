@@ -1,6 +1,6 @@
 -- Your SQL goes here
-CREATE TABLE taxa (
+CREATE TABLE project_user_roles (
     id INTEGER PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE,
-    name VARCHAR(80) NOT NULL,
-    description VARCHAR(255) NOT NULL
+    name VARCHAR(255) NOT NULL UNIQUE,
+    description TEXT
 );
