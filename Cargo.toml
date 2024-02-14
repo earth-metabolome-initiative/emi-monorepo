@@ -1,8 +1,4 @@
 [workspace]
 resolver = "2"
 
-<<<<<<< HEAD
-members = [ "bindings/enrichers", "bindings/sirius","web/backend", "web/portal", "web/web_common"]
-=======
-members = [ "bindings/sirius-bindings",]
->>>>>>> origin/main
+members = ["bindings/enrichers", "bindings/sirius-bindings"]
