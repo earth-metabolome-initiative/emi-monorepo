@@ -9,11 +9,7 @@
 CREATE TABLE project_users (
     user_id INT NOT NULL,
     project_id INT NOT NULL,
-    role INT NOT NULL,
-    added_by INT NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (user_id, project_id, role),
-    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
-    FOREIGN KEY (project_id) REFERENCES projects (id) ON DELETE CASCADE,
-    FOREIGN KEY (added_by) REFERENCES users (id) ON DELETE CASCADE
+    role_id INT NOT NULL REFERENCES project_user_roles (id) ON DELETE CASCADE,
+    editable_id INT NOT NULL REFERENCES editables (id) ON DELETE CASCADE,
+    PRIMARY KEY (user_id, project_id, role_id),
 );
