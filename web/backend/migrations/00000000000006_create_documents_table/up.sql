@@ -11,5 +11,5 @@ CREATE TABLE documents (
     name VARCHAR(255) NOT NULL,
     description VARCHAR(512) NOT NULL,
     path VARCHAR(255) NOT NULL,
-    editable_id INTEGER NOT NULL REFERENCES editables(id),
+    editable_id INTEGER NOT NULL REFERENCES editables(id) ON DELETE CASCADE
 );

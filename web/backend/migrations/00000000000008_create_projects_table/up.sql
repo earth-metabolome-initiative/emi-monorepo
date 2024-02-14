@@ -31,6 +31,6 @@ CREATE TABLE projects (
     expected_end_date TIMESTAMP WITH TIME ZONE DEFAULT NULL,
     end_date TIMESTAMP WITH TIME ZONE DEFAULT NULL,
     website_url VARCHAR(255) DEFAULT NULL,
-    logo_path VARCHAR(255) DEFAULT NULL,
-    editable_id INTEGER NOT NULL REFERENCES editables(id),
+    logo_id INT DEFAULT NULL REFERENCES documents(id) ON DELETE SET NULL,
+    editable_id INTEGER NOT NULL REFERENCES editables(id) ON DELETE CASCADE
 );
