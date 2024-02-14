@@ -7,9 +7,9 @@
 -- also contains a column to specify which administrator added the user to the project.
 
 CREATE TABLE project_users (
+    editable_id INT PRIMARY KEY REFERENCES editables (id) ON DELETE CASCADE,
     user_id INT NOT NULL,
     project_id INT NOT NULL,
     role_id INT NOT NULL REFERENCES project_user_roles (id) ON DELETE CASCADE,
-    editable_id INT NOT NULL REFERENCES editables (id) ON DELETE CASCADE,
-    PRIMARY KEY (user_id, project_id, role_id),
+    UNIQUE (user_id, project_id, role_id)
 );

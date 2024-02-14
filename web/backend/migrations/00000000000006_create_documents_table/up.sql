@@ -11,5 +11,7 @@ CREATE TABLE documents (
     name VARCHAR(255) NOT NULL,
     description VARCHAR(512) NOT NULL,
     path VARCHAR(255) NOT NULL,
+    format_id INTEGER NOT NULL REFERENCES formats(id) ON DELETE CASCADE,
+    bytes INTEGER NOT NULL,
     editable_id INTEGER NOT NULL REFERENCES editables(id) ON DELETE CASCADE
 );
