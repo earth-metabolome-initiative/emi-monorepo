@@ -7,8 +7,8 @@
 -- The path itself does not contain the file name itself, as it may be dangerous to let the user
 -- specify the path of the file. 
 CREATE TABLE documents (
-    id INTEGER PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE REFERENCES describable(id) ON DELETE CASCADE,
+    id BIGINT PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE REFERENCES describables(id) ON DELETE CASCADE,
     path VARCHAR(255) NOT NULL,
-    format_id INTEGER NOT NULL REFERENCES document_formats(id) ON DELETE CASCADE,
+    format_id BIGINT NOT NULL REFERENCES document_formats(id) ON DELETE CASCADE,
     bytes INTEGER NOT NULL
 );

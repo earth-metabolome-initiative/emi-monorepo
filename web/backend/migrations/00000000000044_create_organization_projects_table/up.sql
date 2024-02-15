@@ -7,8 +7,8 @@
 -- the organization_projects table also contains a column to specify which administrator
 -- added the project to the organization.
 CREATE TABLE organization_projects (
-    id INTEGER PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE,
-    organization_id INTEGER NOT NULL REFERENCES organizations (id) ON DELETE CASCADE,
-    project_id INTEGER NOT NULL REFERENCES projects (id) ON DELETE CASCADE,
-    role_id INTEGER NOT NULL REFERENCES team_user_roles (id) ON DELETE CASCADE
+    id BIGINT PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE,
+    organization_id BIGINT NOT NULL REFERENCES organizations (id) ON DELETE CASCADE,
+    project_id BIGINT NOT NULL REFERENCES projects (id) ON DELETE CASCADE,
+    role_id BIGINT NOT NULL REFERENCES team_user_roles (id) ON DELETE CASCADE
 );

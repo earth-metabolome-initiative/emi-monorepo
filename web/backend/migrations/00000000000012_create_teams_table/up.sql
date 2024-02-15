@@ -6,7 +6,7 @@
 -- manage access to each user individually. The created_at and updated_at columns are used to store
 -- the creation and last update time of the record.
 CREATE TABLE teams (
-  id INTEGER PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE REFERENCES describable(id) ON DELETE CASCADE,
+  id BIGINT PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE REFERENCES describables(id) ON DELETE CASCADE,
   parent_team_id INTEGER DEFAULT NULL REFERENCES teams(id) ON DELETE CASCADE,
-  team_state_id INTEGER NOT NULL REFERENCES team_states(id)
+  team_state_id BIGINT NOT NULL REFERENCES team_states(id)
 );

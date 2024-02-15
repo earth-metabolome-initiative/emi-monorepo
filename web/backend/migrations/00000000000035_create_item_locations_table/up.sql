@@ -15,8 +15,8 @@
 -- - created_by: the unique identifier of the user who created the item location.
 -- - updated_by: the unique identifier of the user who last updated the item location.
 CREATE TABLE item_locations (
-  id INTEGER PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE,
-  item_id INTEGER REFERENCES items(id) ON DELETE CASCADE,
-  location_id INTEGER REFERENCES locations(id) ON DELETE CASCADE,
-  previous_location_id INTEGER DEFAULT NULL REFERENCES locations(id) ON DELETE SET NULL
+  id BIGINT PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE,
+  item_id BIGINT REFERENCES items(id) ON DELETE CASCADE,
+  location_id BIGINT REFERENCES locations(id) ON DELETE CASCADE,
+  previous_location_id BIGINT DEFAULT NULL REFERENCES locations(id) ON DELETE SET NULL
 );

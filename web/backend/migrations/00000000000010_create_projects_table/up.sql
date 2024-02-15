@@ -19,15 +19,15 @@
 -- Finally, the project also has an optional path for the project logo.
 
 CREATE TABLE projects (
-    id INTEGER PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE REFERENCES describable(id) ON DELETE CASCADE,
+    id BIGINT PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE REFERENCES describables(id) ON DELETE CASCADE,
     public BOOLEAN DEFAULT FALSE,
-    state_id INTEGER NOT NULL REFERENCES project_states(id),
-    parent_project_id INTEGER REFERENCES projects(id) ON DELETE CASCADE,
-    budget DECIMAL(10, 2) DEFAULT NULL,
-    expenses DECIMAL(10, 2) DEFAULT NULL,
+    state_id BIGINT NOT NULL REFERENCES project_states(id),
+    parent_project_id BIGINT REFERENCES projects(id) ON DELETE CASCADE,
+    budget MONEY DEFAULT NULL,
+    expenses MONEY DEFAULT NULL,
     currency VARCHAR(3) DEFAULT NULL,
     expected_end_date TIMESTAMP WITH TIME ZONE DEFAULT NULL,
     end_date TIMESTAMP WITH TIME ZONE DEFAULT NULL,
     website_url VARCHAR(255) DEFAULT NULL,
-    logo_id INTEGER DEFAULT NULL REFERENCES documents(id) ON DELETE SET NULL
+    logo_id BIGINT DEFAULT NULL REFERENCES documents(id) ON DELETE SET NULL
 );

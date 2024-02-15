@@ -8,6 +8,6 @@
 -- An example of an Item may be a measurement device, a tube potentially containing a sample,
 -- or a sample itself.
 CREATE TABLE items (
-  id INTEGER PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE REFERENCES describable(id) ON DELETE CASCADE,
+  id BIGINT PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE REFERENCES describables(id) ON DELETE CASCADE,
   parent_id INTEGER REFERENCES items(id) ON DELETE SET NULL
 );

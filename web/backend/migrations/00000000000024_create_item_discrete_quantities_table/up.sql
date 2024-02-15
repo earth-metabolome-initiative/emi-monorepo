@@ -7,10 +7,10 @@
 -- the system, we will still allow for the user to specify the counter unit for 
 -- the item. For example, a counter unit may be a box, a tube, or a vial.
 CREATE TABLE item_discrete_quantities (
-    id INTEGER PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE,
-    item_id INTEGER REFERENCES items(id),
+    id BIGINT PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE,
+    item_id BIGINT REFERENCES items(id) ON DELETE CASCADE,
     quantity INTEGER NOT NULL,
-    unit_id INTEGER REFERENCES units(id) ON DELETE CASCADE,
+    unit_id BIGINT REFERENCES units(id) ON DELETE CASCADE,
     measured_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     measured_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
     UNIQUE (item_id, unit_id),

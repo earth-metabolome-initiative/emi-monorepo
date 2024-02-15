@@ -4,7 +4,7 @@
 -- An individual can be associated to no or more taxa, and a taxon can be found in multiple individuals.
 --
 CREATE TABLE sampled_individual_taxa (
-  sampled_individual_id INTEGER NOT NULL REFERENCES sampled_individuals(id) ON DELETE CASCADE,
-  taxon_id INTEGER NOT NULL REFERENCES taxa(id) ON DELETE CASCADE,
+  sampled_individual_id BIGINT NOT NULL REFERENCES sampled_individuals(id) ON DELETE CASCADE,
+  taxon_id BIGINT NOT NULL REFERENCES taxa(id) ON DELETE CASCADE,
   PRIMARY KEY (sampled_individual_id, taxon_id)
 );

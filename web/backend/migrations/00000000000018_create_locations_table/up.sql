@@ -16,13 +16,13 @@
 -- - created_by: the unique identifier of the user who created the location.
 -- - updated_by: the unique identifier of the user who last updated the location.
 CREATE TABLE locations (
-  id INTEGER PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE REFERENCES describable(id) ON DELETE CASCADE,
+  id BIGINT PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE REFERENCES describables(id) ON DELETE CASCADE,
   latitude DECIMAL(9,6),
   longitude DECIMAL(9,6),
   altitude DECIMAL(9,3),
   address TEXT,
-  geolocalization_device_id INTEGER REFERENCES items(id) ON DELETE SET NULL,
-  altitude_device_id INTEGER REFERENCES items(id) ON DELETE SET NULL,
-  parent_location_id INTEGER REFERENCES locations(id) ON DELETE SET NULL,
-  state_id INTEGER NOT NULL REFERENCES location_states(id)
+  geolocalization_device_id BIGINT REFERENCES items(id) ON DELETE SET NULL,
+  altitude_device_id BIGINT REFERENCES items(id) ON DELETE SET NULL,
+  parent_location_id BIGINT REFERENCES locations(id) ON DELETE SET NULL,
+  state_id BIGINT NOT NULL REFERENCES location_states(id)
 );

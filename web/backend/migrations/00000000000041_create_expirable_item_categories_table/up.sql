@@ -3,7 +3,7 @@
 -- they have an interval of time associated to them after which they are no longer
 -- valid. This table is used to enforce the expiration date of items of a certain type.
 CREATE TABLE expirable_item_categories (
-  id INTEGER PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE,
-  item_type_id INTEGER REFERENCES item_categories(id) ON DELETE CASCADE,
+  id BIGINT PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE,
+  item_type_id BIGINT REFERENCES item_categories(id) ON DELETE CASCADE,
   expiration_interval INTERVAL NOT NULL
 );
