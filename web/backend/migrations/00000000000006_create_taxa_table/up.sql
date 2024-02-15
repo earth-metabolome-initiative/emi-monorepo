@@ -1,0 +1,4 @@
+-- Your SQL goes here
+CREATE TABLE taxa (
+    id INTEGER PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE REFERENCES describable(id) ON DELETE CASCADE
+);
