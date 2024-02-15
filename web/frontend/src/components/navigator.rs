@@ -25,40 +25,33 @@
 use yew::prelude::*;
 use yewdux::prelude::*;
 
+
+use crate::components::search_bar::SearchBar;
 use crate::store::Store;
+
 
 #[function_component(Navigator)]
 pub fn navigator() -> Html {
-    let (state, _) = use_store::<Store>();
-
-    let navigator_classes = if state.sidebar_open {
-        "bg-white shadow"
-    } else {
-        "bg-white shadow md:hidden"
-    };
-
     html! {
-        <nav class={navigator_classes}>
-            <div class="flex items-center justify-between p-4">
+        <nav class="bg-white shadow">
+            <div class="flex items center justify-between p-4">
                 <div class="flex items center">
-                    <button class="text-gray-500 focus:outline-none md:hidden">
+                    <button class="md:hidden" >
                         <i class="fas fa-bars"></i>
                     </button>
                     <img class="h-8" src="/logo.svg" alt="logo" />
                 </div>
-                <div class="flex items
-                center">
-                    <input class="hidden md:block bg-gray-100 text-gray-700 rounded-lg p-2 pl-4" type="text" placeholder="Search..." />
-                    <div class="flex items
-                    center ml-4">
-                        <div class="hidden md:block">
-                            <span class="text-gray-700 font-bold">{"John Doe"}</span>
-                            <img class="h-8 w-8 rounded-full ml-2" src="/avatar.jpg" alt="avatar" />
-                            <i class="fas fa-caret-down ml-2"></i>
+                <SearchBar />
+                <div class="flex items center">
+                    <div class="flex items center">
+                        <img class="h-8 w-8 rounded-full" src="/avatar.jpg" alt="avatar" />
+                        <span class="ml-2 hidden md:block">{"John Doe"}</span>
+                        <div class="ml-2 hidden md:block">
+                            <i class="fas fa-caret-down"></i>
                         </div>
-                        <div class="md:hidden">
-                            <img class="h-8 w-8 rounded-full" src="/avatar.jpg" alt="avatar" />
-                        </div>
+                    </div>
+                    <div class="ml-2 hidden md:block">
+                        <span class="bg-red-500 text-white rounded-full p-1">{"Offline"}</span>
                     </div>
                 </div>
             </div>
