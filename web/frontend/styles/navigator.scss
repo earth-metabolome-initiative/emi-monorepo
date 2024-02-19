@@ -1,0 +1,15 @@
+@import 'navigator/hamburger';
+
+nav {
+  border-bottom: 1px solid $primary;
+  padding: 1rem;
+  text-align: center;
+  background-color: white;
+  h1 {
+    margin-bottom: 1rem;
+  }
+
+  a {
+    text-decoration: none;
+  }
+}

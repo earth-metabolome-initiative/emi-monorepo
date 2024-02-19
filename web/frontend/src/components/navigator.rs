@@ -24,7 +24,6 @@
 //! the offline badge, the dropdown menu, and the side bar. When the screen is small, such as in a mobile device, the navigator
 //! will also handle the toggling of the side bar when the hamburger icon is clicked.
 //! 
-//! The styles of the navigator are defined using the Tailwind CSS framework.
 
 use yew::prelude::*;
 use yewdux::prelude::*;
@@ -33,76 +32,16 @@ use yewdux::prelude::*;
 use crate::components::search_bar::SearchBar;
 use crate::store::Store;
 
-use super::Sidebar;
 
+#[function_component(Navigator)]
+pub fn navigator() -> Html {
+    let (store, _) = use_store::<Store>();
 
-pub struct Navigator {
-    sidebar: Sidebar,
-    search_bar: SearchBar,
-}
+    let is_offline = store.is_offline;
 
-impl Component for Navigator {
-    type Message = ();
-    type Properties = ();
-
-    fn create(_: Self::Properties, _: ComponentLink<Self>) -> Self {
-        Self {
-            sidebar: Sidebar,
-            search_bar: SearchBar,
-        }
-    }
-
-    fn update(&mut self, _: Self::Message) -> ShouldRender {
-        false
-    }
-
-    fn changed(&mut self, _: Self::Properties) -> ShouldRender {
-        false
-    }
-
-    fn view(&self) -> Html {
-        html! {
-            <nav class="bg-white shadow-lg">
-                <div class="container mx-auto px-4">
-                    <div class="flex justify-between items-center h-16">
-                        <div class="flex items center">
-                            <button class="text-gray-500 focus:outline-none lg:hidden">
-                                <i class="fas fa-bars"></i>
-                            </button>
-                            <a class="ml-4" href="/">
-                                <img class="h-8" src="/logo.svg" alt="logo" />
-                            </a>
-                        </div>
-                        <div class="hidden lg:flex items center">
-                            <self::SearchBar />
-                        </div>
-                        <div class="flex items center">
-                            <div class="relative">
-                                <button class="text-gray-500 focus:outline-none">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                                <input
-                                    type="text"
-                                    class="w-64 h-10 px-3 pr-10 rounded-full border-2 border-gray-300 focus:outline-none focus:border-blue-500"
-                                    placeholder="Search..."
-                                />
-                            </div>
-                            <div class="ml-4 relative">
-                                <button class="text-gray-500 focus:outline-none">
-                                    <i class="fas fa-bell"></i>
-                                </button>
-                                <div class="absolute right-0 top-0 h-2 w-2 bg-red-500 rounded-full"></div>
-                            </div>
-                            <div class="ml-4 relative">
-                                <button class="text-gray-500 focus:outline-none">
-                                    <i class="fas fa-user"></i>
-                                </button>
-                                <div class="absolute right-0 top-0 h-2 w-2 bg-red-500 rounded-full"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </nav>
-        }
+    html! {
+        <nav>
+            <h1>{"Earth Metabolome Initiative"}</h1>
+        </nav>
     }
 }

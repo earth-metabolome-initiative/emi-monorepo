@@ -20,9 +20,7 @@ serde_json = "1.0.111"
 uuid = { version = "1.7.0", features = ["serde", "v4", "js"] }
 wasm-bindgen = "0.2.90"
 wasm-bindgen-futures = "0.4.40"
-material-yew = "0.2"
 web-sys = { version = "0.3.67", features = ["HtmlInputElement", "Window"] }
 yew = { version = "0.21.0", features = ["csr"] }
 yew-router = "0.18.0"
 yewdux = "0.10.0"
-tailwind-css = "0.13.0"

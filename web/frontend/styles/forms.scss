@@ -1,0 +1,20 @@
+//! File defining the styles for the forms and inputs
+
+// A class that wraps an input class with a font-awesome icon
+// on the right side of the input.
+.input_wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    margin-bottom: 1.5rem;
+    input {
+        padding-right: 2.5rem;
+    }
+    .icon {
+        position: absolute;
+        top: 50%;
+        right: 0.5rem;
+        transform: translateY(-50%);
+        font-size: 1.5rem;
+    }
+}
