@@ -1,14 +1,14 @@
 use serde::{Deserialize, Serialize};
+use web_common::user::User;
 use yewdux::prelude::*;
-
 
 #[derive(Default, PartialEq, Serialize, Deserialize, Store, Clone)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct Store {
     pub sidebar_open: bool,
     pub is_offline: bool,
+    pub user: Option<User>,
 }
-
 
 impl Store {
     pub fn toggle_sidebar(&mut self) {

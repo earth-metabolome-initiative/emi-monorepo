@@ -2,14 +2,51 @@
 
 nav {
   border-bottom: 1px solid $primary;
-  padding: 1rem;
-  text-align: center;
+  box-sizing: border-box;
   background-color: white;
+  position: fixed;
+  width: 100%;
+  z-index: 100;
+  top: 0;
+  left: 0;
+  display: flex;
+  padding: 1em;
   h1 {
-    margin-bottom: 1rem;
+    display: inline-block;
+    color: $primary;
+    font-size: 1.5rem;
+    padding: None;
+    a {
+      color: inherit;
+    }
   }
-
+  .hamburger {
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: none;
+  }
   a {
     text-decoration: none;
+  }
+  a.login {
+    color: $primary;
+    font-size: 1.25rem;
+  }
+  .search {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+@media (max-width: 1024px) {
+  nav {
+    h1 {
+      display: inline-block;
+      padding-left: 50px;
+    }
+    .hamburger {
+      display: inline-block;
+    }
   }
 }

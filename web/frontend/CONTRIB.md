@@ -19,20 +19,3 @@ After that, we can install Trunk by running the following command. You may want 
 # See https://trunkrs.dev/#install for further details
 cargo install --locked trunk
 ```
-
-### Installing cargo watch
-What is cargo watch? It's a tool that watches for changes in your Rust project and automatically recompiles it. It's a great tool to have when you're working on a project and want to see the changes you've made without having to manually recompile it every time.
-
-To install cargo watch, run the following command:
-
-```bash
-cargo install cargo-watch
-```
-
-You will be able to run cargo watch with the following command:
-
-```bash
-cargo watch -q -c -w src/ -x run
-```
-
-Note that this command should be made part of the script that we use to run the project in debug mode.

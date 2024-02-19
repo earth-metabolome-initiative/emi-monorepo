@@ -1,0 +1,1 @@
+//! Router of the single-page application.

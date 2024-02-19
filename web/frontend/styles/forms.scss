@@ -1,20 +1,26 @@
 //! File defining the styles for the forms and inputs
 
 // A class that wraps an input class with a font-awesome icon
-// on the right side of the input.
-.input_wrapper {
-    position: relative;
-    display: inline-block;
-    width: 100%;
-    margin-bottom: 1.5rem;
-    input {
-        padding-right: 2.5rem;
+// on the right side of the input. We also remove the blue border
+// that appears on focus.
+.input-with-icon {
+  position: relative;
+  input {
+    padding-right: 2.5rem;
+    border-radius: 0.5rem;
+    padding: 0.5em;
+    border: 1px solid #ccc;
+    transition: border-color 0.2s;
+    &:focus {
+      outline: none;
+      border-color: $primary;
     }
-    .icon {
-        position: absolute;
-        top: 50%;
-        right: 0.5rem;
-        transform: translateY(-50%);
-        font-size: 1.5rem;
-    }
+  }
+  i {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $primary;
+  }
 }

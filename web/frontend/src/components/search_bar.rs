@@ -21,8 +21,8 @@ use crate::store::Store;
 #[function_component(SearchBar)]
 pub fn search_bar() -> Html {
     html! {
-        <div class="relative">
-            <InputWithIcon icon="fa-search" />
+        <div class="search">
+            <InputWithIcon icon="search" placeholder="Search..."/>
         </div>
     }
 }
