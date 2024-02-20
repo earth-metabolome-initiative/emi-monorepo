@@ -16,12 +16,12 @@ fn App() -> Html {
 
     html! {
         <ContextProvider<Option<User>> context={(*user_state).clone()}>
-            <components::Navigator />
-            <div class="app">
-                <BrowserRouter>
+            <BrowserRouter>
+                <components::Navigator />
+                <div class="app">
                     <Switch<AppRoute> render={switch} />
-                </BrowserRouter>
-            </div>
+                </div>
+            </BrowserRouter>
             <Footer />
         </ContextProvider<Option<User>>>
     }

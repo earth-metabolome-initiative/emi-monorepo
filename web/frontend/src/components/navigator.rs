@@ -20,7 +20,9 @@
 //! the badge will disappear.
 //!
 
+use crate::router::AppRoute;
 use yew::prelude::*;
+use yew_router::prelude::*;
 use yewdux::prelude::*;
 
 use crate::components::hamburger::Hamburger;
@@ -47,28 +49,26 @@ pub fn navigator() -> Html {
             <nav>
                 <Hamburger is_active = {*show_side_bar} onclick = {onclick}/>
                 <h1>
-                    <a href="/">{"EMI"}</a>
+                    <Link<AppRoute> classes="logo" to={AppRoute::Home}>
+                        {"EMI"}
+                    </Link<AppRoute>>
                 </h1>
                 <SearchBar />
-                {if let Some(user) = user {
-                    html! {
-                        <div class="user">
-                            <img src={format!("/api/user/{}/avatar", user.id)} alt={format!("{}'s avatar", user.name)} />
-                            <span>{format!("{} {}", user.name, user.last_name)}</span>
-                            {if store.is_offline {
-                                html! {
-                                    <span class="badge offline">{"Offline"}</span>
-                                }
-                            } else {
-                                html! {}
-                            }}
-                        </div>
-                    }
+                if let Some(user) = user {
+                    <div class="user">
+                        <img src={format!("/api/user/{}/avatar", user.id)} alt={format!("{}'s avatar", user.name)} />
+                        <span>{format!("{} {}", user.name, user.last_name)}</span>
+                        {if store.is_offline {
+                            html! {
+                                <span class="badge offline">{"Offline"}</span>
+                            }
+                        } else {
+                            html! {}
+                        }}
+                    </div>
                 } else {
-                    html! {
-                        <a class="login" href="/login">{"Login"}</a>
-                    }
-                }}
+                    <Link<AppRoute> classes="login" to={AppRoute::Login}>{"Login"}</Link<AppRoute>>
+                }
             </nav>
             <Sidebar visible={*show_side_bar} />
         </>
