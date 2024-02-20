@@ -1,9 +1,7 @@
 //! Router of the single-page application.
-//! 
 
 
 use yew::prelude::*;
-use yew::functional::*;
 use yew_router::prelude::*;
 use crate::pages::*;
 
@@ -16,6 +14,8 @@ pub enum AppRoute {
     #[not_found]
     #[at("/404")]
     NotFound,
+    #[at("/500")]
+    ServerError,
 }
 
 pub fn switch(switch: AppRoute) -> Html {
@@ -23,5 +23,6 @@ pub fn switch(switch: AppRoute) -> Html {
         AppRoute::Home => html!{<Home />},
         AppRoute::Login => html!{<Login />},
         AppRoute::NotFound => html!{<NotFound />},
+        AppRoute::ServerError => html!{<ServerErrorPage />},
     }
 }

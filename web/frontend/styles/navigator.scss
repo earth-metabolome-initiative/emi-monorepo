@@ -33,6 +33,14 @@ nav {
   a.login {
     color: $primary;
     font-size: 1.25rem;
+    border: 1px solid $primary;
+    padding: 0.3em 0.5em;
+    border-radius: 0.3em;
+    transition: background-color 0.2s, color 0.2s;
+    &:hover {
+      background-color: $primary;
+      color: white;
+    }
   }
   .search {
     margin-left: auto;

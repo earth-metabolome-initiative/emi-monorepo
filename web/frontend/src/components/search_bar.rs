@@ -12,12 +12,9 @@
 //!
 
 use crate::components::InputWithIcon;
-use yew::prelude::*;
-use yewdux::prelude::*;
-use web_sys::wasm_bindgen::UnwrapThrowExt;
 use web_sys::wasm_bindgen::JsCast;
-
-use crate::store::Store;
+use web_sys::wasm_bindgen::UnwrapThrowExt;
+use yew::prelude::*;
 
 #[function_component(SearchBar)]
 pub fn search_bar() -> Html {
@@ -35,7 +32,11 @@ pub fn search_bar() -> Html {
         let button_disabled = button_disabled.clone();
         Callback::from(move |input_event: InputEvent| {
             // If the input field is empty, we disable the search button.
-            let input = input_event.target().unwrap_throw().dyn_into::<web_sys::HtmlInputElement>().unwrap_throw();
+            let input = input_event
+                .target()
+                .unwrap_throw()
+                .dyn_into::<web_sys::HtmlInputElement>()
+                .unwrap_throw();
             button_disabled.set(input.value().is_empty());
         })
     };
