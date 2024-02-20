@@ -1,6 +1,8 @@
 // We import the style reset.scss file
+@import 'constants';
 @import 'reset';
 @import 'font';
 @import 'colors';
 @import 'forms';
 @import 'navigator';
+@import 'app';

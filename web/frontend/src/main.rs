@@ -1,20 +1,28 @@
 mod api;
 mod components;
+mod pages;
+mod router;
 mod store;
 
-use components::{Navigator, Sidebar};
-use store::Store;
+use crate::router::{switch, AppRoute};
+use components::Navigator;
+use web_common::user::User;
 use yew::prelude::*;
-use yewdux::prelude::*;
+use yew_router::prelude::*;
 
 #[function_component]
 fn App() -> Html {
-    let (store, _) = use_store::<Store>();
+    let user_state: UseStateHandle<Option<User>> = use_state(|| None);
 
     html! {
-        <div class="app">
+        <ContextProvider<Option<User>> context={(*user_state).clone()}>
             <Navigator />
-        </div>
+            <div class="app">
+                <BrowserRouter>
+                    <Switch<AppRoute> render={switch} />
+                </BrowserRouter>
+            </div>
+        </ContextProvider<Option<User>>>
     }
 }
 
