@@ -5,7 +5,7 @@
 -- information about the login providers.
 
 CREATE TABLE login_providers (
-    id SERIAL PRIMARY KEY,
+    id SMALLSERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL
 );
 

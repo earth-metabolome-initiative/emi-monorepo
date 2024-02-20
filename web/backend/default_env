@@ -33,3 +33,7 @@ ORCID_CLIENT_SECRET='orcid_client_secret'
 # with the email being an academic email address.
 SIRIUS_USERNAME='email@email.com'
 SIRIUS_PASSWORD='password'
+# The GitHub Client ID credentials.
+GITHUB_CLIENT_ID='github_client_id'
+GITHUB_CLIENT_SECRET='github_client_secret'
+CLIENT_ORIGIN='http://localhost:3000'

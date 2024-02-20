@@ -6,6 +6,7 @@
 use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
 
 mod healthchecker;
+mod oauth;
 
 use healthchecker::health_checker_handler;
 

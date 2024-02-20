@@ -4,23 +4,29 @@
 #![allow(clippy::all)]
 
 use crate::schema::*;
-use chrono::NaiveDateTime;
 use bigdecimal::BigDecimal;
-use diesel::sql_types::{Money, Numeric, Interval, Range};
-use diesel::{Queryable, Identifiable};
-use chrono::DateTime;
 use chrono::offset::Utc;
+use chrono::DateTime;
+use chrono::NaiveDateTime;
+use diesel::prelude::*;
+use diesel::r2d2::ConnectionManager;
+use diesel::r2d2::Pool;
+use diesel::sql_types::{Interval, Money, Numeric, Range};
+use diesel::PgConnection;
+use diesel::{Identifiable, Queryable};
 
 #[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = archivables)]
 pub struct Archivable {
-    pub id: i32,
+    pub id: i64,
     pub archived_at: NaiveDateTime,
     pub archived_by: i32,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = container_horizontal_rules)]
 pub struct ContainerHorizontalRule {
-    pub id: i32,
+    pub id: i64,
     pub item_type_id: Option<i32>,
     pub other_item_type_id: Option<i32>,
     pub temperature: Option<Range<Numeric>>,
@@ -29,8 +35,9 @@ pub struct ContainerHorizontalRule {
 }
 
 #[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = container_vertical_rules)]
 pub struct ContainerVerticalRule {
-    pub id: i32,
+    pub id: i64,
     pub container_item_type_id: Option<i32>,
     pub contained_item_type_id: Option<i32>,
     pub temperature: Option<Range<Numeric>>,
@@ -39,37 +46,42 @@ pub struct ContainerVerticalRule {
 }
 
 #[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = continuous_units)]
 pub struct ContinuousUnit {
-    pub id: i32,
+    pub id: i64,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
-#[table_name = "describables"]
+#[diesel(table_name = describables)]
 pub struct Describable {
-    pub id: i32,
+    pub id: i64,
     pub name: String,
     pub description: Option<String>,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = discrete_units)]
 pub struct DiscreteUnit {
-    pub id: i32,
+    pub id: i64,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = document_formats)]
 pub struct DocumentFormat {
-    pub id: i32,
+    pub id: i64,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = documents)]
 pub struct Document {
-    pub id: i32,
+    pub id: i64,
     pub path: String,
-    pub format_id: i32,
+    pub format_id: i64,
     pub bytes: i32,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = editables)]
 pub struct Editable {
     pub id: i64,
     pub created_at: NaiveDateTime,
@@ -77,329 +89,451 @@ pub struct Editable {
 }
 
 #[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = edits)]
 pub struct Edit {
-    pub id: i32,
+    pub id: i64,
     pub edited_by: i32,
     pub edited_at: NaiveDateTime,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
-#[table_name = "expirable_item_categories"]
+#[diesel(table_name = expirable_item_categories)]
 pub struct ExpirableItemCategory {
-    pub id: i32,
-    pub item_type_id: Option<i32>,
+    pub id: i64,
+    pub item_type_id: Option<i64>,
     pub expiration_interval: Interval,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
-#[table_name = "item_categories"]
+#[diesel(table_name = item_categories)]
 pub struct ItemCategory {
-    pub id: i32,
+    pub id: i64,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = item_category_relationships)]
 pub struct ItemCategoryRelationship {
-    pub id: i32,
+    pub id: i64,
     pub parent_id: i32,
     pub child_id: i32,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = item_category_units)]
 pub struct ItemCategoryUnit {
-    pub id: i32,
-    pub item_category_id: i32,
-    pub unit_id: i32,
+    pub id: i64,
+    pub item_category_id: i64,
+    pub unit_id: i64,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
-#[table_name = "item_continuous_quantities"]
+#[diesel(table_name = item_continuous_quantities)]
 pub struct ItemContinuousQuantity {
-    pub id: i32,
-    pub item_id: Option<i32>,
+    pub id: i64,
+    pub item_id: Option<i64>,
     pub weight: BigDecimal,
-    pub unit_id: Option<i32>,
-    pub sensor_id: Option<i32>,
+    pub unit_id: Option<i64>,
+    pub sensor_id: Option<i64>,
     pub measured_at: DateTime<Utc>,
     pub measured_by: Option<i32>,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
-#[table_name = "item_discrete_quantities"]
+#[diesel(table_name = item_discrete_quantities)]
 pub struct ItemDiscreteQuantity {
-    pub id: i32,
-    pub item_id: Option<i32>,
+    pub id: i64,
+    pub item_id: Option<i64>,
     pub quantity: i32,
-    pub unit_id: Option<i32>,
+    pub unit_id: Option<i64>,
     pub measured_at: DateTime<Utc>,
     pub measured_by: Option<i32>,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = item_locations)]
 pub struct ItemLocation {
-    pub id: i32,
-    pub item_id: Option<i32>,
-    pub location_id: Option<i32>,
-    pub previous_location_id: Option<i32>,
+    pub id: i64,
+    pub item_id: Option<i64>,
+    pub location_id: Option<i64>,
+    pub previous_location_id: Option<i64>,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = item_units)]
 pub struct ItemUnit {
-    pub id: i32,
-    pub item_id: i32,
-    pub unit_id: i32,
+    pub id: i64,
+    pub item_id: i64,
+    pub unit_id: i64,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = items)]
 pub struct Item {
-    pub id: i32,
+    pub id: i64,
     pub parent_id: Option<i32>,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = location_states)]
 pub struct LocationState {
-    pub id: i32,
+    pub id: i64,
     pub font_awesome_icon: Option<String>,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = locations)]
 pub struct Location {
-    pub id: i32,
+    pub id: i64,
     pub latitude: Option<BigDecimal>,
     pub longitude: Option<BigDecimal>,
     pub altitude: Option<BigDecimal>,
     pub address: Option<String>,
-    pub geolocalization_device_id: Option<i32>,
-    pub altitude_device_id: Option<i32>,
-    pub parent_location_id: Option<i32>,
-    pub state_id: i32,
+    pub geolocalization_device_id: Option<i64>,
+    pub altitude_device_id: Option<i64>,
+    pub parent_location_id: Option<i64>,
+    pub state_id: i64,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
-#[table_name = "manufactured_item_categories"]
+#[diesel(table_name = login_providers)]
+pub struct LoginProvider {
+    pub id: i16,
+    pub name: String,
+}
+
+impl LoginProvider {
+    pub fn get_provider_id(
+        provider_name: &str,
+        pool: &Pool<ConnectionManager<PgConnection>>,
+    ) -> Result<i16, String> {
+        use crate::schema::login_providers::dsl::*;
+        let mut conn = pool.get().unwrap();
+        let provider = login_providers
+            .filter(name.eq(provider_name))
+            .first::<LoginProvider>(&mut conn);
+        match provider {
+            Ok(provider) => Ok(provider.id),
+            Err(_) => Err(format!("No provider with name {} found", provider_name)),
+        }
+    }
+
+    pub fn get(
+        provider_id: i16,
+        pool: &Pool<ConnectionManager<PgConnection>>,
+    ) -> Result<LoginProvider, String> {
+        use crate::schema::login_providers::dsl::*;
+        let mut conn = pool.get().unwrap();
+        let provider = login_providers
+            .filter(id.eq(provider_id))
+            .first::<LoginProvider>(&mut conn);
+        match provider {
+            Ok(provider) => Ok(provider),
+            Err(_) => Err(format!("No provider with id {} found", provider_id)),
+        }
+    }
+}
+
+#[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = manufactured_item_categories)]
 pub struct ManufacturedItemCategory {
-    pub id: i32,
+    pub id: i64,
     pub cost: BigDecimal,
     pub cost_per_day: BigDecimal,
     pub currency: String,
-    pub manifacturer_id: Option<i32>,
+    pub manifacturer_id: Option<i64>,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = organization_locations)]
 pub struct OrganizationLocation {
-    pub id: i32,
-    pub organization_id: Option<i32>,
-    pub location_id: Option<i32>,
-    pub previous_location_id: Option<i32>,
+    pub id: i64,
+    pub organization_id: Option<i64>,
+    pub location_id: Option<i64>,
+    pub previous_location_id: Option<i64>,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = organization_project_roles)]
 pub struct OrganizationProjectRole {
-    pub id: i32,
+    pub id: i64,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = organization_projects)]
 pub struct OrganizationProject {
-    pub id: i32,
-    pub organization_id: i32,
-    pub project_id: i32,
-    pub role_id: i32,
+    pub id: i64,
+    pub organization_id: i64,
+    pub project_id: i64,
+    pub role_id: i64,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = organization_states)]
 pub struct OrganizationState {
-    pub id: i32,
+    pub id: i64,
     pub font_awesome_icon: Option<String>,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = organization_user_roles)]
 pub struct OrganizationUserRole {
-    pub id: i32,
+    pub id: i64,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = organization_users)]
 pub struct OrganizationUser {
-    pub id: i32,
+    pub id: i64,
     pub user_id: i32,
-    pub organization_id: i32,
-    pub role_id: i32,
+    pub organization_id: i64,
+    pub role_id: i64,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = organizations)]
 pub struct Organization {
-    pub id: i32,
-    pub state_id: Option<i32>,
-    pub parent_organization_id: Option<i32>,
-    pub logo_id: Option<i32>,
+    pub id: i64,
+    pub state_id: Option<i64>,
+    pub parent_organization_id: Option<i64>,
+    pub logo_id: Option<i64>,
     pub website_url: Option<String>,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = procedure_continuous_requirements)]
 pub struct ProcedureContinuousRequirement {
-    pub id: i32,
-    pub procedure_id: i32,
-    pub item_category_id: i32,
+    pub id: i64,
+    pub procedure_id: i64,
+    pub item_category_id: i64,
     pub quantity: f64,
-    pub unit_id: Option<i32>,
+    pub unit_id: Option<i64>,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = procedure_discrete_requirements)]
 pub struct ProcedureDiscreteRequirement {
-    pub id: i32,
-    pub procedure_id: i32,
-    pub item_category_id: i32,
+    pub id: i64,
+    pub procedure_id: i64,
+    pub item_category_id: i64,
     pub quantity: i32,
-    pub unit_id: Option<i32>,
+    pub unit_id: Option<i64>,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = procedures)]
 pub struct Procedure {
-    pub id: i32,
+    pub id: i64,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = project_continuous_requirements)]
 pub struct ProjectContinuousRequirement {
-    pub id: i32,
-    pub project_id: i32,
-    pub item_id: i32,
+    pub id: i64,
+    pub project_id: i64,
+    pub item_id: i64,
     pub quantity: f64,
-    pub unit_id: Option<i32>,
+    pub unit_id: Option<i64>,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = project_discrete_requirements)]
 pub struct ProjectDiscreteRequirement {
-    pub id: i32,
-    pub project_id: i32,
-    pub item_id: i32,
+    pub id: i64,
+    pub project_id: i64,
+    pub item_id: i64,
     pub quantity: f64,
-    pub unit_id: Option<i32>,
+    pub unit_id: Option<i64>,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = project_milestones)]
 pub struct ProjectMilestone {
-    pub id: i32,
-    pub project_id: i32,
+    pub id: i64,
+    pub project_id: i64,
     pub due_date: DateTime<Utc>,
     pub completed_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = project_states)]
 pub struct ProjectState {
-    pub id: i32,
+    pub id: i64,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = project_user_roles)]
 pub struct ProjectUserRole {
-    pub id: i32,
+    pub id: i64,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = project_users)]
 pub struct ProjectUser {
-    pub id: i32,
+    pub id: i64,
     pub user_id: i32,
-    pub project_id: i32,
-    pub role_id: i32,
+    pub project_id: i64,
+    pub role_id: i64,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = projects)]
 pub struct Project {
-    pub id: i32,
+    pub id: i64,
     pub public: Option<bool>,
-    pub state_id: i32,
-    pub parent_project_id: Option<i32>,
+    pub state_id: i64,
+    pub parent_project_id: Option<i64>,
     pub budget: Option<Money>,
     pub expenses: Option<Money>,
     pub currency: Option<String>,
     pub expected_end_date: Option<DateTime<Utc>>,
     pub end_date: Option<DateTime<Utc>>,
     pub website_url: Option<String>,
-    pub logo_id: Option<i32>,
+    pub logo_id: Option<i64>,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
 #[diesel(primary_key(sample_id, taxon_id))]
-#[table_name = "sample_taxa"]
+#[diesel(table_name = sample_taxa)]
 pub struct SampleTaxa {
-    pub sample_id: i32,
-    pub taxon_id: i32,
+    pub sample_id: i64,
+    pub taxon_id: i64,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
 #[diesel(primary_key(sampled_individual_id, taxon_id))]
-#[table_name = "sampled_individual_taxa"]
+#[diesel(table_name = sampled_individual_taxa)]
 pub struct SampledIndividualTaxa {
-    pub sampled_individual_id: i32,
-    pub taxon_id: i32,
+    pub sampled_individual_id: i64,
+    pub taxon_id: i64,
 }
 
-#[derive(Queryable, Debug)]
+#[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = sampled_individuals)]
 pub struct SampledIndividual {
-    pub id: i32,
-    pub item_id: i32,
+    pub id: i64,
 }
 
-#[derive(Queryable, Debug)]
+#[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = samples)]
 pub struct Sample {
-    pub id: i32,
+    pub id: i64,
     pub derived_from: Option<i32>,
 }
 
-#[derive(Queryable, Debug)]
+#[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = spectra)]
 pub struct Spectra {
     pub id: i32,
-    pub spectra_collection_id: i32,
+    pub spectra_collection_id: i64,
 }
 
-#[derive(Queryable, Debug)]
+#[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = spectra_collection)]
 pub struct SpectraCollection {
-    pub id: i32,
-    pub sample_id: i32,
+    pub id: i64,
+    pub sample_id: i64,
 }
 
-#[derive(Queryable, Debug)]
+#[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = taxa)]
 pub struct Taxa {
-    pub id: i32,
+    pub id: i64,
 }
 
-#[derive(Queryable, Debug)]
+#[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = team_states)]
 pub struct TeamState {
-    pub id: i32,
+    pub id: i64,
     pub font_awesome_icon: Option<String>,
 }
 
-#[derive(Queryable, Debug)]
+#[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = team_user_roles)]
 pub struct TeamUserRole {
-    pub id: i32,
+    pub id: i64,
 }
 
-#[derive(Queryable, Debug)]
+#[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = team_users)]
 pub struct TeamUser {
-    pub id: i32,
+    pub id: i64,
     pub user_id: i32,
-    pub team_id: i32,
-    pub role_id: i32,
+    pub team_id: i64,
+    pub role_id: i64,
 }
 
-#[derive(Queryable, Debug)]
+#[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = teams)]
 pub struct Team {
-    pub id: i32,
+    pub id: i64,
     pub parent_team_id: Option<i32>,
-    pub team_state_id: i32,
+    pub team_state_id: i64,
 }
 
-#[derive(Queryable, Debug)]
+#[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = units)]
 pub struct Unit {
-    pub id: i32,
+    pub id: i64,
     pub symbol: String,
 }
 
+#[derive(Queryable, Debug, Identifiable)]
+#[diesel(primary_key(user_id, login_provider_id))]
+#[diesel(table_name = user_emails)]
+pub struct UserEmail {
+    pub email: String,
+    pub user_id: i32,
+    pub login_provider_id: i16,
+    pub primary_email: bool,
+}
+
+impl UserEmail {
+    pub fn get_user_id(
+        user_email: &str,
+        provider_id: i16,
+        pool: &Pool<ConnectionManager<PgConnection>>,
+    ) -> Result<i32, String> {
+        use crate::schema::user_emails::dsl::*;
+        let mut conn = pool.get().unwrap();
+        let row = user_emails
+            .filter(email.eq(user_email))
+            .filter(login_provider_id.eq(provider_id))
+            .first::<UserEmail>(&mut conn);
+        match row {
+            Ok(user_email) => Ok(user_email.user_id),
+            Err(_) => {
+                // We retrieve the name of the provider from the database.
+                let provider = LoginProvider::get(provider_id, pool);
+                match provider {
+                    Ok(provider) => Err(format!(
+                        "No user with email {} and provider {} found",
+                        user_email, provider.name
+                    )),
+                    Err(_) => Err(format!(
+                        "No user with email {} and provider {} found",
+                        user_email, provider_id
+                    )),
+                }
+            }
+        }
+    }
+}
+
 #[derive(Queryable, Debug)]
+#[diesel(table_name = users)]
 pub struct User {
     pub id: i32,
     pub first_name: String,
     pub middle_name: Option<String>,
     pub last_name: String,
-    pub email: String,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }
 
+#[derive(Queryable, Debug, Identifiable)]
+#[diesel(primary_key(user_id, picture_id))]
+#[diesel(table_name = user_pictures)]
+pub struct UserPicture {
+    pub user_id: i32,
+    pub picture_id: i64,
+}

@@ -6,7 +6,8 @@
 CREATE TABLE user_emails (
     email VARCHAR(255) NOT NULL,
     user_id INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,
-    login_provider_id INTEGER NOT NULL REFERENCES login_providers (id) ON DELETE CASCADE,
+    login_provider_id SMALLINT NOT NULL REFERENCES login_providers (id) ON DELETE CASCADE,
+    primary_email BOOLEAN NOT NULL DEFAULT FALSE,
     PRIMARY KEY (user_id, login_provider_id),
     UNIQUE (email, login_provider_id)
 );

@@ -182,6 +182,14 @@ diesel::table! {
 }
 
 diesel::table! {
+    login_providers (id) {
+        id -> Int2,
+        #[max_length = 255]
+        name -> Varchar,
+    }
+}
+
+diesel::table! {
     manufactured_item_categories (id) {
         id -> Int8,
         cost -> Numeric,
@@ -431,12 +439,28 @@ diesel::table! {
 }
 
 diesel::table! {
+    user_emails (user_id, login_provider_id) {
+        #[max_length = 255]
+        email -> Varchar,
+        user_id -> Int4,
+        login_provider_id -> Int2,
+        primary_email -> Bool,
+    }
+}
+
+diesel::table! {
+    user_pictures (user_id, document_id) {
+        user_id -> Int4,
+        document_id -> Int8,
+    }
+}
+
+diesel::table! {
     users (id) {
         id -> Int4,
         first_name -> Varchar,
         middle_name -> Nullable<Varchar>,
         last_name -> Varchar,
-        email -> Varchar,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -571,6 +595,10 @@ diesel::joinable!(teams -> editables (id));
 diesel::joinable!(teams -> team_states (team_state_id));
 diesel::joinable!(units -> describables (id));
 diesel::joinable!(units -> editables (id));
+diesel::joinable!(user_emails -> login_providers (login_provider_id));
+diesel::joinable!(user_emails -> users (user_id));
+diesel::joinable!(user_pictures -> documents (document_id));
+diesel::joinable!(user_pictures -> users (user_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     archivables,
@@ -594,6 +622,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     items,
     location_states,
     locations,
+    login_providers,
     manufactured_item_categories,
     organization_locations,
     organization_project_roles,
@@ -624,5 +653,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     team_users,
     teams,
     units,
+    user_emails,
+    user_pictures,
     users,
 );
