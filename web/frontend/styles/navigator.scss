@@ -36,11 +36,15 @@ nav {
   .search {
     margin-left: auto;
     margin-right: auto;
-    width: 40%;
+    width: 25%;
     min-width: 200px;
     max-width: 600px;
+    transition: width 0.5s;
     input {
       width: 100%;
+    }
+    &:focus-within {
+      width: 40%;
     }
   }
 }
