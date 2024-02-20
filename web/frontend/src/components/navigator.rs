@@ -25,11 +25,8 @@ use yewdux::prelude::*;
 
 use crate::components::hamburger::Hamburger;
 use crate::components::search_bar::SearchBar;
+use crate::components::sidebar::Sidebar;
 use crate::store::Store;
-
-pub enum NavigatorMessages {
-    ToggleSidebar,
-}
 
 #[function_component(Navigator)]
 pub fn navigator() -> Html {
@@ -46,31 +43,34 @@ pub fn navigator() -> Html {
     };
 
     html! {
-        <nav>
-            <Hamburger is_active = {*show_side_bar} onclick = {onclick}/>
-            <h1>
-                <a href="/">{"EMI"}</a>
-            </h1>
-            <SearchBar />
-            {if let Some(user) = user {
-                html! {
-                    <div class="user">
-                        <img src={format!("/api/user/{}/avatar", user.id)} alt={format!("{}'s avatar", user.name)} />
-                        <span>{format!("{} {}", user.name, user.last_name)}</span>
-                        {if store.is_offline {
-                            html! {
-                                <span class="badge offline">{"Offline"}</span>
-                            }
-                        } else {
-                            html! {}
-                        }}
-                    </div>
-                }
-            } else {
-                html! {
-                    <a class="login" href="/login">{"Login"}</a>
-                }
-            }}
-        </nav>
+        <>
+            <nav>
+                <Hamburger is_active = {*show_side_bar} onclick = {onclick}/>
+                <h1>
+                    <a href="/">{"EMI"}</a>
+                </h1>
+                <SearchBar />
+                {if let Some(user) = user {
+                    html! {
+                        <div class="user">
+                            <img src={format!("/api/user/{}/avatar", user.id)} alt={format!("{}'s avatar", user.name)} />
+                            <span>{format!("{} {}", user.name, user.last_name)}</span>
+                            {if store.is_offline {
+                                html! {
+                                    <span class="badge offline">{"Offline"}</span>
+                                }
+                            } else {
+                                html! {}
+                            }}
+                        </div>
+                    }
+                } else {
+                    html! {
+                        <a class="login" href="/login">{"Login"}</a>
+                    }
+                }}
+            </nav>
+            <Sidebar visible={*show_side_bar} />
+        </>
     }
 }

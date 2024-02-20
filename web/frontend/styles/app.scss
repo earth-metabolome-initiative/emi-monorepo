@@ -1,3 +1,11 @@
 .app {
     padding-top: $navigator-height;
+    padding-left: $sidebar-width;
+}
+
+// Media query for smaller screens
+@media screen and (max-width: 768px) {
+    .app {
+        padding-left: 0; // Remove padding on small screens
+    }
 }

@@ -1,0 +1,56 @@
+// Define variables for easy customization
+$sidebar-width: 250px;
+$sidebar-hover-color: #f76a00;
+
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: $navigator-height;
+    height: 100%;
+    width: $sidebar-width;
+    color: $primary;
+    transition: transform 0.3s ease;
+    background-color: white;
+    box-sizing: border-box;
+    border-right: 1px solid $primary;
+    overflow-y: scroll;
+
+    .sidebar-content {
+        padding: 20px;
+
+        ul {
+            list-style: none;
+            padding: 0;
+
+            li {
+                margin-bottom: 15px;
+
+                a {
+                    text-decoration: none;
+                    font-size: 1.2rem;
+                    color: inherit;
+                    transition: color 0.3s ease;
+
+                    &:hover {
+                        color: $sidebar-hover-color;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Media query for smaller screens
+@media screen and (max-width: 768px) {
+    .sidebar {
+        width: 200px; // Adjust width for smaller screens
+
+        &.hidden {
+            transform: translateX(-$sidebar-width);
+        }
+
+        .sidebar-content {
+            padding: 15px;
+        }
+    }
+}
