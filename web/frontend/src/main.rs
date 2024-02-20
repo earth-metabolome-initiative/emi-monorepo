@@ -5,7 +5,7 @@ mod router;
 mod store;
 
 use crate::router::{switch, AppRoute};
-use components::Navigator;
+use crate::components::*;
 use web_common::user::User;
 use yew::prelude::*;
 use yew_router::prelude::*;
@@ -16,12 +16,13 @@ fn App() -> Html {
 
     html! {
         <ContextProvider<Option<User>> context={(*user_state).clone()}>
-            <Navigator />
+            <components::Navigator />
             <div class="app">
                 <BrowserRouter>
                     <Switch<AppRoute> render={switch} />
                 </BrowserRouter>
             </div>
+            <Footer />
         </ContextProvider<Option<User>>>
     }
 }
