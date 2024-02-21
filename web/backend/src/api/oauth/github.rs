@@ -6,6 +6,7 @@ use actix_web::{get, http::header::LOCATION, web, HttpResponse, Responder};
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
 
+use crate::model_implementations::*;
 use crate::models::*;
 use reqwest::Client;
 use serde::Deserialize;
@@ -117,31 +118,83 @@ async fn github_oauth_handler(
 
     let github_config = GitHubConfig::from_env(&pool).unwrap();
 
-    // We query the database to see if the user already exists.
-    let maybe_user_id =
-        UserEmail::get_user_id(github_user.email.as_str(), github_config.provider_id, &pool);
+    // We query the database to see if there is already an user with
+    // the provided email. If so, we will not have to create a new user,
+    // and we need to check whether the provide ID
+    // used for registering the email is the same as the one used for the
+    // current login provider. If the login provider is different, it means
+    // that the user is trying to login with a different provider, and we
+    // need to insert a new user email with the new provider ID.
+    // Conversely, if the user does not exist, we create a new user and
+    // insert a new user email.
+    let mail_row = UserEmail::get_row_from_email(github_user.email.as_str(), &pool);
 
-    let cookie = if let Ok(user_id) = maybe_user_id {
-        create_jwt_cookie(user_id, &github_config.oauth_config)
-    } else {
-        // If the user does not exist, we create a new user.
-        let new_user = NewUser {
-            name: github_user.login.as_str(),
-            email: github_user.email.as_str(),
-            avatar: github_user.avatar_url.as_str(),
-        };
+    let user_id = match mail_row {
+        Ok(mail_row) => {
+            // If the email is already present in the database, we check
+            // whether it was registered with the same provider.
+            // If not, we insert a new user email with the new provider ID.
+            if mail_row.login_provider_id != github_config.provider_id {
+                let new_user_email = NewUserEmail::new(
+                    github_user.email.as_str(),
+                    mail_row.user_id,
+                    github_config.provider_id,
+                );
 
-        let user_id = User::create_user(new_user, &pool).unwrap();
-        let user_email = NewUserEmail {
-            user_id,
-            email: github_user.email.as_str(),
-            provider_id: github_config.provider_id,
-        };
+                if new_user_email.is_err() {
+                    let message = new_user_email.err().unwrap().to_string();
+                    return HttpResponse::BadGateway()
+                        .json(serde_json::json!({"status": "fail", "message": message}));
+                }
 
-        UserEmail::create_user_email(user_email, &pool).unwrap();
+                let query_result = new_user_email.unwrap().insert(&pool);
 
-        create_jwt_cookie(user_id, &github_config.oauth_config)
+                if query_result.is_err() {
+                    let message = query_result.err().unwrap().to_string();
+                    return HttpResponse::BadGateway()
+                        .json(serde_json::json!({"status": "fail", "message": message}));
+                }
+            }
+
+            mail_row.user_id
+        }
+        Err(_) => {
+            // If we cannot find the user email, we create a new user.
+            let new_user_query = NewUser::default().insert(&pool);
+
+            if new_user_query.is_err() {
+                let message = new_user_query.err().unwrap().to_string();
+                return HttpResponse::BadGateway()
+                    .json(serde_json::json!({"status": "fail", "message": message}));
+            }
+
+            let new_user_id = new_user_query.unwrap();
+
+            let new_user_email = NewUserEmail::new(
+                github_user.email.as_str(),
+                new_user_id,
+                github_config.provider_id,
+            );
+
+            if new_user_email.is_err() {
+                let message = new_user_email.err().unwrap().to_string();
+                return HttpResponse::BadGateway()
+                    .json(serde_json::json!({"status": "fail", "message": message}));
+            }
+
+            let query_result = new_user_email.unwrap().insert(&pool);
+
+            if query_result.is_err() {
+                let message = query_result.err().unwrap().to_string();
+                return HttpResponse::BadGateway()
+                    .json(serde_json::json!({"status": "fail", "message": message}));
+            }
+
+            new_user_id
+        }
     };
+
+    let cookie = create_jwt_cookie(user_id, &github_config.oauth_config);
 
     let mut response = HttpResponse::Found();
     response.append_header((

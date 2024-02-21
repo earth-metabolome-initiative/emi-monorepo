@@ -8,11 +8,10 @@ use bigdecimal::BigDecimal;
 use chrono::offset::Utc;
 use chrono::DateTime;
 use chrono::NaiveDateTime;
-use diesel::prelude::*;
-use diesel::r2d2::ConnectionManager;
-use diesel::r2d2::Pool;
+
+
 use diesel::sql_types::{Interval, Money, Numeric, Range};
-use diesel::PgConnection;
+
 use diesel::{Identifiable, Queryable};
 
 #[derive(Queryable, Debug, Identifiable)]
@@ -199,38 +198,6 @@ pub struct Location {
 pub struct LoginProvider {
     pub id: i16,
     pub name: String,
-}
-
-impl LoginProvider {
-    pub fn get_provider_id(
-        provider_name: &str,
-        pool: &Pool<ConnectionManager<PgConnection>>,
-    ) -> Result<i16, String> {
-        use crate::schema::login_providers::dsl::*;
-        let mut conn = pool.get().unwrap();
-        let provider = login_providers
-            .filter(name.eq(provider_name))
-            .first::<LoginProvider>(&mut conn);
-        match provider {
-            Ok(provider) => Ok(provider.id),
-            Err(_) => Err(format!("No provider with name {} found", provider_name)),
-        }
-    }
-
-    pub fn get(
-        provider_id: i16,
-        pool: &Pool<ConnectionManager<PgConnection>>,
-    ) -> Result<LoginProvider, String> {
-        use crate::schema::login_providers::dsl::*;
-        let mut conn = pool.get().unwrap();
-        let provider = login_providers
-            .filter(id.eq(provider_id))
-            .first::<LoginProvider>(&mut conn);
-        match provider {
-            Ok(provider) => Ok(provider),
-            Err(_) => Err(format!("No provider with id {} found", provider_id)),
-        }
-    }
 }
 
 #[derive(Queryable, Debug, Identifiable)]
@@ -487,45 +454,13 @@ pub struct UserEmail {
     pub primary_email: bool,
 }
 
-impl UserEmail {
-    pub fn get_user_id(
-        user_email: &str,
-        provider_id: i16,
-        pool: &Pool<ConnectionManager<PgConnection>>,
-    ) -> Result<i32, String> {
-        use crate::schema::user_emails::dsl::*;
-        let mut conn = pool.get().unwrap();
-        let row = user_emails
-            .filter(email.eq(user_email))
-            .filter(login_provider_id.eq(provider_id))
-            .first::<UserEmail>(&mut conn);
-        match row {
-            Ok(user_email) => Ok(user_email.user_id),
-            Err(_) => {
-                // We retrieve the name of the provider from the database.
-                let provider = LoginProvider::get(provider_id, pool);
-                match provider {
-                    Ok(provider) => Err(format!(
-                        "No user with email {} and provider {} found",
-                        user_email, provider.name
-                    )),
-                    Err(_) => Err(format!(
-                        "No user with email {} and provider {} found",
-                        user_email, provider_id
-                    )),
-                }
-            }
-        }
-    }
-}
-
 #[derive(Queryable, Debug)]
 #[diesel(table_name = users)]
 pub struct User {
     pub id: i32,
-    pub first_name: String,
+    pub first_name: Option<String>,
     pub middle_name: Option<String>,
-    pub last_name: String,
+    pub last_name: Option<String>,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }

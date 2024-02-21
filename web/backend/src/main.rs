@@ -11,6 +11,7 @@ use actix_web::middleware::Logger;
 
 mod api;
 mod models;
+mod model_implementations;
 mod schema;
 
 #[actix_rt::main]

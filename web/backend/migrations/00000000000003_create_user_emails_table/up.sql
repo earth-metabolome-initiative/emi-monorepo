@@ -9,5 +9,6 @@ CREATE TABLE user_emails (
     login_provider_id SMALLINT NOT NULL REFERENCES login_providers (id) ON DELETE CASCADE,
     primary_email BOOLEAN NOT NULL DEFAULT FALSE,
     PRIMARY KEY (user_id, login_provider_id),
+    UNIQUE (email, user_id),
     UNIQUE (email, login_provider_id)
 );

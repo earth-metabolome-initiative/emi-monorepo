@@ -458,9 +458,9 @@ diesel::table! {
 diesel::table! {
     users (id) {
         id -> Int4,
-        first_name -> Varchar,
+        first_name -> Nullable<Varchar>,
         middle_name -> Nullable<Varchar>,
-        last_name -> Varchar,
+        last_name -> Nullable<Varchar>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
