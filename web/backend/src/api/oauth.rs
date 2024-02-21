@@ -1,6 +1,5 @@
 //! Submodule for OAuth2 authentication.
 
-use actix_web::{post, web, HttpResponse, Responder};
 pub mod github;
 use actix_web::cookie::time::Duration as ActixWebDuration;
 use actix_web::cookie::Cookie;

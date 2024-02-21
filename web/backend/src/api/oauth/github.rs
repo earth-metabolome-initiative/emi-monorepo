@@ -62,14 +62,6 @@ impl GitHubConfig {
     fn client_origin(&self) -> &str {
         self.oauth_config.client_origin.as_str()
     }
-
-    fn jwt_secret(&self) -> &str {
-        self.oauth_config.jwt_secret.as_str()
-    }
-
-    fn jwt_max_age(&self) -> i64 {
-        self.oauth_config.jwt_max_age
-    }
 }
 
 #[derive(Deserialize)]
@@ -160,7 +152,7 @@ async fn github_oauth_handler(
         }
         Err(_) => {
             // If we cannot find the user email, we create a new user.
-            let new_user_query = NewUser::default().insert(&pool);
+            let new_user_query = NewUser::insert_default(&pool);
 
             if new_user_query.is_err() {
                 let message = new_user_query.err().unwrap().to_string();

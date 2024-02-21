@@ -157,11 +157,11 @@ pub(crate) struct NewUser {
 }
 
 impl NewUser {
-    pub fn insert(&self, pool: &Pool<ConnectionManager<PgConnection>>) -> Result<i32, String> {
+    pub fn insert_default(pool: &Pool<ConnectionManager<PgConnection>>) -> Result<i32, String> {
         use crate::schema::users::dsl::*;
         let mut conn = pool.get().unwrap();
         let result = diesel::insert_into(users)
-            .values(self)
+            .default_values()
             .returning(id)
             .get_result::<i32>(&mut conn);
         match result {
