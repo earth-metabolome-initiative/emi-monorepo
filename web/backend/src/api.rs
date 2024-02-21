@@ -1,9 +1,4 @@
-// use crate::{
-//     model::FeedbackModel,
-//     schema::{CreateFeedbackSchema, FilterOptions, UpdateFeedbackSchema},
-//     AppState,
-// };
-use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
+use actix_web::web;
 
 mod healthchecker;
 mod oauth;
@@ -13,6 +8,7 @@ use healthchecker::health_checker_handler;
 pub fn config(conf: &mut web::ServiceConfig) {
     let scope = web::scope("/api")
         .service(health_checker_handler)
+        .service(oauth::logout::logout_handler)
         .service(oauth::github::github_oauth_handler);
     // .service(feedback_list_handler)
     // .service(create_feedback_handler)

@@ -17,7 +17,6 @@ use std::error::Error;
 struct GitHubConfig {
     client_id: String,
     client_secret: String,
-    redirect_uri: String,
     oauth_config: OauthConfig,
     provider_id: i16,
 }
@@ -33,7 +32,6 @@ impl GitHubConfig {
         dotenvy::dotenv().ok();
         let client_id = env::var("GITHUB_CLIENT_ID");
         let client_secret = env::var("GITHUB_CLIENT_SECRET");
-        let redirect_uri = env::var("GITHUB_REDIRECT_URI");
 
         if client_id.is_err() {
             return Err("GITHUB_CLIENT_ID not set".to_string());
@@ -43,17 +41,12 @@ impl GitHubConfig {
             return Err("GITHUB_CLIENT_SECRET not set".to_string());
         }
 
-        if redirect_uri.is_err() {
-            return Err("GITHUB_REDIRECT_URI not set".to_string());
-        }
-
         // We retrieve the ID for the 'GitHub' provider from the database.
         let provider_id = LoginProvider::get_provider_id("github", pool).unwrap();
 
         Ok(GitHubConfig {
             client_id: client_id.unwrap(),
             client_secret: client_secret.unwrap(),
-            redirect_uri: redirect_uri.unwrap(),
             oauth_config: OauthConfig::from_env().unwrap(),
             provider_id,
         })
@@ -76,7 +69,7 @@ pub struct GitHubUserMetadata {
     pub email: String,
 }
 
-#[get("/sessions/oauth/github")]
+#[get("/oauth/github")]
 async fn github_oauth_handler(
     query: web::Query<QueryCode>,
     pool: web::Data<Pool<ConnectionManager<PgConnection>>>,

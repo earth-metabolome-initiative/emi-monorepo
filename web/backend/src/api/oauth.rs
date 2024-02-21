@@ -1,30 +1,44 @@
 //! Submodule for OAuth2 authentication.
 
 pub mod github;
+pub mod logout;
 use actix_web::cookie::time::Duration as ActixWebDuration;
 use actix_web::cookie::Cookie;
 use chrono::{prelude::*, Duration};
+use diesel::prelude::*;
+use diesel::r2d2::{ConnectionManager, Pool};
 use jsonwebtoken::{encode, EncodingKey, Header};
 use serde::{Deserialize, Serialize};
+use std::future::{ready, Ready};
+
+use actix_web::{
+    dev::Payload,
+    error::{Error as ActixWebError, ErrorUnauthorized},
+    http, web, FromRequest, HttpRequest,
+};
+use jsonwebtoken::{decode, Algorithm, DecodingKey, Validation};
+use serde_json::json;
+
 use std::env;
+
+use crate::models::User;
 
 pub(crate) struct OauthConfig {
     client_origin: String,
     jwt_secret: String,
-    jwt_expires_in: i64,
     jwt_max_age: i64,
 }
 
 #[derive(Deserialize, Serialize)]
 pub(crate) struct JsonWebTokenClaims {
-    id: i32,
+    user_id: i32,
     exp: usize,
     iat: usize,
 }
 
 impl JsonWebTokenClaims {
-    pub fn new(id: i32, exp: usize, iat: usize) -> JsonWebTokenClaims {
-        JsonWebTokenClaims { id, exp, iat }
+    pub fn new(user_id: i32, exp: usize, iat: usize) -> JsonWebTokenClaims {
+        JsonWebTokenClaims { user_id, exp, iat }
     }
 }
 
@@ -33,7 +47,6 @@ impl OauthConfig {
         dotenvy::dotenv().ok();
         let client_origin = env::var("CLIENT_ORIGIN");
         let jwt_secret = env::var("JWT_SECRET");
-        let jwt_expires_in = env::var("JWT_EXPIRES_IN");
         let jwt_max_age = env::var("JWT_MAX_AGE");
 
         if client_origin.is_err() {
@@ -44,10 +57,6 @@ impl OauthConfig {
             return Err("JWT_SECRET not set".to_string());
         }
 
-        if jwt_expires_in.is_err() {
-            return Err("JWT_EXPIRES_IN not set".to_string());
-        }
-
         if jwt_max_age.is_err() {
             return Err("JWT_MAX_AGE not set".to_string());
         }
@@ -55,10 +64,6 @@ impl OauthConfig {
         Ok(OauthConfig {
             client_origin: client_origin.unwrap(),
             jwt_secret: jwt_secret.unwrap(),
-            jwt_expires_in: jwt_expires_in
-                .unwrap()
-                .parse::<i64>()
-                .map_err(|_| "JWT_EXPIRES_IN must be a valid integer".to_string())?,
             jwt_max_age: jwt_max_age
                 .unwrap()
                 .parse::<i64>()
@@ -107,7 +112,7 @@ pub(crate) struct QueryCode {
 pub(crate) fn create_jwt_cookie(user_id: i32, config: &OauthConfig) -> Cookie {
     let now = Utc::now();
     let iat = now.timestamp() as usize;
-    let exp = (now + Duration::minutes(config.jwt_expires_in)).timestamp() as usize;
+    let exp = (now + Duration::minutes(config.jwt_max_age)).timestamp() as usize;
     let claims: JsonWebTokenClaims = JsonWebTokenClaims::new(user_id, iat, exp);
 
     let token = encode(
@@ -124,4 +129,58 @@ pub(crate) fn create_jwt_cookie(user_id: i32, config: &OauthConfig) -> Cookie {
         .finish();
 
     cookie
+}
+
+pub struct AuthenticationGuard {
+    pub user_id: i32,
+}
+
+impl FromRequest for AuthenticationGuard {
+    type Error = ActixWebError;
+    type Future = Ready<Result<Self, Self::Error>>;
+
+    fn from_request(req: &HttpRequest, _: &mut Payload) -> Self::Future {
+        let token = req
+            .cookie("token")
+            .map(|c| c.value().to_string())
+            .or_else(|| {
+                req.headers()
+                    .get(http::header::AUTHORIZATION)
+                    .map(|h| h.to_str().unwrap().split_at(7).1.to_string())
+            });
+
+        if token.is_none() {
+            return ready(Err(ErrorUnauthorized(
+                json!({"status": "fail", "message": "You are not logged in, please provide token"}),
+            )));
+        }
+
+        let pool = req
+            .app_data::<web::Data<Pool<ConnectionManager<PgConnection>>>>()
+            .unwrap();
+
+        let jwt_secret = OauthConfig::from_env().unwrap().jwt_secret;
+        let decode = decode::<JsonWebTokenClaims>(
+            token.unwrap().as_str(),
+            &DecodingKey::from_secret(jwt_secret.as_ref()),
+            &Validation::new(Algorithm::HS256),
+        );
+
+        match decode {
+            Ok(token) => {
+                if User::exists(token.claims.user_id, pool) {
+                    return ready(Err(ErrorUnauthorized(
+                        json!({"status": "fail", "message": "User belonging to this token no logger exists"}),
+                    )));
+                }
+
+                ready(Ok(AuthenticationGuard {
+                    user_id: token.claims.user_id,
+                }))
+            }
+            Err(_) => ready(Err(ErrorUnauthorized(
+                json!({"status": "fail", "message": "Invalid token or usre doesn't exists"}),
+            ))),
+        }
+    }
 }

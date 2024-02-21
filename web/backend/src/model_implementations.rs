@@ -170,3 +170,29 @@ impl NewUser {
         }
     }
 }
+
+impl User {
+    /// Returns the user with the given ID.
+    /// 
+    /// # Arguments
+    /// * `user_id` - The ID of the user.
+    /// * `pool` - The database connection pool.
+    pub fn get(user_id: i32, pool: &Pool<ConnectionManager<PgConnection>>) -> Result<User, String> {
+        use crate::schema::users::dsl::*;
+        let mut conn = pool.get().unwrap();
+        let user = users.filter(id.eq(user_id)).first::<User>(&mut conn);
+        match user {
+            Ok(user) => Ok(user),
+            Err(_) => Err(format!("No user with id {} found", user_id)),
+        }
+    }
+
+    /// Returns whether a user with the given ID exists.
+    /// 
+    /// # Arguments
+    /// * `user_id` - The ID of the user.
+    /// * `pool` - The database connection pool.
+    pub fn exists(user_id: i32, pool: &Pool<ConnectionManager<PgConnection>>) -> bool {
+        User::get(user_id, pool).is_ok()
+    }
+}
