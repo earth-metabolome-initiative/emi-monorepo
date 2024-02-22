@@ -4,8 +4,8 @@ mod pages;
 mod router;
 mod store;
 
-use crate::router::{switch, AppRoute};
 use crate::components::*;
+use crate::router::{switch, AppRoute};
 use web_common::user::User;
 use yew::prelude::*;
 use yew_router::prelude::*;
@@ -20,9 +20,9 @@ fn App() -> Html {
                 <components::Navigator />
                 <div class="app">
                     <Switch<AppRoute> render={switch} />
+                    <Footer />
                 </div>
             </BrowserRouter>
-            <Footer />
         </ContextProvider<Option<User>>>
     }
 }

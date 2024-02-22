@@ -1,5 +1,5 @@
 //! File describing the hamburger menu component.
-//! 
+//!
 //! On the click event, the hamburger should get the additional class "is-active" and the navigation should be shown.
 
 use yew::prelude::*;
@@ -11,10 +11,7 @@ pub struct HamburgerProperties {
 }
 
 #[function_component(Hamburger)]
-pub fn hamburger(
-    props: &HamburgerProperties,
-) -> Html {
-
+pub fn hamburger(props: &HamburgerProperties) -> Html {
     let classes = if props.is_active {
         "hamburger hamburger--elastic is-active"
     } else {

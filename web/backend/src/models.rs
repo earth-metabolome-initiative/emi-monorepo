@@ -8,10 +8,7 @@ use bigdecimal::BigDecimal;
 use chrono::offset::Utc;
 use chrono::DateTime;
 use chrono::NaiveDateTime;
-
-
 use diesel::sql_types::{Interval, Money, Numeric, Range};
-
 use diesel::{Identifiable, Queryable};
 
 #[derive(Queryable, Debug, Identifiable)]
@@ -100,7 +97,7 @@ pub struct Edit {
 pub struct ExpirableItemCategory {
     pub id: i64,
     pub item_type_id: Option<i64>,
-    pub expiration_interval: Interval,
+    pub expiration_interval: Option<Interval>,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
@@ -198,6 +195,11 @@ pub struct Location {
 pub struct LoginProvider {
     pub id: i16,
     pub name: String,
+    pub font_awesome_icon: String,
+    pub client_id_var_name: String,
+    pub redirect_uri_var_name: String,
+    pub oauth_url: String,
+    pub scope: String,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
@@ -454,6 +456,14 @@ pub struct UserEmail {
     pub primary_email: bool,
 }
 
+#[derive(Queryable, Debug, Identifiable)]
+#[diesel(primary_key(user_id, document_id))]
+#[diesel(table_name = user_pictures)]
+pub struct UserPicture {
+    pub user_id: i32,
+    pub document_id: i64,
+}
+
 #[derive(Queryable, Debug)]
 #[diesel(table_name = users)]
 pub struct User {
@@ -463,12 +473,4 @@ pub struct User {
     pub last_name: Option<String>,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
-}
-
-#[derive(Queryable, Debug, Identifiable)]
-#[diesel(primary_key(user_id, picture_id))]
-#[diesel(table_name = user_pictures)]
-pub struct UserPicture {
-    pub user_id: i32,
-    pub picture_id: i64,
 }

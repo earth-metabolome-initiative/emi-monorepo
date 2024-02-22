@@ -2,11 +2,19 @@
     color: $primary;
     box-sizing: border-box;
     border-top: 1px solid $primary;
-    padding-top: 10px; // Adjust as needed
-    padding-left: $sidebar-width + 10; // Add padding to the left to account for the sidebar
-    padding-right: 10px; // Add padding to the right
+    padding: 1em;
     text-align: center; // Center align text
     font-size: 14px; // Adjust font size as needed
+    position: absolute;
+    bottom: 0;
+    width: 100%; // Full width
+    padding-left: inherit;
+    margin-left: -$sidebar-width;
+
+    @media screen and (max-width: $small-screen) {
+        position: relative; // Reset position on small screens
+        margin-left: 0; // Reset margin on small screens
+    }
 
     .container {
         max-width: 1200px; // Adjust max-width as needed
@@ -15,7 +23,7 @@
         justify-content: space-between; // Space elements evenly
         align-items: center; // Center items vertically
 
-        @media screen and (max-width: 768px) {
+        @media screen and (max-width: $small-screen) {
             flex-direction: column; // Stack elements vertically on small screens
         }
     }
@@ -41,7 +49,7 @@
             }
         }
 
-        @media screen and (max-width: 768px) {
+        @media screen and (max-width: $small-screen) {
             margin-bottom: 20px; // Add spacing between sections on small screens
         }
     }
@@ -50,12 +58,5 @@
         p {
             margin: 0; // Reset margin
         }
-    }
-}
-
-// Media query for smaller screens
-@media screen and (max-width: 768px) {
-    .footer {
-        padding-left: 10px; // Remove padding on small screens
     }
 }

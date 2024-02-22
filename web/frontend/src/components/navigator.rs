@@ -44,6 +44,8 @@ pub fn navigator() -> Html {
         })
     };
 
+    // TODO: add offline badge using https://rustwasm.github.io/wasm-bindgen/api/web_sys/struct.Navigator.html#method.on_line
+
     html! {
         <>
             <nav>

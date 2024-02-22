@@ -8,6 +8,7 @@ use healthchecker::health_checker_handler;
 pub fn config(conf: &mut web::ServiceConfig) {
     let scope = web::scope("/api")
         .service(health_checker_handler)
+        .service(oauth::get_providers)
         .service(oauth::logout::logout_handler)
         .service(oauth::github::github_oauth_handler);
     // .service(feedback_list_handler)

@@ -1,10 +1,14 @@
 .app {
     padding-top: $navigator-height;
     padding-left: $sidebar-width;
+    min-width: 100%;
+    min-height: 100%;
+    box-sizing: border-box;
+    position: relative;
 }
 
 // Media query for smaller screens
-@media screen and (max-width: 768px) {
+@media screen and (max-width: $small-screen) {
     .app {
         padding-left: 0; // Remove padding on small screens
     }

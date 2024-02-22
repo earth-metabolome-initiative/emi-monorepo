@@ -10,8 +10,8 @@ use actix_web::http::header;
 use actix_web::middleware::Logger;
 
 mod api;
-mod models;
 mod model_implementations;
+mod models;
 mod schema;
 
 #[actix_rt::main]
@@ -58,20 +58,20 @@ async fn main() -> std::io::Result<()> {
         // everything under '/api/' route
         // .service(
         //     web::scope("/api")
-                // .service(
-                //     web::resource("/invitation")
-                //         .route(web::post().to(invitation_handler::post_invitation)),
-                // )
-                // .service(
-                //     web::resource("/register/{invitation_id}")
-                //         .route(web::post().to(register_handler::register_user)),
-                // )
-                // .service(
-                //     web::resource("/auth")
-                //         .route(web::post().to(auth_handler::login))
-                //         .route(web::delete().to(auth_handler::logout))
-                //         .route(web::get().to(auth_handler::get_me)),
-                // ),
+        // .service(
+        //     web::resource("/invitation")
+        //         .route(web::post().to(invitation_handler::post_invitation)),
+        // )
+        // .service(
+        //     web::resource("/register/{invitation_id}")
+        //         .route(web::post().to(register_handler::register_user)),
+        // )
+        // .service(
+        //     web::resource("/auth")
+        //         .route(web::post().to(auth_handler::login))
+        //         .route(web::delete().to(auth_handler::logout))
+        //         .route(web::get().to(auth_handler::get_me)),
+        // ),
         // )
     })
     .bind("127.0.0.1:8080")?

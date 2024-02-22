@@ -186,6 +186,16 @@ diesel::table! {
         id -> Int2,
         #[max_length = 255]
         name -> Varchar,
+        #[max_length = 255]
+        font_awesome_icon -> Varchar,
+        #[max_length = 255]
+        client_id_var_name -> Varchar,
+        #[max_length = 255]
+        redirect_uri_var_name -> Varchar,
+        #[max_length = 255]
+        oauth_url -> Varchar,
+        #[max_length = 255]
+        scope -> Varchar,
     }
 }
 

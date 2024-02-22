@@ -7,7 +7,7 @@ use diesel::PgConnection;
 use email_address::*;
 
 #[derive(Queryable, Insertable, Debug)]
-#[table_name = "user_emails"]
+#[diesel(table_name = user_emails)]
 pub(crate) struct NewUserEmail {
     email: String,
     user_id: i32,
@@ -149,7 +149,7 @@ impl LoginProvider {
 }
 
 #[derive(Queryable, Insertable, Debug, Default)]
-#[table_name = "users"]
+#[diesel(table_name = users)]
 pub(crate) struct NewUser {
     first_name: Option<String>,
     middle_name: Option<String>,
@@ -173,7 +173,7 @@ impl NewUser {
 
 impl User {
     /// Returns the user with the given ID.
-    /// 
+    ///
     /// # Arguments
     /// * `user_id` - The ID of the user.
     /// * `pool` - The database connection pool.
@@ -188,11 +188,29 @@ impl User {
     }
 
     /// Returns whether a user with the given ID exists.
-    /// 
+    ///
     /// # Arguments
     /// * `user_id` - The ID of the user.
     /// * `pool` - The database connection pool.
     pub fn exists(user_id: i32, pool: &Pool<ConnectionManager<PgConnection>>) -> bool {
         User::get(user_id, pool).is_ok()
+    }
+}
+
+impl LoginProvider {
+    /// Returns list of available login providers.
+    ///
+    /// # Arguments
+    /// * `pool` - The database connection pool.
+    pub fn get_all(
+        pool: &Pool<ConnectionManager<PgConnection>>,
+    ) -> Result<Vec<LoginProvider>, String> {
+        use crate::schema::login_providers::dsl::*;
+        let mut conn = pool.get().unwrap();
+        let providers = login_providers.load::<LoginProvider>(&mut conn);
+        match providers {
+            Ok(providers) => Ok(providers),
+            Err(_) => Err("Failed to retrieve login providers".to_string()),
+        }
     }
 }

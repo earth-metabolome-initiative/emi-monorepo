@@ -11,6 +11,7 @@ $sidebar-hover-color: #f76a00;
     color: $primary;
     transition: transform 0.3s ease;
     background-color: white;
+    z-index: 100;
     box-sizing: border-box;
     border-right: 1px solid $primary;
     overflow-y: scroll;
@@ -41,7 +42,7 @@ $sidebar-hover-color: #f76a00;
 }
 
 // Media query for smaller screens
-@media screen and (max-width: 768px) {
+@media screen and (max-width: $small-screen) {
     .sidebar {
         width: 200px; // Adjust width for smaller screens
 

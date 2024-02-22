@@ -4,12 +4,16 @@ pub mod github;
 pub mod logout;
 use actix_web::cookie::time::Duration as ActixWebDuration;
 use actix_web::cookie::Cookie;
+use actix_web::get;
+use actix_web::HttpResponse;
+use actix_web::Responder;
 use chrono::{prelude::*, Duration};
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
 use jsonwebtoken::{encode, EncodingKey, Header};
 use serde::{Deserialize, Serialize};
 use std::future::{ready, Ready};
+use web_common::login_provider::OAuth2LoginProvider;
 
 use actix_web::{
     dev::Payload,
@@ -21,7 +25,7 @@ use serde_json::json;
 
 use std::env;
 
-use crate::models::User;
+use crate::models::{LoginProvider, User};
 
 pub(crate) struct OauthConfig {
     client_origin: String,
@@ -183,4 +187,41 @@ impl FromRequest for AuthenticationGuard {
             ))),
         }
     }
+}
+
+#[get("/oauth/providers")]
+/// Returns a list of available OAuth2 providers.
+async fn get_providers(pool: web::Data<Pool<ConnectionManager<PgConnection>>>) -> impl Responder {
+    // We retrieve the system variables using dotenvy.
+    dotenvy::dotenv().ok();
+
+    let providers = LoginProvider::get_all(&pool);
+
+    if providers.is_err() {
+        return HttpResponse::InternalServerError().finish();
+    }
+
+    let providers = providers.unwrap();
+    let mut oauth_providers: Vec<OAuth2LoginProvider> = Vec::new();
+
+    for provider in providers {
+        let client_id = env::var(provider.client_id_var_name);
+        let redirect_uri = env::var(provider.redirect_uri_var_name);
+
+        if client_id.is_err() || redirect_uri.is_err() {
+            return HttpResponse::InternalServerError().finish();
+        }
+
+        oauth_providers.push(OAuth2LoginProvider {
+            id: provider.id,
+            name: provider.name,
+            font_awesome_icon: provider.font_awesome_icon,
+            client_id: client_id.unwrap(),
+            redirect_uri: redirect_uri.unwrap(),
+            oauth_url: provider.oauth_url,
+            scope: provider.scope,
+        });
+    }
+
+    HttpResponse::Ok().json(oauth_providers)
 }

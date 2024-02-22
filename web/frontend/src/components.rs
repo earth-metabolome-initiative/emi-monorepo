@@ -1,12 +1,13 @@
-pub mod sidebar;
-pub mod navigator;
-pub mod input_with_icon;
-pub mod hamburger;
-mod search_bar;
-pub mod footer;
 pub mod error_page;
+pub mod footer;
+pub mod hamburger;
+pub mod input_with_icon;
+pub mod navigator;
+mod search_bar;
+pub mod sidebar;
+pub mod login_provider;
 
-pub use navigator::Navigator;
-pub use input_with_icon::InputWithIcon;
-pub use footer::Footer;
 pub use error_page::ErrorPage;
+pub use footer::Footer;
+pub use input_with_icon::InputWithIcon;
+pub use navigator::Navigator;

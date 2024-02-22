@@ -9,9 +9,7 @@ pub struct ErrorPageProps {
 }
 
 #[function_component(ErrorPage)]
-pub fn error_page(
-    props: &ErrorPageProps,
-) -> Html {
+pub fn error_page(props: &ErrorPageProps) -> Html {
     html! {
         <div class="not-found-container">
             <div class="error-wrapper">

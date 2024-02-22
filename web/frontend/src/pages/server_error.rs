@@ -1,7 +1,7 @@
 //! Not found error page.
 
-use yew::prelude::*;
 use crate::components::ErrorPage;
+use yew::prelude::*;
 
 #[function_component(ServerErrorPage)]
 pub fn server_error_page() -> Html {
