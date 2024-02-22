@@ -2,18 +2,19 @@
     color: $primary;
     box-sizing: border-box;
     border-top: 1px solid $primary;
-    padding: 1em;
+    padding: 10px;
     text-align: center; // Center align text
     font-size: 14px; // Adjust font size as needed
     position: absolute;
     bottom: 0;
     width: 100%; // Full width
-    padding-left: inherit;
+    padding-left: $sidebar-width + 10px; // Add padding to the left to account for the sidebar
     margin-left: -$sidebar-width;
 
     @media screen and (max-width: $small-screen) {
         position: relative; // Reset position on small screens
         margin-left: 0; // Reset margin on small screens
+        padding-left: 10px; // Reset padding on small screens
     }
 
     .container {

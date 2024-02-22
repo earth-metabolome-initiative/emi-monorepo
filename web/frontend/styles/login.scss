@@ -20,6 +20,13 @@
     margin-left: -$sidebar-width;
     padding: inherit;
     box-sizing: border-box;
+
+    @media screen and (max-width: $small-screen) {
+        margin: 0;
+        padding: 0;
+        position: relative;
+        min-height: 400px;
+    }
 }
 
 .login_box {
@@ -32,6 +39,7 @@
   h2 {
     margin-bottom: 20px;
     color: $primary;
+    font-size: 1.5em;
   }
 
   ul {
