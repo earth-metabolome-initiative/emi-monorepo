@@ -9,6 +9,7 @@ use chrono::offset::Utc;
 use chrono::DateTime;
 use chrono::NaiveDateTime;
 use diesel::sql_types::{Interval, Money, Numeric, Range};
+use diesel::Selectable;
 use diesel::{Identifiable, Queryable};
 
 #[derive(Queryable, Debug, Identifiable)]
@@ -269,6 +270,12 @@ pub struct Organization {
 }
 
 #[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = primary_user_emails)]
+pub struct PrimaryUserEmail {
+    pub id: i32,
+}
+
+#[derive(Queryable, Debug, Identifiable)]
 #[diesel(table_name = procedure_continuous_requirements)]
 pub struct ProcedureContinuousRequirement {
     pub id: i64,
@@ -446,14 +453,13 @@ pub struct Unit {
     pub symbol: String,
 }
 
-#[derive(Queryable, Debug, Identifiable)]
-#[diesel(primary_key(user_id, login_provider_id))]
+#[derive(Queryable, Debug, Identifiable, Selectable)]
 #[diesel(table_name = user_emails)]
 pub struct UserEmail {
+    pub id: i32,
     pub email: String,
     pub user_id: i32,
     pub login_provider_id: i16,
-    pub primary_email: bool,
 }
 
 #[derive(Queryable, Debug, Identifiable)]
@@ -464,7 +470,7 @@ pub struct UserPicture {
     pub document_id: i64,
 }
 
-#[derive(Queryable, Debug)]
+#[derive(Queryable, Debug, Selectable)]
 #[diesel(table_name = users)]
 pub struct User {
     pub id: i32,

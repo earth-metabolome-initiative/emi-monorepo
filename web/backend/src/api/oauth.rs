@@ -113,7 +113,7 @@ pub(crate) struct QueryCode {
 /// # Arguments
 /// * `user_id` - The ID of the user to create the JWT for.
 /// * `config` - The OAuth2 configuration to use to create the JWT.
-pub(crate) fn create_jwt_cookie(user_id: i32, config: &OauthConfig) -> Cookie {
+pub(crate) fn create_jwt_cookie(user_id: i32, config: &OauthConfig) -> Result<Cookie, String> {
     let now = Utc::now();
     let iat = now.timestamp() as usize;
     let exp = (now + Duration::minutes(config.jwt_max_age)).timestamp() as usize;
@@ -123,16 +123,19 @@ pub(crate) fn create_jwt_cookie(user_id: i32, config: &OauthConfig) -> Cookie {
         &Header::default(),
         &claims,
         &EncodingKey::from_secret(config.jwt_secret.as_ref()),
-    )
-    .unwrap();
+    );
 
-    let cookie = Cookie::build("token", token)
+    if token.is_err() {
+        return Err("Failed to create JWT".to_string());
+    }
+
+    let cookie = Cookie::build("token", token.unwrap())
         .path("/")
         .max_age(ActixWebDuration::new(60 * config.jwt_max_age, 0))
         .http_only(true)
         .finish();
 
-    cookie
+    Ok(cookie)
 }
 
 pub struct AuthenticationGuard {

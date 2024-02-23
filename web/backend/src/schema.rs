@@ -269,6 +269,12 @@ diesel::table! {
 }
 
 diesel::table! {
+    primary_user_emails (id) {
+        id -> Int4,
+    }
+}
+
+diesel::table! {
     procedure_continuous_requirements (id) {
         id -> Int8,
         procedure_id -> Int8,
@@ -449,12 +455,12 @@ diesel::table! {
 }
 
 diesel::table! {
-    user_emails (user_id, login_provider_id) {
+    user_emails (id) {
+        id -> Int4,
         #[max_length = 255]
         email -> Varchar,
         user_id -> Int4,
         login_provider_id -> Int2,
-        primary_email -> Bool,
     }
 }
 
@@ -544,6 +550,7 @@ diesel::joinable!(organizations -> describables (id));
 diesel::joinable!(organizations -> documents (logo_id));
 diesel::joinable!(organizations -> editables (id));
 diesel::joinable!(organizations -> organization_states (state_id));
+diesel::joinable!(primary_user_emails -> user_emails (id));
 diesel::joinable!(procedure_continuous_requirements -> continuous_units (unit_id));
 diesel::joinable!(procedure_continuous_requirements -> editables (id));
 diesel::joinable!(procedure_continuous_requirements -> item_categories (item_category_id));
@@ -641,6 +648,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     organization_user_roles,
     organization_users,
     organizations,
+    primary_user_emails,
     procedure_continuous_requirements,
     procedure_discrete_requirements,
     procedures,

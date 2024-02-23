@@ -8,6 +8,7 @@ use diesel::r2d2::{ConnectionManager, Pool};
 
 use crate::model_implementations::*;
 use crate::models::*;
+use crate::transactions::renormalize_user_emails::{Emails, renormalize_user_emails};
 use reqwest::Client;
 use serde::Deserialize;
 use std::env;
@@ -30,31 +31,35 @@ impl GitHubConfig {
     /// message if they are not.
     pub fn from_env(pool: &Pool<ConnectionManager<PgConnection>>) -> Result<GitHubConfig, String> {
         dotenvy::dotenv().ok();
-        let client_id = env::var("GITHUB_CLIENT_ID");
         let client_secret = env::var("GITHUB_CLIENT_SECRET");
-
-        if client_id.is_err() {
-            return Err("GITHUB_CLIENT_ID not set".to_string());
-        }
 
         if client_secret.is_err() {
             return Err("GITHUB_CLIENT_SECRET not set".to_string());
         }
 
         // We retrieve the ID for the 'GitHub' provider from the database.
-        let provider_id = LoginProvider::get_provider_id("github", pool).unwrap();
+        let provider = LoginProvider::from_provider_name("GitHub", pool);
+
+        if provider.is_err() {
+            return Err(provider.err().unwrap().to_string());
+        }
+
+        let provider = provider.unwrap();
+
+        let client_id = env::var("GITHUB_CLIENT_ID");
+
+        if client_id.is_err() {
+            return Err("GITHUB_CLIENT_ID not set".to_string());
+        }
 
         Ok(GitHubConfig {
             client_id: client_id.unwrap(),
             client_secret: client_secret.unwrap(),
             oauth_config: OauthConfig::from_env().unwrap(),
-            provider_id,
+            provider_id: provider.id,
         })
     }
 
-    fn client_origin(&self) -> &str {
-        self.oauth_config.client_origin.as_str()
-    }
 }
 
 #[derive(Deserialize)]
@@ -62,11 +67,13 @@ pub struct GitHubOauthToken {
     pub access_token: String,
 }
 
-#[derive(Deserialize)]
-pub struct GitHubUserMetadata {
-    pub login: String,
-    pub avatar_url: String,
-    pub email: String,
+#[derive(Debug, Deserialize)]
+struct GithubEmailMetadata {
+    email: String,
+    verified: bool,
+    primary: bool,
+    #[serde(rename = "visibility")]
+    _visibility: Option<String>,
 }
 
 #[get("/oauth/github")]
@@ -91,102 +98,53 @@ async fn github_oauth_handler(
     }
 
     let token_response = token_response.unwrap();
-    println!("Bearer {}", token_response.access_token);
-    let github_user = get_github_user(&token_response.access_token).await;
-    if github_user.is_err() {
-        let message = github_user.err().unwrap().to_string();
+
+    // We retrieve the GitHub user emails
+    let emails_response = get_github_user_emails(token_response.access_token.as_str()).await;
+
+    if emails_response.is_err() {
+        let message = emails_response.err().unwrap().to_string();
         return HttpResponse::BadGateway()
             .json(serde_json::json!({"status": "fail", "message": message}));
     }
 
-    let github_user = github_user.unwrap();
-
     let github_config = GitHubConfig::from_env(&pool).unwrap();
 
-    // We query the database to see if there is already an user with
-    // the provided email. If so, we will not have to create a new user,
-    // and we need to check whether the provide ID
-    // used for registering the email is the same as the one used for the
-    // current login provider. If the login provider is different, it means
-    // that the user is trying to login with a different provider, and we
-    // need to insert a new user email with the new provider ID.
-    // Conversely, if the user does not exist, we create a new user and
-    // insert a new user email.
-    let mail_row = UserEmail::get_row_from_email(github_user.email.as_str(), &pool);
+    log::debug!("Starting creation of user");
 
-    let user_id = match mail_row {
-        Ok(mail_row) => {
-            // If the email is already present in the database, we check
-            // whether it was registered with the same provider.
-            // If not, we insert a new user email with the new provider ID.
-            if mail_row.login_provider_id != github_config.provider_id {
-                let new_user_email = NewUserEmail::new(
-                    github_user.email.as_str(),
-                    mail_row.user_id,
-                    github_config.provider_id,
-                );
+    let user_query = renormalize_user_emails(
+        github_config.provider_id,
+        emails_response.unwrap(),
+        NewUser::default(),
+        &pool
+    );
 
-                if new_user_email.is_err() {
-                    let message = new_user_email.err().unwrap().to_string();
-                    return HttpResponse::BadGateway()
-                        .json(serde_json::json!({"status": "fail", "message": message}));
-                }
+    if user_query.is_err() {
+        let message = user_query.err().unwrap().to_string();
+        return HttpResponse::BadGateway()
+            .json(serde_json::json!({"status": "fail", "message": message}));
+    }
 
-                let query_result = new_user_email.unwrap().insert(&pool);
+    let user_id = user_query.unwrap().id();
 
-                if query_result.is_err() {
-                    let message = query_result.err().unwrap().to_string();
-                    return HttpResponse::BadGateway()
-                        .json(serde_json::json!({"status": "fail", "message": message}));
-                }
-            }
-
-            mail_row.user_id
-        }
-        Err(_) => {
-            // If we cannot find the user email, we create a new user.
-            let new_user_query = NewUser::insert_default(&pool);
-
-            if new_user_query.is_err() {
-                let message = new_user_query.err().unwrap().to_string();
-                return HttpResponse::BadGateway()
-                    .json(serde_json::json!({"status": "fail", "message": message}));
-            }
-
-            let new_user_id = new_user_query.unwrap();
-
-            let new_user_email = NewUserEmail::new(
-                github_user.email.as_str(),
-                new_user_id,
-                github_config.provider_id,
-            );
-
-            if new_user_email.is_err() {
-                let message = new_user_email.err().unwrap().to_string();
-                return HttpResponse::BadGateway()
-                    .json(serde_json::json!({"status": "fail", "message": message}));
-            }
-
-            let query_result = new_user_email.unwrap().insert(&pool);
-
-            if query_result.is_err() {
-                let message = query_result.err().unwrap().to_string();
-                return HttpResponse::BadGateway()
-                    .json(serde_json::json!({"status": "fail", "message": message}));
-            }
-
-            new_user_id
-        }
-    };
+    // We log in DEBUG mode the user ID
+    log::debug!("User ID: {}", user_id);
 
     let cookie = create_jwt_cookie(user_id, &github_config.oauth_config);
+
+    if cookie.is_err() {
+        let message = cookie.err().unwrap().to_string();
+        return HttpResponse::BadGateway()
+            .json(serde_json::json!({"status": "fail", "message": message}));
+    }
 
     let mut response = HttpResponse::Found();
     response.append_header((
         LOCATION,
-        format!("{}{}", github_config.client_origin(), state),
+        state.to_string(),
     ));
-    response.cookie(cookie);
+    response.cookie(cookie.unwrap());
+    log::debug!("User logged in, redirecting to {}", state);
     response.finish()
 }
 
@@ -217,27 +175,79 @@ pub async fn get_github_oauth_token(
         let oauth_response = response.json::<GitHubOauthToken>().await?;
         Ok(oauth_response)
     } else {
-        let message = "An error occurred while trying to retrieve the access token.";
+        let message = format!(
+            "An error occurred while trying to retrieve the access token: {}, text: {}",
+            response.status(),
+            response.text().await?
+        );
         Err(From::from(message))
     }
 }
 
-pub async fn get_github_user(access_token: &str) -> Result<GitHubUserMetadata, Box<dyn Error>> {
-    let root_url = "https://api.github.com/user";
+/// Function to retrieve the emails associated with a GitHub user.
+///
+/// # Implementative details
+/// This function uses the GitHub API to retrieve the emails associated with a user.
+/// While there is an email field in the set of informations returned as the user logs in,
+/// these emails are optional and the user on GitHub may choose to not display them (in fact
+/// this is the default setting). This function retrieves the emails from the GitHub API
+/// from the endpoint `/user/emails` and returns them as a `Vec<String>`.
+pub async fn get_github_user_emails(authorization_code: &str) -> Result<Emails, Box<dyn Error>> {
+    let root_url = "https://api.github.com/user/emails";
 
     let client = Client::new();
 
     let response = client
         .get(root_url)
-        .bearer_auth(access_token)
+        .header("Accept", "application/json")
+        .header("User-Agent", "EarthMetabolomeInitiativePortal")
+        .bearer_auth(authorization_code)
         .send()
         .await?;
 
     if response.status().is_success() {
-        let user_info = response.json::<GitHubUserMetadata>().await?;
-        Ok(user_info)
+        let emails = response.json::<Vec<GithubEmailMetadata>>().await;
+
+        if emails.is_err() {
+            let message = format!(
+                "An error occurred while trying to retrieve the user emails: {}",
+                emails.err().unwrap().to_string()
+            );
+            return Err(From::from(message));
+        }
+
+        let emails = emails.unwrap();
+
+        let mut primary = String::new();
+        let mut email_list = Vec::new();
+
+        for email in emails {
+            if !email.verified {
+                continue;
+            }
+            if email.primary {
+                primary = email.email.clone();
+            }
+            email_list.push(email.email);
+        }
+
+        // If not primary mail was set, then this was a bad request.
+        if primary.is_empty() {
+            let message = format!("No primary email was found in the list of emails from GitHub",);
+            return Err(From::from(message));
+        }
+
+        // If no email was found, then this was a bad request.
+        if email_list.is_empty() {
+            let message = format!("No email was found in the list of emails from GitHub",);
+            return Err(From::from(message));
+        }
+
+        Ok(Emails::new(email_list, primary))
     } else {
-        let message = "An error occurred while trying to retrieve user information.";
+        let message = format!(
+            "An error occurred while trying to retrieve the user emails",
+        );
         Err(From::from(message))
     }
 }

@@ -47,6 +47,31 @@ To run the migrations, run the following command:
 
 `diesel migration run`
 
+### Reverting the migrations
+To revert the migrations, run the following command:
+
+`diesel migration revert --all`
+
+### Using the Diesel extended CLI
+The Diesel extended CLI is a set of commands that can be used to print out the Rust struct associated with a table, saving a significant amount of time when writing the code. Note that such struct are not always correct and may need to be adjusted,
+expecially when these structs include the use of less common types such as `Money` or `Interval`. To install the Diesel extended CLI, run the following command:
+
+`cargo install diesel_cli_ext`
+
+To use the Diesel extended CLI to generate the models, **AFTER HAVING BACKED UP THE PREVIOUS VERSION**, run the following command:
+
+`diesel_ext --model --add-table-name > src/models.rs`
+
+### Additional python utilities
+In order to handle the many Diesel migrations that compose the application database, we have gradually created some Python utilities.
+
+#### Increase directory counter
+The increase directory counter script is a Python script that increases the counter of the migration directories. This is useful when you want to add a new migration directory to the project in the middle of the existing ones, and you are not keen on manually renaming 50+ directories. To use it, run the following command:
+
+`python migrations/increase_directory_counter.py $number_from_which_to_start`
+
+where `$number_from_which_to_start` is the number from which to start the counter. This will increase the counter of the migration directories starting from the number specified.
+
 ## Starting cargo watch
 Cargo watch is a tool that watches for changes in the project and automatically recompiles the project.
 
