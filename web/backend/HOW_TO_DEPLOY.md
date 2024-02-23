@@ -113,3 +113,39 @@ Error response from daemon: dial unix docker.raw.sock: connect: no such file or 
 ```
 
 This error is caused by not having started the docker desktop application. Note that it can take a minute, so even if you have just started the docker desktop application, you might still encounter this error. Do wait a minute and retry to run the docker compose after that.
+
+#### Linux error caused by not having started the docker service
+If you are running on an Linux machine, you might encounter the following error:
+
+```text
+Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?
+```
+
+You may need to start (or wait for it to finish starting) the Docker service by running the following command:
+
+```bash
+sudo systemctl start docker
+```
+
+#### Linux error caused by not being in the docker group
+If you are running on an Linux machine, you might encounter the following error:
+
+```text
+permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.24/containers/json?all=1&filters=%7B%22label%22%3A%7B%22com.docker.compose.config-hash%22%3Atrue%2C%22com.docker.compose.project%3Dbackend%22%3Atrue%7D%7D": dial unix /var/run/docker.sock: connect: permission denied
+```
+
+This error is caused by not being in the `docker` group. You can add yourself to the `docker` group by running the following command:
+
+```bash
+sudo usermod -aG docker $USER
+```
+
+You can check whether your user has been added to the `docker` group by running the following command:
+
+```bash
+groups $USER
+```
+
+You should see `docker` in the list of groups.
+
+You may need to log out and log back in for the changes to take effect. If you are in a `tmux` session, you may need to restart the `tmux` session.

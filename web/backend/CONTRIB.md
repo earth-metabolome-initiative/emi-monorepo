@@ -46,3 +46,14 @@ Diesel uses environment variables to connect to the database. To set the environ
 To run the migrations, run the following command:
 
 `diesel migration run`
+
+## Starting cargo watch
+Cargo watch is a tool that watches for changes in the project and automatically recompiles the project.
+
+To install it, as per many other Rust tools, run the following command:
+
+`cargo install cargo-watch`
+
+To start cargo watch, run the following command:
+
+`cargo watch -q -c -w src/ -x run`

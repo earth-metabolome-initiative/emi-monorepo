@@ -19,3 +19,10 @@ After that, we can install Trunk by running the following command. You may want 
 # See https://trunkrs.dev/#install for further details
 cargo install --locked trunk
 ```
+
+#### Starting Trunk
+To start Trunk, run the following command:
+
+```bash
+trunk serve --port 3000 --proxy-backend http://localhost:8080/api/
+```
