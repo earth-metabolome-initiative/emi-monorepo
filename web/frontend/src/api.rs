@@ -8,3 +8,11 @@ pub async fn retrieve_login_providers() -> Result<Vec<OAuth2LoginProvider>, gloo
         .json()
         .await
 }
+
+pub async fn retrieve_logged_user_info() -> Result<web_common::user::User, gloo_net::Error> {
+    Request::get("/api/logged_user_info")
+        .send()
+        .await?
+        .json()
+        .await
+}

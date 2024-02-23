@@ -3,16 +3,19 @@
 pub mod github;
 pub mod logout;
 use actix_web::cookie::time::Duration as ActixWebDuration;
+use actix_web::cookie::time::Duration as CookieDuration;
 use actix_web::cookie::Cookie;
 use actix_web::get;
 use actix_web::HttpResponse;
 use actix_web::Responder;
-use chrono::{prelude::*, Duration};
+use chrono::Duration;
+use chrono::Utc;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
 use jsonwebtoken::{encode, EncodingKey, Header};
 use serde::{Deserialize, Serialize};
 use std::future::{ready, Ready};
+use time::OffsetDateTime;
 use web_common::login_provider::OAuth2LoginProvider;
 
 use actix_web::{
@@ -28,6 +31,9 @@ use std::env;
 use crate::models::{LoginProvider, User};
 
 pub(crate) struct OauthConfig {
+    // This is currently not used for logins such as GitHub, but it is commonly
+    // needed by othe OAuth2 providers.
+    #[allow(dead_code)]
     client_origin: String,
     jwt_secret: String,
     jwt_max_age: i64,
@@ -139,7 +145,13 @@ pub(crate) fn create_jwt_cookie(user_id: i32, config: &OauthConfig) -> Result<Co
 }
 
 pub struct AuthenticationGuard {
-    pub user_id: i32,
+    user_id: i32,
+}
+
+impl AuthenticationGuard {
+    pub fn user_id(&self) -> i32 {
+        self.user_id
+    }
 }
 
 impl FromRequest for AuthenticationGuard {
@@ -175,9 +187,11 @@ impl FromRequest for AuthenticationGuard {
 
         match decode {
             Ok(token) => {
-                if User::exists(token.claims.user_id, pool) {
+                if !User::exists(token.claims.user_id, pool) {
+                    // The user no longer exists, so we can't authenticate them.
+
                     return ready(Err(ErrorUnauthorized(
-                        json!({"status": "fail", "message": "User belonging to this token no logger exists"}),
+                        json!({"status": "fail", "message": "Invalid token or user doesn't exists"}),
                     )));
                 }
 
@@ -186,7 +200,7 @@ impl FromRequest for AuthenticationGuard {
                 }))
             }
             Err(_) => ready(Err(ErrorUnauthorized(
-                json!({"status": "fail", "message": "Invalid token or usre doesn't exists"}),
+                json!({"status": "fail", "message": "Invalid token or user doesn't exists"}),
             ))),
         }
     }

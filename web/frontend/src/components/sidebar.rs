@@ -2,6 +2,8 @@
 //!
 
 use yew::prelude::*;
+use crate::store::Store;
+use yewdux::use_store;
 
 #[derive(Properties, Clone, PartialEq, Debug)]
 pub struct SidebarProps {
@@ -10,6 +12,8 @@ pub struct SidebarProps {
 
 #[function_component(Sidebar)]
 pub fn sidebar(props: &SidebarProps) -> Html {
+    let (store, _) = use_store::<Store>();
+
     let sidebar_class = if props.visible {
         "sidebar"
     } else {
@@ -24,6 +28,9 @@ pub fn sidebar(props: &SidebarProps) -> Html {
                     <li><a href="#">{"About"}</a></li>
                     <li><a href="#">{"Services"}</a></li>
                     <li><a href="#">{"Contact"}</a></li>
+                    if store.is_logged_in() {
+                        <li><a href="/api/logout">{"Logout"}</a></li>
+                    }
                 </ul>
             </div>
         </div>
