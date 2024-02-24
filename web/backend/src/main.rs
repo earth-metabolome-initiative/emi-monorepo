@@ -51,7 +51,7 @@ async fn main() -> std::io::Result<()> {
             // pass in the database pool to all routes
             .app_data(web::Data::new(pool.clone()))
             // We register the API handlers
-            .configure(api::config)
+            .configure(api::configure)
             // enable logger
             .wrap(Logger::default())
             // We add a 401 unauthorized error handler
@@ -67,26 +67,9 @@ async fn main() -> std::io::Result<()> {
             .wrap(cors)
             // limit the maximum amount of data that server will accept
             .app_data(web::JsonConfig::default().limit(4096))
-        // everything under '/api/' route
-        // .service(
-        //     web::scope("/api")
-        // .service(
-        //     web::resource("/invitation")
-        //         .route(web::post().to(invitation_handler::post_invitation)),
-        // )
-        // .service(
-        //     web::resource("/register/{invitation_id}")
-        //         .route(web::post().to(register_handler::register_user)),
-        // )
-        // .service(
-        //     web::resource("/auth")
-        //         .route(web::post().to(auth_handler::login))
-        //         .route(web::delete().to(auth_handler::logout))
-        //         .route(web::get().to(auth_handler::get_me)),
-        // ),
-        // )
     })
     .bind("127.0.0.1:8080")?
+    .workers(4)
     .run()
     .await
 }

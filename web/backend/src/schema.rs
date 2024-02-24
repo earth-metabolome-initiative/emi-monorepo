@@ -83,9 +83,8 @@ diesel::table! {
 }
 
 diesel::table! {
-    expirable_item_categories (id) {
-        id -> Int8,
-        item_type_id -> Nullable<Int8>,
+    expirable_item_categories (item_type_id) {
+        item_type_id -> Int8,
         expiration_interval -> Interval,
     }
 }
@@ -206,7 +205,7 @@ diesel::table! {
         cost_per_day -> Numeric,
         #[max_length = 3]
         currency -> Varchar,
-        manifacturer_id -> Nullable<Int8>,
+        manifacturer_id -> Int8,
     }
 }
 
@@ -354,7 +353,7 @@ diesel::table! {
     projects (id) {
         id -> Int8,
         public -> Nullable<Bool>,
-        state_id -> Int8,
+        state_id -> Nullable<Int8>,
         parent_project_id -> Nullable<Int8>,
         budget -> Nullable<Money>,
         expenses -> Nullable<Money>,
@@ -482,6 +481,20 @@ diesel::table! {
     }
 }
 
+diesel::table! {
+    website_roles (id) {
+        id -> Int8,
+    }
+}
+
+diesel::table! {
+    website_user_roles (id) {
+        id -> Int8,
+        website_role_id -> Int8,
+        user_id -> Int8,
+    }
+}
+
 diesel::joinable!(archivables -> editables (id));
 diesel::joinable!(archivables -> users (archived_by));
 diesel::joinable!(container_horizontal_rules -> editables (id));
@@ -498,7 +511,6 @@ diesel::joinable!(editables -> users (created_by));
 diesel::joinable!(edits -> describables (id));
 diesel::joinable!(edits -> editables (id));
 diesel::joinable!(edits -> users (edited_by));
-diesel::joinable!(expirable_item_categories -> editables (id));
 diesel::joinable!(expirable_item_categories -> item_categories (item_type_id));
 diesel::joinable!(item_categories -> describables (id));
 diesel::joinable!(item_categories -> editables (id));
@@ -616,6 +628,11 @@ diesel::joinable!(user_emails -> login_providers (login_provider_id));
 diesel::joinable!(user_emails -> users (user_id));
 diesel::joinable!(user_pictures -> documents (document_id));
 diesel::joinable!(user_pictures -> users (user_id));
+diesel::joinable!(website_roles -> describables (id));
+diesel::joinable!(website_roles -> editables (id));
+diesel::joinable!(website_user_roles -> editables (id));
+diesel::joinable!(website_user_roles -> users (user_id));
+diesel::joinable!(website_user_roles -> website_roles (website_role_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     archivables,
@@ -674,4 +691,6 @@ diesel::allow_tables_to_appear_in_same_query!(
     user_emails,
     user_pictures,
     users,
+    website_roles,
+    website_user_roles,
 );

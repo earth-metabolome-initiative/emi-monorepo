@@ -3,8 +3,8 @@ use crate::schema::*;
 use diesel::prelude::*;
 use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::Pool;
-use diesel::PgConnection;
 use diesel::r2d2::PooledConnection;
+use diesel::PgConnection;
 use email_address::*;
 
 #[derive(Queryable, Insertable, Debug)]
@@ -31,12 +31,10 @@ impl NewUserEmail {
 
     pub fn insert(
         &self,
-        conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>
+        conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>,
     ) -> Result<UserEmail, diesel::result::Error> {
         use crate::schema::user_emails::dsl::*;
-        let result = diesel::insert_into(user_emails)
-            .values(self)
-            .execute(conn);
+        let result = diesel::insert_into(user_emails).values(self).execute(conn);
         match result {
             Ok(_) => user_emails
                 .filter(email.eq(&self.email))
@@ -63,7 +61,7 @@ impl NewPrimaryUserEmail {
 
     pub(crate) fn insert(
         &self,
-        conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>
+        conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>,
     ) -> QueryResult<usize> {
         use crate::schema::primary_user_emails::dsl::*;
         diesel::insert_into(primary_user_emails)
@@ -132,10 +130,12 @@ impl User {
     /// # Arguments
     /// * `user_id` - The ID of the user.
     /// * `pool` - The database connection pool.
-    pub fn get(user_id: i32, pool: &Pool<ConnectionManager<PgConnection>>) -> Result<User, String> {
+    pub fn get(
+        user_id: i32,
+        conn: &mut PooledConnection<ConnectionManager<PgConnection>>,
+    ) -> Result<User, String> {
         use crate::schema::users::dsl::*;
-        let mut conn = pool.get().unwrap();
-        let user = users.filter(id.eq(user_id)).first::<User>(&mut conn);
+        let user = users.filter(id.eq(user_id)).first::<User>(conn);
         match user {
             Ok(user) => Ok(user),
             Err(_) => Err(format!("No user with id {} found", user_id)),
@@ -150,7 +150,7 @@ impl User {
     pub fn get_user_email_from_email(
         &self,
         email: &str,
-        conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>
+        conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>,
     ) -> QueryResult<UserEmail> {
         use crate::schema::user_emails::dsl::*;
         user_emails
@@ -159,18 +159,17 @@ impl User {
             .first::<UserEmail>(conn)
     }
 
-    /// Returns whether a user with the given ID exists.
-    ///
-    /// # Arguments
-    /// * `user_id` - The ID of the user.
-    /// * `pool` - The database connection pool.
-    pub fn exists(user_id: i32, pool: &Pool<ConnectionManager<PgConnection>>) -> bool {
-        User::get(user_id, pool).is_ok()
-    }
-
     /// Returns the user's id.
     pub fn id(&self) -> i32 {
         self.id
+    }
+
+    pub fn is_website_admin(
+        &self,
+        conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>,
+    ) -> bool {
+        use crate::schema::primary_user_emails::dsl::*;
+        
     }
 }
 

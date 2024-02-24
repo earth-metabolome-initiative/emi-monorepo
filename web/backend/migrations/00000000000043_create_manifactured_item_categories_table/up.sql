@@ -7,5 +7,5 @@ CREATE TABLE manufactured_item_categories (
   cost DECIMAL(10, 2) NOT NULL,
   cost_per_day DECIMAL(10, 2) NOT NULL,
   currency VARCHAR(3) NOT NULL,
-  manifacturer_id BIGINT REFERENCES organizations(id)
+  manifacturer_id BIGINT NOT NULL REFERENCES organizations(id) ON DELETE CASCADE
 );

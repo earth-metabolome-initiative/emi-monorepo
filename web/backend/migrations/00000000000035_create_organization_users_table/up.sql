@@ -13,3 +13,25 @@ CREATE TABLE organization_users (
     role_id BIGINT NOT NULL REFERENCES organization_user_roles (id) ON DELETE SET NULL,
     UNIQUE (user_id, organization_id, role_id)
 );
+
+-- We also need to add a bi-directional cascade delete constraint to the editables
+-- table, so that when an organization user is deleted, the corresponding editable is also deleted.
+-- Since the editables table is referenced by several other tables, we cannot add a cascade
+-- delete constraint to the editables table. Instead, we add a trigger to delete the corresponding
+-- record in the editables table when an organization user is deleted.
+CREATE OR REPLACE FUNCTION delete_editables() RETURNS TRIGGER AS $$
+BEGIN
+    DELETE FROM
+        editables
+    WHERE
+        id = OLD.id;
+
+    RETURN OLD;
+
+END;
+
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER delete_editables AFTER
+DELETE
+    ON organization_users FOR EACH ROW EXECUTE FUNCTION delete_editables();

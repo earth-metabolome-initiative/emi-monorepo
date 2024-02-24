@@ -1,7 +1,7 @@
 //! Returns a user object for the currently logged in user.
 //!
 
-use crate::api::oauth::AuthenticationGuard;
+use super::auth_guard::AuthenticationGuard;
 use actix_web::{get, web, HttpResponse, Responder};
 use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::Pool;
@@ -11,7 +11,7 @@ use log::{debug, error};
 use crate::models::User as DBUser;
 use web_common::user::User as CommonUser;
 
-#[get("/logged_user_info")]
+#[get("/me")]
 pub async fn logged_user_info(
     auth_guard: AuthenticationGuard,
     pool: web::Data<Pool<ConnectionManager<PgConnection>>>,

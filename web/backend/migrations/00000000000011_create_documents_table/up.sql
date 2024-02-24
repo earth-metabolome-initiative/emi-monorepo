@@ -7,8 +7,36 @@
 -- The path itself does not contain the file name itself, as it may be dangerous to let the user
 -- specify the path of the file. 
 CREATE TABLE documents (
-    id BIGINT PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE REFERENCES describables(id) ON DELETE CASCADE,
-    path VARCHAR(255) NOT NULL,
-    format_id BIGINT NOT NULL REFERENCES document_formats(id) ON DELETE CASCADE,
-    bytes INTEGER NOT NULL
+    id BIGINT PRIMARY KEY REFERENCES editables(id) ON
+    DELETE
+        CASCADE REFERENCES describables(id) ON
+    DELETE
+        CASCADE,
+        path VARCHAR(255) NOT NULL,
+        format_id BIGINT NOT NULL REFERENCES document_formats(id) ON
+    DELETE
+        CASCADE,
+        bytes INTEGER NOT NULL
 );
+
+-- We also need to add a bi-directional cascade delete constraint to the editables
+-- table, so that when a document is deleted, the corresponding editable is also deleted.
+-- Since the editables table is referenced by several other tables, we cannot add a cascade
+-- delete constraint to the editables table. Instead, we add a trigger to delete the corresponding
+-- record in the editables table when a document is deleted.
+CREATE
+OR REPLACE FUNCTION delete_editables() RETURNS TRIGGER AS $$ BEGIN
+    DELETE FROM
+        editables
+    WHERE
+        id = OLD .id;
+
+RETURN OLD;
+
+END;
+
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER delete_editables AFTER
+DELETE
+    ON documents FOR EACH ROW EXECUTE FUNCTION delete_editables();

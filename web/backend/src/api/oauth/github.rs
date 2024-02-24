@@ -13,12 +13,12 @@ use reqwest::Client;
 use serde::Deserialize;
 use std::env;
 use std::error::Error;
+use super::jwt_cookies::encode_jwt_cookie;
 
 /// Struct representing the GitHub OAuth2 configuration.
 struct GitHubConfig {
     client_id: String,
     client_secret: String,
-    oauth_config: OauthConfig,
     provider_id: i16,
 }
 
@@ -55,7 +55,6 @@ impl GitHubConfig {
         Ok(GitHubConfig {
             client_id: client_id.unwrap(),
             client_secret: client_secret.unwrap(),
-            oauth_config: OauthConfig::from_env().unwrap(),
             provider_id: provider.id,
         })
     }
@@ -76,7 +75,7 @@ struct GithubEmailMetadata {
     _visibility: Option<String>,
 }
 
-#[get("/oauth/github")]
+#[get("/github")]
 async fn github_oauth_handler(
     query: web::Query<QueryCode>,
     pool: web::Data<Pool<ConnectionManager<PgConnection>>>,
@@ -130,7 +129,7 @@ async fn github_oauth_handler(
     // We log in DEBUG mode the user ID
     log::debug!("User ID: {}", user_id);
 
-    let cookie = create_jwt_cookie(user_id, &github_config.oauth_config);
+    let cookie = encode_jwt_cookie(&user_id);
 
     if cookie.is_err() {
         let message = cookie.err().unwrap().to_string();

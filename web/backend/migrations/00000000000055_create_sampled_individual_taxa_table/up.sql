@@ -8,3 +8,21 @@ CREATE TABLE sampled_individual_taxa (
   taxon_id BIGINT NOT NULL REFERENCES taxa(id) ON DELETE CASCADE,
   PRIMARY KEY (sampled_individual_id, taxon_id)
 );
+
+-- Add a trigger to delete the corresponding record in the editables table when a sampled_individual_taxa is deleted.
+CREATE OR REPLACE FUNCTION delete_editables() RETURNS TRIGGER AS $$
+BEGIN
+    DELETE FROM
+        editables
+    WHERE
+        id = OLD.sampled_individual_id;
+
+    RETURN OLD;
+
+END;
+
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER delete_editables AFTER
+DELETE
+    ON sampled_individual_taxa FOR EACH ROW EXECUTE FUNCTION delete_editables();

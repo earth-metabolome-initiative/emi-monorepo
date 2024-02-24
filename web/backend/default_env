@@ -38,4 +38,4 @@ GITHUB_CLIENT_ID='github_client_id'
 GITHUB_CLIENT_SECRET='github_client_secret'
 CLIENT_ORIGIN='http://localhost:3000'
 JWT_SECRET=my_ultra_secure_secret
-JWT_MAX_AGE=43200
+JWT_EXPIRATION_DAYS=1

@@ -82,3 +82,17 @@ To install it, as per many other Rust tools, run the following command:
 To start cargo watch, run the following command:
 
 `cargo watch -q -c -w src/ -x run`
+
+### Common errors
+
+#### Forgetting to start Postgres or Postgres Docker
+If you forget to start Postgres or Postgres Docker, you will get the following error:
+
+```bash
+[2024-02-24T15:24:47Z ERROR r2d2] connection to server at "localhost" (::1), port 5432 failed: Connection refused
+        Is the server running on that host and accepting TCP/IP connections?
+    connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused
+        Is the server running on that host and accepting TCP/IP connections?
+```
+
+Start Postgres or Postgres Docker and the error will be resolved.

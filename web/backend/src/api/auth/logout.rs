@@ -1,5 +1,4 @@
 //! Logout handler
-use crate::api::oauth::AuthenticationGuard;
 use actix_web::cookie::time::Duration as ActixWebDuration;
 use actix_web::{cookie::Cookie, get, HttpResponse, Responder};
 use actix_web::http::header::LOCATION;
