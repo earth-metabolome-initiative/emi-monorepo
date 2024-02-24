@@ -16,6 +16,7 @@ mod error_handlers;
 mod model_implementations;
 mod models;
 mod schema;
+mod diesel_enums;
 mod transactions;
 
 use crate::error_handlers::{handle_internal_server_error, handle_unauthorized_request};

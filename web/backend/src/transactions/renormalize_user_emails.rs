@@ -33,6 +33,7 @@ use diesel::sql_types::Integer;
 use diesel::sql_query;
 use diesel::sql_types::Text;
 use diesel::r2d2::{ConnectionManager, Pool};
+use email_address::EmailAddress;
 
 pub(crate) struct Emails {
     emails: Vec<String>,
@@ -40,8 +41,17 @@ pub(crate) struct Emails {
 }
 
 impl Emails {
-    pub(crate) fn new(emails: Vec<String>, primary: String) -> Emails {
-        Emails { emails, primary }
+    pub(crate) fn new(emails: Vec<String>, primary: String) -> Result<Emails, String> {
+        if !emails.contains(&primary) {
+            return Err("Primary email not in list of emails".to_string());
+        }
+
+        // We check if any of the emails provided are not valid email addresses.
+        if emails.iter().any(|email| !EmailAddress::is_valid(email)) {
+            return Err("Invalid email address".to_string());
+        }
+
+        Ok(Emails { emails, primary })
     }
 
     pub(crate) fn emails(&self) -> &[String] {

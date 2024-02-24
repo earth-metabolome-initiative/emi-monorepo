@@ -24,3 +24,16 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER delete_editables AFTER
 DELETE
     ON organization_user_roles FOR EACH ROW EXECUTE FUNCTION delete_editables();
+
+-- We insert some of the organization user roles into the organization_user_roles table,
+-- such as the organization admin.
+DO $$
+DECLARE
+    editables_id BIGINT;
+BEGIN
+    -- The root user has ID 1
+    INSERT INTO editables (created_by) VALUES (1) RETURNING id INTO editables_id;
+    INSERT INTO describables (id, name, description) VALUES (editables_id, 'admin', 'The organization admin has full access to the organization.');
+    INSERT INTO organization_user_roles (id) VALUES (editables_id);
+END;
+$$;

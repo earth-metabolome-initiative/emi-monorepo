@@ -1,6 +1,5 @@
 //! Set of APIs solely accessible once the user is logged in.
 mod logged_user_info;
-mod auth_guard;
 mod logout;
 use actix_web::web;
 

@@ -491,7 +491,7 @@ diesel::table! {
     website_user_roles (id) {
         id -> Int8,
         website_role_id -> Int8,
-        user_id -> Int8,
+        user_id -> Int4,
     }
 }
 

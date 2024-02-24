@@ -26,3 +26,5 @@ To start Trunk, run the following command:
 ```bash
 trunk serve --port 3000 --proxy-backend http://localhost:8080/api/
 ```
+
+Where `--port` is the port on which to serve the application and `--proxy-backend` is the backend server to proxy requests to. The backend server is the server that serves the REST API.

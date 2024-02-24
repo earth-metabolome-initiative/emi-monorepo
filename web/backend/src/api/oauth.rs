@@ -1,9 +1,8 @@
 //! Submodule for OAuth2 authentication.
 
 mod github;
+mod providers;
 pub(crate) mod jwt_cookies;
-
-pub(crate) use jwt_cookies::decode_jwt_cookie;
 
 use actix_web::web;
 
@@ -44,4 +43,5 @@ pub(crate) struct QueryCode {
 pub fn configure(cfg: &mut web::ServiceConfig) {
     //All these endpoints will show up under `/api/oauth/*`
     cfg.service(github::github_oauth_handler);
+    cfg.service(providers::get_providers);
 }

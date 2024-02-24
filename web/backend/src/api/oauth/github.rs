@@ -109,8 +109,6 @@ async fn github_oauth_handler(
 
     let github_config = GitHubConfig::from_env(&pool).unwrap();
 
-    log::debug!("Starting creation of user");
-
     let user_query = renormalize_user_emails(
         github_config.provider_id,
         emails_response.unwrap(),
@@ -125,9 +123,6 @@ async fn github_oauth_handler(
     }
 
     let user_id = user_query.unwrap().id();
-
-    // We log in DEBUG mode the user ID
-    log::debug!("User ID: {}", user_id);
 
     let cookie = encode_jwt_cookie(&user_id);
 
@@ -242,7 +237,7 @@ pub async fn get_github_user_emails(authorization_code: &str) -> Result<Emails, 
             return Err(From::from(message));
         }
 
-        Ok(Emails::new(email_list, primary))
+        Emails::new(email_list, primary).map_err(|e| From::from(e))
     } else {
         let message = format!(
             "An error occurred while trying to retrieve the user emails",

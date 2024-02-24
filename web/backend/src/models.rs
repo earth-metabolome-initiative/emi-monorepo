@@ -11,6 +11,8 @@ use chrono::NaiveDateTime;
 use diesel::sql_types::{Interval, Money, Numeric, Range};
 use diesel::Selectable;
 use diesel::{Identifiable, Queryable};
+use serde::Serialize;
+use serde::Deserialize;
 
 #[derive(Queryable, Debug, Identifiable)]
 #[diesel(table_name = archivables)]
@@ -48,7 +50,7 @@ pub struct ContinuousUnit {
     pub id: i64,
 }
 
-#[derive(Queryable, Debug, Identifiable)]
+#[derive(Queryable, Debug, Identifiable, Selectable)]
 #[diesel(table_name = describables)]
 pub struct Describable {
     pub id: i64,
@@ -470,7 +472,7 @@ pub struct UserPicture {
     pub document_id: i64,
 }
 
-#[derive(Queryable, Debug, Selectable)]
+#[derive(Queryable, Debug, Selectable, Serialize, Deserialize)]
 #[diesel(table_name = users)]
 pub struct User {
     pub id: i32,
@@ -479,4 +481,16 @@ pub struct User {
     pub last_name: Option<String>,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
+}
+
+#[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = website_roles)]
+pub struct WebsiteRole {
+    pub id: i64,
+}
+
+#[derive(Queryable, Debug, Identifiable)]
+#[diesel(table_name = website_user_roles)]
+pub struct WebsiteUserRole {
+    pub id: i64,
 }

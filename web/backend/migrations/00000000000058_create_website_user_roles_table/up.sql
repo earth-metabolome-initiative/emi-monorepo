@@ -3,7 +3,7 @@
 CREATE TABLE website_user_roles (
     id BIGINT PRIMARY KEY REFERENCES editables(id) ON DELETE cascade,
     website_role_id BIGINT NOT NULL REFERENCES website_roles(id) ON DELETE cascade,
-    user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE cascade,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE cascade,
     UNIQUE (website_role_id, user_id)
 );
 

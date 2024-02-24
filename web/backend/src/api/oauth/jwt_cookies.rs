@@ -1,23 +1,26 @@
 //! Functions and APIs dealing with JWT cookies necessary for OAuth2 logins.
+use crate::models::User;
 use actix_web::cookie::time::Duration as ActixWebDuration;
 use actix_web::cookie::Cookie;
-use actix_web::dev::ServiceRequest;
+use actix_web::dev::Payload;
 use actix_web::error::{Error, ErrorUnauthorized};
 use actix_web::web;
-use actix_web_grants::authorities::AttachAuthorities;
-use actix_web_httpauth::extractors::bearer::BearerAuth;
-use actix_web_httpauth::middleware::HttpAuthentication;
-use diesel::r2d2::ConnectionManager;
-use diesel::PgConnection;
+use actix_web::FromRequest;
+use actix_web::HttpRequest;
 use chrono::Duration;
 use chrono::Utc;
-use crate::models::User;
+use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::Pool;
-use jsonwebtoken::{
-    decode, encode, Algorithm::HS256, DecodingKey, EncodingKey, Header, Validation,
-};
+use diesel::PgConnection;
+use jsonwebtoken::Algorithm;
+use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 use std::env;
+use std::future::{ready, Ready};
+
+/// Set a const with the expected cookie name.
+pub(crate) const JWT_COOKIE_NAME: &str = "access_token";
 
 #[derive(Deserialize, Serialize)]
 pub(crate) struct JsonWebTokenClaims {
@@ -82,72 +85,59 @@ pub(crate) fn encode_jwt_cookie(user_id: &i32) -> Result<Cookie, Error> {
     )
     .map_err(|e| ErrorUnauthorized(e.to_string()))?;
 
-    Ok(Cookie::build("token", token)
+    Ok(Cookie::build(JWT_COOKIE_NAME, token)
         .path("/")
         .max_age(ActixWebDuration::days(config.jwt_max_days))
         .http_only(true)
         .finish())
 }
 
-/// Function to decode a JWT cookie and return the user ID.
-///
-/// # Arguments
-/// * `token` - The JWT token to decode.
-/// * `pool` - The database connection pool to use to decode the token.
-///
-pub(crate) fn decode_jwt_cookie(
-    token: &str,
-    pool: &web::Data<Pool<ConnectionManager<PgConnection>>>,
-) -> Result<User, Error> {
-    let config = JWTConfig::from_env().expect("Failed to load JWT config");
-    decode::<JsonWebTokenClaims>(
-        token,
-        &DecodingKey::from_secret(config.jwt_secret.as_ref()),
-        &Validation::new(HS256),
-    )
-    .map(|token| {
-        let user_id = token.claims.user_id;
-        let mut conn = pool.get().unwrap();
-        let user = User::get(user_id, &mut conn).unwrap();
-        user
-    })
-    .map_err(|e| ErrorUnauthorized(e.to_string()))
-}
-
+#[derive(Debug, PartialEq, Eq, Clone, Copy, Hash, Serialize, Deserialize)]
 pub(crate) enum Permissions {
+    // If is the admin of at least one project
     ProjectAdmin,
+    // If is the admin of at least one organization
     OrganizationAdmin,
-    User,
+    // If is the admin of the website
+    WebsiteAdmin,
+    // If is a logged user
+    LoggedUser,
 }
 
-/// Function to guard a route with JWT authentication.
-pub(crate) async fn authentication_guard(
-    req: ServiceRequest,
-    credentials: BearerAuth,
-) -> Result<ServiceRequest, (Error, ServiceRequest)> {
-    // We get the Connection Pool from the application data
-    // stored in the provided request.
-    let pool = req
-        .app_data::<web::Data<Pool<ConnectionManager<PgConnection>>>>()
-        .unwrap();
+impl FromRequest for User {
+    type Error = Error;
+    type Future = Ready<Result<Self, Self::Error>>;
 
-    // We just get permissions from JWT
-    let result = decode_jwt_cookie(credentials.token(), pool);
+    fn from_request(req: &HttpRequest, _: &mut Payload) -> Self::Future {
+        let token = req.cookie(JWT_COOKIE_NAME).map(|c| c.value().to_string());
 
-    match result {
-        Ok(user) => {
-            let mut permissions = vec![Permissions::User];
-
-            let mut conn = pool.get().unwrap();
-
-            if user.is_admin(&mut conn) {
-                permissions.push(Permissions::ProjectAdmin);
-            }
-
-            req.attach(claims.permissions);
-            Ok(req)
+        if token.is_none() {
+            return ready(Err(ErrorUnauthorized(
+                json!({"status": "fail", "message": "You are not logged in, please provide token"}),
+            )));
         }
-        // required by `actix-web-httpauth` validator signature
-        Err(e) => Err((e, req)),
+
+        let pool = req
+            .app_data::<web::Data<Pool<ConnectionManager<PgConnection>>>>()
+            .unwrap();
+
+        let jwt_secret = JWTConfig::from_env().unwrap().jwt_secret;
+        let decode = decode::<JsonWebTokenClaims>(
+            token.unwrap().as_str(),
+            &DecodingKey::from_secret(jwt_secret.as_ref()),
+            &Validation::new(Algorithm::HS256),
+        );
+
+        match decode {
+            Ok(token) => match User::get(token.claims.user_id, &mut pool.get().unwrap()) {
+                Ok(user) => ready(Ok(user)),
+                Err(_) => ready(Err(ErrorUnauthorized(
+                    json!({"status": "fail", "message": "Invalid token or user doesn't exists"}),
+                ))),
+            },
+            Err(_) => ready(Err(ErrorUnauthorized(
+                json!({"status": "fail", "message": "Invalid token or user doesn't exists"}),
+            ))),
+        }
     }
 }
