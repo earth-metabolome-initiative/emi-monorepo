@@ -14,9 +14,13 @@ mod database;
 #[cfg(target_arch = "wasm32")]
 mod wasm {
 
+    use std::f32::consts::E;
+
     use crate::components::*;
     use crate::router::{switch, AppRoute};
-    use crate::stores::{UserState, refresh_access_token};
+    use crate::stores::{refresh_access_token, UserState};
+    use log::info;
+    use wasm_bindgen::JsValue;
     use web_common::user::User;
     use yew::prelude::*;
     use yew_router::prelude::*;
@@ -24,10 +28,13 @@ mod wasm {
 
     #[function_component]
     pub fn App() -> Html {
-        use crate::stores::user_state::logout;
+        info!("Rendering App component.");
 
         let (user_state, dispatch) = use_store::<UserState>();
-        refresh_access_token(dispatch.clone());
+        if user_state.has_no_access_token() {
+            info!("No access token found, attempting to refresh it.");
+            refresh_access_token(dispatch.clone());
+        }
 
         // In order to continuously check whether we are online, we need to create
         // a timed callback that is called multiple times every few seconds, say 5.
@@ -66,6 +73,7 @@ mod wasm {
 
 #[cfg(target_arch = "wasm32")]
 fn main() {
+    wasm_logger::init(wasm_logger::Config::default());
     yew::Renderer::<wasm::App>::new().render();
 }
 

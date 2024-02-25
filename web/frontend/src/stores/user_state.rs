@@ -17,8 +17,16 @@ impl UserState {
         self.user.is_some()
     }
 
+    pub fn has_no_access_token(&self) -> bool {
+        self.access_token.is_none()
+    }
+
     pub fn set_access_token(&mut self, access_token: AccessToken) {
         self.access_token = Some(access_token);
+    }
+
+    pub fn access_token(&self) -> Option<&AccessToken> {
+        self.access_token.as_ref()
     }
 
     pub fn user(&self) -> Option<&User> {

@@ -68,32 +68,44 @@ impl JWTConfig {
         })
     }
 
-    pub fn access_token_public_key(&self) -> Result<Vec<u8>, String> {
-        BASE64_STANDARD
-            .decode(&self.access_token_base_64_public_key)
-            .map_err(|e| e.to_string())
+    pub fn access_token_public_key(&self) -> Result<String, String> {
+        String::from_utf8(
+            base64::engine::general_purpose::STANDARD
+                .decode(&self.access_token_base_64_public_key)
+                .map_err(|e| e.to_string())?,
+        )
+        .map_err(|e| e.to_string())
     }
 
-    pub fn access_token_private_key(&self) -> Result<Vec<u8>, String> {
-        BASE64_STANDARD
-            .decode(&self.access_token_base_64_private_key)
-            .map_err(|e| e.to_string())
+    pub fn access_token_private_key(&self) -> Result<String, String> {
+        String::from_utf8(
+            base64::engine::general_purpose::STANDARD
+                .decode(&self.access_token_base_64_private_key)
+                .map_err(|e| e.to_string())?,
+        )
+        .map_err(|e| e.to_string())
     }
 
     pub fn access_token_minutes(&self) -> i64 {
         self.access_token_minutes
     }
 
-    pub fn refresh_token_public_key(&self) -> Result<Vec<u8>, String> {
-        BASE64_STANDARD
-            .decode(&self.refresh_token_base_64_public_key)
-            .map_err(|e| e.to_string())
+    pub fn refresh_token_public_key(&self) -> Result<String, String> {
+        String::from_utf8(
+            base64::engine::general_purpose::STANDARD
+                .decode(&self.refresh_token_base_64_public_key)
+                .map_err(|e| e.to_string())?,
+        )
+        .map_err(|e| e.to_string())
     }
 
-    pub fn refresh_token_private_key(&self) -> Result<Vec<u8>, String> {
-        BASE64_STANDARD
-            .decode(&self.refresh_token_base_64_private_key)
-            .map_err(|e| e.to_string())
+    pub fn refresh_token_private_key(&self) -> Result<String, String> {
+        String::from_utf8(
+            base64::engine::general_purpose::STANDARD
+                .decode(&self.refresh_token_base_64_private_key)
+                .map_err(|e| e.to_string())?,
+        )
+        .map_err(|e| e.to_string())
     }
 
     pub fn refresh_token_minutes(&self) -> i64 {
@@ -101,11 +113,11 @@ impl JWTConfig {
     }
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, PartialEq, Debug)]
 struct JsonWebToken {
-    user_id: Uuid,
+    sub: Uuid,
     token_id: Uuid,
-    expires_in: usize,
+    exp: usize,
     created_at: usize,
 }
 
@@ -116,9 +128,9 @@ impl JsonWebToken {
         let created_at = now.timestamp() as usize;
         let expires_in = (now + Duration::minutes(minutes)).timestamp() as usize;
         JsonWebToken {
-            user_id,
+            sub: user_id,
             token_id,
-            expires_in,
+            exp: expires_in,
             created_at,
         }
     }
@@ -143,7 +155,7 @@ impl JsonWebToken {
 
         con.set_ex(
             self.token_id.to_string(),
-            self.user_id.to_string(),
+            self.user_id().to_string(),
             (minutes * 60) as u64,
         )
         .await
@@ -171,7 +183,7 @@ impl JsonWebToken {
             .await
             .map_err(|e| e.to_string())?;
 
-        Ok(user_id == self.user_id.to_string())
+        Ok(user_id == self.user_id().to_string())
     }
 
     /// Delete the token from the redis database.
@@ -190,28 +202,30 @@ impl JsonWebToken {
     }
 
     fn user_id(&self) -> Uuid {
-        self.user_id
+        self.sub
     }
 
     fn is_expired(&self) -> bool {
         let now = Utc::now().timestamp() as usize;
-        now > self.expires_in
+        now > self.exp
     }
 
-    fn encode(&self, private_key: Vec<u8>) -> Result<String, String> {
+    fn encode(&self, private_key: String) -> Result<String, String> {
+        log::info!("Encoding token");
         encode(
-            &Header::default(),
+            &Header::new(Algorithm::RS256),
             &self,
-            &EncodingKey::from_secret(private_key.as_ref()),
+            &EncodingKey::from_rsa_pem(private_key.as_bytes()).map_err(|e| e.to_string())?,
         )
         .map_err(|e| e.to_string())
     }
 
-    fn decode(token: &str, public_key: Vec<u8>) -> Result<JsonWebToken, String> {
+    fn decode(token: &str, public_key: String) -> Result<JsonWebToken, String> {
+        log::info!("Decoding token");
         let decode = decode::<JsonWebToken>(
             token,
-            &DecodingKey::from_rsa_pem(public_key.as_ref()).map_err(|e| e.to_string())?,
-            &Validation::new(Algorithm::HS256),
+            &DecodingKey::from_rsa_pem(public_key.as_bytes()).map_err(|e| e.to_string())?,
+            &Validation::new(Algorithm::RS256),
         );
 
         match decode {
@@ -221,7 +235,7 @@ impl JsonWebToken {
     }
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, PartialEq, Debug)]
 struct JsonRefreshToken {
     web_token: JsonWebToken,
 }
@@ -285,7 +299,24 @@ impl JsonRefreshToken {
     }
 }
 
-#[derive(Deserialize, Serialize)]
+/// We do a small unit test to ensure that the encode and decode process works as expected.
+/// for the JsonRefreshToken struct.
+#[cfg(test)]
+mod refresh_token_tests {
+    use super::*;
+
+    #[test]
+    fn test_encode_decode() {
+        dotenvy::dotenv().ok();
+        let user_id = Uuid::new_v4();
+        let token = JsonRefreshToken::new(user_id).unwrap();
+        let encoded = token.encode().unwrap();
+        let decoded = JsonRefreshToken::decode(&encoded).unwrap();
+        assert_eq!(token, decoded);
+    }
+}
+
+#[derive(Deserialize, Serialize, PartialEq, Debug)]
 struct JsonAccessToken {
     web_token: JsonWebToken,
 }
@@ -349,6 +380,23 @@ impl JsonAccessToken {
     }
 }
 
+/// We do a small unit test to ensure that the encode and decode process works as expected
+/// for the JsonAccessToken struct.
+#[cfg(test)]
+mod access_token_tests {
+    use super::*;
+
+    #[test]
+    fn test_encode_decode() {
+        dotenvy::dotenv().ok();
+        let user_id = Uuid::new_v4();
+        let token = JsonAccessToken::new(user_id).unwrap();
+        let encoded = token.encode().unwrap();
+        let decoded = JsonAccessToken::decode(&encoded).unwrap();
+        assert_eq!(token, decoded);
+    }
+}
+
 /// Function to create a JWT cookie for a given user.
 ///
 /// # Arguments
@@ -358,6 +406,7 @@ async fn encode_jwt_refresh_cookie<'a>(
     user_id: Uuid,
     redis_client: &redis::Client,
 ) -> Result<Cookie<'a>, String> {
+    log::info!("Creating refresh token");
     let config = JWTConfig::from_env()?;
 
     let token = JsonRefreshToken::new(user_id)?;
@@ -396,29 +445,42 @@ pub(crate) async fn build_login_response<'a>(
     state: &str,
     redis_client: &redis::Client,
 ) -> HttpResponse {
-    let refresh_cookie = encode_jwt_refresh_cookie(user_id, redis_client).await;
+    let refresh_cookie = match encode_jwt_refresh_cookie(user_id, redis_client).await {
+        Ok(cookie) => cookie,
+        Err(_) => {
+            return HttpResponse::InternalServerError().finish();
+        }
+    };
 
-    if refresh_cookie.is_err() {
-        return HttpResponse::InternalServerError().finish();
-    }
+    log::info!("Created refresh token");
 
-    let login_cookie = encode_user_online_cookie();
+    log::info!("Creating login token");
 
-    if login_cookie.is_err() {
-        return HttpResponse::InternalServerError().finish();
-    }
+    let login_cookie = match encode_user_online_cookie() {
+        Ok(cookie) => cookie,
+        Err(_) => {
+            return HttpResponse::InternalServerError().finish();
+        }
+    };
 
-    HttpResponse::Found()
+    log::info!("Created login token");
+
+    let response = HttpResponse::Found()
         .append_header((LOCATION, state.to_string()))
-        .cookie(refresh_cookie.unwrap())
-        .cookie(login_cookie.unwrap())
-        .finish()
+        .cookie(refresh_cookie)
+        .cookie(login_cookie)
+        .finish();
+
+    log::info!("Returning login response");
+        
+    response
 }
 
 pub(crate) async fn access_token_validator(
     req: ServiceRequest,
     credentials: BearerAuth,
 ) -> Result<ServiceRequest, (Error, ServiceRequest)> {
+    log::info!("Validating access token");
     match JsonAccessToken::decode(credentials.token()) {
         Ok(token) => {
             if token.is_expired() {
@@ -437,6 +499,7 @@ pub(crate) async fn access_token_validator(
 }
 
 fn eliminate_cookies(mut builder: HttpResponseBuilder) -> HttpResponseBuilder {
+    log::info!("Eliminating cookies");
     let refresh_cookie = Cookie::build(REFRESH_COOKIE_NAME, "")
         .path("/")
         .max_age(ActixWebDuration::ZERO)
@@ -472,17 +535,14 @@ impl FromRequest for User {
             )));
         }
 
-        // Next, we decode the token to get the user_id.
-        let decode = JsonAccessToken::decode(bearer.unwrap().token());
-
-        // If the token is invalid, we return an error.
-        if decode.is_err() {
-            return ready(Err(ErrorUnauthorized(
-                json!({"status": "fail", "message": "Invalid token"}),
-            )));
-        }
-
-        let access_token = decode.unwrap();
+        let access_token = match JsonAccessToken::decode(bearer.unwrap().token()) {
+            Ok(token) => token,
+            Err(_) => {
+                return ready(Err(ErrorUnauthorized(
+                    json!({"status": "fail", "message": "Invalid token"}),
+                )));
+            }
+        };
 
         // If the token is expired, we return an error.
         if access_token.is_expired() {
@@ -514,12 +574,26 @@ impl FromRequest for User {
             // to be authenticated and it still exists in the redis database, we still need
             // to check whether the user exists in the database, as it may have been deleted
             // in the meantime.
-            let pool = req
-                .app_data::<web::Data<Pool<ConnectionManager<PgConnection>>>>()
-                .unwrap();
+            let pool = match req.app_data::<web::Data<Pool<ConnectionManager<PgConnection>>>>() {
+                Some(pool) => pool,
+                None => {
+                    return ready(Err(ErrorInternalServerError(
+                        json!({"status": "fail", "message": "Internal server error"}),
+                    )))
+                }
+            };
+
+            let mut conn = match pool.get() {
+                Ok(conn) => conn,
+                Err(_) => {
+                    return ready(Err(ErrorInternalServerError(
+                        json!({"status": "fail", "message": "Internal server error"}),
+                    )))
+                }
+            };
 
             // If the user doesn't exist, we return an error, otherwise we return the user.
-            match User::get(access_token.user_id(), &mut pool.get().unwrap()) {
+            match User::get(access_token.user_id(), &mut conn) {
                 Ok(user) => ready(Ok(user)),
                 Err(_) => ready(Err(ErrorUnauthorized(
                     json!({"status": "fail", "message": "Invalid token or user doesn't exists"}),
@@ -548,17 +622,19 @@ pub async fn refresh_access_token(
     pool: web::Data<Pool<ConnectionManager<PgConnection>>>,
     redis_client: web::Data<redis::Client>,
 ) -> HttpResponse {
-    // First, we extract the refresh token from the request.
-    let refresh_cookie = req.cookie(REFRESH_COOKIE_NAME);
+    log::info!("Refreshing access token");
+    let refresh_cookie = match req.cookie(REFRESH_COOKIE_NAME) {
+        Some(cookie) => cookie,
+        None => {
+            log::debug!("Refresh token not present in request");
+            return eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::unauthorized());
+        }
+    };
 
-    // If the refresh token is not present, we return an error.
-    if refresh_cookie.is_none() {
-        return eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::unauthorized());
-    }
-
-    let refresh_token = match JsonRefreshToken::decode(refresh_cookie.unwrap().value()) {
+    let refresh_token = match JsonRefreshToken::decode(refresh_cookie.value()) {
         Ok(token) => token,
-        Err(_) =>  {
+        Err(_) => {
+            log::debug!("Unable to decode refresh token");
             return eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::unauthorized());
         }
     };
@@ -572,7 +648,8 @@ pub async fn refresh_access_token(
     // Next up, we check whether the token is still present in the redis database.
     let is_still_present = refresh_token.is_still_present_in_redis(&redis_client).await;
 
-    if is_still_present.is_err() || !is_still_present.unwrap() {
+    if is_still_present.map_or(true, |present| !present) {
+        log::debug!("Refresh token not present in redis");
         return eliminate_cookies(HttpResponse::Unauthorized())
             .json(ApiError::expired_authorization());
     }
@@ -592,17 +669,17 @@ pub async fn refresh_access_token(
     let user = User::get(refresh_token.user_id(), &mut connection);
 
     if user.is_err() {
+        log::debug!("User associated to token doesn't exist");
         return HttpResponse::Unauthorized().json(ApiError::unauthorized());
     }
 
     // If the user exists, we create a new access token and return it.
-    let access_token = JsonAccessToken::new(refresh_token.user_id());
-
-    if access_token.is_err() {
-        return HttpResponse::InternalServerError().json(ApiError::internal_server_error());
-    }
-
-    let access_token = access_token.unwrap();
+    let access_token = match JsonAccessToken::new(refresh_token.user_id()) {
+        Ok(token) => token,
+        Err(_) => {
+            return HttpResponse::InternalServerError().json(ApiError::internal_server_error())
+        }
+    };
 
     match access_token.insert_into_redis(&redis_client).await {
         Ok(_) => (),
@@ -618,15 +695,12 @@ pub async fn refresh_access_token(
     // new access token, but this is a security measure to prevent
     // unauthorized access to the API.
 
-    let encoded_token = access_token.encode();
-
-    if encoded_token.is_err() {
-        return HttpResponse::InternalServerError().json(ApiError::internal_server_error());
+    match access_token.encode() {
+        Ok(encoded_token) => HttpResponse::Ok().json(AccessToken::new(encoded_token)),
+        Err(_) => {
+            HttpResponse::InternalServerError().json(ApiError::internal_server_error())
+        }
     }
-
-    let access_token = AccessToken::new(encoded_token.unwrap());
-
-    HttpResponse::Ok().json(access_token)
 }
 
 #[get("/logout")]
