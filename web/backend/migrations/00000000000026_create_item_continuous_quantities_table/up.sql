@@ -9,7 +9,7 @@ CREATE TABLE item_continuous_quantities (
     unit_id BIGINT REFERENCES units(id) ON DELETE CASCADE,
     sensor_id BIGINT REFERENCES items(id) ON DELETE SET NULL,
     measured_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    measured_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    measured_by UUID REFERENCES users(id) ON DELETE SET NULL,
     UNIQUE (item_id, unit_id),
     FOREIGN KEY (unit_id) REFERENCES continuous_units(id) ON DELETE CASCADE
 );

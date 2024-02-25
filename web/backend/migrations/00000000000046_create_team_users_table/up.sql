@@ -8,7 +8,7 @@
 -- also contains a column to specify which administrator added the user to the team.
 CREATE TABLE team_users (
     id BIGINT PRIMARY KEY REFERENCES editables (id) ON DELETE CASCADE,
-    user_id INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users (id) ON DELETE CASCADE,
     team_id BIGINT NOT NULL REFERENCES teams (id) ON DELETE CASCADE,
     role_id BIGINT NOT NULL REFERENCES team_user_roles (id) ON DELETE CASCADE
 );

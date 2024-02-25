@@ -66,13 +66,23 @@ DELETE
 -- First, we need to create the corresponding editable and describable records.
 DO $$
 DECLARE
+    root_user_id UUID;
     editables_id BIGINT;
     state_id BIGINT;
 BEGIN
+    -- We retrieve the id of the root user.
+    SELECT
+        id INTO root_user_id
+    FROM
+        users
+    WHERE
+        first_name = 'root'
+        AND last_name = 'user';
+
     INSERT INTO
         editables (created_by)
     VALUES
-        (1) RETURNING id INTO editables_id;
+        (root_user_id) RETURNING id INTO editables_id;
 
 INSERT INTO
     describables (id, name, description)

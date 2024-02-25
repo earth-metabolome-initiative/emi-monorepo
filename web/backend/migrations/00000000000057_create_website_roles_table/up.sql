@@ -29,19 +29,29 @@ DELETE
 -- We start by inserting the editables that indixes the roles.
 DO $$
 DECLARE
+    root_user_id UUID;
     first_editables_id BIGINT;
     second_editables_id BIGINT;
 BEGIN
+    -- We retrieve the id of the root user.
+    SELECT
+        id INTO root_user_id
+    FROM
+        users
+    WHERE
+        first_name = 'root'
+        AND last_name = 'user';
+
     -- Insert the editables that indexes the roles.
     INSERT INTO
         editables (created_by)
     VALUES
-        (1) RETURNING id INTO first_editables_id;
+        (root_user_id) RETURNING id INTO first_editables_id;
 
     INSERT INTO
         editables (created_by)
     VALUES
-        (1) RETURNING id INTO second_editables_id;
+        (root_user_id) RETURNING id INTO second_editables_id;
 
     -- Insert the describables that describes the roles.
     INSERT INTO

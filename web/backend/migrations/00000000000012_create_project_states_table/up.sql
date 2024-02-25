@@ -33,7 +33,9 @@ DELETE
 -- We start by inserting the editables that indixes the states.
 DO $$
 DECLARE
-    first_editables_id BIGINT;
+    root_user_id UUID;
+
+first_editables_id BIGINT;
 
 second_editables_id BIGINT;
 
@@ -42,26 +44,35 @@ third_editables_id BIGINT;
 fourth_editables_id BIGINT;
 
 BEGIN
-    -- Insert the editables that indexes the states.
-    INSERT INTO
-        editables (created_by)
-    VALUES
-        (1) RETURNING id INTO first_editables_id;
+    -- We retrieve the id of the root user.
+    SELECT
+        id INTO root_user_id
+    FROM
+        users
+    WHERE
+        first_name = 'root'
+        AND last_name = 'user';
+
+-- Insert the editables that indexes the states.
+INSERT INTO
+    editables (created_by)
+VALUES
+    (root_user_id) RETURNING id INTO first_editables_id;
 
 INSERT INTO
     editables (created_by)
 VALUES
-    (1) RETURNING id INTO second_editables_id;
+    (root_user_id) RETURNING id INTO second_editables_id;
 
 INSERT INTO
     editables (created_by)
 VALUES
-    (1) RETURNING id INTO third_editables_id;
+    (root_user_id) RETURNING id INTO third_editables_id;
 
 INSERT INTO
     editables (created_by)
 VALUES
-    (1) RETURNING id INTO fourth_editables_id;
+    (root_user_id) RETURNING id INTO fourth_editables_id;
 
 -- Insert the describables that describes the states.
 INSERT INTO

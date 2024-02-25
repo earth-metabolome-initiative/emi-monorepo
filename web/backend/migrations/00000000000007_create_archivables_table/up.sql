@@ -4,7 +4,7 @@ CREATE TABLE archivables (
     DELETE
         CASCADE,
         archived_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        archived_by INTEGER NOT NULL REFERENCES users(id)
+        archived_by UUID NOT NULL REFERENCES users(id)
 );
 
 -- We DO NOT add a trigger to delete the corresponding record in the editables table when an archivable is deleted.

@@ -34,6 +34,7 @@ DELETE
 -- We start by inserting the editables that indexes the formats.
 DO $$
 DECLARE
+  root_user_id UUID;
   first_editables_id BIGINT;
   second_editables_id BIGINT;
   third_editables_id BIGINT;
@@ -44,51 +45,62 @@ DECLARE
   eighth_editables_id BIGINT;
   ninth_editables_id BIGINT;
 BEGIN
+  -- We retrieve the id of the root user.
+  SELECT
+    id
+  INTO
+    root_user_id
+  FROM
+    users
+  WHERE
+    first_name = 'root'
+  AND last_name = 'user';
+
   -- Insert the editables that indexes the formats.
   INSERT INTO
     editables (created_by)
   VALUES
-    (1) RETURNING id INTO first_editables_id;
+    (root_user_id) RETURNING id INTO first_editables_id;
 
   INSERT INTO
     editables (created_by)
   VALUES
-    (1) RETURNING id INTO second_editables_id;
+    (root_user_id) RETURNING id INTO second_editables_id;
 
   INSERT INTO
     editables (created_by)
   VALUES
-    (1) RETURNING id INTO third_editables_id;
+    (root_user_id) RETURNING id INTO third_editables_id;
 
   INSERT INTO
     editables (created_by)
   VALUES
-    (1) RETURNING id INTO fourth_editables_id;
+    (root_user_id) RETURNING id INTO fourth_editables_id;
 
   INSERT INTO
     editables (created_by)
   VALUES
-    (1) RETURNING id INTO fifth_editables_id;
+    (root_user_id) RETURNING id INTO fifth_editables_id;
 
   INSERT INTO
     editables (created_by)
   VALUES
-    (1) RETURNING id INTO sixth_editables_id;
+    (root_user_id) RETURNING id INTO sixth_editables_id;
 
   INSERT INTO
     editables (created_by)
   VALUES
-    (1) RETURNING id INTO seventh_editables_id;
+    (root_user_id) RETURNING id INTO seventh_editables_id;
 
   INSERT INTO
     editables (created_by)
   VALUES
-    (1) RETURNING id INTO eighth_editables_id;
+    (root_user_id) RETURNING id INTO eighth_editables_id;
 
   INSERT INTO
     editables (created_by)
   VALUES
-    (1) RETURNING id INTO ninth_editables_id;
+    (root_user_id) RETURNING id INTO ninth_editables_id;
 
   -- Insert the description of the formats in the describables table.
   INSERT INTO

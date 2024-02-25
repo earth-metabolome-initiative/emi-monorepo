@@ -8,7 +8,7 @@
 
 CREATE TABLE project_users (
     id BIGINT PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE,
-    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     project_id BIGINT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
     role_id BIGINT NOT NULL REFERENCES project_user_roles (id) ON DELETE CASCADE,
     UNIQUE (user_id, project_id, role_id)
@@ -42,10 +42,20 @@ DELETE
 -- role, we need to store them into a couple of variables first.
 DO $$
 DECLARE
+    root_user_id UUID;
     project_id BIGINT;
     role_id BIGINT;
     editables_id BIGINT;
 BEGIN
+    -- We retrieve the id of the root user.
+    SELECT
+        id INTO root_user_id
+    FROM
+        users
+    WHERE
+        first_name = 'root'
+        AND last_name = 'user';
+
     -- Since the name of the projects and the roles are NOT stored in the respective
     -- tables but in the describables table, we need to execute a JOIN query between the
     -- two respective tables and the describables table to get the id of the project and
@@ -74,14 +84,14 @@ BEGIN
     INSERT INTO
         editables (created_by)
     VALUES
-        (1) RETURNING id INTO editables_id;
+        (root_user_id) RETURNING id INTO editables_id;
 
     -- We insert the record that links the user #id 1 to the 'Earth Metabolome Initiative'
     -- project as an admin.
     INSERT INTO
         project_users (id, user_id, project_id, role_id)
     VALUES
-        (editables_id, 1, project_id, role_id);
+        (editables_id, root_user_id, project_id, role_id);
 END;
 
 $$;

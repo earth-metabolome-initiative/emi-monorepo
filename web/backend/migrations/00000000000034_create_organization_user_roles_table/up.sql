@@ -29,10 +29,19 @@ DELETE
 -- such as the organization admin.
 DO $$
 DECLARE
+    root_user_id UUID;
     editables_id BIGINT;
 BEGIN
-    -- The root user has ID 1
-    INSERT INTO editables (created_by) VALUES (1) RETURNING id INTO editables_id;
+    -- We retrieve the id of the root user.
+    SELECT
+        id INTO root_user_id
+    FROM
+        users
+    WHERE
+        first_name = 'root'
+        AND last_name = 'user';
+    
+    INSERT INTO editables (created_by) VALUES (root_user_id) RETURNING id INTO editables_id;
     INSERT INTO describables (id, name, description) VALUES (editables_id, 'admin', 'The organization admin has full access to the organization.');
     INSERT INTO organization_user_roles (id) VALUES (editables_id);
 END;
