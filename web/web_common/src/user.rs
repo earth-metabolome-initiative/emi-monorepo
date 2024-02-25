@@ -1,15 +1,16 @@
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 #[derive(PartialEq, Debug, Serialize, Deserialize, Clone)]
 pub struct User {
     name: Option<String>,
     middle_name: Option<String>,
     last_name: Option<String>,
-    id: i32,
+    id: Uuid,
 }
 
 impl User {
-    pub fn new(name: Option<String>, middle_name: Option<String>, last_name: Option<String>, id: i32) -> User {
+    pub fn new(name: Option<String>, middle_name: Option<String>, last_name: Option<String>, id: Uuid) -> User {
         User {
             name,
             middle_name,
@@ -39,7 +40,7 @@ impl User {
         }
     }
 
-    pub fn id(&self) -> i32 {
+    pub fn id(&self) -> Uuid {
         self.id
     }
 
@@ -67,7 +68,7 @@ impl User {
         self.last_name = last_name;
     }
 
-    pub fn set_id(&mut self, id: i32) {
+    pub fn set_id(&mut self, id: Uuid) {
         self.id = id;
     }
 

@@ -29,10 +29,11 @@ use std::env;
 use std::future::{ready, Ready};
 use std::num::ParseIntError;
 use uuid::Uuid;
+use web_common::shared_cookie_names::USER_ONLINE_COOKIE_NAME;
 
 /// Set a const with the expected cookie name.
 pub(crate) const REFRESH_COOKIE_NAME: &str = "refresh_token";
-pub(crate) const USER_ONLINE_COOKIE_NAME: &str = "user_online";
+
 
 struct JWTConfig {
     access_token_base_64_public_key: String,

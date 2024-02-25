@@ -63,13 +63,13 @@ pub fn navigator() -> Html {
                     <div class="user">
                         <img src={format!("/api/user/{}/avatar", user.id())} alt={format!("{}'s avatar", user.name())} />
                         <span>{user.full_name()}</span>
-                        {if store.is_offline() {
-                            html! {
-                                <span class="badge offline">{"Offline"}</span>
-                            }
-                        } else {
-                            html! {}
-                        }}
+                        // {if store.is_offline() {
+                        //     html! {
+                        //         <span class="badge offline">{"Offline"}</span>
+                        //     }
+                        // } else {
+                        //     html! {}
+                        // }}
                     </div>
                 } else {
                     <Link<AppRoute> classes="login" to={AppRoute::Login}>{"Login"}</Link<AppRoute>>

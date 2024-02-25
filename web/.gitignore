@@ -1,2 +1,3 @@
 .env
 database_tmp
+redis_database_tmp
