@@ -9,8 +9,9 @@
 use gluesql::idb_storage::IdbStorage;
 use gluesql::prelude::*;
 
+/// Initializes the database.
 pub(crate) async fn init_database() -> Result<Glue<IdbStorage>, Error> {
     let storage = IdbStorage::new(Some("Earth Metabolome Initiative".to_string())).await?;
-    let mut glue = Glue::new(storage);
+    let glue = Glue::new(storage);
     Ok(glue)
 }

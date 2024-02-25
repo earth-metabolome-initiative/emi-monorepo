@@ -5,7 +5,7 @@ use diesel::pg::PgConnection;
 use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::Pool;
 use std::env;
-use web_common::login_provider::OAuth2LoginProvider;
+use web_common::api::oauth::providers::*;
 
 #[get("/providers")]
 /// Returns a list of available OAuth2 providers.

@@ -1,3 +1,3 @@
-pub mod login_provider;
 pub mod user;
-pub mod shared_cookie_names;
+pub mod api;
+pub mod macros;

@@ -2,11 +2,7 @@
 
 use crate::api::retrieve_login_providers;
 use crate::components::login_provider::LoginProvider;
-use crate::router::AppRoute;
-use crate::store::Store;
 use yew::prelude::*;
-use yew_router::prelude::Redirect;
-use yewdux::use_store;
 
 #[function_component(Login)]
 pub fn login() -> Html {

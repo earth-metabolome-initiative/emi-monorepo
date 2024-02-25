@@ -1,8 +1,8 @@
 //! A sidebar Yew component is responsible for rendering the sidebar on the left side of the page.
 //!
 
+use crate::stores::UserState;
 use yew::prelude::*;
-use crate::store::Store;
 use yewdux::use_store;
 
 #[derive(Properties, Clone, PartialEq, Debug)]
@@ -12,7 +12,7 @@ pub struct SidebarProps {
 
 #[function_component(Sidebar)]
 pub fn sidebar(props: &SidebarProps) -> Html {
-    let (store, _) = use_store::<Store>();
+    let (store, _) = use_store::<UserState>();
 
     let sidebar_class = if props.visible {
         "sidebar"

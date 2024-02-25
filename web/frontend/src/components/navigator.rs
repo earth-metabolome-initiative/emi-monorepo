@@ -21,13 +21,10 @@
 //!
 
 use crate::router::AppRoute;
+use crate::stores::UserState;
 use yew::prelude::*;
 use yew_router::prelude::*;
-use web_common::user::User;
-
-// We retrieve Navigator in order to check whether we are online.
-use wasm_bindgen::JsCast;
-use wasm_bindgen::closure::Closure;
+use yewdux::prelude::*;
 
 use crate::components::hamburger::Hamburger;
 use crate::components::search_bar::SearchBar;
@@ -39,7 +36,7 @@ pub fn navigator() -> Html {
     let show_side_bar = use_state(|| false);
     let route = use_route::<AppRoute>();
     let navigator = use_navigator().unwrap();
-    let mut user = use_context::<Option<User>>().expect("no ctx found");
+    let (user, _) = use_store::<UserState>();
 
     // On click, we send a message to the store to toggle the sidebar.
     let onclick = {
@@ -59,7 +56,7 @@ pub fn navigator() -> Html {
                     </Link<AppRoute>>
                 </h1>
                 <SearchBar />
-                if let Some(user) = user {
+                if let Some(user) = user.user() {
                     <div class="user">
                         <img src={format!("/api/user/{}/avatar", user.id())} alt={format!("{}'s avatar", user.name())} />
                         <span>{user.full_name()}</span>

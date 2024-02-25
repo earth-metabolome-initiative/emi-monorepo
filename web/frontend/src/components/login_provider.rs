@@ -1,5 +1,5 @@
 //! HTML rendering of an OAuth login provider object.
-use web_common::login_provider::OAuth2LoginProvider;
+use web_common::api::oauth::providers::OAuth2LoginProvider;
 use yew::prelude::*;
 use web_sys::wasm_bindgen::UnwrapThrowExt;
 

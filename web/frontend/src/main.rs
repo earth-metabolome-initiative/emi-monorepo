@@ -3,7 +3,7 @@ mod components;
 mod cookies;
 mod pages;
 mod router;
-mod store;
+mod stores;
 
 #[cfg(target_arch = "wasm32")]
 /// While we are always compiling for WASM32, I have yet to figure out how to
@@ -14,37 +14,20 @@ mod database;
 #[cfg(target_arch = "wasm32")]
 mod wasm {
 
-    use crate::api::retrieve_logged_user_info;
     use crate::components::*;
     use crate::router::{switch, AppRoute};
-    use wasm_bindgen::closure::Closure;
+    use crate::stores::{UserState, refresh_access_token};
     use web_common::user::User;
     use yew::prelude::*;
     use yew_router::prelude::*;
+    use yewdux::prelude::*;
 
-    #[cfg(target_arch = "wasm32")]
     #[function_component]
-    fn App() -> Html {
-        let user_state: UseStateHandle<Option<User>> = use_state(|| None);
+    pub fn App() -> Html {
+        use crate::stores::user_state::logout;
 
-        // {
-        //     let user_state = user_state.clone();
-        //     use_effect_with((), move |_| {
-        //         wasm_bindgen_futures::spawn_local(async move {
-        //             *user_state = retrieve_logged_user_info().await.ok();
-        //             // dispatch.reduce_mut(move |store| {
-        //             //     store.set_user(user);
-        //             //     if store.is_logged_in() {
-        //             //         // If the current page is the login page, we redirect to the home page.
-        //             //         if route.map_or(false, |r| r == AppRoute::Login) {
-        //             //             // We trigger a redirect to the home page.
-        //             //             navigator.push(&AppRoute::Home)
-        //             //         }
-        //             //     }
-        //             // });
-        //         });
-        //     });
-        // }
+        let (user_state, dispatch) = use_store::<UserState>();
+        refresh_access_token(dispatch.clone());
 
         // In order to continuously check whether we are online, we need to create
         // a timed callback that is called multiple times every few seconds, say 5.
@@ -70,22 +53,20 @@ mod wasm {
         // }
 
         html! {
-            <ContextProvider<Option<User>> context={(*user_state).clone()}>
-                <BrowserRouter>
-                    <components::Navigator />
-                    <div class="app">
-                        <Switch<AppRoute> render={switch} />
-                        <Footer />
-                    </div>
-                </BrowserRouter>
-            </ContextProvider<Option<User>>>
+            <BrowserRouter>
+                <crate::components::Navigator />
+                <div class="app">
+                    <Switch<AppRoute> render={switch} />
+                    <Footer />
+                </div>
+            </BrowserRouter>
         }
     }
 }
 
 #[cfg(target_arch = "wasm32")]
 fn main() {
-    yew::Renderer::<App>::new().render();
+    yew::Renderer::<wasm::App>::new().render();
 }
 
 #[cfg(not(target_arch = "wasm32"))]

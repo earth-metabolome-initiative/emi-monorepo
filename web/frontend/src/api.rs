@@ -1,18 +1,23 @@
-use gloo_net::http::Request;
-use web_common::login_provider::OAuth2LoginProvider;
+use serde::{Deserialize, Serialize};
+pub(crate) mod oauth;
+pub(crate) use oauth::*;
 
-pub async fn retrieve_login_providers() -> Result<Vec<OAuth2LoginProvider>, gloo_net::Error> {
-    Request::get("/api/oauth/providers")
-        .send()
-        .await?
-        .json()
-        .await
+use web_common::api::ApiError;
+
+#[derive(Debug, Serialize, Deserialize)]
+pub enum FrontendApiError {
+    API(ApiError),
+    Reqwasm(String),
 }
 
-pub async fn retrieve_logged_user_info() -> Result<web_common::user::User, gloo_net::Error> {
-    Request::get("/api/logged_user_info")
-        .send()
-        .await?
-        .json()
-        .await
+impl From<reqwasm::Error> for FrontendApiError {
+    fn from(e: reqwasm::Error) -> Self {
+        Self::Reqwasm(e.to_string())
+    }
+}
+
+impl From<ApiError> for FrontendApiError {
+    fn from(e: ApiError) -> Self {
+        Self::API(e)
+    }
 }

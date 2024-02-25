@@ -11,6 +11,7 @@ use actix_web::web;
 use actix_web::FromRequest;
 use actix_web::HttpRequest;
 use actix_web::HttpResponse;
+use actix_web::HttpResponseBuilder;
 use actix_web::Responder;
 use actix_web_httpauth::extractors::bearer::BearerAuth;
 use base64::prelude::*;
@@ -29,11 +30,11 @@ use std::env;
 use std::future::{ready, Ready};
 use std::num::ParseIntError;
 use uuid::Uuid;
-use web_common::shared_cookie_names::USER_ONLINE_COOKIE_NAME;
+use web_common::api::oauth::jwt_cookies::*;
+use web_common::api::ApiError;
 
 /// Set a const with the expected cookie name.
 pub(crate) const REFRESH_COOKIE_NAME: &str = "refresh_token";
-
 
 struct JWTConfig {
     access_token_base_64_public_key: String,
@@ -435,6 +436,23 @@ pub(crate) async fn access_token_validator(
     }
 }
 
+fn eliminate_cookies(mut builder: HttpResponseBuilder) -> HttpResponseBuilder {
+    let refresh_cookie = Cookie::build(REFRESH_COOKIE_NAME, "")
+        .path("/")
+        .max_age(ActixWebDuration::ZERO)
+        .http_only(true)
+        .finish();
+
+    let user_online_cookie = Cookie::build(USER_ONLINE_COOKIE_NAME, "")
+        .path("/")
+        .max_age(ActixWebDuration::ZERO)
+        .http_only(false)
+        .finish();
+
+    builder.cookie(refresh_cookie).cookie(user_online_cookie);
+    builder
+}
+
 impl FromRequest for User {
     type Error = Error;
     type Future = Ready<Result<Self, Self::Error>>;
@@ -535,29 +553,28 @@ pub async fn refresh_access_token(
 
     // If the refresh token is not present, we return an error.
     if refresh_cookie.is_none() {
-        return HttpResponse::Unauthorized().finish();
+        return eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::unauthorized());
     }
 
-    // Next, we decode the token to get the user_id.
-    let decode = JsonRefreshToken::decode(refresh_cookie.unwrap().value());
-
-    // If the token is invalid, we return an error.
-    if decode.is_err() {
-        return HttpResponse::Unauthorized().finish();
-    }
-
-    let refresh_token = decode.unwrap();
+    let refresh_token = match JsonRefreshToken::decode(refresh_cookie.unwrap().value()) {
+        Ok(token) => token,
+        Err(_) =>  {
+            return eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::unauthorized());
+        }
+    };
 
     // If the token is expired, we return an error.
     if refresh_token.is_expired() {
-        return HttpResponse::Unauthorized().finish();
+        return eliminate_cookies(HttpResponse::Unauthorized())
+            .json(ApiError::expired_authorization());
     }
 
     // Next up, we check whether the token is still present in the redis database.
     let is_still_present = refresh_token.is_still_present_in_redis(&redis_client).await;
 
     if is_still_present.is_err() || !is_still_present.unwrap() {
-        return HttpResponse::Unauthorized().finish();
+        return eliminate_cookies(HttpResponse::Unauthorized())
+            .json(ApiError::expired_authorization());
     }
 
     // Finally, we get the user from the database, as while the user indeed seems
@@ -566,28 +583,32 @@ pub async fn refresh_access_token(
     // in the meantime.
     let mut connection = match pool.get() {
         Ok(pool) => pool,
-        Err(_) => return HttpResponse::InternalServerError().finish(),
+        Err(_) => {
+            return HttpResponse::InternalServerError().json(ApiError::internal_server_error())
+        }
     };
 
     // If the user doesn't exist, we return an error, otherwise we return the user.
     let user = User::get(refresh_token.user_id(), &mut connection);
 
     if user.is_err() {
-        return HttpResponse::Unauthorized().finish();
+        return HttpResponse::Unauthorized().json(ApiError::unauthorized());
     }
 
     // If the user exists, we create a new access token and return it.
     let access_token = JsonAccessToken::new(refresh_token.user_id());
 
     if access_token.is_err() {
-        return HttpResponse::InternalServerError().finish();
+        return HttpResponse::InternalServerError().json(ApiError::internal_server_error());
     }
 
     let access_token = access_token.unwrap();
 
     match access_token.insert_into_redis(&redis_client).await {
         Ok(_) => (),
-        Err(_) => return HttpResponse::InternalServerError().finish(),
+        Err(_) => {
+            return HttpResponse::InternalServerError().json(ApiError::internal_server_error())
+        }
     }
 
     // We return the access token as part of the JSON response, and we
@@ -597,7 +618,15 @@ pub async fn refresh_access_token(
     // new access token, but this is a security measure to prevent
     // unauthorized access to the API.
 
-    HttpResponse::Ok().json(json!({"access_token": access_token.encode().unwrap()}))
+    let encoded_token = access_token.encode();
+
+    if encoded_token.is_err() {
+        return HttpResponse::InternalServerError().json(ApiError::internal_server_error());
+    }
+
+    let access_token = AccessToken::new(encoded_token.unwrap());
+
+    HttpResponse::Ok().json(access_token)
 }
 
 #[get("/logout")]
@@ -621,7 +650,7 @@ async fn logout(
     let access_token = JsonAccessToken::decode(bearer.token());
 
     if access_token.is_err() {
-        return HttpResponse::Unauthorized().finish();
+        return eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::unauthorized());
     }
 
     let access_token = access_token.unwrap();
@@ -629,19 +658,19 @@ async fn logout(
     let is_still_present = access_token.is_still_present_in_redis(&redis_client).await;
 
     if is_still_present.is_err() || !is_still_present.unwrap() {
-        return HttpResponse::Unauthorized().finish();
+        return eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::unauthorized());
     }
 
     let refresh_cookie = req.cookie(REFRESH_COOKIE_NAME);
 
     if refresh_cookie.is_none() {
-        return HttpResponse::Unauthorized().finish();
+        return eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::unauthorized());
     }
 
     let refresh_token = JsonRefreshToken::decode(refresh_cookie.unwrap().value());
 
     if refresh_token.is_err() {
-        return HttpResponse::Unauthorized().finish();
+        return eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::unauthorized());
     }
 
     let refresh_token = refresh_token.unwrap();
@@ -649,34 +678,23 @@ async fn logout(
     let is_still_present = refresh_token.is_still_present_in_redis(&redis_client).await;
 
     if is_still_present.is_err() || !is_still_present.unwrap() {
-        return HttpResponse::Unauthorized().finish();
+        return eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::unauthorized());
     }
 
     match access_token.delete_from_redis(&redis_client).await {
         Ok(_) => (),
-        Err(_) => return HttpResponse::InternalServerError().finish(),
+        Err(_) => {
+            return HttpResponse::InternalServerError().json(ApiError::internal_server_error())
+        }
     }
 
     match refresh_token.delete_from_redis(&redis_client).await {
         Ok(_) => (),
-        Err(_) => return HttpResponse::InternalServerError().finish(),
+        Err(_) => {
+            return HttpResponse::InternalServerError().json(ApiError::internal_server_error())
+        }
     }
 
     // We delete the refresh token cookie and the user online cookie from the user's browser.
-    let refresh_cookie = Cookie::build(REFRESH_COOKIE_NAME, "")
-        .path("/")
-        .max_age(ActixWebDuration::ZERO)
-        .http_only(true)
-        .finish();
-
-    let user_online_cookie = Cookie::build(USER_ONLINE_COOKIE_NAME, "")
-        .path("/")
-        .max_age(ActixWebDuration::ZERO)
-        .http_only(true)
-        .finish();
-
-    HttpResponse::Ok()
-        .cookie(refresh_cookie)
-        .cookie(user_online_cookie)
-        .json(serde_json::json!({"status": "success"}))
+    eliminate_cookies(HttpResponse::Ok()).finish()
 }

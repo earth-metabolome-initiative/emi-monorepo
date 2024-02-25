@@ -1,1 +1,0 @@
-pub const USER_ONLINE_COOKIE_NAME: &str = "user_online";

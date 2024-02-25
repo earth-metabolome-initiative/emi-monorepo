@@ -7,7 +7,7 @@
 //! exist to access cookies that are not `HttpOnly`.
 use wasm_bindgen::JsCast;
 use wasm_bindgen::UnwrapThrowExt;
-use web_common::shared_cookie_names::USER_ONLINE_COOKIE_NAME;
+use web_common::api::oauth::jwt_cookies::USER_ONLINE_COOKIE_NAME;
 use web_sys::window;
 
 /// Returns whether a cookie with the given name exists.
@@ -28,7 +28,7 @@ fn check_cookie(cookie_name: &str) -> bool {
             let parts: Vec<&str> = cookie.split('=').map(|c| c.trim()).collect();
             if parts.len() == 2 && parts[0] == cookie_name {
                 // Check if the cookie is http-only
-                if let Some(cookie_element) = document
+                if let Some(_cookie_element) = document
                     .cookie()
                     .expect("Failed to get cookies")
                     .split(';')
@@ -47,6 +47,6 @@ fn check_cookie(cookie_name: &str) -> bool {
 ///
 /// # Implementation details
 /// This function checks whether the USER_ONLINE_COOKIE_NAME cookie exists.
-pub fn is_logged_in() -> bool {
+pub(crate) fn is_logged_in() -> bool {
     check_cookie(USER_ONLINE_COOKIE_NAME)
 }
