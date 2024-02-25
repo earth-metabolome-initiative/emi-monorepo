@@ -37,5 +37,16 @@ SIRIUS_PASSWORD='password'
 GITHUB_CLIENT_ID='github_client_id'
 GITHUB_CLIENT_SECRET='github_client_secret'
 CLIENT_ORIGIN='http://localhost:3000'
-JWT_SECRET=my_ultra_secure_secret
-JWT_EXPIRATION_DAYS=1
+# Generate the public & secret key using https://travistidwell.com/jsencrypt/demo/
+# then, convert both to base64 using https://www.base64encode.org/
+# Generate keys with 4096 bits!
+ACCESS_TOKEN_PUBLIC_KEY=my_public_key_for_access_token
+ACCESS_TOKEN_PRIVATE_KEY=my_ultra_secure_secret_access_token_key
+ACCESS_TOKEN_MINUTES=15 # in minutes
+# Do the same thing for the refresh token
+REFRESH_TOKEN_PUBLIC_KEY=my_public_key_for_refresh_token
+REFRESH_TOKEN_PRIVATE_KEY=my_ultra_secure_secret_refresh_token_key
+REFRESH_TOKEN_MINUTES=480 # in minutes, equals to 8 hours
+# Next up, we have the Redis configuration
+REDIS_URL='redis://127.0.0.1:6379/'
+REDIS_DATABASE_DIRECTORY='path/to/redis/database'

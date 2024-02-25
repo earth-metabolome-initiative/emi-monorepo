@@ -1,19 +1,20 @@
 //! Login API for GitHub OAuth
 use crate::api::oauth::*;
 
-use actix_web::{get, http::header::LOCATION, web, HttpResponse, Responder};
+use actix_web::{get, web, HttpResponse, Responder};
 
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
 
+use super::jwt_cookies::build_login_response;
 use crate::model_implementations::*;
 use crate::models::*;
-use crate::transactions::renormalize_user_emails::{Emails, renormalize_user_emails};
+use crate::transactions::renormalize_user_emails::{renormalize_user_emails, Emails};
 use reqwest::Client;
+use redis::Client as RedisClient;
 use serde::Deserialize;
 use std::env;
 use std::error::Error;
-use super::jwt_cookies::encode_jwt_cookie;
 
 /// Struct representing the GitHub OAuth2 configuration.
 struct GitHubConfig {
@@ -58,7 +59,6 @@ impl GitHubConfig {
             provider_id: provider.id,
         })
     }
-
 }
 
 #[derive(Deserialize)]
@@ -79,6 +79,7 @@ struct GithubEmailMetadata {
 async fn github_oauth_handler(
     query: web::Query<QueryCode>,
     pool: web::Data<Pool<ConnectionManager<PgConnection>>>,
+    redis_client: web::Data<RedisClient>,
 ) -> impl Responder {
     let code = &query.code;
     let state = &query.state;
@@ -113,7 +114,7 @@ async fn github_oauth_handler(
         github_config.provider_id,
         emails_response.unwrap(),
         NewUser::default(),
-        &pool
+        &pool,
     );
 
     if user_query.is_err() {
@@ -124,22 +125,7 @@ async fn github_oauth_handler(
 
     let user_id = user_query.unwrap().id();
 
-    let cookie = encode_jwt_cookie(&user_id);
-
-    if cookie.is_err() {
-        let message = cookie.err().unwrap().to_string();
-        return HttpResponse::BadGateway()
-            .json(serde_json::json!({"status": "fail", "message": message}));
-    }
-
-    let mut response = HttpResponse::Found();
-    response.append_header((
-        LOCATION,
-        state.to_string(),
-    ));
-    response.cookie(cookie.unwrap());
-    log::debug!("User logged in, redirecting to {}", state);
-    response.finish()
+    build_login_response(user_id, state, &redis_client).await
 }
 
 pub async fn get_github_oauth_token(
@@ -239,9 +225,7 @@ pub async fn get_github_user_emails(authorization_code: &str) -> Result<Emails, 
 
         Emails::new(email_list, primary).map_err(|e| From::from(e))
     } else {
-        let message = format!(
-            "An error occurred while trying to retrieve the user emails",
-        );
+        let message = format!("An error occurred while trying to retrieve the user emails",);
         Err(From::from(message))
     }
 }

@@ -22,6 +22,7 @@ serde_json = "1.0"
 bigdecimal = "0.4.2"
 actix-rt = "2.9.0"
 actix-web = {version="4.5", features=["cookies"]}
+actix-web-httpauth = "0.8.1"
 actix-service = "2.0.2"
 derive_more = "0.99"
 log = "0.4"
@@ -37,3 +38,5 @@ jsonwebtoken = "9.2.0"
 reqwest = {version="0.11.24", features = ["blocking", "json"] }
 email_address = "0.2.4"
 web_common = { path = "../web_common" }
+redis = { version = "0.24.0", features = ["tokio-comp"] }
+base64 = "0.21.7"

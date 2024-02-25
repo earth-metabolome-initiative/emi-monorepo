@@ -7,19 +7,15 @@ use diesel::r2d2::{self, ConnectionManager, Pool};
 
 use actix_cors::Cors;
 use actix_web::http::header;
-use actix_web::http::StatusCode;
-use actix_web::middleware::ErrorHandlers;
 use actix_web::middleware::Logger;
+use redis::Client;
 
 mod api;
-mod error_handlers;
 mod model_implementations;
 mod models;
 mod schema;
 mod diesel_enums;
 mod transactions;
-
-use crate::error_handlers::{handle_internal_server_error, handle_unauthorized_request};
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
@@ -35,6 +31,20 @@ async fn main() -> std::io::Result<()> {
         .max_size(10)
         .build(manager)
         .expect("Failed to create pool.");
+
+    let redis_client = match Client::open(
+        std::env::var("REDIS_URL").expect("REDIS_URL must be set").as_str(),
+    ) {
+        Ok(client) => {
+            println!("✅Connection to the redis is successful!");
+            client
+        }
+        Err(e) => {
+            println!("🔥 Error connecting to Redis: {}", e);
+            std::process::exit(1);
+        }
+    };
+
     // let domain: String = std::env::var("DOMAIN").unwrap_or_else(|_| "localhost".to_string());
 
     // Start http server
@@ -51,19 +61,12 @@ async fn main() -> std::io::Result<()> {
         App::new()
             // pass in the database pool to all routes
             .app_data(web::Data::new(pool.clone()))
+            // pass in the redis client to all routes
+            .app_data(web::Data::new(redis_client.clone()))
             // We register the API handlers
             .configure(api::configure)
             // enable logger
             .wrap(Logger::default())
-            // We add a 401 unauthorized error handler
-            .wrap(
-                ErrorHandlers::new()
-                    .handler(
-                        StatusCode::INTERNAL_SERVER_ERROR,
-                        handle_internal_server_error,
-                    )
-                    .handler(StatusCode::UNAUTHORIZED, handle_unauthorized_request),
-            )
             // We add support for CORS requests
             .wrap(cors)
             // limit the maximum amount of data that server will accept

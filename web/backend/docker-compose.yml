@@ -19,6 +19,13 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+  redis:
+    image: redis:alpine
+    container_name: redis
+    ports:
+      - '6379:6379'
+    volumes:
+      - ${REDIS_DATABASE_DIRECTORY}:/data
   postgres_database_backup:
     profiles:
       - backup

@@ -1,6 +1,5 @@
 //! Set of APIs solely accessible once the user is logged in.
 mod logged_user_info;
-mod logout;
 use actix_web::web;
 
 pub fn configure(cfg: &mut web::ServiceConfig) {

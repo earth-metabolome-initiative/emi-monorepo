@@ -29,11 +29,11 @@ use crate::models::*;
 use crate::model_implementations::{NewUser, NewUserEmail};
 use crate::transactions::create_user::create_user;
 use diesel::prelude::*;
-use diesel::sql_types::Integer;
 use diesel::sql_query;
 use diesel::sql_types::Text;
 use diesel::r2d2::{ConnectionManager, Pool};
 use email_address::EmailAddress;
+use uuid::Uuid;
 
 pub(crate) struct Emails {
     emails: Vec<String>,
@@ -94,7 +94,7 @@ struct ForeignKeyInfo {
 /// * `old_user_id` - The ID of the user that is being deleted.
 /// * `new_user_id` - The ID of the user that is kept.
 /// * `conn` - The connection to the database.
-fn update_foreign_user_id_keys(old_user_id: i32, new_user_id: i32, pool: &Pool<ConnectionManager<PgConnection>>) -> QueryResult<()> {
+fn update_foreign_user_id_keys(old_user_id: Uuid, new_user_id: Uuid, pool: &Pool<ConnectionManager<PgConnection>>) -> QueryResult<()> {
     let mut conn = pool.get().unwrap();
 
     conn.transaction::<_, diesel::result::Error, _>(|conn| {
@@ -125,8 +125,8 @@ fn update_foreign_user_id_keys(old_user_id: i32, new_user_id: i32, pool: &Pool<C
             );
 
             sql_query(&update_statement)
-                .bind::<Integer, _>(new_user_id)
-                .bind::<Integer, _>(old_user_id)
+                .bind::<diesel::sql_types::Uuid, _>(new_user_id)
+                .bind::<diesel::sql_types::Uuid, _>(old_user_id)
                 .execute(conn)?;
         }
 

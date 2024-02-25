@@ -1,3 +1,6 @@
+use crate::diesel_enums::OrganizationUserRole as OrganizationUserRoleEnum;
+use crate::diesel_enums::ProjectUserRole as ProjectUserRoleEnum;
+use crate::diesel_enums::WebsiteRole;
 use crate::models::*;
 use crate::schema::*;
 use diesel::prelude::*;
@@ -5,24 +8,21 @@ use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::Pool;
 use diesel::r2d2::PooledConnection;
 use diesel::PgConnection;
-use crate::diesel_enums::WebsiteRole;
-use crate::diesel_enums::OrganizationUserRole as OrganizationUserRoleEnum;
-use crate::diesel_enums::ProjectUserRole as ProjectUserRoleEnum;
 use email_address::*;
+use uuid::Uuid;
 
 #[derive(Queryable, Insertable, Debug)]
 #[diesel(table_name = user_emails)]
 pub(crate) struct NewUserEmail {
     email: String,
-    user_id: i32,
+    user_id: Uuid,
     login_provider_id: i16,
 }
 
 impl NewUserEmail {
-    pub(crate) fn new(email: &str, user_id: i32, login_provider_id: i16) -> NewUserEmail {
+    pub(crate) fn new(email: &str, user_id: Uuid, login_provider_id: i16) -> NewUserEmail {
         assert!(!email.is_empty());
         assert!(EmailAddress::is_valid(email));
-        assert!(user_id > 0);
         assert!(login_provider_id > 0);
 
         NewUserEmail {
@@ -77,14 +77,6 @@ impl UserEmail {
     pub(crate) fn provider_id(&self) -> i16 {
         self.login_provider_id
     }
-
-    pub(crate) fn user_id(&self) -> i32 {
-        self.user_id
-    }
-
-    pub(crate) fn email(&self) -> &str {
-        &self.email
-    }
 }
 
 impl LoginProvider {
@@ -134,7 +126,7 @@ impl User {
     /// * `user_id` - The ID of the user.
     /// * `pool` - The database connection pool.
     pub fn get(
-        user_id: i32,
+        user_id: Uuid,
         conn: &mut PooledConnection<ConnectionManager<PgConnection>>,
     ) -> Result<User, String> {
         use crate::schema::users::dsl::*;
@@ -148,22 +140,22 @@ impl User {
     /// Returns the UserMail associated to the provided email if it is associated to the current user.
     ///
     /// # Arguments
-    /// * `email` - The email of the user.
+    /// * `user_email` - The email of the user.
     /// * `conn` - The database connection pool.
     pub fn get_user_email_from_email(
         &self,
-        email: &str,
+        user_email: &str,
         conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>,
     ) -> QueryResult<UserEmail> {
         use crate::schema::user_emails::dsl::*;
         user_emails
-            .filter(email.eq(email))
+            .filter(email.eq(user_email))
             .filter(user_id.eq(self.id))
             .first::<UserEmail>(conn)
     }
 
     /// Returns the user's id.
-    pub fn id(&self) -> i32 {
+    pub fn id(&self) -> Uuid {
         self.id
     }
 
@@ -171,8 +163,8 @@ impl User {
         &self,
         conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>,
     ) -> bool {
-        use crate::schema::website_user_roles::dsl::*;
         use crate::schema::describables::dsl::*;
+        use crate::schema::website_user_roles::dsl::*;
         // Check if the user has the admin role
         website_user_roles
             .filter(user_id.eq(self.id))
@@ -181,42 +173,41 @@ impl User {
             .inner_join(describables.on(crate::schema::describables::id.eq(website_role_id)))
             .filter(name.eq(WebsiteRole::Admin.to_string()))
             .select(crate::schema::website_user_roles::id)
-            .first::<i64>(conn).is_ok()
+            .first::<i64>(conn)
+            .is_ok()
     }
 
     pub fn is_organization_admin(
         &self,
-        organization_id: i32,
+        organization_id: i64,
         conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>,
     ) -> bool {
-        let this_organization_id = organization_id;
-        use crate::schema::organization_users::dsl::*;
         use crate::schema::describables::dsl::*;
-        organization_users
-            .filter(user_id.eq(self.id))
-            .filter(organization_id.eq(this_organization_id))
-            .inner_join(describables.on(crate::schema::describables::id.eq(role_id)))
+        crate::schema::organization_users::dsl::organization_users
+            .filter(crate::schema::organization_users::user_id.eq(self.id))
+            .filter(crate::schema::organization_users::organization_id.eq(organization_id))
+            .inner_join(describables.on(crate::schema::describables::id.eq(crate::schema::organization_users::role_id)))
             .filter(name.eq(OrganizationUserRoleEnum::Admin.to_string()))
             .select(crate::schema::organization_users::id)
-            .first::<i64>(conn).is_ok()
+            .first::<i64>(conn)
+            .is_ok()
     }
 
     pub fn is_project_admin(
         &self,
-        project_id: i32,
+        project_id: i64,
         conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>,
     ) -> bool {
-        let this_project_id = project_id;
-        use crate::schema::project_users::dsl::*;
         use crate::schema::describables::dsl::*;
         // Check if the user has the admin role
-        project_users
-            .filter(user_id.eq(self.id))
-            .filter(project_id.eq(this_project_id))
-            .inner_join(describables.on(crate::schema::describables::id.eq(role_id)))
+        crate::schema::project_users::dsl::project_users
+            .filter(crate::schema::project_users::dsl::user_id.eq(self.id))
+            .filter(crate::schema::project_users::dsl::project_id.eq(project_id))
+            .inner_join(describables.on(crate::schema::describables::id.eq(crate::schema::project_users::dsl::role_id)))
             .filter(name.eq(ProjectUserRoleEnum::Admin.to_string()))
             .select(crate::schema::project_users::id)
-            .first::<i64>(conn).is_ok()
+            .first::<i64>(conn)
+            .is_ok()
     }
 }
 

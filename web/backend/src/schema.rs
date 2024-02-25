@@ -4,7 +4,7 @@ diesel::table! {
     archivables (id) {
         id -> Int8,
         archived_at -> Timestamp,
-        archived_by -> Int4,
+        archived_by -> Uuid,
     }
 }
 
@@ -70,14 +70,14 @@ diesel::table! {
     editables (id) {
         id -> Int8,
         created_at -> Timestamp,
-        created_by -> Int4,
+        created_by -> Uuid,
     }
 }
 
 diesel::table! {
     edits (id) {
         id -> Int8,
-        edited_by -> Int4,
+        edited_by -> Uuid,
         edited_at -> Timestamp,
     }
 }
@@ -119,7 +119,7 @@ diesel::table! {
         unit_id -> Nullable<Int8>,
         sensor_id -> Nullable<Int8>,
         measured_at -> Timestamptz,
-        measured_by -> Nullable<Int4>,
+        measured_by -> Nullable<Uuid>,
     }
 }
 
@@ -130,7 +130,7 @@ diesel::table! {
         quantity -> Int4,
         unit_id -> Nullable<Int8>,
         measured_at -> Timestamptz,
-        measured_by -> Nullable<Int4>,
+        measured_by -> Nullable<Uuid>,
     }
 }
 
@@ -250,7 +250,7 @@ diesel::table! {
 diesel::table! {
     organization_users (id) {
         id -> Int8,
-        user_id -> Int4,
+        user_id -> Uuid,
         organization_id -> Int8,
         role_id -> Int8,
     }
@@ -343,7 +343,7 @@ diesel::table! {
 diesel::table! {
     project_users (id) {
         id -> Int8,
-        user_id -> Int4,
+        user_id -> Uuid,
         project_id -> Int8,
         role_id -> Int8,
     }
@@ -431,7 +431,7 @@ diesel::table! {
 diesel::table! {
     team_users (id) {
         id -> Int8,
-        user_id -> Int4,
+        user_id -> Uuid,
         team_id -> Int8,
         role_id -> Int8,
     }
@@ -458,21 +458,21 @@ diesel::table! {
         id -> Int4,
         #[max_length = 255]
         email -> Varchar,
-        user_id -> Int4,
+        user_id -> Uuid,
         login_provider_id -> Int2,
     }
 }
 
 diesel::table! {
     user_pictures (user_id, document_id) {
-        user_id -> Int4,
+        user_id -> Uuid,
         document_id -> Int8,
     }
 }
 
 diesel::table! {
     users (id) {
-        id -> Int4,
+        id -> Uuid,
         first_name -> Nullable<Varchar>,
         middle_name -> Nullable<Varchar>,
         last_name -> Nullable<Varchar>,
@@ -491,7 +491,7 @@ diesel::table! {
     website_user_roles (id) {
         id -> Int8,
         website_role_id -> Int8,
-        user_id -> Int4,
+        user_id -> Uuid,
     }
 }
 

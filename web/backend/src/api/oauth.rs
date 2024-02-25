@@ -1,10 +1,10 @@
 //! Submodule for OAuth2 authentication.
 
 mod github;
-mod providers;
 pub(crate) mod jwt_cookies;
-
+mod providers;
 use actix_web::web;
+pub(crate) use jwt_cookies::access_token_validator;
 
 use serde::Deserialize;
 
@@ -44,4 +44,6 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
     //All these endpoints will show up under `/api/oauth/*`
     cfg.service(github::github_oauth_handler);
     cfg.service(providers::get_providers);
+    cfg.service(jwt_cookies::refresh_access_token);
+    cfg.service(jwt_cookies::logout);
 }
