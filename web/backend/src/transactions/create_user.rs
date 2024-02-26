@@ -38,16 +38,19 @@ pub(crate) fn create_user(
 
     conn.transaction::<_, diesel::result::Error, _>(|conn| {
         // Step 1: Insert the user into the users table
+        log::debug!("Inserting new user in table from provider {}", provider_id);
         let user = diesel::insert_into(crate::schema::users::table)
             .values(&new_user)
             .get_result::<User>(conn)?;
 
         // Step 2: Insert the user's email into the user_emails table
         for email in user_emails.emails() {
+            log::debug!("Inserting new user {} email {} in table for provider {}", user.id, email, provider_id);
             let new_user_email = NewUserEmail::new(email, user.id, provider_id);
             let email = new_user_email.insert(conn)?;
             // We check whether the email is the primary email
             if user_emails.is_primary(&email.email) {
+                log::debug!("Inserting new user {} PRIMARY email {} in table for provider {}", user.id, email.email, provider_id);
                 // Step 3: Insert the user's primary email into the primary_user_emails table
                 let primary_user_email = NewPrimaryUserEmail::new(email.id);
                 primary_user_email.insert(conn)?;

@@ -9,6 +9,7 @@ pub const FULL_ENDPOINT: &str = ENDPOINT;
 #[derive(Debug, Deserialize, Serialize)]
 pub enum ApiError {
     Oauth(oauth::OauthErrors),
+    BadGateway,
     InternalServerError,
 }
 
@@ -23,5 +24,9 @@ impl ApiError {
 
     pub fn internal_server_error() -> Self {
         Self::InternalServerError
+    }
+
+    pub fn bad_gateway() -> Self {
+        Self::BadGateway
     }
 }

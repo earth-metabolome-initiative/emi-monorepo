@@ -183,10 +183,12 @@ pub(crate) fn renormalize_user_emails(
 
     match mail_users.len() {
         0 => {
+            log::info!("Creating the new user for provider {}", provider_id);
             // Case 0: If no mails are associated with a user, we can create a new user account.
             create_user(provider_id, potential_new_user, emails, pool)
         }
         1 => {
+            log::info!("Extending emails from provider {}", provider_id);
             // Case 1: If only one email is associated with a user, we insert all of the emails with the new provider ID.
             let this_user = mail_users.pop().unwrap();
 
@@ -194,7 +196,8 @@ pub(crate) fn renormalize_user_emails(
 
             Ok(this_user)
         }
-        _ => {
+        number_of_emails => {
+            log::info!("Attempting to merge {} from provider {}", number_of_emails, provider_id);
             // Case 3, user merger: If more than one email is associated with a user, we merge the users.
             // We keep the first user, and merge the others into it.
             let user_to_keep = mail_users.pop().unwrap();
