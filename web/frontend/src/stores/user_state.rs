@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 use web_common::{api::oauth::jwt_cookies::AccessToken, user::User};
 use yew_router::prelude::*;
 use yewdux::prelude::*;
+use log::info;
 
 #[derive(Default, PartialEq, Serialize, Deserialize, Store, Clone)]
 /// The following macro will make sure that the store is saved across sessions.
@@ -73,6 +74,7 @@ pub fn logout(dispatch: Dispatch<UserState>, navigator: Navigator) {
 pub fn refresh_access_token(dispatch: Dispatch<UserState>, navigator: Navigator) {
     wasm_bindgen_futures::spawn_local(async move {
         if is_logged_in() {
+            info!("No access token found, attempting to refresh it.");
             match refresh_jwt_cookie().await {
                 Ok(access_token) => {
                     dispatch.reduce_mut(move |store| {

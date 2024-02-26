@@ -48,7 +48,6 @@ pub fn navigator() -> Html {
             update_user_informations(dispatch.clone(), access_token.clone(), navigator);
         }
     } else {
-        info!("No access token found, attempting to refresh it.");
         refresh_access_token(dispatch.clone(), navigator);
     }
 
