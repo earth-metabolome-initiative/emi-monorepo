@@ -8,6 +8,7 @@ use web_common::user::User as CommonUser;
 
 #[get("/me")]
 pub async fn logged_user_info(user: User) -> impl Responder {
+    log::info!("Retrieving logged user info.");
     HttpResponse::Ok().json(CommonUser::new(
         user.first_name,
         user.middle_name,

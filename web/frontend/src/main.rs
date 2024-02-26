@@ -24,7 +24,7 @@ mod wasm {
 
     use crate::components::*;
     use crate::router::{switch, AppRoute};
-    use crate::stores::{refresh_access_token, UserState};
+    use crate::stores::{refresh_access_token, update_user_informations, UserState};
     use log::info;
     use wasm_bindgen::JsValue;
     use web_common::user::User;
@@ -37,7 +37,13 @@ mod wasm {
         info!("Rendering App component.");
 
         let (user_state, dispatch) = use_store::<UserState>();
-        if user_state.has_no_access_token() {
+        if let Some(access_token) = user_state.access_token() {
+            info!("Access token found, recovering user info.");
+            update_user_informations(
+                dispatch.clone(),
+                access_token.clone()
+            );
+        } else if user_state.has_no_user() {
             info!("No access token found, attempting to refresh it.");
             refresh_access_token(dispatch.clone());
         }

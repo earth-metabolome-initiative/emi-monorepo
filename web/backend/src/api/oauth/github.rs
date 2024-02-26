@@ -86,17 +86,14 @@ async fn github_oauth_handler(
     let state = &query.state;
 
     if code.is_empty() {
-        return HttpResponse::Unauthorized().json(
-            ApiError::unauthorized()
-        );
+        return HttpResponse::Unauthorized().json(ApiError::unauthorized());
     }
 
     let token_response = get_github_oauth_token(code.as_str(), &pool).await;
     if token_response.is_err() {
         let message = token_response.err().unwrap().to_string();
         log::error!("GitHub login failed: {}", message);
-        return HttpResponse::BadGateway()
-            .json(ApiError::bad_gateway());
+        return HttpResponse::BadGateway().json(ApiError::bad_gateway());
     }
 
     let token_response = token_response.unwrap();
@@ -107,8 +104,7 @@ async fn github_oauth_handler(
     if emails_response.is_err() {
         let message = emails_response.err().unwrap().to_string();
         log::error!("GitHub mail retrieval failed: {}", message);
-        return HttpResponse::BadGateway()
-            .json(ApiError::bad_gateway());
+        return HttpResponse::BadGateway().json(ApiError::bad_gateway());
     }
 
     let github_config = GitHubConfig::from_env(&pool).unwrap();
@@ -123,8 +119,7 @@ async fn github_oauth_handler(
     if user_query.is_err() {
         let message = user_query.err().unwrap().to_string();
         log::error!("Github user insert into database failed: {}", message);
-        return HttpResponse::InternalServerError()
-            .json(ApiError::internal_server_error());
+        return HttpResponse::InternalServerError().json(ApiError::internal_server_error());
     }
 
     let user_id = user_query.unwrap().id();

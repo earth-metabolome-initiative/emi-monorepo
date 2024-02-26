@@ -12,7 +12,7 @@ pub struct SidebarProps {
 
 #[function_component(Sidebar)]
 pub fn sidebar(props: &SidebarProps) -> Html {
-    let (store, _) = use_store::<UserState>();
+    let (user, _) = use_store::<UserState>();
 
     let sidebar_class = if props.visible {
         "sidebar"
@@ -28,7 +28,7 @@ pub fn sidebar(props: &SidebarProps) -> Html {
                     <li><a href="#">{"About"}</a></li>
                     <li><a href="#">{"Services"}</a></li>
                     <li><a href="#">{"Contact"}</a></li>
-                    if store.is_logged_in() {
+                    if user.is_logged_in() {
                         <li><a href="/api/logout">{"Logout"}</a></li>
                     }
                 </ul>

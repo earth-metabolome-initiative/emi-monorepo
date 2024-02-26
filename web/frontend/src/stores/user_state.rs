@@ -22,6 +22,18 @@ impl UserState {
         self.access_token.is_none()
     }
 
+    pub fn has_access_token(&self) -> bool {
+        self.access_token.is_some()
+    }
+
+    pub fn has_no_user(&self) -> bool {
+        self.user.is_none()
+    }
+
+    pub fn has_user(&self) -> bool {
+        self.user.is_some()
+    }
+
     pub fn set_access_token(&mut self, access_token: AccessToken) {
         self.access_token = Some(access_token);
     }
@@ -51,7 +63,6 @@ pub fn refresh_access_token(dispatch: Dispatch<UserState>) {
         if is_logged_in() {
             match refresh_jwt_cookie().await {
                 Ok(access_token) => {
-                    update_user_informations(dispatch.clone(), access_token.clone());
                     dispatch.reduce_mut(move |store| {
                         store.set_access_token(access_token);
                     });

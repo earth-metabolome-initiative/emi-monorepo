@@ -197,7 +197,11 @@ pub(crate) fn renormalize_user_emails(
             Ok(this_user)
         }
         number_of_emails => {
-            log::info!("Attempting to merge {} from provider {}", number_of_emails, provider_id);
+            log::info!(
+                "Attempting to merge {} from provider {}",
+                number_of_emails,
+                provider_id
+            );
             // Case 3, user merger: If more than one email is associated with a user, we merge the users.
             // We keep the first user, and merge the others into it.
             let user_to_keep = mail_users.pop().unwrap();

@@ -20,15 +20,16 @@ use chrono::Utc;
 use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::Pool;
 use diesel::PgConnection;
-use futures::executor::block_on;
+use futures::Future;
 use jsonwebtoken::Algorithm;
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use redis::AsyncCommands;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::env;
-use std::future::{ready, Ready};
+use std::future::ready;
 use std::num::ParseIntError;
+use std::pin::Pin;
 use uuid::Uuid;
 use web_common::api::oauth::jwt_cookies::*;
 use web_common::api::ApiError;
@@ -518,7 +519,7 @@ fn eliminate_cookies(mut builder: HttpResponseBuilder) -> HttpResponseBuilder {
 
 impl FromRequest for User {
     type Error = Error;
-    type Future = Ready<Result<Self, Self::Error>>;
+    type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
     fn from_request(req: &HttpRequest, payload: &mut Payload) -> Self::Future {
         // First, we extract the token from the request.
@@ -526,78 +527,88 @@ impl FromRequest for User {
         // of the form:
         // Authorization: Bearer <token here>
         //
-        let bearer = BearerAuth::from_request(req, payload).into_inner();
+        let bearer = match BearerAuth::from_request(req, payload).into_inner() {
+            Ok(bearer) => bearer,
+            Err(_) => {
+                log::debug!("Bearer token not present in request");
+                return Box::pin(ready(Err(ErrorUnauthorized(
+                    json!({"status": "fail", "message": "Invalid token"}),
+                ))));
+            }
+        };
 
-        // If the token is not present, we return an error.
-        if bearer.is_err() {
-            return ready(Err(ErrorUnauthorized(
-                json!({"status": "fail", "message": "Invalid token"}),
-            )));
-        }
-
-        let access_token = match JsonAccessToken::decode(bearer.unwrap().token()) {
+        let access_token = match JsonAccessToken::decode(bearer.token()) {
             Ok(token) => token,
             Err(_) => {
-                return ready(Err(ErrorUnauthorized(
+                log::debug!("Unable to decode access token");
+                return Box::pin(ready(Err(ErrorUnauthorized(
                     json!({"status": "fail", "message": "Invalid token"}),
-                )));
+                ))));
             }
         };
 
         // If the token is expired, we return an error.
         if access_token.is_expired() {
-            return ready(Err(ErrorUnauthorized(
+            log::debug!("Token has expired");
+            return Box::pin(ready(Err(ErrorUnauthorized(
                 json!({"status": "fail", "message": "Token has expired"}),
-            )));
+            ))));
         }
 
         // Next up, we check whether the token is still present in the redis database.
         let redis_client = match req.app_data::<web::Data<redis::Client>>() {
-            Some(client) => client,
+            Some(client) => client.clone(),
             None => {
-                return ready(Err(ErrorInternalServerError(
+                log::error!("Redis client not present in request");
+                return Box::pin(ready(Err(ErrorInternalServerError(
                     json!({"status": "fail", "message": "Internal server error"}),
-                )))
+                ))));
             }
         };
 
-        block_on(async move {
+        // Finally, we get the user from the database, as while the user indeed seems
+        // to be authenticated and it still exists in the redis database, we still need
+        // to check whether the user exists in the database, as it may have been deleted
+        // in the meantime.
+        let pool = match req.app_data::<web::Data<Pool<ConnectionManager<PgConnection>>>>() {
+            Some(pool) => pool.clone(),
+            None => {
+                log::error!("Database pool not present in request");
+                return Box::pin(ready(Err(ErrorInternalServerError(
+                    json!({"status": "fail", "message": "Internal server error"}),
+                ))));
+            }
+        };
+
+        let mut conn = match pool.get() {
+            Ok(conn) => conn,
+            Err(_) => {
+                log::error!("Unable to get connection from pool.");
+                return Box::pin(ready(Err(ErrorInternalServerError(
+                    json!({"status": "fail", "message": "Internal server error"}),
+                ))));
+            }
+        };
+
+        Box::pin(async move {
             let is_still_present = access_token.is_still_present_in_redis(&redis_client).await;
 
             if is_still_present.is_err() || !is_still_present.unwrap() {
-                return ready(Err(ErrorUnauthorized(
+                log::error!("Token not present in redis");
+                return Err(ErrorUnauthorized(
                     json!({"status": "fail", "message": "Invalid token"}),
-                )));
+                ));
             }
-
-            // Finally, we get the user from the database, as while the user indeed seems
-            // to be authenticated and it still exists in the redis database, we still need
-            // to check whether the user exists in the database, as it may have been deleted
-            // in the meantime.
-            let pool = match req.app_data::<web::Data<Pool<ConnectionManager<PgConnection>>>>() {
-                Some(pool) => pool,
-                None => {
-                    return ready(Err(ErrorInternalServerError(
-                        json!({"status": "fail", "message": "Internal server error"}),
-                    )))
-                }
-            };
-
-            let mut conn = match pool.get() {
-                Ok(conn) => conn,
-                Err(_) => {
-                    return ready(Err(ErrorInternalServerError(
-                        json!({"status": "fail", "message": "Internal server error"}),
-                    )))
-                }
-            };
 
             // If the user doesn't exist, we return an error, otherwise we return the user.
             match User::get(access_token.user_id(), &mut conn) {
-                Ok(user) => ready(Ok(user)),
-                Err(_) => ready(Err(ErrorUnauthorized(
-                    json!({"status": "fail", "message": "Invalid token or user doesn't exists"}),
-                ))),
+                Ok(user) => Ok(user),
+                Err(_) => {
+                    log::debug!("Did not find user in database");
+                    Err(ErrorUnauthorized(
+                        json!({"status": "fail", "message": "Invalid token or user doesn't exists"}),
+                    ))
+                }
             }
         })
     }

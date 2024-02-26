@@ -17,7 +17,7 @@ async fn get_providers(pool: web::Data<Pool<ConnectionManager<PgConnection>>>) -
     let providers = LoginProvider::get_all(&pool);
 
     if providers.is_err() {
-        return HttpResponse::InternalServerError().json(ApiError::internal_server_error())
+        return HttpResponse::InternalServerError().json(ApiError::internal_server_error());
     }
 
     let providers = providers.unwrap();
