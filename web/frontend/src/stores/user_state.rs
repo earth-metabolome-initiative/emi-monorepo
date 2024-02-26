@@ -1,8 +1,10 @@
 use crate::api::auth::users;
 use crate::api::oauth::jwt_cookies::refresh_jwt_cookie;
 use crate::cookies::is_logged_in;
+use crate::router::AppRoute;
 use serde::{Deserialize, Serialize};
 use web_common::{api::oauth::jwt_cookies::AccessToken, user::User};
+use yew_router::prelude::*;
 use yewdux::prelude::*;
 
 #[derive(Default, PartialEq, Serialize, Deserialize, Store, Clone)]
@@ -51,14 +53,24 @@ impl UserState {
     }
 }
 
-pub fn logout(dispatch: Dispatch<UserState>) {
-    dispatch.reduce_mut(move |store| {
-        store.user = None;
-        store.access_token = None;
-    })
+pub fn logout(dispatch: Dispatch<UserState>, navigator: Navigator) {
+    wasm_bindgen_futures::spawn_local(async move {
+        match crate::api::oauth::logout::logout().await {
+            Ok(_) => {
+                dispatch.reduce_mut(move |store| {
+                    store.user = None;
+                    store.access_token = None;
+                });
+                navigator.push(&AppRoute::Login);
+            }
+            Err(e) => {
+                log::error!("Failed to logout: {:?}", e);
+            }
+        }
+    });
 }
 
-pub fn refresh_access_token(dispatch: Dispatch<UserState>) {
+pub fn refresh_access_token(dispatch: Dispatch<UserState>, navigator: Navigator) {
     wasm_bindgen_futures::spawn_local(async move {
         if is_logged_in() {
             match refresh_jwt_cookie().await {
@@ -68,14 +80,18 @@ pub fn refresh_access_token(dispatch: Dispatch<UserState>) {
                     });
                 }
                 Err(_) => {
-                    logout(dispatch);
+                    logout(dispatch, navigator);
                 }
             }
         }
     });
 }
 
-pub fn update_user_informations(dispatch: Dispatch<UserState>, access_token: AccessToken) {
+pub fn update_user_informations(
+    dispatch: Dispatch<UserState>,
+    access_token: AccessToken,
+    navigator: Navigator,
+) {
     wasm_bindgen_futures::spawn_local(async move {
         match users::me::me(&access_token).await {
             Ok(user) => {
@@ -84,7 +100,7 @@ pub fn update_user_informations(dispatch: Dispatch<UserState>, access_token: Acc
                 });
             }
             Err(_) => {
-                logout(dispatch);
+                logout(dispatch, navigator);
             }
         }
     })

@@ -1,11 +1,11 @@
 use crate::api::FrontendApiError;
 use crate::stores::user_state::UserState;
 use reqwasm::http::Request;
+use std::rc::Rc;
 use web_common::api::oauth::jwt_cookies::*;
 use web_common::api::{auth::users::me::*, ApiError};
-use yewdux::prelude::*;
 use web_common::user::User;
-use std::rc::Rc;
+use yewdux::prelude::*;
 
 /// Returns the informations regarding the currently logged user.
 pub async fn me(access_token: &AccessToken) -> Result<User, FrontendApiError> {
@@ -23,8 +23,7 @@ pub async fn me(access_token: &AccessToken) -> Result<User, FrontendApiError> {
             Ok(user)
         }
         _ => {
-            let api_error: ApiError =
-                response.json().await.map_err(FrontendApiError::from)?;
+            let api_error: ApiError = response.json().await.map_err(FrontendApiError::from)?;
             Err(FrontendApiError::from(api_error))
         }
     }

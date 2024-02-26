@@ -26,16 +26,31 @@ use yew::prelude::*;
 use yew_router::prelude::*;
 use yewdux::prelude::*;
 
+use crate::stores::update_user_informations;
+use crate::stores::refresh_access_token;
 use crate::components::hamburger::Hamburger;
 use crate::components::search_bar::SearchBar;
 use crate::components::sidebar::Sidebar;
+use log::info;
 
 #[function_component(Navigator)]
 pub fn navigator() -> Html {
     let show_side_bar = use_state(|| false);
     let route = use_route::<AppRoute>();
+
+    let (user, dispatch) = use_store::<UserState>();
+
     let navigator = use_navigator().unwrap();
-    let (user, _) = use_store::<UserState>();
+
+    if let Some(access_token) = user.access_token() {
+        if user.has_no_user() {
+            info!("Access token found, recovering user info.");
+            update_user_informations(dispatch.clone(), access_token.clone(), navigator);
+        }
+    } else {
+        info!("No access token found, attempting to refresh it.");
+        refresh_access_token(dispatch.clone(), navigator);
+    }
 
     // On click, we send a message to the store to toggle the sidebar.
     let onclick = {

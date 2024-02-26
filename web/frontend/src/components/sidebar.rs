@@ -1,7 +1,9 @@
 //! A sidebar Yew component is responsible for rendering the sidebar on the left side of the page.
 //!
 
+use super::logout::Logout;
 use crate::stores::UserState;
+use web_common::api::oauth::jwt_cookies::FULL_LOGOUT_ENDPOINT;
 use yew::prelude::*;
 use yewdux::use_store;
 
@@ -29,7 +31,7 @@ pub fn sidebar(props: &SidebarProps) -> Html {
                     <li><a href="#">{"Services"}</a></li>
                     <li><a href="#">{"Contact"}</a></li>
                     if user.is_logged_in() {
-                        <li><a href="/api/logout">{"Logout"}</a></li>
+                        <li><Logout /></li>
                     }
                 </ul>
             </div>

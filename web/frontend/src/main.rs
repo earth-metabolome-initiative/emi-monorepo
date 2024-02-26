@@ -36,18 +36,6 @@ mod wasm {
     pub fn App() -> Html {
         info!("Rendering App component.");
 
-        let (user_state, dispatch) = use_store::<UserState>();
-        if let Some(access_token) = user_state.access_token() {
-            info!("Access token found, recovering user info.");
-            update_user_informations(
-                dispatch.clone(),
-                access_token.clone()
-            );
-        } else if user_state.has_no_user() {
-            info!("No access token found, attempting to refresh it.");
-            refresh_access_token(dispatch.clone());
-        }
-
         // In order to continuously check whether we are online, we need to create
         // a timed callback that is called multiple times every few seconds, say 5.
         // {

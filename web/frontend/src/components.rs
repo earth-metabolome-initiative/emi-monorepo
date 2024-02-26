@@ -3,6 +3,7 @@ pub mod footer;
 pub mod hamburger;
 pub mod input_with_icon;
 pub mod login_provider;
+mod logout;
 pub mod navigator;
 mod search_bar;
 pub mod sidebar;

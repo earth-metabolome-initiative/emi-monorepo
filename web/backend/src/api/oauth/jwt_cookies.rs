@@ -730,43 +730,48 @@ async fn logout(
     bearer: BearerAuth,
     redis_client: web::Data<redis::Client>,
 ) -> impl Responder {
-    let access_token = JsonAccessToken::decode(bearer.token());
-
-    if access_token.is_err() {
-        return eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::unauthorized());
-    }
-
-    let access_token = access_token.unwrap();
+    let access_token = match JsonAccessToken::decode(bearer.token()) {
+        Ok(token) => token,
+        Err(_) => {
+            log::debug!("Unable to decode access token");
+            return eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::unauthorized());
+        }
+    };
 
     let is_still_present = access_token.is_still_present_in_redis(&redis_client).await;
 
-    if is_still_present.is_err() || !is_still_present.unwrap() {
+    if is_still_present.map_or(true, |present| !present) {
+        log::debug!("Access token not present in redis");
         return eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::unauthorized());
     }
 
-    let refresh_cookie = req.cookie(REFRESH_COOKIE_NAME);
+    let refresh_cookie = match req.cookie(REFRESH_COOKIE_NAME) {
+        Some(cookie) => cookie,
+        None => {
+            log::debug!("Refresh token not present in request");
+            return eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::unauthorized());
+        },
+    };
 
-    if refresh_cookie.is_none() {
-        return eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::unauthorized());
-    }
-
-    let refresh_token = JsonRefreshToken::decode(refresh_cookie.unwrap().value());
-
-    if refresh_token.is_err() {
-        return eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::unauthorized());
-    }
-
-    let refresh_token = refresh_token.unwrap();
+    let refresh_token = match JsonRefreshToken::decode(refresh_cookie.value()) {
+        Ok(token) => token,
+        Err(_) => {
+            log::debug!("Unable to decode refresh token");
+            return eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::unauthorized());
+        }
+    };
 
     let is_still_present = refresh_token.is_still_present_in_redis(&redis_client).await;
 
-    if is_still_present.is_err() || !is_still_present.unwrap() {
+    if is_still_present.map_or(true, |present| !present) {
+        log::debug!("Refresh token not present in redis");
         return eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::unauthorized());
     }
 
     match access_token.delete_from_redis(&redis_client).await {
         Ok(_) => (),
         Err(_) => {
+            log::error!("Unable to delete access token from redis");
             return HttpResponse::InternalServerError().json(ApiError::internal_server_error())
         }
     }
@@ -774,10 +779,14 @@ async fn logout(
     match refresh_token.delete_from_redis(&redis_client).await {
         Ok(_) => (),
         Err(_) => {
+            log::error!("Unable to delete refresh token from redis");
             return HttpResponse::InternalServerError().json(ApiError::internal_server_error())
         }
     }
 
     // We delete the refresh token cookie and the user online cookie from the user's browser.
-    eliminate_cookies(HttpResponse::Ok()).finish()
+    eliminate_cookies(HttpResponse::TemporaryRedirect())
+    // We redirect the user to the login page.
+        .append_header((LOCATION, "/login"))
+        .finish()  
 }

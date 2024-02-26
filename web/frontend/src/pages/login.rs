@@ -2,11 +2,22 @@
 
 use crate::api::oauth::providers::retrieve_login_providers;
 use crate::components::login_provider::LoginProvider;
+use crate::router::AppRoute;
+use crate::stores::UserState;
 use web_common::api::oauth::providers::OAuth2LoginProvider;
 use yew::prelude::*;
+use yew_router::prelude::*;
+use yewdux::prelude::*;
 
 #[function_component(Login)]
 pub fn login() -> Html {
+    let navigator = use_navigator().unwrap();
+    let (user, _) = use_store::<UserState>();
+
+    if user.is_logged_in() {
+        navigator.push(&AppRoute::Home);
+    }
+
     let login_providers = use_state(|| Vec::<OAuth2LoginProvider>::new());
 
     {

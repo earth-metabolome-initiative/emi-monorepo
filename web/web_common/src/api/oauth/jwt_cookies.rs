@@ -4,6 +4,8 @@ use crate::combine_path;
 pub const REFRESH_ENDPOINT: &str = "/refresh";
 pub const FULL_REFRESH_ENDPOINT: &str = combine_path!(super::FULL_ENDPOINT, REFRESH_ENDPOINT);
 
+pub const LOGOUT_ENDPOINT: &str = "/logout";
+pub const FULL_LOGOUT_ENDPOINT: &str = combine_path!(super::FULL_ENDPOINT, LOGOUT_ENDPOINT);
 
 pub const USER_ONLINE_COOKIE_NAME: &str = "user_online";
 
