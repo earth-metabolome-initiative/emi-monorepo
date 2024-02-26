@@ -1,5 +1,3 @@
-# Port where the flask server should execute
-FLASK_PORT=16969
 # This is a default version of the '.env' file
 # You should copy this file into a new file called '.env'
 # and then change the values to match your environment
