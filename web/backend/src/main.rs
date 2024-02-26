@@ -26,11 +26,20 @@ async fn main() -> std::io::Result<()> {
 
     // create db connection pool
     let manager = ConnectionManager::<PgConnection>::new(database_url);
-    let pool: Pool<ConnectionManager<PgConnection>> = r2d2::Pool::builder()
+    let pool: Pool<ConnectionManager<PgConnection>> = match r2d2::Pool::builder()
         // We set the maximum number of connections in the pool to 10
         .max_size(10)
         .build(manager)
-        .expect("Failed to create pool.");
+    {
+        Ok(client) => {
+            println!("✅Connection to the Postgres is successful!");
+            client
+        }
+        Err(e) => {
+            println!("🔥 Error connecting to Postgres: {}", e);
+            std::process::exit(1);
+        }
+    };
 
     let redis_client = match Client::open(
         std::env::var("REDIS_URL")
