@@ -1,7 +1,7 @@
 //! HTML rendering of an OAuth login provider object.
 use web_common::api::oauth::providers::OAuth2LoginProvider;
-use yew::prelude::*;
 use web_sys::wasm_bindgen::UnwrapThrowExt;
+use yew::prelude::*;
 
 #[derive(Clone, Debug, Properties, PartialEq)]
 pub struct OAuthLoginProviderProps {
@@ -29,10 +29,7 @@ pub fn login_provider(props: &OAuthLoginProviderProps) -> Html {
 
     let options = format!(
         "client_id={}&redirect_uri={}&scope={}&state={}",
-        props.provider.client_id,
-        props.provider.redirect_uri,
-        props.provider.scope,
-        state
+        props.provider.client_id, props.provider.redirect_uri, props.provider.scope, state
     );
 
     let url = format!("{}?{}", root_url, options);

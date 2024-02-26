@@ -1,7 +1,8 @@
+use crate::api::auth::users;
+use crate::api::oauth::jwt_cookies::refresh_jwt_cookie;
+use crate::cookies::is_logged_in;
 use serde::{Deserialize, Serialize};
 use web_common::{api::oauth::jwt_cookies::AccessToken, user::User};
-use crate::cookies::is_logged_in;
-use crate::api::jwt_cookies::refresh_jwt_cookie;
 use yewdux::prelude::*;
 
 #[derive(Default, PartialEq, Serialize, Deserialize, Store, Clone)]
@@ -25,6 +26,10 @@ impl UserState {
         self.access_token = Some(access_token);
     }
 
+    pub fn set_user(&mut self, user: User) {
+        self.user = Some(user);
+    }
+
     pub fn access_token(&self) -> Option<&AccessToken> {
         self.access_token.as_ref()
     }
@@ -46,6 +51,7 @@ pub fn refresh_access_token(dispatch: Dispatch<UserState>) {
         if is_logged_in() {
             match refresh_jwt_cookie().await {
                 Ok(access_token) => {
+                    update_user_informations(dispatch.clone(), access_token.clone());
                     dispatch.reduce_mut(move |store| {
                         store.set_access_token(access_token);
                     });
@@ -56,4 +62,19 @@ pub fn refresh_access_token(dispatch: Dispatch<UserState>) {
             }
         }
     });
+}
+
+pub fn update_user_informations(dispatch: Dispatch<UserState>, access_token: AccessToken) {
+    wasm_bindgen_futures::spawn_local(async move {
+        match users::me::me(&access_token).await {
+            Ok(user) => {
+                dispatch.reduce_mut(move |store| {
+                    store.set_user(user);
+                });
+            }
+            Err(_) => {
+                logout(dispatch);
+            }
+        }
+    })
 }

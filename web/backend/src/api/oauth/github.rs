@@ -1,7 +1,7 @@
 //! Login API for GitHub OAuth
 use crate::api::oauth::*;
 
-use actix_web::{get, web, HttpResponse, Responder};
+use actix_web::{get, HttpResponse, Responder};
 
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
@@ -10,8 +10,8 @@ use super::jwt_cookies::build_login_response;
 use crate::model_implementations::*;
 use crate::models::*;
 use crate::transactions::renormalize_user_emails::{renormalize_user_emails, Emails};
-use reqwest::Client;
 use redis::Client as RedisClient;
+use reqwest::Client;
 use serde::Deserialize;
 use std::env;
 use std::error::Error;

@@ -448,7 +448,7 @@ pub(crate) async fn build_login_response<'a>(
     let refresh_cookie = match encode_jwt_refresh_cookie(user_id, redis_client).await {
         Ok(cookie) => cookie,
         Err(_) => {
-            return HttpResponse::InternalServerError().finish();
+            return HttpResponse::InternalServerError().json(ApiError::internal_server_error());
         }
     };
 
@@ -459,7 +459,7 @@ pub(crate) async fn build_login_response<'a>(
     let login_cookie = match encode_user_online_cookie() {
         Ok(cookie) => cookie,
         Err(_) => {
-            return HttpResponse::InternalServerError().finish();
+            return HttpResponse::InternalServerError().json(ApiError::internal_server_error());
         }
     };
 
@@ -472,7 +472,7 @@ pub(crate) async fn build_login_response<'a>(
         .finish();
 
     log::info!("Returning login response");
-        
+
     response
 }
 
@@ -697,9 +697,7 @@ pub async fn refresh_access_token(
 
     match access_token.encode() {
         Ok(encoded_token) => HttpResponse::Ok().json(AccessToken::new(encoded_token)),
-        Err(_) => {
-            HttpResponse::InternalServerError().json(ApiError::internal_server_error())
-        }
+        Err(_) => HttpResponse::InternalServerError().json(ApiError::internal_server_error()),
     }
 }
 

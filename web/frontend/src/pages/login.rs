@@ -1,12 +1,13 @@
 //! Login page of the application.
 
-use crate::api::retrieve_login_providers;
+use crate::api::oauth::providers::retrieve_login_providers;
 use crate::components::login_provider::LoginProvider;
+use web_common::api::oauth::providers::OAuth2LoginProvider;
 use yew::prelude::*;
 
 #[function_component(Login)]
 pub fn login() -> Html {
-    let login_providers = use_state(|| Vec::new());
+    let login_providers = use_state(|| Vec::<OAuth2LoginProvider>::new());
 
     {
         let login_providers = login_providers.clone();

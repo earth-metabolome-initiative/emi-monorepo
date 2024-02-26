@@ -23,7 +23,6 @@ impl From<&str> for WebsiteRole {
     }
 }
 
-
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum ProjectUserRole {
     Admin,

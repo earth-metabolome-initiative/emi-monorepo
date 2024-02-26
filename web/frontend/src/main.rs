@@ -1,8 +1,14 @@
+#[cfg(target_arch = "wasm32")]
 mod api;
+#[cfg(target_arch = "wasm32")]
 mod components;
+#[cfg(target_arch = "wasm32")]
 mod cookies;
+#[cfg(target_arch = "wasm32")]
 mod pages;
+#[cfg(target_arch = "wasm32")]
 mod router;
+#[cfg(target_arch = "wasm32")]
 mod stores;
 
 #[cfg(target_arch = "wasm32")]

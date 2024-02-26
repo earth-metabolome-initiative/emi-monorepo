@@ -6,6 +6,7 @@ use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::Pool;
 use std::env;
 use web_common::api::oauth::providers::*;
+use web_common::api::ApiError;
 
 #[get("/providers")]
 /// Returns a list of available OAuth2 providers.
@@ -16,7 +17,7 @@ async fn get_providers(pool: web::Data<Pool<ConnectionManager<PgConnection>>>) -
     let providers = LoginProvider::get_all(&pool);
 
     if providers.is_err() {
-        return HttpResponse::InternalServerError().finish();
+        return HttpResponse::InternalServerError().json(ApiError::internal_server_error())
     }
 
     let providers = providers.unwrap();
@@ -27,7 +28,7 @@ async fn get_providers(pool: web::Data<Pool<ConnectionManager<PgConnection>>>) -
         let redirect_uri = env::var(provider.redirect_uri_var_name);
 
         if client_id.is_err() || redirect_uri.is_err() {
-            return HttpResponse::InternalServerError().finish();
+            return HttpResponse::InternalServerError().json(ApiError::internal_server_error());
         }
 
         oauth_providers.push(OAuth2LoginProvider {

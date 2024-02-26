@@ -7,7 +7,6 @@ use diesel::prelude::*;
 use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::Pool;
 use diesel::r2d2::PooledConnection;
-use diesel::PgConnection;
 use email_address::*;
 use uuid::Uuid;
 
@@ -186,7 +185,11 @@ impl User {
         crate::schema::organization_users::dsl::organization_users
             .filter(crate::schema::organization_users::user_id.eq(self.id))
             .filter(crate::schema::organization_users::organization_id.eq(organization_id))
-            .inner_join(describables.on(crate::schema::describables::id.eq(crate::schema::organization_users::role_id)))
+            .inner_join(
+                describables
+                    .on(crate::schema::describables::id
+                        .eq(crate::schema::organization_users::role_id)),
+            )
             .filter(name.eq(OrganizationUserRoleEnum::Admin.to_string()))
             .select(crate::schema::organization_users::id)
             .first::<i64>(conn)
@@ -203,7 +206,11 @@ impl User {
         crate::schema::project_users::dsl::project_users
             .filter(crate::schema::project_users::dsl::user_id.eq(self.id))
             .filter(crate::schema::project_users::dsl::project_id.eq(project_id))
-            .inner_join(describables.on(crate::schema::describables::id.eq(crate::schema::project_users::dsl::role_id)))
+            .inner_join(
+                describables
+                    .on(crate::schema::describables::id
+                        .eq(crate::schema::project_users::dsl::role_id)),
+            )
             .filter(name.eq(ProjectUserRoleEnum::Admin.to_string()))
             .select(crate::schema::project_users::id)
             .first::<i64>(conn)

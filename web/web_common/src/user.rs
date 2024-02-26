@@ -72,7 +72,7 @@ impl User {
         self.id = id;
     }
 
-    pub fn is_named(&self) -> bool {
+    pub fn has_complete_profile(&self) -> bool {
         self.name.is_some() && self.last_name.is_some()
     }
 }

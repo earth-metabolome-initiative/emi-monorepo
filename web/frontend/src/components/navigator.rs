@@ -30,7 +30,6 @@ use crate::components::hamburger::Hamburger;
 use crate::components::search_bar::SearchBar;
 use crate::components::sidebar::Sidebar;
 
-
 #[function_component(Navigator)]
 pub fn navigator() -> Html {
     let show_side_bar = use_state(|| false);

@@ -20,6 +20,10 @@ impl AccessToken {
     pub fn token(&self) -> &str {
         &self.token
     }
+
+    pub fn header(&self) -> (&str, String) {
+        ("Authorization", format!("Bearer {}", self.token))
+    }
 }
 
 #[derive(Debug, Deserialize, Serialize)]

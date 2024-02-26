@@ -11,10 +11,10 @@ use actix_web::middleware::Logger;
 use redis::Client;
 
 mod api;
+mod diesel_enums;
 mod model_implementations;
 mod models;
 mod schema;
-mod diesel_enums;
 mod transactions;
 
 #[actix_rt::main]
@@ -33,7 +33,9 @@ async fn main() -> std::io::Result<()> {
         .expect("Failed to create pool.");
 
     let redis_client = match Client::open(
-        std::env::var("REDIS_URL").expect("REDIS_URL must be set").as_str(),
+        std::env::var("REDIS_URL")
+            .expect("REDIS_URL must be set")
+            .as_str(),
     ) {
         Ok(client) => {
             println!("✅Connection to the redis is successful!");

@@ -10,8 +10,8 @@ use chrono::NaiveDateTime;
 use diesel::sql_types::{Interval, Money, Numeric, Range};
 use diesel::Selectable;
 use diesel::{Identifiable, Queryable};
-use serde::Serialize;
 use serde::Deserialize;
+use serde::Serialize;
 use uuid::Uuid;
 
 #[derive(Queryable, Debug, Identifiable)]
@@ -496,4 +496,3 @@ pub struct WebsiteUserRole {
     pub website_role_id: i64,
     pub user_id: Uuid,
 }
-

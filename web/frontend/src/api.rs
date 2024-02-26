@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
+pub(crate) mod auth;
 pub(crate) mod oauth;
-pub(crate) use oauth::*;
 
 use web_common::api::ApiError;
 
@@ -8,6 +8,12 @@ use web_common::api::ApiError;
 pub enum FrontendApiError {
     API(ApiError),
     Reqwasm(String),
+}
+
+impl FrontendApiError {
+    pub fn unauthorized() -> Self {
+        FrontendApiError::from(ApiError::unauthorized())
+    }
 }
 
 impl From<reqwasm::Error> for FrontendApiError {

@@ -34,7 +34,7 @@ impl TryFrom<String> for OauthProviders {
 ///
 /// # Fields
 /// * `code` - The authorization code returned by the OAuth2 provider.
-/// * `state` - The state parameter returned by the OAuth2 provider.
+/// * `state` - The original location from where the request started, such as the Login page.
 pub(crate) struct QueryCode {
     pub code: String,
     pub state: String,
@@ -42,8 +42,11 @@ pub(crate) struct QueryCode {
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
     //All these endpoints will show up under `/api/oauth/*`
-    cfg.service(github::github_oauth_handler);
-    cfg.service(providers::get_providers);
-    cfg.service(jwt_cookies::refresh_access_token);
-    cfg.service(jwt_cookies::logout);
+    cfg.service(
+        web::scope(web_common::api::oauth::ENDPOINT)
+            .service(github::github_oauth_handler)
+            .service(providers::get_providers)
+            .service(jwt_cookies::refresh_access_token)
+            .service(jwt_cookies::logout),
+    );
 }

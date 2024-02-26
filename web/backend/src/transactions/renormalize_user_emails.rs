@@ -25,13 +25,13 @@
 //! transaction is rolled back, and the error is returned. If the closure returns Ok, the transaction is committed, and
 //! the Ok value is returned.
 //!
-use crate::models::*;
 use crate::model_implementations::{NewUser, NewUserEmail};
+use crate::models::*;
 use crate::transactions::create_user::create_user;
 use diesel::prelude::*;
+use diesel::r2d2::{ConnectionManager, Pool};
 use diesel::sql_query;
 use diesel::sql_types::Text;
-use diesel::r2d2::{ConnectionManager, Pool};
 use email_address::EmailAddress;
 use uuid::Uuid;
 
@@ -94,7 +94,11 @@ struct ForeignKeyInfo {
 /// * `old_user_id` - The ID of the user that is being deleted.
 /// * `new_user_id` - The ID of the user that is kept.
 /// * `conn` - The connection to the database.
-fn update_foreign_user_id_keys(old_user_id: Uuid, new_user_id: Uuid, pool: &Pool<ConnectionManager<PgConnection>>) -> QueryResult<()> {
+fn update_foreign_user_id_keys(
+    old_user_id: Uuid,
+    new_user_id: Uuid,
+    pool: &Pool<ConnectionManager<PgConnection>>,
+) -> QueryResult<()> {
     let mut conn = pool.get().unwrap();
 
     conn.transaction::<_, diesel::result::Error, _>(|conn| {
@@ -114,8 +118,8 @@ fn update_foreign_user_id_keys(old_user_id: Uuid, new_user_id: Uuid, pool: &Pool
         ";
 
         // Execute the query and iterate over the result
-        let foreign_key_tables: Vec<ForeignKeyInfo> = sql_query(foreign_key_tables_query)
-            .load(conn)?;
+        let foreign_key_tables: Vec<ForeignKeyInfo> =
+            sql_query(foreign_key_tables_query).load(conn)?;
 
         for info in foreign_key_tables {
             // Generate and execute UPDATE statement for each table
@@ -185,7 +189,7 @@ pub(crate) fn renormalize_user_emails(
         1 => {
             // Case 1: If only one email is associated with a user, we insert all of the emails with the new provider ID.
             let this_user = mail_users.pop().unwrap();
-            
+
             insert_user_emails(&this_user, provider_id, emails.emails(), pool)?;
 
             Ok(this_user)
@@ -199,9 +203,7 @@ pub(crate) fn renormalize_user_emails(
 
             for mail_user in mail_users {
                 update_foreign_user_id_keys(mail_user.id(), user_to_keep.id(), pool)?;
-                diesel::delete(
-                    users.filter(id.eq(mail_user.id()))
-                ).execute(&mut conn)?;
+                diesel::delete(users.filter(id.eq(mail_user.id()))).execute(&mut conn)?;
             }
 
             // And now that we have merged the users, we find ourselves in the same situation as in case 1.
