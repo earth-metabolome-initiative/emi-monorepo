@@ -1,2 +1,2 @@
 # emi-monorepo
-Monorepo for the Earth Metabolome Initiative
+Monorepo for the Earth Metabolome Initiative.
