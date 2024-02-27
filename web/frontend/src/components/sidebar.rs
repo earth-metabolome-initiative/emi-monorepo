@@ -5,6 +5,8 @@ use super::logout::Logout;
 use crate::stores::user_state::UserState;
 use yew::prelude::*;
 use yewdux::use_store;
+use crate::router::AppRoute;
+use yew_router::prelude::*;
 
 #[derive(Properties, Clone, PartialEq, Debug)]
 pub struct SidebarProps {
@@ -14,6 +16,7 @@ pub struct SidebarProps {
 #[function_component(Sidebar)]
 pub fn sidebar(props: &SidebarProps) -> Html {
     let (user, _) = use_store::<UserState>();
+    let navigator = use_navigator().unwrap();
 
     let sidebar_class = if props.visible {
         "sidebar"
@@ -21,11 +24,22 @@ pub fn sidebar(props: &SidebarProps) -> Html {
         "sidebar hidden"
     };
 
+    let onclick_home = {
+        let navigator = navigator.clone();
+        Callback::from(move |_| {
+            navigator.push(&AppRoute::Home);
+        })
+    };
+
     html! {
         <div class={sidebar_class}>
             <div class="sidebar-content">
                 <ul>
-                    <li><a href="#">{"Home"}</a></li>
+                    <li>
+                        <button onclick={onclick_home}>
+                            {"Home"}
+                        </button>
+                    </li>
                     <li><a href="#">{"About"}</a></li>
                     <li><a href="#">{"Services"}</a></li>
                     <li><a href="#">{"Contact"}</a></li>
