@@ -413,6 +413,7 @@ async fn encode_jwt_refresh_cookie<'a>(
     token.insert_into_redis(redis_client).await?;
 
     Ok(Cookie::build(REFRESH_COOKIE_NAME, token.encode()?)
+        .domain(std::env::var("DOMAIN").expect("Domain must be set"))
         .path("/")
         .max_age(ActixWebDuration::minutes(config.refresh_token_minutes()))
         // The HTTP_ONLY flag is set to true to prevent the cookie from being accessed by
@@ -425,6 +426,7 @@ async fn encode_jwt_refresh_cookie<'a>(
 fn encode_user_online_cookie<'a>() -> Result<Cookie<'a>, String> {
     let config = JWTConfig::from_env()?;
     Ok(Cookie::build(USER_ONLINE_COOKIE_NAME, "true")
+        .domain(std::env::var("DOMAIN").expect("Domain must be set"))
         .path("/")
         .max_age(ActixWebDuration::minutes(config.refresh_token_minutes()))
         // We want to be able to check the existance of this cookie from the frontend
@@ -500,12 +502,14 @@ pub(crate) async fn access_token_validator(
 pub(crate) fn eliminate_cookies(mut builder: HttpResponseBuilder) -> HttpResponseBuilder {
     log::info!("Eliminating cookies");
     let refresh_cookie = Cookie::build(REFRESH_COOKIE_NAME, "")
+        .domain(std::env::var("DOMAIN").expect("Domain must be set"))
         .path("/")
         .max_age(ActixWebDuration::ZERO)
         .http_only(true)
         .finish();
 
     let user_online_cookie = Cookie::build(USER_ONLINE_COOKIE_NAME, "")
+        .domain(std::env::var("DOMAIN").expect("Domain must be set"))
         .path("/")
         .max_age(ActixWebDuration::ZERO)
         .http_only(false)

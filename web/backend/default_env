@@ -49,3 +49,5 @@ REFRESH_TOKEN_MINUTES=480 # in minutes, equals to 8 hours
 # Next up, we have the Redis configuration
 REDIS_URL='redis://127.0.0.1:6379/'
 REDIS_DATABASE_DIRECTORY='path/to/redis/database'
+# Domain of the website
+DOMAIN='localhost'

@@ -32,11 +32,11 @@ async fn main() -> std::io::Result<()> {
         .build(manager)
     {
         Ok(client) => {
-            println!("✅Connection to the Postgres is successful!");
+            log::info!("✅Connection to the database is successful!");
             client
         }
         Err(e) => {
-            println!("🔥 Error connecting to Postgres: {}", e);
+            log::error!("🔥 Error connecting to the database: {}", e);
             std::process::exit(1);
         }
     };
@@ -47,16 +47,14 @@ async fn main() -> std::io::Result<()> {
             .as_str(),
     ) {
         Ok(client) => {
-            println!("✅Connection to the redis is successful!");
+            log::info!("✅Connection to Redis is successful!");
             client
         }
         Err(e) => {
-            println!("🔥 Error connecting to Redis: {}", e);
+            log::error!("🔥 Error connecting to Redis: {}", e);
             std::process::exit(1);
         }
     };
-
-    // let domain: String = std::env::var("DOMAIN").unwrap_or_else(|_| "localhost".to_string());
 
     // Start http server
     HttpServer::new(move || {
