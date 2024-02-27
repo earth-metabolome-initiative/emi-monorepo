@@ -69,19 +69,23 @@ pub fn navigator() -> Html {
                 </h1>
                 <SearchBar />
                 if let Some(user) = user.user() {
-                    <div class="user">
-                        <img src={format!("/api/user/{}/avatar", user.id())} alt={format!("{}'s avatar", user.name())} />
-                        <span>{user.full_name()}</span>
-                        // {if store.is_offline() {
-                        //     html! {
-                        //         <span class="badge offline">{"Offline"}</span>
-                        //     }
-                        // } else {
-                        //     html! {}
-                        // }}
-                    </div>
+                    if user.has_complete_profile() {
+                        <div class="user">
+                            <img src={format!("/api/user/{}/avatar", user.id())} alt={format!("{}'s avatar", user.name())} />
+                            <span>{user.full_name()}</span>
+                            // {if store.is_offline() {
+                            //     html! {
+                            //         <span class="badge offline">{"Offline"}</span>
+                            //     }
+                            // } else {
+                            //     html! {}
+                            // }}
+                        </div>
+                    } else {
+                        <Link<AppRoute> classes="right_nav_button" to={AppRoute::Profile}>{"Complete profile"}</Link<AppRoute>>
+                    }
                 } else {
-                    <Link<AppRoute> classes="login" to={AppRoute::Login}>{"Login"}</Link<AppRoute>>
+                    <Link<AppRoute> classes="right_nav_button" to={AppRoute::Login}>{"Login"}</Link<AppRoute>>
                 }
             </nav>
             <Sidebar visible={*show_side_bar} />

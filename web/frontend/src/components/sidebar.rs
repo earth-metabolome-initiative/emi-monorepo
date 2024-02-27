@@ -24,21 +24,12 @@ pub fn sidebar(props: &SidebarProps) -> Html {
         "sidebar hidden"
     };
 
-    let onclick_home = {
-        let navigator = navigator.clone();
-        Callback::from(move |_| {
-            navigator.push(&AppRoute::Home);
-        })
-    };
-
     html! {
         <div class={sidebar_class}>
             <div class="sidebar-content">
                 <ul>
                     <li>
-                        <button onclick={onclick_home}>
-                            {"Home"}
-                        </button>
+                        <Link<AppRoute> to={AppRoute::Home}>{"Home"}</Link<AppRoute>>
                     </li>
                     <li><a href="#">{"About"}</a></li>
                     <li><a href="#">{"Services"}</a></li>
