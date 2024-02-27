@@ -20,17 +20,11 @@ mod database;
 #[cfg(target_arch = "wasm32")]
 mod wasm {
 
-    use std::f32::consts::E;
-
-    use crate::components::*;
-    use crate::router::{switch, AppRoute};
-    use crate::stores::{refresh_access_token, update_user_informations, UserState};
-    use log::info;
-    use wasm_bindgen::JsValue;
-    use web_common::user::User;
     use yew::prelude::*;
     use yew_router::prelude::*;
-    use yewdux::prelude::*;
+    use crate::components::*;
+    use crate::router::{switch, AppRoute};
+    use log::info;
 
     #[function_component]
     pub fn App() -> Html {

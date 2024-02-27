@@ -2,8 +2,7 @@
 //!
 
 use super::logout::Logout;
-use crate::stores::UserState;
-use web_common::api::oauth::jwt_cookies::FULL_LOGOUT_ENDPOINT;
+use crate::stores::user_state::UserState;
 use yew::prelude::*;
 use yewdux::use_store;
 

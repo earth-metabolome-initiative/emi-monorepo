@@ -1,18 +1,19 @@
 use crate::api::FrontendApiError;
-use crate::stores::user_state::UserState;
 use reqwasm::http::Request;
-use std::rc::Rc;
 use web_common::api::oauth::jwt_cookies::*;
 use web_common::api::{auth::users::me::*, ApiError};
 use web_common::user::User;
-use yewdux::prelude::*;
+use crate::api::utils::add_bearer;
 
 /// Returns the informations regarding the currently logged user.
+///
+/// # Arguments
+/// * `access_token` - The access token of the user to get the informations from.
 pub async fn me(access_token: &AccessToken) -> Result<User, FrontendApiError> {
-    let header = access_token.header();
-
-    let response = Request::get(FULL_ENDPOINT)
-        .header(header.0, &header.1)
+    let response = add_bearer(
+        Request::get(FULL_ENDPOINT),
+        &access_token
+    )
         .send()
         .await
         .map_err(FrontendApiError::from)?;

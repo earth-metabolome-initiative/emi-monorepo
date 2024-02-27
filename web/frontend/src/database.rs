@@ -6,7 +6,6 @@
 //! offline as well, without having to consult the server for every operation.
 //! You can learn more about GlueSQL [here](https://gluesql.org/docs/0.15/)
 //! and about IndexedDB [here](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API).
-use gluesql::idb_storage::IdbStorage;
 use gluesql::prelude::*;
 
 /// Initializes the database.

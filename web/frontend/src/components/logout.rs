@@ -5,23 +5,20 @@
 //! upon success, proceeds to delete the user session and redirect the user to the
 //! login page.
 
-use crate::api::oauth::logout;
 use yew::prelude::*;
 use yew_router::prelude::*;
 use yewdux::prelude::*;
 
-use crate::router::AppRoute;
 use crate::stores::user_state;
-use crate::stores::UserState;
 
 #[function_component(Logout)]
 /// Logout button for the sidebar.
 pub fn logout() -> Html {
-    let (_user, dispatch) = use_store::<UserState>();
+    let (user, dispatch) = use_store::<user_state::UserState>();
     let navigator = use_navigator().unwrap();
 
     let on_logout = Callback::from(move |_| {
-        user_state::logout(dispatch.clone(), navigator.clone());
+        user_state::logout(dispatch.clone(), navigator.clone(), user.clone().access_token().cloned());
     });
 
     html! {

@@ -3,6 +3,8 @@
 mod github;
 pub(crate) mod jwt_cookies;
 mod providers;
+mod refresh;
+mod logout;
 use actix_web::web;
 pub(crate) use jwt_cookies::access_token_validator;
 
@@ -46,7 +48,7 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
         web::scope(web_common::api::oauth::ENDPOINT)
             .service(github::github_oauth_handler)
             .service(providers::get_providers)
-            .service(jwt_cookies::refresh_access_token)
-            .service(jwt_cookies::logout),
+            .service(refresh::refresh_access_token)
+            .service(logout::logout),
     );
 }

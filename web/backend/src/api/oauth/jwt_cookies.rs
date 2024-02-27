@@ -5,14 +5,12 @@ use actix_web::cookie::Cookie;
 use actix_web::dev::Payload;
 use actix_web::dev::ServiceRequest;
 use actix_web::error::{Error, ErrorInternalServerError, ErrorUnauthorized};
-use actix_web::get;
 use actix_web::http::header::LOCATION;
 use actix_web::web;
 use actix_web::FromRequest;
 use actix_web::HttpRequest;
 use actix_web::HttpResponse;
 use actix_web::HttpResponseBuilder;
-use actix_web::Responder;
 use actix_web_httpauth::extractors::bearer::BearerAuth;
 use base64::prelude::*;
 use chrono::Duration;
@@ -237,12 +235,12 @@ impl JsonWebToken {
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Debug)]
-struct JsonRefreshToken {
+pub(crate) struct JsonRefreshToken {
     web_token: JsonWebToken,
 }
 
 impl JsonRefreshToken {
-    fn new(user_id: Uuid) -> Result<JsonRefreshToken, String> {
+    pub fn new(user_id: Uuid) -> Result<JsonRefreshToken, String> {
         let config = JWTConfig::from_env()?;
         Ok(JsonRefreshToken {
             web_token: JsonWebToken::new(user_id, config.refresh_token_minutes()),
@@ -264,7 +262,7 @@ impl JsonRefreshToken {
     ///
     /// # Arguments
     /// * `redis_client` - The redis client to use for the login.
-    async fn is_still_present_in_redis(
+    pub async fn is_still_present_in_redis(
         &self,
         redis_client: &redis::Client,
     ) -> Result<bool, String> {
@@ -275,24 +273,24 @@ impl JsonRefreshToken {
     ///
     /// # Arguments
     /// * `redis_client` - The redis client to use for the login.
-    async fn delete_from_redis(&self, redis_client: &redis::Client) -> Result<(), String> {
+    pub async fn delete_from_redis(&self, redis_client: &redis::Client) -> Result<(), String> {
         self.web_token.delete_from_redis(redis_client).await
     }
 
-    fn user_id(&self) -> Uuid {
+    pub fn user_id(&self) -> Uuid {
         self.web_token.user_id()
     }
 
-    fn is_expired(&self) -> bool {
+    pub fn is_expired(&self) -> bool {
         self.web_token.is_expired()
     }
 
-    fn encode(&self) -> Result<String, String> {
+    pub fn encode(&self) -> Result<String, String> {
         let config = JWTConfig::from_env()?;
         self.web_token.encode(config.refresh_token_private_key()?)
     }
 
-    fn decode(token: &str) -> Result<JsonRefreshToken, String> {
+    pub fn decode(token: &str) -> Result<JsonRefreshToken, String> {
         let config = JWTConfig::from_env()?;
         Ok(JsonRefreshToken {
             web_token: JsonWebToken::decode(token, config.refresh_token_public_key()?)?,
@@ -318,12 +316,12 @@ mod refresh_token_tests {
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Debug)]
-struct JsonAccessToken {
+pub(crate) struct JsonAccessToken {
     web_token: JsonWebToken,
 }
 
 impl JsonAccessToken {
-    fn new(user_id: Uuid) -> Result<JsonAccessToken, String> {
+    pub fn new(user_id: Uuid) -> Result<JsonAccessToken, String> {
         let config = JWTConfig::from_env()?;
         Ok(JsonAccessToken {
             web_token: JsonWebToken::new(user_id, config.access_token_minutes()),
@@ -334,7 +332,7 @@ impl JsonAccessToken {
     ///
     /// # Arguments
     /// * `redis_client` - The redis client to use for the login.
-    async fn insert_into_redis(&self, redis_client: &redis::Client) -> Result<(), String> {
+    pub async fn insert_into_redis(&self, redis_client: &redis::Client) -> Result<(), String> {
         let config = JWTConfig::from_env()?;
         self.web_token
             .insert_into_redis(redis_client, config.access_token_minutes())
@@ -345,7 +343,7 @@ impl JsonAccessToken {
     ///
     /// # Arguments
     /// * `redis_client` - The redis client to use for the login.
-    async fn is_still_present_in_redis(
+    pub async fn is_still_present_in_redis(
         &self,
         redis_client: &redis::Client,
     ) -> Result<bool, String> {
@@ -356,7 +354,7 @@ impl JsonAccessToken {
     ///
     /// # Arguments
     /// * `redis_client` - The redis client to use for the login.
-    async fn delete_from_redis(&self, redis_client: &redis::Client) -> Result<(), String> {
+    pub async fn delete_from_redis(&self, redis_client: &redis::Client) -> Result<(), String> {
         self.web_token.delete_from_redis(redis_client).await
     }
 
@@ -368,12 +366,12 @@ impl JsonAccessToken {
         self.web_token.is_expired()
     }
 
-    fn encode(&self) -> Result<String, String> {
+    pub fn encode(&self) -> Result<String, String> {
         let config = JWTConfig::from_env()?;
         self.web_token.encode(config.access_token_private_key()?)
     }
 
-    fn decode(token: &str) -> Result<JsonAccessToken, String> {
+    pub fn decode(token: &str) -> Result<JsonAccessToken, String> {
         let config = JWTConfig::from_env()?;
         Ok(JsonAccessToken {
             web_token: JsonWebToken::decode(token, config.access_token_public_key()?)?,
@@ -499,7 +497,7 @@ pub(crate) async fn access_token_validator(
     }
 }
 
-fn eliminate_cookies(mut builder: HttpResponseBuilder) -> HttpResponseBuilder {
+pub(crate) fn eliminate_cookies(mut builder: HttpResponseBuilder) -> HttpResponseBuilder {
     log::info!("Eliminating cookies");
     let refresh_cookie = Cookie::build(REFRESH_COOKIE_NAME, "")
         .path("/")
@@ -612,181 +610,4 @@ impl FromRequest for User {
             }
         })
     }
-}
-
-#[get("/refresh")]
-/// Endpoint to refresh the access token, given a valid refresh token.
-///
-/// # Arguments
-/// * `req` - The request to refresh the token.
-/// * `pool` - The database pool to use for the login.
-/// * `redis_client` - The redis client to use for the login.
-///
-/// # Implementative details
-/// The refresh token is expected to be present in the request as a cookie, with the name
-/// defined by the constant REFRESH_COOKIE_NAME. The refresh token is then decoded, and
-/// checked whether it is still present in the redis database. If it is, we check that the
-/// user associated to the token still exists in the database, and if it does, we create a
-/// new access token and return it. If any of the checks fail, we return an error.
-pub async fn refresh_access_token(
-    req: HttpRequest,
-    pool: web::Data<Pool<ConnectionManager<PgConnection>>>,
-    redis_client: web::Data<redis::Client>,
-) -> HttpResponse {
-    log::info!("Refreshing access token");
-    let refresh_cookie = match req.cookie(REFRESH_COOKIE_NAME) {
-        Some(cookie) => cookie,
-        None => {
-            log::debug!("Refresh token not present in request");
-            return eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::unauthorized());
-        }
-    };
-
-    let refresh_token = match JsonRefreshToken::decode(refresh_cookie.value()) {
-        Ok(token) => token,
-        Err(_) => {
-            log::debug!("Unable to decode refresh token");
-            return eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::unauthorized());
-        }
-    };
-
-    // If the token is expired, we return an error.
-    if refresh_token.is_expired() {
-        return eliminate_cookies(HttpResponse::Unauthorized())
-            .json(ApiError::expired_authorization());
-    }
-
-    // Next up, we check whether the token is still present in the redis database.
-    let is_still_present = refresh_token.is_still_present_in_redis(&redis_client).await;
-
-    if is_still_present.map_or(true, |present| !present) {
-        log::debug!("Refresh token not present in redis");
-        return eliminate_cookies(HttpResponse::Unauthorized())
-            .json(ApiError::expired_authorization());
-    }
-
-    // Finally, we get the user from the database, as while the user indeed seems
-    // to be authenticated and it still exists in the redis database, we still need
-    // to check whether the user exists in the database, as it may have been deleted
-    // in the meantime.
-    let mut connection = match pool.get() {
-        Ok(pool) => pool,
-        Err(_) => {
-            return HttpResponse::InternalServerError().json(ApiError::internal_server_error())
-        }
-    };
-
-    // If the user doesn't exist, we return an error, otherwise we return the user.
-    let user = User::get(refresh_token.user_id(), &mut connection);
-
-    if user.is_err() {
-        log::debug!("User associated to token doesn't exist");
-        return HttpResponse::Unauthorized().json(ApiError::unauthorized());
-    }
-
-    // If the user exists, we create a new access token and return it.
-    let access_token = match JsonAccessToken::new(refresh_token.user_id()) {
-        Ok(token) => token,
-        Err(_) => {
-            return HttpResponse::InternalServerError().json(ApiError::internal_server_error())
-        }
-    };
-
-    match access_token.insert_into_redis(&redis_client).await {
-        Ok(_) => (),
-        Err(_) => {
-            return HttpResponse::InternalServerError().json(ApiError::internal_server_error())
-        }
-    }
-
-    // We return the access token as part of the JSON response, and we
-    // expect the frontend to store it in a variable and use it for
-    // future requests as part of the Authorization header. This means
-    // that upon refreshing the page the user will have to request a
-    // new access token, but this is a security measure to prevent
-    // unauthorized access to the API.
-
-    match access_token.encode() {
-        Ok(encoded_token) => HttpResponse::Ok().json(AccessToken::new(encoded_token)),
-        Err(_) => HttpResponse::InternalServerError().json(ApiError::internal_server_error()),
-    }
-}
-
-#[get("/logout")]
-/// Endpoint to logout the user.
-///
-/// # Arguments
-/// * `req` - The request to logout the user.
-/// * `bearer` - The bearer token of the user to logout.
-/// * `redis_client` - The redis client to use for the login.
-///
-/// # Implementative details
-/// The logout endpoint is expected to be called with a valid access token, and will
-/// remove the access token from the redis database, effectively logging the user out.
-/// It will also remove the refresh token from the redis database, and delete the refresh
-/// token cookie from the user's browser, along with the user online cookie.
-async fn logout(
-    req: HttpRequest,
-    bearer: BearerAuth,
-    redis_client: web::Data<redis::Client>,
-) -> impl Responder {
-    let access_token = match JsonAccessToken::decode(bearer.token()) {
-        Ok(token) => token,
-        Err(_) => {
-            log::debug!("Unable to decode access token");
-            return eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::unauthorized());
-        }
-    };
-
-    let is_still_present = access_token.is_still_present_in_redis(&redis_client).await;
-
-    if is_still_present.map_or(true, |present| !present) {
-        log::debug!("Access token not present in redis");
-        return eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::unauthorized());
-    }
-
-    let refresh_cookie = match req.cookie(REFRESH_COOKIE_NAME) {
-        Some(cookie) => cookie,
-        None => {
-            log::debug!("Refresh token not present in request");
-            return eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::unauthorized());
-        },
-    };
-
-    let refresh_token = match JsonRefreshToken::decode(refresh_cookie.value()) {
-        Ok(token) => token,
-        Err(_) => {
-            log::debug!("Unable to decode refresh token");
-            return eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::unauthorized());
-        }
-    };
-
-    let is_still_present = refresh_token.is_still_present_in_redis(&redis_client).await;
-
-    if is_still_present.map_or(true, |present| !present) {
-        log::debug!("Refresh token not present in redis");
-        return eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::unauthorized());
-    }
-
-    match access_token.delete_from_redis(&redis_client).await {
-        Ok(_) => (),
-        Err(_) => {
-            log::error!("Unable to delete access token from redis");
-            return HttpResponse::InternalServerError().json(ApiError::internal_server_error())
-        }
-    }
-
-    match refresh_token.delete_from_redis(&redis_client).await {
-        Ok(_) => (),
-        Err(_) => {
-            log::error!("Unable to delete refresh token from redis");
-            return HttpResponse::InternalServerError().json(ApiError::internal_server_error())
-        }
-    }
-
-    // We delete the refresh token cookie and the user online cookie from the user's browser.
-    eliminate_cookies(HttpResponse::TemporaryRedirect())
-    // We redirect the user to the login page.
-        .append_header((LOCATION, "/login"))
-        .finish()  
 }

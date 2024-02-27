@@ -2,11 +2,11 @@ use crate::api::auth::users;
 use crate::api::oauth::jwt_cookies::refresh_jwt_cookie;
 use crate::cookies::is_logged_in;
 use crate::router::AppRoute;
+use log::info;
 use serde::{Deserialize, Serialize};
 use web_common::{api::oauth::jwt_cookies::AccessToken, user::User};
 use yew_router::prelude::*;
 use yewdux::prelude::*;
-use log::info;
 
 #[derive(Default, PartialEq, Serialize, Deserialize, Store, Clone)]
 /// The following macro will make sure that the store is saved across sessions.
@@ -54,9 +54,11 @@ impl UserState {
     }
 }
 
-pub fn logout(dispatch: Dispatch<UserState>, navigator: Navigator) {
+pub fn logout(dispatch: Dispatch<UserState>, navigator: Navigator, access_token: Option<AccessToken>) {
     wasm_bindgen_futures::spawn_local(async move {
-        match crate::api::oauth::logout::logout().await {
+        match crate::api::oauth::logout::logout(access_token.as_ref())
+            .await
+        {
             Ok(_) => {
                 dispatch.reduce_mut(move |store| {
                     store.user = None;
@@ -82,14 +84,14 @@ pub fn refresh_access_token(dispatch: Dispatch<UserState>, navigator: Navigator)
                     });
                 }
                 Err(_) => {
-                    logout(dispatch, navigator);
+                    logout(dispatch, navigator, None);
                 }
             }
         }
     });
 }
 
-pub fn update_user_informations(
+pub fn retrieve_user_informations(
     dispatch: Dispatch<UserState>,
     access_token: AccessToken,
     navigator: Navigator,
@@ -102,7 +104,7 @@ pub fn update_user_informations(
                 });
             }
             Err(_) => {
-                logout(dispatch, navigator);
+                logout(dispatch, navigator, Some(access_token));
             }
         }
     })

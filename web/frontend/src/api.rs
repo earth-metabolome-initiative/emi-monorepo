@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 pub(crate) mod auth;
 pub(crate) mod oauth;
+pub(crate) mod utils;
 
 use web_common::api::ApiError;
 
