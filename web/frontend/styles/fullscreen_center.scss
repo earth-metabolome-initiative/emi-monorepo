@@ -1,0 +1,23 @@
+//! Styles for pages requiring to center element in the middle of the screen.
+
+.fullscreen_center_app {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  margin-top: -$navigator-height;
+  margin-left: -$sidebar-width;
+  padding: inherit;
+  box-sizing: border-box;
+
+  @media screen and (max-width: $small-screen) {
+    margin: 0;
+    padding: 0;
+    position: relative;
+    min-height: 400px;
+  }
+}

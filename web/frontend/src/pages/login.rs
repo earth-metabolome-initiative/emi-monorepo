@@ -31,7 +31,7 @@ pub fn login() -> Html {
     }
 
     html! {
-        <div class="login_app">
+        <div class="fullscreen_center_app">
             <div class="login_box">
                 <h2>{"Login"}</h2>
                 <ul class="login_providers">

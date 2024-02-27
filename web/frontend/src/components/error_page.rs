@@ -11,7 +11,7 @@ pub struct ErrorPageProps {
 #[function_component(ErrorPage)]
 pub fn error_page(props: &ErrorPageProps) -> Html {
     html! {
-        <div class="not-found-container">
+        <div class="fullscreen_center_app">
             <div class="error-wrapper">
                 <div class="error-code">
                     {props.error_code}
