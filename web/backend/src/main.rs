@@ -59,7 +59,7 @@ async fn main() -> std::io::Result<()> {
     // Start http server
     HttpServer::new(move || {
         let cors = Cors::default()
-            .allowed_origin("http://localhost:3000")
+            .allowed_origin("http://emi.local")
             .allowed_methods(vec!["GET", "POST", "PATCH", "DELETE"])
             .allowed_headers(vec![
                 header::CONTENT_TYPE,
@@ -81,7 +81,7 @@ async fn main() -> std::io::Result<()> {
             // limit the maximum amount of data that server will accept
             .app_data(web::JsonConfig::default().limit(4096))
     })
-    .bind("127.0.0.1:8080")?
+    .bind("actix.emi.local:8080")?
     .workers(4)
     .run()
     .await

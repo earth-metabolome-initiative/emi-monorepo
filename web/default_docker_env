@@ -1,10 +1,19 @@
+# Domain of the website
+DOMAIN='emi.local'
+ACTIX_PORT=8080
+TRUNK_PORT=3000
+NGINX_WORKER_PROCESSES=4
+ACTIX_WORKER_THREADS=4
+# We set the RUST_LOG environment variable to debug
+# so that we can see the logs of the application
+RUST_LOG=debug
+RUST_BACKTRACE=1
 # This is a default version of the '.env' file
 # You should copy this file into a new file called '.env'
 # and then change the values to match your environment
 POSTGRES_DB='development.db'
 POSTGRES_USER='user'
 POSTGRES_PASSWORD='password'
-POSTGRES_PORT=5432
 # The database url is composed from the previous
 # variables. It is important to not change this
 # variable, as it is used by the application
@@ -13,15 +22,6 @@ DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost/${POST
 # It is recommended to use a large disk for this
 # as the database can grow to be very large
 POSTGRES_DATABASE_DIRECTORY='path/to/large/disk'
-# It is important to run regular backups of the database
-# so that we do not loose all of our data. You need to
-# provide the username, server name and path to the
-# private key for the server that you want to backup to
-BACKUP_SERVER_USERNAME='username'
-BACKUP_SERVER_NAME='server.name'
-BACKUP_SERVER_PORT='22'
-BACKUP_SERVER_PRIVATE_KEY_PATH='path/to/private/key'
-BACKUP_REMOTE_PATH='path/to/remote/backup/directory'
 # In order to provide Oauth authentication for the API
 # you need to provide the client id and client secret
 # for the application that you have created in ORCID
@@ -35,7 +35,7 @@ SIRIUS_PASSWORD='password'
 # The GitHub Client ID credentials.
 GITHUB_CLIENT_ID='github_client_id'
 GITHUB_CLIENT_SECRET='github_client_secret'
-CLIENT_ORIGIN='http://localhost:3000'
+GITHUB_REDIRECT_URI=http://api.${DOMAIN}/api/oauth/github
 # Generate the public & secret key using https://travistidwell.com/jsencrypt/demo/
 # then, convert both to base64 using https://www.base64encode.org/
 # Generate keys with 4096 bits!
@@ -47,7 +47,6 @@ REFRESH_TOKEN_PUBLIC_KEY=my_public_key_for_refresh_token
 REFRESH_TOKEN_PRIVATE_KEY=my_ultra_secure_secret_refresh_token_key
 REFRESH_TOKEN_MINUTES=480 # in minutes, equals to 8 hours
 # Next up, we have the Redis configuration
-REDIS_URL='redis://127.0.0.1:6379/'
+REDIS_PORT=6379
+REDIS_URL=redis://127.0.0.1:${REDIS_PORT}/
 REDIS_DATABASE_DIRECTORY='path/to/redis/database'
-# Domain of the website
-DOMAIN='localhost'
