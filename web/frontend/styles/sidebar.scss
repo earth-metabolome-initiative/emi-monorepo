@@ -26,11 +26,14 @@ $sidebar-hover-color: #f76a00;
             li {
                 margin-bottom: 15px;
 
-                a {
+                a, button {
                     text-decoration: none;
                     font-size: 1.2rem;
                     color: inherit;
                     transition: color 0.3s ease;
+                    background-color: transparent;
+                    border: none;
+                    padding: 0;
 
                     &:hover {
                         color: $sidebar-hover-color;
