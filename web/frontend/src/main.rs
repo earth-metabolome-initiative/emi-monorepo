@@ -67,10 +67,6 @@ mod wasm {
 
 #[cfg(target_arch = "wasm32")]
 fn main() {
-    // We write to a "frontend.check" file to indicate that
-    // the frontend has finished compiling and is now starting.
-    std::fs::write("frontend.check", "frontend is ready.").unwrap();
-
     wasm_logger::init(wasm_logger::Config::default());
     yew::Renderer::<wasm::App>::new().render();
 }
