@@ -14,5 +14,5 @@ RUN rustup target add wasm32-unknown-unknown
 RUN cargo install --locked trunk
 
 # Command to run the Yew frontend application
-CMD trunk serve --port $TRUNK_PORT --address 0.0.0.0 --proxy-backend http://actix-server:${ACTIX_PORT}/api && cat "frontend is running on port $TRUNK_PORT" > /app/frontend.log
+CMD trunk serve --port $TRUNK_PORT --address 0.0.0.0 --proxy-backend http://actix-server:${ACTIX_PORT}/api
 
