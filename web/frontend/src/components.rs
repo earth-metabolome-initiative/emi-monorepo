@@ -7,6 +7,7 @@ mod logout;
 pub mod navigator;
 mod search_bar;
 pub mod sidebar;
+pub mod forms;
 
 pub use error_page::ErrorPage;
 pub use footer::Footer;

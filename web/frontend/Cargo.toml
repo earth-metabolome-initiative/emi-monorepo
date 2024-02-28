@@ -29,8 +29,7 @@ gloo-console = "0.3.0"
 gluesql = { version = "0.15", features = ["idb-storage"], default-features = false }
 wasm-logger = "0.2.0"
 log = "0.4.20"
-yew_form = {path = "../yew_form"}
-yew_form_derive = {path = "../yew_form_derive"}
+validator_derive = "0.16.0"
 
 [dependencies.web-sys]
 version = "0.3.67"
