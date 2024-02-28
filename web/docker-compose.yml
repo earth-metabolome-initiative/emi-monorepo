@@ -68,7 +68,7 @@ services:
     volumes:
       - ./:/app
     ports:
-      - ${ACTIX_PORT}:${ACTIX_PORT}
+      - "${ACTIX_PORT}:${ACTIX_PORT}"
     depends_on:
       - postgres
       - redis
@@ -86,16 +86,16 @@ services:
       TRUNK_PORT: ${TRUNK_PORT}
       DOMAIN: ${DOMAIN}
       ACTIX_PORT: ${ACTIX_PORT}
-      RUST_LOG: ${RUST_LOG}
       RUST_BACKTRACE: ${RUST_BACKTRACE}
     volumes:
       - ./:/app
     ports:
-      - ${TRUNK_PORT}:${TRUNK_PORT}
+      - "${TRUNK_PORT}:${TRUNK_PORT}"
     depends_on:
       - actix-server
     networks:
       - frontend
+      - backend
 
   nginx:
     build:

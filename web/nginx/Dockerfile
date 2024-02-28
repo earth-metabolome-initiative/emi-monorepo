@@ -9,6 +9,6 @@ COPY nginx.conf.template /app/nginx.conf.template
 RUN envsubst < /app/nginx.conf.template > /etc/nginx/nginx.conf
 
 # Start Nginx
-CMD DOLLAR='$' envsubst < /app/nginx.conf.template | sed -e 's/§/$/g' > /etc/nginx/nginx.conf && \
+CMD envsubst < /app/nginx.conf.template | sed -e 's/§/$/g' > /etc/nginx/nginx.conf && \
     cat /etc/nginx/nginx.conf > /app/nginx.conf && \
     nginx -g 'daemon off;'

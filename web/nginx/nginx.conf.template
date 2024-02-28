@@ -16,7 +16,7 @@ http {
         server_name api.${DOMAIN};
 
         location / {
-            proxy_pass http://localhost:${ACTIX_PORT};
+            proxy_pass http://actix-server:${ACTIX_PORT};
             proxy_set_header Host §host;
             proxy_set_header X-Real-IP §remote_addr;
             proxy_set_header X-Forwarded-For §proxy_add_x_forwarded_for;
@@ -26,10 +26,10 @@ http {
 
     server {
         listen 80;
-        server_name emi.local;
+        server_name ${DOMAIN};
 
         location / {
-            proxy_pass http://localhost:${TRUNK_PORT};
+            proxy_pass http://yew-frontend:${TRUNK_PORT};
             proxy_set_header Host §host;
             proxy_set_header X-Real-IP §remote_addr;
             proxy_set_header X-Forwarded-For §proxy_add_x_forwarded_for;

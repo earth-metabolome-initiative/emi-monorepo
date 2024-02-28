@@ -17,7 +17,7 @@ POSTGRES_PASSWORD='password'
 # The database url is composed from the previous
 # variables. It is important to not change this
 # variable, as it is used by the application
-DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost/${POSTGRES_DB}
+DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB}
 # This is the directory where the database will be stored
 # It is recommended to use a large disk for this
 # as the database can grow to be very large

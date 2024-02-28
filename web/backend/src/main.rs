@@ -56,6 +56,10 @@ async fn main() -> std::io::Result<()> {
         }
     };
 
+    // We write to a "backend.check" file to indicate that
+    // the backend has finished compiling and is now starting.
+    std::fs::write("backend.check", "backend is ready.").unwrap();
+
     // Start http server
     HttpServer::new(move || {
         let cors = Cors::default()
@@ -81,7 +85,7 @@ async fn main() -> std::io::Result<()> {
             // limit the maximum amount of data that server will accept
             .app_data(web::JsonConfig::default().limit(4096))
     })
-    .bind("actix.emi.local:8080")?
+    .bind("0.0.0.0:8080")?
     .workers(4)
     .run()
     .await
