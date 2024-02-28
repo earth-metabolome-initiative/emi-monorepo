@@ -48,5 +48,5 @@ REFRESH_TOKEN_PRIVATE_KEY=my_ultra_secure_secret_refresh_token_key
 REFRESH_TOKEN_MINUTES=480 # in minutes, equals to 8 hours
 # Next up, we have the Redis configuration
 REDIS_PORT=6379
-REDIS_URL=redis://127.0.0.1:${REDIS_PORT}/
+REDIS_URL=redis://redis:${REDIS_PORT}/
 REDIS_DATABASE_DIRECTORY='path/to/redis/database'
