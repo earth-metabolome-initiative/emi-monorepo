@@ -35,7 +35,7 @@ SIRIUS_PASSWORD='password'
 # The GitHub Client ID credentials.
 GITHUB_CLIENT_ID='github_client_id'
 GITHUB_CLIENT_SECRET='github_client_secret'
-GITHUB_REDIRECT_URI=http://${DOMAIN}/api/oauth/github
+GITHUB_REDIRECT_URI=http://api.${DOMAIN}/api/oauth/github
 # Generate the public & secret key using https://travistidwell.com/jsencrypt/demo/
 # then, convert both to base64 using https://www.base64encode.org/
 # Generate keys with 4096 bits!

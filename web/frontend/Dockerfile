@@ -15,4 +15,3 @@ RUN cargo install --locked trunk
 
 # Command to run the Yew frontend application
 CMD trunk serve --port $TRUNK_PORT --address 0.0.0.0 --proxy-backend http://actix-server:${ACTIX_PORT}/api
-

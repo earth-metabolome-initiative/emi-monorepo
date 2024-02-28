@@ -42,6 +42,7 @@ struct JWTConfig {
     refresh_token_base_64_public_key: String,
     refresh_token_base_64_private_key: String,
     refresh_token_minutes: i64,
+    domain: String,
 }
 
 impl JWTConfig {
@@ -64,6 +65,7 @@ impl JWTConfig {
                 .map_err(|e| e.to_string())?
                 .parse()
                 .map_err(|e: ParseIntError| e.to_string())?,
+            domain: env::var("DOMAIN").map_err(|e| e.to_string())?,
         })
     }
 
@@ -87,6 +89,10 @@ impl JWTConfig {
 
     pub fn access_token_minutes(&self) -> i64 {
         self.access_token_minutes
+    }
+
+    pub fn domain(&self) -> String {
+        self.domain.clone()
     }
 
     pub fn refresh_token_public_key(&self) -> Result<String, String> {
@@ -413,7 +419,7 @@ async fn encode_jwt_refresh_cookie<'a>(
     token.insert_into_redis(redis_client).await?;
 
     Ok(Cookie::build(REFRESH_COOKIE_NAME, token.encode()?)
-        .domain(std::env::var("DOMAIN").expect("Domain must be set"))
+        .domain(config.domain())
         .path("/")
         .max_age(ActixWebDuration::minutes(config.refresh_token_minutes()))
         // The HTTP_ONLY flag is set to true to prevent the cookie from being accessed by
@@ -426,7 +432,7 @@ async fn encode_jwt_refresh_cookie<'a>(
 fn encode_user_online_cookie<'a>() -> Result<Cookie<'a>, String> {
     let config = JWTConfig::from_env()?;
     Ok(Cookie::build(USER_ONLINE_COOKIE_NAME, "true")
-        .domain(std::env::var("DOMAIN").expect("Domain must be set"))
+        .domain(config.domain())
         .path("/")
         .max_age(ActixWebDuration::minutes(config.refresh_token_minutes()))
         // We want to be able to check the existance of this cookie from the frontend
@@ -501,15 +507,17 @@ pub(crate) async fn access_token_validator(
 
 pub(crate) fn eliminate_cookies(mut builder: HttpResponseBuilder) -> HttpResponseBuilder {
     log::info!("Eliminating cookies");
+    let config = JWTConfig::from_env().unwrap();
+
     let refresh_cookie = Cookie::build(REFRESH_COOKIE_NAME, "")
-        .domain(std::env::var("DOMAIN").expect("Domain must be set"))
+        .domain(config.domain())
         .path("/")
         .max_age(ActixWebDuration::ZERO)
         .http_only(true)
         .finish();
 
     let user_online_cookie = Cookie::build(USER_ONLINE_COOKIE_NAME, "")
-        .domain(std::env::var("DOMAIN").expect("Domain must be set"))
+        .domain(config.domain())
         .path("/")
         .max_age(ActixWebDuration::ZERO)
         .http_only(false)
