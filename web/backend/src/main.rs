@@ -56,9 +56,19 @@ async fn main() -> std::io::Result<()> {
         }
     };
 
-    // We write to a "backend.check" file to indicate that
+    // We remove the file "backend.building" if it exists
+    std::fs::remove_file("/app/backend/backend.building").unwrap_or_default();
+
+    // We write to a "backend.ready" file to indicate that
     // the backend has finished compiling and is now starting.
-    std::fs::write("backend.check", "backend is ready.").unwrap();
+    let timestamp = chrono::Utc::now().to_rfc2822();
+    std::fs::write(
+        "/app/backend/backend.ready",
+        format!(
+            "backend is ready at {}",
+            timestamp
+        )
+    ).unwrap();
 
     // Start http server
     HttpServer::new(move || {
