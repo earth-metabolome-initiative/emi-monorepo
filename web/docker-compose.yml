@@ -41,9 +41,6 @@ services:
     restart: on-failure
 
   actix-server:
-    entrypoint: /bin/bash
-    stdin_open: true # docker run -i
-    tty: true        # docker run -t
     build:
       context: ./backend
       args:
