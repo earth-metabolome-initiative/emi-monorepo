@@ -31,6 +31,7 @@ brew install nss
 ```
 
 Next up, we need to install the root certificate. **This is a one-time operation and will require sudo**:
+Run this command under the `/web` directory.
 
 ```bash
 mkcert -install
