@@ -71,7 +71,7 @@ pub fn navigator() -> Html {
                 if let Some(user) = user.user() {
                     if user.has_complete_profile() {
                         <div class="user">
-                            <img src={format!("/api/user/{}/avatar", user.id())} alt={format!("{}'s avatar", user.name())} />
+                            <img src={format!("/api/user/{}/avatar", user.id())} alt={format!("{}'s avatar", user.last_name().unwrap())} />
                             <span>{user.full_name()}</span>
                             // {if store.is_offline() {
                             //     html! {

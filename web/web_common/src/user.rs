@@ -3,16 +3,16 @@ use uuid::Uuid;
 
 #[derive(PartialEq, Debug, Serialize, Deserialize, Clone)]
 pub struct User {
-    name: Option<String>,
+    first_name: Option<String>,
     middle_name: Option<String>,
     last_name: Option<String>,
     id: Uuid,
 }
 
 impl User {
-    pub fn new(name: Option<String>, middle_name: Option<String>, last_name: Option<String>, id: Uuid) -> User {
+    pub fn new(first_name: Option<String>, middle_name: Option<String>, last_name: Option<String>, id: Uuid) -> User {
         User {
-            name,
+            first_name,
             middle_name,
             last_name,
             id,
@@ -21,8 +21,8 @@ impl User {
 
     pub fn full_name(&self) -> String {
         let mut full_name = String::new();
-        if let Some(name) = &self.name {
-            full_name.push_str(name);
+        if let Some(first_name) = &self.first_name {
+            full_name.push_str(first_name);
         }
         if let Some(middle_name) = &self.middle_name {
             full_name.push_str(" ");
@@ -44,8 +44,8 @@ impl User {
         self.id
     }
 
-    pub fn name(&self) -> String {
-        self.name.clone().unwrap_or("Anonymous".to_string())
+    pub fn first_name(&self) -> Option<String> {
+        self.first_name.clone()
     }
 
     pub fn middle_name(&self) -> Option<String> {
@@ -56,8 +56,8 @@ impl User {
         self.last_name.clone()
     }
 
-    pub fn set_name(&mut self, name: Option<String>) {
-        self.name = name;
+    pub fn set_first_name(&mut self, first_name: Option<String>) {
+        self.first_name = first_name;
     }
 
     pub fn set_middle_name(&mut self, middle_name: Option<String>) {
@@ -73,6 +73,6 @@ impl User {
     }
 
     pub fn has_complete_profile(&self) -> bool {
-        self.name.is_some() && self.last_name.is_some()
+        self.first_name.is_some() && self.last_name.is_some()
     }
 }
