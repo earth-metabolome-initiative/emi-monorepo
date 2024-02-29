@@ -1,0 +1,34 @@
+[build]
+# The index HTML file to drive the bundling process.
+target = "index.html"
+# Build in release mode.
+release = false
+# The output dir for all final assets.
+dist = "dist"
+# The public URL from which assets are to be served.
+public_url = "/"
+# Whether to include hash values in the output file names.
+filehash = true
+# Whether to inject scripts (and module preloads) into the finalized output.
+inject_scripts = true
+# Require Cargo.lock and cache are up to date
+frozen = false
+# Require Cargo.lock is up to date
+locked = false
+# Allow disabling minification
+no_minification = false
+# Allow disabling sub-resource integrity (SRI)
+no_sri = false
+
+[serve]
+# Open a browser tab once the initial build is complete.
+open = false
+# Disable auto-reload of the web app.
+no_autoreload = false
+# Disable error reporting
+no_error_reporting = false
+# Protocol used for autoreload WebSockets connection.
+ws_protocol = "wss"
+# The certificate/private key pair to use for TLS, which is enabled if both are set.
+tls_key_path = "../nginx/emi.local-key.pem"
+tls_cert_path = "../nginx/emi.local.pem"

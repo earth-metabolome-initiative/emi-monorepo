@@ -1,14 +1,18 @@
 // main.rs
 extern crate diesel;
 
-use actix_web::{web, App, HttpServer};
+use actix_web::{get, web, App, HttpServer, Responder};
 use diesel::prelude::*;
 use diesel::r2d2::{self, ConnectionManager, Pool};
 
 use actix_cors::Cors;
+use actix_files::NamedFile;
 use actix_web::http::header;
 use actix_web::middleware::Logger;
+use actix_web::HttpRequest;
+use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 use redis::Client;
+use std::path::PathBuf;
 
 mod api;
 mod diesel_enums;
@@ -17,10 +21,26 @@ mod models;
 mod schema;
 mod transactions;
 
+/// Entrypoint to load the index.html file
+async fn index() -> impl Responder {
+    let file = NamedFile::open("/app/frontend/dist/index.html");
+    file
+}
+
+#[get("/{filename:.*}")]
+/// Entrypoint to load the *.wasm and the *.js files
+///
+/// # Implementative details
+/// If the path happens to not exist, the server will return a 404 error.
+async fn static_files(req: HttpRequest) -> impl Responder {
+    let path: PathBuf = req.match_info().query("filename").parse().unwrap();
+    let file = NamedFile::open(format!("/app/frontend/dist/{}", path.display()));
+    file
+}
+
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     dotenvy::dotenv().ok();
-    std::env::set_var("RUST_LOG", "debug");
     env_logger::init();
     let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
@@ -64,16 +84,25 @@ async fn main() -> std::io::Result<()> {
     let timestamp = chrono::Utc::now().to_rfc2822();
     std::fs::write(
         "/app/backend/backend.ready",
-        format!(
-            "backend is ready at {}",
-            timestamp
-        )
-    ).unwrap();
+        format!("backend is ready at {}", timestamp),
+    )
+    .unwrap();
+
+    // load TLS keys
+    // to create a self-signed temporary cert for testing:
+    // `openssl req -x509 -newkey rsa:4096 -nodes -keyout key.pem -out cert.pem -days 365 -subj '/CN=localhost'`
+    let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls()).unwrap();
+    builder
+        .set_private_key_file("/app/nginx/emi.local-key.pem", SslFiletype::PEM)
+        .unwrap();
+    builder
+        .set_certificate_chain_file("/app/nginx/emi.local.pem")
+        .unwrap();
 
     // Start http server
     HttpServer::new(move || {
         let cors = Cors::default()
-            .allowed_origin("http://emi.local")
+            .allowed_origin("https://emi.local")
             .allowed_methods(vec!["GET", "POST", "PATCH", "DELETE"])
             .allowed_headers(vec![
                 header::CONTENT_TYPE,
@@ -88,6 +117,11 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(redis_client.clone()))
             // We register the API handlers
             .configure(api::configure)
+            // We serve the frontend as static files
+            .route("/", web::get().to(index))
+            .route("/login", web::get().to(index))
+            .route("/profile", web::get().to(index))
+            .service(static_files)
             // enable logger
             .wrap(Logger::default())
             // We add support for CORS requests
@@ -95,7 +129,7 @@ async fn main() -> std::io::Result<()> {
             // limit the maximum amount of data that server will accept
             .app_data(web::JsonConfig::default().limit(4096))
     })
-    .bind("0.0.0.0:8080")?
+    .bind_openssl("0.0.0.0:8080", builder)?
     .workers(4)
     .run()
     .await

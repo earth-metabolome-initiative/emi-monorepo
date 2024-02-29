@@ -1,0 +1,61 @@
+form.standard-form {
+    border: 1px solid $primary;
+    border-radius: 0.5em;
+
+    .form-group {
+        padding: 0.5em;
+    }
+
+    label {
+        color: $primary;
+        font-weight: 100;
+        padding-right: 0.5em;
+    }
+
+    input[type="text"] {
+        padding: 0.5em;
+        transition: border-color 0.2s;
+        &:focus {
+            outline: none;
+            border-color: $primary;
+        }
+    }
+
+    &.delete {
+        border-color: $red;
+    }
+
+    button {
+        padding: 0.5em;
+        color: white;
+        border: none;
+        cursor: pointer;
+        margin-left: auto;
+        font-size: 1em;
+        transition: background-color 0.2s;
+        &:hover {
+            background-color: darken($primary, 10%);
+        }
+
+        &:disabled {
+            cursor: not-allowed;
+            background-color: #ccc;
+        }
+
+        &.get {
+            border-color: $primary;
+        }
+
+        &.post {
+            border-color: $blue;
+        }
+
+        &.put {
+            border-color: $green;
+        }
+
+        &.delete {
+            border-color: $red;
+        }
+    }
+}

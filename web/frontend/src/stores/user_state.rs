@@ -54,22 +54,18 @@ impl UserState {
     }
 }
 
-pub fn logout(dispatch: Dispatch<UserState>, navigator: Navigator, access_token: Option<AccessToken>) {
+pub fn logout(
+    dispatch: Dispatch<UserState>,
+    navigator: Navigator,
+    access_token: Option<AccessToken>,
+) {
     wasm_bindgen_futures::spawn_local(async move {
-        match crate::api::oauth::logout::logout(access_token.as_ref())
-            .await
-        {
-            Ok(_) => {
-                dispatch.reduce_mut(move |store| {
-                    store.user = None;
-                    store.access_token = None;
-                });
-                navigator.push(&AppRoute::Login);
-            }
-            Err(e) => {
-                log::error!("Failed to logout: {:?}", e);
-            }
-        }
+        let _ = crate::api::oauth::logout::logout(access_token.as_ref()).await;
+        dispatch.reduce_mut(move |store| {
+            store.user = None;
+            store.access_token = None;
+        });
+        navigator.push(&AppRoute::Login);
     });
 }
 

@@ -5,43 +5,69 @@ events {
 }
 
 http {
-    include mime.types;
-    default_type application/octet-stream;
 
-    sendfile on;
-    keepalive_timeout 65;
+    upstream frontend {
+        server yew-frontend:${TRUNK_PORT};
+    }
 
-    server {
-        listen 80;
-        server_name api.${DOMAIN};
-
-        location / {
-            proxy_pass http://actix-server:${ACTIX_PORT};
-            proxy_set_header Host §host;
-            proxy_set_header X-Real-IP §remote_addr;
-            proxy_set_header X-Forwarded-For §proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto §scheme;
-        }
+    upstream backend {
+        server actix-server:${ACTIX_PORT};
     }
 
     server {
         listen 80;
         server_name ${DOMAIN};
 
+        # Redirect HTTP requests to HTTPS
+        return 301 https://§server_name§request_uri;
+    }
+
+    server {
+        listen 443 ssl;
+        server_name ${DOMAIN};
+
+        ssl_certificate /app/emi.local.pem;
+        ssl_certificate_key /app/emi.local-key.pem;
+
+        # Set HTTP Strict Transport Security (HSTS) header
+        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; Secure" always;
+
+        location /api {
+            proxy_set_header   Host §http_host;
+            proxy_set_header   X-Real-IP §remote_addr;
+            proxy_set_header   X-NginX-Proxy true;
+            proxy_set_header   X-Forwarded-For §proxy_add_x_forwarded_for;
+            proxy_http_version 1.1;
+            proxy_redirect     off;
+            proxy_buffering    off;
+            proxy_pass         https://backend;
+        }
+
         location / {
-            proxy_pass http://yew-frontend:${TRUNK_PORT};
+            proxy_set_header   Host §http_host;
+            proxy_set_header   X-Real-IP §remote_addr;
+            proxy_set_header   X-NginX-Proxy true;
+            proxy_set_header   X-Forwarded-For §proxy_add_x_forwarded_for;
+            proxy_http_version 1.1;
+            proxy_redirect     off;
+            proxy_buffering    off;
+            proxy_pass         https://frontend;
+
+            # Additional configurations for cookies
+            # Here, we're setting a cookie named "example_cookie" with value "nginx_cookie" for all requests
+            add_header Set-Cookie "example_cookie=nginx_cookie; Path=/; HttpOnly; SameSite=Strict; Secure" always;
+        }
+
+        location /_trunk/ws {
+            proxy_pass https://frontend;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade §http_upgrade;
+            proxy_set_header Connection "upgrade";
             proxy_set_header Host §host;
             proxy_set_header X-Real-IP §remote_addr;
             proxy_set_header X-Forwarded-For §proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto §scheme;
         }
 
-        location /_trunk/ws {
-            proxy_pass http://yew-frontend:${TRUNK_PORT}; # Or whatever port yew has websockets exposed on.
-            proxy_http_version 1.1;
-            proxy_set_header Upgrade §http_upgrade;
-            proxy_set_header Connection "Upgrade";
-            proxy_set_header Host §host;
-        }
     }
 }

@@ -1,41 +1,4 @@
 //! File defining the styles for the forms and inputs
 
-// A class that wraps an input class with a font-awesome icon
-// on the right side of the input. We also remove the blue border
-// that appears on focus.
-.input-with-icon {
-    position: relative;
-    input {
-        padding-right: 2.5rem;
-        border-radius: 0.5rem;
-        padding: 0.5em;
-        box-sizing: border-box;
-        border: 1px solid #ccc;
-        transition: border-color 0.2s;
-        &:focus {
-            outline: none;
-            border-color: $primary;
-        }
-    }
-
-    button {
-        position: absolute;
-        right: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        border: none;
-        background-color: transparent;
-        cursor: pointer;
-        i {
-            font-size: 1.5em;
-            transition: color 0.2s;
-            color: $primary;
-        }
-    }
-    button[disabled] {
-        cursor: not-allowed;
-        i {
-            color: #ccc;
-        }
-    }
-}
+@import 'forms/standard.scss';
+@import "forms/input_with_icon.scss";

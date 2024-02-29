@@ -418,21 +418,29 @@ async fn encode_jwt_refresh_cookie<'a>(
 
     token.insert_into_redis(redis_client).await?;
 
-    Ok(Cookie::build(REFRESH_COOKIE_NAME, token.encode()?)
-        .domain(config.domain())
+    let cookie = Cookie::build(REFRESH_COOKIE_NAME, token.encode()?)
+        .same_site(actix_web::cookie::SameSite::Strict)
+        .secure(true)
+        // .domain(config.domain())
         .path("/")
         .max_age(ActixWebDuration::minutes(config.refresh_token_minutes()))
         // The HTTP_ONLY flag is set to true to prevent the cookie from being accessed by
         // JavaScript. This is a security measure to prevent XSS attacks.
         .http_only(true)
-        .finish())
+        .finish();
+
+    log::info!("Created refresh cookie: {:?}", cookie);
+
+    Ok(cookie)
 }
 
 /// Function to create the user online cookie
 fn encode_user_online_cookie<'a>() -> Result<Cookie<'a>, String> {
     let config = JWTConfig::from_env()?;
     Ok(Cookie::build(USER_ONLINE_COOKIE_NAME, "true")
-        .domain(config.domain())
+        .same_site(actix_web::cookie::SameSite::Strict)
+        .secure(true)
+        // .domain(config.domain())
         .path("/")
         .max_age(ActixWebDuration::minutes(config.refresh_token_minutes()))
         // We want to be able to check the existance of this cookie from the frontend
@@ -510,14 +518,18 @@ pub(crate) fn eliminate_cookies(mut builder: HttpResponseBuilder) -> HttpRespons
     let config = JWTConfig::from_env().unwrap();
 
     let refresh_cookie = Cookie::build(REFRESH_COOKIE_NAME, "")
-        .domain(config.domain())
+        .same_site(actix_web::cookie::SameSite::Strict)
+        .secure(true)
+        // .domain(config.domain())
         .path("/")
         .max_age(ActixWebDuration::ZERO)
         .http_only(true)
         .finish();
 
     let user_online_cookie = Cookie::build(USER_ONLINE_COOKIE_NAME, "")
-        .domain(config.domain())
+        .same_site(actix_web::cookie::SameSite::Strict)
+        .secure(true)
+        // .domain(config.domain())
         .path("/")
         .max_age(ActixWebDuration::ZERO)
         .http_only(false)

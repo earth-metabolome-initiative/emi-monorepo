@@ -94,15 +94,17 @@ pub fn basic_form<F: Form>(form: &F) -> Html {
     // TODO: handle error messages
     // TODO: handle submit button
 
+    let form_button_classes = format!("btn btn-primary {}", form.method());
+
     html! {
-        <form action={form.action()} method={form.method().to_string()}>
+        <form class={format!("standard-form {}", form.method())} action={form.action()} method={form.method().to_string()}>
             { form.inputs()}
             // { if let Some(error) = error {
             //     html! { <div class="invalid-feedback">{ error.message }</div> }
             // } else {
             //     html! {}
             // } }
-            <button type="submit" class="btn btn-primary">{form.crud()}</button>
+            <button type="submit" class={form_button_classes}>{form.crud()}</button>
         </form>
     }
 }

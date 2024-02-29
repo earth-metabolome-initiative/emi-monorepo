@@ -41,17 +41,14 @@ services:
     restart: on-failure
 
   actix-server:
-    entrypoint: /bin/bash
-    stdin_open: true # docker run -i
-    tty: true        # docker run -t
     build:
       context: ./backend
+      dockerfile: DockerfileDeploy
       args:
         ACTIX_PORT: ${ACTIX_PORT}
     environment:
       DATABASE_URL: ${DATABASE_URL}
       REDIS_URL: ${REDIS_URL}
-      RUST_LOG: ${RUST_LOG}
       RUST_BACKTRACE: ${RUST_BACKTRACE}
       GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
       GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
@@ -79,46 +76,18 @@ services:
       - backend
     restart: on-failure
 
-  yew-frontend:
-    entrypoint: /bin/bash
-    stdin_open: true # docker run -i
-    tty: true        # docker run -t
-    build:
-      context: ./frontend
-      args:
-        TRUNK_PORT: ${TRUNK_PORT}
-        ACTIX_PORT: ${ACTIX_PORT}
-    environment:
-      TRUNK_PORT: ${TRUNK_PORT}
-      DOMAIN: ${DOMAIN}
-      ACTIX_PORT: ${ACTIX_PORT}
-      RUST_BACKTRACE: ${RUST_BACKTRACE}
-    volumes:
-      - ./:/app
-    ports:
-      - "${TRUNK_PORT}:${TRUNK_PORT}"
-    depends_on:
-      - actix-server
-    networks:
-      - frontend
-      - backend
-
   nginx:
-    entrypoint: /bin/bash
-    stdin_open: true # docker run -i
-    tty: true        # docker run -t
     build:
       context: ./nginx
+      dockerfile: DockerfileDeploy
       args:
         ACTIX_PORT: ${ACTIX_PORT}
-        TRUNK_PORT: ${TRUNK_PORT}
         DOMAIN: ${DOMAIN}
         NGINX_WORKER_PROCESSES: ${NGINX_WORKER_PROCESSES}
     volumes:
       - ./nginx:/app
     environment:
       ACTIX_PORT: ${ACTIX_PORT}
-      TRUNK_PORT: ${TRUNK_PORT}
       DOMAIN: ${DOMAIN}
       NGINX_WORKER_PROCESSES: ${NGINX_WORKER_PROCESSES}
     ports:
@@ -126,13 +95,9 @@ services:
       - "443:443"
     depends_on:
       - actix-server
-      - yew-frontend
     networks:
-      - frontend
       - backend
 
 networks:
-  frontend:
-    driver: bridge
   backend:
     driver: bridge
