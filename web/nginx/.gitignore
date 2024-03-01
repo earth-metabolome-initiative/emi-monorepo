@@ -1,2 +1,3 @@
 nginx.conf
 *.pem
+nginx.deploy.conf

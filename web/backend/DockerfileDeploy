@@ -24,13 +24,13 @@ CMD rm -rf /app/backend/backend.ready || true && \
     rm -rf /app/backend/backend.building || true && \
     touch /app/backend/backend.building && \
     cd /app/frontend && \
-    echo "Building frontend..." > /app/backend/backend.building && \
+    echo "Building frontend..." >> /app/backend/backend.building && \
     trunk build --release && \
-    echo "Building frontend... done" > /app/backend/backend.ready && \
-    echo "Copying frontend to backend..." > /app/backend/backend.building && \
+    echo "Building frontend... done" >> /app/backend/backend.ready && \
+    echo "Copying frontend to backend..." >> /app/backend/backend.building && \
     cd /app/backend && \
-    echo "Running Diesel migrations..." > /app/backend/backend.ready && \
+    echo "Running Diesel migrations..." >> /app/backend/backend.ready && \
     diesel migration run && \
-    echo "Running Diesel migrations... done" > /app/backend/backend.ready && \
-    echo "Building and running Actix server..." > /app/backend/backend.ready && \
+    echo "Running Diesel migrations... done" >> /app/backend/backend.ready && \
+    echo "Building and running Actix server..." >> /app/backend/backend.ready && \
     cargo run --release

@@ -2,13 +2,13 @@
 # The index HTML file to drive the bundling process.
 target = "index.html"
 # Build in release mode.
-release = false
+release = true
 # The output dir for all final assets.
 dist = "dist"
 # The public URL from which assets are to be served.
 public_url = "/"
 # Whether to include hash values in the output file names.
-filehash = true
+filehash = false
 # Whether to inject scripts (and module preloads) into the finalized output.
 inject_scripts = true
 # Require Cargo.lock and cache are up to date

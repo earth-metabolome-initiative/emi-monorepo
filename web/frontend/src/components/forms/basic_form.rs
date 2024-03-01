@@ -68,6 +68,7 @@ impl Display for FormMethod {
 pub trait Form: Properties + Validate + Clone + PartialEq {
     fn action(&self) -> String;
     fn method(&self) -> FormMethod;
+    fn title(&self) -> String;
     fn inputs(&self) -> Html;
     fn crud(&self) -> &'static str {
         self.method().to_crud()
@@ -98,6 +99,7 @@ pub fn basic_form<F: Form>(form: &F) -> Html {
 
     html! {
         <form class={format!("standard-form {}", form.method())} action={form.action()} method={form.method().to_string()}>
+            <h4>{ form.title() }</h4>
             { form.inputs()}
             // { if let Some(error) = error {
             //     html! { <div class="invalid-feedback">{ error.message }</div> }

@@ -52,10 +52,6 @@ http {
             proxy_redirect     off;
             proxy_buffering    off;
             proxy_pass         https://frontend;
-
-            # Additional configurations for cookies
-            # Here, we're setting a cookie named "example_cookie" with value "nginx_cookie" for all requests
-            add_header Set-Cookie "example_cookie=nginx_cookie; Path=/; HttpOnly; SameSite=Strict; Secure" always;
         }
 
         location /_trunk/ws {
@@ -68,6 +64,5 @@ http {
             proxy_set_header X-Forwarded-For §proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto §scheme;
         }
-
     }
 }

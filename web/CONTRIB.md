@@ -65,3 +65,10 @@ To start the deployment version of the platform, you need to run the following c
 ```bash
 docker-compose -f docker-compose-deploy.yml up
 ```
+
+### Upon encountering very odd errors
+Sometimes it may happen that the Dockers lead to extremely odd errors. In those cases, to exclude the dockers, prune all the containers, images, and volumes. **DO THIS ON SYSTEMS WHERE YOU DO NOT HAVE OTHER DOCKERS**.
+
+```bash
+docker system prune --all
+```

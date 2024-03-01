@@ -23,6 +23,10 @@ impl Form for Name {
         FormMethod::update()
     }
 
+    fn title(&self) -> String {
+        "Name".to_string()
+    }
+
     fn inputs(&self) -> Html {
         let first_name_input = NonEmptyTextField::from(self.first_name.clone());
         let last_name_input = NonEmptyTextField::from(self.last_name.clone());

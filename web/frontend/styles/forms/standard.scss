@@ -2,6 +2,15 @@ form.standard-form {
     border: 1px solid $primary;
     border-radius: 0.5em;
 
+    h4 {
+        padding: 0.5em;
+        margin: 0;
+        background-color: $primary;
+        color: white;
+        border-top-left-radius: 0.5em;
+        border-top-right-radius: 0.5em;
+    }
+
     .form-group {
         padding: 0.5em;
     }
@@ -23,6 +32,10 @@ form.standard-form {
 
     &.delete {
         border-color: $red;
+
+        h4 {
+            color: $red;
+        }
     }
 
     button {
@@ -30,6 +43,7 @@ form.standard-form {
         color: white;
         border: none;
         cursor: pointer;
+        background-color: white;
         margin-left: auto;
         font-size: 1em;
         transition: background-color 0.2s;
