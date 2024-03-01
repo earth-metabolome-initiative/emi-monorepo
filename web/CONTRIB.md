@@ -66,6 +66,15 @@ To start the deployment version of the platform, you need to run the following c
 docker-compose -f docker-compose-deploy.yml up
 ```
 
+### Integrity errors
+Sometimes Trunk may start causing integrity errors. For example you may find in the console errors such as:
+
+```bash
+Failed to find a valid digest in the 'integrity' attribute for resource 'https://emi.local/frontend.js' with computed SHA-384 integrity '328Yb/77DVCU/r2WVi7/JLFi2UQE0ZOtdwEOg0zorekdvvT5nQIbXMf1uFWoXC95'. The resource has been blocked.
+```
+
+In such cases, stop and restart the Yew/Trunk docker.
+
 ### Upon encountering very odd errors
 Sometimes it may happen that the Dockers lead to extremely odd errors. In those cases, to exclude the dockers, prune all the containers, images, and volumes. **DO THIS ON SYSTEMS WHERE YOU DO NOT HAVE OTHER DOCKERS**.
 

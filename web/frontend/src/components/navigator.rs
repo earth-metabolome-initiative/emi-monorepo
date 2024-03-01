@@ -22,6 +22,7 @@
 
 use crate::router::AppRoute;
 use crate::stores::user_state::UserState;
+use wasm_bindgen::UnwrapThrowExt;
 use yew::prelude::*;
 use yew_router::prelude::*;
 use yewdux::prelude::*;
@@ -44,10 +45,15 @@ pub fn navigator() -> Html {
     if let Some(access_token) = user.access_token() {
         if user.has_no_user() {
             info!("Access token found, recovering user info.");
-            retrieve_user_informations(dispatch.clone(), access_token.clone(), navigator);
+            retrieve_user_informations(dispatch.clone(), access_token.clone(), navigator.clone());
         }
     } else {
-        refresh_access_token(dispatch.clone(), navigator);
+        refresh_access_token(dispatch.clone(), navigator.clone());
+    }
+
+    if user.is_logged_in() && !user.has_complete_profile(){
+        // If the user is logged in, but has yet to complete their profile, we redirect them to the profile page.
+        navigator.push(&AppRoute::Profile);
     }
 
     // On click, we send a message to the store to toggle the sidebar.
@@ -71,8 +77,8 @@ pub fn navigator() -> Html {
                 if let Some(user) = user.user() {
                     if user.has_complete_profile() {
                         <div class="user">
-                            <img src={format!("/api/user/{}/avatar", user.id())} alt={format!("{}'s avatar", user.last_name().unwrap())} />
-                            <span>{user.full_name()}</span>
+                            <img src={format!("/api/user/{}/avatar", user.id())} alt={format!("{}'s avatar", user.last_name())} />
+                            <span>{user.full_name().unwrap_throw()}</span>
                             // {if store.is_offline() {
                             //     html! {
                             //         <span class="badge offline">{"Offline"}</span>

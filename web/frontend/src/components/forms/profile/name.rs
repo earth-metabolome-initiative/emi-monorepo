@@ -1,41 +1,54 @@
 //! Component for the form requiring user name and surname.
 
-use crate::components::forms::basic_form::FormMethod;
-use serde::{Deserialize, Serialize};
-use validator::Validate;
+use crate::components::forms::*;
+use crate::stores::user_state::UserState;
+use validator::{Validate, ValidationErrors};
+use wasm_bindgen::UnwrapThrowExt;
+use web_common::api::auth::users::name::{Name, FULL_ENDPOINT};
+use web_sys::FormData;
 use yew::prelude::*;
+use yewdux::prelude::*;
 
-use super::super::inputs::{BasicInput, DynamicLabel, NonEmptyTextField};
-use super::super::Form;
 
-#[derive(PartialEq, Clone, Debug, Properties, Validate, Serialize, Deserialize)]
-pub struct Name {
-    pub first_name: String,
-    pub last_name: String,
+impl TryFrom<FormData> for FormWrapper<Name> {
+    type Error = ValidationErrors;
+
+    /// Convert a set of data collected from a form into a `Name` object.
+    ///
+    /// The names of the fields are expected to be based on the provided labels,
+    /// converted to snake case (e.g. "First name" -> "first_name").
+    fn try_from(data: FormData) -> Result<Self, ValidationErrors> {
+        let first_name = data.get("first_name").as_string().unwrap_throw();
+        let middle_name = data.get("middle_name").as_string().map(|string| if string.is_empty() { None } else { Some(string) }).flatten();
+        let last_name = data.get("last_name").as_string().unwrap_throw();
+
+        let name: Name = Name::new(first_name, middle_name, last_name);
+
+        name.validate()?;
+
+        Ok(FormWrapper::from(name))
+    }
 }
 
-impl Form for Name {
-    fn action(&self) -> String {
-        "/api/user".to_string()
+#[function_component(NameForm)]
+pub fn name_form() -> Html {
+    let (user_state, _dispatch) = use_store::<UserState>();
+
+    if user_state.is_not_logged_in() {
+        unreachable!("This component should only be rendered when the user is logged in.");
     }
 
-    fn method(&self) -> FormMethod {
-        FormMethod::update()
-    }
+    let user = user_state.user().unwrap_throw();
 
-    fn title(&self) -> String {
-        "Name".to_string()
-    }
+    let first_name = user.first_name();
+    let middle_name = user.middle_name().unwrap_or_default();
+    let last_name = user.last_name();
 
-    fn inputs(&self) -> Html {
-        let first_name_input = NonEmptyTextField::from(self.first_name.clone());
-        let last_name_input = NonEmptyTextField::from(self.last_name.clone());
-
-        html! {
-            <>
-                <BasicInput<DynamicLabel<NonEmptyTextField>> label="First name" input={first_name_input} />
-                <BasicInput<DynamicLabel<NonEmptyTextField>> label="Last name" input={last_name_input} />
-            </>
-        }
+    html! {
+        <BasicForm<Name> title="Name" method={FormMethod::update()} action={FULL_ENDPOINT}>
+            <BasicInput label="First name" value={first_name} input_type="text" />
+            <BasicInput label="Middle name" value={middle_name} input_type="text" />
+            <BasicInput label="Last name" value={last_name} input_type="text" />
+        </BasicForm<Name>>
     }
 }

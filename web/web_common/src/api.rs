@@ -30,3 +30,10 @@ impl ApiError {
         Self::BadGateway
     }
 }
+
+impl From<serde_json::Error> for ApiError {
+    fn from(e: serde_json::Error) -> Self {
+        log::error!("Failed to serialize response: {}", e);
+        Self::InternalServerError
+    }
+}

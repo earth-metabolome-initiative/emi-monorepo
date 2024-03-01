@@ -1,8 +1,7 @@
 use crate::api::FrontendApiError;
 use reqwasm::http::Request;
 use web_common::api::oauth::jwt_cookies::*;
-use web_common::api::{auth::users::me::*, ApiError};
-use web_common::user::User;
+use web_common::api::{auth::users::me::*, ApiError, auth::users::User};
 use crate::api::utils::add_bearer;
 
 /// Returns the informations regarding the currently logged user.

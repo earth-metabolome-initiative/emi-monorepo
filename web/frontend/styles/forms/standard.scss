@@ -1,29 +1,36 @@
 form.standard-form {
+    max-width: 90%;
     border-radius: 0.5em;
 
     h4 {
-        padding: 0.5em;
+        padding-bottom: 0.25em;
         margin: 0;
         border-bottom: 1px solid $primary;
         color: $primary;
+        font-weight: 600;
+        font-size: 1.2em;
         border-top-left-radius: 0.5em;
         border-top-right-radius: 0.5em;
     }
 
     .form-group {
-        padding: 0.5em;
+        padding-top: 0.5em;
+        padding-bottom: 0.5em;
     }
 
     label {
-        color: $primary;
+        color: $grey;
         font-weight: 100;
         padding-right: 0.5em;
+        display: inline-block;
+        min-width: 100px;
     }
 
     input[type="text"] {
         padding: 0.5em;
+        box-sizing: border-box;
         max-width: 100%;
-        width: 200px;
+        width: 400px;
         transition: border-color 0.2s;
         border: 1px solid #ccc;
         border-radius: 0.5em;
@@ -49,12 +56,9 @@ form.standard-form {
         background-color: transparent;
         border: 1px solid;
         border-radius: 0.5em;
-        margin-left: auto;
+        float: right;
         font-size: 1em;
         transition: background-color 0.2s;
-        &:hover {
-            background-color: darken($primary, 10%);
-        }
 
         &:disabled {
             cursor: not-allowed;
@@ -63,18 +67,42 @@ form.standard-form {
 
         &.get {
             border-color: $primary;
+            color: $primary;
+
+            &:hover {
+                background-color: $primary;
+                color: white;
+            }
         }
 
         &.post {
             border-color: $blue;
+            color: $blue;
+
+            &:hover {
+                background-color: $blue;
+                color: white;
+            }
         }
 
         &.put {
             border-color: $green;
+            color: $green;
+
+            &:hover {
+                background-color: $green;
+                color: white;
+            }
         }
 
         &.delete {
             border-color: $red;
+            color: $red;
+
+            &:hover {
+                background-color: $red;
+                color: white;
+            }
         }
     }
 }

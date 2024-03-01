@@ -28,3 +28,9 @@ impl From<ApiError> for FrontendApiError {
         Self::API(e)
     }
 }
+
+impl From<serde_json::Error> for FrontendApiError {
+    fn from(e: serde_json::Error) -> Self {
+        Self::API(ApiError::from(e))
+    }
+}

@@ -3,16 +3,19 @@
 
 use actix_web::{get, HttpResponse, Responder};
 
-use crate::models::User;
-use web_common::user::User as CommonUser;
+use crate::models::User as DBUser;
+use web_common::api::auth::users::name::Name;
+use web_common::api::auth::users::User as CommonUser;
 
 #[get("/me")]
-pub async fn logged_user_info(user: User) -> impl Responder {
+pub async fn logged_user_info(user: DBUser) -> impl Responder {
     log::info!("Retrieving logged user info.");
-    HttpResponse::Ok().json(CommonUser::new(
-        user.first_name,
+
+    let name = Name::new(
+        user.first_name.unwrap_or_default(),
         user.middle_name,
-        user.last_name,
-        user.id,
-    ))
+        user.last_name.unwrap_or_default(),
+    );
+
+    HttpResponse::Ok().json(CommonUser::new(name, user.id))
 }

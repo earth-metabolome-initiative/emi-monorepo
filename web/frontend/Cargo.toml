@@ -42,6 +42,7 @@ features = [
   'Window',
   'HtmlDocument',
   'HtmlInputElement',
+  'HtmlFormElement',
   'Navigator',
   'FormData'
 ]

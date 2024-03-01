@@ -4,7 +4,8 @@ use crate::cookies::is_logged_in;
 use crate::router::AppRoute;
 use log::info;
 use serde::{Deserialize, Serialize};
-use web_common::{api::oauth::jwt_cookies::AccessToken, user::User};
+use web_common::api::oauth::jwt_cookies::AccessToken;
+use web_common::api::auth::users::User;
 use yew_router::prelude::*;
 use yewdux::prelude::*;
 
@@ -21,12 +22,22 @@ impl UserState {
         self.user.is_some()
     }
 
+    pub fn is_not_logged_in(&self) -> bool {
+        self.user.is_none()
+    }
+
     pub fn has_no_access_token(&self) -> bool {
         self.access_token.is_none()
     }
 
     pub fn has_access_token(&self) -> bool {
         self.access_token.is_some()
+    }
+
+    pub fn has_complete_profile(&self) -> bool {
+        self.user
+            .as_ref()
+            .map_or(false, |user| user.has_complete_profile())
     }
 
     pub fn has_no_user(&self) -> bool {

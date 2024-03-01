@@ -1,2 +1,2 @@
 pub mod name;
-pub use name::Name;
+pub use name::NameForm;

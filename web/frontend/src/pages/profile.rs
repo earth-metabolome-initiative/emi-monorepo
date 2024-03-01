@@ -1,29 +1,47 @@
 //! Page of the user profile, allowing the user to edit their profile.
 
-use crate::components::forms::profile::Name;
+use crate::components::forms::profile::NameForm;
 use crate::components::forms::BasicForm;
 use crate::router::AppRoute;
 use crate::stores::user_state::UserState;
+use wasm_bindgen::UnwrapThrowExt;
 use yew::prelude::*;
 use yew_router::prelude::*;
 use yewdux::prelude::*;
 
 #[function_component(Profile)]
 pub fn profile() -> Html {
-    let navigator = use_navigator().unwrap();
-    let (user, _) = use_store::<UserState>();
+    // We use the state of the navigator from yew-router
+    // If it happens that it doesn't exist, we throw an error
+    // that can appear on the console.
+    let navigator = use_navigator().unwrap_throw();
+    // Similarly, we retrieve the stored user using yewdux
+    // which is stored across the app, including the different
+    // open tabs. This user is the one stored within the current
+    // session in the Session Local Storage.
+    let (user_state, _) = use_store::<UserState>();
 
-    if !user.is_logged_in() {
+    // If the user happens to not be logged in, we redirect
+    // them to the home page.
+    if !user_state.is_logged_in() {
+        // This is done by pushing the route defined in the AppRoute
+        // enum to the navigator.
         navigator.push(&AppRoute::Home);
     }
 
-    if let Some(user) = user.user() {
-        html! {
-            <div class="fullscreen_center_app">
-                <BasicForm<Name> first_name={user.first_name().unwrap_or_else(|| "".to_string())} last_name={user.last_name().unwrap_or_else(|| "".to_string())} />
+    // Now we know that the user is necessarily logged in, and as such,
+    // we can safely unwrap the user from the user state.
+
+    let user = user_state.user().unwrap_throw();
+
+    // We proceed to render the profile page, which contains a form
+    // to edit the user's name and surname.
+    html! {
+        <div class="fullscreen_center_app">
+            <div class="profile">
+                <h2>{ "Profile" }</h2>
+                <NameForm />
             </div>
-        }
-    } else {
-        unreachable!("User is not logged in.")
+        </div>
     }
 }
