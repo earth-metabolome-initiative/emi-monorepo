@@ -1,12 +1,11 @@
 form.standard-form {
-    border: 1px solid $primary;
     border-radius: 0.5em;
 
     h4 {
         padding: 0.5em;
         margin: 0;
-        background-color: $primary;
-        color: white;
+        border-bottom: 1px solid $primary;
+        color: $primary;
         border-top-left-radius: 0.5em;
         border-top-right-radius: 0.5em;
     }
@@ -23,7 +22,11 @@ form.standard-form {
 
     input[type="text"] {
         padding: 0.5em;
+        max-width: 100%;
+        width: 200px;
         transition: border-color 0.2s;
+        border: 1px solid #ccc;
+        border-radius: 0.5em;
         &:focus {
             outline: none;
             border-color: $primary;
@@ -31,7 +34,7 @@ form.standard-form {
     }
 
     &.delete {
-        border-color: $red;
+        border: 1px solid $red;
 
         h4 {
             color: $red;
@@ -43,7 +46,9 @@ form.standard-form {
         color: white;
         border: none;
         cursor: pointer;
-        background-color: white;
+        background-color: transparent;
+        border: 1px solid;
+        border-radius: 0.5em;
         margin-left: auto;
         font-size: 1em;
         transition: background-color 0.2s;

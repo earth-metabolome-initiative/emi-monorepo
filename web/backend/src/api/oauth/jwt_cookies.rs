@@ -42,7 +42,6 @@ struct JWTConfig {
     refresh_token_base_64_public_key: String,
     refresh_token_base_64_private_key: String,
     refresh_token_minutes: i64,
-    domain: String,
 }
 
 impl JWTConfig {
@@ -65,7 +64,6 @@ impl JWTConfig {
                 .map_err(|e| e.to_string())?
                 .parse()
                 .map_err(|e: ParseIntError| e.to_string())?,
-            domain: env::var("DOMAIN").map_err(|e| e.to_string())?,
         })
     }
 
@@ -89,10 +87,6 @@ impl JWTConfig {
 
     pub fn access_token_minutes(&self) -> i64 {
         self.access_token_minutes
-    }
-
-    pub fn domain(&self) -> String {
-        self.domain.clone()
     }
 
     pub fn refresh_token_public_key(&self) -> Result<String, String> {
@@ -421,7 +415,6 @@ async fn encode_jwt_refresh_cookie<'a>(
     let cookie = Cookie::build(REFRESH_COOKIE_NAME, token.encode()?)
         .same_site(actix_web::cookie::SameSite::Strict)
         .secure(true)
-        // .domain(config.domain())
         .path("/")
         .max_age(ActixWebDuration::minutes(config.refresh_token_minutes()))
         // The HTTP_ONLY flag is set to true to prevent the cookie from being accessed by
@@ -440,7 +433,6 @@ fn encode_user_online_cookie<'a>() -> Result<Cookie<'a>, String> {
     Ok(Cookie::build(USER_ONLINE_COOKIE_NAME, "true")
         .same_site(actix_web::cookie::SameSite::Strict)
         .secure(true)
-        // .domain(config.domain())
         .path("/")
         .max_age(ActixWebDuration::minutes(config.refresh_token_minutes()))
         // We want to be able to check the existance of this cookie from the frontend
@@ -520,7 +512,6 @@ pub(crate) fn eliminate_cookies(mut builder: HttpResponseBuilder) -> HttpRespons
     let refresh_cookie = Cookie::build(REFRESH_COOKIE_NAME, "")
         .same_site(actix_web::cookie::SameSite::Strict)
         .secure(true)
-        // .domain(config.domain())
         .path("/")
         .max_age(ActixWebDuration::ZERO)
         .http_only(true)
@@ -529,7 +520,6 @@ pub(crate) fn eliminate_cookies(mut builder: HttpResponseBuilder) -> HttpRespons
     let user_online_cookie = Cookie::build(USER_ONLINE_COOKIE_NAME, "")
         .same_site(actix_web::cookie::SameSite::Strict)
         .secure(true)
-        // .domain(config.domain())
         .path("/")
         .max_age(ActixWebDuration::ZERO)
         .http_only(false)

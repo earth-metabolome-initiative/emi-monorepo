@@ -74,7 +74,7 @@ where
 
     html! {
         <div class="form-group">
-            <label for={input.label()}>{input.label()}</label>
+            <label for={input.label()}>{format!("{}:", input.label())}</label>
             <input
                 type={I::TYPE}
                 class="form-control"
