@@ -70,5 +70,7 @@ docker-compose -f docker-compose-deploy.yml up
 Sometimes it may happen that the Dockers lead to extremely odd errors. In those cases, to exclude the dockers, prune all the containers, images, and volumes. **DO THIS ON SYSTEMS WHERE YOU DO NOT HAVE OTHER DOCKERS**.
 
 ```bash
+rm -fdr ./database_tmp # This is the database volume
+rm -fdr ./redis # This is the redis volume
 docker system prune --all
 ```
