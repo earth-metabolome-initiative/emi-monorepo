@@ -9,6 +9,7 @@ use diesel::r2d2::Pool;
 use diesel::r2d2::PooledConnection;
 use email_address::*;
 use uuid::Uuid;
+use web_common::api::auth::users::name::Name;
 
 #[derive(Queryable, Insertable, Debug)]
 #[diesel(table_name = user_emails)]
@@ -215,6 +216,30 @@ impl User {
             .select(crate::schema::project_users::id)
             .first::<i64>(conn)
             .is_ok()
+    }
+
+    /// Updates the user's name in the database.
+    ///
+    /// # Arguments
+    /// * `new_name` - The new name to set for the user.
+    /// * `conn` - The database connection pool.
+    pub async fn update_name(
+        &self,
+        new_name: Name,
+        conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>,
+    ) -> Result<(), String> {
+        use crate::schema::users::dsl::*;
+        let update = diesel::update(users.filter(id.eq(self.id)))
+            .set((
+                first_name.eq(new_name.first_name()),
+                middle_name.eq(new_name.middle_name()),
+                last_name.eq(new_name.last_name()),
+            ))
+            .execute(conn);
+        match update {
+            Ok(_) => Ok(()),
+            Err(_) => Err("Failed to update user name".to_string()),
+        }
     }
 }
 

@@ -507,8 +507,6 @@ pub(crate) async fn access_token_validator(
 
 pub(crate) fn eliminate_cookies(mut builder: HttpResponseBuilder) -> HttpResponseBuilder {
     log::info!("Eliminating cookies");
-    let config = JWTConfig::from_env().unwrap();
-
     let refresh_cookie = Cookie::build(REFRESH_COOKIE_NAME, "")
         .same_site(actix_web::cookie::SameSite::Strict)
         .secure(true)

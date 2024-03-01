@@ -21,6 +21,8 @@ mod models;
 mod schema;
 mod transactions;
 
+pub(crate) type DBPool = Pool<ConnectionManager<PgConnection>>;
+
 /// Entrypoint to load the index.html file
 async fn index() -> impl Responder {
     let file = NamedFile::open("/app/frontend/dist/index.html");
@@ -46,7 +48,7 @@ async fn main() -> std::io::Result<()> {
 
     // create db connection pool
     let manager = ConnectionManager::<PgConnection>::new(database_url);
-    let pool: Pool<ConnectionManager<PgConnection>> = match r2d2::Pool::builder()
+    let pool: DBPool = match r2d2::Pool::builder()
         // We set the maximum number of connections in the pool to 10
         .max_size(10)
         .build(manager)

@@ -190,6 +190,7 @@ impl BasicFormProp {
             Request::new(&self.action).method(self.method().to_reqwasm()),
             access_token
         )
+        .header("Content-Type", "application/json")
         .body(body)
         .send()
         .await
