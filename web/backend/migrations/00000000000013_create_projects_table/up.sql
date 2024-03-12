@@ -18,14 +18,14 @@
 -- A project also has an optional URL for when the project has a separate website.
 -- Finally, the project also has an optional path for the project logo.
 CREATE TABLE projects (
-    id BIGINT PRIMARY KEY REFERENCES editables(id) ON
+    id UUID PRIMARY KEY REFERENCES editables(id) ON
     DELETE
         CASCADE REFERENCES describables(id) ON
     DELETE
         CASCADE,
         public BOOLEAN DEFAULT TRUE,
-        state_id BIGINT REFERENCES project_states(id),
-        parent_project_id BIGINT REFERENCES projects(id) ON
+        state_id UUID REFERENCES project_states(id),
+        parent_project_id UUID REFERENCES projects(id) ON
     DELETE
         CASCADE,
         budget MONEY DEFAULT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE projects (
         expected_end_date TIMESTAMP WITH TIME ZONE DEFAULT NULL,
         end_date TIMESTAMP WITH TIME ZONE DEFAULT NULL,
         website_url VARCHAR(255) DEFAULT NULL,
-        logo_id BIGINT DEFAULT NULL REFERENCES documents(id) ON
+        logo_id UUID DEFAULT NULL REFERENCES documents(id) ON
     DELETE
     SET
         NULL
@@ -67,8 +67,8 @@ DELETE
 DO $$
 DECLARE
     root_user_id UUID;
-    editables_id BIGINT;
-    state_id BIGINT;
+    editables_id UUID;
+    state_id UUID;
 BEGIN
     -- We retrieve the id of the root user.
     SELECT

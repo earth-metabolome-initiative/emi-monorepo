@@ -1,9 +1,9 @@
 -- UP MIGRATION
 CREATE TABLE samples (
-    id BIGINT PRIMARY KEY REFERENCES editables(id) ON
+    id UUID PRIMARY KEY REFERENCES editables(id) ON
     DELETE
         CASCADE,
-        derived_from INTEGER REFERENCES samples(id) ON
+        derived_from UUID REFERENCES samples(id) ON
     DELETE
     SET
         NULL

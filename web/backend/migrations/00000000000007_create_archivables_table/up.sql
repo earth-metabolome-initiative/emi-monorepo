@@ -1,6 +1,6 @@
 -- SQL defining the archivables table, containing all archivable content.
 CREATE TABLE archivables (
-    id BIGINT PRIMARY KEY REFERENCES editables(id) ON
+    id UUID PRIMARY KEY REFERENCES editables(id) ON
     DELETE
         CASCADE,
         archived_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

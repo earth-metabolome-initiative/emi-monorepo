@@ -7,10 +7,10 @@
 -- Since an administrator needs to add a user to a team, the team_users table
 -- also contains a column to specify which administrator added the user to the team.
 CREATE TABLE team_users (
-    id BIGINT PRIMARY KEY REFERENCES editables (id) ON DELETE CASCADE,
+    id UUID PRIMARY KEY REFERENCES editables (id) ON DELETE CASCADE,
     user_id UUID NOT NULL REFERENCES users (id) ON DELETE CASCADE,
-    team_id BIGINT NOT NULL REFERENCES teams (id) ON DELETE CASCADE,
-    role_id BIGINT NOT NULL REFERENCES team_user_roles (id) ON DELETE CASCADE
+    team_id UUID NOT NULL REFERENCES teams (id) ON DELETE CASCADE,
+    role_id UUID NOT NULL REFERENCES team_user_roles (id) ON DELETE CASCADE
 );
 
 -- We also need to add a bi-directional cascade delete constraint to the editables

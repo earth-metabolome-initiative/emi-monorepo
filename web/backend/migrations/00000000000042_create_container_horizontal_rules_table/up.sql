@@ -8,9 +8,9 @@
 -- items that are within a certain temperature, humidity, or pressure range. These constraints are also
 -- defined in the container rules.
 CREATE TABLE container_horizontal_rules (
-  id BIGINT PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE,
-  item_type_id INTEGER REFERENCES item_categories(id) ON DELETE CASCADE,
-  other_item_type_id INTEGER REFERENCES item_categories(id) ON DELETE CASCADE,
+  id UUID PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE,
+  item_type_id UUID REFERENCES item_categories(id) ON DELETE CASCADE,
+  other_item_type_id UUID REFERENCES item_categories(id) ON DELETE CASCADE,
   temperature NUMRANGE DEFAULT NULL,
   humidity NUMRANGE DEFAULT NULL,
   pressure NUMRANGE DEFAULT NULL

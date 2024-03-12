@@ -15,10 +15,10 @@
 -- - created_by: the unique identifier of the user who created the item location.
 -- - updated_by: the unique identifier of the user who last updated the item location.
 CREATE TABLE item_locations (
-  id BIGINT PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE,
-  item_id BIGINT REFERENCES items(id) ON DELETE CASCADE,
-  location_id BIGINT REFERENCES locations(id) ON DELETE CASCADE,
-  previous_location_id BIGINT DEFAULT NULL REFERENCES locations(id) ON DELETE SET NULL
+  id UUID PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE,
+  item_id UUID REFERENCES items(id) ON DELETE CASCADE,
+  location_id UUID REFERENCES locations(id) ON DELETE CASCADE,
+  previous_location_id UUID DEFAULT NULL REFERENCES locations(id) ON DELETE SET NULL
 );
 
 -- We also need to add a bi-directional cascade delete constraint to the editables

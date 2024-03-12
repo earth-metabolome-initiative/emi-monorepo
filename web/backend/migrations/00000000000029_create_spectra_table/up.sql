@@ -1,7 +1,7 @@
 -- Your SQL goes here
 CREATE TABLE spectra (
     id SERIAL PRIMARY KEY,
-    spectra_collection_id BIGINT REFERENCES spectra_collection(id) ON DELETE CASCADE NOT NULL
+    spectra_collection_id UUID REFERENCES spectra_collection(id) ON DELETE CASCADE NOT NULL
 );
 
 -- We also need to add a bi-directional cascade delete constraint to the spectra_collection

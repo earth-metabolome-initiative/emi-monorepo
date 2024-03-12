@@ -7,10 +7,10 @@
 -- the organization_projects table also contains a column to specify which administrator
 -- added the project to the organization.
 CREATE TABLE organization_projects (
-    id BIGINT PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE,
-    organization_id BIGINT NOT NULL REFERENCES organizations (id) ON DELETE CASCADE,
-    project_id BIGINT NOT NULL REFERENCES projects (id) ON DELETE CASCADE,
-    role_id BIGINT NOT NULL REFERENCES team_user_roles (id) ON DELETE CASCADE
+    id UUID PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE,
+    organization_id UUID NOT NULL REFERENCES organizations (id) ON DELETE CASCADE,
+    project_id UUID NOT NULL REFERENCES projects (id) ON DELETE CASCADE,
+    role_id UUID NOT NULL REFERENCES team_user_roles (id) ON DELETE CASCADE
 );
 
 -- We also need to add a bi-directional cascade delete constraint to the editables

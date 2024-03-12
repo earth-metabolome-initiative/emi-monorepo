@@ -1,6 +1,6 @@
 -- SQL defining the non-trivial user roles, such as "admin" and "editor".
 CREATE TABLE website_roles (
-    id BIGINT PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE REFERENCES describables(id) ON DELETE CASCADE
+    id UUID PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE REFERENCES describables(id) ON DELETE CASCADE
 );
 
 -- We also need to add a bi-directional cascade delete constraint to the editables
@@ -30,8 +30,8 @@ DELETE
 DO $$
 DECLARE
     root_user_id UUID;
-    first_editables_id BIGINT;
-    second_editables_id BIGINT;
+    first_editables_id UUID;
+    second_editables_id UUID;
 BEGIN
     -- We retrieve the id of the root user.
     SELECT

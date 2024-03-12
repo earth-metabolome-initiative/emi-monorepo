@@ -9,9 +9,9 @@
 -- columns are timestamps that are automatically set to the current time when a new
 -- row is created or updated.
 CREATE TABLE item_category_relationships (
-  id BIGINT PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE,
-  parent_id INTEGER NOT NULL REFERENCES item_categories(id),
-  child_id INTEGER NOT NULL REFERENCES item_categories(id),
+  id UUID PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE,
+  parent_id UUID NOT NULL REFERENCES item_categories(id),
+  child_id UUID NOT NULL REFERENCES item_categories(id),
   UNIQUE (parent_id, child_id)
 );
 

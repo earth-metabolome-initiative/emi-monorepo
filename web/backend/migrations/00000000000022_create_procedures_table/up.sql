@@ -1,6 +1,6 @@
 -- SQL defining the procedures table.
 CREATE TABLE procedures (
-  id BIGINT PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE REFERENCES describables(id) ON DELETE CASCADE
+  id UUID PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE REFERENCES describables(id) ON DELETE CASCADE
 );
 
 -- We also need to add a bi-directional cascade delete constraint to the editables

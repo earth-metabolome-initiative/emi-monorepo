@@ -3,7 +3,7 @@
 -- An individual is a physically identifiable member of a given species.
 
 CREATE TABLE sampled_individuals (
-  id BIGINT PRIMARY KEY REFERENCES items(id) ON DELETE CASCADE
+  id UUID PRIMARY KEY REFERENCES items(id) ON DELETE CASCADE
 );
 
 

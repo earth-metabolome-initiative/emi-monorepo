@@ -1,7 +1,7 @@
 -- SQL defining the document_formats table creation.
 -- The taple specifies the set of possible document formats that can be used in the system.
 CREATE TABLE document_formats (
-  id BIGINT PRIMARY KEY REFERENCES editables(id) ON
+  id UUID PRIMARY KEY REFERENCES editables(id) ON
   DELETE
     CASCADE REFERENCES describables(id) ON
   DELETE
@@ -35,15 +35,15 @@ DELETE
 DO $$
 DECLARE
   root_user_id UUID;
-  first_editables_id BIGINT;
-  second_editables_id BIGINT;
-  third_editables_id BIGINT;
-  fourth_editables_id BIGINT;
-  fifth_editables_id BIGINT;
-  sixth_editables_id BIGINT;
-  seventh_editables_id BIGINT;
-  eighth_editables_id BIGINT;
-  ninth_editables_id BIGINT;
+  first_editables_id UUID;
+  second_editables_id UUID;
+  third_editables_id UUID;
+  fourth_editables_id UUID;
+  fifth_editables_id UUID;
+  sixth_editables_id UUID;
+  seventh_editables_id UUID;
+  eighth_editables_id UUID;
+  ninth_editables_id UUID;
 BEGIN
   -- We retrieve the id of the root user.
   SELECT

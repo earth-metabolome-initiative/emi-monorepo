@@ -8,8 +8,8 @@
 -- An example of an Item may be a measurement device, a tube potentially containing a sample,
 -- or a sample itself.
 CREATE TABLE items (
-  id BIGINT PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE REFERENCES describables(id) ON DELETE CASCADE,
-  parent_id INTEGER REFERENCES items(id) ON DELETE SET NULL
+  id UUID PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE REFERENCES describables(id) ON DELETE CASCADE,
+  parent_id UUID REFERENCES items(id) ON DELETE SET NULL
 );
 
 -- We also need to add a bi-directional cascade delete constraint to the editables

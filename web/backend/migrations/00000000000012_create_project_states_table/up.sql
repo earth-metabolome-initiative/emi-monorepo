@@ -1,6 +1,6 @@
 -- SQL defining a state that a project may be in.
 CREATE TABLE project_states (
-    id BIGINT PRIMARY KEY REFERENCES editables(id) ON
+    id UUID PRIMARY KEY REFERENCES editables(id) ON
     DELETE
         CASCADE REFERENCES describables(id) ON
     DELETE
@@ -35,13 +35,13 @@ DO $$
 DECLARE
     root_user_id UUID;
 
-first_editables_id BIGINT;
+first_editables_id UUID;
 
-second_editables_id BIGINT;
+second_editables_id UUID;
 
-third_editables_id BIGINT;
+third_editables_id UUID;
 
-fourth_editables_id BIGINT;
+fourth_editables_id UUID;
 
 BEGIN
     -- We retrieve the id of the root user.

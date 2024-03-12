@@ -9,8 +9,8 @@
 -- Since only a project administrator can add a milestone to a project, the project_milestones table
 -- also contains a column to specify which administrator added the milestone to the project.
 CREATE TABLE project_milestones (
-    id BIGINT PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE REFERENCES describables(id) ON DELETE CASCADE,
-    project_id BIGINT NOT NULL REFERENCES projects (id) ON DELETE CASCADE,
+    id UUID PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE REFERENCES describables(id) ON DELETE CASCADE,
+    project_id UUID NOT NULL REFERENCES projects (id) ON DELETE CASCADE,
     due_date TIMESTAMP WITH TIME ZONE NOT NULL,
     completed_at TIMESTAMP WITH TIME ZONE
 );

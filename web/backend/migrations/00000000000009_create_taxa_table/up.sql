@@ -1,6 +1,6 @@
 -- Your SQL goes here
 CREATE TABLE taxa (
-    id BIGINT PRIMARY KEY REFERENCES editables(id) ON
+    id UUID PRIMARY KEY REFERENCES editables(id) ON
     DELETE
         CASCADE REFERENCES describables(id) ON
     DELETE

@@ -11,7 +11,7 @@
 -- - created_by: the unique identifier of the user who created the unit.
 -- - updated_by: the unique identifier of the user who last updated the unit.
 CREATE TABLE units (
-  id BIGINT PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE REFERENCES describables(id) ON DELETE CASCADE,
+  id UUID PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE REFERENCES describables(id) ON DELETE CASCADE,
   symbol VARCHAR(255) NOT NULL
 );
 

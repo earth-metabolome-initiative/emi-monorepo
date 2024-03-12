@@ -96,3 +96,23 @@ If you forget to start Postgres or Postgres Docker, you will get the following e
 ```
 
 Start Postgres or Postgres Docker and the error will be resolved.
+
+#### Unable to resolve GitHub
+If you are unable to resolve GitHub, you will get the following error:
+
+```bash
+error: failed to query replaced source registry `crates-io`
+```
+
+It may mean you have some issues in the default DNS available to the Docker deamon.
+In order to solve this issue, you can add the following lines to the `daemon.json` file:
+
+```json
+{ "dns" : [ "1.1.1.1" , "8.8.8.8" ] }
+```
+
+and restart the Docker deamon by running the following command (on Linux)
+
+```bash
+sudo systemctl restart docker
+```

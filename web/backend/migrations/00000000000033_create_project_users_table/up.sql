@@ -7,10 +7,10 @@
 -- also contains a column to specify which admin added the user to the project.
 
 CREATE TABLE project_users (
-    id BIGINT PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE,
+    id UUID PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE,
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    project_id BIGINT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
-    role_id BIGINT NOT NULL REFERENCES project_user_roles (id) ON DELETE CASCADE,
+    project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+    role_id UUID NOT NULL REFERENCES project_user_roles (id) ON DELETE CASCADE,
     UNIQUE (user_id, project_id, role_id)
 );
 
@@ -43,9 +43,9 @@ DELETE
 DO $$
 DECLARE
     root_user_id UUID;
-    project_id BIGINT;
-    role_id BIGINT;
-    editables_id BIGINT;
+    project_id UUID;
+    role_id UUID;
+    editables_id UUID;
 BEGIN
     -- We retrieve the id of the root user.
     SELECT

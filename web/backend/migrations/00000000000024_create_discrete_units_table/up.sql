@@ -2,7 +2,7 @@
 -- The discrete_units table is used as the finite set of units that can be used to measure
 -- the discrete quantities of items. For example, a box, a tube, or a vial.
 CREATE TABLE discrete_units (
-    id BIGINT PRIMARY KEY REFERENCES units(id) ON DELETE CASCADE
+    id UUID PRIMARY KEY REFERENCES units(id) ON DELETE CASCADE
 );
 
 -- We also need to add a bi-directional cascade delete constraint to the units

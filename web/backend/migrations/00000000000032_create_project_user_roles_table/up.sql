@@ -1,6 +1,6 @@
 -- Your SQL goes here
 CREATE TABLE project_user_roles (
-    id BIGINT PRIMARY KEY REFERENCES editables(id) ON
+    id UUID PRIMARY KEY REFERENCES editables(id) ON
     DELETE
         CASCADE REFERENCES describables(id) ON
     DELETE
@@ -34,11 +34,11 @@ DELETE
 DO $$
 DECLARE
     root_user_id UUID;
-    first_editables_id BIGINT;
+    first_editables_id UUID;
 
-second_editables_id BIGINT;
+second_editables_id UUID;
 
-third_editables_id BIGINT;
+third_editables_id UUID;
 
 BEGIN
     -- We retrieve the id of the root user.
