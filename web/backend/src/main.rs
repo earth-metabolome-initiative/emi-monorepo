@@ -11,6 +11,7 @@ use actix_web::http::header;
 use actix_web::middleware::Logger;
 use actix_web::HttpRequest;
 use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
+use sqlx::{postgres::PgPoolOptions, Pool as SQLxPool, Postgres};
 use redis::Client;
 use std::path::PathBuf;
 
@@ -22,6 +23,7 @@ mod schema;
 mod transactions;
 
 pub(crate) type DBPool = Pool<ConnectionManager<PgConnection>>;
+pub(crate) type DieselConn = r2d2::PooledConnection<ConnectionManager<PgConnection>>;
 
 /// Entrypoint to load the index.html file
 async fn index() -> impl Responder {
@@ -45,18 +47,18 @@ async fn main() -> std::io::Result<()> {
     let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
     // create db connection pool
-    let manager = ConnectionManager::<PgConnection>::new(database_url);
+    let manager = ConnectionManager::<PgConnection>::new(&database_url);
     let pool: DBPool = match r2d2::Pool::builder()
         // We set the maximum number of connections in the pool to 10
         .max_size(10)
         .build(manager)
     {
         Ok(client) => {
-            log::info!("✅Connection to the database is successful!");
+            log::info!("✅ Diesel connection to the database is successful!");
             client
         }
         Err(e) => {
-            log::error!("🔥 Error connecting to the database: {}", e);
+            log::error!("🔥 Error connecting to the database with Diesel: {}", e);
             std::process::exit(1);
         }
     };
@@ -72,6 +74,21 @@ async fn main() -> std::io::Result<()> {
         }
         Err(e) => {
             log::error!("🔥 Error connecting to Redis: {}", e);
+            std::process::exit(1);
+        }
+    };
+
+    let sqlx_pool: SQLxPool<Postgres> = match PgPoolOptions::new()
+        .max_connections(10)
+        .connect(&database_url)
+        .await
+    {
+        Ok(pool) => {
+            println!("✅ SQLx Connection to the database is successful!");
+            pool
+        }
+        Err(err) => {
+            println!("🔥 Failed to connect to the SQLx Database: {:?}", err);
             std::process::exit(1);
         }
     };
@@ -115,6 +132,8 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(pool.clone()))
             // pass in the redis client to all routes
             .app_data(web::Data::new(redis_client.clone()))
+            // pass in the sqlx pool to all routes
+            .app_data(web::Data::new(sqlx_pool.clone()))
             // We register the API handlers
             .configure(api::configure)
             // We serve the frontend as static files
