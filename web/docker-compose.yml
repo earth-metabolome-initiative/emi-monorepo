@@ -77,6 +77,9 @@ services:
     restart: on-failure
 
   yew-frontend:
+    entrypoint: /bin/bash
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
     build:
       context: ./frontend
       args:

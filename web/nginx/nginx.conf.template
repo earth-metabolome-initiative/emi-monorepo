@@ -54,7 +54,7 @@ http {
             proxy_pass         https://frontend;
         }
 
-        location /_trunk/ws {
+        location /.well-known/trunk/ws {
             proxy_pass https://frontend;
             proxy_http_version 1.1;
             proxy_set_header Upgrade §http_upgrade;
