@@ -47,7 +47,7 @@ pub async fn update_name(
         }
         Err(e) => {
             log::error!("Failed to update user name: {}", e);
-            return HttpResponse::InternalServerError().finish();
+            HttpResponse::InternalServerError().finish()
         }
     }
 }

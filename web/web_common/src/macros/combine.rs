@@ -24,7 +24,7 @@ macro_rules! combine_path {
         }
         const RESULT: &[u8] = &combined();
         // how bad is the assumption that `&str` and `&[u8]` have the same layout?
-        const RESULT_STR: &str = unsafe { std::mem::transmute(RESULT) };
+        const RESULT_STR: &str = unsafe { std::str::from_utf8_unchecked(RESULT) };
         RESULT_STR
     }};
 }

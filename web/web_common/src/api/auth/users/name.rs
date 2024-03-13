@@ -19,9 +19,9 @@ pub struct Name {
 impl Name {
     pub fn new(first_name: String, middle_name: Option<String>, last_name: String) -> Name {
         Name {
-            first_name: first_name,
+            first_name,
             middle_name,
-            last_name: last_name,
+            last_name,
         }
     }
 
@@ -38,7 +38,7 @@ impl Name {
     }
 
     pub(crate) fn is_complete(&self) -> bool {
-        self.first_name.len() > 0 && self.last_name.len() > 0
+        !self.first_name.is_empty() && !self.last_name.is_empty()
     }
 
     pub(crate) fn full_name(&self) -> Result<String, String> {

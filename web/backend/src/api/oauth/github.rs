@@ -190,7 +190,7 @@ pub async fn get_github_user_emails(authorization_code: &str) -> Result<Emails, 
         if emails.is_err() {
             let message = format!(
                 "An error occurred while trying to retrieve the user emails: {}",
-                emails.err().unwrap().to_string()
+                emails.err().unwrap()
             );
             return Err(From::from(message));
         }
@@ -205,26 +205,26 @@ pub async fn get_github_user_emails(authorization_code: &str) -> Result<Emails, 
                 continue;
             }
             if email.primary {
-                primary = email.email.clone();
+                primary.clone_from(&email.email);
             }
             email_list.push(email.email);
         }
 
         // If not primary mail was set, then this was a bad request.
         if primary.is_empty() {
-            let message = format!("No primary email was found in the list of emails from GitHub",);
+            let message = "No primary email was found in the list of emails from GitHub";
             return Err(From::from(message));
         }
 
         // If no email was found, then this was a bad request.
         if email_list.is_empty() {
-            let message = format!("No email was found in the list of emails from GitHub",);
+            let message = "No email was found in the list of emails from GitHub";
             return Err(From::from(message));
         }
 
-        Emails::new(email_list, primary).map_err(|e| From::from(e))
+        Ok(Emails::new(email_list, primary)?)
     } else {
-        let message = format!("An error occurred while trying to retrieve the user emails",);
+        let message = "An error occurred while trying to retrieve the user emails";
         Err(From::from(message))
     }
 }

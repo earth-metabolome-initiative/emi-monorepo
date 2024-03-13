@@ -125,7 +125,7 @@ impl JsonWebToken {
         let token_id = Uuid::new_v4();
         let now = Utc::now();
         let created_at = now.timestamp() as usize;
-        let expires_in = (now + Duration::minutes(minutes)).timestamp() as usize;
+        let expires_in = (now + Duration::try_minutes(minutes).unwrap()).timestamp() as usize;
         JsonWebToken {
             sub: user_id,
             token_id,

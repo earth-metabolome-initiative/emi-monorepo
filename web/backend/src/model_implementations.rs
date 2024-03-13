@@ -173,13 +173,13 @@ impl User {
             .inner_join(describables.on(crate::schema::describables::id.eq(website_role_id)))
             .filter(name.eq(WebsiteRole::Admin.to_string()))
             .select(crate::schema::website_user_roles::id)
-            .first::<i64>(conn)
+            .first::<Uuid>(conn)
             .is_ok()
     }
 
     pub fn is_organization_admin(
         &self,
-        organization_id: i64,
+        organization_id: Uuid,
         conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>,
     ) -> bool {
         use crate::schema::describables::dsl::*;
@@ -193,13 +193,13 @@ impl User {
             )
             .filter(name.eq(OrganizationUserRoleEnum::Admin.to_string()))
             .select(crate::schema::organization_users::id)
-            .first::<i64>(conn)
+            .first::<Uuid>(conn)
             .is_ok()
     }
 
     pub fn is_project_admin(
         &self,
-        project_id: i64,
+        project_id: Uuid,
         conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>,
     ) -> bool {
         use crate::schema::describables::dsl::*;
@@ -214,7 +214,7 @@ impl User {
             )
             .filter(name.eq(ProjectUserRoleEnum::Admin.to_string()))
             .select(crate::schema::project_users::id)
-            .first::<i64>(conn)
+            .first::<Uuid>(conn)
             .is_ok()
     }
 

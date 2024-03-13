@@ -25,8 +25,7 @@ pub(crate) type DBPool = Pool<ConnectionManager<PgConnection>>;
 
 /// Entrypoint to load the index.html file
 async fn index() -> impl Responder {
-    let file = NamedFile::open("/app/frontend/dist/index.html");
-    file
+    NamedFile::open("/app/frontend/dist/index.html")
 }
 
 #[get("/{filename:.*}")]
@@ -36,8 +35,7 @@ async fn index() -> impl Responder {
 /// If the path happens to not exist, the server will return a 404 error.
 async fn static_files(req: HttpRequest) -> impl Responder {
     let path: PathBuf = req.match_info().query("filename").parse().unwrap();
-    let file = NamedFile::open(format!("/app/frontend/dist/{}", path.display()));
-    file
+    NamedFile::open(format!("/app/frontend/dist/{}", path.display()))
 }
 
 #[actix_rt::main]
