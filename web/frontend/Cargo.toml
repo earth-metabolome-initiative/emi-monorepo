@@ -30,6 +30,8 @@ gluesql = { version = "0.15", features = ["idb-storage"], default-features = fal
 wasm-logger = "0.2.0"
 log = "0.4.20"
 validator = { version = "0.16", features = ["derive"] }
+yew-agent = "0.3.0"
+futures = "0.3.30"
 
 [dependencies.web-sys]
 version = "0.3.67"
