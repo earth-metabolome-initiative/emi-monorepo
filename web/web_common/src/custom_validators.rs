@@ -1,2 +1,9 @@
-pub mod non_empty_or_none;
-pub use non_empty_or_none::non_empty_or_none;
+pub mod no_duplicated_spaces;
+pub use no_duplicated_spaces::*;
+pub mod validation_errors;
+pub mod no_trailing_spaces;
+pub use no_trailing_spaces::*;
+pub mod no_leading_spaces;
+pub use no_leading_spaces::*;
+pub mod not_empty;
+pub use not_empty::*;

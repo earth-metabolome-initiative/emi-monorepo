@@ -6,7 +6,7 @@ use yew::prelude::*;
 #[derive(Clone, PartialEq, Properties)]
 pub struct InputErrorProp {
     pub error: String,
-    pub on_delete: Callback<()>,
+    pub on_delete: Callback<String>,
 }
 
 pub struct InputError {
@@ -39,14 +39,14 @@ impl Component for InputError {
                     return false;
                 }
 
-                self.hide = Some(Timeout::new(500, move || {
+                self.hide = Some(Timeout::new(200, move || {
                     link.send_message(InputErrorMessage::Hide);
                 }));
             }
             InputErrorMessage::Hide => {
                 // When the timeout is finished, we remove the error message from the DOM.
                 self.hide = None;
-                ctx.props().on_delete.emit(());
+                ctx.props().on_delete.emit(ctx.props().error.clone());
             }
         }
         true
@@ -62,12 +62,12 @@ impl Component for InputError {
         };
 
         html! {
-            <div class={classes}>
+            <li class={classes}>
                 <p>{&props.error}</p>
                 <button onclick={ctx.link().callback(|_| InputErrorMessage::StartHide)}>
                     <i class="fas fa-times"></i>
                 </button>
-            </div>
+            </li>
         }
     }
 }

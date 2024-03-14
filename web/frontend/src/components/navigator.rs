@@ -23,8 +23,8 @@
 use crate::router::AppRoute;
 use crate::stores::app_state::AppState;
 use crate::stores::user_state::UserState;
-use web_common::api::auth::users::User;
 use wasm_bindgen::UnwrapThrowExt;
+use web_common::api::auth::users::User;
 use web_common::api::ws::messages::*;
 use yew::prelude::*;
 use yew_agent::scope_ext::AgentScopeExt;
@@ -35,7 +35,6 @@ use crate::components::hamburger::Hamburger;
 use crate::components::search_bar::SearchBar;
 use crate::components::sidebar::Sidebar;
 use crate::stores::user_state::refresh_access_token;
-use crate::stores::user_state::retrieve_user_informations;
 use crate::workers::WebsocketWorker;
 use log::info;
 use std::rc::Rc;
@@ -56,6 +55,14 @@ impl Navigator {
 
     fn user(&self) -> Option<&User> {
         self.user_state.user()
+    }
+
+    fn has_access_token(&self) -> bool {
+        self.user_state.has_access_token()
+    }
+
+    fn has_complete_profile(&self) -> bool {
+        self.user_state.has_complete_profile()
     }
 }
 
@@ -103,7 +110,8 @@ impl Component for Navigator {
                 self.user_state = user_state;
                 if let Some(access_token) = self.user_state.access_token() {
                     log::info!("Access token found, recovering user info.");
-                    self.websocket.send(FrontendMessage::Authentication(access_token.clone()));
+                    self.websocket
+                        .send(FrontendMessage::Authentication(access_token.clone()));
                 } else {
                     refresh_access_token(self.user_dispatch.clone(), ctx.props().navigator.clone());
                 }
@@ -113,8 +121,8 @@ impl Component for Navigator {
                 self.app_state = app_state;
                 true
             }
-            NavigatorMessage::Backend(BackendMessage::Authenticated(user)) => {
-                info!("User authenticated: {:?}", user);
+            NavigatorMessage::Backend(BackendMessage::User(_operation, user)) => {
+                info!("User updated: {:?}", user);
                 self.user_dispatch.reduce_mut(|state| {
                     state.set_user(user);
                 });
@@ -149,19 +157,21 @@ impl Component for Navigator {
                         </Link<AppRoute>>
                     </h1>
                     <SearchBar />
-                    if let Some(user) = self.user() {
-                        if user.has_complete_profile() {
-                            <div class="user">
-                                <img src={format!("/api/user/{}/avatar", user.id())} alt={format!("{}'s avatar", user.last_name())} />
-                                <span>{user.full_name().unwrap_throw()}</span>
-                                // {if store.is_offline() {
-                                //     html! {
-                                //         <span class="badge offline">{"Offline"}</span>
-                                //     }
-                                // } else {
-                                //     html! {}
-                                // }}
-                            </div>
+                    if self.has_access_token() {
+                        if self.has_complete_profile() {
+                            if let Some(user) = self.user() {
+                                <div class="user">
+                                    <img src={format!("/api/user/{}/avatar", user.id())} alt={format!("{}'s avatar", user.last_name().unwrap())} />
+                                    <span>{user.full_name().unwrap_throw()}</span>
+                                    // {if store.is_offline() {
+                                    //     html! {
+                                    //         <span class="badge offline">{"Offline"}</span>
+                                    //     }
+                                    // } else {
+                                    //     html! {}
+                                    // }}
+                                </div>
+                            }
                         } else {
                             <Link<AppRoute> classes="right_nav_button" to={AppRoute::Profile}>{"Complete profile"}</Link<AppRoute>>
                         }

@@ -18,8 +18,8 @@ use validator::{Validate, ValidationError, ValidationErrors, ValidationErrorsKin
 use wasm_bindgen::JsCast;
 use wasm_bindgen::UnwrapThrowExt;
 use web_common::api::auth::users::User;
-use web_common::api::ws::messages::*;
 use web_common::api::oauth::jwt_cookies::AccessToken;
+use web_common::api::ws::messages::*;
 use web_common::api::ApiError;
 use web_sys::EventTarget;
 use web_sys::FormData;
@@ -156,8 +156,8 @@ impl<Data> From<Data> for FormWrapper<Data> {
 pub struct BasicFormProp {
     pub title: String,
     pub method: FormMethod,
-    pub action: String,
-    pub children: ChildrenWithProps<BasicInput>,
+    pub action: FormAction,
+    pub children: Html,
 }
 
 impl BasicFormProp {
@@ -173,56 +173,25 @@ impl BasicFormProp {
         self.method
     }
 
-    pub fn action(&self) -> String {
+    pub fn action(&self) -> FormAction {
         self.action.clone()
     }
 
     pub fn title(&self) -> String {
         self.title.clone()
     }
-
-    async fn submit<Data>(
-        &self,
-        data: Data,
-        access_token: Option<&AccessToken>,
-    ) -> Result<(), FrontendApiError>
-    where
-        Data: Debug + Serialize,
-    {
-        // We convert the provided data to JSON using SERDE
-        // so to be able to set it as the body of the request.
-        let body = serde_json::to_string(&data).map_err(FrontendApiError::from)?;
-
-        let response = add_optional_bearer(
-            Request::new(&self.action).method(self.method().to_reqwasm()),
-            access_token,
-        )
-        .header("Content-Type", "application/json")
-        .body(body)
-        .send()
-        .await
-        .map_err(FrontendApiError::from)?;
-
-        match response.status() {
-            200 => Ok(()),
-            _ => {
-                let api_error: ApiError = response.json().await.map_err(FrontendApiError::from)?;
-                Err(FrontendApiError::from(api_error))
-            }
-        }
-    }
 }
 
 pub struct BasicForm<Data> {
     websocket: WorkerBridgeHandle<WebsocketWorker<FrontendMessage, BackendMessage>>,
     errors: Vec<String>,
+    waiting_for_reply: bool,
     _phantom: std::marker::PhantomData<Data>,
 }
 
 #[derive(Debug, Clone)]
 pub enum FormMessage<Data> {
     Submit(Data),
-    Frontend(FrontendMessage),
     Backend(BackendMessage),
     RemoveError(usize),
 }
@@ -230,7 +199,7 @@ pub enum FormMessage<Data> {
 impl<Data> Component for BasicForm<Data>
 where
     Data: PartialEq + Clone + 'static + Validate + Debug + Serialize,
-    FormWrapper<Data>: TryFrom<FormData, Error = ValidationErrors>,
+    FormWrapper<Data>: TryFrom<FormData, Error = Vec<String>>,
 {
     type Message = FormMessage<Data>;
     type Properties = BasicFormProp;
@@ -244,22 +213,33 @@ where
                 }
             })),
             errors: vec![],
+            waiting_for_reply: false,
             _phantom: std::marker::PhantomData,
         }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            FormMessage::Frontend(fm) => self.websocket.send(fm.into()),
-            FormMessage::Backend(_bm) => {}
+            FormMessage::Backend(_bm) => false,
             FormMessage::Submit(data) => {
-                // We retrieve the user object from the context
+                // First, we validate the data
+                if let Err(errors) = data.validate() {
+                    return true;
+                }
+
+                // Then, we send the data to the backend
+                self.websocket
+                    .send(FrontendMessage::submit(ctx.props().action(), data));
+
+                self.waiting_for_reply = true;
+
+                true
             }
             FormMessage::RemoveError(error_number) => {
                 self.errors.remove(error_number);
+                true
             }
         }
-        true
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
@@ -289,9 +269,9 @@ where
         };
 
         html! {
-            <form enctype={ "multipart/form-data" } class={classes} action={props.action()} onsubmit={on_submit} method={props.method().to_string()}>
+            <form enctype={ "multipart/form-data" } class={classes} onsubmit={on_submit} method={props.method().to_string()}>
                 <h4>{ props.title() }</h4>
-                { for ctx.props().children.iter() }
+                { ctx.props().children.clone() }
                 <ul class="form-errors">
                     { for self.errors.iter().enumerate().map(|(error_number, error)| {
                         let link = ctx.link().clone();
@@ -299,7 +279,7 @@ where
                             link.send_message(FormMessage::RemoveError(error_number));
                         });
                         html! {
-                            <li><InputError error={error.clone()} on_delete={on_delete}/></li>
+                            <InputError error={error.clone()} on_delete={on_delete}/>
                         }
                     })
                     }

@@ -1,6 +1,9 @@
 //! Module providing the websocket messages used in the application.
-use serde::{Deserialize, Serialize};
+use std::{fmt::Debug, str::FromStr};
+
 use crate::api::{auth::users::User, oauth::jwt_cookies::AccessToken};
+use serde::{Deserialize, Serialize};
+use validator::Validate;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CloseReason {
@@ -8,64 +11,51 @@ pub struct CloseReason {
     reason: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
 pub enum SQLOperation {
     Insert,
     Update,
     Delete,
 }
 
+impl FromStr for SQLOperation {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "insert" => Ok(SQLOperation::Insert),
+            "INSERT" => Ok(SQLOperation::Insert),
+            "update" => Ok(SQLOperation::Update),
+            "UPDATE" => Ok(SQLOperation::Update),
+            "delete" => Ok(SQLOperation::Delete),
+            "DELETE" => Ok(SQLOperation::Delete),
+            _ => Err(()),
+        }
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq)]
+pub enum FormAction {
+    UpdateName,
+}
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum FrontendMessage {
     Close(Option<CloseReason>),
     Authentication(AccessToken),
+    Submit(FormAction, Vec<u8>),
 }
 
-pub trait AuthenticationMessage {
-    fn autentication_message(authentication_token: AccessToken) -> Self;
-
-    fn is_authentication(&self) -> bool;
-
-    fn token(self) -> Option<AccessToken>;
-}
-
-impl AuthenticationMessage for FrontendMessage {
-    fn autentication_message(authentication_token: AccessToken) -> Self {
-        FrontendMessage::Authentication(authentication_token)
+impl FrontendMessage {
+    pub fn submit<Payload: Serialize + Validate>(action: FormAction, payload: Payload) -> Self {
+        FrontendMessage::Submit(action, bincode::serialize(&payload).unwrap())
     }
-
-    fn is_authentication(&self) -> bool {
-        match self {
-            FrontendMessage::Authentication(_) => true,
-            _ => false,
-        }
-    }
-
-    fn token(self) -> Option<AccessToken> {
-        match self {
-            FrontendMessage::Authentication(token) => Some(token),
-            _ => None,
-        }
-    }
-}
-
-pub trait AuthenticatedMessage {
-    fn is_authenticated(&self) -> bool;
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum BackendMessage {
     Close(Option<CloseReason>),
-    Authenticated(User),
-}
-
-impl AuthenticatedMessage for BackendMessage {
-    fn is_authenticated(&self) -> bool {
-        match self {
-            BackendMessage::Authenticated(_) => true,
-            _ => false,
-        }
-    }
+    User(SQLOperation, User),
 }
 
 #[cfg(feature = "backend")]

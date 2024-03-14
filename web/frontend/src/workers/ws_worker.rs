@@ -4,7 +4,6 @@ use gloo_net::websocket::futures::WebSocket;
 use std::collections::HashSet;
 use std::fmt::Debug;
 use wasm_bindgen::UnwrapThrowExt;
-use web_common::api::ws::messages::*;
 use web_common::api::ws::FULL_ENDPOINT;
 use yew::platform::spawn_local;
 use yew_agent::worker::HandlerId;
@@ -27,8 +26,8 @@ pub enum InternalMessage<BM> {
 
 impl<FM, BM> WebsocketWorker<FM, BM>
 where
-    FM: Into<gloo_net::websocket::Message> + Clone + 'static + Debug + AuthenticationMessage,
-    BM: From<gloo_net::websocket::Message> + Clone + 'static + Debug + AuthenticatedMessage,
+    FM: Into<gloo_net::websocket::Message> + Clone + 'static + Debug,
+    BM: From<gloo_net::websocket::Message> + Clone + 'static + Debug,
 {
     fn connect(
         scope: &yew_agent::prelude::WorkerScope<Self>,
@@ -50,7 +49,6 @@ where
 
         spawn_local(async move {
             while let Some(frontend_message) = receiver.next().await {
-                log::debug!("Sending message to websocket: {:?}", frontend_message);
                 if write.send(frontend_message.into()).await.is_err() {
                     log::error!("Error sending to websocket");
                     break;
@@ -87,8 +85,8 @@ where
 
 impl<FM, BM> Worker for WebsocketWorker<FM, BM>
 where
-    FM: Into<gloo_net::websocket::Message> + Clone + 'static + Debug + AuthenticationMessage,
-    BM: From<gloo_net::websocket::Message> + Clone + 'static + Debug + AuthenticatedMessage,
+    FM: Into<gloo_net::websocket::Message> + Clone + 'static + Debug,
+    BM: From<gloo_net::websocket::Message> + Clone + 'static + Debug,
 {
     type Message = InternalMessage<BM>;
     type Input = FM;
@@ -175,10 +173,6 @@ where
         frontend_message: Self::Input,
         _id: HandlerId,
     ) {
-        log::debug!(
-            "Attempting to send message from frontend: {:?}",
-            frontend_message
-        );
         if let Some(sender) = &mut self.sender {
             match sender.try_send(frontend_message) {
                 Ok(()) => {}

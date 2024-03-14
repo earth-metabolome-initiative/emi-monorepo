@@ -6,7 +6,6 @@
 //! As such, we will not be able to access the `HttpOnly` cookies from Yew, and these utilities solely
 //! exist to access cookies that are not `HttpOnly`.
 use wasm_bindgen::JsCast;
-use wasm_bindgen::UnwrapThrowExt;
 use web_common::api::oauth::jwt_cookies::USER_ONLINE_COOKIE_NAME;
 use web_sys::window;
 
@@ -14,13 +13,13 @@ use web_sys::window;
 ///
 /// # Arguments
 /// * `cookie_name` - The name of the cookie to check for.
-fn check_cookie(cookie_name: &str) -> bool {
+fn check_cookie(cookie_name: &str) -> Result<bool, String> {
     let document = window()
-        .unwrap_throw()
+        .ok_or("Failed to get the window object in order to check for cookies")?
         .document()
-        .unwrap_throw()
+        .ok_or("Failed to get the document object in order to check for cookies")?
         .dyn_into::<web_sys::HtmlDocument>()
-        .unwrap_throw();
+        .map_err(|_| "Failed to convert the document object into an HtmlDocument")?;
 
     if let Ok(cookie_str) = document.cookie() {
         let cookies: Vec<&str> = cookie_str.split(';').map(|c| c.trim()).collect();
@@ -34,13 +33,13 @@ fn check_cookie(cookie_name: &str) -> bool {
                     .split(';')
                     .find(|cookie| cookie.trim().starts_with(cookie_name))
                 {
-                    return true;
+                    return Ok(true);
                 }
             }
         }
     }
 
-    false
+    Ok(false)
 }
 
 /// Returns whether the user is logged in.
@@ -48,5 +47,5 @@ fn check_cookie(cookie_name: &str) -> bool {
 /// # Implementation details
 /// This function checks whether the USER_ONLINE_COOKIE_NAME cookie exists.
 pub(crate) fn is_logged_in() -> bool {
-    check_cookie(USER_ONLINE_COOKIE_NAME)
+    check_cookie(USER_ONLINE_COOKIE_NAME).unwrap_or(false)
 }

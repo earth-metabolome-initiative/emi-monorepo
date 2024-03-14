@@ -13,7 +13,7 @@ form.standard-form {
         border-top-right-radius: 0.5em;
     }
 
-    .form-group {
+    .input-group {
         padding-top: 0.5em;
         padding-bottom: 0.5em;
     }
@@ -40,15 +40,7 @@ form.standard-form {
         }
     }
 
-    &.delete {
-        border: 1px solid $red;
-
-        h4 {
-            color: $red;
-        }
-    }
-
-    button {
+    button[type="submit"] {
         padding: 0.5em;
         color: white;
         border: none;
@@ -58,44 +50,22 @@ form.standard-form {
         border-radius: 0.5em;
         float: right;
         font-size: 1em;
-        transition: background-color 0.2s;
+        transition: background-color 0.2s, border-color 0.2s, color 0.2s;
 
         &:disabled {
             cursor: not-allowed;
             background-color: #ccc;
         }
+    }
 
-        &.get {
-            border-color: $primary;
-            color: $primary;
+    &[method="DELETE"] {
+        border: 1px solid $red;
 
-            &:hover {
-                background-color: $primary;
-                color: white;
-            }
+        h4 {
+            color: $red;
         }
 
-        &.post {
-            border-color: $blue;
-            color: $blue;
-
-            &:hover {
-                background-color: $blue;
-                color: white;
-            }
-        }
-
-        &.put {
-            border-color: $green;
-            color: $green;
-
-            &:hover {
-                background-color: $green;
-                color: white;
-            }
-        }
-
-        &.delete {
+        button[type="submit"] {
             border-color: $red;
             color: $red;
 
@@ -104,5 +74,108 @@ form.standard-form {
                 color: white;
             }
         }
+    }
+
+    &[method="PUT"] {
+        button[type="submit"] {
+            border-color: $green;
+            color: $green;
+
+            &:hover {
+                background-color: $green;
+                color: white;
+            }
+        }
+    }
+
+    &[method="POST"] {
+        border: 1px solid $blue;
+
+        button[type="submit"] {
+            border-color: $blue;
+            color: $blue;
+
+            &:hover {
+                background-color: $blue;
+                color: white;
+            }
+        }
+    }
+
+    ul.form-errors {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+        font-size: inherit;
+        font-weight: 100;
+
+        li.input-error {
+            background-color: $red;
+            color: white;
+            padding: 0.5em;
+            box-sizing: border-box;
+            border-radius: 0.5em;
+            position: relative;
+            padding-right: 1em;
+            animation: pop-in 0.2s;
+
+            &.hiding {
+                animation: pop-out 0.2s;
+            }
+
+            &:not(:last-child) {
+                margin-bottom: 0.5em;
+            }
+
+            button {
+                background-color: transparent;
+                border: none;
+                box-sizing: border-box;
+                color: white;
+                cursor: pointer;
+                float: right;
+                font-size: inherit;
+                padding: 0.5em;
+                position: absolute;
+                border-radius: 100%;
+                right: 0;
+                top: 0;
+
+                i {
+                    transition: color 0.2s;
+                    color: rgba(255, 255, 255, 0.8);
+                }
+
+                &:hover {
+                    i {
+                        color: white;
+                    }
+                }
+
+                
+            }
+        }
+    }
+}
+
+@keyframes pop-in {
+    0% {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes pop-out {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0.9);
+        opacity: 0;
     }
 }

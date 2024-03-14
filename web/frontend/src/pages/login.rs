@@ -14,7 +14,7 @@ pub fn login() -> Html {
     let navigator = use_navigator().unwrap();
     let (user, _) = use_store::<UserState>();
 
-    if user.is_logged_in() {
+    if user.has_access_token() {
         navigator.push(&AppRoute::Home);
     }
 

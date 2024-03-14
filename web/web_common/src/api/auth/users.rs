@@ -1,4 +1,3 @@
-pub mod me;
 pub mod name;
 
 use crate::combine_path;
@@ -12,17 +11,20 @@ use uuid::Uuid;
 
 #[derive(PartialEq, Debug, Serialize, Deserialize, Clone)]
 pub struct User {
-    name: name::Name,
+    name: Option<name::Name>,
     id: Uuid,
 }
 
 impl User {
-    pub fn new(name: name::Name, id: Uuid) -> User {
+    pub fn new(name: Option<name::Name>, id: Uuid) -> User {
         User { name, id }
     }
 
     pub fn full_name(&self) -> Result<String, String> {
-        self.name.full_name()
+        match &self.name {
+            Some(name) => name.full_name(),
+            None => Err("Name is not complete.".to_string()),
+        }
     }
 
     pub fn id(&self) -> Uuid {
@@ -30,22 +32,34 @@ impl User {
     }
 
     pub fn has_complete_profile(&self) -> bool {
-        self.name.is_complete()
+        match &self.name {
+            Some(name) => name.is_complete(),
+            None => false,
+        }
     }
 
-    pub fn name(&self) -> name::Name {
-        self.name.clone()
+    pub fn name(&self) -> Result<name::Name, String> {
+        match &self.name {
+            Some(name) => Ok(name.clone()),
+            None => Err("Name is not complete.".to_string()),
+        }
     }
 
-    pub fn first_name(&self) -> String {
-        self.name.first_name()
+    pub fn first_name(&self) -> Result<String, String> {
+        match &self.name {
+            Some(name) => Ok(name.first_name().to_string()),
+            None => Err("Name is not complete.".to_string()),
+        }
     }
     
-    pub fn last_name(&self) -> String {
-        self.name.last_name()
+    pub fn last_name(&self) -> Result<String, String> {
+        match &self.name {
+            Some(name) => Ok(name.last_name().to_string()),
+            None => Err("Name is not complete.".to_string()),
+        }
     }
 
     pub fn middle_name(&self) -> Option<String> {
-        self.name.middle_name()
+        self.name.as_ref().and_then(|name| name.middle_name().map(|middle_name| middle_name.to_string()))
     }
 }

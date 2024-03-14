@@ -23,16 +23,11 @@ pub fn profile() -> Html {
 
     // If the user happens to not be logged in, we redirect
     // them to the home page.
-    if !user_state.is_logged_in() {
+    if user_state.has_no_access_token() {
         // This is done by pushing the route defined in the AppRoute
         // enum to the navigator.
         navigator.push(&AppRoute::Home);
     }
-
-    // Now we know that the user is necessarily logged in, and as such,
-    // we can safely unwrap the user from the user state.
-
-    let user = user_state.user().unwrap_throw();
 
     // We proceed to render the profile page, which contains a form
     // to edit the user's name and surname.

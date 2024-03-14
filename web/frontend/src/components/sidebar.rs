@@ -16,7 +16,6 @@ pub struct SidebarProps {
 #[function_component(Sidebar)]
 pub fn sidebar(props: &SidebarProps) -> Html {
     let (user, _) = use_store::<UserState>();
-    let navigator = use_navigator().unwrap();
 
     let sidebar_class = if props.visible {
         "sidebar"
@@ -34,7 +33,7 @@ pub fn sidebar(props: &SidebarProps) -> Html {
                     <li><a href="#">{"About"}</a></li>
                     <li><a href="#">{"Services"}</a></li>
                     <li><a href="#">{"Contact"}</a></li>
-                    if user.is_logged_in() {
+                    if user.has_access_token() {
                         <li><Logout /></li>
                     }
                 </ul>

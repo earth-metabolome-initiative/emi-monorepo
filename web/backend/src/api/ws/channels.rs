@@ -1,77 +1,73 @@
+use crate::api::ws::socket::WebSocket;
+use actix::dev::channel;
+use actix::Message;
 use actix_web::web;
 use core::fmt::Debug;
-use serde::{Serialize, Deserialize, de::DeserializeOwned};
-use sqlx::Postgres;
-use sqlx::Pool;
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use sqlx::error::Error;
 use sqlx::postgres::PgListener;
+use sqlx::Pool;
+use sqlx::Postgres;
+use uuid::Uuid;
+use web_common::api::auth::users::User;
+use web_common::api::ws::messages::SQLOperation;
 
-
-pub trait Channel: ToString {
-    type Payload: DeserializeOwned + Debug;
+pub enum Channel {
+    NotifyUser(User),
 }
 
-// pub struct CommentsChannel;
+impl ToString for Channel {
+    fn to_string(&self) -> String {
+        match self {
+            Channel::NotifyUser(user) => format!("notify_user_{}", user.id()),
+        }
+    }
+}
 
-// impl ToString for CommentsChannel {
-//     fn to_string(&self) -> String {
-//         "comments".to_string()
-//     }
-// }
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+pub enum ChannelTable {
+    Users,
+}
 
-// impl Channel for CommentsChannel {
-//     type Payload = CommentsPayload;
-// }
+#[derive(Debug, Serialize, Deserialize, Message, Clone, PartialEq, Eq)]
+#[rtype(result = "()")]
+pub struct ChannelMessage<Record = serde_json::Value> {
+    pub table: ChannelTable,
+    pub operation: SQLOperation,
+    pub record: Record,
+}
 
-// pub struct CommentsUserChannel {
-//     pub user: User,
-// }
+impl ChannelMessage {
+    pub fn deserialize_into<Record: DeserializeOwned>(
+        self,
+    ) -> Result<ChannelMessage<Record>, serde_json::Error> {
+        let record: Record = serde_json::from_value(self.record)?;
+        Ok(ChannelMessage {
+            table: self.table,
+            operation: self.operation,
+            record,
+        })
+    }
+}
 
-// impl CommentsUserChannel {
-//     pub fn new(user: User) -> Self {
-//         Self { user }
-//     }
-// }
-
-// impl ToString for CommentsUserChannel {
-//     fn to_string(&self) -> String {
-//         format!("comments_{}", self.user.id)
-//     }
-// }
-
-// impl Channel for CommentsUserChannel {
-//     type Payload = CommentsPayload;
-// }
-
-// #[derive(Deserialize, Debug)]
-// pub struct CommentsPayload {
-//     pub action_type: ActionType,
-//     pub id: i32,
-//     pub user_id: i32,
-//     pub body: String,
-// }
-
-// impl Into<commons::comments::Comment> for CommentsPayload {
-//     fn into(self) -> commons::comments::Comment {
-//         commons::comments::Comment {
-//             id: self.id,
-//             user_id: self.user_id,
-//             body: self.body,
-//         }
-//     }
-// }
-
-pub async fn start_listening<Ch: Channel>(
+pub async fn start_listening(
     pool: &Pool<Postgres>,
-    channel: Ch,
-    mut call_back: impl FnMut(Ch::Payload),
+    channels: Vec<Channel>,
+    address: actix::prelude::Addr<WebSocket>,
 ) -> Result<(), Error> {
+    let channel_names = channels
+        .iter()
+        .map(|channel| channel.to_string())
+        .collect::<Vec<String>>();
+
+    let channel_references = channel_names
+        .iter()
+        .map(|channel_name| channel_name.as_str())
+        .collect::<Vec<&str>>();
+
     // Initiate the logger.
     let mut listener = PgListener::connect_with(pool).await.unwrap();
-    listener
-        .listen_all(vec![channel.to_string().as_str()])
-        .await?;
-    log::info!("Listening to channel: {}", channel.to_string());
+    listener.listen_all(channel_references).await?;
     loop {
         while let Some(notification) = listener.try_recv().await? {
             log::info!(
@@ -82,7 +78,19 @@ pub async fn start_listening<Ch: Channel>(
 
             let notification_payload: String = notification.payload().to_owned();
 
-            call_back(serde_json::from_str::<Ch::Payload>(&notification_payload).unwrap());
+            let value: ChannelMessage = serde_json::from_str(&notification_payload).unwrap();
+
+            match &value.table {
+                ChannelTable::Users => {
+                    address.do_send(value.deserialize_into::<User>().unwrap());
+                }
+                table_name => {
+                    unimplemented!(
+                        "Received a notification for a table {:?} that is not implemented yet",
+                        table_name
+                    );
+                }
+            }
         }
     }
 }

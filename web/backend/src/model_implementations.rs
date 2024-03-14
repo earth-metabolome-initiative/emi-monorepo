@@ -248,7 +248,7 @@ impl User {
             self.first_name.clone().unwrap_or_default(),
             self.middle_name.clone(),
             self.last_name.clone().unwrap_or_default(),
-        );
+        ).ok();
         web_common::api::auth::users::User::new(name, self.id)
     }
 }

@@ -10,6 +10,8 @@ use actix::{Actor, StreamHandler};
 use actix_web_actors::ws;
 use sqlx::{Pool as SQLxPool, Postgres};
 use std::collections::HashMap;
+use web_common::api::auth::users::User;
+use web_common::api::ws::messages::SQLOperation;
 
 use web_common::api::ws::messages::{BackendMessage, FrontendMessage};
 
@@ -38,10 +40,7 @@ impl WebSocket {
 
     /// Ensure that the user is authenticated before allowing any further messages to be processed,
     /// killing the connection if the user is not authenticated.
-    fn must_be_authenticated(
-        &self,
-        ctx: &mut ws::WebsocketContext<Self>,
-    ) -> bool {
+    fn must_be_authenticated(&self, ctx: &mut ws::WebsocketContext<Self>) -> bool {
         if self.user.is_none() {
             ctx.close(Some(ws::CloseCode::Policy.into()));
         }
@@ -61,6 +60,29 @@ impl actix::Handler<BackendMessage> for WebSocket {
     }
 }
 
+impl actix::Handler<ChannelMessage<User>> for WebSocket {
+    type Result = ();
+
+    fn handle(&mut self, msg: ChannelMessage<User>, ctx: &mut Self::Context) {
+        match msg.operation {
+            SQLOperation::Update => {
+                ctx.binary(BackendMessage::User(SQLOperation::Update, msg.record));
+            }
+            SQLOperation::Insert => {
+                unreachable!("We do not expect notifications for insert operations");
+            }
+            SQLOperation::Delete => {
+                // If the current user has been deleted, close the connection
+                if let Some(user) = &self.user {
+                    if user.id() == msg.record.id() {
+                        ctx.close(Some(ws::CloseCode::Policy.into()));
+                    }
+                }
+            }
+        }
+    }
+}
+
 #[derive(Debug, Message)]
 #[rtype(result = "()")]
 enum InternalMessage {
@@ -74,7 +96,10 @@ impl actix::Handler<InternalMessage> for WebSocket {
     fn handle(&mut self, msg: InternalMessage, ctx: &mut Self::Context) {
         match msg {
             InternalMessage::Authenticated(user) => {
-                ctx.binary(BackendMessage::Authenticated(user.to_web_common_user()));
+                ctx.binary(BackendMessage::User(
+                    SQLOperation::Update,
+                    user.to_web_common_user(),
+                ));
                 self.user = Some(user);
             }
             InternalMessage::Unauthorized => {

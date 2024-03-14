@@ -1,4 +1,3 @@
-use crate::api::auth::users;
 use crate::api::oauth::jwt_cookies::refresh_jwt_cookie;
 use crate::cookies::is_logged_in;
 use crate::router::AppRoute;
@@ -18,14 +17,6 @@ pub struct UserState {
 }
 
 impl UserState {
-    pub fn is_logged_in(&self) -> bool {
-        self.user.is_some()
-    }
-
-    pub fn is_not_logged_in(&self) -> bool {
-        self.user.is_none()
-    }
-
     pub fn has_no_access_token(&self) -> bool {
         self.access_token.is_none()
     }
@@ -35,7 +26,7 @@ impl UserState {
     }
 
     pub fn has_complete_profile(&self) -> bool {
-        self.user
+        self.has_access_token() && self.user
             .as_ref()
             .map_or(false, |user| user.has_complete_profile())
     }
@@ -98,21 +89,3 @@ pub fn refresh_access_token(dispatch: Dispatch<UserState>, navigator: Navigator)
     });
 }
 
-pub fn retrieve_user_informations(
-    dispatch: Dispatch<UserState>,
-    access_token: AccessToken,
-    navigator: Navigator,
-) {
-    wasm_bindgen_futures::spawn_local(async move {
-        match users::me::me(&access_token).await {
-            Ok(user) => {
-                dispatch.reduce_mut(move |store| {
-                    store.set_user(user);
-                });
-            }
-            Err(_) => {
-                logout(dispatch, navigator, Some(access_token));
-            }
-        }
-    })
-}

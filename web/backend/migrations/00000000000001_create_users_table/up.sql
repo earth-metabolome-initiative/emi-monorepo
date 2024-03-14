@@ -16,3 +16,38 @@ INSERT INTO
     users (first_name, last_name)
 VALUES
     ('root', 'user');
+
+-- We import the function that will notify the user when a record is
+-- inserted, updated or deleted.
+CREATE
+OR REPLACE FUNCTION notify_user() RETURNS TRIGGER AS $$
+DECLARE
+    record JSON;
+BEGIN
+    IF TG_OP = 'INSERT'
+    OR TG_OP = 'UPDATE' THEN record = row_to_json(NEW);
+
+ELSE record = row_to_json(OLD);
+
+END IF;
+
+
+PERFORM pg_notify(
+    'notify_user_' || user_id,
+    json_build_object(
+        'table', TG_TABLE_NAME,
+        'operation', TG_OP,
+        'record', record
+    ) :: text
+);
+
+RETURN NEW;
+
+END;
+
+$$ LANGUAGE plpgsql;
+
+-- We create the triggers that will notify the user when a record is
+-- inserted, updated or deleted.
+CREATE TRIGGER notify_user_update AFTER UPDATE ON users FOR EACH ROW EXECUTE FUNCTION notify_user();
+CREATE TRIGGER notify_user_insert AFTER DELETE ON users FOR EACH ROW EXECUTE FUNCTION notify_user();
