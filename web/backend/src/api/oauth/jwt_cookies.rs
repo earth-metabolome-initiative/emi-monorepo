@@ -1,5 +1,6 @@
 //! Functions and APIs dealing with JWT cookies necessary for OAuth2 logins.
 use crate::models::User;
+use crate::DieselConn;
 use actix_web::cookie::time::Duration as ActixWebDuration;
 use actix_web::cookie::Cookie;
 use actix_web::dev::Payload;
@@ -527,6 +528,62 @@ pub(crate) fn eliminate_cookies(mut builder: HttpResponseBuilder) -> HttpRespons
     builder
 }
 
+impl User {
+    pub(crate) async fn from_bearer_token<S>(
+        redis_client: redis::Client,
+        diesel_pool: Pool<ConnectionManager<PgConnection>>,
+        token: S,
+    ) -> Result<Self, Error> where S: AsRef<str>{
+        let access_token = match JsonAccessToken::decode(token.as_ref()) {
+            Ok(token) => token,
+            Err(_) => {
+                log::debug!("Unable to decode access token");
+                return Err(ErrorUnauthorized(
+                    json!({"status": "fail", "message": "Invalid token"}),
+                ));
+            }
+        };
+
+        let mut conn: DieselConn = match diesel_pool.get() {
+            Ok(conn) => conn,
+            Err(_) => {
+                log::error!("Unable to get connection from pool.");
+                return Err(ErrorInternalServerError(
+                    json!({"status": "fail", "message": "Internal server error"}),
+                ));
+            }
+        };
+
+        // If the token is expired, we return an error.
+        if access_token.is_expired() {
+            log::debug!("Token has expired");
+            return Err(ErrorUnauthorized(
+                json!({"status": "fail", "message": "Token has expired"}),
+            ));
+        }
+
+        let is_still_present = access_token.is_still_present_in_redis(&redis_client).await;
+
+        if is_still_present.is_err() || !is_still_present.unwrap() {
+            log::error!("Token not present in redis");
+            return Err(ErrorUnauthorized(
+                json!({"status": "fail", "message": "Invalid token"}),
+            ));
+        }
+
+        // If the user doesn't exist, we return an error, otherwise we return the user.
+        match User::get(access_token.user_id(), &mut conn) {
+            Ok(user) => Ok(user),
+            Err(_) => {
+                log::debug!("Did not find user in database");
+                Err(ErrorUnauthorized(
+                    json!({"status": "fail", "message": "Invalid token or user doesn't exists"}),
+                ))
+            }
+        }
+    }
+}
+
 impl FromRequest for User {
     type Error = Error;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
@@ -547,24 +604,6 @@ impl FromRequest for User {
             }
         };
 
-        let access_token = match JsonAccessToken::decode(bearer.token()) {
-            Ok(token) => token,
-            Err(_) => {
-                log::debug!("Unable to decode access token");
-                return Box::pin(ready(Err(ErrorUnauthorized(
-                    json!({"status": "fail", "message": "Invalid token"}),
-                ))));
-            }
-        };
-
-        // If the token is expired, we return an error.
-        if access_token.is_expired() {
-            log::debug!("Token has expired");
-            return Box::pin(ready(Err(ErrorUnauthorized(
-                json!({"status": "fail", "message": "Token has expired"}),
-            ))));
-        }
-
         // Next up, we check whether the token is still present in the redis database.
         let redis_client = match req.app_data::<web::Data<redis::Client>>() {
             Some(client) => client.clone(),
@@ -574,13 +613,13 @@ impl FromRequest for User {
                     json!({"status": "fail", "message": "Internal server error"}),
                 ))));
             }
-        };
+        }.get_ref().clone();
 
         // Finally, we get the user from the database, as while the user indeed seems
         // to be authenticated and it still exists in the redis database, we still need
         // to check whether the user exists in the database, as it may have been deleted
         // in the meantime.
-        let pool = match req.app_data::<web::Data<Pool<ConnectionManager<PgConnection>>>>() {
+        let diesel_pool = match req.app_data::<web::Data<Pool<ConnectionManager<PgConnection>>>>() {
             Some(pool) => pool.clone(),
             None => {
                 log::error!("Database pool not present in request");
@@ -588,38 +627,10 @@ impl FromRequest for User {
                     json!({"status": "fail", "message": "Internal server error"}),
                 ))));
             }
-        };
-
-        let mut conn = match pool.get() {
-            Ok(conn) => conn,
-            Err(_) => {
-                log::error!("Unable to get connection from pool.");
-                return Box::pin(ready(Err(ErrorInternalServerError(
-                    json!({"status": "fail", "message": "Internal server error"}),
-                ))));
-            }
-        };
+        }.get_ref().clone();
 
         Box::pin(async move {
-            let is_still_present = access_token.is_still_present_in_redis(&redis_client).await;
-
-            if is_still_present.is_err() || !is_still_present.unwrap() {
-                log::error!("Token not present in redis");
-                return Err(ErrorUnauthorized(
-                    json!({"status": "fail", "message": "Invalid token"}),
-                ));
-            }
-
-            // If the user doesn't exist, we return an error, otherwise we return the user.
-            match User::get(access_token.user_id(), &mut conn) {
-                Ok(user) => Ok(user),
-                Err(_) => {
-                    log::debug!("Did not find user in database");
-                    Err(ErrorUnauthorized(
-                        json!({"status": "fail", "message": "Invalid token or user doesn't exists"}),
-                    ))
-                }
-            }
+            User::from_bearer_token(redis_client, diesel_pool, &bearer.token()).await
         })
     }
 }

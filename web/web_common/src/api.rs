@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 pub mod oauth;
 pub mod auth;
+pub mod ws;
 use validator::ValidationErrors;
 
 

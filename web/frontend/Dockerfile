@@ -4,6 +4,8 @@ FROM rust:latest
 # Set the working directory inside the container
 WORKDIR /app/frontend
 
+RUN apt-get update && apt-get install -y tmux
+
 # Expose the port that the Yew frontend will run on
 EXPOSE $TRUNK_PORT
 
@@ -14,4 +16,4 @@ RUN rustup target add wasm32-unknown-unknown
 RUN cargo install --locked trunk
 
 # Command to run the Yew frontend application
-CMD trunk serve --port $TRUNK_PORT --address 0.0.0.0 --proxy-backend https://actix-server:${ACTIX_PORT}/api
+CMD tmux new-session -s yew "trunk serve --port $TRUNK_PORT --address 0.0.0.0 --proxy-backend https://actix-server:${ACTIX_PORT}/api"

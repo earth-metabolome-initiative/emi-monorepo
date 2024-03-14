@@ -5,7 +5,7 @@ FROM rust:latest
 EXPOSE $ACTIX_PORT
 
 # We need to install postgresql-dev to build the diesel-cli
-RUN apt-get update && apt-get install -y libpq-dev
+RUN apt-get update && apt-get install -y libpq-dev tmux
 
 # We need to install the `watch` command to run the Actix server
 RUN cargo install cargo-watch
@@ -16,5 +16,7 @@ RUN cargo install diesel_cli --no-default-features --features postgres
 # Set the working directory inside the container
 WORKDIR /app/backend
 
-# Command to run the Actix server application
-CMD rm -rf /app/backend/backend.ready || true && touch /app/backend/backend.building && diesel migration run && cargo watch -q -c -w src/ -x run > /app/backend/backend.log
+# We run the Actix server by executing inside a TMUX session
+# the bash script called `start.sh`
+CMD tmux new-session -s actix 'bash /app/backend/start.sh'
+

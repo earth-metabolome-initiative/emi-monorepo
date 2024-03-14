@@ -1,5 +1,4 @@
 pub mod users;
-pub mod ws;
 
 use crate::combine_path;
 

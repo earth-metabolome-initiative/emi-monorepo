@@ -1,5 +1,6 @@
 //! Module providing the websocket messages used in the application.
 use serde::{Deserialize, Serialize};
+use crate::api::{auth::users::User, oauth::jwt_cookies::AccessToken};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CloseReason {
@@ -17,10 +18,55 @@ pub enum SQLOperation {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum FrontendMessage {
     Close(Option<CloseReason>),
+    Authentication(AccessToken),
+}
+
+pub trait AuthenticationMessage {
+    fn autentication_message(authentication_token: AccessToken) -> Self;
+
+    fn is_authentication(&self) -> bool;
+
+    fn token(self) -> Option<AccessToken>;
+}
+
+impl AuthenticationMessage for FrontendMessage {
+    fn autentication_message(authentication_token: AccessToken) -> Self {
+        FrontendMessage::Authentication(authentication_token)
+    }
+
+    fn is_authentication(&self) -> bool {
+        match self {
+            FrontendMessage::Authentication(_) => true,
+            _ => false,
+        }
+    }
+
+    fn token(self) -> Option<AccessToken> {
+        match self {
+            FrontendMessage::Authentication(token) => Some(token),
+            _ => None,
+        }
+    }
+}
+
+pub trait AuthenticatedMessage {
+    fn is_authenticated(&self) -> bool;
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub enum BackendMessage {}
+pub enum BackendMessage {
+    Close(Option<CloseReason>),
+    Authenticated(User),
+}
+
+impl AuthenticatedMessage for BackendMessage {
+    fn is_authenticated(&self) -> bool {
+        match self {
+            BackendMessage::Authenticated(_) => true,
+            _ => false,
+        }
+    }
+}
 
 #[cfg(feature = "backend")]
 impl actix::Message for BackendMessage {

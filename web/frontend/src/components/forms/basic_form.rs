@@ -2,24 +2,35 @@
 
 use crate::api::utils::add_optional_bearer;
 use crate::api::FrontendApiError;
+use crate::components::forms::InputError;
 use crate::stores::user_state;
 use crate::stores::user_state::UserState;
+use crate::workers::WebsocketWorker;
 use core::fmt::Display;
 use reqwasm::http::Method;
 use reqwasm::http::Request;
 use serde::Deserialize;
 use serde::Serialize;
+use std::borrow::Borrow;
 use std::fmt::Debug;
 use std::ops::Deref;
 use validator::{Validate, ValidationError, ValidationErrors, ValidationErrorsKind};
 use wasm_bindgen::JsCast;
+use wasm_bindgen::UnwrapThrowExt;
+use web_common::api::auth::users::User;
+use web_common::api::ws::messages::*;
 use web_common::api::oauth::jwt_cookies::AccessToken;
+use web_common::api::ApiError;
 use web_sys::EventTarget;
 use web_sys::FormData;
-use web_common::api::ApiError;
 use web_sys::HtmlFormElement;
+use yew::html::IntoPropValue;
 use yew::prelude::*;
+use yew_agent::prelude::WorkerBridgeHandle;
+use yew_agent::scope_ext::AgentScopeExt;
 use yewdux::prelude::*;
+
+use super::BasicInput;
 
 #[derive(Debug, Clone, Copy, PartialEq, Deserialize)]
 pub enum FormMethod {
@@ -146,7 +157,7 @@ pub struct BasicFormProp {
     pub title: String,
     pub method: FormMethod,
     pub action: String,
-    pub children: Html,
+    pub children: ChildrenWithProps<BasicInput>,
 }
 
 impl BasicFormProp {
@@ -170,10 +181,6 @@ impl BasicFormProp {
         self.title.clone()
     }
 
-    pub fn children(&self) -> Html {
-        self.children.clone()
-    }
-
     async fn submit<Data>(
         &self,
         data: Data,
@@ -188,7 +195,7 @@ impl BasicFormProp {
 
         let response = add_optional_bearer(
             Request::new(&self.action).method(self.method().to_reqwasm()),
-            access_token
+            access_token,
         )
         .header("Content-Type", "application/json")
         .body(body)
@@ -206,119 +213,99 @@ impl BasicFormProp {
     }
 }
 
-#[function_component(BasicForm)]
-pub fn basic_form<Data>(props: &BasicFormProp) -> Html
+pub struct BasicForm<Data> {
+    websocket: WorkerBridgeHandle<WebsocketWorker<FrontendMessage, BackendMessage>>,
+    errors: Vec<String>,
+    _phantom: std::marker::PhantomData<Data>,
+}
+
+#[derive(Debug, Clone)]
+pub enum FormMessage<Data> {
+    Submit(Data),
+    Frontend(FrontendMessage),
+    Backend(BackendMessage),
+    RemoveError(usize),
+}
+
+impl<Data> Component for BasicForm<Data>
 where
     Data: PartialEq + Clone + 'static + Validate + Debug + Serialize,
     FormWrapper<Data>: TryFrom<FormData, Error = ValidationErrors>,
 {
-    // TODO: handle cross page syncronization!
-    // TODO: handle submit button
+    type Message = FormMessage<Data>;
+    type Properties = BasicFormProp;
 
-    // We retrieve the access token of the user if it is present
-    // so to add it to the request as an Authorization header token
-    // to the Bearer field.
-    let (user_state, _dispatch) = use_store::<UserState>();
-
-
-    let errors = use_state(|| None);
-
-    let form_button_classes = format!("btn btn-primary {}", props.method.lower());
-
-    let on_submit = {
-        let props = props.clone();
-        let user_state = user_state.clone();
-        let errors = errors.clone();
-        Callback::from(move |event: SubmitEvent| {
-            event.prevent_default();
-            log::info!("Submitting form");
-
-            let handle_errors = |message: &str| {
-                log::info!("{}", message);
-                let mut error = ValidationErrors::new();
-                error.add("form", ValidationError::new("Failed to create form data"));
-                errors.set(Some(error));
-            };
-
-            match event.target() {
-                Some(target) => match target.dyn_into::<HtmlFormElement>() {
-                    Ok(form) => match FormData::new_with_form(&form) {
-                        Ok(form_data) => match FormWrapper::<Data>::try_from(form_data) {
-                            Ok(wrapper) => {
-                                let data = wrapper.data();
-                                log::info!("Form data: {:?}", data);
-                                match data.validate() {
-                                    Ok(_) => {
-                                        log::info!("Form data is valid");
-                                        errors.set(None);
-                                        let props = props.clone();
-                                        let user_state = user_state.clone();
-                                        let errors = errors.clone();
-                                        wasm_bindgen_futures::spawn_local(async move {
-                                            let access_token: Option<&AccessToken> = user_state.access_token();
-                                            match props.submit(data, access_token).await {
-                                                Ok(_) => {
-                                                    log::info!("Form submitted successfully");
-                                                }
-                                                Err(error) => {
-                                                    log::info!("Failed to submit form: {:?}", error);
-                                                    //errors.set(Some(error));
-                                                }
-                                            }
-                                        });
-                                    }
-                                    Err(error) => {
-                                        log::info!("Form data is invalid: {:?}", error);
-                                        errors.set(Some(error));
-                                    }
-                                }
-                            }
-                            Err(error) => {
-                                log::info!("Failed to create form wrapper: {:?}", error);
-                                errors.set(Some(error));
-                            }
-                        },
-                        Err(_error) => {
-                            handle_errors("Failed to create form data");
-                        }
-                    },
-                    Err(_error) => {
-                        handle_errors("Failed to get form");
-                    }
-                },
-                None => {
-                    handle_errors("Failed to get target");
+    fn create(ctx: &Context<Self>) -> Self {
+        Self {
+            websocket: ctx.link().bridge_worker(Callback::from({
+                let link = ctx.link().clone();
+                move |message: BackendMessage| {
+                    link.send_message(FormMessage::Backend(message));
                 }
-            }
-        })
-    };
+            })),
+            errors: vec![],
+            _phantom: std::marker::PhantomData,
+        }
+    }
 
-    html! {
-        <form enctype={ "multipart/form-data" } class={format!("standard-form {}", props.method)} action={props.action()} onsubmit={on_submit} method={props.method().to_string()}>
-            <h4>{ props.title() }</h4>
-            { props.children()}
-            if let Some(errors) = errors.deref() {
-                <div class="form-group alert alert-danger" role="alert">
-                    <ul>
-                        { for errors.errors().iter().map(|(field, error_kinds): (&&'static str, &ValidationErrorsKind)| {
-                            match error_kinds {
-                                ValidationErrorsKind::Field(errors) => {
-                                    html! {
-                                        <li>{ format!("{}: {}", field, errors.iter().filter(|error| error.message.is_some()).map(|error| error.clone().message.unwrap().to_string()).collect::<Vec<String>>().join(", ")) }</li>
-                                    }
-                                }
-                                ValidationErrorsKind::Struct(_errors) => {
-                                    unimplemented!("Struct errors are not yet supported")
-                                }
-                                ValidationErrorsKind::List(_errors) => {
-                                    unimplemented!("List errors are not yet supported")
-                                }
-                            }
-                        }) }
-                    </ul>
-                </div>
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+        match msg {
+            FormMessage::Frontend(fm) => self.websocket.send(fm.into()),
+            FormMessage::Backend(_bm) => {}
+            FormMessage::Submit(data) => {
+                // We retrieve the user object from the context
             }
-            <button type="submit" class={form_button_classes}>{format!("{} {}", props.crud(), props.title())}</button>
-        </form>
+            FormMessage::RemoveError(error_number) => {
+                self.errors.remove(error_number);
+            }
+        }
+        true
+    }
+
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let props = ctx.props();
+
+        let on_submit = {
+            let link = ctx.link().clone();
+            Callback::from(move |event: SubmitEvent| {
+                event.prevent_default();
+                let form = event
+                    .target()
+                    .unwrap_throw()
+                    .dyn_into::<HtmlFormElement>()
+                    .unwrap_throw();
+                let data =
+                    FormWrapper::<Data>::try_from(FormData::new_with_form(&form).unwrap_throw())
+                        .unwrap_throw()
+                        .data();
+                link.send_message(FormMessage::Submit(data));
+            })
+        };
+
+        let classes = if self.errors.is_empty() {
+            "standard-form"
+        } else {
+            "standard-form error"
+        };
+
+        html! {
+            <form enctype={ "multipart/form-data" } class={classes} action={props.action()} onsubmit={on_submit} method={props.method().to_string()}>
+                <h4>{ props.title() }</h4>
+                { for ctx.props().children.iter() }
+                <ul class="form-errors">
+                    { for self.errors.iter().enumerate().map(|(error_number, error)| {
+                        let link = ctx.link().clone();
+                        let on_delete = Callback::from(move |_| {
+                            link.send_message(FormMessage::RemoveError(error_number));
+                        });
+                        html! {
+                            <li><InputError error={error.clone()} on_delete={on_delete}/></li>
+                        }
+                    })
+                    }
+                </ul>
+                <button type="submit" class="btn btn-primary">{format!("{} {}", props.crud(), props.title())}</button>
+            </form>
+        }
     }
 }

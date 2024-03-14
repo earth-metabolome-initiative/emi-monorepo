@@ -1,9 +1,10 @@
 # Use an Nginx base image
 FROM nginx:latest
 
+RUN apt-get update && apt-get install -y tmux
+
 WORKDIR /app
 
 # Start Nginx
-CMD envsubst < /app/nginx.conf.template | sed -e 's/§/$/g' > /etc/nginx/nginx.conf && \
-    cat /etc/nginx/nginx.conf > /app/nginx.conf && \
-    nginx -g 'daemon off;'
+CMD tmux new-session -s nginx 'bash /app/start.sh'
+

@@ -241,6 +241,16 @@ impl User {
             Err(_) => Err("Failed to update user name".to_string()),
         }
     }
+
+    /// Create a new web-commons User from a database User.
+    pub fn to_web_common_user(&self) -> web_common::api::auth::users::User {
+        let name = Name::new(
+            self.first_name.clone().unwrap_or_default(),
+            self.middle_name.clone(),
+            self.last_name.clone().unwrap_or_default(),
+        );
+        web_common::api::auth::users::User::new(name, self.id)
+    }
 }
 
 impl LoginProvider {

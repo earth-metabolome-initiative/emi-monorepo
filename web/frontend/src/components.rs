@@ -13,5 +13,5 @@ pub mod forms;
 pub use error_page::ErrorPage;
 pub use footer::Footer;
 pub use input_with_icon::InputWithIcon;
-pub use navigator::Navigator;
+pub use navigator::*;
 pub use app::App;
