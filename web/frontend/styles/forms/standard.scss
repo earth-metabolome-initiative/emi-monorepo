@@ -84,6 +84,10 @@ form.standard-form {
             left: -100%;
         }
 
+        i {
+            margin-right: 0.5em;
+        }
+
         &.enabled::before {
             animation: shine-in 3s ease-in-out;
         }
@@ -290,7 +294,7 @@ $anim-speed: 0.65; // in seconds
       left: -100%;
       transition-property: left;
     }
-    #{($anim-speed / ($anim-duration + $anim-speed) * 100%)},
+    #{calc($anim-speed / ($anim-duration + $anim-speed) * 100%)},
     100% {
       left: 100%;
       transition-property: left;
@@ -302,7 +306,7 @@ $anim-speed: 0.65; // in seconds
       left: 100%;
       transition-property: left;
     }
-    #{($anim-speed / ($anim-duration + $anim-speed) * 100%)},
+    #{calc($anim-speed / ($anim-duration + $anim-speed) * 100%)},
     100% {
       left: -100%;
       transition-property: left;

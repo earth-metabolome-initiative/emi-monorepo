@@ -1,38 +1,23 @@
 //! Module providing a yew component that handles a basic form.
 
-use crate::api::utils::add_optional_bearer;
-use crate::api::FrontendApiError;
 use crate::components::forms::InputError;
-use crate::stores::user_state;
-use crate::stores::user_state::UserState;
 use crate::workers::WebsocketWorker;
 use core::fmt::Display;
+use gloo::timers::callback::Timeout;
 use reqwasm::http::Method;
-use reqwasm::http::Request;
 use serde::Deserialize;
 use serde::Serialize;
-use std::borrow::Borrow;
 use std::fmt::Debug;
-use std::ops::Deref;
-use validator::{Validate, ValidationError, ValidationErrors, ValidationErrorsKind};
+use validator::Validate;
 use wasm_bindgen::JsCast;
-use wasm_bindgen::UnwrapThrowExt;
-use web_common::api::auth::users::User;
-use web_common::api::oauth::jwt_cookies::AccessToken;
 use web_common::api::ws::messages::*;
-use web_common::api::ApiError;
 use web_common::custom_validators::validation_errors::ValidationErrorToString;
-use web_sys::EventTarget;
 use web_sys::FormData;
 use web_sys::HtmlFormElement;
 use web_sys::HtmlInputElement;
-use yew::html::IntoPropValue;
 use yew::prelude::*;
 use yew_agent::prelude::WorkerBridgeHandle;
 use yew_agent::scope_ext::AgentScopeExt;
-use yewdux::prelude::*;
-
-use super::BasicInput;
 
 #[derive(Debug, Clone, Copy, PartialEq, Deserialize)]
 pub enum FormMethod {
@@ -91,6 +76,18 @@ impl FormMethod {
             FormMethod::TRACE => "trace",
             FormMethod::HEAD => "head",
             FormMethod::PATCH => "patch",
+        }
+    }
+
+    pub fn font_awesome_icon(&self) -> &'static str {
+        match self {
+            FormMethod::GET => "fas fa-search",
+            FormMethod::POST => "fas fa-plus",
+            FormMethod::PUT => "fas fa-pen",
+            FormMethod::DELETE => "fas fa-trash",
+            FormMethod::TRACE => "fas fa-search",
+            FormMethod::HEAD => "fas fa-search",
+            FormMethod::PATCH => "fas fa-pen",
         }
     }
 
@@ -189,6 +186,7 @@ pub struct BasicForm<Data> {
     errors: Vec<String>,
     waiting_for_reply: bool,
     submit_button_disabled: bool,
+    validate_timeout: Option<Timeout>,
     _phantom: std::marker::PhantomData<Data>,
 }
 
@@ -244,6 +242,7 @@ pub enum FormMessage<Data> {
     Backend(BackendMessage),
     RemoveError(usize),
     SetSubmitButtonDisabled(bool),
+    StartSetSubmitButtonDisabledTimeout(bool),
 }
 
 impl<Data> Component for BasicForm<Data>
@@ -265,6 +264,7 @@ where
             errors: vec![],
             waiting_for_reply: false,
             submit_button_disabled: true,
+            validate_timeout: None,
             _phantom: std::marker::PhantomData,
         }
     }
@@ -298,12 +298,25 @@ where
                 true
             }
             FormMessage::SetSubmitButtonDisabled(disabled) => {
+                if let Some(timeout) = self.validate_timeout.take() {
+                    timeout.cancel();
+                }
                 if self.submit_button_disabled != disabled {
                     self.submit_button_disabled = disabled;
                     true
                 } else {
                     false
                 }
+            }
+            FormMessage::StartSetSubmitButtonDisabledTimeout(disabled) => {
+                if let Some(timeout) = self.validate_timeout.take() {
+                    timeout.cancel();
+                }
+                let link = ctx.link().clone();
+                self.validate_timeout = Some(Timeout::new(300, move || {
+                    link.send_message(FormMessage::SetSubmitButtonDisabled(disabled));
+                }));
+                false
             }
         }
     }
@@ -328,7 +341,9 @@ where
         // so to know whether the submit button should be enabled or not
         let on_input = ctx.link().callback(|event: InputEvent| {
             event.prevent_default();
-            FormMessage::SetSubmitButtonDisabled(Self::extract_data_from_input_event(event).is_err())
+            FormMessage::StartSetSubmitButtonDisabledTimeout(
+                Self::extract_data_from_input_event(event).is_err(),
+            )
         });
 
         let classes = if self.errors.is_empty() {
@@ -365,7 +380,10 @@ where
                     })
                     }
                 </ul>
-                <button type="submit" title={title_message} class={button_classes} disabled={self.submit_button_disabled}>{format!("{} {}", props.crud(), props.title())}</button>
+                <button type="submit" title={title_message} class={button_classes} disabled={self.submit_button_disabled}>
+                    <i class={props.method().font_awesome_icon()}></i>
+                    <span>{format!("{} {}", props.crud(), props.title())}</span>
+                </button>
             </form>
         }
     }
