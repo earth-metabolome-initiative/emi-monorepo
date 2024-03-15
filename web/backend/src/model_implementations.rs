@@ -231,9 +231,9 @@ impl User {
         use crate::schema::users::dsl::*;
         let update = diesel::update(users.filter(id.eq(self.id)))
             .set((
-                first_name.eq(new_name.first_name()),
-                middle_name.eq(new_name.middle_name()),
-                last_name.eq(new_name.last_name()),
+                first_name.eq(new_name.first_name().to_string()),
+                middle_name.eq(new_name.middle_name().map(|s| s.to_string())),
+                last_name.eq(new_name.last_name().to_string()),
             ))
             .execute(conn);
         match update {

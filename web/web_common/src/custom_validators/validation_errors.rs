@@ -6,7 +6,8 @@ pub trait ValidationErrorToString {
 
 impl ValidationErrorToString for ValidationError {
     fn convert_to_string(&self) -> Vec<String> {
-        vec![self.message
+        vec![self
+            .message
             .clone()
             .map(|message| format!("{}", message))
             .unwrap_or_else(|| self.code.to_string())]
@@ -17,18 +18,16 @@ impl ValidationErrorToString for ValidationErrors {
     fn convert_to_string(&self) -> Vec<String> {
         self.errors()
             .iter()
-            .flat_map(|(_, errors)| {
-                match errors {
-                    ValidationErrorsKind::Field(errors) => errors
-                        .iter()
-                        .flat_map(|error| error.convert_to_string())
-                        .collect::<Vec<String>>(),
-                    ValidationErrorsKind::List(errors) => errors
-                        .iter()
-                        .flat_map(|(_, error)| error.convert_to_string())
-                        .collect::<Vec<String>>(),
-                    ValidationErrorsKind::Struct(errors) => errors.convert_to_string()
-                }
+            .flat_map(|(_, errors)| match errors {
+                ValidationErrorsKind::Field(errors) => errors
+                    .iter()
+                    .flat_map(|error| error.convert_to_string())
+                    .collect::<Vec<String>>(),
+                ValidationErrorsKind::List(errors) => errors
+                    .iter()
+                    .flat_map(|(_, error)| error.convert_to_string())
+                    .collect::<Vec<String>>(),
+                ValidationErrorsKind::Struct(errors) => errors.convert_to_string(),
             })
             .collect::<Vec<String>>()
     }

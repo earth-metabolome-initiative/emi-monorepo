@@ -7,7 +7,11 @@ use crate::combine_path;
 pub const ENDPOINT: &str = "/name";
 pub const FULL_ENDPOINT: &str = combine_path!(super::FULL_ENDPOINT, ENDPOINT);
 
-pub type ValidatedNameField = NoLeadingSpaces<NoTrailingSpaces<NoDoubleSpaces<NotEmpty<String>>>>;
+pub type ValidatedNameField = NoSpecialCharacters<
+    MustBeCapitalized<
+        NoDigits<NoLeadingSpaces<NoTrailingSpaces<NoDoubleSpaces<NotEmpty<String>>>>>,
+    >,
+>;
 
 #[derive(PartialEq, Clone, Debug, Default, Validate, Serialize, Deserialize)]
 pub struct Name {

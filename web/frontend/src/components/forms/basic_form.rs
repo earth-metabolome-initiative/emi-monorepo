@@ -21,9 +21,11 @@ use web_common::api::auth::users::User;
 use web_common::api::oauth::jwt_cookies::AccessToken;
 use web_common::api::ws::messages::*;
 use web_common::api::ApiError;
+use web_common::custom_validators::validation_errors::ValidationErrorToString;
 use web_sys::EventTarget;
 use web_sys::FormData;
 use web_sys::HtmlFormElement;
+use web_sys::HtmlInputElement;
 use yew::html::IntoPropValue;
 use yew::prelude::*;
 use yew_agent::prelude::WorkerBridgeHandle;
@@ -186,7 +188,54 @@ pub struct BasicForm<Data> {
     websocket: WorkerBridgeHandle<WebsocketWorker<FrontendMessage, BackendMessage>>,
     errors: Vec<String>,
     waiting_for_reply: bool,
+    submit_button_disabled: bool,
     _phantom: std::marker::PhantomData<Data>,
+}
+
+impl<Data> BasicForm<Data>
+where
+    FormWrapper<Data>: TryFrom<FormData, Error = Vec<String>>,
+{
+    fn extract_data_from_input_event<E>(event: E) -> Result<Data, String>
+    where
+        E: AsRef<Event>,
+    {
+        let form = event
+            .as_ref()
+            .target()
+            .ok_or("No target found in the event")?
+            .dyn_into::<HtmlInputElement>()
+            .map_err(|e| format!("The target of the event is not a form: {:?}", e))?
+            .closest("form")
+            .map_err(|e| format!("Error getting the closest form: {:?}", e))?
+            .ok_or("No form found")?
+            .dyn_into::<HtmlFormElement>()
+            .map_err(|e| format!("The target of the event is not a form: {:?}", e))?;
+        Self::extract_data_from_form(form)
+    }
+
+    fn extract_data_from_form_event<E>(event: E) -> Result<Data, String>
+    where
+        E: AsRef<Event>,
+    {
+        let form = event
+            .as_ref()
+            .target()
+            .ok_or("No target found in the event")?
+            .dyn_into::<HtmlFormElement>()
+            .map_err(|e| format!("The target of the event is not a form: {:?}", e))?;
+        Self::extract_data_from_form(form)
+    }
+
+    fn extract_data_from_form(form: HtmlFormElement) -> Result<Data, String> {
+        let data = FormWrapper::<Data>::try_from(
+            FormData::new_with_form(&form)
+                .map_err(|e| format!("Error creating form data: {:?}", e))?,
+        )
+        .map_err(|e| e.join("\n"))?
+        .data();
+        Ok(data)
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -194,6 +243,7 @@ pub enum FormMessage<Data> {
     Submit(Data),
     Backend(BackendMessage),
     RemoveError(usize),
+    SetSubmitButtonDisabled(bool),
 }
 
 impl<Data> Component for BasicForm<Data>
@@ -214,6 +264,7 @@ where
             })),
             errors: vec![],
             waiting_for_reply: false,
+            submit_button_disabled: true,
             _phantom: std::marker::PhantomData,
         }
     }
@@ -222,8 +273,15 @@ where
         match msg {
             FormMessage::Backend(_bm) => false,
             FormMessage::Submit(data) => {
+                let mut change = false;
+                if !self.errors.is_empty() {
+                    self.errors.clear();
+                    change = true;
+                }
+
                 // First, we validate the data
                 if let Err(errors) = data.validate() {
+                    self.errors = errors.convert_to_string();
                     return true;
                 }
 
@@ -233,11 +291,19 @@ where
 
                 self.waiting_for_reply = true;
 
-                true
+                change
             }
             FormMessage::RemoveError(error_number) => {
                 self.errors.remove(error_number);
                 true
+            }
+            FormMessage::SetSubmitButtonDisabled(disabled) => {
+                if self.submit_button_disabled != disabled {
+                    self.submit_button_disabled = disabled;
+                    true
+                } else {
+                    false
+                }
             }
         }
     }
@@ -249,18 +315,21 @@ where
             let link = ctx.link().clone();
             Callback::from(move |event: SubmitEvent| {
                 event.prevent_default();
-                let form = event
-                    .target()
-                    .unwrap_throw()
-                    .dyn_into::<HtmlFormElement>()
-                    .unwrap_throw();
-                let data =
-                    FormWrapper::<Data>::try_from(FormData::new_with_form(&form).unwrap_throw())
-                        .unwrap_throw()
-                        .data();
-                link.send_message(FormMessage::Submit(data));
+                match Self::extract_data_from_form_event(event) {
+                    Ok(data) => link.send_message(FormMessage::Submit(data)),
+                    Err(errors) => {
+                        log::error!("Error extracting data from form: {:?}", errors);
+                    }
+                }
             })
         };
+
+        // Every time there is any change in any of the input fields, we validate the form
+        // so to know whether the submit button should be enabled or not
+        let on_input = ctx.link().callback(|event: InputEvent| {
+            event.prevent_default();
+            FormMessage::SetSubmitButtonDisabled(Self::extract_data_from_input_event(event).is_err())
+        });
 
         let classes = if self.errors.is_empty() {
             "standard-form"
@@ -268,8 +337,14 @@ where
             "standard-form error"
         };
 
+        let button_classes = if self.submit_button_disabled {
+            ""
+        } else {
+            "enabled"
+        };
+
         html! {
-            <form enctype={ "multipart/form-data" } class={classes} onsubmit={on_submit} method={props.method().to_string()}>
+            <form enctype={ "multipart/form-data" } class={classes} oninput={on_input} onsubmit={on_submit} method={props.method().to_string()}>
                 <h4>{ props.title() }</h4>
                 { ctx.props().children.clone() }
                 <ul class="form-errors">
@@ -284,7 +359,7 @@ where
                     })
                     }
                 </ul>
-                <button type="submit" class="btn btn-primary">{format!("{} {}", props.crud(), props.title())}</button>
+                <button type="submit" class={button_classes} disabled={self.submit_button_disabled}>{format!("{} {}", props.crud(), props.title())}</button>
             </form>
         }
     }

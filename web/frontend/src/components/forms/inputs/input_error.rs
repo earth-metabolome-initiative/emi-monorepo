@@ -64,7 +64,9 @@ impl Component for InputError {
         html! {
             <li class={classes}>
                 <p>{&props.error}</p>
-                <button onclick={ctx.link().callback(|_| InputErrorMessage::StartHide)}>
+                <button onclick={ctx.link().callback(|event: MouseEvent| {
+                    event.prevent_default();
+                    InputErrorMessage::StartHide})}>
                     <i class="fas fa-times"></i>
                 </button>
             </li>

@@ -5,7 +5,6 @@ use crate::combine_path;
 pub const ENDPOINT: &str = "/users";
 pub const FULL_ENDPOINT: &str = combine_path!(super::FULL_ENDPOINT, ENDPOINT);
 
-
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -51,7 +50,7 @@ impl User {
             None => Err("Name is not complete.".to_string()),
         }
     }
-    
+
     pub fn last_name(&self) -> Result<String, String> {
         match &self.name {
             Some(name) => Ok(name.last_name().to_string()),
@@ -60,6 +59,9 @@ impl User {
     }
 
     pub fn middle_name(&self) -> Option<String> {
-        self.name.as_ref().and_then(|name| name.middle_name().map(|middle_name| middle_name.to_string()))
+        self.name.as_ref().and_then(|name| {
+            name.middle_name()
+                .map(|middle_name| middle_name.to_string())
+        })
     }
 }

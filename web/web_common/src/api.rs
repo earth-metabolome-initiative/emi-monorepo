@@ -1,9 +1,8 @@
 use serde::{Deserialize, Serialize};
-pub mod oauth;
 pub mod auth;
+pub mod oauth;
 pub mod ws;
 use validator::ValidationErrors;
-
 
 pub const ENDPOINT: &str = "/api";
 pub const FULL_ENDPOINT: &str = ENDPOINT;
@@ -18,11 +17,15 @@ pub enum ApiError {
 
 impl ApiError {
     pub fn unauthorized() -> Self {
-        Self::Oauth(oauth::OauthErrors::Refresh(oauth::jwt_cookies::RefreshError::Unauthorized))
+        Self::Oauth(oauth::OauthErrors::Refresh(
+            oauth::jwt_cookies::RefreshError::Unauthorized,
+        ))
     }
 
     pub fn expired_authorization() -> Self {
-        Self::Oauth(oauth::OauthErrors::Refresh(oauth::jwt_cookies::RefreshError::ExpiredAuthorization))
+        Self::Oauth(oauth::OauthErrors::Refresh(
+            oauth::jwt_cookies::RefreshError::ExpiredAuthorization,
+        ))
     }
 
     pub fn internal_server_error() -> Self {

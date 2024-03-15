@@ -53,6 +53,7 @@ pub struct BasicInput<Data> {
 pub enum InputMessage<Data> {
     Backend(BackendMessage),
     RemoveError(String),
+    RemoveErrors,
     Validate(Result<Data, Vec<String>>),
     StartValidationTimeout(Result<Data, Vec<String>>),
     UpdateCurrentValue(String),
@@ -89,6 +90,14 @@ where
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             InputMessage::Backend(_bm) => false,
+            InputMessage::RemoveErrors => {
+                if self.errors.is_empty() {
+                    false 
+                } else {
+                    self.errors.clear();
+                    true
+                }
+            }
             InputMessage::RemoveError(error) => {
                 self.errors.remove(&error);
                 true
@@ -168,6 +177,7 @@ where
                 link.send_message(InputMessage::UpdateCurrentValue(value.clone()));
 
                 if props.optional && value.is_empty() {
+                    link.send_message(InputMessage::RemoveErrors);
                     return;
                 }
 
