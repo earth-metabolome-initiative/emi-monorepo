@@ -343,6 +343,12 @@ where
             "enabled"
         };
 
+        let title_message = if self.submit_button_disabled {
+            "You cannot submit the form until all the fields are valid"
+        } else {
+            "Submit the form"
+        };
+
         html! {
             <form enctype={ "multipart/form-data" } class={classes} oninput={on_input} onsubmit={on_submit} method={props.method().to_string()}>
                 <h4>{ props.title() }</h4>
@@ -359,7 +365,7 @@ where
                     })
                     }
                 </ul>
-                <button type="submit" class={button_classes} disabled={self.submit_button_disabled}>{format!("{} {}", props.crud(), props.title())}</button>
+                <button type="submit" title={title_message} class={button_classes} disabled={self.submit_button_disabled}>{format!("{} {}", props.crud(), props.title())}</button>
             </form>
         }
     }

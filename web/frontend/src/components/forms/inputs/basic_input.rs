@@ -46,6 +46,7 @@ pub struct BasicInput<Data> {
     _websocket: WorkerBridgeHandle<WebsocketWorker<FrontendMessage, BackendMessage>>,
     errors: HashSet<String>,
     current_value: Option<String>,
+    is_valid: Option<bool>,
     validation_timeout: Option<Timeout>,
     _data: std::marker::PhantomData<Data>,
 }
@@ -81,6 +82,7 @@ where
                 }
             })),
             errors: HashSet::new(),
+            is_valid: None,
             current_value: None,
             validation_timeout: None,
             _data: std::marker::PhantomData,
@@ -91,12 +93,19 @@ where
         match msg {
             InputMessage::Backend(_bm) => false,
             InputMessage::RemoveErrors => {
-                if self.errors.is_empty() {
-                    false 
-                } else {
+                let mut changes = false;
+
+                if !self.errors.is_empty() {
                     self.errors.clear();
-                    true
+                    changes = true;
                 }
+
+                if self.is_valid.is_some() {
+                    self.is_valid = None;
+                    changes = true;
+                }
+
+                changes
             }
             InputMessage::RemoveError(error) => {
                 self.errors.remove(&error);
@@ -118,6 +127,7 @@ where
                     for error in errors {
                         self.errors.insert(error);
                     }
+                    self.is_valid = Some(false);
                     return true;
                 }
 
@@ -127,8 +137,15 @@ where
                     for error in errors.convert_to_string() {
                         self.errors.insert(error);
                     }
+                    self.is_valid = Some(false);
                     change = true;
                 }
+
+                if self.is_valid != Some(true) {
+                    self.is_valid = Some(true);
+                    change = true;
+                }
+
                 change
             }
             InputMessage::StartValidationTimeout(data) => {
@@ -151,10 +168,10 @@ where
     fn view(&self, ctx: &Context<Self>) -> Html {
         let props = ctx.props();
 
-        let classes = if self.errors.is_empty() {
-            "input-group"
-        } else {
-            "input-group error"
+        let classes = match self.is_valid {
+            Some(true) => "input-group input-group-valid",
+            Some(false) => "input-group input-group-invalid",
+            None => "input-group",
         };
 
         // We create a timeout so that when the user stops typing for at least
@@ -202,6 +219,7 @@ where
                     .value();
 
                 if props.optional && value.is_empty() {
+                    link.send_message(InputMessage::RemoveErrors);
                     return;
                 }
 

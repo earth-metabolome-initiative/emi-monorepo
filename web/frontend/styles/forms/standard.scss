@@ -1,12 +1,11 @@
 form.standard-form {
-    max-width: 90%;
     border-radius: 0.5em;
 
     h4 {
         padding-bottom: 0.25em;
         margin: 0;
-        border-bottom: 1px solid $primary;
-        color: $primary;
+        border-bottom: 1px solid $near_black;
+        color: $near_black;
         font-weight: 600;
         font-size: 1.2em;
         border-top-left-radius: 0.5em;
@@ -16,6 +15,19 @@ form.standard-form {
     .input-group {
         padding-top: 0.5em;
         padding-bottom: 0.5em;
+
+        &.input-group-invalid {
+            input[type="text"] {
+                border-color: $red;
+                animation: small-shake 0.2s;
+            }
+        }
+
+        &.input-group-valid {
+            input[type="text"] {
+                border-color: $green;
+            }
+        }
     }
 
     label {
