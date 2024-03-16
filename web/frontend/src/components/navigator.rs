@@ -18,11 +18,12 @@
 //! they do not have an internet connection. Therefore, the navigator will also display a message to the
 //! user if they are offline by putting a badge with the text "Offline" on their avatar. Upon returning online,
 //! the badge will disappear.
-//!
 
 use crate::router::AppRoute;
 use crate::stores::app_state::AppState;
 use crate::stores::user_state::UserState;
+use crate::utils::is_online;
+use gloo::timers::callback::Interval;
 use wasm_bindgen::UnwrapThrowExt;
 use web_common::api::auth::users::User;
 use web_common::api::ws::messages::*;
@@ -46,6 +47,7 @@ pub struct Navigator {
     user_dispatch: Dispatch<UserState>,
     app_state: Rc<AppState>,
     app_dispatch: Dispatch<AppState>,
+    connectivity_checked: Option<Interval>
 }
 
 impl Navigator {
@@ -71,6 +73,7 @@ pub enum NavigatorMessage {
     UserState(Rc<UserState>),
     AppState(Rc<AppState>),
     ToggleSidebar,
+    ResumeTasks,
 }
 
 #[derive(Clone, Properties, PartialEq)]
@@ -101,6 +104,7 @@ impl Component for Navigator {
             user_dispatch,
             app_state,
             app_dispatch,
+            connectivity_checked: None
         }
     }
 
@@ -119,7 +123,45 @@ impl Component for Navigator {
             }
             NavigatorMessage::AppState(app_state) => {
                 self.app_state = app_state;
+
+                ctx.link().send_message(NavigatorMessage::ResumeTasks);
+
+                if let Some(interval) = self.connectivity_checked.take() {
+                    interval.cancel();
+                }
+                // We define an interval that check the internet connection every second and
+                // updates the app state accordingly when the connection status changes.
+                self.connectivity_checked = Some({
+                    let app_dispatch = self.app_dispatch.clone();
+                    let current_connection_status = self.app_state.connect_to_internet();
+                    Interval::new(1000, move || {
+                        let new_connection_status = is_online();
+                        if current_connection_status != new_connection_status {
+                            log::info!("Connection status changed to {}", new_connection_status);
+                            app_dispatch.reduce_mut(|state| {
+                                state.set_connect_to_internet(new_connection_status);
+                            });
+                        }
+                    })
+                });
+
                 true
+            }
+            NavigatorMessage::ResumeTasks => {
+                if self.app_state.connect_to_internet() {
+                    let tasks = self.app_state.tasks();
+                    for (task_id, form_action, form_data) in tasks {
+                        info!("Resuming task {}", task_id);
+                        self.websocket.send(FrontendMessage::task(
+                            *task_id,
+                            form_action.clone(),
+                            form_data.clone(),
+                        ));
+                    }
+                    !tasks.is_empty()
+                } else {
+                    false
+                }
             }
             NavigatorMessage::Backend(BackendMessage::User(_operation, user)) => {
                 info!("User updated: {:?}", user);
@@ -128,13 +170,42 @@ impl Component for Navigator {
                 });
                 true
             }
+            NavigatorMessage::Backend(BackendMessage::ExpiredToken) => {
+                refresh_access_token(self.user_dispatch.clone(), ctx.props().navigator.clone());
+                true
+            }
+            NavigatorMessage::Backend(BackendMessage::TaskResult(task_id, _, result)) => {
+                match result {
+                    Ok(()) => {
+                        info!("Task {} completed successfully", task_id);
+                        // TODO: trigger a popup upon task completion
+                        self.app_dispatch.reduce_mut(|state| {
+                            state.remove_task(task_id);
+                        });
+                    }
+                    Err(api_error) => {
+                        if api_error.is_unauthorized() {
+                            refresh_access_token(
+                                self.user_dispatch.clone(),
+                                ctx.props().navigator.clone(),
+                            );
+                        }
+                        log::error!("Task {} failed: {:?}", task_id, api_error);
+                    }
+                }
+                true
+            }
+            NavigatorMessage::Backend(BackendMessage::Authenticated) => {
+                ctx.link().send_message(NavigatorMessage::ResumeTasks);
+                false
+            }
+            NavigatorMessage::Backend(_) => false,
             NavigatorMessage::ToggleSidebar => {
                 self.app_dispatch.reduce_mut(|state| {
                     state.toggle_sidebar();
                 });
                 true
             }
-            _ => false,
         }
     }
 

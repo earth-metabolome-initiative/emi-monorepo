@@ -5,6 +5,7 @@ use actix_web::{get, Error, HttpRequest, HttpResponse};
 use sqlx::{Pool as SQLxPool, Postgres};
 pub mod channels;
 pub mod socket;
+pub mod users;
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(start_websocket);

@@ -529,11 +529,21 @@ pub(crate) fn eliminate_cookies(mut builder: HttpResponseBuilder) -> HttpRespons
 }
 
 impl User {
+    pub(crate) fn is_token_expired<S>(token: S) -> Result<bool, String>
+    where
+        S: AsRef<str>,
+    {
+        JsonAccessToken::decode(token.as_ref()).map(|token| token.is_expired())
+    }
+
     pub(crate) async fn from_bearer_token<S>(
         redis_client: redis::Client,
         diesel_pool: Pool<ConnectionManager<PgConnection>>,
         token: S,
-    ) -> Result<Self, Error> where S: AsRef<str>{
+    ) -> Result<Self, Error>
+    where
+        S: AsRef<str>,
+    {
         let access_token = match JsonAccessToken::decode(token.as_ref()) {
             Ok(token) => token,
             Err(_) => {
@@ -613,21 +623,26 @@ impl FromRequest for User {
                     json!({"status": "fail", "message": "Internal server error"}),
                 ))));
             }
-        }.get_ref().clone();
+        }
+        .get_ref()
+        .clone();
 
         // Finally, we get the user from the database, as while the user indeed seems
         // to be authenticated and it still exists in the redis database, we still need
         // to check whether the user exists in the database, as it may have been deleted
         // in the meantime.
-        let diesel_pool = match req.app_data::<web::Data<Pool<ConnectionManager<PgConnection>>>>() {
-            Some(pool) => pool.clone(),
-            None => {
-                log::error!("Database pool not present in request");
-                return Box::pin(ready(Err(ErrorInternalServerError(
-                    json!({"status": "fail", "message": "Internal server error"}),
-                ))));
+        let diesel_pool =
+            match req.app_data::<web::Data<Pool<ConnectionManager<PgConnection>>>>() {
+                Some(pool) => pool.clone(),
+                None => {
+                    log::error!("Database pool not present in request");
+                    return Box::pin(ready(Err(ErrorInternalServerError(
+                        json!({"status": "fail", "message": "Internal server error"}),
+                    ))));
+                }
             }
-        }.get_ref().clone();
+            .get_ref()
+            .clone();
 
         Box::pin(async move {
             User::from_bearer_token(redis_client, diesel_pool, &bearer.token()).await

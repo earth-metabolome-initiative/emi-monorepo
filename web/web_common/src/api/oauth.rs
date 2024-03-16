@@ -7,7 +7,7 @@ use crate::combine_path;
 pub const ENDPOINT: &str = "/oauth";
 pub const FULL_ENDPOINT: &str = combine_path!(super::FULL_ENDPOINT, ENDPOINT);
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub enum OauthErrors {
     Refresh(jwt_cookies::RefreshError),
 }

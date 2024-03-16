@@ -1,13 +1,13 @@
 //! Module providing a yew component that handles a basic form.
 
 use crate::components::forms::InputError;
-use crate::workers::WebsocketWorker;
-use core::fmt::Display;
+use crate::router::AppRoute;
+use crate::stores::app_state::AppState;
+use crate::stores::user_state::UserState;
 use gloo::timers::callback::Timeout;
-use reqwasm::http::Method;
-use serde::Deserialize;
 use serde::Serialize;
 use std::fmt::Debug;
+use std::rc::Rc;
 use validator::Validate;
 use wasm_bindgen::JsCast;
 use web_common::api::ws::messages::*;
@@ -16,123 +16,8 @@ use web_sys::FormData;
 use web_sys::HtmlFormElement;
 use web_sys::HtmlInputElement;
 use yew::prelude::*;
-use yew_agent::prelude::WorkerBridgeHandle;
-use yew_agent::scope_ext::AgentScopeExt;
-
-#[derive(Debug, Clone, Copy, PartialEq, Deserialize)]
-pub enum FormMethod {
-    GET,    // Use GET to execute a query
-    POST,   // Use POST to CREATE a new resource
-    PUT, // Use PUT instead of POST when you want to UPDATE or PATCH a resource and you have an ID
-    DELETE, // Use DELETE to remove a resource
-    TRACE, // Use TRACE to test the connection
-    HEAD, // Use HEAD to retrieve the headers of a resource
-    PATCH, // Use PATCH to partially update a resource
-}
-
-impl FormMethod {
-    pub fn to_reqwasm(&self) -> Method {
-        match self {
-            FormMethod::GET => Method::GET,
-            FormMethod::POST => Method::POST,
-            FormMethod::PUT => Method::PUT,
-            FormMethod::DELETE => Method::DELETE,
-            FormMethod::TRACE => Method::TRACE,
-            FormMethod::HEAD => Method::HEAD,
-            FormMethod::PATCH => Method::PATCH,
-        }
-    }
-
-    pub fn to_crud(&self) -> &'static str {
-        match self {
-            FormMethod::GET => "Retrieve",
-            FormMethod::POST => "Create",
-            FormMethod::PUT => "Update",
-            FormMethod::DELETE => "Delete",
-            FormMethod::TRACE => "Trace",
-            FormMethod::HEAD => "Head",
-            FormMethod::PATCH => "Patch",
-        }
-    }
-
-    pub fn ongoing_crud(&self) -> &'static str {
-        match self {
-            FormMethod::GET => "Retrieving",
-            FormMethod::POST => "Creating",
-            FormMethod::PUT => "Updating",
-            FormMethod::DELETE => "Deleting",
-            FormMethod::TRACE => "Tracing",
-            FormMethod::HEAD => "Heading",
-            FormMethod::PATCH => "Patching",
-        }
-    }
-
-    pub fn lower(&self) -> &'static str {
-        match self {
-            FormMethod::GET => "get",
-            FormMethod::POST => "post",
-            FormMethod::PUT => "put",
-            FormMethod::DELETE => "delete",
-            FormMethod::TRACE => "trace",
-            FormMethod::HEAD => "head",
-            FormMethod::PATCH => "patch",
-        }
-    }
-
-    pub fn font_awesome_icon(&self) -> &'static str {
-        match self {
-            FormMethod::GET => "fas fa-search",
-            FormMethod::POST => "fas fa-plus",
-            FormMethod::PUT => "fas fa-pen",
-            FormMethod::DELETE => "fas fa-trash",
-            FormMethod::TRACE => "fas fa-search",
-            FormMethod::HEAD => "fas fa-search",
-            FormMethod::PATCH => "fas fa-pen",
-        }
-    }
-
-    pub fn get() -> FormMethod {
-        FormMethod::GET
-    }
-
-    pub fn post() -> FormMethod {
-        FormMethod::POST
-    }
-
-    pub fn put() -> FormMethod {
-        FormMethod::PUT
-    }
-
-    pub fn delete() -> FormMethod {
-        FormMethod::DELETE
-    }
-
-    pub fn read() -> FormMethod {
-        Self::get()
-    }
-
-    pub fn create() -> FormMethod {
-        Self::post()
-    }
-
-    pub fn update() -> FormMethod {
-        Self::put()
-    }
-}
-
-impl Display for FormMethod {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            FormMethod::GET => write!(f, "GET"),
-            FormMethod::POST => write!(f, "POST"),
-            FormMethod::PUT => write!(f, "PUT"),
-            FormMethod::DELETE => write!(f, "DELETE"),
-            FormMethod::TRACE => write!(f, "TRACE"),
-            FormMethod::HEAD => write!(f, "HEAD"),
-            FormMethod::PATCH => write!(f, "PATCH"),
-        }
-    }
-}
+use yew_router::prelude::use_navigator;
+use yewdux::prelude::*;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct FormWrapper<Data> {
@@ -152,24 +37,32 @@ impl<Data> From<Data> for FormWrapper<Data> {
 }
 
 #[derive(Debug, Clone, PartialEq, Properties)]
-pub struct BasicFormProp {
-    pub title: String,
-    pub method: FormMethod,
+pub struct BasicFormProp<Data>
+where
+    Data: PartialEq + Clone + 'static + Validate + Debug + Serialize,
+{
     pub action: FormAction,
     pub children: Html,
+    #[prop_or_default]
+    pub navigator: Option<yew_router::navigator::Navigator>,
+    #[prop_or_default]
+    pub _phantom: std::marker::PhantomData<Data>,
 }
 
-impl BasicFormProp {
+impl<Data> BasicFormProp<Data>
+where
+    Data: PartialEq + Clone + 'static + Validate + Debug + Serialize,
+{
     pub fn crud(&self) -> &'static str {
-        self.method.to_crud()
+        self.method().to_crud()
     }
 
     pub fn ongoing_crud(&self) -> &'static str {
-        self.method.ongoing_crud()
+        self.method().ongoing_crud()
     }
 
     pub fn method(&self) -> FormMethod {
-        self.method
+        self.action.method()
     }
 
     pub fn action(&self) -> FormAction {
@@ -177,20 +70,24 @@ impl BasicFormProp {
     }
 
     pub fn title(&self) -> String {
-        self.title.clone()
+        self.action.title()
     }
 }
 
-pub struct BasicForm<Data> {
-    websocket: WorkerBridgeHandle<WebsocketWorker<FrontendMessage, BackendMessage>>,
+pub struct InnerBasicForm<Data> {
+    app_state: Rc<AppState>,
+    app_dispatch: Dispatch<AppState>,
+    user_state: Rc<UserState>,
+    _user_dispatch: Dispatch<UserState>,
     errors: Vec<String>,
     waiting_for_reply: bool,
     submit_button_disabled: bool,
+    uuid: Option<uuid::Uuid>,
     validate_timeout: Option<Timeout>,
     _phantom: std::marker::PhantomData<Data>,
 }
 
-impl<Data> BasicForm<Data>
+impl<Data> InnerBasicForm<Data>
 where
     FormWrapper<Data>: TryFrom<FormData, Error = Vec<String>>,
 {
@@ -236,42 +133,81 @@ where
     }
 }
 
-#[derive(Debug, Clone)]
 pub enum FormMessage<Data> {
     Submit(Data),
     Backend(BackendMessage),
     RemoveError(usize),
     SetSubmitButtonDisabled(bool),
     StartSetSubmitButtonDisabledTimeout(bool),
+    AppState(Rc<AppState>),
+    UserState(Rc<UserState>),
 }
 
-impl<Data> Component for BasicForm<Data>
+impl<Data> Component for InnerBasicForm<Data>
 where
     Data: PartialEq + Clone + 'static + Validate + Debug + Serialize,
     FormWrapper<Data>: TryFrom<FormData, Error = Vec<String>>,
 {
     type Message = FormMessage<Data>;
-    type Properties = BasicFormProp;
+    type Properties = BasicFormProp<Data>;
 
     fn create(ctx: &Context<Self>) -> Self {
+        let app_dispatch =
+            Dispatch::<AppState>::global().subscribe(ctx.link().callback(FormMessage::AppState));
+        let app_state = app_dispatch.get();
+        let user_dispatch =
+            Dispatch::<UserState>::global().subscribe(ctx.link().callback(FormMessage::UserState));
+        let user_state = user_dispatch.get();
         Self {
-            websocket: ctx.link().bridge_worker(Callback::from({
-                let link = ctx.link().clone();
-                move |message: BackendMessage| {
-                    link.send_message(FormMessage::Backend(message));
-                }
-            })),
             errors: vec![],
+            app_state,
+            app_dispatch,
+            user_state,
+            _user_dispatch: user_dispatch,
             waiting_for_reply: false,
             submit_button_disabled: true,
             validate_timeout: None,
+            uuid: None,
             _phantom: std::marker::PhantomData,
         }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            FormMessage::Backend(_bm) => false,
+            FormMessage::Backend(BackendMessage::ExpiredToken) => {
+                log::info!("Token expired, redirecting to login page.");
+                if let Some(navigator) = ctx.props().navigator.as_ref() {
+                    navigator.push(&AppRoute::Login);
+                }
+                false
+            }
+            FormMessage::Backend(BackendMessage::Authenticated) => false,
+            FormMessage::Backend(BackendMessage::TaskResult(uuid, form_action, outcome)) => {
+                if form_action == ctx.props().action() && self.uuid == Some(uuid) {
+                    self.waiting_for_reply = false;
+                    match outcome {
+                        Ok(()) => {
+                            log::info!("Form submitted successfully");
+                            true
+                        }
+                        Err(errors) => {
+                            self.errors = errors.into();
+                            true
+                        }
+                    }
+                } else {
+                    false
+                }
+            }
+            FormMessage::AppState(app_state) => {
+                self.app_state = app_state;
+                true
+            }
+            FormMessage::UserState(user_state) => {
+                self.user_state = user_state;
+                true
+            }
+            FormMessage::Backend(_) => false,
             FormMessage::Submit(data) => {
                 let mut change = false;
                 if !self.errors.is_empty() {
@@ -285,9 +221,15 @@ where
                     return true;
                 }
 
+                let uuid = uuid::Uuid::new_v4();
+                self.uuid = Some(uuid);
+
+                let action = ctx.props().action().clone();
+
                 // Then, we send the data to the backend
-                self.websocket
-                    .send(FrontendMessage::submit(ctx.props().action(), data));
+                self.app_dispatch.reduce_mut(move |state| {
+                    state.add_task((uuid, action, bincode::serialize(&data).unwrap()));
+                });
 
                 self.waiting_for_reply = true;
 
@@ -322,6 +264,15 @@ where
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
+        if ctx.props().action().requires_authentication() {
+            if let Some(navigator) = ctx.props().navigator.as_ref() {
+                if self.user_state.has_no_access_token() {
+                    log::info!("No access token found, redirecting to login page.");
+                    navigator.push(&AppRoute::Login);
+                }
+            }
+        }
+
         let props = ctx.props();
 
         let on_submit = {
@@ -386,5 +337,19 @@ where
                 </button>
             </form>
         }
+    }
+}
+
+#[function_component(BasicForm)]
+pub fn basic_form<Data>(props: &BasicFormProp<Data>) -> Html
+where
+    Data: PartialEq + Clone + 'static + Validate + Debug + Serialize,
+    FormWrapper<Data>: TryFrom<FormData, Error = Vec<String>>,
+{
+    let navigator = use_navigator().unwrap();
+    html! {
+        <InnerBasicForm<Data> navigator={navigator} action={props.action.clone()}>
+            { props.children.clone() }
+        </InnerBasicForm<Data>>
     }
 }

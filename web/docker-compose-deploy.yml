@@ -7,6 +7,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      ADMINISTRATORS_TEAM_NAME: ${ADMINISTRATORS_TEAM_NAME}
     volumes:
       - ${POSTGRES_DATABASE_DIRECTORY}:/var/lib/postgresql/data
     ports:

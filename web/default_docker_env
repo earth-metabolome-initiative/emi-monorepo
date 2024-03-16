@@ -14,6 +14,7 @@ RUST_BACKTRACE=1
 POSTGRES_DB='development.db'
 POSTGRES_USER='user'
 POSTGRES_PASSWORD='password'
+ADMINISTRATORS_TEAM_NAME='Administrators'
 # The database url is composed from the previous
 # variables. It is important to not change this
 # variable, as it is used by the application

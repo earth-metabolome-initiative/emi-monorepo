@@ -28,8 +28,8 @@ CREATE TABLE projects (
         parent_project_id UUID REFERENCES projects(id) ON
     DELETE
         CASCADE,
-        budget MONEY DEFAULT NULL,
-        expenses MONEY DEFAULT NULL,
+        budget FLOAT DEFAULT NULL,
+        expenses FLOAT DEFAULT NULL,
         currency VARCHAR(3) DEFAULT NULL,
         expected_end_date TIMESTAMP WITH TIME ZONE DEFAULT NULL,
         end_date TIMESTAMP WITH TIME ZONE DEFAULT NULL,

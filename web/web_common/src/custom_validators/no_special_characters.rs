@@ -24,11 +24,11 @@ pub const INVALID_NAME_CHARS: [char; 172] = [
     '﹜', '﹝', '﹞', '﹟', '﹠', '﹡', '﹢', '﹣', '﹤', '﹥', '﹦', '\u{fe68}', '﹩', '﹪', '﹫',
 ];
 
-pub const INVALID_NAME_REPEATED_CHARS: [char; 4] = ['-', '.', ',', '\''];
+pub const INVALID_NAME_REPEATED_CHARS: [char; 5] = ['-', '.', ',', '\'', ' '];
 
-pub const INVALID_LEADING_CHARS: [char; 4] = ['-', '.', ',', '\''];
+pub const INVALID_LEADING_CHARS: [char; 5] = ['-', '.', ',', '\'', ' '];
 
-pub const INVALID_TRAILING_CHARS: [char; 2] = ['-', ','];
+pub const INVALID_TRAILING_CHARS: [char; 3] = ['-', ',', ' '];
 
 #[custom_validator("This field cannot contain special characters")]
 /// Validates that the input does not contain any special_characters.

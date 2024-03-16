@@ -28,7 +28,7 @@ impl AccessToken {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub enum RefreshError {
     Unauthorized,
     ExpiredAuthorization,

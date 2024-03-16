@@ -4,8 +4,8 @@
 -- cost.
 CREATE TABLE manufactured_item_categories (
   id UUID PRIMARY KEY REFERENCES item_categories(id) ON DELETE CASCADE,
-  cost DECIMAL(10, 2) NOT NULL,
-  cost_per_day DECIMAL(10, 2) NOT NULL,
+  cost FLOAT NOT NULL,
+  cost_per_day FLOAT NOT NULL,
   currency VARCHAR(3) NOT NULL,
   manifacturer_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE
 );

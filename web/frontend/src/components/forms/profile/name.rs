@@ -53,7 +53,7 @@ pub fn name_form() -> Html {
         let middle_name = middle_name.unwrap_or_default();
 
         html! {
-            <BasicForm<Name> title="Name" method={FormMethod::update()} action={FormAction::UpdateName}>
+            <BasicForm<Name> action={FormAction::UpdateName}>
                 <BasicInput<ValidatedNameField> label="First name" value={first_name} input_type="text" />
                 <BasicInput<ValidatedNameField> label="Middle name" value={middle_name} optional={true} input_type="text" />
                 <BasicInput<ValidatedNameField> label="Last name" value={last_name} input_type="text" />

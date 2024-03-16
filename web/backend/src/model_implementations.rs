@@ -1,6 +1,3 @@
-use crate::diesel_enums::OrganizationUserRole as OrganizationUserRoleEnum;
-use crate::diesel_enums::ProjectUserRole as ProjectUserRoleEnum;
-use crate::diesel_enums::WebsiteRole;
 use crate::models::*;
 use crate::schema::*;
 use diesel::prelude::*;
@@ -159,65 +156,6 @@ impl User {
         self.id
     }
 
-    pub fn is_website_admin(
-        &self,
-        conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>,
-    ) -> bool {
-        use crate::schema::describables::dsl::*;
-        use crate::schema::website_user_roles::dsl::*;
-        // Check if the user has the admin role
-        website_user_roles
-            .filter(user_id.eq(self.id))
-            // We execute an inner join on the website_role_id from the website_user_roles table
-            // and the id from the describables table, to get the actual role name.
-            .inner_join(describables.on(crate::schema::describables::id.eq(website_role_id)))
-            .filter(name.eq(WebsiteRole::Admin.to_string()))
-            .select(crate::schema::website_user_roles::id)
-            .first::<Uuid>(conn)
-            .is_ok()
-    }
-
-    pub fn is_organization_admin(
-        &self,
-        organization_id: Uuid,
-        conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>,
-    ) -> bool {
-        use crate::schema::describables::dsl::*;
-        crate::schema::organization_users::dsl::organization_users
-            .filter(crate::schema::organization_users::user_id.eq(self.id))
-            .filter(crate::schema::organization_users::organization_id.eq(organization_id))
-            .inner_join(
-                describables
-                    .on(crate::schema::describables::id
-                        .eq(crate::schema::organization_users::role_id)),
-            )
-            .filter(name.eq(OrganizationUserRoleEnum::Admin.to_string()))
-            .select(crate::schema::organization_users::id)
-            .first::<Uuid>(conn)
-            .is_ok()
-    }
-
-    pub fn is_project_admin(
-        &self,
-        project_id: Uuid,
-        conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>,
-    ) -> bool {
-        use crate::schema::describables::dsl::*;
-        // Check if the user has the admin role
-        crate::schema::project_users::dsl::project_users
-            .filter(crate::schema::project_users::dsl::user_id.eq(self.id))
-            .filter(crate::schema::project_users::dsl::project_id.eq(project_id))
-            .inner_join(
-                describables
-                    .on(crate::schema::describables::id
-                        .eq(crate::schema::project_users::dsl::role_id)),
-            )
-            .filter(name.eq(ProjectUserRoleEnum::Admin.to_string()))
-            .select(crate::schema::project_users::id)
-            .first::<Uuid>(conn)
-            .is_ok()
-    }
-
     /// Updates the user's name in the database.
     ///
     /// # Arguments
@@ -248,8 +186,15 @@ impl User {
             self.first_name.clone().unwrap_or_default(),
             self.middle_name.clone(),
             self.last_name.clone().unwrap_or_default(),
-        ).ok();
+        )
+        .ok();
         web_common::api::auth::users::User::new(name, self.id)
+    }
+}
+
+impl Into<web_common::api::auth::users::User> for User {
+    fn into(self) -> web_common::api::auth::users::User {
+        self.to_web_common_user()
     }
 }
 

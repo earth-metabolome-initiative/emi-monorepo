@@ -17,9 +17,9 @@
 -- - updated_by: the unique identifier of the user who last updated the location.
 CREATE TABLE locations (
   id UUID PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE REFERENCES describables(id) ON DELETE CASCADE,
-  latitude DECIMAL(9,6),
-  longitude DECIMAL(9,6),
-  altitude DECIMAL(9,3),
+  latitude Float,
+  longitude Float,
+  altitude Float,
   address TEXT,
   geolocalization_device_id UUID REFERENCES items(id) ON DELETE SET NULL,
   altitude_device_id UUID REFERENCES items(id) ON DELETE SET NULL,

@@ -1,15 +1,15 @@
 use crate::api::ws::socket::WebSocket;
-use actix::dev::channel;
 use actix::Message;
-use actix_web::web;
+use actix_web_actors::ws::CloseCode;
 use core::fmt::Debug;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use sqlx::error::Error;
 use sqlx::postgres::PgListener;
 use sqlx::Pool;
 use sqlx::Postgres;
-use uuid::Uuid;
 use web_common::api::auth::users::User;
+use web_common::api::ws::messages;
+use web_common::api::ws::messages::BackendMessage;
 use web_common::api::ws::messages::SQLOperation;
 
 pub enum Channel {
@@ -24,15 +24,10 @@ impl ToString for Channel {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
-pub enum ChannelTable {
-    Users,
-}
-
 #[derive(Debug, Serialize, Deserialize, Message, Clone, PartialEq, Eq)]
 #[rtype(result = "()")]
 pub struct ChannelMessage<Record = serde_json::Value> {
-    pub table: ChannelTable,
+    pub table: messages::Table,
     pub operation: SQLOperation,
     pub record: Record,
 }
@@ -81,15 +76,46 @@ pub async fn start_listening(
             let value: ChannelMessage = serde_json::from_str(&notification_payload).unwrap();
 
             match &value.table {
-                ChannelTable::Users => {
-                    address.do_send(value.deserialize_into::<User>().unwrap());
+                messages::Table::Users => {
+                    let message: ChannelMessage<crate::models::User> =
+                        value.deserialize_into().unwrap();
+                    address.do_send(message);
                 }
                 table_name => {
-                    unimplemented!(
+                    log::error!(
                         "Received a notification for a table {:?} that is not implemented yet",
                         table_name
                     );
                 }
+            }
+        }
+    }
+}
+
+impl actix::Handler<ChannelMessage<crate::models::User>> for WebSocket {
+    type Result = ();
+
+    fn handle(&mut self, msg: ChannelMessage<crate::models::User>, ctx: &mut Self::Context) {
+        match msg.operation {
+            SQLOperation::Update => {
+                ctx.binary(BackendMessage::User(
+                    SQLOperation::Update,
+                    msg.record.to_web_common_user(),
+                ));
+            }
+            SQLOperation::Insert => {
+                unreachable!("We do not expect notifications for insert operations");
+            }
+            SQLOperation::Delete => {
+                // If the current user has been deleted, close the connection
+                if let Some(user) = &self.user {
+                    if user.id() == msg.record.id() {
+                        ctx.close(Some(CloseCode::Policy.into()));
+                    }
+                }
+            }
+            SQLOperation::Select => {
+                unreachable!("We do not expect notifications for select operations");
             }
         }
     }

@@ -5,7 +5,7 @@
 CREATE TABLE item_continuous_quantities (
     id UUID PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE,
     item_id UUID REFERENCES items(id) ON DELETE CASCADE,
-    weight DECIMAL(10, 2) NOT NULL,
+    weight FLOAT NOT NULL,
     unit_id UUID REFERENCES units(id) ON DELETE CASCADE,
     sensor_id UUID REFERENCES items(id) ON DELETE SET NULL,
     measured_at TIMESTAMPTZ NOT NULL DEFAULT now(),

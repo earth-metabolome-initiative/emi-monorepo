@@ -11,18 +11,22 @@ use actix_web_actors::ws;
 use sqlx::{Pool as SQLxPool, Postgres};
 use std::collections::HashMap;
 use web_common::api::auth::users::User;
+use web_common::api::ws::messages::FormAction;
 use web_common::api::ws::messages::SQLOperation;
+use web_common::api::ApiError;
 
 use web_common::api::ws::messages::{BackendMessage, FrontendMessage};
 
 use super::channels::*;
+use crate::api::ws::users::UserMessage;
 use crate::DBPool;
 use crate::DieselConn;
 
 pub struct WebSocket {
     pg_handlers: HashMap<String, SpawnHandle>,
-    user: Option<DBUser>,
+    pub(crate) user: Option<DBUser>,
     diesel: DBPool,
+    pub(crate) diesel_connection: DieselConn,
     redis: redis::Client,
     sqlx: SQLxPool<Postgres>,
 }
@@ -32,6 +36,7 @@ impl WebSocket {
         Self {
             pg_handlers: HashMap::new(),
             user: None,
+            diesel_connection: diesel.get().unwrap(),
             diesel,
             redis,
             sqlx,
@@ -40,11 +45,14 @@ impl WebSocket {
 
     /// Ensure that the user is authenticated before allowing any further messages to be processed,
     /// killing the connection if the user is not authenticated.
-    fn must_be_authenticated(&self, ctx: &mut ws::WebsocketContext<Self>) -> bool {
-        if self.user.is_none() {
-            ctx.close(Some(ws::CloseCode::Policy.into()));
+    fn must_be_authenticated(
+        &self,
+        _ctx: &mut ws::WebsocketContext<Self>,
+    ) -> Result<&DBUser, ApiError> {
+        match self.user.as_ref() {
+            Some(user) => Ok(user),
+            None => Err(ApiError::unauthorized()),
         }
-        self.user.is_some()
     }
 }
 
@@ -60,34 +68,12 @@ impl actix::Handler<BackendMessage> for WebSocket {
     }
 }
 
-impl actix::Handler<ChannelMessage<User>> for WebSocket {
-    type Result = ();
-
-    fn handle(&mut self, msg: ChannelMessage<User>, ctx: &mut Self::Context) {
-        match msg.operation {
-            SQLOperation::Update => {
-                ctx.binary(BackendMessage::User(SQLOperation::Update, msg.record));
-            }
-            SQLOperation::Insert => {
-                unreachable!("We do not expect notifications for insert operations");
-            }
-            SQLOperation::Delete => {
-                // If the current user has been deleted, close the connection
-                if let Some(user) = &self.user {
-                    if user.id() == msg.record.id() {
-                        ctx.close(Some(ws::CloseCode::Policy.into()));
-                    }
-                }
-            }
-        }
-    }
-}
-
 #[derive(Debug, Message)]
 #[rtype(result = "()")]
 enum InternalMessage {
     Authenticated(DBUser),
     Unauthorized,
+    ExpiredToken,
 }
 
 impl actix::Handler<InternalMessage> for WebSocket {
@@ -101,9 +87,34 @@ impl actix::Handler<InternalMessage> for WebSocket {
                     user.to_web_common_user(),
                 ));
                 self.user = Some(user);
+                // With the user authenticated, we can start to listen to its channels.
+                let user: User = self.user.as_ref().unwrap().to_web_common_user();
+                let sqlx_pool = self.sqlx.clone();
+                let recipient = ctx.address();
+                let channel = Channel::NotifyUser(user);
+                if !self.pg_handlers.contains_key(&channel.to_string()) {
+                    self.pg_handlers.insert(
+                        channel.to_string(),
+                        ctx.spawn(
+                            async move {
+                                match start_listening(&sqlx_pool, vec![channel], recipient).await {
+                                    Ok(_) => {}
+                                    Err(err) => {
+                                        log::error!("Error starting to listen to channel: {:?}", err);
+                                    }
+                                
+                                }
+                            }
+                            .into_actor(self),
+                        ),
+                    );
+                }
             }
             InternalMessage::Unauthorized => {
                 ctx.close(Some(ws::CloseCode::Policy.into()));
+            }
+            InternalMessage::ExpiredToken => {
+                ctx.binary(BackendMessage::ExpiredToken);
             }
         }
     }
@@ -117,7 +128,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                 log::debug!("Got message from WebSocket: {:?}", msg);
                 let frontend_message: FrontendMessage = msg.into();
                 match frontend_message {
-                    FrontendMessage::Close(code) => {
+                    FrontendMessage::Close(_code) => {
                         ctx.stop();
                     }
                     FrontendMessage::Authentication(token) => {
@@ -126,6 +137,22 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                         let address = ctx.address();
                         ctx.spawn(
                             async move {
+                                // If the token provided has only expired, we let the user know that
+                                // they need to require a new one, without kicking them out.
+                                match DBUser::is_token_expired(token.token()) {
+                                    Ok(true) => {
+                                        address.do_send(InternalMessage::ExpiredToken);
+                                        return;
+                                    }
+                                    Ok(false) => {}
+                                    Err(err) => {
+                                        // If the deserilization of the token fails, we consider
+                                        // the user completely unauthorized.
+                                        log::error!("Error deserializing token: {:?}", err);
+                                        address.do_send(InternalMessage::Unauthorized);
+                                        return;
+                                    }
+                                }
                                 if let Ok(user) =
                                     DBUser::from_bearer_token(redis, diesel, token.token()).await
                                 {
@@ -137,9 +164,36 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                             .into_actor(self),
                         );
                     }
-                    _ => {
-                        self.must_be_authenticated(ctx);
-                        log::error!("Unhandled message: {:?}", frontend_message);
+                    FrontendMessage::Task(task_id, form_action, data) => {
+                        if form_action.requires_authentication() {
+                            match self.must_be_authenticated(ctx) {
+                                Ok(user) => match form_action {
+                                    FormAction::UpdateName => match bincode::deserialize(&data) {
+                                        Ok(value) => {
+                                            ctx.address().do_send(UserMessage::UpdateName(
+                                                task_id,
+                                                user.id(),
+                                                value,
+                                            ));
+                                        }
+                                        Err(err) => {
+                                            ctx.binary(BackendMessage::TaskResult(
+                                                task_id,
+                                                form_action,
+                                                Err(ApiError::from(err)),
+                                            ));
+                                        }
+                                    },
+                                },
+                                Err(api_error) => {
+                                    ctx.address().do_send(BackendMessage::TaskResult(
+                                        task_id,
+                                        form_action,
+                                        Err(api_error),
+                                    ));
+                                }
+                            }
+                        }
                     }
                 }
             }

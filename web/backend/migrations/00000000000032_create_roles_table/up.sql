@@ -1,5 +1,5 @@
 -- Your SQL goes here
-CREATE TABLE project_user_roles (
+CREATE TABLE roles (
     id UUID PRIMARY KEY REFERENCES editables(id) ON
     DELETE
         CASCADE REFERENCES describables(id) ON
@@ -27,9 +27,9 @@ $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER delete_editables AFTER
 DELETE
-    ON project_user_roles FOR EACH ROW EXECUTE FUNCTION delete_editables();
+    ON roles FOR EACH ROW EXECUTE FUNCTION delete_editables();
 
--- We proceed to add some standard roles to the project_user_roles table.
+-- We proceed to add some standard roles to the roles table.
 -- We start by inserting the editables that indixes the states.
 DO $$
 DECLARE
@@ -87,7 +87,7 @@ VALUES
     );
 
 INSERT INTO
-    project_user_roles (id)
+    roles (id)
 VALUES
     (first_editables_id),
     (second_editables_id),

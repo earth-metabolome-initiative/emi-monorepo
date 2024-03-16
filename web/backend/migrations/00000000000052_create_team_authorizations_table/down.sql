@@ -1,2 +1,2 @@
 -- This file should undo anything in `up.sql`
-DROP TABLE team_user_roles;
+DROP TABLE team_authorizations;
