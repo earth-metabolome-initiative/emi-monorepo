@@ -46,7 +46,7 @@ where
     #[prop_or_default]
     pub navigator: Option<yew_router::navigator::Navigator>,
     #[prop_or_default]
-    pub _phantom: std::marker::PhantomData<Data>,
+    pub current: Option<Data>,
 }
 
 impl<Data> BasicFormProp<Data>
@@ -277,8 +277,12 @@ where
 
         let on_submit = {
             let link = ctx.link().clone();
+            let waiting_for_reply = self.waiting_for_reply;
             Callback::from(move |event: SubmitEvent| {
                 event.prevent_default();
+                if waiting_for_reply {
+                    return;
+                }
                 match Self::extract_data_from_form_event(event) {
                     Ok(data) => link.send_message(FormMessage::Submit(data)),
                     Err(errors) => {
@@ -290,12 +294,21 @@ where
 
         // Every time there is any change in any of the input fields, we validate the form
         // so to know whether the submit button should be enabled or not
-        let on_input = ctx.link().callback(|event: InputEvent| {
-            event.prevent_default();
-            FormMessage::StartSetSubmitButtonDisabledTimeout(
-                Self::extract_data_from_input_event(event).is_err(),
-            )
-        });
+        let on_input = {
+            let current = ctx.props().current.clone();
+            let method = ctx.props().action().method();
+            let link = ctx.link().clone();
+            Callback::from(move |event: InputEvent| {
+                link.send_message(FormMessage::StartSetSubmitButtonDisabledTimeout(
+                    match Self::extract_data_from_input_event(event) {
+                        Ok(data) => current
+                            .as_ref()
+                            .map_or(false, |current| *current == data && method.is_update()),
+                        Err(_) => true,
+                    },
+                ));
+            })
+        };
 
         let classes = if self.errors.is_empty() {
             "standard-form"
@@ -305,11 +318,15 @@ where
 
         let button_classes = if self.submit_button_disabled {
             ""
+        } else if self.waiting_for_reply {
+            "waiting"
         } else {
             "enabled"
         };
 
-        let title_message = if self.submit_button_disabled {
+        let title_message = if self.waiting_for_reply {
+            "You have already submitted the form, please wait for the reply."
+        } else if self.submit_button_disabled {
             "You cannot submit the form until all the fields are valid"
         } else {
             "Submit the form"
@@ -332,7 +349,11 @@ where
                     }
                 </ul>
                 <button type="submit" title={title_message} class={button_classes} disabled={self.submit_button_disabled}>
-                    <i class={props.method().font_awesome_icon()}></i>
+                    {if self.waiting_for_reply {
+                        html! { <i class="fas fa-spinner fa-spin"></i> }
+                    } else {
+                        html! { <i class={props.method().font_awesome_icon()}></i> }
+                    }}
                     <span>{format!("{} {}", props.crud(), props.title())}</span>
                 </button>
             </form>
@@ -348,7 +369,7 @@ where
 {
     let navigator = use_navigator().unwrap();
     html! {
-        <InnerBasicForm<Data> navigator={navigator} action={props.action.clone()}>
+        <InnerBasicForm<Data> navigator={navigator} action={props.action.clone()} current={props.current.clone()}>
             { props.children.clone() }
         </InnerBasicForm<Data>>
     }

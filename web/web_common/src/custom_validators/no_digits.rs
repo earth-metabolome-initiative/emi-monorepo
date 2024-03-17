@@ -3,6 +3,9 @@ use web_common_derive::custom_validator;
 
 #[custom_validator("This field cannot contain digits")]
 /// Validates that the input does not contain any digits.
+/// 
+/// # Arguments
+/// * `v` - The input to validate.
 ///
 /// # Example
 ///

@@ -213,6 +213,13 @@ impl FormMethod {
     pub fn update() -> FormMethod {
         Self::put()
     }
+
+    pub fn is_update(&self) -> bool {
+        match self {
+            FormMethod::PUT => true,
+            _ => false,
+        }
+    }
 }
 
 impl Display for FormMethod {

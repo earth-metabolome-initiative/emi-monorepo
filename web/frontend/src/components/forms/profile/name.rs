@@ -45,15 +45,15 @@ pub fn name_form() -> Html {
     }
 
     if let Some(user) = user_state.user() {
-        let (first_name, middle_name, last_name) = user
-            .name()
-            .unwrap_or_else(|_| Default::default())
-            .scompose();
+        let name = user
+            .name().unwrap_or_else(|_| Default::default());
+
+        let (first_name, middle_name, last_name) = name.clone().scompose();
 
         let middle_name = middle_name.unwrap_or_default();
 
         html! {
-            <BasicForm<Name> action={FormAction::UpdateName}>
+            <BasicForm<Name> action={FormAction::UpdateName} current={name}>
                 <BasicInput<ValidatedNameField> label="First name" value={first_name} input_type="text" />
                 <BasicInput<ValidatedNameField> label="Middle name" value={middle_name} optional={true} input_type="text" />
                 <BasicInput<ValidatedNameField> label="Last name" value={last_name} input_type="text" />

@@ -91,6 +91,10 @@ form.standard-form {
         &.enabled::before {
             animation: shine-in 3s ease-in-out;
         }
+
+        &.waiting {
+            cursor: not-allowed;
+        }
         
         &:disabled {
             cursor: not-allowed;
