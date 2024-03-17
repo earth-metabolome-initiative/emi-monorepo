@@ -5,10 +5,10 @@ use web_common_derive::custom_validator;
 
 pub fn is_emoji(c: char) -> bool {
     // Emojis are defined by a specific codepoint range
-    (c >= '\u{1F600}') && (c <= '\u{1F64F}') ||  // Emoticons block
-       (c >= '\u{1F680}') && (c <= '\u{1F6C5}') ||  // Emoticons block
-       (c >= '\u{2702}') && (c <= '\u{27B0}') ||  // Dingbats block
-       (c >= '\u{1F1E6}') && (c <= '\u{1F1FF}') // Flags block
+    ('\u{1F600}'..='\u{1F64F}').contains(&c) ||  // Emoticons block
+    ('\u{1F680}'..='\u{1F6C5}').contains(&c) ||  // Emoticons block
+       ('\u{2702}'..='\u{27B0}').contains(&c) ||  // Dingbats block
+       ('\u{1F1E6}'..='\u{1F1FF}').contains(&c) // Flags block
 }
 
 #[custom_validator("This field cannot contain emojis")]
