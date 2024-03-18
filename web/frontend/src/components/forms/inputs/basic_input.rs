@@ -19,7 +19,8 @@ where
     Data: 'static + Clone + PartialEq,
 {
     pub label: String,
-    pub value: Data,
+    #[prop_or_default]
+    pub value: Option<Data>,
     pub input_type: String,
     #[prop_or(false)]
     pub optional: bool,
@@ -33,8 +34,8 @@ where
         self.label.clone()
     }
 
-    pub fn value(&self) -> String {
-        self.value.clone().to_string()
+    pub fn value(&self) -> Option<Data> {
+        self.value.clone()
     }
 
     pub fn input_type(&self) -> String {
@@ -146,6 +147,16 @@ where
                     change = true;
                 }
 
+                // If the current value of the input field is equal to
+                // the default value, we do not want to display the field
+                // as being valid, but back to its initial state.
+                if let Some(value) = ctx.props().value() {
+                    if value == data {
+                        self.is_valid = None;
+                        change = true;
+                    }
+                }
+
                 change
             }
             InputMessage::StartValidationTimeout(data) => {
@@ -229,6 +240,15 @@ where
             })
         };
 
+        let input_value = self.current_value.as_ref().map_or_else(
+            || {
+                props
+                    .value()
+                    .map_or_else(|| "".to_string(), |value| value.to_string())
+            },
+            |value| value.to_string(),
+        );
+
         html! {
             <div class={classes}>
                 <label for={props.label()}>{format!("{}:", props.label())}</label>
@@ -236,7 +256,7 @@ where
                     type={props.input_type()}
                     class="input-control"
                     name={props.label().to_lowercase().replace(" ", "_")}
-                    value={self.current_value.as_ref().map_or_else(|| props.value().to_string(), |value| value.to_string())}
+                    value={input_value}
                     oninput={on_input}
                     onblur={on_blur}
                 />
