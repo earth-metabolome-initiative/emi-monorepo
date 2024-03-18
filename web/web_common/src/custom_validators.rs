@@ -15,3 +15,5 @@ pub mod no_special_characters;
 pub use no_special_characters::*;
 pub mod no_emojis;
 pub use no_emojis::*;
+pub mod no_slurs;
+pub use no_slurs::*;
