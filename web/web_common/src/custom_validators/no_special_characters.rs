@@ -130,14 +130,22 @@ where
     no_emojis(v)?;
 
     // We check that the first character is not in the `INVALID_LEADING_CHARS` array
-    if v.as_ref().chars().next().map_or(false, |c| INVALID_LEADING_CHARS.contains(&c)) {
+    if v.as_ref()
+        .chars()
+        .next()
+        .map_or(false, |c| INVALID_LEADING_CHARS.contains(&c))
+    {
         return Err(ValidationError::new(
             "This field cannot start with special characters",
         ));
     }
 
     // We check that the last character is not in the `INVALID_TRAILING_CHARS` array
-    if v.as_ref().chars().last().map_or(false, |c| INVALID_TRAILING_CHARS.contains(&c)) {
+    if v.as_ref()
+        .chars()
+        .last()
+        .map_or(false, |c| INVALID_TRAILING_CHARS.contains(&c))
+    {
         return Err(ValidationError::new(
             "This field cannot end with special characters",
         ));

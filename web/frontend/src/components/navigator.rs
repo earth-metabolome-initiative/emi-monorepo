@@ -26,7 +26,9 @@ use crate::utils::is_online;
 use gloo::timers::callback::Interval;
 use wasm_bindgen::UnwrapThrowExt;
 use web_common::api::auth::users::User;
+use web_common::api::oauth::jwt_cookies::RefreshError::Unauthorized;
 use web_common::api::ws::messages::*;
+use web_common::api::ApiError;
 use yew::prelude::*;
 use yew_agent::scope_ext::AgentScopeExt;
 use yew_router::prelude::*;
@@ -47,7 +49,7 @@ pub struct Navigator {
     user_dispatch: Dispatch<UserState>,
     app_state: Rc<AppState>,
     app_dispatch: Dispatch<AppState>,
-    connectivity_checked: Option<Interval>
+    connectivity_checked: Option<Interval>,
 }
 
 impl Navigator {
@@ -104,7 +106,7 @@ impl Component for Navigator {
             user_dispatch,
             app_state,
             app_dispatch,
-            connectivity_checked: None
+            connectivity_checked: None,
         }
     }
 
@@ -113,7 +115,6 @@ impl Component for Navigator {
             NavigatorMessage::UserState(user_state) => {
                 self.user_state = user_state;
                 if let Some(access_token) = self.user_state.access_token() {
-                    log::info!("Access token found, recovering user info.");
                     self.websocket
                         .send(FrontendMessage::Authentication(access_token.clone()));
                 } else {
@@ -184,13 +185,20 @@ impl Component for Navigator {
                         });
                     }
                     Err(api_error) => {
-                        if api_error.is_unauthorized() {
-                            refresh_access_token(
-                                self.user_dispatch.clone(),
-                                ctx.props().navigator.clone(),
-                            );
+                        match api_error {
+                            ApiError::Unauthorized | ApiError::ExpiredAuthorization => {
+                                refresh_access_token(
+                                    self.user_dispatch.clone(),
+                                    ctx.props().navigator.clone(),
+                                );
+                            }
+                            ApiError::InternalServerError | ApiError::BadGateway => {}
+                            ApiError::BadRequest(_errors) => {
+                                self.app_dispatch.reduce_mut(|state| {
+                                    state.remove_task(task_id);
+                                });
+                            }
                         }
-                        log::error!("Task {} failed: {:?}", task_id, api_error);
                     }
                 }
                 true

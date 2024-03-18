@@ -47,7 +47,7 @@ pub async fn refresh_access_token(
     // If the token is expired, we return an error.
     if refresh_token.is_expired() {
         return eliminate_cookies(HttpResponse::Unauthorized())
-            .json(ApiError::expired_authorization());
+            .json(ApiError::ExpiredAuthorization);
     }
 
     // Next up, we check whether the token is still present in the redis database.
@@ -56,7 +56,7 @@ pub async fn refresh_access_token(
     if is_still_present.map_or(true, |present| !present) {
         log::debug!("Refresh token not present in redis");
         return eliminate_cookies(HttpResponse::Unauthorized())
-            .json(ApiError::expired_authorization());
+            .json(ApiError::ExpiredAuthorization);
     }
 
     // Finally, we get the user from the database, as while the user indeed seems

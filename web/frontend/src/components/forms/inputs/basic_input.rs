@@ -2,7 +2,7 @@
 
 use std::collections::HashSet;
 
-use super::InputError;
+use super::InputErrors;
 use crate::workers::WebsocketWorker;
 use gloo::timers::callback::Timeout;
 use validator::Validate;
@@ -180,7 +180,20 @@ where
         let props = ctx.props();
 
         let classes = match self.is_valid {
-            Some(true) => "input-group input-group-valid",
+            Some(true) => {
+                if let (Some(previous), Some(current)) = (
+                    ctx.props().value(),
+                    self.current_value.as_ref().and_then(|value| Data::try_from(value.clone()).ok()),
+                ) {
+                    if previous != current {
+                        "input-group input-group-valid"
+                    } else {
+                        "input-group"
+                    }
+                } else {
+                    "input-group input-group-valid"
+                }
+            },
             Some(false) => "input-group input-group-invalid",
             None => "input-group",
         };
@@ -249,6 +262,13 @@ where
             |value| value.to_string(),
         );
 
+        let on_delete ={
+            let link = ctx.link().clone();
+            Callback::from(move |error: String| {
+                link.send_message(InputMessage::RemoveError(error));
+            })
+        };
+        
         html! {
             <div class={classes}>
                 <label for={props.label()}>{format!("{}:", props.label())}</label>
@@ -260,20 +280,7 @@ where
                     oninput={on_input}
                     onblur={on_blur}
                 />
-                <ul class="form-errors">
-                    { for self.errors.iter().map(|error| {
-                        let link = ctx.link().clone();
-
-                        let on_delete =
-                            Callback::from(move |error: String| {
-                                link.send_message(InputMessage::RemoveError(error));
-                            });
-                        html! {
-                            <InputError error={error.clone()} on_delete={on_delete}/>
-                        }
-                    })
-                    }
-                </ul>
+                <InputErrors errors={self.errors.clone()} on_delete={on_delete} />
             </div>
         }
     }

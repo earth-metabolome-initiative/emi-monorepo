@@ -1,12 +1,16 @@
 //! Module providing a yew component that handles a basic form.
 
-use crate::components::forms::InputError;
+use crate::components::forms::InputErrors;
 use crate::router::AppRoute;
 use crate::stores::app_state::AppState;
 use crate::stores::user_state::UserState;
 use gloo::timers::callback::Timeout;
 use serde::Serialize;
+use std::collections::HashSet;
 use std::fmt::Debug;
+use yew_agent::prelude::WorkerBridgeHandle;
+use yew_agent::scope_ext::AgentScopeExt;
+use crate::workers::WebsocketWorker;
 use std::rc::Rc;
 use validator::Validate;
 use wasm_bindgen::JsCast;
@@ -75,11 +79,12 @@ where
 }
 
 pub struct InnerBasicForm<Data> {
+    websocket: WorkerBridgeHandle<WebsocketWorker<FrontendMessage, BackendMessage>>,
     app_state: Rc<AppState>,
     app_dispatch: Dispatch<AppState>,
     user_state: Rc<UserState>,
     _user_dispatch: Dispatch<UserState>,
-    errors: Vec<String>,
+    errors: HashSet<String>,
     waiting_for_reply: bool,
     submit_button_disabled: bool,
     uuid: Option<uuid::Uuid>,
@@ -136,7 +141,7 @@ where
 pub enum FormMessage<Data> {
     Submit(Data),
     Backend(BackendMessage),
-    RemoveError(usize),
+    RemoveError(String),
     SetSubmitButtonDisabled(bool),
     StartSetSubmitButtonDisabledTimeout(bool),
     AppState(Rc<AppState>),
@@ -159,7 +164,13 @@ where
             Dispatch::<UserState>::global().subscribe(ctx.link().callback(FormMessage::UserState));
         let user_state = user_dispatch.get();
         Self {
-            errors: vec![],
+            websocket: ctx.link().bridge_worker(Callback::from({
+                let link = ctx.link().clone();
+                move |message: BackendMessage| {
+                    link.send_message(FormMessage::Backend(message));
+                }
+            })),
+            errors: HashSet::new(),
             app_state,
             app_dispatch,
             user_state,
@@ -183,6 +194,7 @@ where
             }
             FormMessage::Backend(BackendMessage::Authenticated) => false,
             FormMessage::Backend(BackendMessage::TaskResult(uuid, form_action, outcome)) => {
+                log::info!("Received task result");
                 if form_action == ctx.props().action() && self.uuid == Some(uuid) {
                     self.waiting_for_reply = false;
                     match outcome {
@@ -217,7 +229,7 @@ where
 
                 // First, we validate the data
                 if let Err(errors) = data.validate() {
-                    self.errors = errors.convert_to_string();
+                    self.errors = errors.convert_to_string().into_iter().collect();
                     return true;
                 }
 
@@ -235,8 +247,8 @@ where
 
                 change
             }
-            FormMessage::RemoveError(error_number) => {
-                self.errors.remove(error_number);
+            FormMessage::RemoveError(error) => {
+                self.errors.remove(&error);
                 true
             }
             FormMessage::SetSubmitButtonDisabled(disabled) => {
@@ -332,22 +344,18 @@ where
             "Submit the form"
         };
 
+        let on_delete ={
+            let link = ctx.link().clone();
+            Callback::from(move |error: String| {
+                link.send_message(FormMessage::RemoveError(error));
+            })
+        };
+
         html! {
             <form enctype={ "multipart/form-data" } class={classes} oninput={on_input} onsubmit={on_submit} method={props.method().to_string()}>
                 <h4>{ props.title() }</h4>
                 { ctx.props().children.clone() }
-                <ul class="form-errors">
-                    { for self.errors.iter().enumerate().map(|(error_number, error)| {
-                        let link = ctx.link().clone();
-                        let on_delete = Callback::from(move |_| {
-                            link.send_message(FormMessage::RemoveError(error_number));
-                        });
-                        html! {
-                            <InputError error={error.clone()} on_delete={on_delete}/>
-                        }
-                    })
-                    }
-                </ul>
+                <InputErrors errors={self.errors.clone()} on_delete={on_delete} />
                 <button type="submit" title={title_message} class={button_classes} disabled={self.submit_button_disabled}>
                     {if self.waiting_for_reply {
                         html! { <i class="fas fa-spinner fa-spin"></i> }

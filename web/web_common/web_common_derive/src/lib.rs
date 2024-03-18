@@ -6,17 +6,15 @@
 //! The usage example of the custom_validator macro is as follows:
 //!
 //! ```rust
-//!
 //! use web_common::custom_validator;
 //!
 //! #[custom_validator("No trailing spaces allowed.")]
 //! pub fn no_trailing_spaces<S>(v: &S) -> Result<(), ValidationError> {
-//!     if v.as_ref().ends_with(' '){
-//!        return Err(ValidationError::new("no_trailing_spaces"));
+//!     if v.as_ref().ends_with(' ') {
+//!         return Err(ValidationError::new("no_trailing_spaces"));
 //!     }
 //!     Ok(())
 //! }
-//!
 //! ```
 //!
 //! This decorated function will generate the struct #struct_name and

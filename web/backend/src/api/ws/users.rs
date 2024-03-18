@@ -8,7 +8,11 @@ use web_common::api::ws::messages::FormAction;
 #[derive(Debug, Message)]
 #[rtype(result = "()")]
 pub(crate) enum UserMessage {
-    UpdateName(uuid::Uuid, uuid::Uuid, web_common::api::auth::users::name::Name),
+    UpdateName(
+        uuid::Uuid,
+        uuid::Uuid,
+        web_common::api::auth::users::name::Name,
+    ),
 }
 
 impl actix::Handler<UserMessage> for WebSocket {
@@ -16,16 +20,21 @@ impl actix::Handler<UserMessage> for WebSocket {
 
     fn handle(&mut self, msg: UserMessage, ctx: &mut Self::Context) {
         match msg {
-            UserMessage::UpdateName(uuid, user_id, name) => if let Err(failure) = update_user_name(
-                &mut self.diesel_connection,
-                self.user.as_ref().unwrap().clone(),
-                user_id,
-                name,
-            ) {
+            UserMessage::UpdateName(uuid, user_id, name) => {
+                // ctx.binary(BackendMessage::TaskResult(
+                //     uuid,
+                //     FormAction::UpdateName,
+                //     update_user_name(
+                //         &mut self.diesel_connection,
+                //         self.user.as_ref().unwrap().clone(),
+                //         user_id,
+                //         name,
+                //     ),
+                // ));
                 ctx.binary(BackendMessage::TaskResult(
                     uuid,
                     FormAction::UpdateName,
-                    Err(failure),
+                    Err(web_common::api::ApiError::BadRequest(vec!["Test Error".to_string()]))
                 ));
             }
         }

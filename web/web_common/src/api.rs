@@ -1,9 +1,11 @@
+use std::collections::HashSet;
+
 use serde::{Deserialize, Serialize};
 pub mod auth;
 pub mod oauth;
 pub mod ws;
-use validator::ValidationErrors;
 use validator::ValidationError;
+use validator::ValidationErrors;
 
 use crate::custom_validators::validation_errors::ValidationErrorToString;
 
@@ -12,7 +14,8 @@ pub const FULL_ENDPOINT: &str = ENDPOINT;
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub enum ApiError {
-    Oauth(oauth::OauthErrors),
+    Unauthorized,
+    ExpiredAuthorization,
     BadGateway,
     BadRequest(Vec<String>),
     InternalServerError,
@@ -20,24 +23,7 @@ pub enum ApiError {
 
 impl ApiError {
     pub fn unauthorized() -> Self {
-        Self::Oauth(oauth::OauthErrors::Refresh(
-            oauth::jwt_cookies::RefreshError::Unauthorized,
-        ))
-    }
-
-    pub fn is_unauthorized(&self) -> bool {
-        match self {
-            ApiError::Oauth(oauth::OauthErrors::Refresh(
-                oauth::jwt_cookies::RefreshError::Unauthorized,
-            )) => true,
-            _ => false,
-        }
-    }
-
-    pub fn expired_authorization() -> Self {
-        Self::Oauth(oauth::OauthErrors::Refresh(
-            oauth::jwt_cookies::RefreshError::ExpiredAuthorization,
-        ))
+        Self::Unauthorized
     }
 
     pub fn internal_server_error() -> Self {
@@ -86,9 +72,22 @@ impl Into<Vec<String>> for ApiError {
     fn into(self) -> Vec<String> {
         match self {
             ApiError::BadRequest(errors) => errors,
-            ApiError::Oauth(oauth_error) => vec![format!("Oauth error: {:?}", oauth_error)],
+            ApiError::Unauthorized => vec!["Unauthorized".to_string()],
+            ApiError::ExpiredAuthorization => vec!["Expired Authorization".to_string()],
             ApiError::BadGateway => vec!["Bad Gateway".to_string()],
             ApiError::InternalServerError => vec!["Internal Server Error".to_string()],
+        }
+    }
+}
+
+impl Into<HashSet<String>> for ApiError {
+    fn into(self) -> HashSet<String> {
+        match self {
+            ApiError::BadRequest(errors) => errors.into_iter().collect(),
+            ApiError::Unauthorized => vec!["Unauthorized".to_string()].into_iter().collect(),
+            ApiError::ExpiredAuthorization => vec!["Expired Authorization".to_string()].into_iter().collect(),
+            ApiError::BadGateway => vec!["Bad Gateway".to_string()].into_iter().collect(),
+            ApiError::InternalServerError => vec!["Internal Server Error".to_string()].into_iter().collect(),
         }
     }
 }

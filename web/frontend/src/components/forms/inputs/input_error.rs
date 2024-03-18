@@ -2,6 +2,7 @@
 
 use gloo::timers::callback::Timeout;
 use yew::prelude::*;
+use std::collections::HashSet;
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct InputErrorProp {
@@ -71,5 +72,26 @@ impl Component for InputError {
                 </button>
             </li>
         }
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct InputErrorsProp {
+    pub errors: HashSet<String>,
+    pub on_delete: Callback<String>,
+}
+
+#[function_component(InputErrors)]
+pub fn input_errors(props: &InputErrorsProp) -> Html {
+    if props.errors.is_empty() {
+        return html! { <></> };
+    }
+
+    html! {
+        <ul class="input-errors">
+            { for props.errors.iter().map(|error| html! {
+                <InputError error={error.clone()} on_delete={props.on_delete.clone()} />
+            })}
+        </ul>
     }
 }
