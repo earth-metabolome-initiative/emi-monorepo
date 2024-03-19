@@ -66,7 +66,7 @@ form.standard-form {
                     background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
                     background-size: 15px 1px, 15px 1px, 1px 15px, 1px 15px;
                     background-position: top left, bottom left, top left, top right;
-                    animation: border-dance 10s infinite linear;
+                    animation: pop-in 0.2s, border-dance 10s infinite linear;
 
                     i,
                     p {
@@ -77,7 +77,7 @@ form.standard-form {
                         font-size: 2em;
                         // When the user hovers the drop area, we make the icon
                         // make small jumps in loop, with delay between each jump
-                        animation: small-jump 1.5s infinite;
+                        animation: fade-in-up 0.3s, small-jump 1.5s infinite;
                     }
                 }
             }
