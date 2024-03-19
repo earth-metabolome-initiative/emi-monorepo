@@ -1,19 +1,17 @@
 //! Submodule providing the file input component for the frontend.
 
 use std::collections::HashSet;
-use std::hash::Hasher;
 use std::hash::DefaultHasher;
 use std::hash::Hash;
+use std::hash::Hasher;
 
 use super::InputErrors;
 use crate::workers::WebsocketWorker;
 use gloo::timers::callback::Timeout;
-use validator::Validate;
 use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
 use wasm_bindgen::JsValue;
 use web_common::api::ws::messages::*;
-use web_common::custom_validators::validation_errors::ValidationErrorToString;
 use yew::prelude::*;
 use yew_agent::prelude::WorkerBridgeHandle;
 use yew_agent::scope_ext::AgentScopeExt;
@@ -117,7 +115,14 @@ impl Component for FileInput {
 
                 for i in 0..number_of_files {
                     let file = files.get(i).unwrap();
-                    self.files.push(file);
+
+                    if !self.files.iter().any(|f| {
+                        f.name() == file.name()
+                            && f.size() == file.size()
+                            && f.last_modified() == file.last_modified()
+                    }) {
+                        self.files.push(file);
+                    }
                 }
 
                 ctx.link()
@@ -359,6 +364,12 @@ pub struct FilePreviewProp {
     pub hiding: bool,
 }
 
+impl FilePreviewProp {
+    pub fn number_of_files(&self) -> usize {
+        self.files.len()
+    }
+}
+
 #[function_component(FilePreview)]
 /// A component to display a preview of the files that have been selected.
 ///
@@ -401,10 +412,18 @@ pub fn file_preview(props: &FilePreviewProp) -> Html {
         };
     }
 
-    let class = format!(
+    let mut class = format!(
         "file-preview-list {}",
         if props.hiding { "hiding" } else { "" }
     );
+
+    if props.number_of_files() == 2 {
+        class += " two-files";
+    }
+
+    if props.number_of_files() == 3 {
+        class += " three-files";
+    }
 
     html! {
         <ul class={class}>
@@ -452,6 +471,10 @@ impl FilePreviewItemProp {
         self.file.type_().starts_with("image")
     }
 
+    pub fn is_pdf(&self) -> bool {
+        self.file.type_().starts_with("application/pdf")
+    }
+
     pub fn last_modified(&self) -> u64 {
         self.file.last_modified() as u64
     }
@@ -469,9 +492,9 @@ impl FilePreviewItemProp {
         if size < 1024 {
             format!("{} B", size)
         } else if size < 1024 * 1024 {
-            format!("{:.2} KB", size as f64 / 1024.0)
+            format!("{:.0} KB", size as f64 / 1024.0)
         } else if size < 1024 * 1024 * 1024 {
-            format!("{:.2} MB", size as f64 / (1024.0 * 1024.0))
+            format!("{:.0} MB", size as f64 / (1024.0 * 1024.0))
         } else {
             format!("{:.2} GB", size as f64 / (1024.0 * 1024.0 * 1024.0))
         }
@@ -533,7 +556,35 @@ impl Component for ImagePreview {
         let url = format!("{}#{}", url, hash);
 
         html! {
-            <div class="image-preview" style={format!("background-image: url({})", url)}></div>
+            <img src={url} class="preview" />
+        }
+    }
+}
+
+pub struct PDFPreview {}
+
+impl Component for PDFPreview {
+    type Message = ();
+    type Properties = FilePreviewItemProp;
+
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {}
+    }
+
+    fn update(&mut self, _ctx: &Context<Self>, _msg: Self::Message) -> bool {
+        false
+    }
+
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let file = ctx.props().file.clone();
+        let url = web_sys::Url::create_object_url_with_blob(&file).unwrap();
+
+        let hash = ctx.props().metadata_hash();
+
+        let url = format!("{}#{}", url, hash);
+
+        html! {
+            <iframe src={url} class="preview"></iframe>
         }
     }
 }
@@ -657,6 +708,8 @@ pub fn file_preview_item(props: &FilePreviewItemProp) -> Html {
     let thumbnail: Html = {
         if props.is_image() {
             html! { <ImagePreview file={props.file.clone()} large={props.large} /> }
+        } else if props.is_pdf() {
+            html! { <PDFPreview file={props.file.clone()} large={props.large} /> }
         } else {
             html! { <TextualFilePreview file_props={props.clone()} /> }
         }
@@ -675,7 +728,7 @@ pub fn file_preview_item(props: &FilePreviewItemProp) -> Html {
         <>
             {thumbnail}
             <button class="delete" onclick={on_click}><i class="fas fa-times"></i></button>
-            <p class="metadata">{format!("{}, edited last {}", props.human_readable_size(), props.human_readable_modified_delta())}</p>
+            <p class="metadata">{format!("{}, from {}", props.human_readable_size(), props.human_readable_modified_delta())}</p>
         </>
     };
 

@@ -55,6 +55,7 @@ pub fn name_form() -> Html {
         html! {
             <BasicForm<Name> action={FormAction::UpdateName} current={name}>
                 <FileInput label="Profile picture" />
+                <FileInput label="Gallery" multiple={true} />
                 <BasicInput<ValidatedNameField> label="First name" value={first_name} input_type="text" />
                 <BasicInput<ValidatedNameField> label="Middle name" value={middle_name} optional={true} input_type="text" />
                 <BasicInput<ValidatedNameField> label="Last name" value={last_name} input_type="text" />
