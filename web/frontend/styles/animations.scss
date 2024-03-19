@@ -1,0 +1,171 @@
+
+@keyframes pop-in {
+    0% {
+        transform: scale(0.9);
+        opacity: 0;
+        margin: 0;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+        margin: auto;
+    }
+}
+
+@keyframes pop-out {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+        margin: auto;
+    }
+
+    100% {
+        transform: scale(0.9);
+        opacity: 0;
+        margin: 0;
+    }
+}
+
+@keyframes small-shake {
+    0% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-2px);
+    }
+
+    50% {
+        transform: translateX(2px);
+    }
+
+    75% {
+        transform: translateX(-2px);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}
+
+$anim-duration: 5; // in seconds
+$anim-speed: 0.65; // in seconds
+
+@keyframes shine-in {
+    0% {
+        left: -100%;
+        transition-property: left;
+    }
+
+    #{calc($anim-speed / ($anim-duration + $anim-speed) * 100%)},
+    100% {
+        left: 100%;
+        transition-property: left;
+    }
+}
+
+@keyframes shine-out {
+    0% {
+        left: 100%;
+        transition-property: left;
+    }
+
+    #{calc($anim-speed / ($anim-duration + $anim-speed) * 100%)},
+    100% {
+        left: -100%;
+        transition-property: left;
+    }
+}
+
+@keyframes slide-in-from-bottom {
+    0% {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slide-in-from-right {
+    0% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fade-in-left {
+    0% {
+        transform: translateX(-50px);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fade-in-right {
+    0% {
+        transform: translateX(50px);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fade-in-up {
+    0% {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes small-jump {
+    0% {
+        transform: translateY(0);
+    }
+
+    25% {
+        transform: translateY(-5px);
+    }
+
+    50% {
+        transform: translateY(0);
+    }
+
+    75% {
+        transform: translateY(-5px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
+
+@keyframes border-dance {
+    0% {
+      background-position: top left, bottom right, bottom left, top right;
+    }
+    100% {
+      background-position: top right, bottom left, top left, bottom right;
+    }
+  }
+  
