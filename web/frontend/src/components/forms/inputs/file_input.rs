@@ -1,12 +1,17 @@
 //! Submodule providing the file input component for the frontend.
 
 use std::collections::HashSet;
+use std::hash::Hasher;
+use std::hash::DefaultHasher;
+use std::hash::Hash;
 
 use super::InputErrors;
 use crate::workers::WebsocketWorker;
 use gloo::timers::callback::Timeout;
 use validator::Validate;
+use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
+use wasm_bindgen::JsValue;
 use web_common::api::ws::messages::*;
 use web_common::custom_validators::validation_errors::ValidationErrorToString;
 use yew::prelude::*;
@@ -34,6 +39,9 @@ pub struct FileInput {
     is_valid: Option<bool>,
     validation_timeout: Option<Timeout>,
     files: Vec<web_sys::File>,
+    show_drop_area: bool,
+    show_drop_area_timeout: Option<Timeout>,
+    hide_drop_area_timeout: Option<Timeout>,
 }
 
 pub enum InputMessage {
@@ -46,6 +54,8 @@ pub enum InputMessage {
     // Loaded(String, String, Vec<u8>),
     Files(web_sys::FileList),
     FilesRemoved(usize),
+    SetTimeoutDropAreaVisibility(bool),
+    SetDropAreaVisibility(bool),
 }
 
 impl Component for FileInput {
@@ -64,6 +74,9 @@ impl Component for FileInput {
             is_valid: None,
             validation_timeout: None,
             files: Vec::new(),
+            show_drop_area: true,
+            show_drop_area_timeout: None,
+            hide_drop_area_timeout: None,
         }
     }
 
@@ -86,6 +99,10 @@ impl Component for FileInput {
                 changes
             }
             InputMessage::Files(files) => {
+                if files.length() == 0 {
+                    return false;
+                }
+
                 // If the properties require the file to be singular, we only keep the first file
                 // and replace eventual previous files.
                 if !ctx.props().multiple {
@@ -102,6 +119,11 @@ impl Component for FileInput {
                     let file = files.get(i).unwrap();
                     self.files.push(file);
                 }
+
+                ctx.link()
+                    .send_message(InputMessage::SetTimeoutDropAreaVisibility(
+                        self.files.is_empty(),
+                    ));
 
                 files.length() > 0
             }
@@ -129,8 +151,6 @@ impl Component for FileInput {
                     return true;
                 }
 
-                let data = data.unwrap();
-
                 if self.is_valid != Some(true) {
                     self.is_valid = Some(true);
                     change = true;
@@ -154,7 +174,51 @@ impl Component for FileInput {
             }
             InputMessage::FilesRemoved(index) => {
                 self.files.remove(index);
+                ctx.link()
+                    .send_message(InputMessage::SetTimeoutDropAreaVisibility(
+                        self.files.is_empty(),
+                    ));
                 true
+            }
+            InputMessage::SetDropAreaVisibility(visibility) => {
+                if let Some(timeout) = self.hide_drop_area_timeout.take() {
+                    timeout.cancel();
+                }
+                if let Some(timeout) = self.show_drop_area_timeout.take() {
+                    timeout.cancel();
+                }
+                if self.show_drop_area != visibility {
+                    self.show_drop_area = visibility;
+                    true
+                } else {
+                    false
+                }
+            }
+            InputMessage::SetTimeoutDropAreaVisibility(visibility) => {
+                if let Some(timeout) = self.hide_drop_area_timeout.take() {
+                    timeout.cancel();
+                }
+                if let Some(timeout) = self.show_drop_area_timeout.take() {
+                    timeout.cancel();
+                }
+                let link = ctx.link().clone();
+
+                // If the target visibility is already the current visibility, we do not need to
+                // do anything.
+                if visibility == self.show_drop_area {
+                    return false;
+                }
+
+                if visibility {
+                    self.show_drop_area_timeout = Some(Timeout::new(200, move || {
+                        link.send_message(InputMessage::SetDropAreaVisibility(true));
+                    }));
+                } else {
+                    self.hide_drop_area_timeout = Some(Timeout::new(200, move || {
+                        link.send_message(InputMessage::SetDropAreaVisibility(false));
+                    }));
+                }
+                false
             }
         }
     }
@@ -228,8 +292,32 @@ impl Component for FileInput {
             })
         };
 
+        let no_files = self.files.is_empty();
+
+        let ondragover = {
+            let link = ctx.link().clone();
+            Callback::from(move |event: DragEvent| {
+                event.prevent_default();
+                link.send_message(InputMessage::SetTimeoutDropAreaVisibility(true));
+            })
+        };
+
+        let ondragleave = {
+            let link = ctx.link().clone();
+            Callback::from(move |event: DragEvent| {
+                event.prevent_default();
+                link.send_message(InputMessage::SetTimeoutDropAreaVisibility(no_files));
+            })
+        };
+
+        let droparea_classes = if self.hide_drop_area_timeout.is_some() {
+            "droparea hiding"
+        } else {
+            "droparea"
+        };
+
         html! {
-            <div class={classes} onclick={on_click} ondrop={on_drop} ondragover={|event: DragEvent| event.prevent_default()}>
+            <div class={classes} onclick={on_click} ondrop={on_drop} ondragover={ondragover} ondragleave={ondragleave}>
                 <label for={props.label()}>{format!("{}:", props.label())}</label>
                 <input
                     type="file"
@@ -241,8 +329,22 @@ impl Component for FileInput {
                     oninput={on_input}
                     // onblur={on_blur}
                 />
-                <p>{"Drag & Drop files here or click to select"}</p>
-                <FilePreview files={self.files.clone()} on_delete={on_file_delete} />
+                {if self.show_drop_area {
+                    html! {
+                        <div class={droparea_classes}>
+                            <div class="droparea-icon"><i class="fas fa-file-upload"></i></div>
+                            <p>{"Drag & Drop files here or click to select"}</p>
+                        </div>
+                    }
+                } else {
+                    html! {
+                        <FilePreview
+                            hiding={self.show_drop_area_timeout.is_some()}
+                            files={self.files.clone()}
+                            on_delete={on_file_delete}
+                        />
+                    }
+                }}
                 <InputErrors errors={self.errors.clone()} on_delete={on_delete} />
             </div>
         }
@@ -253,6 +355,8 @@ impl Component for FileInput {
 pub struct FilePreviewProp {
     pub files: Vec<web_sys::File>,
     pub on_delete: Callback<usize>,
+    #[prop_or_default]
+    pub hiding: bool,
 }
 
 #[function_component(FilePreview)]
@@ -276,26 +380,46 @@ pub fn file_preview(props: &FilePreviewProp) -> Html {
     }
 
     if props.files.len() == 1 {
-        let props = props.clone();
-        let on_delete = Callback::from(move |_| {
-            props.on_delete.emit(0);
-        });
+        let on_delete = {
+            let props = props.clone();
+            Callback::from(move |_| {
+                let props = props.clone();
+                let timeout = Timeout::new(200, move || {
+                    props.on_delete.emit(0);
+                });
+                timeout.forget();
+            })
+        };
 
         return html! {
-            <LargeFilePreviewItem file={props.files[0].clone()} on_delete={on_delete} />
+            <FilePreviewItem
+                hiding={props.hiding}
+                large={true}
+                file={props.files[0].clone()}
+                on_delete={on_delete}
+            />
         };
     }
 
+    let class = format!(
+        "file-preview-list {}",
+        if props.hiding { "hiding" } else { "" }
+    );
+
     html! {
-        <ul class="file-preview">
+        <ul class={class}>
             { for props.files.iter().enumerate().map(|(i, file)|{
                 let props = props.clone();
                 let on_delete = Callback::from(move |_| {
-                    props.on_delete.emit(i);
+                    let props = props.clone();
+                    let timeout = Timeout::new(200, move || {
+                        props.on_delete.emit(i);
+                    });
+                    timeout.forget();
                 });
 
                 html! {
-                <FilePreviewItem file={file.clone()} on_delete={on_delete} />
+                <FilePreviewItem large={false} file={file.clone()} on_delete={on_delete} />
             }})}
         </ul>
     }
@@ -304,130 +428,268 @@ pub fn file_preview(props: &FilePreviewProp) -> Html {
 #[derive(Clone, PartialEq, Properties)]
 pub struct FilePreviewItemProp {
     pub file: web_sys::File,
+    #[prop_or_default]
     pub on_delete: Callback<()>,
+    pub large: bool,
+    #[prop_or_default]
+    pub hiding: bool,
 }
 
-const DEFAULT_PREVIEW_LINES: usize = 5;
-
-pub fn read_text_preview(file: &web_sys::File) -> Option<String> {
-    let reader = web_sys::FileReader::new().unwrap();
-    reader.read_as_text(&file).ok()?;
-    let result = reader.result().ok()?;
-    let text = result.as_string().unwrap();
-
-    Some(get_first_lines(&text))
-}
-
-fn get_first_lines(text: &str) -> String {
-    let mut preview = String::new();
-    let lines = text.lines().take(DEFAULT_PREVIEW_LINES);
-    for line in lines {
-        preview.push_str(line);
-        preview.push('\n');
+impl FilePreviewItemProp {
+    pub fn name(&self) -> String {
+        self.file.name()
     }
-    preview.trim().to_string()
+
+    pub fn extension(&self) -> Option<String> {
+        self.file.name().split('.').last().map(|s| s.to_string())
+    }
+
+    pub fn size(&self) -> u64 {
+        self.file.size() as u64
+    }
+
+    pub fn is_image(&self) -> bool {
+        self.file.type_().starts_with("image")
+    }
+
+    pub fn last_modified(&self) -> u64 {
+        self.file.last_modified() as u64
+    }
+
+    pub fn metadata_hash(&self) -> u64 {
+        let mut hasher = DefaultHasher::new();
+        self.file.name().hash(&mut hasher);
+        self.size().hash(&mut hasher);
+        self.last_modified().hash(&mut hasher);
+        hasher.finish()
+    }
+
+    pub fn human_readable_size(&self) -> String {
+        let size = self.size();
+        if size < 1024 {
+            format!("{} B", size)
+        } else if size < 1024 * 1024 {
+            format!("{:.2} KB", size as f64 / 1024.0)
+        } else if size < 1024 * 1024 * 1024 {
+            format!("{:.2} MB", size as f64 / (1024.0 * 1024.0))
+        } else {
+            format!("{:.2} GB", size as f64 / (1024.0 * 1024.0 * 1024.0))
+        }
+    }
+
+    pub fn last_modified_date(&self) -> String {
+        let date = self.file.last_modified();
+        let date = js_sys::Date::new(&JsValue::from_f64(date));
+        let date = date.to_locale_string("en-US", &JsValue::undefined());
+        date.as_string().unwrap()
+    }
+
+    /// Returns a human-readable string representing the time elapsed since the file was last modified.
+    pub fn human_readable_modified_delta(&self) -> String {
+        let date = self.file.last_modified();
+        let date = js_sys::Date::new(&JsValue::from_f64(date));
+        let now = js_sys::Date::new_0();
+        let delta = now.get_time() - date.get_time();
+        let delta = (delta as f64 / 1000.0) as u64;
+        if delta < 60 {
+            format!("{} seconds ago", delta)
+        } else if delta < 60 * 60 {
+            format!("{} minutes ago", delta / 60)
+        } else if delta < 60 * 60 * 24 {
+            format!("{} hours ago", delta / (60 * 60))
+        } else if delta < 60 * 60 * 24 * 30 {
+            format!("{} days ago", delta / (60 * 60 * 24))
+        } else if delta < 60 * 60 * 24 * 30 * 12 {
+            format!("{} months ago", delta / (60 * 60 * 24 * 30))
+        } else {
+            format!("{} years ago", delta / (60 * 60 * 24 * 30 * 12))
+        }
+    }
 }
 
-#[function_component(LargeFilePreviewItem)]
-/// A component to display a preview of a single file.
-pub fn large_file_preview_item(props: &FilePreviewItemProp) -> Html {
-    let file = props.file.clone();
-    let name = file.name();
-    let size = file.size();
-    let last_modified = file.last_modified();
-    let on_delete = props.on_delete.clone();
+pub struct ImagePreview {}
 
-    let on_click = {
-        Callback::from(move |click: MouseEvent| {
-            click.stop_immediate_propagation();
-            click.prevent_default();
-            on_delete.emit(());
-        })
-    };
+impl Component for ImagePreview {
+    type Message = ();
+    type Properties = FilePreviewItemProp;
 
-    // Depending on whether the file is an image or a text file, we
-    // wither display the image or the first few lines of the file as
-    // a background.
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {}
+    }
 
-    let background: Html = {
-        let file_type = file.type_();
-        if file_type.starts_with("image") {
-            let url = web_sys::Url::create_object_url_with_blob(&file).unwrap();
-            let image_url = format!("url({})", url);
-            html! {
-                <div class="file-preview-item-background" style={format!("background-image: {}", image_url)}></div>
-            }
-        } else if file_type.starts_with("text") {
-            let text = match read_text_preview(&file) {
-                Some(preview) => preview,
-                None => "none".to_string(),
-            };
-            html! {
-                <div class="file-preview-item-background">
-                    <p>{text}</p>
-                </div>
-            }
-        } else {
-            html! { <div class="file-preview-item-background"></div> }
+    fn update(&mut self, _ctx: &Context<Self>, _msg: Self::Message) -> bool {
+        false
+    }
+
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let file = ctx.props().file.clone();
+        let url = web_sys::Url::create_object_url_with_blob(&file).unwrap();
+
+        // We add an hash obtained from the file name and the associated informations, such
+        // as the file size and the last modified date, to the URL to make sure that the URL
+        // changes when the file changes, so that the image is reloaded when the file changes.
+
+        let hash = ctx.props().metadata_hash();
+        let url = format!("{}#{}", url, hash);
+
+        html! {
+            <div class="image-preview" style={format!("background-image: url({})", url)}></div>
         }
-    };
+    }
+}
 
-    html! {
-        <div class="file-preview-item large">
-            <div class="file-preview-item-header">
-                {background}
-                <p>{name}</p>
-                <button onclick={on_click}><i class="fas fa-times"></i></button>
+pub struct TextualFilePreview {
+    text: String,
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct TextualFilePreviewProps {
+    pub file_props: FilePreviewItemProp,
+    #[prop_or(20)]
+    pub number_of_lines: usize,
+}
+
+pub enum TextualFilePreviewMessage {
+    Load(String),
+}
+
+impl Component for TextualFilePreview {
+    type Message = TextualFilePreviewMessage;
+    type Properties = TextualFilePreviewProps;
+
+    fn create(ctx: &Context<Self>) -> Self {
+        let file = ctx.props().file_props.file.clone();
+        let reader = web_sys::FileReader::new().unwrap();
+        let link = ctx.link().clone();
+        // We read the first few lines of the file to display a preview of the file.
+
+        const CHUNK_SIZE: usize = 1024; // Adjust the chunk size as needed
+
+        let number_of_lines = ctx.props().number_of_lines;
+
+        let on_load = Closure::wrap(Box::new(move |event: web_sys::ProgressEvent| {
+            let mut lines_read = 0;
+            let mut text = String::new();
+            let reader = event
+                .target()
+                .unwrap()
+                .dyn_into::<web_sys::FileReader>()
+                .unwrap();
+            let result = reader.result().unwrap();
+            let data = js_sys::Uint8Array::new(&result);
+
+            let mut chunk = Vec::with_capacity(CHUNK_SIZE);
+            for i in 0..data.length() {
+                chunk.push(data.get_index(i));
+                if chunk.len() >= CHUNK_SIZE {
+                    let chunk_text = String::from_utf8_lossy(&chunk);
+
+                    for line in chunk_text.lines() {
+                        text.push_str(line);
+                        text.push('\n');
+                        lines_read += 1;
+                        if lines_read >= number_of_lines {
+                            break;
+                        }
+                    }
+
+                    if lines_read >= number_of_lines {
+                        break;
+                    }
+
+                    chunk.clear();
+                }
+            }
+
+            if lines_read < number_of_lines {
+                let remaining_chunk_text = String::from_utf8_lossy(&chunk);
+                text.push_str(&remaining_chunk_text);
+                lines_read += remaining_chunk_text.lines().count();
+            }
+
+            link.send_message(TextualFilePreviewMessage::Load(text));
+        }) as Box<dyn FnMut(_)>);
+
+        reader.set_onload(Some(on_load.as_ref().unchecked_ref()));
+        on_load.forget();
+
+        reader.read_as_array_buffer(&file).unwrap();
+
+        Self {
+            text: String::new(),
+        }
+    }
+
+    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
+        match msg {
+            TextualFilePreviewMessage::Load(text) => {
+                self.text = text;
+                true
+            }
+        }
+    }
+
+    fn view(&self, _ctx: &Context<Self>) -> Html {
+        html! {
+            <div class="file-preview-item-thumbnail">
+                <p>{&self.text}</p>
             </div>
-            <div class="file-preview-item-body">
-                <p>{format!("Size: {}", size)}</p>
-                <p>{format!("Last modified: {}", last_modified)}</p>
-            </div>
-        </div>
+        }
     }
 }
 
 #[function_component(FilePreviewItem)]
 /// A component to display a preview of a single file of a list of files.
 pub fn file_preview_item(props: &FilePreviewItemProp) -> Html {
-    let file = props.file.clone();
-    let name = file.name();
-    let size = file.size();
-    let last_modified = file.last_modified();
     let on_delete = props.on_delete.clone();
+    let hiding = use_state(|| false);
 
     let on_click = {
+        let hiding = hiding.clone();
         Callback::from(move |click: MouseEvent| {
             click.stop_immediate_propagation();
             click.prevent_default();
+            hiding.set(true);
             on_delete.emit(());
         })
     };
 
     let thumbnail: Html = {
-        let file_type = file.type_();
-        if file_type.starts_with("image") {
-            let url = web_sys::Url::create_object_url_with_blob(&file).unwrap();
-            let image_url = format!("url({})", url);
-            html! {
-                <div class="file-preview-item-thumbnail" style={format!("background-image: {}", image_url)}></div>
-            }
+        if props.is_image() {
+            html! { <ImagePreview file={props.file.clone()} large={props.large} /> }
         } else {
-            html! { <div class="file-preview-item-thumbnail"></div> }
+            html! { <TextualFilePreview file_props={props.clone()} /> }
         }
     };
 
-    html! {
-        <li class="file-preview-item">
-            <div class="file-preview-item-header">
-                {thumbnail}
-                <p>{name}</p>
-                <button onclick={on_click}><i class="fas fa-times"></i></button>
+    let class = format!(
+        "file-preview-item{}",
+        if props.hiding || *hiding {
+            " hiding"
+        } else {
+            ""
+        }
+    );
+
+    let wrapped = html! {
+        <>
+            {thumbnail}
+            <button class="delete" onclick={on_click}><i class="fas fa-times"></i></button>
+            <p class="metadata">{format!("{}, edited last {}", props.human_readable_size(), props.human_readable_modified_delta())}</p>
+        </>
+    };
+
+    if props.large {
+        html! {
+            <div class={class}>
+                {wrapped}
             </div>
-            <div class="file-preview-item-body">
-                <p>{format!("Size: {}", size)}</p>
-                <p>{format!("Last modified: {}", last_modified)}</p>
-            </div>
-        </li>
+        }
+    } else {
+        html! {
+            <li class={class}>
+                {wrapped}
+            </li>
+        }
     }
 }
