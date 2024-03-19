@@ -70,8 +70,7 @@ impl Component for MapInput {
 
         let link = ctx.link().clone();
         map.on_mouse_click(Box::new(move |event: leaflet::MouseEvent| {
-            let latlng = event.lat_lng();
-            link.send_message(Msg::MarkerDrag(latlng));
+            link.send_message(Msg::MarkerDrag(event.lat_lng()));
         }));
 
         Self {
@@ -85,7 +84,7 @@ impl Component for MapInput {
         match msg {
             Msg::MarkerDrag(new_pos) => {
                 ctx.props().callback.emit((new_pos.lat(), new_pos.lng()));
-                false
+                true
             }
         }
     }
