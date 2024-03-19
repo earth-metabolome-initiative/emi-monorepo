@@ -13,6 +13,7 @@ use web_sys::{Coordinates, Geolocation, Position, PositionError, PositionOptions
 use yew::prelude::*;
 
 use super::BasicInput;
+use super::MapInput;
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct GPSInputProps {
@@ -131,8 +132,18 @@ pub fn gps_input(props: &GPSInputProps) -> Html {
         error_callback.forget();
     }
 
+    let map_callback = {
+        let latitude = latitude.clone();
+        let longitude = longitude.clone();
+        Callback::from(move |coords: (f64, f64)| {
+            latitude.set(Some(coords.0));
+            longitude.set(Some(coords.1));
+        })
+    };
+
     html! {
         <div class="gps-input">
+            <MapInput latitude={(*latitude).unwrap_or(0.0)} longitude={(*longitude).unwrap_or(0.0)} callback={map_callback}/>
             <BasicInput<Float64>
                 label={format!("{} latitude", &props.label)}
                 value={(*latitude).map(Float64::from)}
