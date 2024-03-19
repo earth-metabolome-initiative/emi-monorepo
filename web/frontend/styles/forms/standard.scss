@@ -82,10 +82,6 @@ form.standard-form {
                 }
             }
 
-            input {
-                display: none;
-            }
-
             ul.file-preview-list {
                 list-style: none;
             }
@@ -199,7 +195,7 @@ form.standard-form {
         min-width: 100px;
     }
 
-    input[type="text"] {
+    input[type="text"], input[type="number"] {
         padding: 0.5em;
         box-sizing: border-box;
         max-width: 100%;
@@ -213,7 +209,11 @@ form.standard-form {
             border-color: $primary;
         }
     }
-    
+
+    input[type="file"] {
+        display: none;
+    }
+
     button[type="submit"] {
         padding: 0.5em;
         border: none;

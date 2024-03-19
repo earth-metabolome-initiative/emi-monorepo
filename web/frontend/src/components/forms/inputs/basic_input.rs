@@ -20,8 +20,12 @@ where
 {
     pub label: String,
     #[prop_or_default]
+    pub placeholder: Option<String>,
+    #[prop_or_default]
     pub value: Option<Data>,
     pub input_type: String,
+    #[prop_or_default]
+    pub step: Option<f64>,
     #[prop_or(false)]
     pub optional: bool,
 }
@@ -277,6 +281,8 @@ where
                     class="input-control"
                     name={props.label().to_lowercase().replace(" ", "_")}
                     value={input_value}
+                    placeholder={props.placeholder.clone().unwrap_or_else(|| format!("Enter {}", props.label()))}
+                    step={props.step.map_or_else(|| "".to_string(), |step| step.to_string())}
                     oninput={on_input}
                     onblur={on_blur}
                 />

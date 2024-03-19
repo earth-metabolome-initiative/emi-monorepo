@@ -59,7 +59,12 @@ features = [
   'Blob',
   'Url',
   'FileReader',
-  'EventTarget'
+  'EventTarget',
+  'Geolocation',
+  'Coordinates',
+  'Position',
+  'PositionOptions',
+  'PositionError'
 ]
 
 
