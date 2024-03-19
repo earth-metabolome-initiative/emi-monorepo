@@ -8,7 +8,7 @@
 }
 
 // Media query for smaller screens
-@media screen and (max-width: $small-screen) {
+@media screen and (max-width: $small-screen-width) {
     .app {
         padding-left: 0; // Remove padding on small screens
     }

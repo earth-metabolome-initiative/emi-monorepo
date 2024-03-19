@@ -47,7 +47,7 @@ $sidebar-hover-color: #f76a00;
 }
 
 // Media query for smaller screens
-@media screen and (max-width: $small-screen) {
+@media screen and (max-width: $small-screen-width) {
     .sidebar {
         width: 200px; // Adjust width for smaller screens
 

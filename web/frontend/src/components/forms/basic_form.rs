@@ -322,11 +322,14 @@ where
             })
         };
 
-        let classes = if self.errors.is_empty() {
-            "standard-form"
-        } else {
-            "standard-form error"
-        };
+        let classes = format!(
+            "standard-form{}",
+            if self.errors.is_empty() {
+                " error"
+            } else {
+                ""
+            }
+        );
 
         let button_classes = if self.submit_button_disabled {
             ""
@@ -364,6 +367,7 @@ where
                     }}
                     <span>{format!("{} {}", props.crud(), props.title())}</span>
                 </button>
+                <div class="clear"></div>
             </form>
         }
     }

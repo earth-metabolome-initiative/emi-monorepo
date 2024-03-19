@@ -60,7 +60,7 @@ nav {
   }
 }
 
-@media (max-width: $small-screen) {
+@media (max-width: $small-screen-width) {
   nav {
     h1 {
       display: inline-block;

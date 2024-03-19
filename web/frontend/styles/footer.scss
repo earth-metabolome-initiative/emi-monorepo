@@ -11,7 +11,13 @@
     padding-left: $sidebar-width + 10px; // Add padding to the left to account for the sidebar
     margin-left: -$sidebar-width;
 
-    @media screen and (max-width: $small-screen) {
+    @media screen and (max-width: $small-screen-width) {
+        position: relative; // Reset position on small screens
+        margin-left: 0; // Reset margin on small screens
+        padding-left: 10px; // Reset padding on small screens
+    }
+
+    @media screen and (max-height: $small-screen-height) {
         position: relative; // Reset position on small screens
         margin-left: 0; // Reset margin on small screens
         padding-left: 10px; // Reset padding on small screens
@@ -24,7 +30,7 @@
         justify-content: space-between; // Space elements evenly
         align-items: center; // Center items vertically
 
-        @media screen and (max-width: $small-screen) {
+        @media screen and (max-width: $small-screen-width){
             flex-direction: column; // Stack elements vertically on small screens
         }
     }
@@ -50,7 +56,7 @@
             }
         }
 
-        @media screen and (max-width: $small-screen) {
+        @media screen and (max-width: $small-screen-width) {
             margin-bottom: 20px; // Add spacing between sections on small screens
         }
     }

@@ -213,10 +213,9 @@ form.standard-form {
             border-color: $primary;
         }
     }
-
+    
     button[type="submit"] {
         padding: 0.5em;
-        color: white;
         border: none;
         cursor: pointer;
         background-color: transparent;
@@ -225,7 +224,6 @@ form.standard-form {
         float: right;
         font-size: 1em;
         transition: background-color 0.2s, border-color 0.2s, color 0.2s;
-        animation: fade-in-right 0.3s;
 
         position: relative;
         overflow: hidden;
@@ -236,7 +234,7 @@ form.standard-form {
             top: 0;
             width: 100%;
             height: 100%;
-            transition: background 0.2s;
+            transition: background-color 0.2s;
             background: linear-gradient(120deg,
                     transparent,
                     rgba($grey, 0.2),
@@ -351,6 +349,7 @@ form.standard-form {
             position: relative;
             padding-right: 1em;
             animation: pop-in 0.2s;
+            transition: margin 0.2s;
 
             &.hiding {
                 animation: pop-out 0.2s;
