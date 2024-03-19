@@ -12,6 +12,7 @@ use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
 use wasm_bindgen::JsValue;
 use web_common::api::ws::messages::*;
+use web_common::file_formats::GenericFileFormat;
 use yew::prelude::*;
 use yew_agent::prelude::WorkerBridgeHandle;
 use yew_agent::scope_ext::AgentScopeExt;
@@ -23,11 +24,32 @@ pub struct FileInputProp {
     pub optional: bool,
     #[prop_or(false)]
     pub multiple: bool,
+    #[prop_or_default]
+    pub allowed_formats: Vec<GenericFileFormat>,
 }
 
 impl FileInputProp {
     pub fn label(&self) -> String {
         self.label.clone()
+    }
+
+    pub fn human_readable_allowed_formats(&self) -> String {
+        let mut formats = self
+            .allowed_formats
+            .iter()
+            .flat_map(|f| f.extensions())
+            .map(|s| s.to_string())
+            .collect::<Vec<String>>();
+
+        if formats.len() == 1 {
+            formats[0].to_string()
+        } else if formats.len() == 2 {
+            format!("{} and {}", formats[0], formats[1])
+        } else {
+            let last = formats.pop().unwrap();
+            let first = formats.join(", ");
+            format!("{}, and {}", first, last)
+        }
     }
 }
 
@@ -40,6 +62,7 @@ pub struct FileInput {
     show_drop_area: bool,
     show_drop_area_timeout: Option<Timeout>,
     hide_drop_area_timeout: Option<Timeout>,
+    dragging: bool,
 }
 
 pub enum InputMessage {
@@ -54,6 +77,7 @@ pub enum InputMessage {
     FilesRemoved(usize),
     SetTimeoutDropAreaVisibility(bool),
     SetDropAreaVisibility(bool),
+    SetDragging(bool),
 }
 
 impl Component for FileInput {
@@ -61,6 +85,30 @@ impl Component for FileInput {
     type Properties = FileInputProp;
 
     fn create(ctx: &Context<Self>) -> Self {
+        let document = web_sys::window().unwrap().document().unwrap();
+
+        let link = ctx.link().clone();
+        let closure = Closure::wrap(Box::new(move |event: web_sys::Event| {
+            // Handle the dragover event here
+            // For example, prevent the default behavior to allow dropping elements
+            event.prevent_default();
+            link.send_message(InputMessage::SetDragging(true));
+        }) as Box<dyn FnMut(_)>);
+        document.add_event_listener_with_callback("dragover", closure.as_ref().unchecked_ref()).unwrap();
+        closure.forget(); // Prevent the closure from being dropped immediately
+
+        let link = ctx.link().clone();
+        let closure = Closure::wrap(Box::new(move |event: web_sys::Event| {
+            // Handle the dragend event here
+            // For example, prevent the default behavior to allow dropping elements
+            event.prevent_default();
+            link.send_message(InputMessage::SetDragging(false));
+        }) as Box<dyn FnMut(_)>);
+        document.add_event_listener_with_callback("dragend", closure.as_ref().unchecked_ref()).unwrap();
+        document.add_event_listener_with_callback("dragleave", closure.as_ref().unchecked_ref()).unwrap();
+        document.add_event_listener_with_callback("drop", closure.as_ref().unchecked_ref()).unwrap();
+        closure.forget(); // Prevent the closure from being dropped immediately
+
         Self {
             _websocket: ctx.link().bridge_worker(Callback::from({
                 let link = ctx.link().clone();
@@ -75,12 +123,21 @@ impl Component for FileInput {
             show_drop_area: true,
             show_drop_area_timeout: None,
             hide_drop_area_timeout: None,
+            dragging: false,
         }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             InputMessage::Backend(_bm) => false,
+            InputMessage::SetDragging(dragging) => {
+                if self.dragging != dragging {
+                    self.dragging = dragging;
+                    true
+                } else {
+                    false
+                }
+            }
             InputMessage::RemoveErrors => {
                 let mut changes = false;
 
@@ -101,6 +158,13 @@ impl Component for FileInput {
                     return false;
                 }
 
+                let mut changes = false;
+
+                if !self.errors.is_empty() {
+                    self.errors.clear();
+                    changes = true;
+                }
+
                 // If the properties require the file to be singular, we only keep the first file
                 // and replace eventual previous files.
                 if !ctx.props().multiple {
@@ -113,8 +177,33 @@ impl Component for FileInput {
                     files.length().min(1)
                 };
 
+                let allowed_formats = &ctx.props().allowed_formats;
+
                 for i in 0..number_of_files {
                     let file = files.get(i).unwrap();
+
+                    if !allowed_formats.is_empty() {
+                        match GenericFileFormat::try_from_mime(&file.type_()) {
+                            Ok(format) => {
+                                if !allowed_formats.iter().any(|f| f == &format) {
+                                    self.errors.insert(format!(
+                                        concat!(
+                                            "The file {} is not of an allowed format. ",
+                                            "The allowed formats are: {}."
+                                        ),
+                                        file.type_(),
+                                        ctx.props().human_readable_allowed_formats()
+                                    ));
+                                    continue;
+                                }
+                            }
+                            Err(error) => {
+                                let errors: Vec<String> = error.into();
+                                self.errors.extend(errors.iter().cloned());
+                                continue;
+                            }
+                        }
+                    }
 
                     if !self.files.iter().any(|f| {
                         f.name() == file.name()
@@ -130,7 +219,7 @@ impl Component for FileInput {
                         self.files.is_empty(),
                     ));
 
-                files.length() > 0
+                changes || files.length() > 0
             }
             InputMessage::RemoveError(error) => {
                 self.errors.remove(&error);
@@ -315,14 +404,22 @@ impl Component for FileInput {
             })
         };
 
-        let droparea_classes = if self.hide_drop_area_timeout.is_some() {
-            "droparea hiding"
-        } else {
-            "droparea"
-        };
+        let droparea_classes = format!(
+            "droparea{}{}",
+            if self.dragging {
+                " dragging"
+            } else {
+                ""
+            },
+            if self.hide_drop_area_timeout.is_some() {
+                " hiding"
+            } else {
+                ""
+            }
+        );
 
         html! {
-            <div class={classes} onclick={on_click} ondrop={on_drop} ondragover={ondragover} ondragleave={ondragleave}>
+            <div class={classes} onclick={on_click} ondrop={on_drop} ondragover={ondragover} ondragleave={ondragleave.clone()} ondragend={ondragleave}>
                 <label for={props.label()}>{format!("{}:", props.label())}</label>
                 <input
                     type="file"
@@ -455,8 +552,12 @@ pub struct FilePreviewItemProp {
 }
 
 impl FilePreviewItemProp {
-    pub fn name(&self) -> String {
+    pub fn path(&self) -> String {
         self.file.name()
+    }
+
+    pub fn name(&self) -> String {
+        self.file.name().split('/').last().unwrap().to_string()
     }
 
     pub fn extension(&self) -> Option<String> {
@@ -728,21 +829,28 @@ pub fn file_preview_item(props: &FilePreviewItemProp) -> Html {
         <>
             {thumbnail}
             <button class="delete" onclick={on_click}><i class="fas fa-times"></i></button>
-            <p class="metadata">{format!("{}, from {}", props.human_readable_size(), props.human_readable_modified_delta())}</p>
+            <p class="metadata">{format!("{}, {}, from {}", props.name(), props.human_readable_size(), props.human_readable_modified_delta())}</p>
         </>
     };
 
     if props.large {
         html! {
-            <div class={class}>
+            <div class={class} title={props.path()}>
                 {wrapped}
             </div>
         }
     } else {
         html! {
-            <li class={class}>
+            <li class={class} title={props.path()}>
                 {wrapped}
             </li>
         }
+    }
+}
+
+#[function_component(ImageInput)]
+pub fn image_input(props: &FileInputProp) -> Html {
+    html! {
+        <FileInput label={props.label.clone()} optional={props.optional} multiple={props.multiple} allowed_formats={vec![GenericFileFormat::Image]} />
     }
 }

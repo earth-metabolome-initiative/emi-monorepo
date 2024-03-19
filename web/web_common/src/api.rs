@@ -19,6 +19,7 @@ pub enum ApiError {
     BadGateway,
     BadRequest(Vec<String>),
     InternalServerError,
+    InvalidFileFormat(String),
 }
 
 impl ApiError {
@@ -32,6 +33,13 @@ impl ApiError {
 
     pub fn bad_gateway() -> Self {
         Self::BadGateway
+    }
+
+    pub fn invalid_file_format<S>(format: S) -> Self
+    where
+        S: Into<String>,
+    {
+        Self::InvalidFileFormat(format.into())
     }
 }
 
@@ -76,18 +84,14 @@ impl Into<Vec<String>> for ApiError {
             ApiError::ExpiredAuthorization => vec!["Expired Authorization".to_string()],
             ApiError::BadGateway => vec!["Bad Gateway".to_string()],
             ApiError::InternalServerError => vec!["Internal Server Error".to_string()],
+            ApiError::InvalidFileFormat(format) => vec![format!("Invalid file format: {}", format)],
         }
     }
 }
 
 impl Into<HashSet<String>> for ApiError {
     fn into(self) -> HashSet<String> {
-        match self {
-            ApiError::BadRequest(errors) => errors.into_iter().collect(),
-            ApiError::Unauthorized => vec!["Unauthorized".to_string()].into_iter().collect(),
-            ApiError::ExpiredAuthorization => vec!["Expired Authorization".to_string()].into_iter().collect(),
-            ApiError::BadGateway => vec!["Bad Gateway".to_string()].into_iter().collect(),
-            ApiError::InternalServerError => vec!["Internal Server Error".to_string()].into_iter().collect(),
-        }
+        let vector: Vec<String> = self.into();
+        vector.into_iter().collect()
     }
 }

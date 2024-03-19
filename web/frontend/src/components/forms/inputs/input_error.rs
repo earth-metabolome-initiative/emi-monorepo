@@ -67,6 +67,7 @@ impl Component for InputError {
                 <p>{&props.error}</p>
                 <button onclick={ctx.link().callback(|event: MouseEvent| {
                     event.prevent_default();
+                    event.stop_propagation();
                     InputErrorMessage::StartHide})}>
                     <i class="fas fa-times"></i>
                 </button>

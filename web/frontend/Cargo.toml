@@ -58,7 +58,8 @@ features = [
   'DataTransfer',
   'Blob',
   'Url',
-  'FileReader'
+  'FileReader',
+  'EventTarget'
 ]
 
 

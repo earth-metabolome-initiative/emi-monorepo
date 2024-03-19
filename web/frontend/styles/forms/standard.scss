@@ -1,5 +1,6 @@
 form.standard-form {
     border-radius: 0.5em;
+    animation: slide-in-from-bottom 0.3s;
 
     h4 {
         padding-bottom: 0.25em;
@@ -39,59 +40,50 @@ form.standard-form {
                 margin-top: 0.5em;
                 min-height: 100px;
                 border-radius: 0.5em;
-                transition: border-color 0.2s ease-in-out;
-                border: 1px dashed $grey;
+                transition: background-color 0.3s;
                 cursor: pointer;
                 animation: pop-in 0.2s;
-
-                &.drag-over {
-                    border-color: $primary;
-                }
+                background: linear-gradient(90deg, rgba($grey, 0.8) 50%, transparent 50%), linear-gradient(90deg, rgba($grey, 0.8) 50%, transparent 50%), linear-gradient(0deg, rgba($grey, 0.8) 50%, transparent 50%), linear-gradient(0deg, rgba($grey, 0.8) 50%, transparent 50%);
+                background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+                background-size: 15px 1px, 15px 1px, 1px 15px, 1px 15px;
+                background-position: top left, bottom left, top left, top right;
 
                 &.hiding {
                     animation: pop-out 0.2s;
                 }
 
-                p, i {
-                    font-size: 18px;
+                p,
+                i {
+                    font-size: 1.25em;
                     color: $grey;
-                    transition: color 0.2s ease-in-out;
+                    transition: font-size 0.3s ease-in-out, color 0.3s ease-in-out;
                     animation: fade-in-up 0.3s;
                 }
 
-                &:hover {
+                &:hover, &.dragging {
                     border-color: $primary;
+                    background: linear-gradient(90deg, rgba($primary, 0.8) 50%, transparent 50%), linear-gradient(90deg, rgba($primary, 0.8) 50%, transparent 50%), linear-gradient(0deg, rgba($primary, 0.8) 50%, transparent 50%), linear-gradient(0deg, rgba($primary, 0.8) 50%, transparent 50%);
+                    background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+                    background-size: 15px 1px, 15px 1px, 1px 15px, 1px 15px;
+                    background-position: top left, bottom left, top left, top right;
+                    animation: border-dance 10s infinite linear;
 
-                    i, p {
+                    i,
+                    p {
                         color: $primary;
+                    }
+
+                    i {
+                        font-size: 2em;
+                        // When the user hovers the drop area, we make the icon
+                        // make small jumps in loop, with delay between each jump
+                        animation: small-jump 1.5s infinite;
                     }
                 }
             }
 
             input {
                 display: none;
-            }
-
-            p {
-                font-size: 18px;
-                color: #666;
-                transition: color 0.2s ease-in-out;
-            }
-
-            &:hover {
-                border-color: #777;
-
-                p {
-                    color: #777;
-                }
-            }
-
-            &.drag-over {
-                border-color: #4CAF50;
-
-                p {
-                    color: #4CAF50;
-                }
             }
 
             ul.file-preview-list {
@@ -110,24 +102,25 @@ form.standard-form {
                 }
             }
 
-            div.file-preview-item, ul.file-preview-list {
+            div.file-preview-item,
+            ul.file-preview-list {
                 margin-top: 0.5em;
                 width: 100%;
             }
 
-            li {
-                width: 150px;
-            }
-
-            ul.file-preview-list.two-files {
+            ul.file-preview-list {
                 li {
-                    width: calc(50% - 0.5em);
+                    width: 150px;
                 }
-            }
-
-            ul.file-preview-list.three-files {
-                li {
-                    width: calc(33.3333% - 1em / 3);
+                &.two-files {
+                    li {
+                        width: calc(50% - 0.5em);
+                    }
+                }
+                &.three-files {
+                    li {
+                        width: calc(33.3333% - 1em / 3);
+                    }
                 }
             }
 
@@ -245,6 +238,7 @@ form.standard-form {
         float: right;
         font-size: 1em;
         transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+        animation: fade-in-right 0.3s;
 
         position: relative;
         overflow: hidden;
@@ -519,6 +513,30 @@ $anim-speed: 0.65; // in seconds
     }
 }
 
+@keyframes fade-in-left {
+    0% {
+        transform: translateX(-50px);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fade-in-right {
+    0% {
+        transform: translateX(50px);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
 @keyframes fade-in-up {
     0% {
         transform: translateY(50px);
@@ -530,3 +548,35 @@ $anim-speed: 0.65; // in seconds
         opacity: 1;
     }
 }
+
+@keyframes small-jump {
+    0% {
+        transform: translateY(0);
+    }
+
+    25% {
+        transform: translateY(-5px);
+    }
+
+    50% {
+        transform: translateY(0);
+    }
+
+    75% {
+        transform: translateY(-5px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
+
+@keyframes border-dance {
+    0% {
+      background-position: top left, bottom right, bottom left, top right;
+    }
+    100% {
+      background-position: top right, bottom left, top left, bottom right;
+    }
+  }
+  

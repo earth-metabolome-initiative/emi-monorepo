@@ -193,7 +193,7 @@ impl Component for Navigator {
                                 );
                             }
                             ApiError::InternalServerError | ApiError::BadGateway => {}
-                            ApiError::BadRequest(_errors) => {
+                            ApiError::BadRequest(_) | ApiError::InvalidFileFormat(_) => {
                                 self.app_dispatch.reduce_mut(|state| {
                                     state.remove_task(task_id);
                                 });
