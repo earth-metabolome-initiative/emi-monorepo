@@ -86,7 +86,7 @@ pub fn gps_input(props: &GPSInputProps) -> Html {
     let latitude: UseStateHandle<Option<f64>> = use_state(|| props.latitude);
     let longitude: UseStateHandle<Option<f64>> = use_state(|| props.longitude);
     let altitude: UseStateHandle<Option<f64>> = use_state(|| props.altitude);
-    let accuracy: UseStateHandle<Option<f64>> = use_state(|| props.accuracy);
+    let lat_lon_accuracy: UseStateHandle<Option<f64>> = use_state(|| props.accuracy);
     let altitude_accuracy: UseStateHandle<Option<f64>> = use_state(|| props.altitude_accuracy);
 
     if latitude.is_none() || longitude.is_none() {
@@ -96,7 +96,7 @@ pub fn gps_input(props: &GPSInputProps) -> Html {
             let latitude = latitude.clone();
             let longitude = longitude.clone();
             let altitude = altitude.clone();
-            let accuracy = accuracy.clone();
+            let lat_lon_accuracy = lat_lon_accuracy.clone();
             let altitude_accuracy = altitude_accuracy.clone();
             let position_options = position_options.clone();
 
@@ -105,7 +105,7 @@ pub fn gps_input(props: &GPSInputProps) -> Html {
                 latitude.set(Some(coords.latitude()));
                 longitude.set(Some(coords.longitude()));
                 altitude.set(coords.altitude());
-                accuracy.set(Some(coords.accuracy()));
+                lat_lon_accuracy.set(Some(coords.accuracy()));
                 altitude_accuracy.set(coords.altitude_accuracy());
             }) as Box<dyn Fn(Position)>);
 
@@ -127,9 +127,11 @@ pub fn gps_input(props: &GPSInputProps) -> Html {
     let map_callback = {
         let latitude = latitude.clone();
         let longitude = longitude.clone();
+        let lat_lon_accuracy = lat_lon_accuracy.clone();
         Callback::from(move |coords: (f64, f64)| {
             latitude.set(Some(coords.0));
             longitude.set(Some(coords.1));
+            lat_lon_accuracy.set(Some(0.0));
         })
     };
 
@@ -156,7 +158,7 @@ pub fn gps_input(props: &GPSInputProps) -> Html {
                 <li>
                     <BasicInput<Float64>
                         label={"Lat/Lng accuracy (meters)".to_string()}
-                        value={(*accuracy).map(Float64::from)}
+                        value={(*lat_lon_accuracy).map(Float64::from)}
                         input_type="number"
                         optional={true}
                         step={0.01}

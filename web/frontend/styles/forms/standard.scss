@@ -110,6 +110,7 @@ form.standard-form {
         }
 
         &.file {
+            min-height: 100px;
             .droparea {
                 display: flex;
                 flex-direction: column;
