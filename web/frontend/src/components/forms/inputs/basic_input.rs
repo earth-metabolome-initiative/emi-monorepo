@@ -19,6 +19,8 @@ where
     Data: 'static + Clone + PartialEq,
 {
     pub label: String,
+    #[prop_or(true)]
+    pub show_label: bool,
     #[prop_or_default]
     pub placeholder: Option<String>,
     #[prop_or_default]
@@ -275,13 +277,19 @@ where
         
         html! {
             <div class={classes}>
-                <label for={props.label()}>{format!("{}:", props.label())}</label>
+                {if props.show_label {
+                    html! {
+                        <label class="input-label">{props.label()}</label>
+                    }
+                } else {
+                    html! {}
+                }}
                 <input
                     type={props.input_type()}
                     class="input-control"
                     name={props.label().to_lowercase().replace(" ", "_")}
                     value={input_value}
-                    placeholder={props.placeholder.clone().unwrap_or_else(|| format!("Enter {}", props.label()))}
+                    placeholder={props.placeholder.clone().unwrap_or_else(|| props.label())}
                     step={props.step.map_or_else(|| "".to_string(), |step| step.to_string())}
                     oninput={on_input}
                     onblur={on_blur}

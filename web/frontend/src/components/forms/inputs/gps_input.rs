@@ -27,10 +27,6 @@ pub struct GPSInputProps {
     #[prop_or_default]
     pub altitude_accuracy: Option<f64>,
     #[prop_or_default]
-    pub heading: Option<f64>,
-    #[prop_or_default]
-    pub speed: Option<f64>,
-    #[prop_or_default]
     pub accuracy: Option<f64>,
 }
 
@@ -91,8 +87,6 @@ pub fn gps_input(props: &GPSInputProps) -> Html {
     let longitude: UseStateHandle<Option<f64>> = use_state(|| props.longitude);
     let altitude: UseStateHandle<Option<f64>> = use_state(|| props.altitude);
     let accuracy: UseStateHandle<Option<f64>> = use_state(|| props.accuracy);
-    let heading: UseStateHandle<Option<f64>> = use_state(|| props.heading);
-    let speed: UseStateHandle<Option<f64>> = use_state(|| props.speed);
     let altitude_accuracy: UseStateHandle<Option<f64>> = use_state(|| props.altitude_accuracy);
 
     if latitude.is_none() || longitude.is_none() {
@@ -103,8 +97,6 @@ pub fn gps_input(props: &GPSInputProps) -> Html {
             let longitude = longitude.clone();
             let altitude = altitude.clone();
             let accuracy = accuracy.clone();
-            let heading = heading.clone();
-            let speed = speed.clone();
             let altitude_accuracy = altitude_accuracy.clone();
             let position_options = position_options.clone();
 
@@ -114,8 +106,6 @@ pub fn gps_input(props: &GPSInputProps) -> Html {
                 longitude.set(Some(coords.longitude()));
                 altitude.set(coords.altitude());
                 accuracy.set(Some(coords.accuracy()));
-                heading.set(coords.heading());
-                speed.set(coords.speed());
                 altitude_accuracy.set(coords.altitude_accuracy());
             }) as Box<dyn Fn(Position)>);
 
@@ -146,49 +136,50 @@ pub fn gps_input(props: &GPSInputProps) -> Html {
     html! {
         <div class="gps-input">
             <MapInput latitude={(*latitude).unwrap_or(0.0)} longitude={(*longitude).unwrap_or(0.0)} callback={map_callback}/>
-            <BasicInput<Float64>
-                label={format!("{} latitude", &props.label)}
-                value={(*latitude).map(Float64::from)}
-                input_type="number"
-                step={0.000001}
-            />
-            <BasicInput<Float64>
-                label={format!("{} longitude", &props.label)}
-                value={(*longitude).map(Float64::from)}
-                input_type="number"
-                step={0.000001}
-            />
-            <BasicInput<Float64>
-                label={format!("{} altitude", &props.label)}
-                value={(*altitude).map(Float64::from)}
-                input_type="number"
-                step={0.000001}
-            />
-            <BasicInput<Float64>
-                label={format!("{} accuracy", &props.label)}
-                value={(*accuracy).map(Float64::from)}
-                input_type="number"
-                step={0.000001}
-            />
-            <BasicInput<Float64>
-                label={format!("{} heading", &props.label)}
-                value={(*heading).map(Float64::from)}
-                input_type="number"
-                step={0.000001}
-            />
-            <BasicInput<Float64>
-                label={format!("{} speed", &props.label)}
-                value={(*speed).map(Float64::from)}
-                input_type="number"
-                step={0.000001}
-            />
-            <BasicInput<Float64>
-                label={format!("{} altitude accuracy", &props.label)}
-                value={(*altitude_accuracy).map(Float64::from)}
-                input_type="number"
-                step={0.000001}
-            />
-
+            <ul class="coords-wrapper input-group">
+                <li>
+                    <BasicInput<Float64>
+                        label={"Latitude".to_string()}
+                        value={(*latitude).map(Float64::from)}
+                        input_type="number"
+                        step={0.000001}
+                    />
+                </li>
+                <li>
+                    <BasicInput<Float64>
+                        label={"Longitude".to_string()}
+                        value={(*longitude).map(Float64::from)}
+                        input_type="number"
+                        step={0.000001}
+                    />
+                </li>
+                <li>
+                    <BasicInput<Float64>
+                        label={"Lat/Lng accuracy".to_string()}
+                        value={(*accuracy).map(Float64::from)}
+                        input_type="number"
+                        step={0.000001}
+                    />
+                </li>
+            </ul>
+            <ul class="altitude-wrapper input-group">
+                <li>
+                    <BasicInput<Float64>
+                        label={"Altitude".to_string()}
+                        value={(*altitude).map(Float64::from)}
+                        input_type="number"
+                        step={0.000001}
+                    />
+                </li>
+                <li>
+                    <BasicInput<Float64>
+                        label={"Altitude accuracy".to_string()}
+                        value={(*altitude_accuracy).map(Float64::from)}
+                        input_type="number"
+                        step={0.000001}
+                    />
+                </li>
+            </ul>
         </div>
     }
 }

@@ -1,5 +1,5 @@
 use leaflet::DragEndEvent;
-use leaflet::{DragEvents, LatLng, MapOptions, Marker, TileLayer};
+use leaflet::{DragEvents, LatLng, MapOptions, Marker, TileLayer, DivIconOptions, DivIcon};
 use wasm_bindgen::JsCast;
 use web_sys::Element;
 use web_sys::HtmlElement;
@@ -26,6 +26,10 @@ pub struct MapInputProps {
     pub latitude: f64,
     pub longitude: f64,
     pub callback: Callback<(f64, f64)>,
+    #[prop_or_default]
+    pub font_awesome_icon: Option<String>,
+    #[prop_or(13.0)]
+    pub zoom: f64,
 }
 
 impl MapInputProps {
@@ -54,10 +58,19 @@ impl Component for MapInput {
 
         let marker_options = leaflet::MarkerOptions::default();
         marker_options.set_draggable(true);
+
+        if let Some(icon) = &ctx.props().font_awesome_icon {
+            let options = DivIconOptions::new();
+            options.set_html(format!("<i class='fa fa-{}'></i>", icon));
+            options.set_class_name("map-icon".to_string());
+            let icon = DivIcon::new(&options);
+            marker_options.set_icon(icon.into());
+        }
+
         let marker = Marker::new_with_options(&ctx.props().latlng(), &marker_options);
 
         let map_options = MapOptions::default();
-        map_options.set_zoom(13.0);
+        map_options.set_zoom(ctx.props().zoom);
 
         let map = leaflet::Map::new_with_element(&container, &map_options);
         marker.add_to(&map);

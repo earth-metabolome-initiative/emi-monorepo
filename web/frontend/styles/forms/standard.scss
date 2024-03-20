@@ -1,5 +1,8 @@
 form.standard-form {
     border-radius: 0.5em;
+    width: 600px;
+    max-width: 100%;
+    margin: 0 auto;
     animation: slide-in-from-bottom 0.3s;
 
     h4 {
@@ -11,6 +14,67 @@ form.standard-form {
         font-size: 1.2em;
         border-top-left-radius: 0.5em;
         border-top-right-radius: 0.5em;
+    }
+
+    ul.coords-wrapper, ul.altitude-wrapper {
+        display: flex;
+
+        &:before {
+            display: flex;
+            align-items: center;
+            color: $grey;
+            margin-right: 0.5em;
+        }
+
+        li {
+            flex: 1;
+            padding: 0;
+
+
+            .input-group {
+                flex: 1;
+                margin: 0;
+                padding: 0;
+
+                label {
+                    display: block;
+                    font-size: 0.8em;
+                    margin-bottom: 0.2em;
+                }
+
+                input[type="number"] {
+                    width: 100%;
+                }
+            }
+        }
+    }
+
+    ul.coords-wrapper {
+        &:before {
+            content: "Coords:";
+        }
+
+        li {
+            width: calc(100% / 3 - 0.5em);
+
+            &:not(:last-child) {
+                margin-right: 0.5em;
+            }
+        }
+    }
+
+    ul.altitude-wrapper {
+        &:before {
+            content: "Altitude:";
+        }
+
+        li {
+            width: calc(100% / 2 - 0.5em);
+
+            &:not(:last-child) {
+                margin-right: 0.5em;
+            }
+        }
     }
 
     .input-group {
@@ -60,7 +124,8 @@ form.standard-form {
                     animation: fade-in-up 0.3s;
                 }
 
-                &:hover, &.dragging {
+                &:hover,
+                &.dragging {
                     border-color: $primary;
                     background: linear-gradient(90deg, rgba($primary, 0.8) 50%, transparent 50%), linear-gradient(90deg, rgba($primary, 0.8) 50%, transparent 50%), linear-gradient(0deg, rgba($primary, 0.8) 50%, transparent 50%), linear-gradient(0deg, rgba($primary, 0.8) 50%, transparent 50%);
                     background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
@@ -108,11 +173,13 @@ form.standard-form {
                 li {
                     width: 150px;
                 }
+
                 &.two-files {
                     li {
                         width: calc(50% - 0.5em);
                     }
                 }
+
                 &.three-files {
                     li {
                         width: calc(33.3333% - 1em / 3);
@@ -201,7 +268,8 @@ form.standard-form {
         min-width: 100px;
     }
 
-    input[type="text"], input[type="number"] {
+    input[type="text"],
+    input[type="number"] {
         padding: 0.5em;
         box-sizing: border-box;
         max-width: 100%;
