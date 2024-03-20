@@ -20,5 +20,7 @@ RUN cargo install --locked wasm-bindgen-cli
 # Install the trunk package manager
 RUN cargo install --locked trunk
 
+RUN cargo update
+
 # Command to run the Yew frontend application
 CMD tmux new-session -s yew "trunk serve --port $TRUNK_PORT --address 0.0.0.0 --proxy-backend https://actix-server:${ACTIX_PORT}/api"
