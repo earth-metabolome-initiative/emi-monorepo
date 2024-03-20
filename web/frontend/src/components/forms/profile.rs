@@ -1,2 +1,2 @@
 pub mod name;
-pub use name::NameForm;
+pub use name::CompleteProfileForm;

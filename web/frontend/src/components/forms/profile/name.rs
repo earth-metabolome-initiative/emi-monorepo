@@ -36,8 +36,8 @@ impl TryFrom<FormData> for FormWrapper<Name> {
     }
 }
 
-#[function_component(NameForm)]
-pub fn name_form() -> Html {
+#[function_component(CompleteProfileForm)]
+pub fn complete_profile_form() -> Html {
     let (user_state, _dispatch) = use_store::<UserState>();
 
     if user_state.has_no_access_token() {
