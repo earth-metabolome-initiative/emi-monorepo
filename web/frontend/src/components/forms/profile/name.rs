@@ -56,9 +56,11 @@ pub fn name_form() -> Html {
             <BasicForm<Name> action={FormAction::UpdateName} current={name}>
                 <ImageInput label="Profile picture" />
                 <GPSInput label="Location" />
-                <BasicInput<ValidatedNameField> label="First name" value={first_name} input_type="text" />
-                <BasicInput<ValidatedNameField> label="Middle name" value={middle_name} optional={true} input_type="text" />
-                <BasicInput<ValidatedNameField> label="Last name" value={last_name} input_type="text" />
+                <ul class="name-wrapper input-group">
+                    <li><BasicInput<ValidatedNameField> label="First name" value={first_name} input_type="text" /></li>
+                    <li><BasicInput<ValidatedNameField> label="Middle name" value={middle_name} optional={true} input_type="text" /></li>
+                    <li><BasicInput<ValidatedNameField> label="Last name" value={last_name} input_type="text" /></li>
+                </ul>
             </BasicForm<Name>>
         }
     } else {

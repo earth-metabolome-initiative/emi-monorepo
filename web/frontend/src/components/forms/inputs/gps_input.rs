@@ -155,28 +155,31 @@ pub fn gps_input(props: &GPSInputProps) -> Html {
                 </li>
                 <li>
                     <BasicInput<Float64>
-                        label={"Lat/Lng accuracy".to_string()}
+                        label={"Lat/Lng accuracy (meters)".to_string()}
                         value={(*accuracy).map(Float64::from)}
                         input_type="number"
-                        step={0.000001}
+                        optional={true}
+                        step={0.01}
                     />
                 </li>
             </ul>
             <ul class="altitude-wrapper input-group">
                 <li>
                     <BasicInput<Float64>
-                        label={"Altitude".to_string()}
+                        label={"Altitude (meters)".to_string()}
                         value={(*altitude).map(Float64::from)}
                         input_type="number"
-                        step={0.000001}
+                        optional={true}
+                        step={0.1}
                     />
                 </li>
                 <li>
                     <BasicInput<Float64>
-                        label={"Altitude accuracy".to_string()}
+                        label={"Altitude accuracy (meters)".to_string()}
                         value={(*altitude_accuracy).map(Float64::from)}
                         input_type="number"
-                        step={0.000001}
+                        optional={true}
+                        step={0.1}
                     />
                 </li>
             </ul>

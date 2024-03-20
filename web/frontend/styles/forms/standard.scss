@@ -16,7 +16,7 @@ form.standard-form {
         border-top-right-radius: 0.5em;
     }
 
-    ul.coords-wrapper, ul.altitude-wrapper {
+    ul.input-group {
         display: flex;
 
         &:before {
@@ -42,13 +42,27 @@ form.standard-form {
                     margin-bottom: 0.2em;
                 }
 
-                input[type="number"] {
+                input[type="number"], input[type="text"] {
                     width: 100%;
                 }
             }
         }
     }
 
+    ul.name-wrapper {
+        &:before {
+            content: "Name:";
+        }
+
+        li {
+            width: calc(100% / 3 - 0.5em);
+
+            &:not(:last-child) {
+                margin-right: 0.5em;
+            }
+        }
+    }
+    
     ul.coords-wrapper {
         &:before {
             content: "Coords:";
@@ -64,6 +78,7 @@ form.standard-form {
     }
 
     ul.altitude-wrapper {
+        padding-top: 0;
         &:before {
             content: "Altitude:";
         }
