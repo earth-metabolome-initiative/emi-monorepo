@@ -1,10 +1,14 @@
 //! Module providing the websocket messages used in the application.
 use std::{fmt::Debug, str::FromStr};
 
-use crate::api::{auth::users::User, oauth::jwt_cookies::AccessToken, ApiError};
+use crate::api::{
+    auth::users::{CompleteProfile, User},
+    oauth::jwt_cookies::AccessToken,
+    ApiError,
+};
+use crate::api::form_traits::FormResult;
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
-use validator::Validate;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CloseReason {
@@ -113,151 +117,22 @@ impl FromStr for SQLOperation {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Deserialize)]
-pub enum FormMethod {
-    GET,    // Use GET to execute a query
-    POST,   // Use POST to CREATE a new resource
-    PUT, // Use PUT instead of POST when you want to UPDATE or PATCH a resource and you have an ID
-    DELETE, // Use DELETE to remove a resource
-    TRACE, // Use TRACE to test the connection
-    HEAD, // Use HEAD to retrieve the headers of a resource
-    PATCH, // Use PATCH to partially update a resource
-}
-
-impl FormMethod {
-    #[cfg(feature = "frontend")]
-    pub fn to_reqwasm(&self) -> gloo_net::http::Method {
-        match self {
-            FormMethod::GET => gloo_net::http::Method::GET,
-            FormMethod::POST => gloo_net::http::Method::POST,
-            FormMethod::PUT => gloo_net::http::Method::PUT,
-            FormMethod::DELETE => gloo_net::http::Method::DELETE,
-            FormMethod::TRACE => gloo_net::http::Method::TRACE,
-            FormMethod::HEAD => gloo_net::http::Method::HEAD,
-            FormMethod::PATCH => gloo_net::http::Method::PATCH,
-        }
-    }
-
-    pub fn to_crud(&self) -> &'static str {
-        match self {
-            FormMethod::GET => "Retrieve",
-            FormMethod::POST => "Create",
-            FormMethod::PUT => "Update",
-            FormMethod::DELETE => "Delete",
-            FormMethod::TRACE => "Trace",
-            FormMethod::HEAD => "Head",
-            FormMethod::PATCH => "Patch",
-        }
-    }
-
-    pub fn ongoing_crud(&self) -> &'static str {
-        match self {
-            FormMethod::GET => "Retrieving",
-            FormMethod::POST => "Creating",
-            FormMethod::PUT => "Updating",
-            FormMethod::DELETE => "Deleting",
-            FormMethod::TRACE => "Tracing",
-            FormMethod::HEAD => "Heading",
-            FormMethod::PATCH => "Patching",
-        }
-    }
-
-    pub fn lower(&self) -> &'static str {
-        match self {
-            FormMethod::GET => "get",
-            FormMethod::POST => "post",
-            FormMethod::PUT => "put",
-            FormMethod::DELETE => "delete",
-            FormMethod::TRACE => "trace",
-            FormMethod::HEAD => "head",
-            FormMethod::PATCH => "patch",
-        }
-    }
-
-    pub fn font_awesome_icon(&self) -> &'static str {
-        match self {
-            FormMethod::GET => "fas fa-search",
-            FormMethod::POST => "fas fa-plus",
-            FormMethod::PUT => "fas fa-pen",
-            FormMethod::DELETE => "fas fa-trash",
-            FormMethod::TRACE => "fas fa-search",
-            FormMethod::HEAD => "fas fa-search",
-            FormMethod::PATCH => "fas fa-pen",
-        }
-    }
-
-    pub fn get() -> FormMethod {
-        FormMethod::GET
-    }
-
-    pub fn post() -> FormMethod {
-        FormMethod::POST
-    }
-
-    pub fn put() -> FormMethod {
-        FormMethod::PUT
-    }
-
-    pub fn delete() -> FormMethod {
-        FormMethod::DELETE
-    }
-
-    pub fn read() -> FormMethod {
-        Self::get()
-    }
-
-    pub fn create() -> FormMethod {
-        Self::post()
-    }
-
-    pub fn update() -> FormMethod {
-        Self::put()
-    }
-
-    pub fn is_update(&self) -> bool {
-        match self {
-            FormMethod::PUT => true,
-            _ => false,
-        }
-    }
-}
-
-impl Display for FormMethod {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            FormMethod::GET => write!(f, "GET"),
-            FormMethod::POST => write!(f, "POST"),
-            FormMethod::PUT => write!(f, "PUT"),
-            FormMethod::DELETE => write!(f, "DELETE"),
-            FormMethod::TRACE => write!(f, "TRACE"),
-            FormMethod::HEAD => write!(f, "HEAD"),
-            FormMethod::PATCH => write!(f, "PATCH"),
-        }
-    }
-}
-
 #[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq)]
 pub enum FormAction {
-    UpdateName,
+    CompleteProfile(CompleteProfile),
 }
 
 impl FormAction {
     pub fn requires_authentication(&self) -> bool {
         match self {
-            FormAction::UpdateName => true,
+            FormAction::CompleteProfile(_) => CompleteProfile::requires_authentication(),
         }
     }
+}
 
-    pub fn method(&self) -> FormMethod {
-        match self {
-            FormAction::UpdateName => FormMethod::PUT,
-        }
-    }
-
-    pub fn title(&self) -> String {
-        match self {
-            FormAction::UpdateName => "Name".to_string(),
-        }
+impl From<CompleteProfile> for FormAction {
+    fn from(profile: CompleteProfile) -> Self {
+        FormAction::CompleteProfile(profile)
     }
 }
 
@@ -265,20 +140,12 @@ impl FormAction {
 pub enum FrontendMessage {
     Close(Option<CloseReason>),
     Authentication(AccessToken),
-    Task(uuid::Uuid, FormAction, Vec<u8>),
+    Task(uuid::Uuid, FormAction),
 }
 
 impl FrontendMessage {
-    pub fn submit<Payload: Serialize + Validate>(
-        id: uuid::Uuid,
-        action: FormAction,
-        payload: Payload,
-    ) -> Self {
-        Self::task(id, action, bincode::serialize(&payload).unwrap())
-    }
-
-    pub fn task(id: uuid::Uuid, action: FormAction, payload: Vec<u8>) -> Self {
-        FrontendMessage::Task(id, action, payload)
+    pub fn submit(id: uuid::Uuid, action: FormAction) -> Self {
+        FrontendMessage::Task(id, action)
     }
 }
 
@@ -286,7 +153,7 @@ impl FrontendMessage {
 pub enum BackendMessage {
     Close(Option<CloseReason>),
     User(SQLOperation, User),
-    TaskResult(uuid::Uuid, FormAction, Result<(), ApiError>),
+    TaskResult(uuid::Uuid, Result<(), ApiError>),
     ExpiredToken,
     Authenticated,
 }

@@ -10,7 +10,6 @@ use actix::{Actor, StreamHandler};
 use actix_web_actors::ws;
 use sqlx::{Pool as SQLxPool, Postgres};
 use std::collections::HashMap;
-use web_common::api::auth::users::User;
 use web_common::api::ws::messages::FormAction;
 use web_common::api::ws::messages::SQLOperation;
 use web_common::api::ApiError;
@@ -82,16 +81,16 @@ impl actix::Handler<InternalMessage> for WebSocket {
     fn handle(&mut self, msg: InternalMessage, ctx: &mut Self::Context) {
         match msg {
             InternalMessage::Authenticated(user) => {
+                let web_common_user = user.to_web_common_user(&mut self.diesel_connection);
                 ctx.binary(BackendMessage::User(
                     SQLOperation::Update,
-                    user.to_web_common_user(),
+                    web_common_user.clone(),
                 ));
                 self.user = Some(user);
                 // With the user authenticated, we can start to listen to its channels.
-                let user: User = self.user.as_ref().unwrap().to_web_common_user();
                 let sqlx_pool = self.sqlx.clone();
                 let recipient = ctx.address();
-                let channel = Channel::NotifyUser(user);
+                let channel = Channel::NotifyUser(web_common_user);
                 if !self.pg_handlers.contains_key(&channel.to_string()) {
                     self.pg_handlers.insert(
                         channel.to_string(),
@@ -100,9 +99,11 @@ impl actix::Handler<InternalMessage> for WebSocket {
                                 match start_listening(&sqlx_pool, vec![channel], recipient).await {
                                     Ok(_) => {}
                                     Err(err) => {
-                                        log::error!("Error starting to listen to channel: {:?}", err);
+                                        log::error!(
+                                            "Error starting to listen to channel: {:?}",
+                                            err
+                                        );
                                     }
-                                
                                 }
                             }
                             .into_actor(self),
@@ -122,10 +123,8 @@ impl actix::Handler<InternalMessage> for WebSocket {
 
 impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
     fn handle(&mut self, msg: Result<ws::Message, ws::ProtocolError>, ctx: &mut Self::Context) {
-        log::debug!("Got message from WebSocket: {:?}", msg);
         match msg {
             Ok(msg) => {
-                log::debug!("Got message from WebSocket: {:?}", msg);
                 let frontend_message: FrontendMessage = msg.into();
                 match frontend_message {
                     FrontendMessage::Close(_code) => {
@@ -164,31 +163,21 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                             .into_actor(self),
                         );
                     }
-                    FrontendMessage::Task(task_id, form_action, data) => {
+                    FrontendMessage::Task(task_id, form_action) => {
                         if form_action.requires_authentication() {
                             match self.must_be_authenticated(ctx) {
                                 Ok(user) => match form_action {
-                                    FormAction::UpdateName => match bincode::deserialize(&data) {
-                                        Ok(value) => {
-                                            ctx.address().do_send(UserMessage::UpdateName(
-                                                task_id,
-                                                user.id(),
-                                                value,
-                                            ));
-                                        }
-                                        Err(err) => {
-                                            ctx.binary(BackendMessage::TaskResult(
-                                                task_id,
-                                                form_action,
-                                                Err(ApiError::from(err)),
-                                            ));
-                                        }
-                                    },
+                                    FormAction::CompleteProfile(profile) => {
+                                        ctx.address().do_send(UserMessage::CompleteProfile(
+                                            task_id,
+                                            user.id(),
+                                            profile,
+                                        ));
+                                    }
                                 },
                                 Err(api_error) => {
                                     ctx.address().do_send(BackendMessage::TaskResult(
                                         task_id,
-                                        form_action,
                                         Err(api_error),
                                     ));
                                 }

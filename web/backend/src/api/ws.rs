@@ -37,6 +37,6 @@ async fn start_websocket(
     actix_web_actors::ws::start(
         socket::WebSocket::new(diesel_pool, sqlx_pool, redis_client),
         &req,
-        stream,
+        stream
     )
 }

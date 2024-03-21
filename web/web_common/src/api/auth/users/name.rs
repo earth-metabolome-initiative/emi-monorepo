@@ -2,18 +2,13 @@ use crate::custom_validators::*;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
-use crate::combine_path;
-
-pub const ENDPOINT: &str = "/name";
-pub const FULL_ENDPOINT: &str = combine_path!(super::FULL_ENDPOINT, ENDPOINT);
-
 pub type ValidatedNameField = NoSpecialCharacters<
     MustBeCapitalized<
         NoDigits<NoLeadingSpaces<NoTrailingSpaces<NoDoubleSpaces<NotEmpty<String>>>>>,
     >,
 >;
 
-#[derive(PartialEq, Clone, Debug, Default, Validate, Serialize, Deserialize)]
+#[derive(PartialEq, Clone, Debug, Default, Validate, Serialize, Deserialize, Eq)]
 pub struct Name {
     #[validate]
     first_name: ValidatedNameField,

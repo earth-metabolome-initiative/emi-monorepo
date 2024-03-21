@@ -8,7 +8,7 @@ use yewdux::prelude::*;
 pub struct AppState {
     sidebar_open: bool,
     connect_to_internet: bool,
-    tasks: Vec<(uuid::Uuid, FormAction, Vec<u8>)>,
+    tasks: Vec<(uuid::Uuid, FormAction)>,
 }
 
 impl AppState {
@@ -20,15 +20,15 @@ impl AppState {
         self.sidebar_open = !self.sidebar_open;
     }
 
-    pub fn add_task(&mut self, task: (uuid::Uuid, FormAction, Vec<u8>)) {
+    pub fn add_task(&mut self, task: (uuid::Uuid, FormAction)) {
         self.tasks.push(task);
     }
 
     pub fn remove_task(&mut self, task_id: uuid::Uuid) {
-        self.tasks.retain(|(id, _, _)| id != &task_id);
+        self.tasks.retain(|(id, _)| id != &task_id);
     }
 
-    pub fn tasks(&self) -> &[(uuid::Uuid, FormAction, Vec<u8>)] {
+    pub fn tasks(&self) -> &[(uuid::Uuid, FormAction)] {
         &self.tasks
     }
 

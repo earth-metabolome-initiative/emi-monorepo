@@ -4,6 +4,8 @@ use serde::{Deserialize, Serialize};
 pub mod auth;
 pub mod oauth;
 pub mod ws;
+pub mod form_traits;
+
 use validator::ValidationError;
 use validator::ValidationErrors;
 

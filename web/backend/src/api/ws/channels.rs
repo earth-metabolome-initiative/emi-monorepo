@@ -100,7 +100,7 @@ impl actix::Handler<ChannelMessage<crate::models::User>> for WebSocket {
             SQLOperation::Update => {
                 ctx.binary(BackendMessage::User(
                     SQLOperation::Update,
-                    msg.record.to_web_common_user(),
+                    msg.record.to_web_common_user(&mut self.diesel_connection),
                 ));
             }
             SQLOperation::Insert => {

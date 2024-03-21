@@ -16,6 +16,13 @@ form.standard-form {
         border-top-right-radius: 0.5em;
     }
 
+    p.instructions {
+        color: $near_black;
+        margin-top: 0.5em;
+        margin-bottom: 0.5em;
+        text-align: justify;
+    }
+
     ul.input-group {
         display: flex;
 
@@ -26,7 +33,7 @@ form.standard-form {
             margin-right: 0.5em;
         }
 
-        li {
+        >li {
             flex: 1;
             padding: 0;
 
@@ -54,7 +61,7 @@ form.standard-form {
             content: "Name:";
         }
 
-        li {
+        >li {
             width: calc(100% / 3 - 0.5em);
 
             &:not(:last-child) {
@@ -68,7 +75,7 @@ form.standard-form {
             content: "Coords:";
         }
 
-        li {
+        >li {
             width: calc(100% / 3 - 0.5em);
 
             &:not(:last-child) {
@@ -83,7 +90,7 @@ form.standard-form {
             content: "Altitude:";
         }
 
-        li {
+        >li {
             width: calc(100% / 2 - 0.5em);
 
             &:not(:last-child) {
@@ -186,18 +193,18 @@ form.standard-form {
             }
 
             ul.file-preview-list {
-                li {
+                >li {
                     width: 150px;
                 }
 
                 &.two-files {
-                    li {
+                    >li {
                         width: calc(50% - 0.5em);
                     }
                 }
 
                 &.three-files {
-                    li {
+                    >li {
                         width: calc(33.3333% - 1em / 3);
                     }
                 }
@@ -429,6 +436,7 @@ form.standard-form {
         list-style: none;
         font-size: inherit;
         font-weight: 100;
+        margin-top: 0.5em;
 
         li.input-error {
             background-color: $red;
@@ -441,16 +449,12 @@ form.standard-form {
             animation: pop-in 0.2s;
             transition: margin 0.2s;
 
-            &.hiding {
-                animation: pop-out 0.2s;
-            }
-
-            &:first-child {
+            &:not(:first-child) {
                 margin-top: 0.5em;
             }
 
-            &:not(:last-child) {
-                margin-bottom: 0.5em;
+            &.hiding {
+                animation: pop-out 0.2s;
             }
 
             button {
@@ -481,7 +485,8 @@ form.standard-form {
         }
     }
 
-    &>ul.form-errors {
+    &>ul.input-errors {
+        margin-top: 0;
         margin-bottom: 0.5em;
     }
 }

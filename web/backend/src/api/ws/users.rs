@@ -1,17 +1,19 @@
 pub mod update_user_name;
 use crate::api::ws::socket::WebSocket;
 use actix::Message;
-pub use update_user_name::update_user_name;
-use web_common::api::ws::messages::BackendMessage;
-use web_common::api::ws::messages::FormAction;
+use validator::Validate;
+use web_common::{
+    api::ws::messages::BackendMessage,
+    custom_validators::validation_errors::ValidationErrorToString,
+};
 
 #[derive(Debug, Message)]
 #[rtype(result = "()")]
 pub(crate) enum UserMessage {
-    UpdateName(
+    CompleteProfile(
         uuid::Uuid,
         uuid::Uuid,
-        web_common::api::auth::users::name::Name,
+        web_common::api::auth::users::CompleteProfile,
     ),
 }
 
@@ -20,10 +22,10 @@ impl actix::Handler<UserMessage> for WebSocket {
 
     fn handle(&mut self, msg: UserMessage, ctx: &mut Self::Context) {
         match msg {
-            UserMessage::UpdateName(uuid, user_id, name) => {
+            UserMessage::CompleteProfile(uuid, user_id, profile) => {
                 // ctx.binary(BackendMessage::TaskResult(
                 //     uuid,
-                //     FormAction::UpdateName,
+                //     FormAction::CompleteProfile,
                 //     update_user_name(
                 //         &mut self.diesel_connection,
                 //         self.user.as_ref().unwrap().clone(),
@@ -31,11 +33,19 @@ impl actix::Handler<UserMessage> for WebSocket {
                 //         name,
                 //     ),
                 // ));
-                ctx.binary(BackendMessage::TaskResult(
-                    uuid,
-                    FormAction::UpdateName,
-                    Err(web_common::api::ApiError::BadRequest(vec!["Test Error".to_string()]))
-                ));
+                if let Err(e) = profile.validate() {
+                    ctx.binary(BackendMessage::TaskResult(
+                        uuid,
+                        Err(web_common::api::ApiError::BadRequest(e.convert_to_string())),
+                    ));
+                } else {
+                    ctx.binary(BackendMessage::TaskResult(
+                        uuid,
+                        Err(web_common::api::ApiError::BadRequest(vec![
+                            "Test Error".to_string()
+                        ])),
+                    ));
+                }
             }
         }
     }

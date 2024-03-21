@@ -8,14 +8,28 @@ use std::hash::Hasher;
 use super::InputErrors;
 use crate::workers::WebsocketWorker;
 use gloo::timers::callback::Timeout;
+use validator::Validate;
 use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
 use wasm_bindgen::JsValue;
+use web_common::api::form_traits::TryFromCallback;
 use web_common::api::ws::messages::*;
 use web_common::file_formats::GenericFileFormat;
 use yew::prelude::*;
 use yew_agent::prelude::WorkerBridgeHandle;
 use yew_agent::scope_ext::AgentScopeExt;
+
+pub fn human_readable_size(size: u64) -> String {
+    if size < 1024 {
+        format!("{} B", size)
+    } else if size < 1024 * 1024 {
+        format!("{:.0} KB", size as f64 / 1024.0)
+    } else if size < 1024 * 1024 * 1024 {
+        format!("{:.0} MB", size as f64 / (1024.0 * 1024.0))
+    } else {
+        format!("{:.2} GB", size as f64 / (1024.0 * 1024.0 * 1024.0))
+    }
+}
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct FileInputProp {
@@ -26,11 +40,19 @@ pub struct FileInputProp {
     pub multiple: bool,
     #[prop_or_default]
     pub allowed_formats: Vec<GenericFileFormat>,
+    #[prop_or_default]
+    pub url: Option<String>,
+    #[prop_or_default]
+    pub maximal_size: Option<u64>,
 }
 
 impl FileInputProp {
     pub fn label(&self) -> String {
         self.label.clone()
+    }
+
+    pub fn normalized_label(&self) -> String {
+        self.label.to_lowercase().replace(" ", "_")
     }
 
     pub fn human_readable_allowed_formats(&self) -> String {
@@ -53,7 +75,7 @@ impl FileInputProp {
     }
 }
 
-pub struct FileInput {
+pub struct FileInput<Data> {
     _websocket: WorkerBridgeHandle<WebsocketWorker<FrontendMessage, BackendMessage>>,
     errors: HashSet<String>,
     is_valid: Option<bool>,
@@ -63,16 +85,14 @@ pub struct FileInput {
     show_drop_area_timeout: Option<Timeout>,
     hide_drop_area_timeout: Option<Timeout>,
     dragging: bool,
+    _phantom: std::marker::PhantomData<Data>,
 }
 
 pub enum InputMessage {
     Backend(BackendMessage),
     RemoveError(String),
     RemoveErrors,
-    Validate(Result<(), Vec<String>>),
-    StartValidationTimeout(Result<(), Vec<String>>),
-    UpdateCurrentValue(String),
-    // Loaded(String, String, Vec<u8>),
+    Validate(Result<web_sys::File, Vec<String>>),
     Files(web_sys::FileList),
     FilesRemoved(usize),
     SetTimeoutDropAreaVisibility(bool),
@@ -80,7 +100,10 @@ pub enum InputMessage {
     SetDragging(bool),
 }
 
-impl Component for FileInput {
+impl<Data> Component for FileInput<Data>
+where
+    Data: 'static + Clone + Validate + TryFromCallback<web_sys::File>,
+{
     type Message = InputMessage;
     type Properties = FileInputProp;
 
@@ -94,7 +117,9 @@ impl Component for FileInput {
             event.prevent_default();
             link.send_message(InputMessage::SetDragging(true));
         }) as Box<dyn FnMut(_)>);
-        document.add_event_listener_with_callback("dragover", closure.as_ref().unchecked_ref()).unwrap();
+        document
+            .add_event_listener_with_callback("dragover", closure.as_ref().unchecked_ref())
+            .unwrap();
         closure.forget(); // Prevent the closure from being dropped immediately
 
         let link = ctx.link().clone();
@@ -104,10 +129,18 @@ impl Component for FileInput {
             event.prevent_default();
             link.send_message(InputMessage::SetDragging(false));
         }) as Box<dyn FnMut(_)>);
-        document.add_event_listener_with_callback("dragend", closure.as_ref().unchecked_ref()).unwrap();
-        document.add_event_listener_with_callback("dragleave", closure.as_ref().unchecked_ref()).unwrap();
-        document.add_event_listener_with_callback("drop", closure.as_ref().unchecked_ref()).unwrap();
+        document
+            .add_event_listener_with_callback("dragend", closure.as_ref().unchecked_ref())
+            .unwrap();
+        document
+            .add_event_listener_with_callback("dragleave", closure.as_ref().unchecked_ref())
+            .unwrap();
+        document
+            .add_event_listener_with_callback("drop", closure.as_ref().unchecked_ref())
+            .unwrap();
         closure.forget(); // Prevent the closure from being dropped immediately
+
+        let maybe_url = ctx.props().url.clone();
 
         Self {
             _websocket: ctx.link().bridge_worker(Callback::from({
@@ -120,10 +153,11 @@ impl Component for FileInput {
             is_valid: None,
             validation_timeout: None,
             files: Vec::new(),
-            show_drop_area: true,
+            show_drop_area: maybe_url.is_none(),
             show_drop_area_timeout: None,
             hide_drop_area_timeout: None,
             dragging: false,
+            _phantom: std::marker::PhantomData,
         }
     }
 
@@ -158,17 +192,18 @@ impl Component for FileInput {
                     return false;
                 }
 
-                let mut changes = false;
+                let mut change = false;
 
                 if !self.errors.is_empty() {
                     self.errors.clear();
-                    changes = true;
+                    change = true;
                 }
 
                 // If the properties require the file to be singular, we only keep the first file
                 // and replace eventual previous files.
                 if !ctx.props().multiple {
                     self.files.clear();
+                    change = true;
                 }
 
                 let number_of_files = if ctx.props().multiple {
@@ -182,6 +217,19 @@ impl Component for FileInput {
                 for i in 0..number_of_files {
                     let file = files.get(i).unwrap();
 
+                    if let Some(maximal_size) = ctx.props().maximal_size {
+                        if file.size() as u64 > maximal_size {
+                            self.errors.insert(format!(
+                                "The file {} is too large. The maximal size is {}, but the file is {}.",
+                                file.name(),
+                                human_readable_size(maximal_size),
+                                human_readable_size(file.size() as u64)
+                            ));
+                            change = true;
+                            continue;
+                        }
+                    }
+
                     if !allowed_formats.is_empty() {
                         match GenericFileFormat::try_from_mime(&file.type_()) {
                             Ok(format) => {
@@ -194,12 +242,14 @@ impl Component for FileInput {
                                         file.type_(),
                                         ctx.props().human_readable_allowed_formats()
                                     ));
+                                    change = true;
                                     continue;
                                 }
                             }
                             Err(error) => {
                                 let errors: Vec<String> = error.into();
                                 self.errors.extend(errors.iter().cloned());
+                                change = true;
                                 continue;
                             }
                         }
@@ -210,16 +260,16 @@ impl Component for FileInput {
                             && f.size() == file.size()
                             && f.last_modified() == file.last_modified()
                     }) {
-                        self.files.push(file);
+                        let link = ctx.link().clone();
+                        if let Err(error) = Data::try_from_callback(file.clone(), move |result| {
+                            link.send_message(InputMessage::Validate(result.map(|_| file)));
+                        }) {
+                            ctx.link().send_message(InputMessage::Validate(Err(error)));
+                        }
                     }
                 }
 
-                ctx.link()
-                    .send_message(InputMessage::SetTimeoutDropAreaVisibility(
-                        self.files.is_empty(),
-                    ));
-
-                changes || files.length() > 0
+                change
             }
             InputMessage::RemoveError(error) => {
                 self.errors.remove(&error);
@@ -230,41 +280,25 @@ impl Component for FileInput {
                     timeout.cancel();
                 }
 
-                let mut change = false;
-
-                if !self.errors.is_empty() {
-                    self.errors.clear();
-                    change = true;
-                }
-
-                if let Err(errors) = data {
-                    for error in errors {
-                        self.errors.insert(error);
+                match data {
+                    Ok(file) => {
+                        self.files.push(file);
+                        self.is_valid = Some(true);
                     }
-                    self.is_valid = Some(false);
-                    return true;
+                    Err(errors) => {
+                        for error in errors {
+                            self.errors.insert(error);
+                        }
+                        self.is_valid = Some(false);
+                    }
                 }
 
-                if self.is_valid != Some(true) {
-                    self.is_valid = Some(true);
-                    change = true;
-                }
+                ctx.link()
+                    .send_message(InputMessage::SetTimeoutDropAreaVisibility(
+                        self.files.is_empty(),
+                    ));
 
-                change
-            }
-            InputMessage::StartValidationTimeout(data) => {
-                let link = ctx.link().clone();
-                if let Some(timeout) = self.validation_timeout.take() {
-                    timeout.cancel();
-                }
-                self.validation_timeout = Some(Timeout::new(300, move || {
-                    link.send_message(InputMessage::Validate(data));
-                }));
-                false
-            }
-            InputMessage::UpdateCurrentValue(value) => {
-                // self.current_value = Some(value);
-                false
+                true
             }
             InputMessage::FilesRemoved(index) => {
                 self.files.remove(index);
@@ -406,11 +440,7 @@ impl Component for FileInput {
 
         let droparea_classes = format!(
             "droparea{}{}",
-            if self.dragging {
-                " dragging"
-            } else {
-                ""
-            },
+            if self.dragging { " dragging" } else { "" },
             if self.hide_drop_area_timeout.is_some() {
                 " hiding"
             } else {
@@ -420,12 +450,12 @@ impl Component for FileInput {
 
         html! {
             <div class={classes} onclick={on_click} ondrop={on_drop} ondragover={ondragover} ondragleave={ondragleave.clone()} ondragend={ondragleave}>
-                <label for={props.label()}>{format!("{}:", props.label())}</label>
+                <label for={props.normalized_label()}>{format!("{}:", props.label())}</label>
                 <input
                     type="file"
                     id={uuid}
                     class="input-control"
-                    name={props.label().to_lowercase().replace(" ", "_")}
+                    name={props.normalized_label()}
                     multiple={props.multiple}
                     // value={input_value}
                     oninput={on_input}
@@ -459,6 +489,8 @@ pub struct FilePreviewProp {
     pub on_delete: Callback<usize>,
     #[prop_or_default]
     pub hiding: bool,
+    #[prop_or_default]
+    pub url: Option<String>,
 }
 
 impl FilePreviewProp {
@@ -483,6 +515,12 @@ impl FilePreviewProp {
 /// also needs to be able to communicate with the parent component, it receives a callback to
 /// send messages to the parent component to delete the file from the list of selected files.
 pub fn file_preview(props: &FilePreviewProp) -> Html {
+    if let Some(url) = &props.url {
+        return html! {
+            <img src={url.clone()} class="preview" />
+        };
+    }
+
     if props.files.is_empty() {
         return html! { <></> };
     }
@@ -589,16 +627,7 @@ impl FilePreviewItemProp {
     }
 
     pub fn human_readable_size(&self) -> String {
-        let size = self.size();
-        if size < 1024 {
-            format!("{} B", size)
-        } else if size < 1024 * 1024 {
-            format!("{:.0} KB", size as f64 / 1024.0)
-        } else if size < 1024 * 1024 * 1024 {
-            format!("{:.0} MB", size as f64 / (1024.0 * 1024.0))
-        } else {
-            format!("{:.2} GB", size as f64 / (1024.0 * 1024.0 * 1024.0))
-        }
+        human_readable_size(self.size())
     }
 
     pub fn last_modified_date(&self) -> String {
@@ -845,12 +874,5 @@ pub fn file_preview_item(props: &FilePreviewItemProp) -> Html {
                 {wrapped}
             </li>
         }
-    }
-}
-
-#[function_component(ImageInput)]
-pub fn image_input(props: &FileInputProp) -> Html {
-    html! {
-        <FileInput label={props.label.clone()} optional={props.optional} multiple={props.multiple} allowed_formats={vec![GenericFileFormat::Image]} />
     }
 }

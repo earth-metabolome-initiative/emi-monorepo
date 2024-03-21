@@ -26,7 +26,6 @@ use crate::utils::is_online;
 use gloo::timers::callback::Interval;
 use wasm_bindgen::UnwrapThrowExt;
 use web_common::api::auth::users::User;
-use web_common::api::oauth::jwt_cookies::RefreshError::Unauthorized;
 use web_common::api::ws::messages::*;
 use web_common::api::ApiError;
 use yew::prelude::*;
@@ -151,13 +150,10 @@ impl Component for Navigator {
             NavigatorMessage::ResumeTasks => {
                 if self.app_state.connect_to_internet() {
                     let tasks = self.app_state.tasks();
-                    for (task_id, form_action, form_data) in tasks {
+                    for (task_id, task) in tasks.iter().cloned() {
                         info!("Resuming task {}", task_id);
-                        self.websocket.send(FrontendMessage::task(
-                            *task_id,
-                            form_action.clone(),
-                            form_data.clone(),
-                        ));
+                        self.websocket
+                            .send(FrontendMessage::submit(task_id, task));
                     }
                     !tasks.is_empty()
                 } else {
@@ -175,7 +171,7 @@ impl Component for Navigator {
                 refresh_access_token(self.user_dispatch.clone(), ctx.props().navigator.clone());
                 true
             }
-            NavigatorMessage::Backend(BackendMessage::TaskResult(task_id, _, result)) => {
+            NavigatorMessage::Backend(BackendMessage::TaskResult(task_id, result)) => {
                 match result {
                     Ok(()) => {
                         info!("Task {} completed successfully", task_id);
@@ -184,22 +180,20 @@ impl Component for Navigator {
                             state.remove_task(task_id);
                         });
                     }
-                    Err(api_error) => {
-                        match api_error {
-                            ApiError::Unauthorized | ApiError::ExpiredAuthorization => {
-                                refresh_access_token(
-                                    self.user_dispatch.clone(),
-                                    ctx.props().navigator.clone(),
-                                );
-                            }
-                            ApiError::InternalServerError | ApiError::BadGateway => {}
-                            ApiError::BadRequest(_) | ApiError::InvalidFileFormat(_) => {
-                                self.app_dispatch.reduce_mut(|state| {
-                                    state.remove_task(task_id);
-                                });
-                            }
+                    Err(api_error) => match api_error {
+                        ApiError::Unauthorized | ApiError::ExpiredAuthorization => {
+                            refresh_access_token(
+                                self.user_dispatch.clone(),
+                                ctx.props().navigator.clone(),
+                            );
                         }
-                    }
+                        ApiError::InternalServerError | ApiError::BadGateway => {}
+                        ApiError::BadRequest(_) | ApiError::InvalidFileFormat(_) => {
+                            self.app_dispatch.reduce_mut(|state| {
+                                state.remove_task(task_id);
+                            });
+                        }
+                    },
                 }
                 true
             }

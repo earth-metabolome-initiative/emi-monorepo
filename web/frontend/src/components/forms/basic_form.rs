@@ -4,22 +4,24 @@ use crate::components::forms::InputErrors;
 use crate::router::AppRoute;
 use crate::stores::app_state::AppState;
 use crate::stores::user_state::UserState;
+use crate::workers::WebsocketWorker;
 use gloo::timers::callback::Timeout;
 use serde::Serialize;
 use std::collections::HashSet;
 use std::fmt::Debug;
-use yew_agent::prelude::WorkerBridgeHandle;
-use yew_agent::scope_ext::AgentScopeExt;
-use crate::workers::WebsocketWorker;
 use std::rc::Rc;
 use validator::Validate;
 use wasm_bindgen::JsCast;
+use web_common::api::form_traits::FormResult;
+use web_common::api::form_traits::TryFromCallback;
 use web_common::api::ws::messages::*;
 use web_common::custom_validators::validation_errors::ValidationErrorToString;
 use web_sys::FormData;
 use web_sys::HtmlFormElement;
 use web_sys::HtmlInputElement;
 use yew::prelude::*;
+use yew_agent::prelude::WorkerBridgeHandle;
+use yew_agent::scope_ext::AgentScopeExt;
 use yew_router::prelude::use_navigator;
 use yewdux::prelude::*;
 
@@ -45,37 +47,11 @@ pub struct BasicFormProp<Data>
 where
     Data: PartialEq + Clone + 'static + Validate + Debug + Serialize,
 {
-    pub action: FormAction,
     pub children: Html,
     #[prop_or_default]
     pub navigator: Option<yew_router::navigator::Navigator>,
     #[prop_or_default]
     pub current: Option<Data>,
-}
-
-impl<Data> BasicFormProp<Data>
-where
-    Data: PartialEq + Clone + 'static + Validate + Debug + Serialize,
-{
-    pub fn crud(&self) -> &'static str {
-        self.method().to_crud()
-    }
-
-    pub fn ongoing_crud(&self) -> &'static str {
-        self.method().ongoing_crud()
-    }
-
-    pub fn method(&self) -> FormMethod {
-        self.action.method()
-    }
-
-    pub fn action(&self) -> FormAction {
-        self.action.clone()
-    }
-
-    pub fn title(&self) -> String {
-        self.action.title()
-    }
 }
 
 pub struct InnerBasicForm<Data> {
@@ -94,52 +70,58 @@ pub struct InnerBasicForm<Data> {
 
 impl<Data> InnerBasicForm<Data>
 where
-    FormWrapper<Data>: TryFrom<FormData, Error = Vec<String>>,
+    FormWrapper<Data>: TryFromCallback<FormData>,
 {
-    fn extract_data_from_input_event<E>(event: E) -> Result<Data, String>
+    fn extract_data_from_input_event<E, C>(event: E, callback: C) -> Result<(), Vec<String>>
     where
         E: AsRef<Event>,
+        C: FnOnce(Result<Data, Vec<String>>) + 'static,
     {
         let form = event
             .as_ref()
             .target()
-            .ok_or("No target found in the event")?
+            .ok_or(vec!["No target found in the event".to_string()])?
             .dyn_into::<HtmlInputElement>()
-            .map_err(|e| format!("The target of the event is not a form: {:?}", e))?
+            .map_err(|e| vec![format!("The target of the event is not a form: {:?}", e)])?
             .closest("form")
-            .map_err(|e| format!("Error getting the closest form: {:?}", e))?
-            .ok_or("No form found")?
+            .map_err(|e| vec![format!("Error getting the closest form: {:?}", e)])?
+            .ok_or(vec!["No form found".to_string()])?
             .dyn_into::<HtmlFormElement>()
-            .map_err(|e| format!("The target of the event is not a form: {:?}", e))?;
-        Self::extract_data_from_form(form)
+            .map_err(|e| vec![format!("The target of the event is not a form: {:?}", e)])?;
+        Self::extract_data_from_form(form, callback)
     }
 
-    fn extract_data_from_form_event<E>(event: E) -> Result<Data, String>
+    fn extract_data_from_form_event<E, C>(event: E, callback: C) -> Result<(), Vec<String>>
     where
         E: AsRef<Event>,
+        C: FnOnce(Result<Data, Vec<String>>) + 'static,
     {
         let form = event
             .as_ref()
             .target()
-            .ok_or("No target found in the event")?
+            .ok_or(vec!["No target found in the event".to_string()])?
             .dyn_into::<HtmlFormElement>()
-            .map_err(|e| format!("The target of the event is not a form: {:?}", e))?;
-        Self::extract_data_from_form(form)
+            .map_err(|e| vec![format!("The target of the event is not a form: {:?}", e)])?;
+        Self::extract_data_from_form(form, callback)
     }
 
-    fn extract_data_from_form(form: HtmlFormElement) -> Result<Data, String> {
-        let data = FormWrapper::<Data>::try_from(
+    fn extract_data_from_form<C>(form: HtmlFormElement, callback: C) -> Result<(), Vec<String>>
+    where
+        C: FnOnce(Result<Data, Vec<String>>) + 'static,
+    {
+        FormWrapper::<Data>::try_from_callback(
             FormData::new_with_form(&form)
-                .map_err(|e| format!("Error creating form data: {:?}", e))?,
+                .map_err(|e| vec![format!("Error creating form data: {:?}", e)])?,
+            move |result| {
+                callback(result.map(|wrapper| wrapper.data()));
+            },
         )
-        .map_err(|e| e.join("\n"))?
-        .data();
-        Ok(data)
     }
 }
 
 pub enum FormMessage<Data> {
     Submit(Data),
+    Errors(Vec<String>),
     Backend(BackendMessage),
     RemoveError(String),
     SetSubmitButtonDisabled(bool),
@@ -150,8 +132,8 @@ pub enum FormMessage<Data> {
 
 impl<Data> Component for InnerBasicForm<Data>
 where
-    Data: PartialEq + Clone + 'static + Validate + Debug + Serialize,
-    FormWrapper<Data>: TryFrom<FormData, Error = Vec<String>>,
+    Data: PartialEq + Clone + 'static + Validate + Debug + Serialize + FormResult,
+    FormWrapper<Data>: TryFromCallback<FormData>,
 {
     type Message = FormMessage<Data>;
     type Properties = BasicFormProp<Data>;
@@ -193,9 +175,9 @@ where
                 false
             }
             FormMessage::Backend(BackendMessage::Authenticated) => false,
-            FormMessage::Backend(BackendMessage::TaskResult(uuid, form_action, outcome)) => {
+            FormMessage::Backend(BackendMessage::TaskResult(uuid, outcome)) => {
                 log::info!("Received task result");
-                if form_action == ctx.props().action() && self.uuid == Some(uuid) {
+                if self.uuid == Some(uuid) {
                     self.waiting_for_reply = false;
                     match outcome {
                         Ok(()) => {
@@ -203,13 +185,17 @@ where
                             true
                         }
                         Err(errors) => {
-                            self.errors = errors.into();
+                            ctx.link().send_message(FormMessage::Errors(errors.into()));
                             true
                         }
                     }
                 } else {
                     false
                 }
+            }
+            FormMessage::Errors(errors) => {
+                self.errors = errors.into_iter().collect();
+                true
             }
             FormMessage::AppState(app_state) => {
                 self.app_state = app_state;
@@ -236,11 +222,9 @@ where
                 let uuid = uuid::Uuid::new_v4();
                 self.uuid = Some(uuid);
 
-                let action = ctx.props().action().clone();
-
                 // Then, we send the data to the backend
                 self.app_dispatch.reduce_mut(move |state| {
-                    state.add_task((uuid, action, bincode::serialize(&data).unwrap()));
+                    state.add_task((uuid, data.into()));
                 });
 
                 self.waiting_for_reply = true;
@@ -266,6 +250,9 @@ where
                 if let Some(timeout) = self.validate_timeout.take() {
                     timeout.cancel();
                 }
+                if self.submit_button_disabled == disabled {
+                    return false;
+                }
                 let link = ctx.link().clone();
                 self.validate_timeout = Some(Timeout::new(300, move || {
                     link.send_message(FormMessage::SetSubmitButtonDisabled(disabled));
@@ -276,7 +263,7 @@ where
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        if ctx.props().action().requires_authentication() {
+        if Data::requires_authentication() {
             if let Some(navigator) = ctx.props().navigator.as_ref() {
                 if self.user_state.has_no_access_token() {
                     log::info!("No access token found, redirecting to login page.");
@@ -284,8 +271,6 @@ where
                 }
             }
         }
-
-        let props = ctx.props();
 
         let on_submit = {
             let link = ctx.link().clone();
@@ -295,11 +280,16 @@ where
                 if waiting_for_reply {
                     return;
                 }
-                match Self::extract_data_from_form_event(event) {
-                    Ok(data) => link.send_message(FormMessage::Submit(data)),
-                    Err(errors) => {
-                        log::error!("Error extracting data from form: {:?}", errors);
-                    }
+                let link2 = link.clone();
+                if let Err(errors) =
+                    Self::extract_data_from_form_event(event, move |result| match result {
+                        Ok(data) => link2.send_message(FormMessage::Submit(data)),
+                        Err(errors) => {
+                            link2.send_message(FormMessage::Errors(errors));
+                        }
+                    })
+                {
+                    link.send_message(FormMessage::Errors(errors));
                 }
             })
         };
@@ -307,28 +297,24 @@ where
         // Every time there is any change in any of the input fields, we validate the form
         // so to know whether the submit button should be enabled or not
         let on_input = {
-            let current = ctx.props().current.clone();
-            let method = ctx.props().action().method();
             let link = ctx.link().clone();
             Callback::from(move |event: InputEvent| {
-                link.send_message(FormMessage::StartSetSubmitButtonDisabledTimeout(
-                    match Self::extract_data_from_input_event(event) {
-                        Ok(data) => current
-                            .as_ref()
-                            .map_or(false, |current| *current == data && method.is_update()),
-                        Err(_) => true,
-                    },
-                ));
+                let link2 = link.clone();
+                if Self::extract_data_from_input_event(event, move |result| {
+                    link2.send_message(FormMessage::StartSetSubmitButtonDisabledTimeout(
+                        result.is_err(),
+                    ))
+                })
+                .is_err()
+                {
+                    link.send_message(FormMessage::StartSetSubmitButtonDisabledTimeout(true));
+                }
             })
         };
 
         let classes = format!(
             "standard-form{}",
-            if self.errors.is_empty() {
-                " error"
-            } else {
-                ""
-            }
+            if self.errors.is_empty() { " error" } else { "" }
         );
 
         let button_classes = if self.submit_button_disabled {
@@ -347,7 +333,7 @@ where
             "Submit the form"
         };
 
-        let on_delete ={
+        let on_delete = {
             let link = ctx.link().clone();
             Callback::from(move |error: String| {
                 link.send_message(FormMessage::RemoveError(error));
@@ -355,17 +341,18 @@ where
         };
 
         html! {
-            <form enctype={ "multipart/form-data" } class={classes} oninput={on_input} onsubmit={on_submit} method={props.method().to_string()}>
-                <h4>{ props.title() }</h4>
+            <form enctype={ "multipart/form-data" } class={classes} oninput={on_input} onsubmit={on_submit} method={Data::METHOD.to_string()}>
+                <h4>{ Data::title() }</h4>
+                <p class="instructions">{Data::description()}</p>
                 { ctx.props().children.clone() }
                 <InputErrors errors={self.errors.clone()} on_delete={on_delete} />
                 <button type="submit" title={title_message} class={button_classes} disabled={self.submit_button_disabled}>
                     {if self.waiting_for_reply {
                         html! { <i class="fas fa-spinner fa-spin"></i> }
                     } else {
-                        html! { <i class={props.method().font_awesome_icon()}></i> }
+                        html! { <i class={Data::METHOD.font_awesome_icon()}></i> }
                     }}
-                    <span>{format!("{} {}", props.crud(), props.title())}</span>
+                    <span>{format!("{} {}", Data::METHOD.to_crud(), Data::task_target())}</span>
                 </button>
                 <div class="clear"></div>
             </form>
@@ -376,12 +363,12 @@ where
 #[function_component(BasicForm)]
 pub fn basic_form<Data>(props: &BasicFormProp<Data>) -> Html
 where
-    Data: PartialEq + Clone + 'static + Validate + Debug + Serialize,
-    FormWrapper<Data>: TryFrom<FormData, Error = Vec<String>>,
+    Data: PartialEq + Clone + 'static + Validate + Debug + Serialize + FormResult,
+    FormWrapper<Data>: TryFromCallback<FormData>,
 {
     let navigator = use_navigator().unwrap();
     html! {
-        <InnerBasicForm<Data> navigator={navigator} action={props.action.clone()} current={props.current.clone()}>
+        <InnerBasicForm<Data> navigator={navigator} current={props.current.clone()}>
             { props.children.clone() }
         </InnerBasicForm<Data>>
     }

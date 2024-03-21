@@ -1,4 +1,8 @@
 pub mod name;
+pub mod complete_profile;
+
+pub use name::Name;
+pub use complete_profile::*;
 
 use crate::combine_path;
 
@@ -11,12 +15,17 @@ use uuid::Uuid;
 #[derive(PartialEq, Debug, Serialize, Deserialize, Clone)]
 pub struct User {
     name: Option<name::Name>,
+    profile_picture_url: Option<String>,
     id: Uuid,
 }
 
 impl User {
-    pub fn new(name: Option<name::Name>, id: Uuid) -> User {
-        User { name, id }
+    pub fn new(
+        name: Option<name::Name>,
+        profile_picture_url: Option<String>,
+        id: Uuid
+    ) -> User {
+        User { name, profile_picture_url, id }
     }
 
     pub fn full_name(&self) -> Result<String, String> {
@@ -42,6 +51,10 @@ impl User {
             Some(name) => Ok(name.clone()),
             None => Err("Name is not complete.".to_string()),
         }
+    }
+
+    pub fn profile_picture_url(&self) -> Option<String> {
+        self.profile_picture_url.clone()
     }
 
     pub fn first_name(&self) -> Result<String, String> {

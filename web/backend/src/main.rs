@@ -146,7 +146,7 @@ async fn main() -> std::io::Result<()> {
             // We add support for CORS requests
             .wrap(cors)
             // limit the maximum amount of data that server will accept
-            .app_data(web::JsonConfig::default().limit(4096))
+            // .app_data(web::JsonConfig::default().limit(10*1024*1024))
     })
     .bind_openssl("0.0.0.0:8080", builder)?
     .workers(4)

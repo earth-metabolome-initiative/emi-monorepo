@@ -180,21 +180,48 @@ impl User {
         }
     }
 
+    pub fn profile_picture_path(&self) -> String {
+        format!(
+            "/api/users/{}/profile_picture/small.jpg",
+            self.id.to_string().to_lowercase()
+        )
+    }
+
+    pub fn has_profile_picture(&self, conn: &mut crate::DieselConn) -> bool {
+        // In order to determine whether a user has a profile picture, we need to check whether
+        // the user is the author, in the field created_by from the editables table, of any
+        // document from the documents table as determined by the path column.
+        let profile_picture_path = self.profile_picture_path();
+        use crate::schema::documents::dsl::*;
+        use crate::schema::editables::dsl::*;
+        editables
+            .inner_join(documents)
+            .filter(created_by.eq(self.id))
+            .filter(path.eq(profile_picture_path))
+            .first::<(Editable, Document)>(conn)
+            .is_ok()
+    }
+
     /// Create a new web-commons User from a database User.
-    pub fn to_web_common_user(&self) -> web_common::api::auth::users::User {
+    pub fn to_web_common_user(
+        &self,
+        conn: &mut crate::DieselConn,
+    ) -> web_common::api::auth::users::User {
         let name = Name::new(
             self.first_name.clone().unwrap_or_default(),
             self.middle_name.clone(),
             self.last_name.clone().unwrap_or_default(),
         )
         .ok();
-        web_common::api::auth::users::User::new(name, self.id)
-    }
-}
-
-impl Into<web_common::api::auth::users::User> for User {
-    fn into(self) -> web_common::api::auth::users::User {
-        self.to_web_common_user()
+        if self.has_profile_picture(conn) {
+            web_common::api::auth::users::User::new(
+                name,
+                Some(self.profile_picture_path()),
+                self.id,
+            )
+        } else {
+            web_common::api::auth::users::User::new(name, None, self.id)
+        }
     }
 }
 

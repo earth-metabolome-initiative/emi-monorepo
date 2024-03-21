@@ -40,6 +40,10 @@ where
         self.label.clone()
     }
 
+    pub fn normalized_label(&self) -> String {
+        self.label.replace(" ", "_").to_lowercase()
+    }
+
     pub fn value(&self) -> Option<Data> {
         self.value.clone()
     }
@@ -279,7 +283,7 @@ where
             <div class={classes}>
                 {if props.show_label {
                     html! {
-                        <label class="input-label">{props.label()}</label>
+                        <label for={props.normalized_label()} class="input-label">{props.label()}</label>
                     }
                 } else {
                     html! {}
@@ -287,7 +291,7 @@ where
                 <input
                     type={props.input_type()}
                     class="input-control"
-                    name={props.label().to_lowercase().replace(" ", "_")}
+                    name={props.normalized_label()}
                     value={input_value}
                     placeholder={props.placeholder.clone().unwrap_or_else(|| props.label())}
                     step={props.step.map_or_else(|| "".to_string(), |step| step.to_string())}
