@@ -19,5 +19,6 @@ diesel::table! {
         last_edit_title -> Nullable<Text>,
         last_edit_extended_reason -> Nullable<Text>,
         extension -> Text,
+        mime_type -> Text,
     }
 }

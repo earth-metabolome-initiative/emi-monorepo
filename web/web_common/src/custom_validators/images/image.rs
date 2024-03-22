@@ -21,7 +21,9 @@ pub struct Image {
 
 #[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
 pub enum ImageSize {
+    #[serde(rename = "thumbnail")]
     Thumbnail,
+    #[serde(rename = "standard")]
     Standard
 }
 

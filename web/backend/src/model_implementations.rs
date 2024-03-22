@@ -1,4 +1,3 @@
-use crate::diesel::connection::SimpleConnection;
 use crate::model_views::DocumentView;
 use crate::models::*;
 use crate::schema::*;
@@ -27,6 +26,16 @@ impl DocumentFormat {
             .filter(name.eq(extension))
             .select(DocumentFormat::as_select())
             .first::<DocumentFormat>(conn)
+    }
+}
+
+impl Document {
+    pub fn from_path(
+        path: &str,
+        conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>,
+    ) -> Result<Document, diesel::result::Error> {
+        use crate::schema::documents::dsl::*;
+        documents.filter(path.eq(path)).first::<Document>(conn)
     }
 }
 
@@ -227,7 +236,7 @@ impl User {
                 conn,
                 &new_editable,
                 NewDescribable::new("Profile Picture", None),
-            ).unwrap();
+            )?;
             // Similarly, we create the document for the thumbnail.
             let thumbnail_document = NewDocument::new(
                 self.profile_picture_path(&ImageSize::Thumbnail),
@@ -238,20 +247,21 @@ impl User {
                 conn,
                 &new_editable,
                 NewDescribable::new("Profile Picture Thumbnail", None),
-            ).unwrap();
+            )?;
             // We attempt to save the profile picture and thumbnail
             let profile_picture_path =
-                DocumentView::get(conn, profile_picture_document.id).unwrap().internal_path();
-            profile_picture.save_with_format(profile_picture_path, ImageFormat::Png).unwrap();
-            let thumbnail_path = DocumentView::get(conn, thumbnail_document.id).unwrap().internal_path();
-            thumbnail.save_with_format(thumbnail_path, ImageFormat::Png).unwrap();
+                DocumentView::get(conn, profile_picture_document.id)?.internal_path();
+            profile_picture.save_with_format(profile_picture_path, ImageFormat::Png)?;
+            let thumbnail_path = DocumentView::get(conn, thumbnail_document.id)?.internal_path();
+            thumbnail.save_with_format(thumbnail_path, ImageFormat::Png)?;
             Ok(())
         })
     }
 
     pub fn profile_picture_path(&self, image_size: &ImageSize) -> String {
         format!(
-            "/api/users/{}/profile_picture/{}.png",
+            "{}/{}/{}.png",
+            web_common::api::documents::profile::picture::FULL_ENDPOINT,
             self.id.to_string().to_lowercase(),
             image_size.to_string()
         )

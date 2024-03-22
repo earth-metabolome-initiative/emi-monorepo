@@ -41,7 +41,7 @@ pub struct FileInputProp {
     #[prop_or_default]
     pub allowed_formats: Vec<GenericFileFormat>,
     #[prop_or_default]
-    pub url: Option<String>,
+    pub urls: Vec<String>,
     #[prop_or_default]
     pub maximal_size: Option<u64>,
 }
@@ -140,8 +140,6 @@ where
             .unwrap();
         closure.forget(); // Prevent the closure from being dropped immediately
 
-        let maybe_url = ctx.props().url.clone();
-
         Self {
             _websocket: ctx.link().bridge_worker(Callback::from({
                 let link = ctx.link().clone();
@@ -153,7 +151,7 @@ where
             is_valid: None,
             validation_timeout: None,
             files: Vec::new(),
-            show_drop_area: maybe_url.is_none(),
+            show_drop_area: ctx.props().urls.is_empty(),
             show_drop_area_timeout: None,
             hide_drop_area_timeout: None,
             dragging: false,
@@ -295,7 +293,7 @@ where
 
                 ctx.link()
                     .send_message(InputMessage::SetTimeoutDropAreaVisibility(
-                        self.files.is_empty(),
+                        self.files.is_empty() && ctx.props().urls.is_empty(),
                     ));
 
                 true
@@ -304,7 +302,7 @@ where
                 self.files.remove(index);
                 ctx.link()
                     .send_message(InputMessage::SetTimeoutDropAreaVisibility(
-                        self.files.is_empty(),
+                        self.files.is_empty() && ctx.props().urls.is_empty(),
                     ));
                 true
             }
@@ -420,7 +418,7 @@ where
             })
         };
 
-        let no_files = self.files.is_empty();
+        let no_files = self.files.is_empty() && ctx.props().urls.is_empty();
 
         let ondragover = {
             let link = ctx.link().clone();
@@ -474,6 +472,7 @@ where
                             hiding={self.show_drop_area_timeout.is_some()}
                             files={self.files.clone()}
                             on_delete={on_file_delete}
+                            urls={if props.multiple || self.files.is_empty() {props.urls.clone()} else {vec![]}}
                         />
                     }
                 }}
@@ -490,12 +489,41 @@ pub struct FilePreviewProp {
     #[prop_or_default]
     pub hiding: bool,
     #[prop_or_default]
-    pub url: Option<String>,
+    pub urls: Vec<String>,
+}
+
+#[derive(Clone, PartialEq)]
+pub enum FileLike {
+    File(web_sys::File),
+    Url(String),
 }
 
 impl FilePreviewProp {
     pub fn number_of_files(&self) -> usize {
-        self.files.len()
+        self.files.len() + self.urls.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.files.is_empty() && self.urls.is_empty()
+    }
+
+    pub fn one_file(&self) -> Option<FileLike> {
+        if self.number_of_files() == 1 {
+            if let Some(file) = self.files.first() {
+                return Some(FileLike::File(file.clone()));
+            }
+            if let Some(url) = self.urls.first() {
+                return Some(FileLike::Url(url.clone()));
+            }
+        }
+        None
+    }
+
+    pub fn iter(&self) -> impl Iterator<Item = FileLike> + '_ {
+        self.files
+            .iter()
+            .map(|f| FileLike::File(f.clone()))
+            .chain(self.urls.iter().map(|u| FileLike::Url(u.clone())))
     }
 }
 
@@ -515,36 +543,46 @@ impl FilePreviewProp {
 /// also needs to be able to communicate with the parent component, it receives a callback to
 /// send messages to the parent component to delete the file from the list of selected files.
 pub fn file_preview(props: &FilePreviewProp) -> Html {
-    if let Some(url) = &props.url {
+    if props.is_empty() {
         return html! {
-            <img src={url.clone()} class="preview" />
+            <></>
         };
     }
 
-    if props.files.is_empty() {
-        return html! { <></> };
-    }
+    if let Some(file_like) = props.one_file() {
+        match file_like {
+            FileLike::File(file) => {
+                let on_delete = {
+                    let props = props.clone();
+                    Callback::from(move |_| {
+                        let props = props.clone();
+                        let timeout = Timeout::new(200, move || {
+                            props.on_delete.emit(0);
+                        });
+                        timeout.forget();
+                    })
+                };
 
-    if props.files.len() == 1 {
-        let on_delete = {
-            let props = props.clone();
-            Callback::from(move |_| {
-                let props = props.clone();
-                let timeout = Timeout::new(200, move || {
-                    props.on_delete.emit(0);
-                });
-                timeout.forget();
-            })
-        };
-
-        return html! {
-            <FilePreviewItem
-                hiding={props.hiding}
-                large={true}
-                file={props.files[0].clone()}
-                on_delete={on_delete}
-            />
-        };
+                return html! {
+                    <FilePreviewItem
+                        hiding={props.hiding}
+                        large={true}
+                        file={FileLike::File(file)}
+                        on_delete={on_delete}
+                    />
+                };
+            }
+            FileLike::Url(url) => {
+                return html! {
+                    <FilePreviewItem
+                        hiding={props.hiding}
+                        large={true}
+                        file={FileLike::Url(url)}
+                        on_delete={Callback::noop()}
+                    />
+                };
+            }
+        }
     }
 
     let mut class = format!(
@@ -562,7 +600,7 @@ pub fn file_preview(props: &FilePreviewProp) -> Html {
 
     html! {
         <ul class={class}>
-            { for props.files.iter().enumerate().map(|(i, file)|{
+            { for props.iter().enumerate().map(|(i, file)|{
                 let props = props.clone();
                 let on_delete = Callback::from(move |_| {
                     let props = props.clone();
@@ -581,7 +619,7 @@ pub fn file_preview(props: &FilePreviewProp) -> Html {
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct FilePreviewItemProp {
-    pub file: web_sys::File,
+    pub file: FileLike,
     #[prop_or_default]
     pub on_delete: Callback<()>,
     pub large: bool,
@@ -590,61 +628,103 @@ pub struct FilePreviewItemProp {
 }
 
 impl FilePreviewItemProp {
-    pub fn path(&self) -> String {
-        self.file.name()
+    pub fn path(&self) -> Option<String> {
+        match &self.file {
+            FileLike::File(file) => Some(file.name()),
+            FileLike::Url(_) => None,
+        }
     }
 
-    pub fn name(&self) -> String {
-        self.file.name().split('/').last().unwrap().to_string()
+    pub fn name(&self) -> Option<String> {
+        match &self.file {
+            FileLike::File(file) => Some(file.name().split('/').last().unwrap().to_string()),
+            FileLike::Url(_) => None,
+        }
     }
 
     pub fn extension(&self) -> Option<String> {
-        self.file.name().split('.').last().map(|s| s.to_string())
+        match &self.file {
+            FileLike::File(file) => {
+                let path = file.name();
+                let extension = path.split('.').last();
+                extension.map(|s| s.to_string())
+            }
+            FileLike::Url(url) => {
+                let extension = url.split('.').last();
+                extension.map(|s| s.to_string())
+            }
+        }
     }
 
-    pub fn size(&self) -> u64 {
-        self.file.size() as u64
+    pub fn size(&self) -> Option<u64> {
+        match &self.file {
+            FileLike::File(file) => Some(file.size() as u64),
+            FileLike::Url(_) => None,
+        }
     }
 
     pub fn is_image(&self) -> bool {
-        self.file.type_().starts_with("image")
+        match &self.file {
+            FileLike::File(file) => file.type_().starts_with("image"),
+            FileLike::Url(url) => {
+                url.ends_with(".png")
+                    || url.ends_with(".jpg")
+                    || url.ends_with(".jpeg")
+                    || url.ends_with(".gif")
+                    || url.ends_with(".webp")
+            }
+        }
     }
 
     pub fn is_pdf(&self) -> bool {
-        self.file.type_().starts_with("application/pdf")
+        match &self.file {
+            FileLike::File(file) => file.type_().starts_with("application/pdf"),
+            FileLike::Url(url) => url.ends_with(".pdf"),
+        }
     }
 
-    pub fn last_modified(&self) -> u64 {
-        self.file.last_modified() as u64
+    pub fn last_modified(&self) -> Option<u64> {
+        match &self.file {
+            FileLike::File(file) => Some(file.last_modified() as u64),
+            FileLike::Url(_) => None,
+        }
     }
 
     pub fn metadata_hash(&self) -> u64 {
         let mut hasher = DefaultHasher::new();
-        self.file.name().hash(&mut hasher);
+        match &self.file {
+            FileLike::File(file) => {
+                file.name().hash(&mut hasher);
+            }
+            FileLike::Url(url) => {
+                url.hash(&mut hasher);
+            }
+        }
         self.size().hash(&mut hasher);
         self.last_modified().hash(&mut hasher);
         hasher.finish()
     }
 
-    pub fn human_readable_size(&self) -> String {
-        human_readable_size(self.size())
+    pub fn human_readable_size(&self) -> Option<String> {
+        self.size().map(human_readable_size)
     }
 
-    pub fn last_modified_date(&self) -> String {
-        let date = self.file.last_modified();
-        let date = js_sys::Date::new(&JsValue::from_f64(date));
-        let date = date.to_locale_string("en-US", &JsValue::undefined());
-        date.as_string().unwrap()
+    pub fn last_modified_date(&self) -> Option<String> {
+        self.last_modified().map(|last_modified| {
+            let date = js_sys::Date::new(&JsValue::from_f64(last_modified as f64));
+            let date = date.to_locale_string("en-US", &JsValue::undefined());
+            date.as_string().unwrap()
+        })
     }
 
     /// Returns a human-readable string representing the time elapsed since the file was last modified.
-    pub fn human_readable_modified_delta(&self) -> String {
-        let date = self.file.last_modified();
-        let date = js_sys::Date::new(&JsValue::from_f64(date));
+    pub fn human_readable_modified_delta(&self) -> Option<String> {
+        let date = self.last_modified()?;
+        let date = js_sys::Date::new(&JsValue::from_f64(date as f64));
         let now = js_sys::Date::new_0();
         let delta = now.get_time() - date.get_time();
         let delta = (delta as f64 / 1000.0) as u64;
-        if delta < 60 {
+        Some(if delta < 60 {
             format!("{} seconds ago", delta)
         } else if delta < 60 * 60 {
             format!("{} minutes ago", delta / 60)
@@ -656,6 +736,19 @@ impl FilePreviewItemProp {
             format!("{} months ago", delta / (60 * 60 * 24 * 30))
         } else {
             format!("{} years ago", delta / (60 * 60 * 24 * 30 * 12))
+        })
+    }
+
+    /// Returns the file metadata when the variant is a File.
+    pub fn file_metadata(&self) -> Option<String> {
+        match &self.file {
+            FileLike::File(_) => Some(format!(
+                "{}, {}, from {}",
+                self.name()?,
+                self.human_readable_size()?,
+                self.human_readable_modified_delta()?
+            )),
+            FileLike::Url(_) => None,
         }
     }
 }
@@ -675,18 +768,26 @@ impl Component for ImagePreview {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let file = ctx.props().file.clone();
-        let url = web_sys::Url::create_object_url_with_blob(&file).unwrap();
-
         // We add an hash obtained from the file name and the associated informations, such
         // as the file size and the last modified date, to the URL to make sure that the URL
         // changes when the file changes, so that the image is reloaded when the file changes.
 
         let hash = ctx.props().metadata_hash();
-        let url = format!("{}#{}", url, hash);
 
-        html! {
-            <img src={url} class="preview" />
+        match &ctx.props().file {
+            FileLike::File(file) => {
+                let url = web_sys::Url::create_object_url_with_blob(&file).unwrap();
+                let url = format!("{}#{}", url, hash);
+                html! {
+                    <img src={url} class="preview" />
+                }
+            }
+            FileLike::Url(url) => {
+                let url = format!("{}#{}", url, hash);
+                html! {
+                    <img src={url} class="preview" />
+                }
+            }
         }
     }
 }
@@ -706,15 +807,26 @@ impl Component for PDFPreview {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let file = ctx.props().file.clone();
-        let url = web_sys::Url::create_object_url_with_blob(&file).unwrap();
+        // We add an hash obtained from the file name and the associated informations, such
+        // as the file size and the last modified date, to the URL to make sure that the URL
+        // changes when the file changes, so that the image is reloaded when the file changes.
 
         let hash = ctx.props().metadata_hash();
 
-        let url = format!("{}#{}", url, hash);
-
-        html! {
-            <iframe src={url} class="preview"></iframe>
+        match &ctx.props().file {
+            FileLike::File(file) => {
+                let url = web_sys::Url::create_object_url_with_blob(&file).unwrap();
+                let url = format!("{}#{}", url, hash);
+                html! {
+                    <iframe src={url} class="preview"></iframe>
+                }
+            }
+            FileLike::Url(url) => {
+                let url = format!("{}#{}", url, hash);
+                html! {
+                    <iframe src={url} class="preview"></iframe>
+                }
+            }
         }
     }
 }
@@ -739,7 +851,12 @@ impl Component for TextualFilePreview {
     type Properties = TextualFilePreviewProps;
 
     fn create(ctx: &Context<Self>) -> Self {
-        let file = ctx.props().file_props.file.clone();
+        let file = match ctx.props().file_props.file.clone() {
+            FileLike::File(file) => file,
+            FileLike::Url(_) => {
+                unreachable!("TextualFilePreview should only be used with files, not URLs.")
+            }
+        };
         let reader = web_sys::FileReader::new().unwrap();
         let link = ctx.link().clone();
         // We read the first few lines of the file to display a preview of the file.
@@ -857,8 +974,18 @@ pub fn file_preview_item(props: &FilePreviewItemProp) -> Html {
     let wrapped = html! {
         <>
             {thumbnail}
-            <button class="delete" onclick={on_click}><i class="fas fa-times"></i></button>
-            <p class="metadata">{format!("{}, {}, from {}", props.name(), props.human_readable_size(), props.human_readable_modified_delta())}</p>
+            {if let Some(metadata) = props.file_metadata() {
+                html!{
+                    <>
+                    <button class="delete" onclick={on_click}><i class="fas fa-times"></i></button>
+                    <p class="metadata">{metadata}</p>
+                    </>
+                }
+            } else {
+                html!{
+                    <></>
+                }
+            }}
         </>
     };
 

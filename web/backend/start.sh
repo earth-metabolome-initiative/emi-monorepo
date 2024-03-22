@@ -1,3 +1,4 @@
+mkdir -p $DOCUMENTS_DIRECTORY
 rm -rf /app/backend/backend.ready || true
 touch /app/backend/backend.building
 diesel migration run

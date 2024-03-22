@@ -34,7 +34,8 @@ SELECT
     last_edits_view.editor_last_name AS last_editor_last_name,
     last_edits_view.edit_title AS last_edit_title,
     last_edits_view.edit_extended_reason AS last_edit_extended_reason,
-    formats_view.extension
+    formats_view.extension,
+    formats_view.mime_type
 FROM documents
 JOIN editables ON documents.id = editables.id
 JOIN users ON editables.created_by = users.id

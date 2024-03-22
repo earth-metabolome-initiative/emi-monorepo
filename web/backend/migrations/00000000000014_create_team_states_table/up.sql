@@ -39,60 +39,32 @@ DELETE
 DO $$
 DECLARE
   root_user_id UUID;
-
-editables_ids UUID [ ];
-
-BEGIN
-  -- We retrieve the id of the root user.
-  SELECT
-    id INTO root_user_id
-  FROM
-    users
-  WHERE
-    first_name = 'root'
-    AND last_name = 'user';
-
--- We insert the first team state into the editables and describables tables.
-WITH inserted_rows AS (
-  INSERT INTO
-    editables (created_by)
-  VALUES
-    (root_user_id),
-    (root_user_id),
-    (root_user_id) RETURNING id
-)
-SELECT
-  array_agg(id) INTO editables_ids
-FROM
-  inserted_rows;
-
-INSERT INTO
-  describables (id, name, description)
-VALUES
-  (
-    editables_ids [ 1 ],
-    'active',
-    'The team is active and can be used.'
-  ),
-  (
-    editables_ids [ 2 ],
-    'inactive',
-    'The team is inactive and cannot be used.'
-  ),
-  (
-    editables_ids [ 3 ],
-    'archived',
+  editables_ids UUID[];
+  names VARCHAR(255)[] := ARRAY['active', 'inactive', 'archived'];
+  descriptions VARCHAR(255)[] := ARRAY[
+    'The team is active and can be used.',
+    'The team is inactive and cannot be used.',
     'The team is archived and cannot be used.'
-  );
+  ];
+  font_awesome_icons VARCHAR(255)[] := ARRAY['fa-check', 'fa-times', 'fa-archive'];
+BEGIN
+  -- Retrieve the id of the root user
+  SELECT id INTO root_user_id FROM users WHERE first_name = 'root' AND last_name = 'user';
 
--- We insert the team states into the team_states table.
-INSERT INTO
-  team_states (id, font_awesome_icon)
-VALUES
-  (editables_ids [ 1 ], 'fa-check'),
-  (editables_ids [ 2 ], 'fa-times'),
-  (editables_ids [ 3 ], 'fa-archive');
+  -- Insert the editables that index the team states
+  WITH inserted_rows AS (
+    INSERT INTO editables (created_by)
+    SELECT root_user_id FROM generate_series(1, array_length(names, 1))
+    RETURNING id
+  )
+  SELECT array_agg(id) INTO editables_ids FROM inserted_rows;
 
+  -- Insert the description of the team states in the describables table
+  INSERT INTO describables (id, name, description)
+  SELECT unnest(editables_ids), unnest(names), unnest(descriptions);
+
+  -- Insert the team states in the team_states table
+  INSERT INTO team_states (id, font_awesome_icon)
+  SELECT unnest(editables_ids), unnest(font_awesome_icons);
 END;
-
 $$;

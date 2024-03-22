@@ -71,6 +71,7 @@ pub struct DiscreteUnit {
 #[diesel(table_name = document_formats)]
 pub struct DocumentFormat {
     pub id: Uuid,
+    pub mime_type: String,
 }
 
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]

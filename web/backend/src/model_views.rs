@@ -34,6 +34,7 @@ pub struct DocumentView {
     pub last_edit_title: Option<String>,
     pub last_edit_extended_reason: Option<String>,
     pub extension: String,
+    pub mime_type: String,
 }
 
 impl DocumentView {

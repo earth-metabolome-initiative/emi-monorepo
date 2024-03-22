@@ -98,7 +98,7 @@ pub fn complete_profile_form() -> Html {
                 <FileInput<ProfileImage>
                     label="Profile picture"
                     maximal_size={5*1024_u64.pow(2)}
-                    url={profile_picture_url}
+                    urls={profile_picture_url.map_or_else(|| vec![], |url| vec![url])}
                     allowed_formats={vec![GenericFileFormat::Image]}
                 />
                 <ul class="name-wrapper input-group">

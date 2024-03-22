@@ -4,6 +4,7 @@
 CREATE VIEW formats_view AS
 SELECT
     document_formats.id,
+    document_formats.mime_type,
     describables.name AS extension,
     describables.description AS format_description
 FROM document_formats

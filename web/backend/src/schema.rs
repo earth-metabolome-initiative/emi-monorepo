@@ -53,6 +53,8 @@ diesel::table! {
 diesel::table! {
     document_formats (id) {
         id -> Uuid,
+        #[max_length = 255]
+        mime_type -> Varchar,
     }
 }
 

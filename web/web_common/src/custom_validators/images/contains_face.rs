@@ -80,7 +80,6 @@ mod frontend {
     where
         I: AsRef<Image>,
     {
-        log::warn!("The `contains_face` validator is not available in the frontend.");
         Ok(())
     }
 
@@ -89,7 +88,6 @@ mod frontend {
     where
         I: AsRef<Image>,
     {
-        log::warn!("The `contains_one_face` validator is not available in the frontend.");
         Ok(())
     }
 
@@ -98,7 +96,6 @@ mod frontend {
     where
         I: AsRef<Image>,
     {
-        log::warn!("The `no_faces` validator is not available in the frontend.");
         Ok(())
     }
 }

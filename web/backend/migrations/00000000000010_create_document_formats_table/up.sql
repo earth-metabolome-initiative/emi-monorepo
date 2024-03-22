@@ -5,7 +5,8 @@ CREATE TABLE document_formats (
   DELETE
     CASCADE REFERENCES describables(id) ON
   DELETE
-    CASCADE
+    CASCADE,
+    mime_type VARCHAR(255) NOT NULL
 );
 
 -- We also need to add a bi-directional cascade delete constraint to the editables
@@ -35,98 +36,78 @@ DELETE
 DO $$
 DECLARE
   root_user_id UUID;
-  first_editables_id UUID;
-  second_editables_id UUID;
-  third_editables_id UUID;
-  fourth_editables_id UUID;
-  fifth_editables_id UUID;
-  sixth_editables_id UUID;
-  seventh_editables_id UUID;
-  eighth_editables_id UUID;
-  ninth_editables_id UUID;
+
+editables_ids UUID [ ];
+
+extensions VARCHAR(255) [ ] := ARRAY [ 'pdf',
+'jpg',
+'png',
+'mgf',
+'jpeg',
+'csv',
+'txt',
+'webp',
+'json' ];
+
+descriptions VARCHAR(255) [ ] := ARRAY [ 'Portable Document Format',
+'Joint Photographic Experts Group',
+'Portable Network Graphics',
+'Mascot generic format files',
+'Joint Photographic Experts Group',
+'Comma-separated values',
+'Plain text',
+'WebP image format',
+'JavaScript Object Notation' ];
+
+mime_types VARCHAR(255) [ ] := ARRAY [ 'application/pdf',
+'image/jpeg',
+'image/png',
+'text/mgf',
+'image/jpeg',
+'text/csv',
+'text/plain',
+'image/webp',
+'application/json' ];
+
 BEGIN
-  -- We retrieve the id of the root user.
+  -- Retrieve the id of the root user
   SELECT
-    id
-  INTO
-    root_user_id
+    id INTO root_user_id
   FROM
     users
   WHERE
     first_name = 'root'
-  AND last_name = 'user';
+    AND last_name = 'user';
 
-  -- Insert the editables that indexes the formats.
+-- Insert the editables that index the formats
+WITH inserted_rows AS (
   INSERT INTO
     editables (created_by)
-  VALUES
-    (root_user_id) RETURNING id INTO first_editables_id;
+  SELECT
+    root_user_id
+  FROM
+    generate_series(1, array_length(extensions, 1)) RETURNING id
+)
+SELECT
+  array_agg(id) INTO editables_ids
+FROM
+  inserted_rows;
 
-  INSERT INTO
-    editables (created_by)
-  VALUES
-    (root_user_id) RETURNING id INTO second_editables_id;
+-- Insert the description of the formats in the describables table
+INSERT INTO
+  describables (id, name, description)
+SELECT
+  unnest(editables_ids),
+  unnest(extensions),
+  unnest(descriptions);
 
-  INSERT INTO
-    editables (created_by)
-  VALUES
-    (root_user_id) RETURNING id INTO third_editables_id;
+-- Insert the formats in the document_formats table
+INSERT INTO
+  document_formats (id, mime_type)
+SELECT
+  unnest(editables_ids),
+  unnest(mime_types);
 
-  INSERT INTO
-    editables (created_by)
-  VALUES
-    (root_user_id) RETURNING id INTO fourth_editables_id;
+END;
 
-  INSERT INTO
-    editables (created_by)
-  VALUES
-    (root_user_id) RETURNING id INTO fifth_editables_id;
-
-  INSERT INTO
-    editables (created_by)
-  VALUES
-    (root_user_id) RETURNING id INTO sixth_editables_id;
-
-  INSERT INTO
-    editables (created_by)
-  VALUES
-    (root_user_id) RETURNING id INTO seventh_editables_id;
-
-  INSERT INTO
-    editables (created_by)
-  VALUES
-    (root_user_id) RETURNING id INTO eighth_editables_id;
-
-  INSERT INTO
-    editables (created_by)
-  VALUES
-    (root_user_id) RETURNING id INTO ninth_editables_id;
-
-  -- Insert the description of the formats in the describables table.
-  INSERT INTO
-    describables (id, name, description)
-  VALUES
-    (first_editables_id, 'pdf', 'Portable Document Format'),
-    (second_editables_id, 'jpg', 'Joint Photographic Experts Group'),
-    (third_editables_id, 'png', 'Portable Network Graphics'),
-    (fourth_editables_id, 'mgf', 'Mascot generic format files'),
-    (fifth_editables_id, 'jpeg', 'Joint Photographic Experts Group'),
-    (sixth_editables_id, 'csv', 'Comma-separated values'),
-    (seventh_editables_id, 'txt', 'Plain text'),
-    (eighth_editables_id, 'webp', 'WebP image format'),
-    (ninth_editables_id, 'json', 'JavaScript Object Notation');
-
-  -- Insert the formats in the document_formats table.
-  INSERT INTO
-    document_formats (id)
-  VALUES
-    (first_editables_id),
-    (second_editables_id),
-    (third_editables_id),
-    (fourth_editables_id),
-    (fifth_editables_id),
-    (sixth_editables_id),
-    (seventh_editables_id),
-    (eighth_editables_id),
-    (ninth_editables_id);
-END $$;
+$$;
