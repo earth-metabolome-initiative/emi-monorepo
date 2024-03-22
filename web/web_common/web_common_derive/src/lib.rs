@@ -279,6 +279,16 @@ pub fn image_validator(args: TokenStream, mut input: TokenStream) -> TokenStream
                 self.value.as_ref()
             }
         }
+
+        impl<S> From<#struct_name<S>> for Image
+        where
+            S: AsRef<Image> + serde::Serialize + validator::Validate,
+            S: Into<Image>,
+        {
+            fn from(value: #struct_name<S>) -> Image {
+                value.value.into()
+            }
+        }
     };
 
     input.extend(TokenStream::from(expanded));

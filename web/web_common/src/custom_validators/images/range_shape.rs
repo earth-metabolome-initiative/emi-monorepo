@@ -206,6 +206,21 @@ where
     }
 }
 
+impl<
+        V,
+        const MIN_WIDTH: u32,
+        const MAX_WIDTH: u32,
+        const MIN_HEIGHT: u32,
+        const MAX_HEIGHT: u32,
+    > From<RangeShape<V, MIN_WIDTH, MAX_WIDTH, MIN_HEIGHT, MAX_HEIGHT>> for Image
+where
+    V: AsRef<Image> + serde::Serialize + validator::Validate + Into<Image>,
+{
+    fn from(value: RangeShape<V, MIN_WIDTH, MAX_WIDTH, MIN_HEIGHT, MAX_HEIGHT>) -> Self {
+        value.value.into()
+    }
+}
+
 pub type ExactShape<V, const WIDTH: u32, const HEIGHT: u32> =
     RangeShape<V, WIDTH, WIDTH, HEIGHT, HEIGHT>;
 pub type MinShape<V, const MIN_WIDTH: u32, const MIN_HEIGHT: u32> =

@@ -47,6 +47,7 @@ services:
       dockerfile: DockerfileDeploy
       args:
         ACTIX_PORT: ${ACTIX_PORT}
+        DOCUMENTS_DIRECTORY: ${DOCUMENTS_DIRECTORY}
     environment:
       DATABASE_URL: ${DATABASE_URL}
       REDIS_URL: ${REDIS_URL}
@@ -66,6 +67,7 @@ services:
       REFRESH_TOKEN_MINUTES: ${REFRESH_TOKEN_MINUTES}
       ACTIX_PORT: ${ACTIX_PORT}
       ACTIX_WORKER_THREADS: ${ACTIX_WORKER_THREADS}
+      DOCUMENTS_DIRECTORY: ${DOCUMENTS_DIRECTORY}
     volumes:
       - ./:/app
     ports:

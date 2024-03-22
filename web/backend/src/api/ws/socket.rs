@@ -166,11 +166,10 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                     FrontendMessage::Task(task_id, form_action) => {
                         if form_action.requires_authentication() {
                             match self.must_be_authenticated(ctx) {
-                                Ok(user) => match form_action {
+                                Ok(_user) => match form_action {
                                     FormAction::CompleteProfile(profile) => {
                                         ctx.address().do_send(UserMessage::CompleteProfile(
                                             task_id,
-                                            user.id(),
                                             profile,
                                         ));
                                     }

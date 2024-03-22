@@ -1,3 +1,5 @@
+use crate::diesel::connection::SimpleConnection;
+use crate::model_views::DocumentView;
 use crate::models::*;
 use crate::schema::*;
 use diesel::prelude::*;
@@ -5,8 +7,28 @@ use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::Pool;
 use diesel::r2d2::PooledConnection;
 use email_address::*;
+use image::DynamicImage;
+use image::ImageFormat;
 use uuid::Uuid;
 use web_common::api::auth::users::name::Name;
+use web_common::api::ApiError;
+use web_common::custom_validators::ImageSize;
+
+impl DocumentFormat {
+    pub fn from_extension(
+        extension: &str,
+        conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>,
+    ) -> Result<DocumentFormat, diesel::result::Error> {
+        use crate::schema::describables::dsl::*;
+        use crate::schema::document_formats::dsl::*;
+        // The extension of the format is stored as the name of the describable.
+        document_formats
+            .inner_join(describables)
+            .filter(name.eq(extension))
+            .select(DocumentFormat::as_select())
+            .first::<DocumentFormat>(conn)
+    }
+}
 
 #[derive(Queryable, Insertable, Debug)]
 #[diesel(table_name = user_emails)]
@@ -161,29 +183,77 @@ impl User {
     /// # Arguments
     /// * `new_name` - The new name to set for the user.
     /// * `conn` - The database connection pool.
-    pub async fn update_name(
+    pub fn update_name(
         &self,
         new_name: Name,
         conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>,
-    ) -> Result<(), String> {
+    ) -> Result<usize, diesel::result::Error> {
         use crate::schema::users::dsl::*;
-        let update = diesel::update(users.filter(id.eq(self.id)))
+        diesel::update(users.filter(id.eq(self.id)))
             .set((
                 first_name.eq(new_name.first_name().to_string()),
                 middle_name.eq(new_name.middle_name().map(|s| s.to_string())),
                 last_name.eq(new_name.last_name().to_string()),
             ))
-            .execute(conn);
-        match update {
-            Ok(_) => Ok(()),
-            Err(_) => Err("Failed to update user name".to_string()),
-        }
+            .execute(conn)
     }
 
-    pub fn profile_picture_path(&self) -> String {
+    /// Inserts the user new profile and thumbnail pictures in the database.
+    ///
+    /// # Arguments
+    /// * `profile_picture` - The profile picture to insert.
+    /// * `thumbnail` - The thumbnail to insert.
+    /// * `conn` - The database connection pool.
+    pub fn insert_profile_pictures(
+        &self,
+        profile_picture: DynamicImage,
+        conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>,
+    ) -> Result<(), ApiError> {
+        // First, we create the thumbnail.
+        let thumbnail =
+            profile_picture.thumbnail(ImageSize::Thumbnail.width(), ImageSize::Thumbnail.height());
+
+        let png_format = DocumentFormat::from_extension("png", conn)?;
+
+        conn.transaction::<_, ApiError, _>(|conn| {
+            // First, we create the document for the profile picture.
+            let profile_picture_document = NewDocument::new(
+                self.profile_picture_path(&ImageSize::Standard),
+                png_format.id,
+                profile_picture.as_bytes().len() as i32,
+            );
+            let new_editable = NewEditable::new(self.id);
+            let profile_picture_document = profile_picture_document.insert(
+                conn,
+                &new_editable,
+                NewDescribable::new("Profile Picture", None),
+            ).unwrap();
+            // Similarly, we create the document for the thumbnail.
+            let thumbnail_document = NewDocument::new(
+                self.profile_picture_path(&ImageSize::Thumbnail),
+                png_format.id,
+                thumbnail.as_bytes().len() as i32,
+            );
+            let thumbnail_document = thumbnail_document.insert(
+                conn,
+                &new_editable,
+                NewDescribable::new("Profile Picture Thumbnail", None),
+            ).unwrap();
+            // We attempt to save the profile picture and thumbnail
+            let profile_picture_path =
+                DocumentView::get(conn, profile_picture_document.id).unwrap().internal_path();
+            profile_picture.save_with_format(profile_picture_path, ImageFormat::Png).unwrap();
+            let thumbnail_path = DocumentView::get(conn, thumbnail_document.id).unwrap().internal_path();
+            thumbnail.save_with_format(thumbnail_path, ImageFormat::Png).unwrap();
+            Ok(())
+        })
+    }
+
+    pub fn profile_picture_path(&self, image_size: &ImageSize) -> String {
         format!(
-            "/api/users/{}/profile_picture/small.jpg",
-            self.id.to_string().to_lowercase()
+            "/api/users/{}/profile_picture/{}.png",
+            self.id.to_string().to_lowercase(),
+            image_size.to_string()
         )
     }
 
@@ -191,7 +261,7 @@ impl User {
         // In order to determine whether a user has a profile picture, we need to check whether
         // the user is the author, in the field created_by from the editables table, of any
         // document from the documents table as determined by the path column.
-        let profile_picture_path = self.profile_picture_path();
+        let profile_picture_path = self.profile_picture_path(&ImageSize::Thumbnail);
         use crate::schema::documents::dsl::*;
         use crate::schema::editables::dsl::*;
         editables
@@ -216,11 +286,12 @@ impl User {
         if self.has_profile_picture(conn) {
             web_common::api::auth::users::User::new(
                 name,
-                Some(self.profile_picture_path()),
+                Some(self.profile_picture_path(&ImageSize::Standard)),
+                Some(self.profile_picture_path(&ImageSize::Thumbnail)),
                 self.id,
             )
         } else {
-            web_common::api::auth::users::User::new(name, None, self.id)
+            web_common::api::auth::users::User::new(name, None, None, self.id)
         }
     }
 }
@@ -240,5 +311,112 @@ impl LoginProvider {
             Ok(providers) => Ok(providers),
             Err(_) => Err("Failed to retrieve login providers".to_string()),
         }
+    }
+}
+
+#[derive(Queryable, Insertable, Debug)]
+#[diesel(table_name = editables)]
+pub struct NewEditable {
+    pub created_by: Uuid,
+}
+
+impl NewEditable {
+    pub fn new(created_by: Uuid) -> NewEditable {
+        NewEditable { created_by }
+    }
+
+    /// Insert the editable into the database.
+    pub fn insert(
+        &self,
+        conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>,
+    ) -> Result<Editable, diesel::result::Error> {
+        diesel::insert_into(editables::table)
+            .values(self)
+            .get_result::<Editable>(conn)
+    }
+}
+
+impl Describable {
+    pub fn insert(
+        &self,
+        conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>,
+    ) -> Result<Describable, diesel::result::Error> {
+        diesel::insert_into(describables::table)
+            .values(self)
+            .get_result::<Describable>(conn)
+    }
+}
+
+#[derive(Queryable, Insertable, Debug, Clone)]
+#[diesel(table_name = describables)]
+pub struct NewDescribable {
+    pub name: String,
+    pub description: Option<String>,
+}
+
+impl NewDescribable {
+    pub fn new(name: &str, description: Option<&str>) -> NewDescribable {
+        NewDescribable {
+            name: name.to_string(),
+            description: description.map(|s| s.to_string()),
+        }
+    }
+
+    pub fn into_describable(self, editable: Editable) -> Describable {
+        Describable {
+            id: editable.id,
+            name: self.name,
+            description: self.description,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct NewDocument {
+    pub path: String,
+    pub format_id: Uuid,
+    pub bytes: i32,
+}
+
+impl NewDocument {
+    pub fn new(path: String, format_id: Uuid, bytes: i32) -> NewDocument {
+        NewDocument {
+            path,
+            format_id,
+            bytes,
+        }
+    }
+
+    fn into_document(self, editable: Editable) -> Document {
+        Document {
+            id: editable.id,
+            path: self.path,
+            format_id: self.format_id,
+            bytes: self.bytes,
+        }
+    }
+
+    /// Insert the document into the database.
+    pub fn insert(
+        self,
+        conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>,
+        new_editable: &NewEditable,
+        new_describable: NewDescribable,
+    ) -> Result<Document, diesel::result::Error> {
+        conn.transaction::<_, diesel::result::Error, _>(|conn| {
+            let editable = diesel::insert_into(editables::table)
+                .values(new_editable)
+                .get_result::<Editable>(conn)?;
+
+            let new_document = self.into_document(editable.clone());
+            let new_describable = new_describable.into_describable(editable);
+
+            // We insert the description of the document.
+            new_describable.insert(conn)?;
+
+            diesel::insert_into(documents::table)
+                .values(&new_document)
+                .get_result::<Document>(conn)
+        })
     }
 }

@@ -20,6 +20,10 @@ impl CompleteProfile {
             profile_picture: profile_picture.try_into()?,
         })
     }
+
+    pub fn scompose(self) -> (super::Name, Image) {
+        (self.name, self.profile_picture.into())
+    }
 }
 
 impl FormResult for CompleteProfile {

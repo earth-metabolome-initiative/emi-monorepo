@@ -66,6 +66,7 @@ def main():
     imports = [
         "use diesel::Queryable;",
         "use diesel::Identifiable;",
+        "use diesel::Insertable;",
         "use crate::schema::*;",
         "use diesel::Selectable;",
         "use serde::Deserialize;",
@@ -120,6 +121,7 @@ def main():
     complex_derives = [
         "Serialize",
         "Deserialize",
+        "Insertable"
     ]
 
     deny_list = [

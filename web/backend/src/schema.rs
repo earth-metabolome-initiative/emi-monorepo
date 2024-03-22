@@ -77,8 +77,7 @@ diesel::table! {
 diesel::table! {
     edits (id) {
         id -> Uuid,
-        edited_by -> Uuid,
-        edited_at -> Timestamp,
+        editable_id -> Uuid,
     }
 }
 
@@ -465,8 +464,6 @@ diesel::joinable!(documents -> document_formats (format_id));
 diesel::joinable!(documents -> editables (id));
 diesel::joinable!(editables -> users (created_by));
 diesel::joinable!(edits -> describables (id));
-diesel::joinable!(edits -> editables (id));
-diesel::joinable!(edits -> users (edited_by));
 diesel::joinable!(expirable_item_categories -> item_categories (item_type_id));
 diesel::joinable!(item_categories -> describables (id));
 diesel::joinable!(item_categories -> editables (id));

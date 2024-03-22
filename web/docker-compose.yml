@@ -49,6 +49,7 @@ services:
       dockerfile: Dockerfile
       args:
         ACTIX_PORT: ${ACTIX_PORT}
+        DOCUMENTS_DIRECTORY: ${DOCUMENTS_DIRECTORY}
     environment:
       DATABASE_URL: ${DATABASE_URL}
       REDIS_URL: ${REDIS_URL}
@@ -69,6 +70,7 @@ services:
       ACTIX_PORT: ${ACTIX_PORT}
       ACTIX_WORKER_THREADS: ${ACTIX_WORKER_THREADS}
       ADMINISTRATORS_TEAM_NAME: ${ADMINISTRATORS_TEAM_NAME}
+      DOCUMENTS_DIRECTORY: ${DOCUMENTS_DIRECTORY}
     volumes:
       - ./:/app
     ports:

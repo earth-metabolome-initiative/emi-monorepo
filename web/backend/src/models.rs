@@ -7,6 +7,7 @@ use diesel::sql_types::Interval;
 use diesel::sql_types::Numeric;
 use diesel::sql_types::Range;
 use diesel::Identifiable;
+use diesel::Insertable;
 use diesel::Queryable;
 use diesel::Selectable;
 use serde::Deserialize;
@@ -16,7 +17,7 @@ use chrono::offset::Utc;
 use chrono::DateTime;
 use chrono::NaiveDateTime;
 use uuid::Uuid;
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = archivables)]
 pub struct Archivable {
     pub id: Uuid,
@@ -46,13 +47,13 @@ pub struct ContainerVerticalRule {
     pub pressure: Option<Range<Numeric>>,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = continuous_units)]
 pub struct ContinuousUnit {
     pub id: Uuid,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = describables)]
 pub struct Describable {
     pub id: Uuid,
@@ -60,19 +61,19 @@ pub struct Describable {
     pub description: Option<String>,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = discrete_units)]
 pub struct DiscreteUnit {
     pub id: Uuid,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = document_formats)]
 pub struct DocumentFormat {
     pub id: Uuid,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = documents)]
 pub struct Document {
     pub id: Uuid,
@@ -81,7 +82,7 @@ pub struct Document {
     pub bytes: i32,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = editables)]
 pub struct Editable {
     pub id: Uuid,
@@ -89,12 +90,11 @@ pub struct Editable {
     pub created_by: Uuid,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = edits)]
 pub struct Edit {
     pub id: Uuid,
-    pub edited_by: Uuid,
-    pub edited_at: NaiveDateTime,
+    pub editable_id: Uuid,
 }
 
 #[derive(Clone, Selectable, Queryable, Debug, Identifiable)]
@@ -105,13 +105,13 @@ pub struct ExpirableItemCategory {
     pub expiration_interval: Interval,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = item_categories)]
 pub struct ItemCategory {
     pub id: Uuid,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = item_category_relationships)]
 pub struct ItemCategoryRelationship {
     pub id: Uuid,
@@ -119,7 +119,7 @@ pub struct ItemCategoryRelationship {
     pub child_id: Uuid,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = item_category_units)]
 pub struct ItemCategoryUnit {
     pub id: Uuid,
@@ -127,7 +127,7 @@ pub struct ItemCategoryUnit {
     pub unit_id: Uuid,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = item_continuous_quantities)]
 pub struct ItemContinuousQuantity {
     pub id: Uuid,
@@ -139,7 +139,7 @@ pub struct ItemContinuousQuantity {
     pub measured_by: Option<Uuid>,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = item_discrete_quantities)]
 pub struct ItemDiscreteQuantity {
     pub id: Uuid,
@@ -150,7 +150,7 @@ pub struct ItemDiscreteQuantity {
     pub measured_by: Option<Uuid>,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = item_locations)]
 pub struct ItemLocation {
     pub id: Uuid,
@@ -159,7 +159,7 @@ pub struct ItemLocation {
     pub previous_location_id: Option<Uuid>,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = item_units)]
 pub struct ItemUnit {
     pub id: Uuid,
@@ -167,21 +167,21 @@ pub struct ItemUnit {
     pub unit_id: Uuid,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = items)]
 pub struct Item {
     pub id: Uuid,
     pub parent_id: Option<Uuid>,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = location_states)]
 pub struct LocationState {
     pub id: Uuid,
     pub font_awesome_icon: Option<String>,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = locations)]
 pub struct Location {
     pub id: Uuid,
@@ -195,7 +195,7 @@ pub struct Location {
     pub state_id: Uuid,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = login_providers)]
 pub struct LoginProvider {
     pub id: i16,
@@ -207,7 +207,7 @@ pub struct LoginProvider {
     pub scope: String,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = manufactured_item_categories)]
 pub struct ManufacturedItemCategory {
     pub id: Uuid,
@@ -217,7 +217,7 @@ pub struct ManufacturedItemCategory {
     pub manifacturer_id: Uuid,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(primary_key(organization_id, editable_id, role_id))]
 #[diesel(table_name = organization_authorizations)]
 pub struct OrganizationAuthorization {
@@ -226,7 +226,7 @@ pub struct OrganizationAuthorization {
     pub role_id: Uuid,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = organization_locations)]
 pub struct OrganizationLocation {
     pub id: Uuid,
@@ -235,14 +235,14 @@ pub struct OrganizationLocation {
     pub previous_location_id: Option<Uuid>,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = organization_states)]
 pub struct OrganizationState {
     pub id: Uuid,
     pub font_awesome_icon: Option<String>,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = organizations)]
 pub struct Organization {
     pub id: Uuid,
@@ -252,13 +252,13 @@ pub struct Organization {
     pub website_url: Option<String>,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = primary_user_emails)]
 pub struct PrimaryUserEmail {
     pub id: i32,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = procedure_continuous_requirements)]
 pub struct ProcedureContinuousRequirement {
     pub id: Uuid,
@@ -268,7 +268,7 @@ pub struct ProcedureContinuousRequirement {
     pub unit_id: Option<Uuid>,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = procedure_discrete_requirements)]
 pub struct ProcedureDiscreteRequirement {
     pub id: Uuid,
@@ -278,13 +278,13 @@ pub struct ProcedureDiscreteRequirement {
     pub unit_id: Option<Uuid>,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = procedures)]
 pub struct Procedure {
     pub id: Uuid,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = project_continuous_requirements)]
 pub struct ProjectContinuousRequirement {
     pub id: Uuid,
@@ -294,7 +294,7 @@ pub struct ProjectContinuousRequirement {
     pub unit_id: Option<Uuid>,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = project_discrete_requirements)]
 pub struct ProjectDiscreteRequirement {
     pub id: Uuid,
@@ -304,7 +304,7 @@ pub struct ProjectDiscreteRequirement {
     pub unit_id: Option<Uuid>,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = project_milestones)]
 pub struct ProjectMilestone {
     pub id: Uuid,
@@ -313,13 +313,13 @@ pub struct ProjectMilestone {
     pub completed_at: Option<DateTime<Utc>>,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = project_states)]
 pub struct ProjectState {
     pub id: Uuid,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = projects)]
 pub struct Project {
     pub id: Uuid,
@@ -335,13 +335,13 @@ pub struct Project {
     pub logo_id: Option<Uuid>,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = roles)]
 pub struct Role {
     pub id: Uuid,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(primary_key(sample_id, taxon_id))]
 #[diesel(table_name = sample_taxa)]
 pub struct SampleTaxa {
@@ -349,7 +349,7 @@ pub struct SampleTaxa {
     pub taxon_id: Uuid,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(primary_key(sampled_individual_id, taxon_id))]
 #[diesel(table_name = sampled_individual_taxa)]
 pub struct SampledIndividualTaxa {
@@ -357,40 +357,40 @@ pub struct SampledIndividualTaxa {
     pub taxon_id: Uuid,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = sampled_individuals)]
 pub struct SampledIndividual {
     pub id: Uuid,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = samples)]
 pub struct Sample {
     pub id: Uuid,
     pub derived_from: Option<Uuid>,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = spectra)]
 pub struct Spectra {
     pub id: i32,
     pub spectra_collection_id: Uuid,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = spectra_collection)]
 pub struct SpectraCollection {
     pub id: Uuid,
     pub sample_id: Uuid,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = taxa)]
 pub struct Taxa {
     pub id: Uuid,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(primary_key(team_id, editable_id, role_id))]
 #[diesel(table_name = team_authorizations)]
 pub struct TeamAuthorization {
@@ -399,14 +399,14 @@ pub struct TeamAuthorization {
     pub role_id: Uuid,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = team_states)]
 pub struct TeamState {
     pub id: Uuid,
     pub font_awesome_icon: String,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = teams)]
 pub struct Team {
     pub id: Uuid,
@@ -414,14 +414,14 @@ pub struct Team {
     pub team_state_id: Uuid,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = units)]
 pub struct Unit {
     pub id: Uuid,
     pub symbol: String,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(primary_key(user_id, editable_id, role_id))]
 #[diesel(table_name = user_authorizations)]
 pub struct UserAuthorization {
@@ -430,7 +430,7 @@ pub struct UserAuthorization {
     pub role_id: Uuid,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = user_emails)]
 pub struct UserEmail {
     pub id: i32,
@@ -439,7 +439,7 @@ pub struct UserEmail {
     pub login_provider_id: i16,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(primary_key(user_id, document_id))]
 #[diesel(table_name = user_pictures)]
 pub struct UserPicture {
@@ -447,7 +447,7 @@ pub struct UserPicture {
     pub document_id: Uuid,
 }
 
-#[derive(Deserialize, Serialize, Clone, Selectable, Queryable, Debug)]
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = users)]
 pub struct User {
     pub id: Uuid,

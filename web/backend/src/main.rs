@@ -19,6 +19,8 @@ mod api;
 mod diesel_enums;
 mod model_implementations;
 mod models;
+mod schema_views;
+mod model_views;
 mod schema;
 mod transactions;
 

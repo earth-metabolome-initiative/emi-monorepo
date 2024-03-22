@@ -23,6 +23,9 @@ DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/${POSTG
 # It is recommended to use a large disk for this
 # as the database can grow to be very large
 POSTGRES_DATABASE_DIRECTORY='path/to/large/disk'
+# Similarly, the following is the directory where the documents will be stored.
+# It is recommended to use a large disk for this as well.
+DOCUMENTS_DIRECTORY='/app/documents_tmp'
 # In order to provide Oauth authentication for the API
 # you need to provide the client id and client secret
 # for the application that you have created in ORCID

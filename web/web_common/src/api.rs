@@ -97,3 +97,19 @@ impl Into<HashSet<String>> for ApiError {
         vector.into_iter().collect()
     }
 }
+
+#[cfg(feature = "backend")]
+impl From<diesel::result::Error> for ApiError {
+    fn from(e: diesel::result::Error) -> Self {
+        log::error!("Database error: {:?}", e);
+        Self::InternalServerError
+    }
+}
+
+#[cfg(feature = "backend")]
+impl From<image::ImageError> for ApiError {
+    fn from(e: image::ImageError) -> Self {
+        log::error!("Image error: {:?}", e);
+        Self::InternalServerError
+    }
+}

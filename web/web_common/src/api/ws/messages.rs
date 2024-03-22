@@ -22,6 +22,10 @@ pub enum Table {
     Users,
     #[serde(rename = "teams")]
     Teams,
+    #[serde(rename = "editables")]
+    Editables,
+    #[serde(rename = "documents")]
+    Documents,
 }
 
 impl Table {
@@ -31,6 +35,15 @@ impl Table {
             _ => false,
         }
     }
+
+    pub fn is_editables(&self) -> bool {
+        match self {
+            Table::Users => false,
+            Table::Teams => true,
+            Table::Editables => true,
+            Table::Documents => true,
+        }
+    }
 }
 
 impl Display for Table {
@@ -38,6 +51,8 @@ impl Display for Table {
         match self {
             Table::Users => write!(f, "users"),
             Table::Teams => write!(f, "teams"),
+            Table::Editables => write!(f, "editables"),
+            Table::Documents => write!(f, "documents"),
         }
     }
 }

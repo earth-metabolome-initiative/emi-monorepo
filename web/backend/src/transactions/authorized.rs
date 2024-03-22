@@ -99,6 +99,28 @@ pub(crate) fn is_authorized(
         return Ok(roles.contains(&messages::Role::Admin) && is_admin(conn, user_id)?);
     }
 
+    // If we get up to this point, the table must be of the Editables kind.
+    assert!(table.is_editables());
+
+    // Before anything else, we check whether the user is the author of the editable
+    // associated with the provided ID. We do this by checking whether the created_by
+    // column of the table is equal to the provided user ID. If the user is the author,
+    // then we return true, as the author is always authorized to perform operations on
+    // the editable they created.
+    {
+        use crate::schema::editables;
+
+        let is_author: bool = editables::dsl::editables
+            .filter(editables::dsl::id.eq(id))
+            .filter(editables::dsl::created_by.eq(user_id))
+            .select(sql::<diesel::sql_types::Bool>("true"))
+            .get_result(conn)?;
+
+        if is_author {
+            return Ok(true);
+        }
+    }
+
     // We convert the provided Roles into the associated Uuids by querying the database.
     // The roles name is stored in the describable table, so we need to join the roles table
     // with the describable table to get the Uuid of the roles.

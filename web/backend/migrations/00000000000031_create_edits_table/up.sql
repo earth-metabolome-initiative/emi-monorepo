@@ -1,23 +1,7 @@
 -- Your SQL goes here
 CREATE TABLE edits (
-  id UUID PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE REFERENCES describables(id) ON DELETE CASCADE,
-  edited_by UUID NOT NULL REFERENCES users(id),
-  edited_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    -- The id of the edit, inserted as an editable created by some user.
+    id UUID PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE REFERENCES describables(id) ON DELETE CASCADE,
+    -- The id of the editable object that was edited
+    editable_id UUID NOT NULL REFERENCES editables(id) ON DELETE CASCADE
 );
-
-CREATE OR REPLACE FUNCTION delete_editables() RETURNS TRIGGER AS $$
-BEGIN
-    DELETE FROM
-        editables
-    WHERE
-        id = OLD.id;
-
-    RETURN OLD;
-
-END;
-
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER delete_editables AFTER
-DELETE
-    ON edits FOR EACH ROW EXECUTE FUNCTION delete_editables();

@@ -1,3 +1,4 @@
 .env
 database_tmp
 redis
+documents_tmp

@@ -1,6 +1,9 @@
 # Use a lightweight image as a base
 FROM rust:latest
 
+ARG ACTIX_PORT
+ARG DOCUMENTS_DIRECTORY
+
 # Expose the port that the Actix server will run on
 EXPOSE $ACTIX_PORT
 
@@ -18,6 +21,10 @@ RUN cargo install --locked trunk
 
 # We need to compile diesel-cli to run the migrations
 RUN cargo install diesel_cli --no-default-features --features postgres
+
+# We create the directory specified in the ${DOCUMENTS_DIRECTORY} environment variable
+# and we make sure that if it already exists, it won't be overwritten.
+RUN mkdir -p $DOCUMENTS_DIRECTORY
 
 # Command to run the Actix server application
 CMD rm -rf /app/backend/backend.ready || true && \

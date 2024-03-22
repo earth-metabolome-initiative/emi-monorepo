@@ -16,6 +16,7 @@ use uuid::Uuid;
 pub struct User {
     name: Option<name::Name>,
     profile_picture_url: Option<String>,
+    thumbnail_profile_picture_url: Option<String>,
     id: Uuid,
 }
 
@@ -23,9 +24,10 @@ impl User {
     pub fn new(
         name: Option<name::Name>,
         profile_picture_url: Option<String>,
+        thumbnail_profile_picture_url: Option<String>,
         id: Uuid
     ) -> User {
-        User { name, profile_picture_url, id }
+        User { name, profile_picture_url, thumbnail_profile_picture_url, id }
     }
 
     pub fn full_name(&self) -> Result<String, String> {
