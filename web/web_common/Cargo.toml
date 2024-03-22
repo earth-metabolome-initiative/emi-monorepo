@@ -41,12 +41,37 @@ rustface = { version="0.1.7", optional = true }
 wasm-bindgen-futures = {version="0.4.42", optional = true}
 futures-util = "0.3.30"
 wasm-bindgen = {version="0.2.92", optional = true}
+const_format = "0.2.32"
 
 [dependencies.web-sys]
 version = "0.3.69"
 optional = true
 features = [
-    "FileReaderSync"
+    'Headers',
+  'Request',
+  'RequestInit',
+  'RequestMode',
+  'Response',
+  'Window',
+  'Document',
+  'HtmlDocument',
+  'HtmlInputElement',
+  'HtmlFormElement',
+  'Navigator',
+  'FormData',
+  'File',
+  'HtmlDivElement',
+  'DataTransfer',
+  'Blob',
+  'Url',
+  'FileReader',
+  'EventTarget',
+  'Geolocation',
+  'Coordinates',
+  'Position',
+  'PositionOptions',
+  'PositionError',
+  'HtmlAnchorElement',
 ]
 
 [features]

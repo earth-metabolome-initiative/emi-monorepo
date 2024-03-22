@@ -4,10 +4,18 @@
 use serde::{Serialize, Deserialize};
 use validator::Validate;
 
-use super::validation_errors::TryFromString;
+use crate::custom_validators::validation_errors::TryFromString;
 
 
 #[derive(Debug, Clone, Serialize, PartialEq, Eq, Default, Hash, Deserialize)]
+#[repr(transparent)]
+/// A wrapper around a string that implements the `Validate` trait.
+/// 
+/// # Implementation details
+/// The Validate trait is from the external crate `validator`, and the String
+/// is the standard library's String type, so we cannot just implement the trait
+/// for the String type. Instead, we wrap the String in a newtype and implement
+/// the trait for the newtype, trying to make the newtype as transparent as possible.
 pub struct ValidatableString {
     value: String,
 }

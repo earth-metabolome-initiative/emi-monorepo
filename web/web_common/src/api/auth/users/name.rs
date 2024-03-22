@@ -2,11 +2,7 @@ use crate::custom_validators::*;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
-pub type ValidatedNameField = NoSpecialCharacters<
-    MustBeCapitalized<
-        NoDigits<NoLeadingSpaces<NoTrailingSpaces<NoDoubleSpaces<NotEmpty<ValidatableString>>>>>,
-    >,
->;
+pub type ValidatedNameField = NoSpecialCharacters<MustBeCapitalized<NoDigits<NotEmpty>>>;
 
 #[derive(PartialEq, Clone, Debug, Default, Validate, Serialize, Deserialize, Eq)]
 pub struct Name {

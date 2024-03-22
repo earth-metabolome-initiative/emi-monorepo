@@ -11,12 +11,6 @@ pub enum FrontendApiError {
     Reqwasm(String),
 }
 
-impl FrontendApiError {
-    pub fn unauthorized() -> Self {
-        FrontendApiError::from(ApiError::unauthorized())
-    }
-}
-
 impl From<reqwasm::Error> for FrontendApiError {
     fn from(e: reqwasm::Error) -> Self {
         Self::Reqwasm(e.to_string())

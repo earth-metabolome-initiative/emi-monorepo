@@ -57,13 +57,13 @@ Different platforms have different ways of installing Docker, so we will not cov
 To start the docker compose, you need to run the following command:
 
 ```bash
-docker-compose -f docker-compose.yml up
+docker-compose -f docker-compose.yml up -d --build -V
 ```
 
 To start the deployment version of the platform, you need to run the following command:
 
 ```bash
-docker-compose -f docker-compose-deploy.yml up
+docker compose -f docker-compose-deploy.yml up -d --build -V
 ```
 
 ### Integrity errors

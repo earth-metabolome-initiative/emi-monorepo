@@ -3,19 +3,22 @@ use crate::{api::form_traits::FormResult, custom_validators::*};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
-pub type ProfileImage = Squarish<ContainsOneFace<Image>>;
+pub type ProfileImage = MinShape<Squarish<ContainsOneFace<Image>>, 64, 64>;
 
 #[derive(PartialEq, Clone, Debug, Validate, Serialize, Deserialize, Eq)]
 pub struct CompleteProfile {
     #[validate]
     name: super::Name,
     #[validate]
-    profile_picture: ProfileImage
+    profile_picture: ProfileImage,
 }
 
 impl CompleteProfile {
     pub fn new(name: super::Name, profile_picture: Image) -> Result<Self, Vec<String>> {
-        Ok(Self { name, profile_picture: profile_picture.try_into()? })
+        Ok(Self {
+            name,
+            profile_picture: profile_picture.try_into()?,
+        })
     }
 }
 

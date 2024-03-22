@@ -106,5 +106,5 @@ mod frontend {
 #[cfg(feature = "backend")]
 pub use backend::*;
 
-#[cfg(not(feature = "backend"))]
+#[cfg(feature = "frontend")]
 pub use frontend::*;
