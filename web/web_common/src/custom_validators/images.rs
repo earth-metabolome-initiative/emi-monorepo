@@ -7,5 +7,3 @@ pub use image::*;
 pub use contains_face::*;
 pub use squarish::*;
 
-pub mod nudity;
-pub use nudity::*;

@@ -8,7 +8,6 @@ use serde::{Deserialize, Serialize};
 use validator::Validate;
 use validator::ValidationError;
 
-use crate::api::form_traits::TryFromCallback;
 
 #[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
 pub struct Image {
@@ -45,7 +44,7 @@ impl Validate for Image {
 }
 
 #[cfg(feature = "frontend")]
-impl TryFromCallback<web_sys::File> for Image {
+impl crate::api::form_traits::TryFromCallback<web_sys::File> for Image {
     fn try_from_callback<C>(file: web_sys::File, callback: C) -> Result<(), Vec<String>>
     where
         C: FnOnce(Result<Self, Vec<String>>) + 'static,

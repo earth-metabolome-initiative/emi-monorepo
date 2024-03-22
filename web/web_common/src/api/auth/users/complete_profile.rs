@@ -3,7 +3,7 @@ use crate::{api::form_traits::FormResult, custom_validators::*};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
-pub type ProfileImage = NoNudes<Squarish<ContainsOneFace<Image>>>;
+pub type ProfileImage = Squarish<ContainsOneFace<Image>>;
 
 #[derive(PartialEq, Clone, Debug, Validate, Serialize, Deserialize, Eq)]
 pub struct CompleteProfile {

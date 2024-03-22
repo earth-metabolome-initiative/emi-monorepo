@@ -4,7 +4,7 @@ use validator::Validate;
 
 pub type ValidatedNameField = NoSpecialCharacters<
     MustBeCapitalized<
-        NoDigits<NoLeadingSpaces<NoTrailingSpaces<NoDoubleSpaces<NotEmpty<String>>>>>,
+        NoDigits<NoLeadingSpaces<NoTrailingSpaces<NoDoubleSpaces<NotEmpty<ValidatableString>>>>>,
     >,
 >;
 

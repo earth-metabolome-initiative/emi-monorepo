@@ -19,3 +19,5 @@ pub mod no_slurs;
 pub use no_slurs::*;
 pub mod images;
 pub use images::*;
+pub mod validatable_str;
+pub use validatable_str::*;

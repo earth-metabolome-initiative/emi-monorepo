@@ -75,17 +75,18 @@ pub fn custom_validator(args: TokenStream, mut input: TokenStream) -> TokenStrea
         #[automatically_derived]
         #[repr(transparent)]
         #[derive(Debug, validator::Validate, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, Clone, Default, serde::Deserialize)]
-        pub struct #struct_name<S=String>
+        pub struct #struct_name<S=crate::custom_validators::ValidatableString>
         where
-            S: AsRef<str> + serde::Serialize,
+            S: AsRef<str> + serde::Serialize + validator::Validate,
         {
+            #[validate]
             #[validate(custom(function=#function_name, message=#error_message))]
             value: S,
         }
 
         impl<S> #struct_name<S>
         where
-            S: AsRef<str> + serde::Serialize,
+            S: AsRef<str> + serde::Serialize + validator::Validate,
         {
             pub fn is_empty(&self) -> bool {
                 self.value.as_ref().is_empty()
@@ -93,7 +94,7 @@ pub fn custom_validator(args: TokenStream, mut input: TokenStream) -> TokenStrea
         }
 
         impl<S> TryFrom<String> for #struct_name<S>
-        where S: crate::custom_validators::validation_errors::TryFromString + AsRef<str> + serde::Serialize
+        where S: crate::custom_validators::validation_errors::TryFromString + AsRef<str> + serde::Serialize + validator::Validate,
         {
             type Error = Vec<String>;
 
@@ -109,7 +110,7 @@ pub fn custom_validator(args: TokenStream, mut input: TokenStream) -> TokenStrea
         }
 
         impl<S> crate::custom_validators::validation_errors::TryFromString for #struct_name<S>
-        where S: AsRef<str> + serde::Serialize + crate::custom_validators::validation_errors::TryFromString
+        where S: AsRef<str> + serde::Serialize + validator::Validate + crate::custom_validators::validation_errors::TryFromString
         {
             fn try_from_string(value: String) -> Result<Self, Vec<String>> {
                 use validator::Validate;
@@ -124,7 +125,7 @@ pub fn custom_validator(args: TokenStream, mut input: TokenStream) -> TokenStrea
 
         impl<S> AsRef<str> for #struct_name<S>
         where
-            S: AsRef<str> + serde::Serialize,
+            S: AsRef<str> + serde::Serialize + validator::Validate,
         {
             fn as_ref(&self) -> &str {
                 self.value.as_ref()
@@ -133,7 +134,7 @@ pub fn custom_validator(args: TokenStream, mut input: TokenStream) -> TokenStrea
 
         impl<S> validator::HasLen for &#struct_name<S>
         where
-            S: AsRef<str> + serde::Serialize,
+            S: AsRef<str> + serde::Serialize + validator::Validate,
         {
             fn length(&self) -> u64 {
                 self.value.as_ref().len() as u64
@@ -142,7 +143,7 @@ pub fn custom_validator(args: TokenStream, mut input: TokenStream) -> TokenStrea
 
         impl<S> std::fmt::Display for #struct_name<S>
         where
-            S: AsRef<str> + serde::Serialize,
+            S: AsRef<str> + serde::Serialize + validator::Validate,
         {
             fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 write!(f, "{}", self.value.as_ref())
