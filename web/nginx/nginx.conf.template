@@ -64,6 +64,10 @@ http {
             proxy_set_header X-Forwarded-For §proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto §scheme;
             proxy_buffering off;
+            proxy_read_timeout 1800;
+            proxy_connect_timeout 1800;
+            proxy_send_timeout 1800;
+            send_timeout 1800;
         }
 
         location /_trunk/ws {
@@ -76,6 +80,10 @@ http {
             proxy_set_header X-Forwarded-For §proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto §scheme;
             proxy_buffering off;
+            proxy_read_timeout 1800;
+            proxy_connect_timeout 1800;
+            proxy_send_timeout 1800;
+            send_timeout 1800;
         }
 
         location /api/ws {
