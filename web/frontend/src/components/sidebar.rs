@@ -1,12 +1,11 @@
 //! A sidebar Yew component is responsible for rendering the sidebar on the left side of the page.
-//!
 
 use super::logout::Logout;
+use crate::router::AppRoute;
 use crate::stores::user_state::UserState;
 use yew::prelude::*;
-use yewdux::use_store;
-use crate::router::AppRoute;
 use yew_router::prelude::*;
+use yewdux::use_store;
 
 #[derive(Properties, Clone, PartialEq, Debug)]
 pub struct SidebarProps {

@@ -7,7 +7,7 @@ use crate::api::ApiError;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum GenericFileFormat {
     Image,
-    PDF
+    PDF,
 }
 
 impl GenericFileFormat {
@@ -15,23 +15,24 @@ impl GenericFileFormat {
         match mime {
             "image/jpeg" | "image/png" | "image/gif" | "image/bmp" => Ok(GenericFileFormat::Image),
             "application/pdf" => Ok(GenericFileFormat::PDF),
-            mime => Err(ApiError::invalid_file_format(
-                format!("The file format {} is not supported.", mime)
-            ))
+            mime => Err(ApiError::invalid_file_format(format!(
+                "The file format {} is not supported.",
+                mime
+            ))),
         }
     }
 
     pub fn mime_types(&self) -> &'static [&'static str] {
         match self {
             GenericFileFormat::Image => &["image/jpeg", "image/png", "image/gif", "image/bmp"],
-            GenericFileFormat::PDF => &["application/pdf"]
+            GenericFileFormat::PDF => &["application/pdf"],
         }
     }
 
     pub fn extensions(&self) -> &'static [&'static str] {
         match self {
             GenericFileFormat::Image => &["jpg", "jpeg", "png", "gif", "bmp"],
-            GenericFileFormat::PDF => &["pdf"]
+            GenericFileFormat::PDF => &["pdf"],
         }
     }
 }

@@ -2,9 +2,9 @@
 
 mod github;
 pub(crate) mod jwt_cookies;
+mod logout;
 mod providers;
 mod refresh;
-mod logout;
 use actix_web::web;
 pub(crate) use jwt_cookies::access_token_validator;
 

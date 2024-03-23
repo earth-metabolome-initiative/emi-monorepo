@@ -27,7 +27,6 @@ async fn start_websocket(
     diesel_pool: web::Data<DBPool>,
     sqlx_pool: web::Data<SQLxPool<Postgres>>,
 ) -> Result<HttpResponse, Error> {
-
     log::info!("Starting websocket");
 
     let diesel_pool = diesel_pool.get_ref().clone();
@@ -37,6 +36,6 @@ async fn start_websocket(
     actix_web_actors::ws::start(
         socket::WebSocket::new(diesel_pool, sqlx_pool, redis_client),
         &req,
-        stream
+        stream,
     )
 }

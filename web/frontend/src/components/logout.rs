@@ -18,7 +18,11 @@ pub fn logout() -> Html {
     let navigator = use_navigator().unwrap();
 
     let on_logout = Callback::from(move |_| {
-        user_state::logout(dispatch.clone(), navigator.clone(), user.clone().access_token().cloned());
+        user_state::logout(
+            dispatch.clone(),
+            navigator.clone(),
+            user.clone().access_token().cloned(),
+        );
     });
 
     html! {

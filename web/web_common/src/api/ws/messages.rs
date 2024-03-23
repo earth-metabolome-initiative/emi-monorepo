@@ -1,12 +1,12 @@
 //! Module providing the websocket messages used in the application.
 use std::{fmt::Debug, str::FromStr};
 
+use crate::api::form_traits::FormResult;
 use crate::api::{
     auth::users::{CompleteProfile, User},
     oauth::jwt_cookies::AccessToken,
     ApiError,
 };
-use crate::api::form_traits::FormResult;
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 

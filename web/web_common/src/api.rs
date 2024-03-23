@@ -2,10 +2,10 @@ use std::collections::HashSet;
 
 use serde::{Deserialize, Serialize};
 pub mod auth;
+pub mod documents;
+pub mod form_traits;
 pub mod oauth;
 pub mod ws;
-pub mod form_traits;
-pub mod documents;
 
 use validator::ValidationError;
 use validator::ValidationErrors;

@@ -1,10 +1,10 @@
 use actix_web::web;
 
 mod auth;
+mod documents;
 mod healthchecker;
 mod oauth;
 mod ws;
-mod documents;
 
 use healthchecker::health_checker_handler;
 

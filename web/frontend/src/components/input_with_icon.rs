@@ -1,7 +1,6 @@
 //! A reusable component showing a flat-designed input field with an icon on the right that looks like
 //! part of the input field. The icon is specified using Font Awesome classes. The input field is
 //! responsive and will shrink and grow depending on the size of the screen.
-//!
 
 use yew::prelude::*;
 

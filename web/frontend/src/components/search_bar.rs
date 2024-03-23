@@ -9,7 +9,6 @@
 //! The search bar is also responsive, as it will shrink and grow depending on the size of the screen.
 //! Upon clicking the search button, the search bar will be cleared and the focus will be removed from it. The url is updated by
 //! using the Yew router, as we are working in a single page application.
-//!
 
 use crate::components::InputWithIcon;
 use web_sys::wasm_bindgen::JsCast;

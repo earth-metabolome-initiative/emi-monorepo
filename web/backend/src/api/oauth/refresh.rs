@@ -1,12 +1,14 @@
 //! API endpoint to refresh the access token.
+use crate::api::oauth::jwt_cookies::{
+    eliminate_cookies, JsonAccessToken, JsonRefreshToken, REFRESH_COOKIE_NAME,
+};
+use crate::models::User;
 use actix_web::{get, web, HttpRequest, HttpResponse};
 use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::Pool;
 use diesel::PgConnection;
-use crate::models::User;
-use web_common::api::ApiError;
 use web_common::api::oauth::jwt_cookies::AccessToken;
-use crate::api::oauth::jwt_cookies::{eliminate_cookies, REFRESH_COOKIE_NAME, JsonRefreshToken, JsonAccessToken};
+use web_common::api::ApiError;
 
 #[get("/refresh")]
 /// Endpoint to refresh the access token, given a valid refresh token.

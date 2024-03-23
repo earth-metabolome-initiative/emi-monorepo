@@ -5,11 +5,11 @@ use crate::stores::user_state::UserState;
 use wasm_bindgen::JsCast;
 use web_common::api::auth::users::{CompleteProfile, ProfileImage};
 use web_common::api::form_traits::TryFromCallback;
+use web_common::file_formats::GenericFileFormat;
 use web_common::{
     api::auth::users::name::{Name, ValidatedNameField},
     custom_validators::image,
 };
-use web_common::file_formats::GenericFileFormat;
 use web_sys::FormData;
 use yew::prelude::*;
 use yewdux::prelude::*;
@@ -54,21 +54,17 @@ impl TryFromCallback<FormData> for FormWrapper<CompleteProfile> {
             number => Err(vec![format!("Expected 1 file, but received {}.", number)]),
         }?;
 
-        image::Image::try_from_callback(file, move |image| {
-            match image {
-                Ok(image) => {
-                    match CompleteProfile::new(name.clone(), image) {
-                        Ok(form) => {
-                            callback(Ok(FormWrapper::from(form)));
-                        }
-                        Err(errors) => {
-                            callback(Err(errors));
-                        }
-                    }
-                },
+        image::Image::try_from_callback(file, move |image| match image {
+            Ok(image) => match CompleteProfile::new(name.clone(), image) {
+                Ok(form) => {
+                    callback(Ok(FormWrapper::from(form)));
+                }
                 Err(errors) => {
                     callback(Err(errors));
                 }
+            },
+            Err(errors) => {
+                callback(Err(errors));
             }
         })?;
 

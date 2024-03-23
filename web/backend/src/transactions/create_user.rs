@@ -5,7 +5,6 @@
 //! - Inserting the user into the users table
 //! - Inserting the user's email into the user_emails table
 //! - Inserting the user's primary email into the primary_user_emails table
-//!
 
 use crate::diesel::connection::SimpleConnection; // Required for batch_execute
 use crate::model_implementations::*;

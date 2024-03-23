@@ -11,17 +11,17 @@ use actix_web::http::header;
 use actix_web::middleware::Logger;
 use actix_web::HttpRequest;
 use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
-use sqlx::{postgres::PgPoolOptions, Pool as SQLxPool, Postgres};
 use redis::Client;
+use sqlx::{postgres::PgPoolOptions, Pool as SQLxPool, Postgres};
 use std::path::PathBuf;
 
 mod api;
 mod diesel_enums;
 mod model_implementations;
-mod models;
-mod schema_views;
 mod model_views;
+mod models;
 mod schema;
+mod schema_views;
 mod transactions;
 
 pub(crate) type DBPool = Pool<ConnectionManager<PgConnection>>;
@@ -147,8 +147,8 @@ async fn main() -> std::io::Result<()> {
             .wrap(Logger::default())
             // We add support for CORS requests
             .wrap(cors)
-            // limit the maximum amount of data that server will accept
-            // .app_data(web::JsonConfig::default().limit(10*1024*1024))
+        // limit the maximum amount of data that server will accept
+        // .app_data(web::JsonConfig::default().limit(10*1024*1024))
     })
     .bind_openssl("0.0.0.0:8080", builder)?
     .workers(4)

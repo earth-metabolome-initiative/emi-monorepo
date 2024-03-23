@@ -32,6 +32,7 @@ where
     fn connect(
         scope: &yew_agent::prelude::WorkerScope<Self>,
     ) -> Result<futures::channel::mpsc::Sender<FM>, String> {
+        log::debug!("Connecting to websocket");
         let websocket = WebSocket::open(&format!("wss://emi.local{}", FULL_ENDPOINT))
             .map_err(|err| format!("Error opening websocket connection: {:?}", err))?;
 
@@ -95,7 +96,7 @@ where
     fn create(scope: &yew_agent::prelude::WorkerScope<Self>) -> Self {
         Self {
             subscribers: HashSet::new(),
-            sender: Some(Self::connect(scope).unwrap_throw()),
+            sender: None, //Some(Self::connect(scope).unwrap_throw()),
             reconnection_attempt: 0,
             _phantom: std::marker::PhantomData,
         }
@@ -106,6 +107,7 @@ where
         scope: &yew_agent::prelude::WorkerScope<Self>,
         internal_message: Self::Message,
     ) {
+        return;
         match internal_message {
             InternalMessage::Backend(backend_message) => {
                 log::debug!("Received message from websocket: {:?}", backend_message);
@@ -173,6 +175,7 @@ where
         frontend_message: Self::Input,
         _id: HandlerId,
     ) {
+        return;
         if let Some(sender) = &mut self.sender {
             match sender.try_send(frontend_message) {
                 Ok(()) => {}

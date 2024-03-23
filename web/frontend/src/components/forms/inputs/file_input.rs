@@ -88,7 +88,7 @@ pub struct FileInput<Data> {
     _phantom: std::marker::PhantomData<Data>,
 }
 
-pub enum InputMessage {
+pub enum FileInputMessage {
     Backend(BackendMessage),
     RemoveError(String),
     RemoveErrors,
@@ -104,7 +104,7 @@ impl<Data> Component for FileInput<Data>
 where
     Data: 'static + Clone + Validate + TryFromCallback<web_sys::File>,
 {
-    type Message = InputMessage;
+    type Message = FileInputMessage;
     type Properties = FileInputProp;
 
     fn create(ctx: &Context<Self>) -> Self {
@@ -115,7 +115,7 @@ where
             // Handle the dragover event here
             // For example, prevent the default behavior to allow dropping elements
             event.prevent_default();
-            link.send_message(InputMessage::SetDragging(true));
+            link.send_message(FileInputMessage::SetDragging(true));
         }) as Box<dyn FnMut(_)>);
         document
             .add_event_listener_with_callback("dragover", closure.as_ref().unchecked_ref())
@@ -127,7 +127,7 @@ where
             // Handle the dragend event here
             // For example, prevent the default behavior to allow dropping elements
             event.prevent_default();
-            link.send_message(InputMessage::SetDragging(false));
+            link.send_message(FileInputMessage::SetDragging(false));
         }) as Box<dyn FnMut(_)>);
         document
             .add_event_listener_with_callback("dragend", closure.as_ref().unchecked_ref())
@@ -144,7 +144,7 @@ where
             _websocket: ctx.link().bridge_worker(Callback::from({
                 let link = ctx.link().clone();
                 move |message: BackendMessage| {
-                    link.send_message(InputMessage::Backend(message));
+                    link.send_message(FileInputMessage::Backend(message));
                 }
             })),
             errors: HashSet::new(),
@@ -161,8 +161,8 @@ where
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            InputMessage::Backend(_bm) => false,
-            InputMessage::SetDragging(dragging) => {
+            FileInputMessage::Backend(_bm) => false,
+            FileInputMessage::SetDragging(dragging) => {
                 if self.dragging != dragging {
                     self.dragging = dragging;
                     true
@@ -170,7 +170,7 @@ where
                     false
                 }
             }
-            InputMessage::RemoveErrors => {
+            FileInputMessage::RemoveErrors => {
                 let mut changes = false;
 
                 if !self.errors.is_empty() {
@@ -185,7 +185,7 @@ where
 
                 changes
             }
-            InputMessage::Files(files) => {
+            FileInputMessage::Files(files) => {
                 if files.length() == 0 {
                     return false;
                 }
@@ -260,20 +260,20 @@ where
                     }) {
                         let link = ctx.link().clone();
                         if let Err(error) = Data::try_from_callback(file.clone(), move |result| {
-                            link.send_message(InputMessage::Validate(result.map(|_| file)));
+                            link.send_message(FileInputMessage::Validate(result.map(|_| file)));
                         }) {
-                            ctx.link().send_message(InputMessage::Validate(Err(error)));
+                            ctx.link().send_message(FileInputMessage::Validate(Err(error)));
                         }
                     }
                 }
 
                 change
             }
-            InputMessage::RemoveError(error) => {
+            FileInputMessage::RemoveError(error) => {
                 self.errors.remove(&error);
                 true
             }
-            InputMessage::Validate(data) => {
+            FileInputMessage::Validate(data) => {
                 if let Some(timeout) = self.validation_timeout.take() {
                     timeout.cancel();
                 }
@@ -292,21 +292,21 @@ where
                 }
 
                 ctx.link()
-                    .send_message(InputMessage::SetTimeoutDropAreaVisibility(
+                    .send_message(FileInputMessage::SetTimeoutDropAreaVisibility(
                         self.files.is_empty() && ctx.props().urls.is_empty(),
                     ));
 
                 true
             }
-            InputMessage::FilesRemoved(index) => {
+            FileInputMessage::FilesRemoved(index) => {
                 self.files.remove(index);
                 ctx.link()
-                    .send_message(InputMessage::SetTimeoutDropAreaVisibility(
+                    .send_message(FileInputMessage::SetTimeoutDropAreaVisibility(
                         self.files.is_empty() && ctx.props().urls.is_empty(),
                     ));
                 true
             }
-            InputMessage::SetDropAreaVisibility(visibility) => {
+            FileInputMessage::SetDropAreaVisibility(visibility) => {
                 if let Some(timeout) = self.hide_drop_area_timeout.take() {
                     timeout.cancel();
                 }
@@ -320,7 +320,7 @@ where
                     false
                 }
             }
-            InputMessage::SetTimeoutDropAreaVisibility(visibility) => {
+            FileInputMessage::SetTimeoutDropAreaVisibility(visibility) => {
                 if let Some(timeout) = self.hide_drop_area_timeout.take() {
                     timeout.cancel();
                 }
@@ -337,11 +337,11 @@ where
 
                 if visibility {
                     self.show_drop_area_timeout = Some(Timeout::new(200, move || {
-                        link.send_message(InputMessage::SetDropAreaVisibility(true));
+                        link.send_message(FileInputMessage::SetDropAreaVisibility(true));
                     }));
                 } else {
                     self.hide_drop_area_timeout = Some(Timeout::new(200, move || {
-                        link.send_message(InputMessage::SetDropAreaVisibility(false));
+                        link.send_message(FileInputMessage::SetDropAreaVisibility(false));
                     }));
                 }
                 false
@@ -391,14 +391,14 @@ where
                     .files()
                     .unwrap();
 
-                link.send_message(InputMessage::Files(files));
+                link.send_message(FileInputMessage::Files(files));
             })
         };
 
         let on_delete = {
             let link = ctx.link().clone();
             Callback::from(move |error: String| {
-                link.send_message(InputMessage::RemoveError(error));
+                link.send_message(FileInputMessage::RemoveError(error));
             })
         };
 
@@ -407,14 +407,14 @@ where
             Callback::from(move |drop_event: DragEvent| {
                 drop_event.prevent_default();
                 let files = drop_event.data_transfer().unwrap().files().unwrap();
-                link.send_message(InputMessage::Files(files));
+                link.send_message(FileInputMessage::Files(files));
             })
         };
 
         let on_file_delete = {
             let link = ctx.link().clone();
             Callback::from(move |index: usize| {
-                link.send_message(InputMessage::FilesRemoved(index));
+                link.send_message(FileInputMessage::FilesRemoved(index));
             })
         };
 
@@ -424,7 +424,7 @@ where
             let link = ctx.link().clone();
             Callback::from(move |event: DragEvent| {
                 event.prevent_default();
-                link.send_message(InputMessage::SetTimeoutDropAreaVisibility(true));
+                link.send_message(FileInputMessage::SetTimeoutDropAreaVisibility(true));
             })
         };
 
@@ -432,7 +432,7 @@ where
             let link = ctx.link().clone();
             Callback::from(move |event: DragEvent| {
                 event.prevent_default();
-                link.send_message(InputMessage::SetTimeoutDropAreaVisibility(no_files));
+                link.send_message(FileInputMessage::SetTimeoutDropAreaVisibility(no_files));
             })
         };
 

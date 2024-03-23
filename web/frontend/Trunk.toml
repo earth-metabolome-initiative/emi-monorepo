@@ -2,7 +2,7 @@
 # The index HTML file to drive the bundling process.
 target = "index.html"
 # Build in release mode.
-release = true
+release = false
 # The output dir for all final assets.
 dist = "dist"
 # The public URL from which assets are to be served.
@@ -14,11 +14,11 @@ inject_scripts = true
 # Require Cargo.lock and cache are up to date
 frozen = false
 # Require Cargo.lock is up to date
-locked = false
+locked = true
 # Allow disabling minification
-no_minification = false
+no_minification = true
 # Allow disabling sub-resource integrity (SRI)
-no_sri = false
+no_sri = true
 
 [serve]
 # Open a browser tab once the initial build is complete.

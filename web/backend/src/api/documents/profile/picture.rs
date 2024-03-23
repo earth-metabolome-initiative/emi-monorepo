@@ -3,9 +3,9 @@
 use std::fs::File;
 
 use actix_web::{get, HttpResponse, Responder};
+use std::io::Read;
 use uuid::Uuid;
 use web_common::custom_validators::ImageSize;
-use std::io::Read;
 
 use crate::{model_views::DocumentView, models::Document};
 

@@ -4,15 +4,14 @@
 
 use image::io::Reader;
 use image::DynamicImage;
+use image::GenericImage;
+use image::GenericImageView;
 use image::ImageFormat;
+use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 use std::fmt::Formatter;
-use image::GenericImageView;
-use image::GenericImage;
-use serde::{Deserialize, Serialize};
 use validator::Validate;
 use validator::ValidationError;
-
 
 #[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
 pub struct Image {
@@ -24,21 +23,21 @@ pub enum ImageSize {
     #[serde(rename = "thumbnail")]
     Thumbnail,
     #[serde(rename = "standard")]
-    Standard
+    Standard,
 }
 
 impl ImageSize {
     pub fn width(&self) -> u32 {
         match self {
             ImageSize::Thumbnail => 64,
-            ImageSize::Standard => 64
+            ImageSize::Standard => 64,
         }
     }
 
     pub fn height(&self) -> u32 {
         match self {
             ImageSize::Thumbnail => 64,
-            ImageSize::Standard => 64
+            ImageSize::Standard => 64,
         }
     }
 }
@@ -47,7 +46,7 @@ impl Display for ImageSize {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
         match self {
             ImageSize::Thumbnail => write!(f, "thumbnail"),
-            ImageSize::Standard => write!(f, "standard")
+            ImageSize::Standard => write!(f, "standard"),
         }
     }
 }
@@ -171,7 +170,9 @@ impl Image {
         let cropped_image = image.crop(x_padding, y_padding, size, size);
 
         // Paste the cropped image onto the square canvas
-        square.copy_from(&cropped_image, 0, 0).map_err(|e| vec![e.to_string()])?;
+        square
+            .copy_from(&cropped_image, 0, 0)
+            .map_err(|e| vec![e.to_string()])?;
 
         Ok(square)
     }

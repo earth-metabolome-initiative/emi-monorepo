@@ -3,8 +3,8 @@ use crate::cookies::is_logged_in;
 use crate::router::AppRoute;
 use log::info;
 use serde::{Deserialize, Serialize};
-use web_common::api::oauth::jwt_cookies::AccessToken;
 use web_common::api::auth::users::User;
+use web_common::api::oauth::jwt_cookies::AccessToken;
 use yew_router::prelude::*;
 use yewdux::prelude::*;
 
@@ -26,9 +26,11 @@ impl UserState {
     }
 
     pub fn has_complete_profile(&self) -> bool {
-        self.has_access_token() && self.user
-            .as_ref()
-            .map_or(false, |user| user.has_complete_profile())
+        self.has_access_token()
+            && self
+                .user
+                .as_ref()
+                .map_or(false, |user| user.has_complete_profile())
     }
 
     pub fn has_no_user(&self) -> bool {
@@ -43,8 +45,14 @@ impl UserState {
         self.access_token = Some(access_token);
     }
 
-    pub fn set_user(&mut self, user: User) {
-        self.user = Some(user);
+    /// Set the user to the provided value and returns whether any changes were made.
+    pub fn set_user(&mut self, user: User) -> bool {
+        if self.user.as_ref() != Some(&user) {
+            self.user = Some(user);
+            true
+        } else {
+            false
+        }
     }
 
     pub fn access_token(&self) -> Option<&AccessToken> {
@@ -88,4 +96,3 @@ pub fn refresh_access_token(dispatch: Dispatch<UserState>, navigator: Navigator)
         }
     });
 }
-

@@ -2,14 +2,14 @@
 use crate::api::oauth::jwt_cookies::{
     eliminate_cookies, JsonAccessToken, JsonRefreshToken, REFRESH_COOKIE_NAME,
 };
-use actix_web::error::Error;
 use actix_web::dev::Payload;
+use actix_web::error::Error;
 use actix_web::FromRequest;
 use actix_web::{get, web, HttpRequest, HttpResponse};
 use actix_web_httpauth::extractors::bearer::BearerAuth;
-use web_common::api::ApiError;
 use std::future::ready;
 use std::future::Ready;
+use web_common::api::ApiError;
 
 struct MaybeBearer {
     bearer: Option<BearerAuth>,

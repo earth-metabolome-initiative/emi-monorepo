@@ -60,7 +60,6 @@ pub(crate) fn is_authorized(
     id: uuid::Uuid,
     roles: Vec<messages::Role>,
 ) -> Result<bool, diesel::result::Error> {
-
     use diesel::dsl::sql;
     // Preliminarily, we check whether the provided table is a valid table.
     debug_assert!(diesel::select(sql::<diesel::sql_types::Bool>(&format!(

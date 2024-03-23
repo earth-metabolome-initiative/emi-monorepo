@@ -8,9 +8,8 @@ use yew_agent::worker::WorkerProvider;
 use yew_router::prelude::*;
 
 #[function_component]
-
 pub fn App() -> Html {
-    info!("Rendering App component.");
+    info!("Rendering App component at {}", chrono::Local::now());
 
     html! {
         <WorkerProvider<WebsocketWorker<FrontendMessage, BackendMessage>> path="web_socket_worker.js">

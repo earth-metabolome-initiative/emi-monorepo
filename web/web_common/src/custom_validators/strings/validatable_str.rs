@@ -1,16 +1,15 @@
 //! Submodule providing structs that transparently wrap strings and str references and implement
 //! the validator::Validate trait.
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use validator::Validate;
 
 use crate::custom_validators::validation_errors::TryFromString;
 
-
 #[derive(Debug, Clone, Serialize, PartialEq, Eq, Default, Hash, Deserialize)]
 #[repr(transparent)]
 /// A wrapper around a string that implements the `Validate` trait.
-/// 
+///
 /// # Implementation details
 /// The Validate trait is from the external crate `validator`, and the String
 /// is the standard library's String type, so we cannot just implement the trait
@@ -34,7 +33,9 @@ impl From<String> for ValidatableString {
 
 impl From<&str> for ValidatableString {
     fn from(value: &str) -> Self {
-        Self { value: value.to_string() }
+        Self {
+            value: value.to_string(),
+        }
     }
 }
 

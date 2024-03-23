@@ -193,7 +193,9 @@ where
             Some(true) => {
                 if let (Some(previous), Some(current)) = (
                     ctx.props().value(),
-                    self.current_value.as_ref().and_then(|value| Data::try_from(value.clone()).ok()),
+                    self.current_value
+                        .as_ref()
+                        .and_then(|value| Data::try_from(value.clone()).ok()),
                 ) {
                     if previous != current {
                         "input-group input-group-valid"
@@ -203,7 +205,7 @@ where
                 } else {
                     "input-group input-group-valid"
                 }
-            },
+            }
             Some(false) => "input-group input-group-invalid",
             None => "input-group",
         };
@@ -272,13 +274,13 @@ where
             |value| value.to_string(),
         );
 
-        let on_delete ={
+        let on_delete = {
             let link = ctx.link().clone();
             Callback::from(move |error: String| {
                 link.send_message(InputMessage::RemoveError(error));
             })
         };
-        
+
         html! {
             <div class={classes}>
                 {if props.show_label {

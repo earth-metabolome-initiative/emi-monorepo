@@ -169,8 +169,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                 Ok(_user) => match form_action {
                                     FormAction::CompleteProfile(profile) => {
                                         ctx.address().do_send(UserMessage::CompleteProfile(
-                                            task_id,
-                                            profile,
+                                            task_id, profile,
                                         ));
                                     }
                                 },

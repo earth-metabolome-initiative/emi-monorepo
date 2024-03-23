@@ -1,8 +1,8 @@
-pub mod name;
 pub mod complete_profile;
+pub mod name;
 
-pub use name::Name;
 pub use complete_profile::*;
+pub use name::Name;
 
 use crate::combine_path;
 
@@ -25,9 +25,14 @@ impl User {
         name: Option<name::Name>,
         profile_picture_url: Option<String>,
         thumbnail_profile_picture_url: Option<String>,
-        id: Uuid
+        id: Uuid,
     ) -> User {
-        User { name, profile_picture_url, thumbnail_profile_picture_url, id }
+        User {
+            name,
+            profile_picture_url,
+            thumbnail_profile_picture_url,
+            id,
+        }
     }
 
     pub fn full_name(&self) -> Result<String, String> {

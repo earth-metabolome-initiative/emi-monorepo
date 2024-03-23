@@ -8,7 +8,6 @@ use crate::traits::Enablable;
 /// build the [`Sirius`](crate::sirius::Sirius) struct, and through the builder we can evaluate all of the provided
 /// parameters. If we make this struct public, we would allow the user to create a [`Sirius`](crate::sirius::Sirius)
 /// struct with invalid parameters. DO NOT MAKE THIS STRUCT PUBLIC.
-///
 pub(crate) struct SiriusConfig<V: Version> {
     core_parameters: Vec<V::Core>,
     config_parameters: Vec<V::Config>,
@@ -41,7 +40,6 @@ impl<V: Version> SiriusConfig<V> {
     /// # Arguments
     ///
     /// * `parameter` - The parameter to add.
-    ///
     pub fn add_core_parameter(&mut self, parameter: V::Core) -> Result<(), String> {
         // We check if the parameter is already present in the vector
         // If it is, we return an error
@@ -69,7 +67,6 @@ impl<V: Version> SiriusConfig<V> {
     /// # Arguments
     ///
     /// * `parameter` - The parameter to add.
-    ///
     pub fn add_config_parameter(&mut self, parameter: V::Config) -> Result<(), String> {
         // We check if the parameter is already present in the vector
         // If it is, we return an error
@@ -103,7 +100,6 @@ impl<V: Version> SiriusConfig<V> {
     /// # Arguments
     ///
     /// * `parameter` - The parameter to add.
-    ///
     pub fn add_formula_parameter(&mut self, parameter: V::Formula) -> Result<(), String> {
         // We check if the parameter is already present in the vector
         // If it is, we return an error
@@ -137,7 +133,6 @@ impl<V: Version> SiriusConfig<V> {
     /// # Arguments
     ///
     /// * `parameter` - The parameter to add.
-    ///
     pub fn add_zodiac_parameter(&mut self, parameter: V::Zodiac) -> Result<(), String> {
         // We check if the parameter is already present in the vector
         // If it is, we return an error
@@ -171,7 +166,6 @@ impl<V: Version> SiriusConfig<V> {
     /// # Arguments
     ///
     /// * `parameter` - The parameter to add.
-    ///
     pub fn add_fingerprint_parameter(&mut self, parameter: V::Fingerprint) -> Result<(), String> {
         // We check if the parameter is already present in the vector
         // If it is, we return an error
@@ -205,7 +199,6 @@ impl<V: Version> SiriusConfig<V> {
     /// # Arguments
     ///
     /// * `parameter` - The parameter to add.
-    ///
     pub fn add_structure_parameter(&mut self, parameter: V::Structure) -> Result<(), String> {
         // We check if the parameter is already present in the vector
         // If it is, we return an error
@@ -239,7 +232,6 @@ impl<V: Version> SiriusConfig<V> {
     /// # Arguments
     ///
     /// * `parameter` - The parameter to add.
-    ///
     pub fn add_canopus_parameter(&mut self, parameter: V::Canopus) -> Result<(), String> {
         // We check if the parameter is already present in the vector
         // If it is, we return an error
@@ -273,7 +265,6 @@ impl<V: Version> SiriusConfig<V> {
     /// # Arguments
     ///
     /// * `parameter` - The parameter to add.
-    ///
     pub fn add_write_summaries_parameter(
         &mut self,
         parameter: V::WriteSummaries,

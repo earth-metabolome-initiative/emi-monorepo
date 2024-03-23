@@ -7,10 +7,7 @@ use web_common::api::ws::messages::BackendMessage;
 #[derive(Debug, Message)]
 #[rtype(result = "()")]
 pub(crate) enum UserMessage {
-    CompleteProfile(
-        uuid::Uuid,
-        web_common::api::auth::users::CompleteProfile,
-    ),
+    CompleteProfile(uuid::Uuid, web_common::api::auth::users::CompleteProfile),
 }
 
 impl actix::Handler<UserMessage> for WebSocket {

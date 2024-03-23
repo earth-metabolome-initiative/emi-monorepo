@@ -24,7 +24,6 @@
 //! contains the operations that should be performed as part of the transaction. If the closure returns an error, the
 //! transaction is rolled back, and the error is returned. If the closure returns Ok, the transaction is committed, and
 //! the Ok value is returned.
-//!
 use crate::model_implementations::{NewUser, NewUserEmail};
 use crate::models::*;
 use crate::transactions::create_user::create_user;

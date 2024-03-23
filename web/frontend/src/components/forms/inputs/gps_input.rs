@@ -81,7 +81,9 @@ pub fn gps_input(props: &GPSInputProps) -> Html {
     // we can, if the user allows it, get the current position
     // with a high degree of accuracy and keep it updated.
     let mut position_options = PositionOptions::new();
-    position_options.enable_high_accuracy(true).maximum_age(10_000);
+    position_options
+        .enable_high_accuracy(true)
+        .maximum_age(10_000);
 
     let latitude: UseStateHandle<Option<f64>> = use_state(|| props.latitude);
     let longitude: UseStateHandle<Option<f64>> = use_state(|| props.longitude);
@@ -90,7 +92,8 @@ pub fn gps_input(props: &GPSInputProps) -> Html {
     let altitude_accuracy: UseStateHandle<Option<f64>> = use_state(|| props.altitude_accuracy);
 
     if latitude.is_none() || longitude.is_none() {
-        if let Some(geolocation) = web_sys::window().and_then(|win| win.navigator().geolocation().ok())
+        if let Some(geolocation) =
+            web_sys::window().and_then(|win| win.navigator().geolocation().ok())
         {
             let geolocation: Geolocation = geolocation.clone();
             let latitude = latitude.clone();

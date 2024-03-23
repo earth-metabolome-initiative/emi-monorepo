@@ -1,5 +1,4 @@
 //! A builder is a type of struct that will collect configurations and once build, prodiuces a complete struct.
-//!
 use crate::prelude::*;
 use crate::sirius_config::SiriusConfig;
 use crate::traits::IntoDefault;
@@ -24,16 +23,15 @@ impl SiriusBuilder<Version5> {
     /// ```
     /// use sirius_bindings::prelude::*;
     ///
-    /// let sirius = SiriusBuilder::default()
-    ///    .maximal_mz(1000.0).unwrap()
-    ///   .build();
+    /// let sirius = SiriusBuilder::default().maximal_mz(1000.0).unwrap().build();
     ///
     /// assert!(SiriusBuilder::default().maximal_mz(-67.0).is_err());
     /// assert!(SiriusBuilder::default().maximal_mz(0.0).is_err());
     /// assert!(SiriusBuilder::default().maximal_mz(std::f64::NAN).is_err());
-    /// assert!(SiriusBuilder::default().maximal_mz(std::f64::INFINITY).is_err());
+    /// assert!(SiriusBuilder::default()
+    ///     .maximal_mz(std::f64::INFINITY)
+    ///     .is_err());
     /// ```
-    ///
     pub fn maximal_mz(mut self, maximal_mz: f64) -> Result<Self, String> {
         if maximal_mz < 0.0 {
             return Err(format!(
@@ -62,9 +60,7 @@ impl SiriusBuilder<Version5> {
     /// # Example
     /// ```
     /// use sirius_bindings::prelude::*;
-    /// let sirius = SiriusBuilder::default()
-    ///  .max_cpus(4).unwrap()
-    /// .build();
+    /// let sirius = SiriusBuilder::default().max_cpus(4).unwrap().build();
     /// ```
     pub fn max_cpus(mut self, n_cores: usize) -> Result<Self, String> {
         self.config.add_core_parameter(CoreV5::NCpus(n_cores))?;
@@ -79,8 +75,9 @@ impl SiriusBuilder<Version5> {
     /// ```
     /// use sirius_bindings::prelude::*;
     /// let sirius = SiriusBuilder::default()
-    ///   .isotope_settings_filter(true).unwrap()
-    ///   .build();
+    ///     .isotope_settings_filter(true)
+    ///     .unwrap()
+    ///     .build();
     /// ```
     pub fn isotope_settings_filter(
         mut self,
@@ -98,10 +95,13 @@ impl SiriusBuilder<Version5> {
     /// ```
     /// use sirius_bindings::prelude::*;
     /// let sirius = SiriusBuilder::default()
-    ///  .formula_search_db(DBVector::from(vec![SearchDB::Hmdb])).unwrap()
-    /// .build();
+    ///     .formula_search_db(DBVector::from(vec![SearchDB::Hmdb]))
+    ///     .unwrap()
+    ///     .build();
     ///
-    /// assert!(SiriusBuilder::default().formula_search_db(DBVector::from(vec![SearchDB::Hmdb])).is_ok());
+    /// assert!(SiriusBuilder::default()
+    ///     .formula_search_db(DBVector::from(vec![SearchDB::Hmdb]))
+    ///     .is_ok());
     /// ```
     pub fn formula_search_db(
         mut self,
@@ -119,8 +119,9 @@ impl SiriusBuilder<Version5> {
     /// ```
     /// use sirius_bindings::prelude::*;
     /// let sirius = SiriusBuilder::default()
-    /// .structure_search_db(DBVector::from(vec![SearchDB::Zincbio])).unwrap()
-    /// .build();
+    ///     .structure_search_db(DBVector::from(vec![SearchDB::Zincbio]))
+    ///     .unwrap()
+    ///     .build();
     /// ```
     pub fn structure_search_db(
         mut self,
@@ -138,8 +139,9 @@ impl SiriusBuilder<Version5> {
     /// ```
     /// use sirius_bindings::prelude::*;
     /// let sirius = SiriusBuilder::default()
-    /// .timeout_seconds_per_tree(100).unwrap()
-    /// .build();
+    ///     .timeout_seconds_per_tree(100)
+    ///     .unwrap()
+    ///     .build();
     /// ```
     pub fn timeout_seconds_per_tree(
         mut self,
@@ -517,16 +519,21 @@ impl SiriusBuilder<Version5> {
     /// ```
     /// use sirius_bindings::prelude::*;
     /// let sirius = SiriusBuilder::default()
-    /// .zodiac_library_scoring_min_cosine(0.5).unwrap()
-    /// .build();
+    ///     .zodiac_library_scoring_min_cosine(0.5)
+    ///     .unwrap()
+    ///     .build();
     /// ```
     /// # Errors
     /// If the value is not in the range 0 and 1.
     /// # Example
     /// ```
     /// use sirius_bindings::prelude::*;
-    /// assert!(SiriusBuilder::default().zodiac_library_scoring_min_cosine(1.1).is_err());
-    /// assert!(SiriusBuilder::default().zodiac_library_scoring_min_cosine(-0.1).is_err());
+    /// assert!(SiriusBuilder::default()
+    ///     .zodiac_library_scoring_min_cosine(1.1)
+    ///     .is_err());
+    /// assert!(SiriusBuilder::default()
+    ///     .zodiac_library_scoring_min_cosine(-0.1)
+    ///     .is_err());
     /// ```
     pub fn zodiac_library_scoring_min_cosine(
         mut self,
@@ -1087,14 +1094,17 @@ impl SiriusBuilder<Version5> {
     /// use sirius_bindings::prelude::*;
     ///
     /// let sirius = SiriusBuilder::default()
-    ///    .maximal_mz_default().unwrap()
-    ///  .build();
+    ///     .maximal_mz_default()
+    ///     .unwrap()
+    ///     .build();
     ///
     /// assert!(SiriusBuilder::default().maximal_mz_default().is_ok());
     ///
-    /// assert!(SiriusBuilder::default().maximal_mz_default().unwrap().maximal_mz_default().is_err());
-    ///
-    ///
+    /// assert!(SiriusBuilder::default()
+    ///     .maximal_mz_default()
+    ///     .unwrap()
+    ///     .maximal_mz_default()
+    ///     .is_err());
     /// ```
     pub fn maximal_mz_default(mut self) -> Result<Self, String> {
         self.config
