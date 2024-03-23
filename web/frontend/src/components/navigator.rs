@@ -112,9 +112,9 @@ impl Component for Navigator {
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             NavigatorMessage::UserState(user_state) => {
-                if self.user_state == user_state {
-                    return false;
-                }
+                // if self.user_state == user_state {
+                //     return false;
+                // }
                 self.user_state = user_state;
                 if let Some(access_token) = self.user_state.access_token() {
                     self.websocket
@@ -125,9 +125,9 @@ impl Component for Navigator {
                 true
             }
             NavigatorMessage::AppState(app_state) => {
-                if self.app_state == app_state {
-                    return false;
-                }
+                // if self.app_state == app_state {
+                //     return false;
+                // }
 
                 self.app_state = app_state;
 

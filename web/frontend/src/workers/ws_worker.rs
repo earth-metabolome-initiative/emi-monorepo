@@ -96,7 +96,7 @@ where
     fn create(scope: &yew_agent::prelude::WorkerScope<Self>) -> Self {
         Self {
             subscribers: HashSet::new(),
-            sender: None, //Some(Self::connect(scope).unwrap_throw()),
+            sender: Some(Self::connect(scope).unwrap_throw()),
             reconnection_attempt: 0,
             _phantom: std::marker::PhantomData,
         }
@@ -107,7 +107,6 @@ where
         scope: &yew_agent::prelude::WorkerScope<Self>,
         internal_message: Self::Message,
     ) {
-        return;
         match internal_message {
             InternalMessage::Backend(backend_message) => {
                 log::debug!("Received message from websocket: {:?}", backend_message);
@@ -175,7 +174,6 @@ where
         frontend_message: Self::Input,
         _id: HandlerId,
     ) {
-        return;
         if let Some(sender) = &mut self.sender {
             match sender.try_send(frontend_message) {
                 Ok(()) => {}

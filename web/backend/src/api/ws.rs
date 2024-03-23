@@ -5,6 +5,7 @@ use actix_web::{get, Error, HttpRequest, HttpResponse};
 use sqlx::{Pool as SQLxPool, Postgres};
 pub mod channels;
 pub mod socket;
+use actix_web_actors::ws::WsResponseBuilder;
 pub mod users;
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
@@ -33,9 +34,13 @@ async fn start_websocket(
     let sqlx_pool = sqlx_pool.get_ref().clone();
     let redis_client = redis_client.get_ref().clone();
 
-    actix_web_actors::ws::start(
+    WsResponseBuilder::new(
         socket::WebSocket::new(diesel_pool, sqlx_pool, redis_client),
         &req,
         stream,
     )
+    .codec(actix_http::ws::Codec::new())
+    // This will overwrite the codec's max frame-size
+    .frame_size(1024 * 1024 * 5) // 5MB
+    .start()
 }
