@@ -1,14 +1,10 @@
 //! Module providing the websocket messages used in the application.
-use std::{fmt::Debug, str::FromStr};
+use std::fmt::Debug;
 
-use crate::api::form_traits::FormResult;
-use crate::api::{
-    auth::users::{CompleteProfile, User},
-    oauth::jwt_cookies::AccessToken,
-    ApiError,
-};
+use crate::api::database::operations::Operation;
+use crate::api::database::selects::Answer;
+use crate::api::{oauth::jwt_cookies::AccessToken, ApiError};
 use serde::{Deserialize, Serialize};
-use std::fmt::Display;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CloseReason {
@@ -16,161 +12,18 @@ pub struct CloseReason {
     reason: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
-pub enum Table {
-    #[serde(rename = "users")]
-    Users,
-    #[serde(rename = "teams")]
-    Teams,
-    #[serde(rename = "editables")]
-    Editables,
-    #[serde(rename = "documents")]
-    Documents,
-}
-
-impl Table {
-    pub fn is_users(&self) -> bool {
-        match self {
-            Table::Users => true,
-            _ => false,
-        }
-    }
-
-    pub fn is_editables(&self) -> bool {
-        match self {
-            Table::Users => false,
-            Table::Teams => true,
-            Table::Editables => true,
-            Table::Documents => true,
-        }
-    }
-}
-
-impl Display for Table {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Table::Users => write!(f, "users"),
-            Table::Teams => write!(f, "teams"),
-            Table::Editables => write!(f, "editables"),
-            Table::Documents => write!(f, "documents"),
-        }
-    }
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq)]
-pub enum Role {
-    Admin,
-    Moderator,
-    User,
-}
-
-impl Display for Role {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Role::Admin => write!(f, "admin"),
-            Role::Moderator => write!(f, "moderator"),
-            Role::User => write!(f, "user"),
-        }
-    }
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
-pub enum SQLOperation {
-    #[serde(rename = "INSERT")]
-    Insert,
-    #[serde(rename = "UPDATE")]
-    Update,
-    #[serde(rename = "DELETE")]
-    Delete,
-    #[serde(rename = "SELECT")]
-    Select,
-}
-
-impl SQLOperation {
-    pub fn is_insert(&self) -> bool {
-        match self {
-            SQLOperation::Insert => true,
-            _ => false,
-        }
-    }
-
-    pub fn is_update(&self) -> bool {
-        match self {
-            SQLOperation::Update => true,
-            _ => false,
-        }
-    }
-
-    pub fn is_delete(&self) -> bool {
-        match self {
-            SQLOperation::Delete => true,
-            _ => false,
-        }
-    }
-
-    pub fn is_select(&self) -> bool {
-        match self {
-            SQLOperation::Select => true,
-            _ => false,
-        }
-    }
-}
-
-impl FromStr for SQLOperation {
-    type Err = ();
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "insert" => Ok(SQLOperation::Insert),
-            "INSERT" => Ok(SQLOperation::Insert),
-            "update" => Ok(SQLOperation::Update),
-            "UPDATE" => Ok(SQLOperation::Update),
-            "delete" => Ok(SQLOperation::Delete),
-            "DELETE" => Ok(SQLOperation::Delete),
-            _ => Err(()),
-        }
-    }
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq)]
-pub enum FormAction {
-    CompleteProfile(CompleteProfile),
-}
-
-impl FormAction {
-    pub fn requires_authentication(&self) -> bool {
-        match self {
-            FormAction::CompleteProfile(_) => CompleteProfile::requires_authentication(),
-        }
-    }
-}
-
-impl From<CompleteProfile> for FormAction {
-    fn from(profile: CompleteProfile) -> Self {
-        FormAction::CompleteProfile(profile)
-    }
-}
-
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum FrontendMessage {
     Close(Option<CloseReason>),
-    Authentication(AccessToken),
-    Task(uuid::Uuid, FormAction),
-}
-
-impl FrontendMessage {
-    pub fn submit(id: uuid::Uuid, action: FormAction) -> Self {
-        FrontendMessage::Task(id, action)
-    }
+    Task(uuid::Uuid, Operation),
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum BackendMessage {
     Close(Option<CloseReason>),
-    User(SQLOperation, User),
+    Answer(Answer), // Answer of a select query
     TaskResult(uuid::Uuid, Result<(), ApiError>),
-    ExpiredToken,
-    Authenticated,
+    RefreshToken(AccessToken),
 }
 
 #[cfg(feature = "backend")]

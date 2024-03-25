@@ -2,7 +2,7 @@
 use serde::Deserialize;
 use std::fmt::Display;
 
-use super::ws::messages::FormAction;
+use super::database::operations::Operation;
 
 #[derive(Debug, Clone, Copy, PartialEq, Deserialize)]
 pub enum FormMethod {
@@ -112,7 +112,7 @@ pub trait TryFromCallback<T>: Sized {
         C: FnOnce(Result<Self, Vec<String>>) + 'static;
 }
 
-pub trait FormResult: Into<FormAction> {
+pub trait FormResult: Into<Operation> {
     const METHOD: FormMethod;
 
     /// Returns the title to use for the Form.

@@ -26,18 +26,20 @@ pub enum ImageSize {
     Standard,
 }
 
+pub const STANDARD_IMAGE_SIZE: u32 = 512;
+
 impl ImageSize {
     pub fn width(&self) -> u32 {
         match self {
             ImageSize::Thumbnail => 64,
-            ImageSize::Standard => 64,
+            ImageSize::Standard => STANDARD_IMAGE_SIZE,
         }
     }
 
     pub fn height(&self) -> u32 {
         match self {
             ImageSize::Thumbnail => 64,
-            ImageSize::Standard => 64,
+            ImageSize::Standard => STANDARD_IMAGE_SIZE,
         }
     }
 }
@@ -155,7 +157,25 @@ impl Image {
             .and_then(|r| r.format())
     }
 
-    pub fn to_square(&self) -> Result<DynamicImage, Vec<String>> {
+    #[cfg(feature = "backend")]
+    /// Cuts a square from the image, centered around the face detected in the image.
+    ///
+    /// # Implementative details
+    /// The face detection is implemented using the `rustface` crate.
+    pub fn to_face_square(&self) -> Result<DynamicImage, Vec<String>> {
+        let faces = crate::custom_validators::images::contains_face::get_faces(self)
+            .map_err(|e| vec![e.to_string()])?;
+
+        if faces.len() != 1 {
+            return Err(vec!["Expected exactly one face.".to_string()]);
+        }
+
+        let face = faces[0].bbox();
+
+        // We get the central coordinates of the face
+        let mut x = face.x() as u32 + face.width() / 2;
+        let mut y = face.y() as u32 + face.height() / 2;
+
         let mut image = image::load_from_memory(&self.data).map_err(|e| vec![e.to_string()])?;
         let (width, height) = image.dimensions();
         let size = std::cmp::min(width, height);
@@ -163,11 +183,9 @@ impl Image {
         // We need to crop the image to a square
         let mut square = image::DynamicImage::new_rgba8(size, size);
 
-        let x_padding = (width - size) / 2;
-        let y_padding = (height - size) / 2;
-
-        // Crop the original image to make it square
-        let cropped_image = image.crop(x_padding, y_padding, size, size);
+        x = x.saturating_sub(size);
+        y = y.saturating_sub(size);
+        let cropped_image = image.crop(x, y, x + size, y + size);
 
         // Paste the cropped image onto the square canvas
         square

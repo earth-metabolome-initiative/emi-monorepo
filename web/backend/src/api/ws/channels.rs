@@ -1,47 +1,40 @@
 use crate::api::ws::socket::WebSocket;
 use actix::Message;
-use actix_web_actors::ws::CloseCode;
+use uuid::Uuid;
 use core::fmt::Debug;
-use serde::{de::DeserializeOwned, Deserialize, Serialize};
+use serde::{Deserialize, Serialize};
 use sqlx::error::Error;
 use sqlx::postgres::PgListener;
 use sqlx::Pool;
 use sqlx::Postgres;
-use web_common::api::auth::users::User;
-use web_common::api::ws::messages;
+use std::fmt::Display;
+use std::fmt::Formatter;
+use std::fmt;
+use web_common::api::database::operations::Operation;
 use web_common::api::ws::messages::BackendMessage;
-use web_common::api::ws::messages::SQLOperation;
 
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, Hash)]
 pub enum Channel {
-    NotifyUser(User),
+    NotifyUser(Uuid),
 }
 
-impl ToString for Channel {
-    fn to_string(&self) -> String {
+impl Display for Channel {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         match self {
-            Channel::NotifyUser(user) => format!("notify_user_{}", user.id()),
+            Channel::NotifyUser(user_id) => write!(f, "notify_user_{}", user_id),
         }
     }
 }
 
 #[derive(Debug, Serialize, Deserialize, Message, Clone, PartialEq, Eq)]
 #[rtype(result = "()")]
-pub struct ChannelMessage<Record = serde_json::Value> {
-    pub table: messages::Table,
-    pub operation: SQLOperation,
-    pub record: Record,
+pub struct ChannelMessage {
+    pub table: Operation,
 }
 
 impl ChannelMessage {
-    pub fn deserialize_into<Record: DeserializeOwned>(
-        self,
-    ) -> Result<ChannelMessage<Record>, serde_json::Error> {
-        let record: Record = serde_json::from_value(self.record)?;
-        Ok(ChannelMessage {
-            table: self.table,
-            operation: self.operation,
-            record,
-        })
+    pub fn into_view(self) -> Operation {
+        self.table
     }
 }
 
@@ -75,48 +68,15 @@ pub async fn start_listening(
 
             let value: ChannelMessage = serde_json::from_str(&notification_payload).unwrap();
 
-            match &value.table {
-                messages::Table::Users => {
-                    let message: ChannelMessage<crate::models::User> =
-                        value.deserialize_into().unwrap();
-                    address.do_send(message);
-                }
-                table_name => {
-                    log::error!(
-                        "Received a notification for a table {:?} that is not implemented yet",
-                        table_name
-                    );
-                }
-            }
+            address.do_send(value);
         }
     }
 }
 
-impl actix::Handler<ChannelMessage<crate::models::User>> for WebSocket {
+impl actix::Handler<ChannelMessage> for WebSocket {
     type Result = ();
 
-    fn handle(&mut self, msg: ChannelMessage<crate::models::User>, ctx: &mut Self::Context) {
-        match msg.operation {
-            SQLOperation::Update => {
-                ctx.binary(BackendMessage::User(
-                    SQLOperation::Update,
-                    msg.record.to_web_common_user(&mut self.diesel_connection),
-                ));
-            }
-            SQLOperation::Insert => {
-                unreachable!("We do not expect notifications for insert operations");
-            }
-            SQLOperation::Delete => {
-                // If the current user has been deleted, close the connection
-                if let Some(user) = &self.user {
-                    if user.id() == msg.record.id() {
-                        ctx.close(Some(CloseCode::Policy.into()));
-                    }
-                }
-            }
-            SQLOperation::Select => {
-                unreachable!("We do not expect notifications for select operations");
-            }
-        }
+    fn handle(&mut self, msg: ChannelMessage, ctx: &mut Self::Context) {
+        ctx.binary(BackendMessage::Operation(msg.into_view()));
     }
 }

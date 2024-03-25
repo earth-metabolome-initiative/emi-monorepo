@@ -3,7 +3,8 @@
 
 use crate::DieselConn;
 use diesel::prelude::*;
-use web_common::api::ws::messages;
+use web_common::api::database::operations::Operation;
+use web_common::api::database::roles::Role;
 
 /// Check whether a user is a website admin.
 ///
@@ -52,14 +53,32 @@ pub(crate) fn is_admin(
 /// * `conn` - A connection to the database.
 /// * `user_id` - The user id to check authorization for.
 /// * `table` - The table to check authorization for.
-/// * `id` - The id of the row to check authorization for.
+/// * `roles` - The roles that are allowed to perform the given operation on the table.
+/// 
+/// # Implementation details
+/// If the provided roles are None, we default to the roles that are allowed to perform the given
+/// operation on the table.
 pub(crate) fn is_authorized(
     conn: &mut DieselConn,
     user_id: uuid::Uuid,
-    table: messages::Table,
-    id: uuid::Uuid,
-    roles: Vec<messages::Role>,
+    operation: Operation,
+    roles: Option<Vec<Role>>,
 ) -> Result<bool, diesel::result::Error> {
+    if operation.is_insert() {
+        unimplemented!(concat!(
+            "Insert operations are not supported by the is_authorized method. ",
+            "Most likely you intend to check whether you can UPDATE the other tables ",
+            "that have FOREIGN KEYS with the table you are trying to INSERT into."
+        ));
+    }
+
+    let id = operation.id().unwrap();
+
+    let roles = match roles {
+        Some(roles) => roles,
+        None => operation.default_roles_for_operation(),
+    };
+
     use diesel::dsl::sql;
     // Preliminarily, we check whether the provided table is a valid table.
     debug_assert!(diesel::select(sql::<diesel::sql_types::Bool>(&format!(
@@ -68,7 +87,7 @@ pub(crate) fn is_authorized(
             FROM information_schema.tables
             WHERE table_schema = 'public' AND table_name = '{}'
         )",
-        table
+        table.table_name()
     )))
     .get_result(conn)?);
 
@@ -81,7 +100,7 @@ pub(crate) fn is_authorized(
             SELECT 1
             FROM {} WHERE id = '{}'
         )",
-        table, id
+        table.table_name(), id
     )))
     .get_result(conn)?);
 
@@ -95,7 +114,7 @@ pub(crate) fn is_authorized(
 
         // If one of the requested roles is the admin role, we check whether the user is
         // within the global admin team.
-        return Ok(roles.contains(&messages::Role::Admin) && is_admin(conn, user_id)?);
+        return Ok(roles.contains(&Role::Admin) && is_admin(conn, user_id)?);
     }
 
     // If we get up to this point, the table must be of the Editables kind.
@@ -104,9 +123,8 @@ pub(crate) fn is_authorized(
     // Before anything else, we check whether the user is the author of the editable
     // associated with the provided ID. We do this by checking whether the created_by
     // column of the table is equal to the provided user ID. If the user is the author,
-    // then we return true, as the author is always authorized to perform operations on
-    // the editable they created.
-    {
+    // and among the provided roles is the Creator role, we return true.
+    if roles.contains(&Role::Creator) {
         use crate::schema::editables;
 
         let is_author: bool = editables::dsl::editables

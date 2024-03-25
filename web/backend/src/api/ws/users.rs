@@ -18,7 +18,7 @@ impl actix::Handler<UserMessage> for WebSocket {
             UserMessage::CompleteProfile(task_id, profile) => {
                 ctx.binary(BackendMessage::TaskResult(
                     task_id,
-                    complete_profile(
+                    self.user.as_ref().unwrap().complete_profile(
                         &mut self.diesel_connection,
                         self.user.as_ref().unwrap(),
                         profile,

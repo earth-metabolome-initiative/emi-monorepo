@@ -3,7 +3,7 @@ use crate::cookies::is_logged_in;
 use crate::router::AppRoute;
 use log::info;
 use serde::{Deserialize, Serialize};
-use web_common::api::auth::users::User;
+use web_common::api::database::selects::PublicUser;
 use web_common::api::oauth::jwt_cookies::AccessToken;
 use yew_router::prelude::*;
 use yewdux::prelude::*;
@@ -12,7 +12,7 @@ use yewdux::prelude::*;
 /// The following macro will make sure that the store is saved across sessions.
 #[store(storage = "session", storage_tab_sync)]
 pub struct UserState {
-    user: Option<User>,
+    user: Option<PublicUser>,
     access_token: Option<AccessToken>,
 }
 
@@ -23,14 +23,6 @@ impl UserState {
 
     pub fn has_access_token(&self) -> bool {
         self.access_token.is_some()
-    }
-
-    pub fn has_complete_profile(&self) -> bool {
-        self.has_access_token()
-            && self
-                .user
-                .as_ref()
-                .map_or(false, |user| user.has_complete_profile())
     }
 
     pub fn has_no_user(&self) -> bool {
@@ -46,7 +38,7 @@ impl UserState {
     }
 
     /// Set the user to the provided value and returns whether any changes were made.
-    pub fn set_user(&mut self, user: User) -> bool {
+    pub fn set_user(&mut self, user: PublicUser) -> bool {
         if self.user.as_ref() != Some(&user) {
             self.user = Some(user);
             true
@@ -59,7 +51,7 @@ impl UserState {
         self.access_token.as_ref()
     }
 
-    pub fn user(&self) -> Option<&User> {
+    pub fn user(&self) -> Option<&PublicUser> {
         self.user.as_ref()
     }
 }

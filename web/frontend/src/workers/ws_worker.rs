@@ -4,10 +4,10 @@ use gloo_net::websocket::futures::WebSocket;
 use std::collections::HashSet;
 use std::fmt::Debug;
 use wasm_bindgen::UnwrapThrowExt;
-use web_common::api::ws::FULL_ENDPOINT;
 use yew::platform::spawn_local;
 use yew_agent::worker::HandlerId;
 use yew_agent::worker::Worker;
+use crate::cookies::is_logged_in;
 
 const NOMINAL_CLOSURE_CODE: u16 = 1000;
 
@@ -33,7 +33,13 @@ where
         scope: &yew_agent::prelude::WorkerScope<Self>,
     ) -> Result<futures::channel::mpsc::Sender<FM>, String> {
         log::debug!("Connecting to websocket");
-        let websocket = WebSocket::open(&format!("wss://emi.local{}", FULL_ENDPOINT))
+        let endpoint = if is_logged_in() {
+            web_common::api::auth::ws::FULL_ENDPOINT
+        } else {
+            web_common::api::ws::FULL_ENDPOINT
+        };
+
+        let websocket = WebSocket::open(&format!("wss://emi.local{}", endpoint))
             .map_err(|err| format!("Error opening websocket connection: {:?}", err))?;
 
         match websocket.state() {

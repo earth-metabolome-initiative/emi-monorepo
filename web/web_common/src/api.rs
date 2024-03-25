@@ -2,6 +2,7 @@ use std::collections::HashSet;
 
 use serde::{Deserialize, Serialize};
 pub mod auth;
+pub mod database;
 pub mod documents;
 pub mod form_traits;
 pub mod oauth;
@@ -92,6 +93,12 @@ impl Into<Vec<String>> for ApiError {
     }
 }
 
+impl From<Vec<String>> for ApiError {
+    fn from(errors: Vec<String>) -> Self {
+        ApiError::BadRequest(errors)
+    }
+}
+
 impl Into<HashSet<String>> for ApiError {
     fn into(self) -> HashSet<String> {
         let vector: Vec<String> = self.into();
@@ -112,5 +119,22 @@ impl From<image::ImageError> for ApiError {
     fn from(e: image::ImageError) -> Self {
         log::error!("Image error: {:?}", e);
         Self::InternalServerError
+    }
+}
+
+#[cfg(feature = "backend")]
+impl From<ApiError> for actix_web::HttpResponse {
+    fn from(e: ApiError) -> Self {
+        match e {
+            ApiError::Unauthorized => actix_web::HttpResponse::Unauthorized().finish(),
+            ApiError::ExpiredAuthorization => actix_web::HttpResponse::Unauthorized().finish(),
+            ApiError::BadGateway => actix_web::HttpResponse::BadGateway().finish(),
+            ApiError::BadRequest(errors) => actix_web::HttpResponse::BadRequest().json(errors),
+            ApiError::InternalServerError => {
+                actix_web::HttpResponse::InternalServerError().finish()
+            }
+            ApiError::InvalidFileFormat(format) => actix_web::HttpResponse::BadRequest()
+                .json(format!("Invalid file format: {}", format)),
+        }
     }
 }

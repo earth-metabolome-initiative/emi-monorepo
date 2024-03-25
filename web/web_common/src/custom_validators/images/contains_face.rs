@@ -8,11 +8,11 @@
 #[cfg(feature = "backend")]
 mod backend {
     use crate::custom_validators::images::image::Image;
-    use rustface::ImageData;
+    use rustface::{FaceInfo, ImageData};
     use validator::ValidationError;
     use web_common_derive::image_validator;
 
-    pub fn get_number_of_faces<I>(data: &I) -> Result<usize, ValidationError>
+    pub fn get_faces<I>(data: &I) -> Result<Vec<FaceInfo>, ValidationError>
     where
         I: AsRef<Image>,
     {
@@ -30,8 +30,14 @@ mod backend {
 
         let (width, height) = gray.dimensions();
         let mut image = ImageData::new(&gray, width, height);
-        let faces = detector.detect(&mut image);
-        Ok(faces.len())
+        Ok(detector.detect(&mut image))
+    }
+
+    pub fn get_number_of_faces<I>(data: &I) -> Result<usize, ValidationError>
+    where
+        I: AsRef<Image>,
+    {
+        get_faces(data).map(|faces| faces.len())
     }
 
     #[image_validator("We expected the image to contain a human face.")]

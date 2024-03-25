@@ -167,14 +167,6 @@ where
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            FormMessage::Backend(BackendMessage::ExpiredToken) => {
-                log::info!("Token expired, redirecting to login page.");
-                if let Some(navigator) = ctx.props().navigator.as_ref() {
-                    navigator.push(&AppRoute::Login);
-                }
-                false
-            }
-            FormMessage::Backend(BackendMessage::Authenticated) => false,
             FormMessage::Backend(BackendMessage::TaskResult(uuid, outcome)) => {
                 log::info!("Received task result");
                 if self.uuid == Some(uuid) {

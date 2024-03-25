@@ -24,13 +24,13 @@ use crate::stores::app_state::AppState;
 use crate::stores::user_state::UserState;
 use crate::utils::is_online;
 use gloo::timers::callback::Interval;
-use wasm_bindgen::UnwrapThrowExt;
-use web_common::api::auth::users::User;
+use web_common::api::database::selects::PublicUser;
 use web_common::api::ws::messages::*;
 use web_common::api::ApiError;
 use yew::prelude::*;
 use yew_agent::scope_ext::AgentScopeExt;
 use yew_router::prelude::*;
+use web_common::api::database::selects::Answer;
 use yewdux::prelude::*;
 
 use crate::components::hamburger::Hamburger;
@@ -56,16 +56,12 @@ impl Navigator {
         self.app_state.sidebar_open()
     }
 
-    fn user(&self) -> Option<&User> {
+    fn user(&self) -> Option<&PublicUser> {
         self.user_state.user()
     }
 
     fn has_access_token(&self) -> bool {
         self.user_state.has_access_token()
-    }
-
-    fn has_complete_profile(&self) -> bool {
-        self.user_state.has_complete_profile()
     }
 }
 
@@ -116,12 +112,6 @@ impl Component for Navigator {
                 //     return false;
                 // }
                 self.user_state = user_state;
-                if let Some(access_token) = self.user_state.access_token() {
-                    self.websocket
-                        .send(FrontendMessage::Authentication(access_token.clone()));
-                } else {
-                    refresh_access_token(self.user_dispatch.clone(), ctx.props().navigator.clone());
-                }
                 true
             }
             NavigatorMessage::AppState(app_state) => {
@@ -159,22 +149,17 @@ impl Component for Navigator {
                     let tasks = self.app_state.tasks();
                     for (task_id, task) in tasks.iter().cloned() {
                         info!("Resuming task {}", task_id);
-                        self.websocket.send(FrontendMessage::submit(task_id, task));
+                        self.websocket.send(FrontendMessage::Task(task_id, task));
                     }
                     !tasks.is_empty()
                 } else {
                     false
                 }
             }
-            NavigatorMessage::Backend(BackendMessage::User(_operation, user)) => {
-                info!("User updated: {:?}", user);
+            NavigatorMessage::Backend(BackendMessage::Answer(Answer::PublicUser(user))) => {
                 self.user_dispatch.reduce_mut(|state| {
                     state.set_user(user);
                 });
-                true
-            }
-            NavigatorMessage::Backend(BackendMessage::ExpiredToken) => {
-                refresh_access_token(self.user_dispatch.clone(), ctx.props().navigator.clone());
                 true
             }
             NavigatorMessage::Backend(BackendMessage::TaskResult(task_id, result)) => {
@@ -202,10 +187,6 @@ impl Component for Navigator {
                     },
                 }
                 true
-            }
-            NavigatorMessage::Backend(BackendMessage::Authenticated) => {
-                ctx.link().send_message(NavigatorMessage::ResumeTasks);
-                false
             }
             NavigatorMessage::Backend(_) => false,
             NavigatorMessage::ToggleSidebar => {
@@ -237,20 +218,18 @@ impl Component for Navigator {
                     </h1>
                     <SearchBar />
                     if self.has_access_token() {
-                        if self.has_complete_profile() {
-                            if let Some(user) = self.user() {
-                                <div class="user">
-                                    <img src={format!("/api/user/{}/avatar", user.id())} alt={format!("{}'s avatar", user.last_name().unwrap())} />
-                                    <span>{user.full_name().unwrap_throw()}</span>
-                                    // {if store.is_offline() {
-                                    //     html! {
-                                    //         <span class="badge offline">{"Offline"}</span>
-                                    //     }
-                                    // } else {
-                                    //     html! {}
-                                    // }}
-                                </div>
-                            }
+                        if let Some(user) = self.user() {
+                            <div class="user">
+                                <img src={format!("/api/user/{}/avatar", user.id())} alt={format!("{}'s avatar", user.full_name())} />
+                                <span>{user.full_name()}</span>
+                                // {if store.is_offline() {
+                                //     html! {
+                                //         <span class="badge offline">{"Offline"}</span>
+                                //     }
+                                // } else {
+                                //     html! {}
+                                // }}
+                            </div>
                         } else {
                             <Link<AppRoute> classes="right_nav_button" to={AppRoute::Profile}>{"Complete profile"}</Link<AppRoute>>
                         }

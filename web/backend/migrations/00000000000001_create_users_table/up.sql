@@ -35,9 +35,9 @@ END IF;
 PERFORM pg_notify(
     'notify_user_' || OLD.id :: text,
     json_build_object(
-        'table', TG_TABLE_NAME,
-        'operation', TG_OP,
-        'record', record
+        TG_TABLE_NAME: json_build_object(
+            TG_OP, record
+        )
     ) :: text
 );
 

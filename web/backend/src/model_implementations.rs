@@ -9,8 +9,13 @@ use email_address::*;
 use image::DynamicImage;
 use image::ImageFormat;
 use uuid::Uuid;
-use web_common::api::auth::users::name::Name;
+use web_common::api::database::selects::PublicUser;
+use web_common::custom_validators::Image;
+use crate::DieselConn;
+use crate::diesel::connection::SimpleConnection;
+use validator::Validate;
 use web_common::api::ApiError;
+use web_common::api::database::updates::CompleteProfile;
 use web_common::custom_validators::ImageSize;
 
 impl DocumentFormat {
@@ -187,26 +192,6 @@ impl User {
         self.id
     }
 
-    /// Updates the user's name in the database.
-    ///
-    /// # Arguments
-    /// * `new_name` - The new name to set for the user.
-    /// * `conn` - The database connection pool.
-    pub fn update_name(
-        &self,
-        new_name: Name,
-        conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>,
-    ) -> Result<usize, diesel::result::Error> {
-        use crate::schema::users::dsl::*;
-        diesel::update(users.filter(id.eq(self.id)))
-            .set((
-                first_name.eq(new_name.first_name().to_string()),
-                middle_name.eq(new_name.middle_name().map(|s| s.to_string())),
-                last_name.eq(new_name.last_name().to_string()),
-            ))
-            .execute(conn)
-    }
-
     /// Inserts the user new profile and thumbnail pictures in the database.
     ///
     /// # Arguments
@@ -283,27 +268,59 @@ impl User {
     }
 
     /// Create a new web-commons User from a database User.
-    pub fn to_web_common_user(
+    pub fn public_user(
         &self,
         conn: &mut crate::DieselConn,
-    ) -> web_common::api::auth::users::User {
-        let name = Name::new(
-            self.first_name.clone().unwrap_or_default(),
+    ) -> PublicUser {
+        PublicUser::new(
+            self.id,
+            self.first_name.clone(),
             self.middle_name.clone(),
-            self.last_name.clone().unwrap_or_default(),
+            self.last_name.clone(),
+            self.profile_picture_path(&ImageSize::Standard),
+            self.profile_picture_path(&ImageSize::Thumbnail),
         )
-        .ok();
-        if self.has_profile_picture(conn) {
-            web_common::api::auth::users::User::new(
-                name,
-                Some(self.profile_picture_path(&ImageSize::Standard)),
-                Some(self.profile_picture_path(&ImageSize::Thumbnail)),
-                self.id,
-            )
-        } else {
-            web_common::api::auth::users::User::new(name, None, None, self.id)
-        }
     }
+
+    /// Method to update a user's name.
+    ///
+    /// # Arguments
+    /// * `conn` - A connection to the database.
+    /// * `profile` - The data to use to complete the profile.
+    ///
+    pub fn update_profile(
+        &self,
+        conn: &mut DieselConn,
+        new_profile: CompleteProfile,
+    ) -> Result<(), ApiError> {
+        new_profile.validate()?;
+
+        let picture: Image = new_profile.picture.into();
+        let squared_profile_picture = picture.to_face_square().map_err(|errors| {
+            log::error!("Failed to square profile picture: {}", errors.join(", "));
+            ApiError::internal_server_error()
+        })?;
+
+        conn.batch_execute("SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;")
+            .expect("Failed to set transaction isolation level");
+
+        // We need to execute multiple queries in a single transaction so to
+        // avoid that the user is left with a profile picture but no name or vice versa.
+        conn.transaction::<_, ApiError, _>(|conn| {
+            use crate::schema::users::dsl::*;
+        diesel::update(users.filter(id.eq(self.id)))
+            .set((
+                first_name.eq(new_profile.first_name.to_string()),
+                middle_name.eq(new_profile.middle_name.map(|s| s.to_string())),
+                last_name.eq(new_profile.last_name.to_string()),
+            ))
+            .execute(conn)?;
+
+            self.insert_profile_pictures(squared_profile_picture, conn)?;
+            Ok(())
+        })
+    }
+
 }
 
 impl LoginProvider {

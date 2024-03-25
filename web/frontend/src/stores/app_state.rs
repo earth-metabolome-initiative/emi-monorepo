@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use web_common::api::ws::messages::FormAction;
+use web_common::api::database::operations::Operation;
 use yewdux::prelude::*;
 
 #[derive(Default, PartialEq, Serialize, Deserialize, Store, Clone)]
@@ -8,7 +8,7 @@ use yewdux::prelude::*;
 pub struct AppState {
     sidebar_open: bool,
     connect_to_internet: bool,
-    tasks: Vec<(uuid::Uuid, FormAction)>,
+    tasks: Vec<(uuid::Uuid, Operation)>,
 }
 
 impl AppState {
@@ -20,7 +20,7 @@ impl AppState {
         self.sidebar_open = !self.sidebar_open;
     }
 
-    pub fn add_task(&mut self, task: (uuid::Uuid, FormAction)) {
+    pub fn add_task(&mut self, task: (uuid::Uuid, Operation)) {
         self.tasks.push(task);
     }
 
@@ -28,7 +28,7 @@ impl AppState {
         self.tasks.retain(|(id, _)| id != &task_id);
     }
 
-    pub fn tasks(&self) -> &[(uuid::Uuid, FormAction)] {
+    pub fn tasks(&self) -> &[(uuid::Uuid, Operation)] {
         &self.tasks
     }
 
