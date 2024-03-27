@@ -44,9 +44,251 @@ With a more concrete example:
 ]
 ```
 
+Since we also need to interface with the Frontend database which are NOT based
+on Postgres, we also need to duplicate the code in the web commons and generate
+the From implementations for the structs in the `src/models.rs` file. The `web_common`
+structs will be generated in the `src/database/tables.rs` file in the `web_common` crate.
+Since these structs are field-by-field identical, we can simply copy the structs while
+ignoring the `#[derive(...)]` and `#[table_name = "..."]` attributes which would not be
+applicable in the `web_common` crate. The `From` implementations will be generated in the
+`src/models.rs` file in the `backend` crate, below each of the diesel-generated structs and
+will make use of the full path to the struct in the `web_common` crate so to avoid conflicts.
+
 """
 import compress_json
 import os
+
+def write_from_impls():
+    """Write the `From` implementations for the structs in the `src/models.rs` file."""
+    with open('src/models.rs', 'r') as file:
+        content = file.read()
+    
+    # After each struct ends, as defined by the `}` character, after
+    # we have found a `struct` keyword, we write the `From` implementation
+    # for the struct where we implement the conversion to the struct in the
+    # `web_common` crate.
+
+    impl_from_line = "impl From<{struct_name}> for web_common::database::tables::{struct_name} {{\n"
+    reverse_from = "impl From<web_common::database::tables::{struct_name}> for {struct_name} {{\n"
+
+    struct_name = None
+    struct_field_names = []
+    new_content = ""
+
+    for line in content.split('\n'):
+        new_content += line + '\n'
+
+        if 'struct' in line:
+            # We have found a line such as "pub struct Archivable {"
+            # and we need to extract the struct name.
+            struct_name = line.split(' ')[2]
+        
+        # We are currently inside a struct
+        if struct_name is not None:
+            # And we have found the end of the struct
+            if '}' in line:
+                # We have found the end of the struct, and we write the
+                # `From` implementation.
+                new_content += "\n"
+                new_content += impl_from_line.format(struct_name=struct_name)
+                new_content += f"    fn from(item: {struct_name}) -> Self {{\n"
+                new_content += "        Self {\n"
+                for field_name in struct_field_names:
+                    new_content += f"            {field_name}: item.{field_name},\n"
+                new_content += "        }\n"
+                new_content += "    }\n"
+                new_content += "}\n\n"
+
+                new_content += reverse_from.format(struct_name=struct_name)
+                new_content += f"    fn from(item: web_common::database::tables::{struct_name}) -> Self {{\n"
+                new_content += "        Self {\n"
+                for field_name in struct_field_names:
+                    new_content += f"            {field_name}: item.{field_name},\n"
+                new_content += "        }\n"
+                new_content += "    }\n"
+                new_content += "}\n\n"                
+
+                struct_name = None
+                struct_field_names = []
+
+        # We are currently inside a struct, and we are looking for
+        # the field names.
+        if struct_name is not None and 'pub' in line and ':' in line:
+            # We have found a line such as `pub name: String,`
+            # and we need to extract the field name.
+            field_name = line.strip().split(' ')[1].strip(':')
+            struct_field_names.append(field_name)
+        
+    with open('src/models.rs', 'w') as file:
+        file.write(new_content)
+
+def write_web_common_structs(
+    path: str,
+    target: str,
+    enumeration: str
+):
+    """Write the structs in the target file in the `web_common` crate.
+
+    Parameters
+    ----------
+    path : str
+        The path from where to load the structs for the tables or views.
+    target : str
+        The path where to write the structs in the `web_common` crate.
+    enumeration : str
+        The name of the enumeration to write in the target file.
+    """
+    # The derive statements to include in the `src/database/tables.rs` document
+    imports = [
+        "use serde::Deserialize;",
+        "use serde::Serialize;",
+        "use uuid::Uuid;",
+        "use chrono::NaiveDateTime;",
+        "use chrono::DateTime;",
+        "use chrono::Utc;"
+    ]
+
+    # The derives to apply to the structs in the `src/database/tables.rs` document
+    derives = [
+        "Deserialize",
+        "Serialize",
+        "Clone",
+        "Debug",
+        "PartialEq"
+    ]
+
+    # We check that we are currently executing in the `backend` crate
+    # so to make sure that the relative path to the `web_common` crate
+    # is correct.
+    if not os.getcwd().endswith('backend'):
+        raise Exception("This script must be executed in the `backend` crate.")
+
+    tables = open(f"../web_common/src/database/{target}.rs", 'w')
+
+    with open(path, 'r') as file:
+        models = file.read()
+
+    for import_statement in imports:
+        struct_imported = import_statement.split(':')[-1].strip(';')
+        if struct_imported not in models:
+            continue
+        tables.write(f"{import_statement}\n")
+
+    inside_struct = False
+
+    # A dictionary to store the table names and their
+    # respective structs.
+    table_names = {}
+    last_table_name = None
+
+    for line in models.split('\n'):
+        # We skip all lines beginning with `//!` as they are comments
+        if line.startswith('//!'):
+            continue
+
+        # We find the table name by searching lines like
+        # #[diesel(table_name = item_continuous_quantities)]
+        if 'table_name =' in line:
+            last_table_name = line.split('=')[1].strip(" )]")
+
+        # We determine whether a new struct has started
+        # by checking if the `struct` keyword is present
+        # in the line.
+        if 'struct' in line:
+            struct_name = line.split(' ')[2]
+            table_names[struct_name] = last_table_name
+
+            inside_struct = True
+            # If we have just started a new struct, we need to
+            # write the `#[derive(...)]` decorator.
+            tables.write(f"#[derive(")
+            for derive in derives:
+                tables.write(f"{derive}, ")
+            tables.write(f")]\n")
+
+        if inside_struct:
+            # We determine whether the struct has ended
+            # by checking if the `}` keyword is present
+            # in the line.
+            if '}' in line:
+                inside_struct = False
+
+            # We write the line to the file
+            tables.write(f"{line}\n")
+        
+    # We create the Table enumeration, containing all
+    # the table names. We also implement the `table_name`
+    # method for the enumeration, returning the table name
+    # for each of the structs.
+    tables.write("\n")
+
+    derives_for_enum = [
+        "Deserialize",
+        "Serialize",
+        "Clone",
+        "Debug",
+        "PartialEq",
+        "Copy",
+        "Eq"
+    ]
+
+    lower_enumeration = enumeration.lower()
+
+    tables.write(f"#[derive(")
+    for derive in derives_for_enum:
+        tables.write(f"{derive}, ")
+    tables.write(f")]\n")
+    tables.write(f"pub enum {enumeration} {{\n")
+    for struct_name in table_names.keys():
+        tables.write(f"    {struct_name},\n")
+    tables.write("}\n\n")
+
+    tables.write(f"impl {enumeration} {{\n")
+    tables.write("    pub fn name(&self) -> &'static str {\n")
+    tables.write("        match self {\n")
+    for struct_name, table_name in table_names.items():
+        tables.write(f"            {enumeration}::{struct_name} => \"{table_name}\",\n")
+    tables.write("        }\n")
+    tables.write("    }\n")
+    tables.write("}\n")
+
+    # Finally, we write an enum for the rows in the tables (or views)
+
+    tables.write("\n")
+    tables.write(f"#[derive(")
+    for derive in derives:
+        tables.write(f"{derive}, ")
+    tables.write(f")]\n")
+    tables.write(f"pub enum {enumeration}Row {{\n")
+    for struct_name in table_names.keys():
+        tables.write(f"    {struct_name}({struct_name}),\n")
+    tables.write("}\n\n")
+
+    # We also implement the From<&str> trait for the enumeration
+    tables.write(f"impl From<&str> for {enumeration} {{\n")
+    tables.write("    fn from(item: &str) -> Self {\n")
+    tables.write("        match item {\n")
+    for struct_name, table_name in table_names.items():
+        tables.write(f"            \"{table_name}\" => {enumeration}::{struct_name},\n")
+    tables.write("            _ => panic!(\"Unknown table name\"),\n")
+    tables.write("        }\n")
+    tables.write("    }\n")
+    tables.write("}\n")
+
+    tables.write(f"impl {enumeration}Row {{\n")
+    tables.write(f"    pub fn {lower_enumeration}(&self) -> &'static {enumeration} {{\n")
+    tables.write("        match self {\n")
+    for struct_name in table_names.keys():
+        tables.write(f"            {enumeration}Row::{struct_name}(_) => &{enumeration}::{struct_name},\n")
+    tables.write("        }\n")
+    tables.write("    }\n")
+    tables.write("\n")
+    tables.write(f"    pub fn {lower_enumeration}_name(&self) -> &'static str {{\n")
+    tables.write(f"        self.{lower_enumeration}().name()\n")
+    tables.write("    }\n")
+    tables.write("}\n")
+
+    tables.close()
 
 def main():
     # Read the replacements from the JSON file
@@ -136,6 +378,7 @@ def main():
     # next `}` is found.
     new_content = ""
     currently_in_struct = False
+
     for line_number, line in enumerate(content.split('\n')):
         if '#[derive(' in line:
             currently_in_struct = True
@@ -173,3 +416,10 @@ def main():
 
 if __name__ == '__main__':
     main()
+    write_web_common_structs('src/models.rs', 'tables', 'Table')
+    write_web_common_structs('src/views/views.rs', 'views', 'View')
+    write_from_impls()
+    # Finally, we format the file
+    os.system('rustfmt src/models.rs')
+    os.system('rustfmt ../web_common/src/database/tables.rs')
+    os.system('rustfmt ../web_common/src/database/views.rs')

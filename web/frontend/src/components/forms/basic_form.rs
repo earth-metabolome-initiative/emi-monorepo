@@ -132,7 +132,7 @@ pub enum FormMessage<Data> {
 
 impl<Data> Component for InnerBasicForm<Data>
 where
-    Data: PartialEq + Clone + 'static + Validate + Debug + Serialize + FormResult,
+    Data: 'static + Validate + Debug + Serialize + FormResult,
     FormWrapper<Data>: TryFromCallback<FormData>,
 {
     type Message = FormMessage<Data>;
@@ -211,12 +211,12 @@ where
                     return true;
                 }
 
-                let uuid = uuid::Uuid::new_v4();
-                self.uuid = Some(uuid);
+                let task = data.into();
+                self.uuid = Some(task.id());
 
                 // Then, we send the data to the backend
                 self.app_dispatch.reduce_mut(move |state| {
-                    state.add_task((uuid, data.into()));
+                    state.add_task(task);
                 });
 
                 self.waiting_for_reply = true;

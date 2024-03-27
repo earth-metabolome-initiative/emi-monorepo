@@ -18,10 +18,9 @@ use std::path::PathBuf;
 mod api;
 mod diesel_enums;
 mod model_implementations;
-mod model_views;
+mod views;
 mod models;
 mod schema;
-mod schema_views;
 mod transactions;
 
 pub(crate) type DBPool = Pool<ConnectionManager<PgConnection>>;

@@ -2,7 +2,7 @@
 use serde::Deserialize;
 use std::fmt::Display;
 
-use super::database::operations::Operation;
+use crate::database::Task;
 
 #[derive(Debug, Clone, Copy, PartialEq, Deserialize)]
 pub enum FormMethod {
@@ -13,16 +13,6 @@ pub enum FormMethod {
 }
 
 impl FormMethod {
-    #[cfg(feature = "frontend")]
-    pub fn to_reqwasm(&self) -> gloo_net::http::Method {
-        match self {
-            FormMethod::GET => gloo_net::http::Method::GET,
-            FormMethod::POST => gloo_net::http::Method::POST,
-            FormMethod::PUT => gloo_net::http::Method::PUT,
-            FormMethod::DELETE => gloo_net::http::Method::DELETE,
-        }
-    }
-
     pub fn to_crud(&self) -> &'static str {
         match self {
             FormMethod::GET => "Retrieve",
@@ -112,7 +102,7 @@ pub trait TryFromCallback<T>: Sized {
         C: FnOnce(Result<Self, Vec<String>>) + 'static;
 }
 
-pub trait FormResult: Into<Operation> {
+pub trait FormResult: Clone + PartialEq + Into<Task> {
     const METHOD: FormMethod;
 
     /// Returns the title to use for the Form.

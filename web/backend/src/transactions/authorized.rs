@@ -3,8 +3,8 @@
 
 use crate::DieselConn;
 use diesel::prelude::*;
-use web_common::api::database::operations::Operation;
-use web_common::api::database::roles::Role;
+use web_common::database::Authorization;
+use web_common::database::roles::Role;
 
 /// Check whether a user is a website admin.
 ///
@@ -47,78 +47,31 @@ pub(crate) fn is_admin(
     Ok(is_admin)
 }
 
-/// Check whether a user is authorized to perform a given operation on the provided table and Uuid.
-///
-/// # Arguments
-/// * `conn` - A connection to the database.
-/// * `user_id` - The user id to check authorization for.
-/// * `table` - The table to check authorization for.
-/// * `roles` - The roles that are allowed to perform the given operation on the table.
-/// 
-/// # Implementation details
-/// If the provided roles are None, we default to the roles that are allowed to perform the given
-/// operation on the table.
-pub(crate) fn is_authorized(
+/// Checks whether a given authorization checks out.
+fn check_authorization(
     conn: &mut DieselConn,
     user_id: uuid::Uuid,
-    operation: Operation,
-    roles: Option<Vec<Role>>,
+    authorization: Authorization,
 ) -> Result<bool, diesel::result::Error> {
-    if operation.is_insert() {
-        unimplemented!(concat!(
-            "Insert operations are not supported by the is_authorized method. ",
-            "Most likely you intend to check whether you can UPDATE the other tables ",
-            "that have FOREIGN KEYS with the table you are trying to INSERT into."
-        ));
-    }
+    // If the ID associated to the provided authorization does not exist in the database,
+    // we return false. It is possible that the row in question has been deleted by another
+    // user, or that the provided ID is incorrect. The ID, if it exists, is stored in the
+    // editables table.
+    let id = authorization.id;
 
-    let id = operation.id().unwrap();
+    {
+        use crate::schema::editables;
+        use diesel::dsl::sql;
 
-    let roles = match roles {
-        Some(roles) => roles,
-        None => operation.default_roles_for_operation(),
-    };
+        let exists: bool = editables::dsl::editables
+            .filter(editables::dsl::id.eq(id))
+            .select(sql::<diesel::sql_types::Bool>("true"))
+            .get_result(conn)?;
 
-    use diesel::dsl::sql;
-    // Preliminarily, we check whether the provided table is a valid table.
-    debug_assert!(diesel::select(sql::<diesel::sql_types::Bool>(&format!(
-        "EXISTS (
-            SELECT 1
-            FROM information_schema.tables
-            WHERE table_schema = 'public' AND table_name = '{}'
-        )",
-        table.table_name()
-    )))
-    .get_result(conn)?);
-
-    // First, we check whether the provided ID exists in the provided table.
-    // We only do this check in debug mode, as it is not necessary in release mode
-    // since this method is only called from within this crate and it would be
-    // a bug to call it with an invalid table or id.
-    debug_assert!(diesel::select(sql::<diesel::sql_types::Bool>(&format!(
-        "EXISTS (
-            SELECT 1
-            FROM {} WHERE id = '{}'
-        )",
-        table.table_name(), id
-    )))
-    .get_result(conn)?);
-
-    if table.is_users() {
-        // If the table is the users table, we check whether the provided user ID is the
-        // same as the ID of the user we are checking authorization for. If it is, we
-        // return true, as a user is always authorized to perform operations on itself.
-        if user_id == id {
-            return Ok(true);
+        if !exists {
+            return Ok(false);
         }
-
-        // If one of the requested roles is the admin role, we check whether the user is
-        // within the global admin team.
-        return Ok(roles.contains(&Role::Admin) && is_admin(conn, user_id)?);
     }
-
-    // If we get up to this point, the table must be of the Editables kind.
-    assert!(table.is_editables());
 
     // Before anything else, we check whether the user is the author of the editable
     // associated with the provided ID. We do this by checking whether the created_by
@@ -126,6 +79,7 @@ pub(crate) fn is_authorized(
     // and among the provided roles is the Creator role, we return true.
     if roles.contains(&Role::Creator) {
         use crate::schema::editables;
+        use diesel::dsl::sql;
 
         let is_author: bool = editables::dsl::editables
             .filter(editables::dsl::id.eq(id))
@@ -166,6 +120,7 @@ pub(crate) fn is_authorized(
 
     {
         use crate::schema::user_authorizations;
+        use diesel::dsl::sql;
 
         let authorized: bool = user_authorizations::dsl::user_authorizations
             .filter(user_authorizations::dsl::user_id.eq(user_id))
@@ -209,6 +164,7 @@ pub(crate) fn is_authorized(
 
     {
         use crate::schema::team_authorizations;
+        use diesel::dsl::sql;
 
         let authorized: bool = team_authorizations::dsl::team_authorizations
             .filter(team_authorizations::dsl::team_id.eq_any(team_ids))
@@ -253,6 +209,7 @@ pub(crate) fn is_authorized(
 
     {
         use crate::schema::organization_authorizations;
+        use diesel::dsl::sql;
 
         let authorized: bool = organization_authorizations::dsl::organization_authorizations
             .filter(organization_authorizations::dsl::organization_id.eq_any(organization_ids))
@@ -267,4 +224,35 @@ pub(crate) fn is_authorized(
     }
 
     Ok(false)
+}
+
+/// Check whether a user is authorized to perform a given operation on the provided table and Uuid.
+///
+/// # Arguments
+/// * `conn` - A connection to the database.
+/// * `user_id` - The user id to check authorization for.
+/// * `table` - The table to check authorization for.
+/// * `roles` - The roles that are allowed to perform the given operation on the table.
+/// 
+/// # Implementation details
+/// If the provided roles are None, we default to the roles that are allowed to perform the given
+/// operation on the table.
+pub(crate) fn is_authorized(
+    conn: &mut DieselConn,
+    user_id: uuid::Uuid,
+    authorizations: Vec<Authorization>
+) -> Result<bool, diesel::result::Error> {
+    // If the provided user is an admin, we return true.
+    if is_admin(conn, user_id)? {
+        return Ok(true);
+    }
+
+    for authorization in authorizations {
+        // If any of the authorizations does not check out, we return false.
+        if !check_authorization(conn, user_id, authorization)? {
+            return Ok(false);
+        }
+    }
+    // If all the authorizations check out, we return true.
+    Ok(true)
 }

@@ -10,10 +10,7 @@ use actix::{Actor, StreamHandler};
 use actix_web_actors::ws;
 use sqlx::{Pool as SQLxPool, Postgres};
 use std::collections::HashMap;
-use web_common::api::database::operations::Operation;
 use web_common::api::oauth::jwt_cookies::AccessToken;
-use web_common::api::ws::messages::FormAction;
-
 use web_common::api::ws::messages::{BackendMessage, FrontendMessage};
 
 use super::channels::*;
@@ -138,7 +135,7 @@ impl actix::Handler<InternalMessage> for WebSocket {
 impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
     fn handle(&mut self, msg: Result<ws::Message, ws::ProtocolError>, ctx: &mut Self::Context) {
         self.enable_default_channels(ctx);
-        
+
         match msg {
             Ok(msg) => {
                 let frontend_message: FrontendMessage = msg.into();
@@ -146,10 +143,10 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                     FrontendMessage::Close(_code) => {
                         ctx.stop();
                     }
-                    FrontendMessage::Task(task_id, form_action) => {
-                        if form_action.requires_authentication() {
+                    FrontendMessage::Task(task) => {
+                        if task.requires_authentication() {
                             match self.must_be_authenticated(ctx) {
-                                Ok(_user) => match form_action {
+                                Ok(_user) => match task {
                                     FormAction::CompleteProfile(profile) => {
                                         ctx.address().do_send(UserMessage::CompleteProfile(
                                             task_id, profile,

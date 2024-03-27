@@ -3,9 +3,6 @@
 #![allow(unused)]
 #![allow(clippy::all)]
 use crate::schema::*;
-use diesel::sql_types::Interval;
-use diesel::sql_types::Numeric;
-use diesel::sql_types::Range;
 use diesel::Identifiable;
 use diesel::Insertable;
 use diesel::Queryable;
@@ -25,32 +22,134 @@ pub struct Archivable {
     pub archived_by: Uuid,
 }
 
-#[derive(Clone, Selectable, Queryable, Debug, Identifiable)]
+impl From<Archivable> for web_common::database::tables::Archivable {
+    fn from(item: Archivable) -> Self {
+        Self {
+            id: item.id,
+            archived_at: item.archived_at,
+            archived_by: item.archived_by,
+        }
+    }
+}
+
+impl From<web_common::database::tables::Archivable> for Archivable {
+    fn from(item: web_common::database::tables::Archivable) -> Self {
+        Self {
+            id: item.id,
+            archived_at: item.archived_at,
+            archived_by: item.archived_by,
+        }
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = container_horizontal_rules)]
 pub struct ContainerHorizontalRule {
     pub id: Uuid,
     pub item_type_id: Option<Uuid>,
     pub other_item_type_id: Option<Uuid>,
-    pub temperature: Option<Range<Numeric>>,
-    pub humidity: Option<Range<Numeric>>,
-    pub pressure: Option<Range<Numeric>>,
+    pub minimum_temperature: Option<f64>,
+    pub maximum_temperature: Option<f64>,
+    pub minimum_humidity: Option<f64>,
+    pub maximum_humidity: Option<f64>,
+    pub minimum_pressure: Option<f64>,
+    pub maximum_pressure: Option<f64>,
 }
 
-#[derive(Clone, Selectable, Queryable, Debug, Identifiable)]
+impl From<ContainerHorizontalRule> for web_common::database::tables::ContainerHorizontalRule {
+    fn from(item: ContainerHorizontalRule) -> Self {
+        Self {
+            id: item.id,
+            item_type_id: item.item_type_id,
+            other_item_type_id: item.other_item_type_id,
+            minimum_temperature: item.minimum_temperature,
+            maximum_temperature: item.maximum_temperature,
+            minimum_humidity: item.minimum_humidity,
+            maximum_humidity: item.maximum_humidity,
+            minimum_pressure: item.minimum_pressure,
+            maximum_pressure: item.maximum_pressure,
+        }
+    }
+}
+
+impl From<web_common::database::tables::ContainerHorizontalRule> for ContainerHorizontalRule {
+    fn from(item: web_common::database::tables::ContainerHorizontalRule) -> Self {
+        Self {
+            id: item.id,
+            item_type_id: item.item_type_id,
+            other_item_type_id: item.other_item_type_id,
+            minimum_temperature: item.minimum_temperature,
+            maximum_temperature: item.maximum_temperature,
+            minimum_humidity: item.minimum_humidity,
+            maximum_humidity: item.maximum_humidity,
+            minimum_pressure: item.minimum_pressure,
+            maximum_pressure: item.maximum_pressure,
+        }
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = container_vertical_rules)]
 pub struct ContainerVerticalRule {
     pub id: Uuid,
     pub container_item_type_id: Option<Uuid>,
     pub contained_item_type_id: Option<Uuid>,
-    pub temperature: Option<Range<Numeric>>,
-    pub humidity: Option<Range<Numeric>>,
-    pub pressure: Option<Range<Numeric>>,
+    pub minimum_temperature: Option<f64>,
+    pub maximum_temperature: Option<f64>,
+    pub minimum_humidity: Option<f64>,
+    pub maximum_humidity: Option<f64>,
+    pub minimum_pressure: Option<f64>,
+    pub maximum_pressure: Option<f64>,
+}
+
+impl From<ContainerVerticalRule> for web_common::database::tables::ContainerVerticalRule {
+    fn from(item: ContainerVerticalRule) -> Self {
+        Self {
+            id: item.id,
+            container_item_type_id: item.container_item_type_id,
+            contained_item_type_id: item.contained_item_type_id,
+            minimum_temperature: item.minimum_temperature,
+            maximum_temperature: item.maximum_temperature,
+            minimum_humidity: item.minimum_humidity,
+            maximum_humidity: item.maximum_humidity,
+            minimum_pressure: item.minimum_pressure,
+            maximum_pressure: item.maximum_pressure,
+        }
+    }
+}
+
+impl From<web_common::database::tables::ContainerVerticalRule> for ContainerVerticalRule {
+    fn from(item: web_common::database::tables::ContainerVerticalRule) -> Self {
+        Self {
+            id: item.id,
+            container_item_type_id: item.container_item_type_id,
+            contained_item_type_id: item.contained_item_type_id,
+            minimum_temperature: item.minimum_temperature,
+            maximum_temperature: item.maximum_temperature,
+            minimum_humidity: item.minimum_humidity,
+            maximum_humidity: item.maximum_humidity,
+            minimum_pressure: item.minimum_pressure,
+            maximum_pressure: item.maximum_pressure,
+        }
+    }
 }
 
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = continuous_units)]
 pub struct ContinuousUnit {
     pub id: Uuid,
+}
+
+impl From<ContinuousUnit> for web_common::database::tables::ContinuousUnit {
+    fn from(item: ContinuousUnit) -> Self {
+        Self { id: item.id }
+    }
+}
+
+impl From<web_common::database::tables::ContinuousUnit> for ContinuousUnit {
+    fn from(item: web_common::database::tables::ContinuousUnit) -> Self {
+        Self { id: item.id }
+    }
 }
 
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
@@ -61,10 +160,42 @@ pub struct Describable {
     pub description: Option<String>,
 }
 
+impl From<Describable> for web_common::database::tables::Describable {
+    fn from(item: Describable) -> Self {
+        Self {
+            id: item.id,
+            name: item.name,
+            description: item.description,
+        }
+    }
+}
+
+impl From<web_common::database::tables::Describable> for Describable {
+    fn from(item: web_common::database::tables::Describable) -> Self {
+        Self {
+            id: item.id,
+            name: item.name,
+            description: item.description,
+        }
+    }
+}
+
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = discrete_units)]
 pub struct DiscreteUnit {
     pub id: Uuid,
+}
+
+impl From<DiscreteUnit> for web_common::database::tables::DiscreteUnit {
+    fn from(item: DiscreteUnit) -> Self {
+        Self { id: item.id }
+    }
+}
+
+impl From<web_common::database::tables::DiscreteUnit> for DiscreteUnit {
+    fn from(item: web_common::database::tables::DiscreteUnit) -> Self {
+        Self { id: item.id }
+    }
 }
 
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
@@ -72,6 +203,24 @@ pub struct DiscreteUnit {
 pub struct DocumentFormat {
     pub id: Uuid,
     pub mime_type: String,
+}
+
+impl From<DocumentFormat> for web_common::database::tables::DocumentFormat {
+    fn from(item: DocumentFormat) -> Self {
+        Self {
+            id: item.id,
+            mime_type: item.mime_type,
+        }
+    }
+}
+
+impl From<web_common::database::tables::DocumentFormat> for DocumentFormat {
+    fn from(item: web_common::database::tables::DocumentFormat) -> Self {
+        Self {
+            id: item.id,
+            mime_type: item.mime_type,
+        }
+    }
 }
 
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
@@ -83,12 +232,54 @@ pub struct Document {
     pub bytes: i32,
 }
 
+impl From<Document> for web_common::database::tables::Document {
+    fn from(item: Document) -> Self {
+        Self {
+            id: item.id,
+            path: item.path,
+            format_id: item.format_id,
+            bytes: item.bytes,
+        }
+    }
+}
+
+impl From<web_common::database::tables::Document> for Document {
+    fn from(item: web_common::database::tables::Document) -> Self {
+        Self {
+            id: item.id,
+            path: item.path,
+            format_id: item.format_id,
+            bytes: item.bytes,
+        }
+    }
+}
+
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = editables)]
 pub struct Editable {
     pub id: Uuid,
     pub created_at: NaiveDateTime,
     pub created_by: Uuid,
+}
+
+impl From<Editable> for web_common::database::tables::Editable {
+    fn from(item: Editable) -> Self {
+        Self {
+            id: item.id,
+            created_at: item.created_at,
+            created_by: item.created_by,
+        }
+    }
+}
+
+impl From<web_common::database::tables::Editable> for Editable {
+    fn from(item: web_common::database::tables::Editable) -> Self {
+        Self {
+            id: item.id,
+            created_at: item.created_at,
+            created_by: item.created_by,
+        }
+    }
 }
 
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
@@ -98,18 +289,40 @@ pub struct Edit {
     pub editable_id: Uuid,
 }
 
-#[derive(Clone, Selectable, Queryable, Debug, Identifiable)]
-#[diesel(primary_key(item_type_id))]
-#[diesel(table_name = expirable_item_categories)]
-pub struct ExpirableItemCategory {
-    pub item_type_id: Uuid,
-    pub expiration_interval: Interval,
+impl From<Edit> for web_common::database::tables::Edit {
+    fn from(item: Edit) -> Self {
+        Self {
+            id: item.id,
+            editable_id: item.editable_id,
+        }
+    }
+}
+
+impl From<web_common::database::tables::Edit> for Edit {
+    fn from(item: web_common::database::tables::Edit) -> Self {
+        Self {
+            id: item.id,
+            editable_id: item.editable_id,
+        }
+    }
 }
 
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = item_categories)]
 pub struct ItemCategory {
     pub id: Uuid,
+}
+
+impl From<ItemCategory> for web_common::database::tables::ItemCategory {
+    fn from(item: ItemCategory) -> Self {
+        Self { id: item.id }
+    }
+}
+
+impl From<web_common::database::tables::ItemCategory> for ItemCategory {
+    fn from(item: web_common::database::tables::ItemCategory) -> Self {
+        Self { id: item.id }
+    }
 }
 
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
@@ -120,12 +333,52 @@ pub struct ItemCategoryRelationship {
     pub child_id: Uuid,
 }
 
+impl From<ItemCategoryRelationship> for web_common::database::tables::ItemCategoryRelationship {
+    fn from(item: ItemCategoryRelationship) -> Self {
+        Self {
+            id: item.id,
+            parent_id: item.parent_id,
+            child_id: item.child_id,
+        }
+    }
+}
+
+impl From<web_common::database::tables::ItemCategoryRelationship> for ItemCategoryRelationship {
+    fn from(item: web_common::database::tables::ItemCategoryRelationship) -> Self {
+        Self {
+            id: item.id,
+            parent_id: item.parent_id,
+            child_id: item.child_id,
+        }
+    }
+}
+
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = item_category_units)]
 pub struct ItemCategoryUnit {
     pub id: Uuid,
     pub item_category_id: Uuid,
     pub unit_id: Uuid,
+}
+
+impl From<ItemCategoryUnit> for web_common::database::tables::ItemCategoryUnit {
+    fn from(item: ItemCategoryUnit) -> Self {
+        Self {
+            id: item.id,
+            item_category_id: item.item_category_id,
+            unit_id: item.unit_id,
+        }
+    }
+}
+
+impl From<web_common::database::tables::ItemCategoryUnit> for ItemCategoryUnit {
+    fn from(item: web_common::database::tables::ItemCategoryUnit) -> Self {
+        Self {
+            id: item.id,
+            item_category_id: item.item_category_id,
+            unit_id: item.unit_id,
+        }
+    }
 }
 
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
@@ -140,6 +393,34 @@ pub struct ItemContinuousQuantity {
     pub measured_by: Option<Uuid>,
 }
 
+impl From<ItemContinuousQuantity> for web_common::database::tables::ItemContinuousQuantity {
+    fn from(item: ItemContinuousQuantity) -> Self {
+        Self {
+            id: item.id,
+            item_id: item.item_id,
+            weight: item.weight,
+            unit_id: item.unit_id,
+            sensor_id: item.sensor_id,
+            measured_at: item.measured_at,
+            measured_by: item.measured_by,
+        }
+    }
+}
+
+impl From<web_common::database::tables::ItemContinuousQuantity> for ItemContinuousQuantity {
+    fn from(item: web_common::database::tables::ItemContinuousQuantity) -> Self {
+        Self {
+            id: item.id,
+            item_id: item.item_id,
+            weight: item.weight,
+            unit_id: item.unit_id,
+            sensor_id: item.sensor_id,
+            measured_at: item.measured_at,
+            measured_by: item.measured_by,
+        }
+    }
+}
+
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = item_discrete_quantities)]
 pub struct ItemDiscreteQuantity {
@@ -151,6 +432,32 @@ pub struct ItemDiscreteQuantity {
     pub measured_by: Option<Uuid>,
 }
 
+impl From<ItemDiscreteQuantity> for web_common::database::tables::ItemDiscreteQuantity {
+    fn from(item: ItemDiscreteQuantity) -> Self {
+        Self {
+            id: item.id,
+            item_id: item.item_id,
+            quantity: item.quantity,
+            unit_id: item.unit_id,
+            measured_at: item.measured_at,
+            measured_by: item.measured_by,
+        }
+    }
+}
+
+impl From<web_common::database::tables::ItemDiscreteQuantity> for ItemDiscreteQuantity {
+    fn from(item: web_common::database::tables::ItemDiscreteQuantity) -> Self {
+        Self {
+            id: item.id,
+            item_id: item.item_id,
+            quantity: item.quantity,
+            unit_id: item.unit_id,
+            measured_at: item.measured_at,
+            measured_by: item.measured_by,
+        }
+    }
+}
+
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = item_locations)]
 pub struct ItemLocation {
@@ -158,6 +465,28 @@ pub struct ItemLocation {
     pub item_id: Option<Uuid>,
     pub location_id: Option<Uuid>,
     pub previous_location_id: Option<Uuid>,
+}
+
+impl From<ItemLocation> for web_common::database::tables::ItemLocation {
+    fn from(item: ItemLocation) -> Self {
+        Self {
+            id: item.id,
+            item_id: item.item_id,
+            location_id: item.location_id,
+            previous_location_id: item.previous_location_id,
+        }
+    }
+}
+
+impl From<web_common::database::tables::ItemLocation> for ItemLocation {
+    fn from(item: web_common::database::tables::ItemLocation) -> Self {
+        Self {
+            id: item.id,
+            item_id: item.item_id,
+            location_id: item.location_id,
+            previous_location_id: item.previous_location_id,
+        }
+    }
 }
 
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
@@ -168,6 +497,26 @@ pub struct ItemUnit {
     pub unit_id: Uuid,
 }
 
+impl From<ItemUnit> for web_common::database::tables::ItemUnit {
+    fn from(item: ItemUnit) -> Self {
+        Self {
+            id: item.id,
+            item_id: item.item_id,
+            unit_id: item.unit_id,
+        }
+    }
+}
+
+impl From<web_common::database::tables::ItemUnit> for ItemUnit {
+    fn from(item: web_common::database::tables::ItemUnit) -> Self {
+        Self {
+            id: item.id,
+            item_id: item.item_id,
+            unit_id: item.unit_id,
+        }
+    }
+}
+
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = items)]
 pub struct Item {
@@ -175,11 +524,47 @@ pub struct Item {
     pub parent_id: Option<Uuid>,
 }
 
+impl From<Item> for web_common::database::tables::Item {
+    fn from(item: Item) -> Self {
+        Self {
+            id: item.id,
+            parent_id: item.parent_id,
+        }
+    }
+}
+
+impl From<web_common::database::tables::Item> for Item {
+    fn from(item: web_common::database::tables::Item) -> Self {
+        Self {
+            id: item.id,
+            parent_id: item.parent_id,
+        }
+    }
+}
+
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = location_states)]
 pub struct LocationState {
     pub id: Uuid,
     pub font_awesome_icon: Option<String>,
+}
+
+impl From<LocationState> for web_common::database::tables::LocationState {
+    fn from(item: LocationState) -> Self {
+        Self {
+            id: item.id,
+            font_awesome_icon: item.font_awesome_icon,
+        }
+    }
+}
+
+impl From<web_common::database::tables::LocationState> for LocationState {
+    fn from(item: web_common::database::tables::LocationState) -> Self {
+        Self {
+            id: item.id,
+            font_awesome_icon: item.font_awesome_icon,
+        }
+    }
 }
 
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
@@ -196,6 +581,38 @@ pub struct Location {
     pub state_id: Uuid,
 }
 
+impl From<Location> for web_common::database::tables::Location {
+    fn from(item: Location) -> Self {
+        Self {
+            id: item.id,
+            latitude: item.latitude,
+            longitude: item.longitude,
+            altitude: item.altitude,
+            address: item.address,
+            geolocalization_device_id: item.geolocalization_device_id,
+            altitude_device_id: item.altitude_device_id,
+            parent_location_id: item.parent_location_id,
+            state_id: item.state_id,
+        }
+    }
+}
+
+impl From<web_common::database::tables::Location> for Location {
+    fn from(item: web_common::database::tables::Location) -> Self {
+        Self {
+            id: item.id,
+            latitude: item.latitude,
+            longitude: item.longitude,
+            altitude: item.altitude,
+            address: item.address,
+            geolocalization_device_id: item.geolocalization_device_id,
+            altitude_device_id: item.altitude_device_id,
+            parent_location_id: item.parent_location_id,
+            state_id: item.state_id,
+        }
+    }
+}
+
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = login_providers)]
 pub struct LoginProvider {
@@ -208,6 +625,34 @@ pub struct LoginProvider {
     pub scope: String,
 }
 
+impl From<LoginProvider> for web_common::database::tables::LoginProvider {
+    fn from(item: LoginProvider) -> Self {
+        Self {
+            id: item.id,
+            name: item.name,
+            font_awesome_icon: item.font_awesome_icon,
+            client_id_var_name: item.client_id_var_name,
+            redirect_uri_var_name: item.redirect_uri_var_name,
+            oauth_url: item.oauth_url,
+            scope: item.scope,
+        }
+    }
+}
+
+impl From<web_common::database::tables::LoginProvider> for LoginProvider {
+    fn from(item: web_common::database::tables::LoginProvider) -> Self {
+        Self {
+            id: item.id,
+            name: item.name,
+            font_awesome_icon: item.font_awesome_icon,
+            client_id_var_name: item.client_id_var_name,
+            redirect_uri_var_name: item.redirect_uri_var_name,
+            oauth_url: item.oauth_url,
+            scope: item.scope,
+        }
+    }
+}
+
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = manufactured_item_categories)]
 pub struct ManufacturedItemCategory {
@@ -216,6 +661,67 @@ pub struct ManufacturedItemCategory {
     pub cost_per_day: f64,
     pub currency: String,
     pub manifacturer_id: Uuid,
+}
+
+impl From<ManufacturedItemCategory> for web_common::database::tables::ManufacturedItemCategory {
+    fn from(item: ManufacturedItemCategory) -> Self {
+        Self {
+            id: item.id,
+            cost: item.cost,
+            cost_per_day: item.cost_per_day,
+            currency: item.currency,
+            manifacturer_id: item.manifacturer_id,
+        }
+    }
+}
+
+impl From<web_common::database::tables::ManufacturedItemCategory> for ManufacturedItemCategory {
+    fn from(item: web_common::database::tables::ManufacturedItemCategory) -> Self {
+        Self {
+            id: item.id,
+            cost: item.cost,
+            cost_per_day: item.cost_per_day,
+            currency: item.currency,
+            manifacturer_id: item.manifacturer_id,
+        }
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[diesel(table_name = notifications)]
+pub struct Notification {
+    pub id: Uuid,
+    pub user_id: Uuid,
+    pub operation: String,
+    pub table_name: String,
+    pub row_id: Option<Uuid>,
+    pub read: bool,
+}
+
+impl From<Notification> for web_common::database::tables::Notification {
+    fn from(item: Notification) -> Self {
+        Self {
+            id: item.id,
+            user_id: item.user_id,
+            operation: item.operation,
+            table_name: item.table_name,
+            row_id: item.row_id,
+            read: item.read,
+        }
+    }
+}
+
+impl From<web_common::database::tables::Notification> for Notification {
+    fn from(item: web_common::database::tables::Notification) -> Self {
+        Self {
+            id: item.id,
+            user_id: item.user_id,
+            operation: item.operation,
+            table_name: item.table_name,
+            row_id: item.row_id,
+            read: item.read,
+        }
+    }
 }
 
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
@@ -227,6 +733,26 @@ pub struct OrganizationAuthorization {
     pub role_id: Uuid,
 }
 
+impl From<OrganizationAuthorization> for web_common::database::tables::OrganizationAuthorization {
+    fn from(item: OrganizationAuthorization) -> Self {
+        Self {
+            organization_id: item.organization_id,
+            editable_id: item.editable_id,
+            role_id: item.role_id,
+        }
+    }
+}
+
+impl From<web_common::database::tables::OrganizationAuthorization> for OrganizationAuthorization {
+    fn from(item: web_common::database::tables::OrganizationAuthorization) -> Self {
+        Self {
+            organization_id: item.organization_id,
+            editable_id: item.editable_id,
+            role_id: item.role_id,
+        }
+    }
+}
+
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = organization_locations)]
 pub struct OrganizationLocation {
@@ -236,11 +762,51 @@ pub struct OrganizationLocation {
     pub previous_location_id: Option<Uuid>,
 }
 
+impl From<OrganizationLocation> for web_common::database::tables::OrganizationLocation {
+    fn from(item: OrganizationLocation) -> Self {
+        Self {
+            id: item.id,
+            organization_id: item.organization_id,
+            location_id: item.location_id,
+            previous_location_id: item.previous_location_id,
+        }
+    }
+}
+
+impl From<web_common::database::tables::OrganizationLocation> for OrganizationLocation {
+    fn from(item: web_common::database::tables::OrganizationLocation) -> Self {
+        Self {
+            id: item.id,
+            organization_id: item.organization_id,
+            location_id: item.location_id,
+            previous_location_id: item.previous_location_id,
+        }
+    }
+}
+
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = organization_states)]
 pub struct OrganizationState {
     pub id: Uuid,
     pub font_awesome_icon: Option<String>,
+}
+
+impl From<OrganizationState> for web_common::database::tables::OrganizationState {
+    fn from(item: OrganizationState) -> Self {
+        Self {
+            id: item.id,
+            font_awesome_icon: item.font_awesome_icon,
+        }
+    }
+}
+
+impl From<web_common::database::tables::OrganizationState> for OrganizationState {
+    fn from(item: web_common::database::tables::OrganizationState) -> Self {
+        Self {
+            id: item.id,
+            font_awesome_icon: item.font_awesome_icon,
+        }
+    }
 }
 
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
@@ -253,10 +819,46 @@ pub struct Organization {
     pub website_url: Option<String>,
 }
 
+impl From<Organization> for web_common::database::tables::Organization {
+    fn from(item: Organization) -> Self {
+        Self {
+            id: item.id,
+            state_id: item.state_id,
+            parent_organization_id: item.parent_organization_id,
+            logo_id: item.logo_id,
+            website_url: item.website_url,
+        }
+    }
+}
+
+impl From<web_common::database::tables::Organization> for Organization {
+    fn from(item: web_common::database::tables::Organization) -> Self {
+        Self {
+            id: item.id,
+            state_id: item.state_id,
+            parent_organization_id: item.parent_organization_id,
+            logo_id: item.logo_id,
+            website_url: item.website_url,
+        }
+    }
+}
+
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = primary_user_emails)]
 pub struct PrimaryUserEmail {
     pub id: i32,
+}
+
+impl From<PrimaryUserEmail> for web_common::database::tables::PrimaryUserEmail {
+    fn from(item: PrimaryUserEmail) -> Self {
+        Self { id: item.id }
+    }
+}
+
+impl From<web_common::database::tables::PrimaryUserEmail> for PrimaryUserEmail {
+    fn from(item: web_common::database::tables::PrimaryUserEmail) -> Self {
+        Self { id: item.id }
+    }
 }
 
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
@@ -269,6 +871,34 @@ pub struct ProcedureContinuousRequirement {
     pub unit_id: Option<Uuid>,
 }
 
+impl From<ProcedureContinuousRequirement>
+    for web_common::database::tables::ProcedureContinuousRequirement
+{
+    fn from(item: ProcedureContinuousRequirement) -> Self {
+        Self {
+            id: item.id,
+            procedure_id: item.procedure_id,
+            item_category_id: item.item_category_id,
+            quantity: item.quantity,
+            unit_id: item.unit_id,
+        }
+    }
+}
+
+impl From<web_common::database::tables::ProcedureContinuousRequirement>
+    for ProcedureContinuousRequirement
+{
+    fn from(item: web_common::database::tables::ProcedureContinuousRequirement) -> Self {
+        Self {
+            id: item.id,
+            procedure_id: item.procedure_id,
+            item_category_id: item.item_category_id,
+            quantity: item.quantity,
+            unit_id: item.unit_id,
+        }
+    }
+}
+
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = procedure_discrete_requirements)]
 pub struct ProcedureDiscreteRequirement {
@@ -279,10 +909,50 @@ pub struct ProcedureDiscreteRequirement {
     pub unit_id: Option<Uuid>,
 }
 
+impl From<ProcedureDiscreteRequirement>
+    for web_common::database::tables::ProcedureDiscreteRequirement
+{
+    fn from(item: ProcedureDiscreteRequirement) -> Self {
+        Self {
+            id: item.id,
+            procedure_id: item.procedure_id,
+            item_category_id: item.item_category_id,
+            quantity: item.quantity,
+            unit_id: item.unit_id,
+        }
+    }
+}
+
+impl From<web_common::database::tables::ProcedureDiscreteRequirement>
+    for ProcedureDiscreteRequirement
+{
+    fn from(item: web_common::database::tables::ProcedureDiscreteRequirement) -> Self {
+        Self {
+            id: item.id,
+            procedure_id: item.procedure_id,
+            item_category_id: item.item_category_id,
+            quantity: item.quantity,
+            unit_id: item.unit_id,
+        }
+    }
+}
+
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = procedures)]
 pub struct Procedure {
     pub id: Uuid,
+}
+
+impl From<Procedure> for web_common::database::tables::Procedure {
+    fn from(item: Procedure) -> Self {
+        Self { id: item.id }
+    }
+}
+
+impl From<web_common::database::tables::Procedure> for Procedure {
+    fn from(item: web_common::database::tables::Procedure) -> Self {
+        Self { id: item.id }
+    }
 }
 
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
@@ -295,6 +965,34 @@ pub struct ProjectContinuousRequirement {
     pub unit_id: Option<Uuid>,
 }
 
+impl From<ProjectContinuousRequirement>
+    for web_common::database::tables::ProjectContinuousRequirement
+{
+    fn from(item: ProjectContinuousRequirement) -> Self {
+        Self {
+            id: item.id,
+            project_id: item.project_id,
+            item_id: item.item_id,
+            quantity: item.quantity,
+            unit_id: item.unit_id,
+        }
+    }
+}
+
+impl From<web_common::database::tables::ProjectContinuousRequirement>
+    for ProjectContinuousRequirement
+{
+    fn from(item: web_common::database::tables::ProjectContinuousRequirement) -> Self {
+        Self {
+            id: item.id,
+            project_id: item.project_id,
+            item_id: item.item_id,
+            quantity: item.quantity,
+            unit_id: item.unit_id,
+        }
+    }
+}
+
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = project_discrete_requirements)]
 pub struct ProjectDiscreteRequirement {
@@ -303,6 +1001,30 @@ pub struct ProjectDiscreteRequirement {
     pub item_id: Uuid,
     pub quantity: f64,
     pub unit_id: Option<Uuid>,
+}
+
+impl From<ProjectDiscreteRequirement> for web_common::database::tables::ProjectDiscreteRequirement {
+    fn from(item: ProjectDiscreteRequirement) -> Self {
+        Self {
+            id: item.id,
+            project_id: item.project_id,
+            item_id: item.item_id,
+            quantity: item.quantity,
+            unit_id: item.unit_id,
+        }
+    }
+}
+
+impl From<web_common::database::tables::ProjectDiscreteRequirement> for ProjectDiscreteRequirement {
+    fn from(item: web_common::database::tables::ProjectDiscreteRequirement) -> Self {
+        Self {
+            id: item.id,
+            project_id: item.project_id,
+            item_id: item.item_id,
+            quantity: item.quantity,
+            unit_id: item.unit_id,
+        }
+    }
 }
 
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
@@ -314,10 +1036,44 @@ pub struct ProjectMilestone {
     pub completed_at: Option<DateTime<Utc>>,
 }
 
+impl From<ProjectMilestone> for web_common::database::tables::ProjectMilestone {
+    fn from(item: ProjectMilestone) -> Self {
+        Self {
+            id: item.id,
+            project_id: item.project_id,
+            due_date: item.due_date,
+            completed_at: item.completed_at,
+        }
+    }
+}
+
+impl From<web_common::database::tables::ProjectMilestone> for ProjectMilestone {
+    fn from(item: web_common::database::tables::ProjectMilestone) -> Self {
+        Self {
+            id: item.id,
+            project_id: item.project_id,
+            due_date: item.due_date,
+            completed_at: item.completed_at,
+        }
+    }
+}
+
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = project_states)]
 pub struct ProjectState {
     pub id: Uuid,
+}
+
+impl From<ProjectState> for web_common::database::tables::ProjectState {
+    fn from(item: ProjectState) -> Self {
+        Self { id: item.id }
+    }
+}
+
+impl From<web_common::database::tables::ProjectState> for ProjectState {
+    fn from(item: web_common::database::tables::ProjectState) -> Self {
+        Self { id: item.id }
+    }
 }
 
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
@@ -336,10 +1092,58 @@ pub struct Project {
     pub logo_id: Option<Uuid>,
 }
 
+impl From<Project> for web_common::database::tables::Project {
+    fn from(item: Project) -> Self {
+        Self {
+            id: item.id,
+            public: item.public,
+            state_id: item.state_id,
+            parent_project_id: item.parent_project_id,
+            budget: item.budget,
+            expenses: item.expenses,
+            currency: item.currency,
+            expected_end_date: item.expected_end_date,
+            end_date: item.end_date,
+            website_url: item.website_url,
+            logo_id: item.logo_id,
+        }
+    }
+}
+
+impl From<web_common::database::tables::Project> for Project {
+    fn from(item: web_common::database::tables::Project) -> Self {
+        Self {
+            id: item.id,
+            public: item.public,
+            state_id: item.state_id,
+            parent_project_id: item.parent_project_id,
+            budget: item.budget,
+            expenses: item.expenses,
+            currency: item.currency,
+            expected_end_date: item.expected_end_date,
+            end_date: item.end_date,
+            website_url: item.website_url,
+            logo_id: item.logo_id,
+        }
+    }
+}
+
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = roles)]
 pub struct Role {
     pub id: Uuid,
+}
+
+impl From<Role> for web_common::database::tables::Role {
+    fn from(item: Role) -> Self {
+        Self { id: item.id }
+    }
+}
+
+impl From<web_common::database::tables::Role> for Role {
+    fn from(item: web_common::database::tables::Role) -> Self {
+        Self { id: item.id }
+    }
 }
 
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
@@ -350,6 +1154,24 @@ pub struct SampleTaxa {
     pub taxon_id: Uuid,
 }
 
+impl From<SampleTaxa> for web_common::database::tables::SampleTaxa {
+    fn from(item: SampleTaxa) -> Self {
+        Self {
+            sample_id: item.sample_id,
+            taxon_id: item.taxon_id,
+        }
+    }
+}
+
+impl From<web_common::database::tables::SampleTaxa> for SampleTaxa {
+    fn from(item: web_common::database::tables::SampleTaxa) -> Self {
+        Self {
+            sample_id: item.sample_id,
+            taxon_id: item.taxon_id,
+        }
+    }
+}
+
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(primary_key(sampled_individual_id, taxon_id))]
 #[diesel(table_name = sampled_individual_taxa)]
@@ -358,10 +1180,40 @@ pub struct SampledIndividualTaxa {
     pub taxon_id: Uuid,
 }
 
+impl From<SampledIndividualTaxa> for web_common::database::tables::SampledIndividualTaxa {
+    fn from(item: SampledIndividualTaxa) -> Self {
+        Self {
+            sampled_individual_id: item.sampled_individual_id,
+            taxon_id: item.taxon_id,
+        }
+    }
+}
+
+impl From<web_common::database::tables::SampledIndividualTaxa> for SampledIndividualTaxa {
+    fn from(item: web_common::database::tables::SampledIndividualTaxa) -> Self {
+        Self {
+            sampled_individual_id: item.sampled_individual_id,
+            taxon_id: item.taxon_id,
+        }
+    }
+}
+
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = sampled_individuals)]
 pub struct SampledIndividual {
     pub id: Uuid,
+}
+
+impl From<SampledIndividual> for web_common::database::tables::SampledIndividual {
+    fn from(item: SampledIndividual) -> Self {
+        Self { id: item.id }
+    }
+}
+
+impl From<web_common::database::tables::SampledIndividual> for SampledIndividual {
+    fn from(item: web_common::database::tables::SampledIndividual) -> Self {
+        Self { id: item.id }
+    }
 }
 
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
@@ -371,11 +1223,47 @@ pub struct Sample {
     pub derived_from: Option<Uuid>,
 }
 
+impl From<Sample> for web_common::database::tables::Sample {
+    fn from(item: Sample) -> Self {
+        Self {
+            id: item.id,
+            derived_from: item.derived_from,
+        }
+    }
+}
+
+impl From<web_common::database::tables::Sample> for Sample {
+    fn from(item: web_common::database::tables::Sample) -> Self {
+        Self {
+            id: item.id,
+            derived_from: item.derived_from,
+        }
+    }
+}
+
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = spectra)]
 pub struct Spectra {
     pub id: i32,
     pub spectra_collection_id: Uuid,
+}
+
+impl From<Spectra> for web_common::database::tables::Spectra {
+    fn from(item: Spectra) -> Self {
+        Self {
+            id: item.id,
+            spectra_collection_id: item.spectra_collection_id,
+        }
+    }
+}
+
+impl From<web_common::database::tables::Spectra> for Spectra {
+    fn from(item: web_common::database::tables::Spectra) -> Self {
+        Self {
+            id: item.id,
+            spectra_collection_id: item.spectra_collection_id,
+        }
+    }
 }
 
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
@@ -385,10 +1273,40 @@ pub struct SpectraCollection {
     pub sample_id: Uuid,
 }
 
+impl From<SpectraCollection> for web_common::database::tables::SpectraCollection {
+    fn from(item: SpectraCollection) -> Self {
+        Self {
+            id: item.id,
+            sample_id: item.sample_id,
+        }
+    }
+}
+
+impl From<web_common::database::tables::SpectraCollection> for SpectraCollection {
+    fn from(item: web_common::database::tables::SpectraCollection) -> Self {
+        Self {
+            id: item.id,
+            sample_id: item.sample_id,
+        }
+    }
+}
+
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = taxa)]
 pub struct Taxa {
     pub id: Uuid,
+}
+
+impl From<Taxa> for web_common::database::tables::Taxa {
+    fn from(item: Taxa) -> Self {
+        Self { id: item.id }
+    }
+}
+
+impl From<web_common::database::tables::Taxa> for Taxa {
+    fn from(item: web_common::database::tables::Taxa) -> Self {
+        Self { id: item.id }
+    }
 }
 
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
@@ -400,11 +1318,49 @@ pub struct TeamAuthorization {
     pub role_id: Uuid,
 }
 
+impl From<TeamAuthorization> for web_common::database::tables::TeamAuthorization {
+    fn from(item: TeamAuthorization) -> Self {
+        Self {
+            team_id: item.team_id,
+            editable_id: item.editable_id,
+            role_id: item.role_id,
+        }
+    }
+}
+
+impl From<web_common::database::tables::TeamAuthorization> for TeamAuthorization {
+    fn from(item: web_common::database::tables::TeamAuthorization) -> Self {
+        Self {
+            team_id: item.team_id,
+            editable_id: item.editable_id,
+            role_id: item.role_id,
+        }
+    }
+}
+
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = team_states)]
 pub struct TeamState {
     pub id: Uuid,
     pub font_awesome_icon: String,
+}
+
+impl From<TeamState> for web_common::database::tables::TeamState {
+    fn from(item: TeamState) -> Self {
+        Self {
+            id: item.id,
+            font_awesome_icon: item.font_awesome_icon,
+        }
+    }
+}
+
+impl From<web_common::database::tables::TeamState> for TeamState {
+    fn from(item: web_common::database::tables::TeamState) -> Self {
+        Self {
+            id: item.id,
+            font_awesome_icon: item.font_awesome_icon,
+        }
+    }
 }
 
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
@@ -415,11 +1371,49 @@ pub struct Team {
     pub team_state_id: Uuid,
 }
 
+impl From<Team> for web_common::database::tables::Team {
+    fn from(item: Team) -> Self {
+        Self {
+            id: item.id,
+            parent_team_id: item.parent_team_id,
+            team_state_id: item.team_state_id,
+        }
+    }
+}
+
+impl From<web_common::database::tables::Team> for Team {
+    fn from(item: web_common::database::tables::Team) -> Self {
+        Self {
+            id: item.id,
+            parent_team_id: item.parent_team_id,
+            team_state_id: item.team_state_id,
+        }
+    }
+}
+
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
 #[diesel(table_name = units)]
 pub struct Unit {
     pub id: Uuid,
     pub symbol: String,
+}
+
+impl From<Unit> for web_common::database::tables::Unit {
+    fn from(item: Unit) -> Self {
+        Self {
+            id: item.id,
+            symbol: item.symbol,
+        }
+    }
+}
+
+impl From<web_common::database::tables::Unit> for Unit {
+    fn from(item: web_common::database::tables::Unit) -> Self {
+        Self {
+            id: item.id,
+            symbol: item.symbol,
+        }
+    }
 }
 
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
@@ -431,7 +1425,27 @@ pub struct UserAuthorization {
     pub role_id: Uuid,
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl From<UserAuthorization> for web_common::database::tables::UserAuthorization {
+    fn from(item: UserAuthorization) -> Self {
+        Self {
+            user_id: item.user_id,
+            editable_id: item.editable_id,
+            role_id: item.role_id,
+        }
+    }
+}
+
+impl From<web_common::database::tables::UserAuthorization> for UserAuthorization {
+    fn from(item: web_common::database::tables::UserAuthorization) -> Self {
+        Self {
+            user_id: item.user_id,
+            editable_id: item.editable_id,
+            role_id: item.role_id,
+        }
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = user_emails)]
 pub struct UserEmail {
     pub id: i32,
@@ -440,12 +1454,26 @@ pub struct UserEmail {
     pub login_provider_id: i16,
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
-#[diesel(primary_key(user_id, document_id))]
-#[diesel(table_name = user_pictures)]
-pub struct UserPicture {
-    pub user_id: Uuid,
-    pub document_id: Uuid,
+impl From<UserEmail> for web_common::database::tables::UserEmail {
+    fn from(item: UserEmail) -> Self {
+        Self {
+            id: item.id,
+            email: item.email,
+            user_id: item.user_id,
+            login_provider_id: item.login_provider_id,
+        }
+    }
+}
+
+impl From<web_common::database::tables::UserEmail> for UserEmail {
+    fn from(item: web_common::database::tables::UserEmail) -> Self {
+        Self {
+            id: item.id,
+            email: item.email,
+            user_id: item.user_id,
+            login_provider_id: item.login_provider_id,
+        }
+    }
 }
 
 #[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug)]
@@ -457,4 +1485,30 @@ pub struct User {
     pub last_name: Option<String>,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
+}
+
+impl From<User> for web_common::database::tables::User {
+    fn from(item: User) -> Self {
+        Self {
+            id: item.id,
+            first_name: item.first_name,
+            middle_name: item.middle_name,
+            last_name: item.last_name,
+            created_at: item.created_at,
+            updated_at: item.updated_at,
+        }
+    }
+}
+
+impl From<web_common::database::tables::User> for User {
+    fn from(item: web_common::database::tables::User) -> Self {
+        Self {
+            id: item.id,
+            first_name: item.first_name,
+            middle_name: item.middle_name,
+            last_name: item.last_name,
+            created_at: item.created_at,
+            updated_at: item.updated_at,
+        }
+    }
 }

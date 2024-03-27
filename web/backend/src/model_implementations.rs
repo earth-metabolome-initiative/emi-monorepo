@@ -1,6 +1,8 @@
-use crate::model_views::DocumentView;
+use crate::diesel::connection::SimpleConnection;
 use crate::models::*;
 use crate::schema::*;
+use crate::views::DocumentView;
+use crate::DieselConn;
 use diesel::prelude::*;
 use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::Pool;
@@ -9,14 +11,11 @@ use email_address::*;
 use image::DynamicImage;
 use image::ImageFormat;
 use uuid::Uuid;
-use web_common::api::database::selects::PublicUser;
-use web_common::custom_validators::Image;
-use crate::DieselConn;
-use crate::diesel::connection::SimpleConnection;
 use validator::Validate;
 use web_common::api::ApiError;
-use web_common::api::database::updates::CompleteProfile;
+use web_common::custom_validators::Image;
 use web_common::custom_validators::ImageSize;
+use web_common::database::updates::CompleteProfile;
 
 impl DocumentFormat {
     pub fn from_extension(
@@ -39,8 +38,9 @@ impl Document {
         path: &str,
         conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>,
     ) -> Result<Document, diesel::result::Error> {
-        use crate::schema::documents::dsl::*;
-        documents.filter(path.eq(path)).first::<Document>(conn)
+        documents::dsl::documents
+            .filter(documents::dsl::path.eq(path))
+            .first::<Document>(conn)
     }
 }
 
@@ -212,7 +212,7 @@ impl User {
         conn.transaction::<_, ApiError, _>(|conn| {
             // First, we create the document for the profile picture.
             let profile_picture_document = NewDocument::new(
-                self.profile_picture_path(&ImageSize::Standard),
+                self.standard_profile_picture_path(),
                 png_format.id,
                 profile_picture.as_bytes().len() as i32,
             );
@@ -224,7 +224,7 @@ impl User {
             )?;
             // Similarly, we create the document for the thumbnail.
             let thumbnail_document = NewDocument::new(
-                self.profile_picture_path(&ImageSize::Thumbnail),
+                self.thumbnail_path(),
                 png_format.id,
                 thumbnail.as_bytes().len() as i32,
             );
@@ -243,20 +243,22 @@ impl User {
         })
     }
 
-    pub fn profile_picture_path(&self, image_size: &ImageSize) -> String {
-        format!(
-            "{}/{}/{}.png",
-            web_common::api::documents::profile::picture::FULL_ENDPOINT,
-            self.id.to_string().to_lowercase(),
-            image_size.to_string()
+    pub fn thumbnail_path(&self) -> String {
+        web_common::database::views::PublicUser::profile_picture_path(
+            self.id,
+            &ImageSize::Thumbnail,
         )
+    }
+
+    pub fn standard_profile_picture_path(&self) -> String {
+        web_common::database::views::PublicUser::profile_picture_path(self.id, &ImageSize::Standard)
     }
 
     pub fn has_profile_picture(&self, conn: &mut crate::DieselConn) -> bool {
         // In order to determine whether a user has a profile picture, we need to check whether
         // the user is the author, in the field created_by from the editables table, of any
         // document from the documents table as determined by the path column.
-        let profile_picture_path = self.profile_picture_path(&ImageSize::Thumbnail);
+        let profile_picture_path = self.standard_profile_picture_path();
         use crate::schema::documents::dsl::*;
         use crate::schema::editables::dsl::*;
         editables
@@ -267,27 +269,11 @@ impl User {
             .is_ok()
     }
 
-    /// Create a new web-commons User from a database User.
-    pub fn public_user(
-        &self,
-        conn: &mut crate::DieselConn,
-    ) -> PublicUser {
-        PublicUser::new(
-            self.id,
-            self.first_name.clone(),
-            self.middle_name.clone(),
-            self.last_name.clone(),
-            self.profile_picture_path(&ImageSize::Standard),
-            self.profile_picture_path(&ImageSize::Thumbnail),
-        )
-    }
-
     /// Method to update a user's name.
     ///
     /// # Arguments
     /// * `conn` - A connection to the database.
     /// * `profile` - The data to use to complete the profile.
-    ///
     pub fn update_profile(
         &self,
         conn: &mut DieselConn,
@@ -308,19 +294,18 @@ impl User {
         // avoid that the user is left with a profile picture but no name or vice versa.
         conn.transaction::<_, ApiError, _>(|conn| {
             use crate::schema::users::dsl::*;
-        diesel::update(users.filter(id.eq(self.id)))
-            .set((
-                first_name.eq(new_profile.first_name.to_string()),
-                middle_name.eq(new_profile.middle_name.map(|s| s.to_string())),
-                last_name.eq(new_profile.last_name.to_string()),
-            ))
-            .execute(conn)?;
+            diesel::update(users.filter(id.eq(self.id)))
+                .set((
+                    first_name.eq(new_profile.first_name.to_string()),
+                    middle_name.eq(new_profile.middle_name.map(|s| s.to_string())),
+                    last_name.eq(new_profile.last_name.to_string()),
+                ))
+                .execute(conn)?;
 
             self.insert_profile_pictures(squared_profile_picture, conn)?;
             Ok(())
         })
     }
-
 }
 
 impl LoginProvider {

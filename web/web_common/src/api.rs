@@ -2,7 +2,6 @@ use std::collections::HashSet;
 
 use serde::{Deserialize, Serialize};
 pub mod auth;
-pub mod database;
 pub mod documents;
 pub mod form_traits;
 pub mod oauth;

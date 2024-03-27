@@ -42,4 +42,3 @@ JOIN users ON editables.created_by = users.id
 LEFT JOIN last_edits_view ON documents.id = last_edits_view.editable_id
 JOIN formats_view ON documents.format_id = formats_view.id
 JOIN describables ON documents.id = describables.id;
-

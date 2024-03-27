@@ -1,10 +1,10 @@
 //! Module providing the websocket messages used in the application.
 use std::fmt::Debug;
 
-use crate::api::database::operations::Operation;
-use crate::api::database::selects::Answer;
 use crate::api::{oauth::jwt_cookies::AccessToken, ApiError};
+use crate::database::*;
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CloseReason {
@@ -15,15 +15,20 @@ pub struct CloseReason {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum FrontendMessage {
     Close(Option<CloseReason>),
-    Task(uuid::Uuid, Operation),
+    Task(Task),
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum BackendMessage {
     Close(Option<CloseReason>),
-    Answer(Answer), // Answer of a select query
-    TaskResult(uuid::Uuid, Result<(), ApiError>),
     RefreshToken(AccessToken),
+    Notification(Notification),
+    SelectResult(uuid::Uuid, Result<Vec<ViewRow>, ApiError>),
+    TaskResult(Uuid, Result<(), ApiError>),
+}
+
+pub enum DeleteNotification {
+    User(uuid::Uuid),
 }
 
 #[cfg(feature = "backend")]

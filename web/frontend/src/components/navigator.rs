@@ -24,13 +24,13 @@ use crate::stores::app_state::AppState;
 use crate::stores::user_state::UserState;
 use crate::utils::is_online;
 use gloo::timers::callback::Interval;
-use web_common::api::database::selects::PublicUser;
+use web_common::database::PublicUser;
 use web_common::api::ws::messages::*;
 use web_common::api::ApiError;
+use web_common::database::ViewRow;
 use yew::prelude::*;
 use yew_agent::scope_ext::AgentScopeExt;
 use yew_router::prelude::*;
-use web_common::api::database::selects::Answer;
 use yewdux::prelude::*;
 
 use crate::components::hamburger::Hamburger;
@@ -145,28 +145,32 @@ impl Component for Navigator {
                 true
             }
             NavigatorMessage::ResumeTasks => {
+                let mut task_submitted = false;
                 if self.app_state.connect_to_internet() {
                     let tasks = self.app_state.tasks();
-                    for (task_id, task) in tasks.iter().cloned() {
-                        info!("Resuming task {}", task_id);
-                        self.websocket.send(FrontendMessage::Task(task_id, task));
+                    for task in tasks.iter() {
+                        if task.should_retry() {
+                            self.websocket.send(task.clone().into());
+                            task_submitted = true;
+                        }
                     }
-                    !tasks.is_empty()
-                } else {
-                    false
                 }
+                task_submitted
             }
-            NavigatorMessage::Backend(BackendMessage::Answer(Answer::PublicUser(user))) => {
-                self.user_dispatch.reduce_mut(|state| {
-                    state.set_user(user);
-                });
-                true
+            NavigatorMessage::Backend(BackendMessage::SelectResult(_, result)) => {
+                match result {
+                    Ok(rows) => {
+                        // TODO!
+                    }
+                    Err(api_error) => {
+                        log::error!("Failed to fetch rows: {:?}", api_error);
+                    },
+                }
+                false
             }
             NavigatorMessage::Backend(BackendMessage::TaskResult(task_id, result)) => {
                 match result {
                     Ok(()) => {
-                        info!("Task {} completed successfully", task_id);
-                        // TODO: trigger a popup upon task completion
                         self.app_dispatch.reduce_mut(|state| {
                             state.remove_task(task_id);
                         });
@@ -186,7 +190,7 @@ impl Component for Navigator {
                         }
                     },
                 }
-                true
+                false
             }
             NavigatorMessage::Backend(_) => false,
             NavigatorMessage::ToggleSidebar => {
@@ -220,7 +224,7 @@ impl Component for Navigator {
                     if self.has_access_token() {
                         if let Some(user) = self.user() {
                             <div class="user">
-                                <img src={format!("/api/user/{}/avatar", user.id())} alt={format!("{}'s avatar", user.full_name())} />
+                                <img src={user.thumbnail_path()} alt={format!("{}'s avatar", user.full_name())} />
                                 <span>{user.full_name()}</span>
                                 // {if store.is_offline() {
                                 //     html! {

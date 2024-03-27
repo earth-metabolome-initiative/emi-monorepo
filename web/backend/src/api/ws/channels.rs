@@ -1,48 +1,46 @@
 use crate::api::ws::socket::WebSocket;
-use actix::Message;
-use uuid::Uuid;
-use core::fmt::Debug;
+
 use serde::{Deserialize, Serialize};
 use sqlx::error::Error;
 use sqlx::postgres::PgListener;
 use sqlx::Pool;
 use sqlx::Postgres;
+use std::fmt;
 use std::fmt::Display;
 use std::fmt::Formatter;
-use std::fmt;
-use web_common::api::database::operations::Operation;
+use uuid::Uuid;
+use web_common::database::operations::Operation;
 use web_common::api::ws::messages::BackendMessage;
 
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, Hash)]
-pub enum Channel {
-    NotifyUser(Uuid),
+pub trait Channel {
+    type Message;
+
+    /// Returns the operation that this channel listens to.
+    fn operation(&self) -> Operation;
+
+    /// Returns the primary key that this channel listens to.
+    fn primary_key(&self) -> PrimaryKey;
 }
 
-impl Display for Channel {
+impl<C> Display for C
+where
+    C: Channel,
+{
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        match self {
-            Channel::NotifyUser(user_id) => write!(f, "notify_user_{}", user_id),
-        }
+        let key = self.primary_key();
+        write!(f, "{}_{}_{}", self.operation(), key.table_name(), key.id())
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, Message, Clone, PartialEq, Eq)]
-#[rtype(result = "()")]
-pub struct ChannelMessage {
-    pub table: Operation,
-}
-
-impl ChannelMessage {
-    pub fn into_view(self) -> Operation {
-        self.table
-    }
-}
-
-pub async fn start_listening(
+pub async fn start_listening<C>(
     pool: &Pool<Postgres>,
-    channels: Vec<Channel>,
+    channels: Vec<C>,
     address: actix::prelude::Addr<WebSocket>,
-) -> Result<(), Error> {
+) -> Result<(), Error>
+where
+    C: Channel,
+    WebSocket: actix_web::Handler<C::Message>,
+{
     let channel_names = channels
         .iter()
         .map(|channel| channel.to_string())
@@ -58,25 +56,9 @@ pub async fn start_listening(
     listener.listen_all(channel_references).await?;
     loop {
         while let Some(notification) = listener.try_recv().await? {
-            log::info!(
-                "Getting notification with payload: {:?} from channel {:?}",
-                notification.payload(),
-                notification.channel()
-            );
-
             let notification_payload: String = notification.payload().to_owned();
-
-            let value: ChannelMessage = serde_json::from_str(&notification_payload).unwrap();
-
+            let value: C::Message = serde_json::from_str(&notification_payload).unwrap();
             address.do_send(value);
         }
-    }
-}
-
-impl actix::Handler<ChannelMessage> for WebSocket {
-    type Result = ();
-
-    fn handle(&mut self, msg: ChannelMessage, ctx: &mut Self::Context) {
-        ctx.binary(BackendMessage::Operation(msg.into_view()));
     }
 }

@@ -3,8 +3,8 @@
 use crate::components::forms::*;
 use crate::stores::user_state::UserState;
 use wasm_bindgen::JsCast;
-use web_common::api::database::updates::update_profile::{ProfileImage, ValidatedNameField};
-use web_common::api::database::updates::CompleteProfile;
+use web_common::database::updates::update_profile::{ProfileImage, ValidatedNameField};
+use web_common::database::updates::CompleteProfile;
 use web_common::api::form_traits::TryFromCallback;
 use web_common::custom_validators::image;
 use web_common::file_formats::GenericFileFormat;

@@ -3,8 +3,7 @@ use crate::cookies::is_logged_in;
 use crate::router::AppRoute;
 use log::info;
 use serde::{Deserialize, Serialize};
-use web_common::api::database::selects::PublicUser;
-use web_common::api::oauth::jwt_cookies::AccessToken;
+use web_common::{api::oauth::jwt_cookies::AccessToken, database::PublicUser};
 use yew_router::prelude::*;
 use yewdux::prelude::*;
 

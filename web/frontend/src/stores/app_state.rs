@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use web_common::api::database::operations::Operation;
+use web_common::database::Task;
 use yewdux::prelude::*;
 
 #[derive(Default, PartialEq, Serialize, Deserialize, Store, Clone)]
@@ -8,7 +8,7 @@ use yewdux::prelude::*;
 pub struct AppState {
     sidebar_open: bool,
     connect_to_internet: bool,
-    tasks: Vec<(uuid::Uuid, Operation)>,
+    tasks: Vec<Task>,
 }
 
 impl AppState {
@@ -20,15 +20,15 @@ impl AppState {
         self.sidebar_open = !self.sidebar_open;
     }
 
-    pub fn add_task(&mut self, task: (uuid::Uuid, Operation)) {
+    pub fn add_task(&mut self, task: Task) {
         self.tasks.push(task);
     }
 
     pub fn remove_task(&mut self, task_id: uuid::Uuid) {
-        self.tasks.retain(|(id, _)| id != &task_id);
+        self.tasks.retain(|task| task.id() != task_id);
     }
 
-    pub fn tasks(&self) -> &[(uuid::Uuid, Operation)] {
+    pub fn tasks(&self) -> &[Task] {
         &self.tasks
     }
 

@@ -13,9 +13,12 @@ diesel::table! {
         id -> Uuid,
         item_type_id -> Nullable<Uuid>,
         other_item_type_id -> Nullable<Uuid>,
-        temperature -> Nullable<Numrange>,
-        humidity -> Nullable<Numrange>,
-        pressure -> Nullable<Numrange>,
+        minimum_temperature -> Nullable<Float8>,
+        maximum_temperature -> Nullable<Float8>,
+        minimum_humidity -> Nullable<Float8>,
+        maximum_humidity -> Nullable<Float8>,
+        minimum_pressure -> Nullable<Float8>,
+        maximum_pressure -> Nullable<Float8>,
     }
 }
 
@@ -24,9 +27,12 @@ diesel::table! {
         id -> Uuid,
         container_item_type_id -> Nullable<Uuid>,
         contained_item_type_id -> Nullable<Uuid>,
-        temperature -> Nullable<Numrange>,
-        humidity -> Nullable<Numrange>,
-        pressure -> Nullable<Numrange>,
+        minimum_temperature -> Nullable<Float8>,
+        maximum_temperature -> Nullable<Float8>,
+        minimum_humidity -> Nullable<Float8>,
+        maximum_humidity -> Nullable<Float8>,
+        minimum_pressure -> Nullable<Float8>,
+        maximum_pressure -> Nullable<Float8>,
     }
 }
 
@@ -80,13 +86,6 @@ diesel::table! {
     edits (id) {
         id -> Uuid,
         editable_id -> Uuid,
-    }
-}
-
-diesel::table! {
-    expirable_item_categories (item_type_id) {
-        item_type_id -> Uuid,
-        expiration_interval -> Interval,
     }
 }
 
@@ -207,6 +206,19 @@ diesel::table! {
         #[max_length = 3]
         currency -> Varchar,
         manifacturer_id -> Uuid,
+    }
+}
+
+diesel::table! {
+    notifications (id) {
+        id -> Uuid,
+        user_id -> Uuid,
+        #[max_length = 6]
+        operation -> Varchar,
+        #[max_length = 255]
+        table_name -> Varchar,
+        row_id -> Nullable<Uuid>,
+        read -> Bool,
     }
 }
 
@@ -435,13 +447,6 @@ diesel::table! {
 }
 
 diesel::table! {
-    user_pictures (user_id, document_id) {
-        user_id -> Uuid,
-        document_id -> Uuid,
-    }
-}
-
-diesel::table! {
     users (id) {
         id -> Uuid,
         first_name -> Nullable<Varchar>,
@@ -454,8 +459,8 @@ diesel::table! {
 
 diesel::joinable!(archivables -> editables (id));
 diesel::joinable!(archivables -> users (archived_by));
-diesel::joinable!(container_horizontal_rules -> editables (id));
-diesel::joinable!(container_vertical_rules -> editables (id));
+diesel::joinable!(container_horizontal_rules -> describables (id));
+diesel::joinable!(container_vertical_rules -> describables (id));
 diesel::joinable!(continuous_units -> units (id));
 diesel::joinable!(describables -> editables (id));
 diesel::joinable!(discrete_units -> units (id));
@@ -466,9 +471,8 @@ diesel::joinable!(documents -> document_formats (format_id));
 diesel::joinable!(documents -> editables (id));
 diesel::joinable!(editables -> users (created_by));
 diesel::joinable!(edits -> describables (id));
-diesel::joinable!(expirable_item_categories -> item_categories (item_type_id));
+diesel::joinable!(edits -> editables (editable_id));
 diesel::joinable!(item_categories -> describables (id));
-diesel::joinable!(item_categories -> editables (id));
 diesel::joinable!(item_category_relationships -> editables (id));
 diesel::joinable!(item_category_units -> editables (id));
 diesel::joinable!(item_category_units -> item_categories (item_category_id));
@@ -488,14 +492,12 @@ diesel::joinable!(item_units -> editables (id));
 diesel::joinable!(item_units -> items (item_id));
 diesel::joinable!(item_units -> units (unit_id));
 diesel::joinable!(items -> describables (id));
-diesel::joinable!(items -> editables (id));
 diesel::joinable!(location_states -> describables (id));
-diesel::joinable!(location_states -> editables (id));
 diesel::joinable!(locations -> describables (id));
-diesel::joinable!(locations -> editables (id));
 diesel::joinable!(locations -> location_states (state_id));
 diesel::joinable!(manufactured_item_categories -> item_categories (id));
 diesel::joinable!(manufactured_item_categories -> organizations (manifacturer_id));
+diesel::joinable!(notifications -> users (user_id));
 diesel::joinable!(organization_authorizations -> editables (editable_id));
 diesel::joinable!(organization_authorizations -> organizations (organization_id));
 diesel::joinable!(organization_authorizations -> roles (role_id));
@@ -503,10 +505,8 @@ diesel::joinable!(organization_locations -> editables (id));
 diesel::joinable!(organization_locations -> locations (location_id));
 diesel::joinable!(organization_locations -> organizations (organization_id));
 diesel::joinable!(organization_states -> describables (id));
-diesel::joinable!(organization_states -> editables (id));
 diesel::joinable!(organizations -> describables (id));
 diesel::joinable!(organizations -> documents (logo_id));
-diesel::joinable!(organizations -> editables (id));
 diesel::joinable!(organizations -> organization_states (state_id));
 diesel::joinable!(primary_user_emails -> user_emails (id));
 diesel::joinable!(procedure_continuous_requirements -> continuous_units (unit_id));
@@ -520,7 +520,6 @@ diesel::joinable!(procedure_discrete_requirements -> item_categories (item_categ
 diesel::joinable!(procedure_discrete_requirements -> procedures (procedure_id));
 diesel::joinable!(procedure_discrete_requirements -> units (unit_id));
 diesel::joinable!(procedures -> describables (id));
-diesel::joinable!(procedures -> editables (id));
 diesel::joinable!(project_continuous_requirements -> continuous_units (unit_id));
 diesel::joinable!(project_continuous_requirements -> editables (id));
 diesel::joinable!(project_continuous_requirements -> item_categories (item_id));
@@ -532,7 +531,6 @@ diesel::joinable!(project_discrete_requirements -> item_categories (item_id));
 diesel::joinable!(project_discrete_requirements -> projects (project_id));
 diesel::joinable!(project_discrete_requirements -> units (unit_id));
 diesel::joinable!(project_milestones -> describables (id));
-diesel::joinable!(project_milestones -> editables (id));
 diesel::joinable!(project_milestones -> projects (project_id));
 diesel::joinable!(project_states -> describables (id));
 diesel::joinable!(project_states -> editables (id));
@@ -562,14 +560,11 @@ diesel::joinable!(teams -> describables (id));
 diesel::joinable!(teams -> editables (id));
 diesel::joinable!(teams -> team_states (team_state_id));
 diesel::joinable!(units -> describables (id));
-diesel::joinable!(units -> editables (id));
 diesel::joinable!(user_authorizations -> editables (editable_id));
 diesel::joinable!(user_authorizations -> roles (role_id));
 diesel::joinable!(user_authorizations -> users (user_id));
 diesel::joinable!(user_emails -> login_providers (login_provider_id));
 diesel::joinable!(user_emails -> users (user_id));
-diesel::joinable!(user_pictures -> documents (document_id));
-diesel::joinable!(user_pictures -> users (user_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     archivables,
@@ -582,7 +577,6 @@ diesel::allow_tables_to_appear_in_same_query!(
     documents,
     editables,
     edits,
-    expirable_item_categories,
     item_categories,
     item_category_relationships,
     item_category_units,
@@ -595,6 +589,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     locations,
     login_providers,
     manufactured_item_categories,
+    notifications,
     organization_authorizations,
     organization_locations,
     organization_states,
@@ -622,6 +617,5 @@ diesel::allow_tables_to_appear_in_same_query!(
     units,
     user_authorizations,
     user_emails,
-    user_pictures,
     users,
 );
