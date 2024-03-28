@@ -283,7 +283,7 @@ form.standard-form {
         border-radius: 0.5em;
     }
 
-    label {
+    label.input-label {
         color: $grey;
         font-weight: 100;
         padding-right: 0.5em;
@@ -292,6 +292,7 @@ form.standard-form {
     }
 
     input[type="text"],
+    textarea,
     input[type="number"] {
         padding: 0.5em;
         box-sizing: border-box;
@@ -305,6 +306,50 @@ form.standard-form {
             outline: none;
             border-color: $primary;
         }
+    }
+
+    textarea {
+        width: 100%;
+        min-width: 100%;
+        max-width: 100%;
+        font-family: inherit;
+        display: block;
+        min-height: 50px;
+        margin-top: 0.5em;
+    }
+
+    // We style inputs of type checkbox in such
+    // a way that they look like switches.
+    input[type="checkbox"] {
+        display: none;
+    }
+
+    label.checkbox {
+        display: inline-block;
+        width: 40px;
+        height: 20px;
+        background-color: #ccc;
+        border-radius: 10px;
+        position: relative;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        
+        &::after {
+            content: '';
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            width: 18px;
+            height: 18px;
+            background-color: #fff;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s;
+        }
+    }
+
+    input[type="checkbox"]:checked + label.checkbox::after {
+        transform: translateX(100%);
     }
 
     input[type="file"] {
@@ -372,6 +417,10 @@ form.standard-form {
             color: $red;
         }
 
+        input[type="checkbox"]:checked + label.checkbox {
+            background-color: $red;
+        }
+
         button[type="submit"] {
             border-color: $red;
             color: $red;
@@ -391,6 +440,10 @@ form.standard-form {
     }
 
     &[method="PUT"] {
+        input[type="checkbox"]:checked + label.checkbox {
+            background-color: $green;
+        }
+
         button[type="submit"] {
             border-color: $green;
             color: $green;
@@ -410,7 +463,9 @@ form.standard-form {
     }
 
     &[method="POST"] {
-        border: 1px solid $blue;
+        input[type="checkbox"]:checked + label.checkbox {
+            background-color: $blue;
+        }
 
         button[type="submit"] {
             border-color: $blue;

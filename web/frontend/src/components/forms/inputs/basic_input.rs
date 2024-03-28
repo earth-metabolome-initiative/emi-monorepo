@@ -220,12 +220,20 @@ where
                 input_event.prevent_default();
 
                 // We extract the current value of the input field
-                let value = input_event
-                    .target()
-                    .unwrap()
-                    .dyn_into::<web_sys::HtmlInputElement>()
-                    .unwrap()
-                    .value();
+                let value = match props.input_type().as_str() {
+                    "textarea" => input_event
+                        .target()
+                        .unwrap()
+                        .dyn_into::<web_sys::HtmlTextAreaElement>()
+                        .unwrap()
+                        .value(),
+                    _ => input_event
+                        .target()
+                        .unwrap()
+                        .dyn_into::<web_sys::HtmlInputElement>()
+                        .unwrap()
+                        .value(),
+                };
 
                 link.send_message(InputMessage::UpdateCurrentValue(value.clone()));
 
@@ -247,12 +255,20 @@ where
                 input_event.prevent_default();
 
                 // We extract the current value of the input field
-                let value = input_event
-                    .target()
-                    .unwrap()
-                    .dyn_into::<web_sys::HtmlInputElement>()
-                    .unwrap()
-                    .value();
+                let value = match props.input_type().as_str() {
+                    "textarea" => input_event
+                        .target()
+                        .unwrap()
+                        .dyn_into::<web_sys::HtmlTextAreaElement>()
+                        .unwrap()
+                        .value(),
+                    _ => input_event
+                        .target()
+                        .unwrap()
+                        .dyn_into::<web_sys::HtmlInputElement>()
+                        .unwrap()
+                        .value(),
+                };
 
                 if props.optional && value.is_empty() {
                     link.send_message(InputMessage::RemoveErrors);
@@ -285,36 +301,49 @@ where
             <div class={classes}>
                 {if props.show_label {
                     html! {
-                        <label for={props.normalized_label()} class="input-label">{props.label()}</label>
+                        <>
+                        <label for={props.normalized_label()} class={"input-label"}>
+                            {props.label()}
+                        </label>
+                        {if props.input_type() == "textarea" {
+                            html! {
+                                <textarea
+                                    class="input-control"
+                                    name={props.normalized_label()}
+                                    id={props.normalized_label()}
+                                    value={input_value}
+                                    placeholder={props.placeholder.clone().unwrap_or_else(|| props.label())}
+                                    oninput={on_input}
+                                    onblur={on_blur}
+                                ></textarea>
+                            }
+                        } else {
+                            html! {
+                                <input
+                                    type={props.input_type()}
+                                    class="input-control"
+                                    name={props.normalized_label()}
+                                    id={props.normalized_label()}
+                                    value={input_value}
+                                    placeholder={props.placeholder.clone().unwrap_or_else(|| props.label())}
+                                    step={props.step.map_or_else(|| "".to_string(), |step| step.to_string())}
+                                    oninput={on_input}
+                                    onblur={on_blur}
+                                />
+                            }
+                        }}
+                        {if props.input_type() == "checkbox" {
+                            html! {
+                                <label for={props.normalized_label()} class="checkbox"></label>
+                            }
+                        } else {
+                            html! {}
+                        }}
+                        </>
                     }
                 } else {
                     html! {}
                 }}
-                {{if props.input_type() == "textarea" {
-                    html! {
-                        <textarea
-                            class="input-control"
-                            name={props.normalized_label()}
-                            value={input_value}
-                            placeholder={props.placeholder.clone().unwrap_or_else(|| props.label())}
-                            oninput={on_input}
-                            onblur={on_blur}
-                        ></textarea>
-                    }
-                } else {
-                    html! {
-                        <input
-                            type={props.input_type()}
-                            class="input-control"
-                            name={props.normalized_label()}
-                            value={input_value}
-                            placeholder={props.placeholder.clone().unwrap_or_else(|| props.label())}
-                            step={props.step.map_or_else(|| "".to_string(), |step| step.to_string())}
-                            oninput={on_input}
-                            onblur={on_blur}
-                        />
-                    }
-                }}}
                 <InputErrors errors={self.errors.clone()} on_delete={on_delete} />
             </div>
         }
