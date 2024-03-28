@@ -16,7 +16,6 @@ use sqlx::{postgres::PgPoolOptions, Pool as SQLxPool, Postgres};
 use std::path::PathBuf;
 
 mod api;
-mod diesel_enums;
 mod model_implementations;
 mod views;
 mod models;

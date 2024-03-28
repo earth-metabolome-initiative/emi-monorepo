@@ -1,6 +1,6 @@
 -- Your SQL goes here
 CREATE TABLE spectra (
-    id SERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY REFERENCES editables (id) ON DELETE CASCADE,
     spectra_collection_id UUID REFERENCES spectra_collection(id) ON DELETE CASCADE NOT NULL
 );
 

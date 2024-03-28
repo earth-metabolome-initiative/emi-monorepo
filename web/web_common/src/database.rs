@@ -11,4 +11,5 @@ pub use views::*;
 pub mod operations;
 pub use operations::*;
 pub mod view_implementations;
-pub use view_implementations::*;
+pub mod notification_message;
+pub use notification_message::NotificationMessage;

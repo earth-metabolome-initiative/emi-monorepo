@@ -3,6 +3,9 @@
 #![allow(unused)]
 #![allow(clippy::all)]
 use crate::schema::*;
+use diesel::prelude::*;
+use diesel::r2d2::ConnectionManager;
+use diesel::r2d2::PooledConnection;
 use diesel::Identifiable;
 use diesel::Insertable;
 use diesel::Queryable;
@@ -14,7 +17,7 @@ use chrono::offset::Utc;
 use chrono::DateTime;
 use chrono::NaiveDateTime;
 use uuid::Uuid;
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = archivables)]
 pub struct Archivable {
     pub id: Uuid,
@@ -42,7 +45,24 @@ impl From<web_common::database::tables::Archivable> for Archivable {
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl Archivable {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::archivables;
+        archivables::dsl::archivables
+            .filter(archivables::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = container_horizontal_rules)]
 pub struct ContainerHorizontalRule {
     pub id: Uuid,
@@ -88,7 +108,24 @@ impl From<web_common::database::tables::ContainerHorizontalRule> for ContainerHo
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl ContainerHorizontalRule {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::container_horizontal_rules;
+        container_horizontal_rules::dsl::container_horizontal_rules
+            .filter(container_horizontal_rules::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = container_vertical_rules)]
 pub struct ContainerVerticalRule {
     pub id: Uuid,
@@ -134,7 +171,24 @@ impl From<web_common::database::tables::ContainerVerticalRule> for ContainerVert
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl ContainerVerticalRule {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::container_vertical_rules;
+        container_vertical_rules::dsl::container_vertical_rules
+            .filter(container_vertical_rules::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = continuous_units)]
 pub struct ContinuousUnit {
     pub id: Uuid,
@@ -152,7 +206,24 @@ impl From<web_common::database::tables::ContinuousUnit> for ContinuousUnit {
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl ContinuousUnit {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::continuous_units;
+        continuous_units::dsl::continuous_units
+            .filter(continuous_units::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = describables)]
 pub struct Describable {
     pub id: Uuid,
@@ -180,7 +251,24 @@ impl From<web_common::database::tables::Describable> for Describable {
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl Describable {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::describables;
+        describables::dsl::describables
+            .filter(describables::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = discrete_units)]
 pub struct DiscreteUnit {
     pub id: Uuid,
@@ -198,7 +286,24 @@ impl From<web_common::database::tables::DiscreteUnit> for DiscreteUnit {
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl DiscreteUnit {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::discrete_units;
+        discrete_units::dsl::discrete_units
+            .filter(discrete_units::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = document_formats)]
 pub struct DocumentFormat {
     pub id: Uuid,
@@ -223,7 +328,24 @@ impl From<web_common::database::tables::DocumentFormat> for DocumentFormat {
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl DocumentFormat {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::document_formats;
+        document_formats::dsl::document_formats
+            .filter(document_formats::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = documents)]
 pub struct Document {
     pub id: Uuid,
@@ -254,7 +376,24 @@ impl From<web_common::database::tables::Document> for Document {
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl Document {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::documents;
+        documents::dsl::documents
+            .filter(documents::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = editables)]
 pub struct Editable {
     pub id: Uuid,
@@ -282,7 +421,24 @@ impl From<web_common::database::tables::Editable> for Editable {
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl Editable {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::editables;
+        editables::dsl::editables
+            .filter(editables::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = edits)]
 pub struct Edit {
     pub id: Uuid,
@@ -307,7 +463,24 @@ impl From<web_common::database::tables::Edit> for Edit {
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl Edit {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::edits;
+        edits::dsl::edits
+            .filter(edits::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = item_categories)]
 pub struct ItemCategory {
     pub id: Uuid,
@@ -325,7 +498,24 @@ impl From<web_common::database::tables::ItemCategory> for ItemCategory {
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl ItemCategory {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::item_categories;
+        item_categories::dsl::item_categories
+            .filter(item_categories::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = item_category_relationships)]
 pub struct ItemCategoryRelationship {
     pub id: Uuid,
@@ -353,7 +543,24 @@ impl From<web_common::database::tables::ItemCategoryRelationship> for ItemCatego
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl ItemCategoryRelationship {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::item_category_relationships;
+        item_category_relationships::dsl::item_category_relationships
+            .filter(item_category_relationships::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = item_category_units)]
 pub struct ItemCategoryUnit {
     pub id: Uuid,
@@ -381,7 +588,24 @@ impl From<web_common::database::tables::ItemCategoryUnit> for ItemCategoryUnit {
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl ItemCategoryUnit {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::item_category_units;
+        item_category_units::dsl::item_category_units
+            .filter(item_category_units::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = item_continuous_quantities)]
 pub struct ItemContinuousQuantity {
     pub id: Uuid,
@@ -421,7 +645,24 @@ impl From<web_common::database::tables::ItemContinuousQuantity> for ItemContinuo
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl ItemContinuousQuantity {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::item_continuous_quantities;
+        item_continuous_quantities::dsl::item_continuous_quantities
+            .filter(item_continuous_quantities::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = item_discrete_quantities)]
 pub struct ItemDiscreteQuantity {
     pub id: Uuid,
@@ -458,7 +699,24 @@ impl From<web_common::database::tables::ItemDiscreteQuantity> for ItemDiscreteQu
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl ItemDiscreteQuantity {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::item_discrete_quantities;
+        item_discrete_quantities::dsl::item_discrete_quantities
+            .filter(item_discrete_quantities::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = item_locations)]
 pub struct ItemLocation {
     pub id: Uuid,
@@ -489,7 +747,24 @@ impl From<web_common::database::tables::ItemLocation> for ItemLocation {
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl ItemLocation {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::item_locations;
+        item_locations::dsl::item_locations
+            .filter(item_locations::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = item_units)]
 pub struct ItemUnit {
     pub id: Uuid,
@@ -517,7 +792,24 @@ impl From<web_common::database::tables::ItemUnit> for ItemUnit {
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl ItemUnit {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::item_units;
+        item_units::dsl::item_units
+            .filter(item_units::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = items)]
 pub struct Item {
     pub id: Uuid,
@@ -542,7 +834,24 @@ impl From<web_common::database::tables::Item> for Item {
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl Item {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::items;
+        items::dsl::items
+            .filter(items::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = location_states)]
 pub struct LocationState {
     pub id: Uuid,
@@ -567,7 +876,24 @@ impl From<web_common::database::tables::LocationState> for LocationState {
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl LocationState {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::location_states;
+        location_states::dsl::location_states
+            .filter(location_states::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = locations)]
 pub struct Location {
     pub id: Uuid,
@@ -613,10 +939,27 @@ impl From<web_common::database::tables::Location> for Location {
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl Location {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::locations;
+        locations::dsl::locations
+            .filter(locations::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = login_providers)]
 pub struct LoginProvider {
-    pub id: i16,
+    pub id: Uuid,
     pub name: String,
     pub font_awesome_icon: String,
     pub client_id_var_name: String,
@@ -653,7 +996,24 @@ impl From<web_common::database::tables::LoginProvider> for LoginProvider {
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl LoginProvider {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::login_providers;
+        login_providers::dsl::login_providers
+            .filter(login_providers::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = manufactured_item_categories)]
 pub struct ManufacturedItemCategory {
     pub id: Uuid,
@@ -687,7 +1047,24 @@ impl From<web_common::database::tables::ManufacturedItemCategory> for Manufactur
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl ManufacturedItemCategory {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::manufactured_item_categories;
+        manufactured_item_categories::dsl::manufactured_item_categories
+            .filter(manufactured_item_categories::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = notifications)]
 pub struct Notification {
     pub id: Uuid,
@@ -724,10 +1101,27 @@ impl From<web_common::database::tables::Notification> for Notification {
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
-#[diesel(primary_key(organization_id, editable_id, role_id))]
+impl Notification {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::notifications;
+        notifications::dsl::notifications
+            .filter(notifications::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = organization_authorizations)]
 pub struct OrganizationAuthorization {
+    pub id: Uuid,
     pub organization_id: Uuid,
     pub editable_id: Uuid,
     pub role_id: Uuid,
@@ -736,6 +1130,7 @@ pub struct OrganizationAuthorization {
 impl From<OrganizationAuthorization> for web_common::database::tables::OrganizationAuthorization {
     fn from(item: OrganizationAuthorization) -> Self {
         Self {
+            id: item.id,
             organization_id: item.organization_id,
             editable_id: item.editable_id,
             role_id: item.role_id,
@@ -746,6 +1141,7 @@ impl From<OrganizationAuthorization> for web_common::database::tables::Organizat
 impl From<web_common::database::tables::OrganizationAuthorization> for OrganizationAuthorization {
     fn from(item: web_common::database::tables::OrganizationAuthorization) -> Self {
         Self {
+            id: item.id,
             organization_id: item.organization_id,
             editable_id: item.editable_id,
             role_id: item.role_id,
@@ -753,7 +1149,24 @@ impl From<web_common::database::tables::OrganizationAuthorization> for Organizat
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl OrganizationAuthorization {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::organization_authorizations;
+        organization_authorizations::dsl::organization_authorizations
+            .filter(organization_authorizations::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = organization_locations)]
 pub struct OrganizationLocation {
     pub id: Uuid,
@@ -784,7 +1197,24 @@ impl From<web_common::database::tables::OrganizationLocation> for OrganizationLo
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl OrganizationLocation {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::organization_locations;
+        organization_locations::dsl::organization_locations
+            .filter(organization_locations::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = organization_states)]
 pub struct OrganizationState {
     pub id: Uuid,
@@ -809,7 +1239,24 @@ impl From<web_common::database::tables::OrganizationState> for OrganizationState
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl OrganizationState {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::organization_states;
+        organization_states::dsl::organization_states
+            .filter(organization_states::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = organizations)]
 pub struct Organization {
     pub id: Uuid,
@@ -843,10 +1290,27 @@ impl From<web_common::database::tables::Organization> for Organization {
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl Organization {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::organizations;
+        organizations::dsl::organizations
+            .filter(organizations::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = primary_user_emails)]
 pub struct PrimaryUserEmail {
-    pub id: i32,
+    pub id: Uuid,
 }
 
 impl From<PrimaryUserEmail> for web_common::database::tables::PrimaryUserEmail {
@@ -861,7 +1325,24 @@ impl From<web_common::database::tables::PrimaryUserEmail> for PrimaryUserEmail {
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl PrimaryUserEmail {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::primary_user_emails;
+        primary_user_emails::dsl::primary_user_emails
+            .filter(primary_user_emails::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = procedure_continuous_requirements)]
 pub struct ProcedureContinuousRequirement {
     pub id: Uuid,
@@ -899,7 +1380,24 @@ impl From<web_common::database::tables::ProcedureContinuousRequirement>
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl ProcedureContinuousRequirement {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::procedure_continuous_requirements;
+        procedure_continuous_requirements::dsl::procedure_continuous_requirements
+            .filter(procedure_continuous_requirements::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = procedure_discrete_requirements)]
 pub struct ProcedureDiscreteRequirement {
     pub id: Uuid,
@@ -937,7 +1435,24 @@ impl From<web_common::database::tables::ProcedureDiscreteRequirement>
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl ProcedureDiscreteRequirement {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::procedure_discrete_requirements;
+        procedure_discrete_requirements::dsl::procedure_discrete_requirements
+            .filter(procedure_discrete_requirements::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = procedures)]
 pub struct Procedure {
     pub id: Uuid,
@@ -955,7 +1470,24 @@ impl From<web_common::database::tables::Procedure> for Procedure {
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl Procedure {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::procedures;
+        procedures::dsl::procedures
+            .filter(procedures::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = project_continuous_requirements)]
 pub struct ProjectContinuousRequirement {
     pub id: Uuid,
@@ -993,7 +1525,24 @@ impl From<web_common::database::tables::ProjectContinuousRequirement>
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl ProjectContinuousRequirement {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::project_continuous_requirements;
+        project_continuous_requirements::dsl::project_continuous_requirements
+            .filter(project_continuous_requirements::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = project_discrete_requirements)]
 pub struct ProjectDiscreteRequirement {
     pub id: Uuid,
@@ -1027,7 +1576,24 @@ impl From<web_common::database::tables::ProjectDiscreteRequirement> for ProjectD
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl ProjectDiscreteRequirement {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::project_discrete_requirements;
+        project_discrete_requirements::dsl::project_discrete_requirements
+            .filter(project_discrete_requirements::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = project_milestones)]
 pub struct ProjectMilestone {
     pub id: Uuid,
@@ -1058,7 +1624,24 @@ impl From<web_common::database::tables::ProjectMilestone> for ProjectMilestone {
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl ProjectMilestone {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::project_milestones;
+        project_milestones::dsl::project_milestones
+            .filter(project_milestones::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = project_states)]
 pub struct ProjectState {
     pub id: Uuid,
@@ -1076,7 +1659,24 @@ impl From<web_common::database::tables::ProjectState> for ProjectState {
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl ProjectState {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::project_states;
+        project_states::dsl::project_states
+            .filter(project_states::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = projects)]
 pub struct Project {
     pub id: Uuid,
@@ -1128,7 +1728,24 @@ impl From<web_common::database::tables::Project> for Project {
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl Project {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::projects;
+        projects::dsl::projects
+            .filter(projects::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = roles)]
 pub struct Role {
     pub id: Uuid,
@@ -1146,10 +1763,27 @@ impl From<web_common::database::tables::Role> for Role {
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
-#[diesel(primary_key(sample_id, taxon_id))]
+impl Role {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::roles;
+        roles::dsl::roles
+            .filter(roles::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = sample_taxa)]
 pub struct SampleTaxa {
+    pub id: Uuid,
     pub sample_id: Uuid,
     pub taxon_id: Uuid,
 }
@@ -1157,6 +1791,7 @@ pub struct SampleTaxa {
 impl From<SampleTaxa> for web_common::database::tables::SampleTaxa {
     fn from(item: SampleTaxa) -> Self {
         Self {
+            id: item.id,
             sample_id: item.sample_id,
             taxon_id: item.taxon_id,
         }
@@ -1166,16 +1801,34 @@ impl From<SampleTaxa> for web_common::database::tables::SampleTaxa {
 impl From<web_common::database::tables::SampleTaxa> for SampleTaxa {
     fn from(item: web_common::database::tables::SampleTaxa) -> Self {
         Self {
+            id: item.id,
             sample_id: item.sample_id,
             taxon_id: item.taxon_id,
         }
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
-#[diesel(primary_key(sampled_individual_id, taxon_id))]
+impl SampleTaxa {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::sample_taxa;
+        sample_taxa::dsl::sample_taxa
+            .filter(sample_taxa::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = sampled_individual_taxa)]
 pub struct SampledIndividualTaxa {
+    pub id: Uuid,
     pub sampled_individual_id: Uuid,
     pub taxon_id: Uuid,
 }
@@ -1183,6 +1836,7 @@ pub struct SampledIndividualTaxa {
 impl From<SampledIndividualTaxa> for web_common::database::tables::SampledIndividualTaxa {
     fn from(item: SampledIndividualTaxa) -> Self {
         Self {
+            id: item.id,
             sampled_individual_id: item.sampled_individual_id,
             taxon_id: item.taxon_id,
         }
@@ -1192,13 +1846,31 @@ impl From<SampledIndividualTaxa> for web_common::database::tables::SampledIndivi
 impl From<web_common::database::tables::SampledIndividualTaxa> for SampledIndividualTaxa {
     fn from(item: web_common::database::tables::SampledIndividualTaxa) -> Self {
         Self {
+            id: item.id,
             sampled_individual_id: item.sampled_individual_id,
             taxon_id: item.taxon_id,
         }
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl SampledIndividualTaxa {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::sampled_individual_taxa;
+        sampled_individual_taxa::dsl::sampled_individual_taxa
+            .filter(sampled_individual_taxa::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = sampled_individuals)]
 pub struct SampledIndividual {
     pub id: Uuid,
@@ -1216,7 +1888,24 @@ impl From<web_common::database::tables::SampledIndividual> for SampledIndividual
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl SampledIndividual {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::sampled_individuals;
+        sampled_individuals::dsl::sampled_individuals
+            .filter(sampled_individuals::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = samples)]
 pub struct Sample {
     pub id: Uuid,
@@ -1241,10 +1930,27 @@ impl From<web_common::database::tables::Sample> for Sample {
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl Sample {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::samples;
+        samples::dsl::samples
+            .filter(samples::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = spectra)]
 pub struct Spectra {
-    pub id: i32,
+    pub id: Uuid,
     pub spectra_collection_id: Uuid,
 }
 
@@ -1266,7 +1972,24 @@ impl From<web_common::database::tables::Spectra> for Spectra {
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl Spectra {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::spectra;
+        spectra::dsl::spectra
+            .filter(spectra::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = spectra_collection)]
 pub struct SpectraCollection {
     pub id: Uuid,
@@ -1291,7 +2014,24 @@ impl From<web_common::database::tables::SpectraCollection> for SpectraCollection
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl SpectraCollection {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::spectra_collection;
+        spectra_collection::dsl::spectra_collection
+            .filter(spectra_collection::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = taxa)]
 pub struct Taxa {
     pub id: Uuid,
@@ -1309,10 +2049,27 @@ impl From<web_common::database::tables::Taxa> for Taxa {
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
-#[diesel(primary_key(team_id, editable_id, role_id))]
+impl Taxa {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::taxa;
+        taxa::dsl::taxa
+            .filter(taxa::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = team_authorizations)]
 pub struct TeamAuthorization {
+    pub id: Uuid,
     pub team_id: Uuid,
     pub editable_id: Uuid,
     pub role_id: Uuid,
@@ -1321,6 +2078,7 @@ pub struct TeamAuthorization {
 impl From<TeamAuthorization> for web_common::database::tables::TeamAuthorization {
     fn from(item: TeamAuthorization) -> Self {
         Self {
+            id: item.id,
             team_id: item.team_id,
             editable_id: item.editable_id,
             role_id: item.role_id,
@@ -1331,6 +2089,7 @@ impl From<TeamAuthorization> for web_common::database::tables::TeamAuthorization
 impl From<web_common::database::tables::TeamAuthorization> for TeamAuthorization {
     fn from(item: web_common::database::tables::TeamAuthorization) -> Self {
         Self {
+            id: item.id,
             team_id: item.team_id,
             editable_id: item.editable_id,
             role_id: item.role_id,
@@ -1338,7 +2097,24 @@ impl From<web_common::database::tables::TeamAuthorization> for TeamAuthorization
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl TeamAuthorization {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::team_authorizations;
+        team_authorizations::dsl::team_authorizations
+            .filter(team_authorizations::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = team_states)]
 pub struct TeamState {
     pub id: Uuid,
@@ -1363,7 +2139,24 @@ impl From<web_common::database::tables::TeamState> for TeamState {
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl TeamState {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::team_states;
+        team_states::dsl::team_states
+            .filter(team_states::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = teams)]
 pub struct Team {
     pub id: Uuid,
@@ -1391,7 +2184,24 @@ impl From<web_common::database::tables::Team> for Team {
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
+impl Team {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::teams;
+        teams::dsl::teams
+            .filter(teams::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = units)]
 pub struct Unit {
     pub id: Uuid,
@@ -1416,10 +2226,27 @@ impl From<web_common::database::tables::Unit> for Unit {
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug, Identifiable)]
-#[diesel(primary_key(user_id, editable_id, role_id))]
+impl Unit {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::units;
+        units::dsl::units
+            .filter(units::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = user_authorizations)]
 pub struct UserAuthorization {
+    pub id: Uuid,
     pub user_id: Uuid,
     pub editable_id: Uuid,
     pub role_id: Uuid,
@@ -1428,6 +2255,7 @@ pub struct UserAuthorization {
 impl From<UserAuthorization> for web_common::database::tables::UserAuthorization {
     fn from(item: UserAuthorization) -> Self {
         Self {
+            id: item.id,
             user_id: item.user_id,
             editable_id: item.editable_id,
             role_id: item.role_id,
@@ -1438,6 +2266,7 @@ impl From<UserAuthorization> for web_common::database::tables::UserAuthorization
 impl From<web_common::database::tables::UserAuthorization> for UserAuthorization {
     fn from(item: web_common::database::tables::UserAuthorization) -> Self {
         Self {
+            id: item.id,
             user_id: item.user_id,
             editable_id: item.editable_id,
             role_id: item.role_id,
@@ -1445,13 +2274,30 @@ impl From<web_common::database::tables::UserAuthorization> for UserAuthorization
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug)]
+impl UserAuthorization {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::user_authorizations;
+        user_authorizations::dsl::user_authorizations
+            .filter(user_authorizations::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = user_emails)]
 pub struct UserEmail {
-    pub id: i32,
+    pub id: Uuid,
     pub email: String,
     pub user_id: Uuid,
-    pub login_provider_id: i16,
+    pub login_provider_id: Uuid,
 }
 
 impl From<UserEmail> for web_common::database::tables::UserEmail {
@@ -1476,7 +2322,24 @@ impl From<web_common::database::tables::UserEmail> for UserEmail {
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Clone, Selectable, Queryable, Debug)]
+impl UserEmail {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::user_emails;
+        user_emails::dsl::user_emails
+            .filter(user_emails::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = users)]
 pub struct User {
     pub id: Uuid,
@@ -1509,6 +2372,516 @@ impl From<web_common::database::tables::User> for User {
             last_name: item.last_name,
             created_at: item.created_at,
             updated_at: item.updated_at,
+        }
+    }
+}
+
+impl User {
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq)]
+pub enum TableRow {
+    Archivable(Archivable),
+    ContainerHorizontalRule(ContainerHorizontalRule),
+    ContainerVerticalRule(ContainerVerticalRule),
+    ContinuousUnit(ContinuousUnit),
+    Describable(Describable),
+    DiscreteUnit(DiscreteUnit),
+    DocumentFormat(DocumentFormat),
+    Document(Document),
+    Editable(Editable),
+    Edit(Edit),
+    ItemCategory(ItemCategory),
+    ItemCategoryRelationship(ItemCategoryRelationship),
+    ItemCategoryUnit(ItemCategoryUnit),
+    ItemContinuousQuantity(ItemContinuousQuantity),
+    ItemDiscreteQuantity(ItemDiscreteQuantity),
+    ItemLocation(ItemLocation),
+    ItemUnit(ItemUnit),
+    Item(Item),
+    LocationState(LocationState),
+    Location(Location),
+    LoginProvider(LoginProvider),
+    ManufacturedItemCategory(ManufacturedItemCategory),
+    Notification(Notification),
+    OrganizationAuthorization(OrganizationAuthorization),
+    OrganizationLocation(OrganizationLocation),
+    OrganizationState(OrganizationState),
+    Organization(Organization),
+    PrimaryUserEmail(PrimaryUserEmail),
+    ProcedureContinuousRequirement(ProcedureContinuousRequirement),
+    ProcedureDiscreteRequirement(ProcedureDiscreteRequirement),
+    Procedure(Procedure),
+    ProjectContinuousRequirement(ProjectContinuousRequirement),
+    ProjectDiscreteRequirement(ProjectDiscreteRequirement),
+    ProjectMilestone(ProjectMilestone),
+    ProjectState(ProjectState),
+    Project(Project),
+    Role(Role),
+    SampleTaxa(SampleTaxa),
+    SampledIndividualTaxa(SampledIndividualTaxa),
+    SampledIndividual(SampledIndividual),
+    Sample(Sample),
+    Spectra(Spectra),
+    SpectraCollection(SpectraCollection),
+    Taxa(Taxa),
+    TeamAuthorization(TeamAuthorization),
+    TeamState(TeamState),
+    Team(Team),
+    Unit(Unit),
+    UserAuthorization(UserAuthorization),
+    UserEmail(UserEmail),
+    User(User),
+}
+
+impl TableRow {
+    /// Get the row from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the row to get.
+    /// * `connection` - The connection to the database.
+    /// * `tables` - The variant of the row to get.
+    pub fn get(
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        tables: &web_common::database::Table,
+    ) -> Result<Self, diesel::result::Error> {
+        match tables {
+            web_common::database::Table::Archivable => {
+                Ok(Self::Archivable(Archivable::get(id, connection)?))
+            }
+            web_common::database::Table::ContainerHorizontalRule => Ok(
+                Self::ContainerHorizontalRule(ContainerHorizontalRule::get(id, connection)?),
+            ),
+            web_common::database::Table::ContainerVerticalRule => Ok(Self::ContainerVerticalRule(
+                ContainerVerticalRule::get(id, connection)?,
+            )),
+            web_common::database::Table::ContinuousUnit => {
+                Ok(Self::ContinuousUnit(ContinuousUnit::get(id, connection)?))
+            }
+            web_common::database::Table::Describable => {
+                Ok(Self::Describable(Describable::get(id, connection)?))
+            }
+            web_common::database::Table::DiscreteUnit => {
+                Ok(Self::DiscreteUnit(DiscreteUnit::get(id, connection)?))
+            }
+            web_common::database::Table::DocumentFormat => {
+                Ok(Self::DocumentFormat(DocumentFormat::get(id, connection)?))
+            }
+            web_common::database::Table::Document => {
+                Ok(Self::Document(Document::get(id, connection)?))
+            }
+            web_common::database::Table::Editable => {
+                Ok(Self::Editable(Editable::get(id, connection)?))
+            }
+            web_common::database::Table::Edit => Ok(Self::Edit(Edit::get(id, connection)?)),
+            web_common::database::Table::ItemCategory => {
+                Ok(Self::ItemCategory(ItemCategory::get(id, connection)?))
+            }
+            web_common::database::Table::ItemCategoryRelationship => Ok(
+                Self::ItemCategoryRelationship(ItemCategoryRelationship::get(id, connection)?),
+            ),
+            web_common::database::Table::ItemCategoryUnit => Ok(Self::ItemCategoryUnit(
+                ItemCategoryUnit::get(id, connection)?,
+            )),
+            web_common::database::Table::ItemContinuousQuantity => Ok(
+                Self::ItemContinuousQuantity(ItemContinuousQuantity::get(id, connection)?),
+            ),
+            web_common::database::Table::ItemDiscreteQuantity => Ok(Self::ItemDiscreteQuantity(
+                ItemDiscreteQuantity::get(id, connection)?,
+            )),
+            web_common::database::Table::ItemLocation => {
+                Ok(Self::ItemLocation(ItemLocation::get(id, connection)?))
+            }
+            web_common::database::Table::ItemUnit => {
+                Ok(Self::ItemUnit(ItemUnit::get(id, connection)?))
+            }
+            web_common::database::Table::Item => Ok(Self::Item(Item::get(id, connection)?)),
+            web_common::database::Table::LocationState => {
+                Ok(Self::LocationState(LocationState::get(id, connection)?))
+            }
+            web_common::database::Table::Location => {
+                Ok(Self::Location(Location::get(id, connection)?))
+            }
+            web_common::database::Table::LoginProvider => {
+                Ok(Self::LoginProvider(LoginProvider::get(id, connection)?))
+            }
+            web_common::database::Table::ManufacturedItemCategory => Ok(
+                Self::ManufacturedItemCategory(ManufacturedItemCategory::get(id, connection)?),
+            ),
+            web_common::database::Table::Notification => {
+                Ok(Self::Notification(Notification::get(id, connection)?))
+            }
+            web_common::database::Table::OrganizationAuthorization => Ok(
+                Self::OrganizationAuthorization(OrganizationAuthorization::get(id, connection)?),
+            ),
+            web_common::database::Table::OrganizationLocation => Ok(Self::OrganizationLocation(
+                OrganizationLocation::get(id, connection)?,
+            )),
+            web_common::database::Table::OrganizationState => Ok(Self::OrganizationState(
+                OrganizationState::get(id, connection)?,
+            )),
+            web_common::database::Table::Organization => {
+                Ok(Self::Organization(Organization::get(id, connection)?))
+            }
+            web_common::database::Table::PrimaryUserEmail => Ok(Self::PrimaryUserEmail(
+                PrimaryUserEmail::get(id, connection)?,
+            )),
+            web_common::database::Table::ProcedureContinuousRequirement => {
+                Ok(Self::ProcedureContinuousRequirement(
+                    ProcedureContinuousRequirement::get(id, connection)?,
+                ))
+            }
+            web_common::database::Table::ProcedureDiscreteRequirement => {
+                Ok(Self::ProcedureDiscreteRequirement(
+                    ProcedureDiscreteRequirement::get(id, connection)?,
+                ))
+            }
+            web_common::database::Table::Procedure => {
+                Ok(Self::Procedure(Procedure::get(id, connection)?))
+            }
+            web_common::database::Table::ProjectContinuousRequirement => {
+                Ok(Self::ProjectContinuousRequirement(
+                    ProjectContinuousRequirement::get(id, connection)?,
+                ))
+            }
+            web_common::database::Table::ProjectDiscreteRequirement => Ok(
+                Self::ProjectDiscreteRequirement(ProjectDiscreteRequirement::get(id, connection)?),
+            ),
+            web_common::database::Table::ProjectMilestone => Ok(Self::ProjectMilestone(
+                ProjectMilestone::get(id, connection)?,
+            )),
+            web_common::database::Table::ProjectState => {
+                Ok(Self::ProjectState(ProjectState::get(id, connection)?))
+            }
+            web_common::database::Table::Project => {
+                Ok(Self::Project(Project::get(id, connection)?))
+            }
+            web_common::database::Table::Role => Ok(Self::Role(Role::get(id, connection)?)),
+            web_common::database::Table::SampleTaxa => {
+                Ok(Self::SampleTaxa(SampleTaxa::get(id, connection)?))
+            }
+            web_common::database::Table::SampledIndividualTaxa => Ok(Self::SampledIndividualTaxa(
+                SampledIndividualTaxa::get(id, connection)?,
+            )),
+            web_common::database::Table::SampledIndividual => Ok(Self::SampledIndividual(
+                SampledIndividual::get(id, connection)?,
+            )),
+            web_common::database::Table::Sample => Ok(Self::Sample(Sample::get(id, connection)?)),
+            web_common::database::Table::Spectra => {
+                Ok(Self::Spectra(Spectra::get(id, connection)?))
+            }
+            web_common::database::Table::SpectraCollection => Ok(Self::SpectraCollection(
+                SpectraCollection::get(id, connection)?,
+            )),
+            web_common::database::Table::Taxa => Ok(Self::Taxa(Taxa::get(id, connection)?)),
+            web_common::database::Table::TeamAuthorization => Ok(Self::TeamAuthorization(
+                TeamAuthorization::get(id, connection)?,
+            )),
+            web_common::database::Table::TeamState => {
+                Ok(Self::TeamState(TeamState::get(id, connection)?))
+            }
+            web_common::database::Table::Team => Ok(Self::Team(Team::get(id, connection)?)),
+            web_common::database::Table::Unit => Ok(Self::Unit(Unit::get(id, connection)?)),
+            web_common::database::Table::UserAuthorization => Ok(Self::UserAuthorization(
+                UserAuthorization::get(id, connection)?,
+            )),
+            web_common::database::Table::UserEmail => {
+                Ok(Self::UserEmail(UserEmail::get(id, connection)?))
+            }
+            web_common::database::Table::User => Ok(Self::User(User::get(id, connection)?)),
+        }
+    }
+}
+impl From<web_common::database::tables::TableRow> for TableRow {
+    fn from(item: web_common::database::tables::TableRow) -> Self {
+        match item {
+            web_common::database::tables::TableRow::Archivable(item) => {
+                TableRow::Archivable(item.into())
+            }
+            web_common::database::tables::TableRow::ContainerHorizontalRule(item) => {
+                TableRow::ContainerHorizontalRule(item.into())
+            }
+            web_common::database::tables::TableRow::ContainerVerticalRule(item) => {
+                TableRow::ContainerVerticalRule(item.into())
+            }
+            web_common::database::tables::TableRow::ContinuousUnit(item) => {
+                TableRow::ContinuousUnit(item.into())
+            }
+            web_common::database::tables::TableRow::Describable(item) => {
+                TableRow::Describable(item.into())
+            }
+            web_common::database::tables::TableRow::DiscreteUnit(item) => {
+                TableRow::DiscreteUnit(item.into())
+            }
+            web_common::database::tables::TableRow::DocumentFormat(item) => {
+                TableRow::DocumentFormat(item.into())
+            }
+            web_common::database::tables::TableRow::Document(item) => {
+                TableRow::Document(item.into())
+            }
+            web_common::database::tables::TableRow::Editable(item) => {
+                TableRow::Editable(item.into())
+            }
+            web_common::database::tables::TableRow::Edit(item) => TableRow::Edit(item.into()),
+            web_common::database::tables::TableRow::ItemCategory(item) => {
+                TableRow::ItemCategory(item.into())
+            }
+            web_common::database::tables::TableRow::ItemCategoryRelationship(item) => {
+                TableRow::ItemCategoryRelationship(item.into())
+            }
+            web_common::database::tables::TableRow::ItemCategoryUnit(item) => {
+                TableRow::ItemCategoryUnit(item.into())
+            }
+            web_common::database::tables::TableRow::ItemContinuousQuantity(item) => {
+                TableRow::ItemContinuousQuantity(item.into())
+            }
+            web_common::database::tables::TableRow::ItemDiscreteQuantity(item) => {
+                TableRow::ItemDiscreteQuantity(item.into())
+            }
+            web_common::database::tables::TableRow::ItemLocation(item) => {
+                TableRow::ItemLocation(item.into())
+            }
+            web_common::database::tables::TableRow::ItemUnit(item) => {
+                TableRow::ItemUnit(item.into())
+            }
+            web_common::database::tables::TableRow::Item(item) => TableRow::Item(item.into()),
+            web_common::database::tables::TableRow::LocationState(item) => {
+                TableRow::LocationState(item.into())
+            }
+            web_common::database::tables::TableRow::Location(item) => {
+                TableRow::Location(item.into())
+            }
+            web_common::database::tables::TableRow::LoginProvider(item) => {
+                TableRow::LoginProvider(item.into())
+            }
+            web_common::database::tables::TableRow::ManufacturedItemCategory(item) => {
+                TableRow::ManufacturedItemCategory(item.into())
+            }
+            web_common::database::tables::TableRow::Notification(item) => {
+                TableRow::Notification(item.into())
+            }
+            web_common::database::tables::TableRow::OrganizationAuthorization(item) => {
+                TableRow::OrganizationAuthorization(item.into())
+            }
+            web_common::database::tables::TableRow::OrganizationLocation(item) => {
+                TableRow::OrganizationLocation(item.into())
+            }
+            web_common::database::tables::TableRow::OrganizationState(item) => {
+                TableRow::OrganizationState(item.into())
+            }
+            web_common::database::tables::TableRow::Organization(item) => {
+                TableRow::Organization(item.into())
+            }
+            web_common::database::tables::TableRow::PrimaryUserEmail(item) => {
+                TableRow::PrimaryUserEmail(item.into())
+            }
+            web_common::database::tables::TableRow::ProcedureContinuousRequirement(item) => {
+                TableRow::ProcedureContinuousRequirement(item.into())
+            }
+            web_common::database::tables::TableRow::ProcedureDiscreteRequirement(item) => {
+                TableRow::ProcedureDiscreteRequirement(item.into())
+            }
+            web_common::database::tables::TableRow::Procedure(item) => {
+                TableRow::Procedure(item.into())
+            }
+            web_common::database::tables::TableRow::ProjectContinuousRequirement(item) => {
+                TableRow::ProjectContinuousRequirement(item.into())
+            }
+            web_common::database::tables::TableRow::ProjectDiscreteRequirement(item) => {
+                TableRow::ProjectDiscreteRequirement(item.into())
+            }
+            web_common::database::tables::TableRow::ProjectMilestone(item) => {
+                TableRow::ProjectMilestone(item.into())
+            }
+            web_common::database::tables::TableRow::ProjectState(item) => {
+                TableRow::ProjectState(item.into())
+            }
+            web_common::database::tables::TableRow::Project(item) => TableRow::Project(item.into()),
+            web_common::database::tables::TableRow::Role(item) => TableRow::Role(item.into()),
+            web_common::database::tables::TableRow::SampleTaxa(item) => {
+                TableRow::SampleTaxa(item.into())
+            }
+            web_common::database::tables::TableRow::SampledIndividualTaxa(item) => {
+                TableRow::SampledIndividualTaxa(item.into())
+            }
+            web_common::database::tables::TableRow::SampledIndividual(item) => {
+                TableRow::SampledIndividual(item.into())
+            }
+            web_common::database::tables::TableRow::Sample(item) => TableRow::Sample(item.into()),
+            web_common::database::tables::TableRow::Spectra(item) => TableRow::Spectra(item.into()),
+            web_common::database::tables::TableRow::SpectraCollection(item) => {
+                TableRow::SpectraCollection(item.into())
+            }
+            web_common::database::tables::TableRow::Taxa(item) => TableRow::Taxa(item.into()),
+            web_common::database::tables::TableRow::TeamAuthorization(item) => {
+                TableRow::TeamAuthorization(item.into())
+            }
+            web_common::database::tables::TableRow::TeamState(item) => {
+                TableRow::TeamState(item.into())
+            }
+            web_common::database::tables::TableRow::Team(item) => TableRow::Team(item.into()),
+            web_common::database::tables::TableRow::Unit(item) => TableRow::Unit(item.into()),
+            web_common::database::tables::TableRow::UserAuthorization(item) => {
+                TableRow::UserAuthorization(item.into())
+            }
+            web_common::database::tables::TableRow::UserEmail(item) => {
+                TableRow::UserEmail(item.into())
+            }
+            web_common::database::tables::TableRow::User(item) => TableRow::User(item.into()),
+        }
+    }
+}
+impl From<TableRow> for web_common::database::tables::TableRow {
+    fn from(item: TableRow) -> Self {
+        match item {
+            TableRow::Archivable(item) => {
+                web_common::database::tables::TableRow::Archivable(item.into())
+            }
+            TableRow::ContainerHorizontalRule(item) => {
+                web_common::database::tables::TableRow::ContainerHorizontalRule(item.into())
+            }
+            TableRow::ContainerVerticalRule(item) => {
+                web_common::database::tables::TableRow::ContainerVerticalRule(item.into())
+            }
+            TableRow::ContinuousUnit(item) => {
+                web_common::database::tables::TableRow::ContinuousUnit(item.into())
+            }
+            TableRow::Describable(item) => {
+                web_common::database::tables::TableRow::Describable(item.into())
+            }
+            TableRow::DiscreteUnit(item) => {
+                web_common::database::tables::TableRow::DiscreteUnit(item.into())
+            }
+            TableRow::DocumentFormat(item) => {
+                web_common::database::tables::TableRow::DocumentFormat(item.into())
+            }
+            TableRow::Document(item) => {
+                web_common::database::tables::TableRow::Document(item.into())
+            }
+            TableRow::Editable(item) => {
+                web_common::database::tables::TableRow::Editable(item.into())
+            }
+            TableRow::Edit(item) => web_common::database::tables::TableRow::Edit(item.into()),
+            TableRow::ItemCategory(item) => {
+                web_common::database::tables::TableRow::ItemCategory(item.into())
+            }
+            TableRow::ItemCategoryRelationship(item) => {
+                web_common::database::tables::TableRow::ItemCategoryRelationship(item.into())
+            }
+            TableRow::ItemCategoryUnit(item) => {
+                web_common::database::tables::TableRow::ItemCategoryUnit(item.into())
+            }
+            TableRow::ItemContinuousQuantity(item) => {
+                web_common::database::tables::TableRow::ItemContinuousQuantity(item.into())
+            }
+            TableRow::ItemDiscreteQuantity(item) => {
+                web_common::database::tables::TableRow::ItemDiscreteQuantity(item.into())
+            }
+            TableRow::ItemLocation(item) => {
+                web_common::database::tables::TableRow::ItemLocation(item.into())
+            }
+            TableRow::ItemUnit(item) => {
+                web_common::database::tables::TableRow::ItemUnit(item.into())
+            }
+            TableRow::Item(item) => web_common::database::tables::TableRow::Item(item.into()),
+            TableRow::LocationState(item) => {
+                web_common::database::tables::TableRow::LocationState(item.into())
+            }
+            TableRow::Location(item) => {
+                web_common::database::tables::TableRow::Location(item.into())
+            }
+            TableRow::LoginProvider(item) => {
+                web_common::database::tables::TableRow::LoginProvider(item.into())
+            }
+            TableRow::ManufacturedItemCategory(item) => {
+                web_common::database::tables::TableRow::ManufacturedItemCategory(item.into())
+            }
+            TableRow::Notification(item) => {
+                web_common::database::tables::TableRow::Notification(item.into())
+            }
+            TableRow::OrganizationAuthorization(item) => {
+                web_common::database::tables::TableRow::OrganizationAuthorization(item.into())
+            }
+            TableRow::OrganizationLocation(item) => {
+                web_common::database::tables::TableRow::OrganizationLocation(item.into())
+            }
+            TableRow::OrganizationState(item) => {
+                web_common::database::tables::TableRow::OrganizationState(item.into())
+            }
+            TableRow::Organization(item) => {
+                web_common::database::tables::TableRow::Organization(item.into())
+            }
+            TableRow::PrimaryUserEmail(item) => {
+                web_common::database::tables::TableRow::PrimaryUserEmail(item.into())
+            }
+            TableRow::ProcedureContinuousRequirement(item) => {
+                web_common::database::tables::TableRow::ProcedureContinuousRequirement(item.into())
+            }
+            TableRow::ProcedureDiscreteRequirement(item) => {
+                web_common::database::tables::TableRow::ProcedureDiscreteRequirement(item.into())
+            }
+            TableRow::Procedure(item) => {
+                web_common::database::tables::TableRow::Procedure(item.into())
+            }
+            TableRow::ProjectContinuousRequirement(item) => {
+                web_common::database::tables::TableRow::ProjectContinuousRequirement(item.into())
+            }
+            TableRow::ProjectDiscreteRequirement(item) => {
+                web_common::database::tables::TableRow::ProjectDiscreteRequirement(item.into())
+            }
+            TableRow::ProjectMilestone(item) => {
+                web_common::database::tables::TableRow::ProjectMilestone(item.into())
+            }
+            TableRow::ProjectState(item) => {
+                web_common::database::tables::TableRow::ProjectState(item.into())
+            }
+            TableRow::Project(item) => web_common::database::tables::TableRow::Project(item.into()),
+            TableRow::Role(item) => web_common::database::tables::TableRow::Role(item.into()),
+            TableRow::SampleTaxa(item) => {
+                web_common::database::tables::TableRow::SampleTaxa(item.into())
+            }
+            TableRow::SampledIndividualTaxa(item) => {
+                web_common::database::tables::TableRow::SampledIndividualTaxa(item.into())
+            }
+            TableRow::SampledIndividual(item) => {
+                web_common::database::tables::TableRow::SampledIndividual(item.into())
+            }
+            TableRow::Sample(item) => web_common::database::tables::TableRow::Sample(item.into()),
+            TableRow::Spectra(item) => web_common::database::tables::TableRow::Spectra(item.into()),
+            TableRow::SpectraCollection(item) => {
+                web_common::database::tables::TableRow::SpectraCollection(item.into())
+            }
+            TableRow::Taxa(item) => web_common::database::tables::TableRow::Taxa(item.into()),
+            TableRow::TeamAuthorization(item) => {
+                web_common::database::tables::TableRow::TeamAuthorization(item.into())
+            }
+            TableRow::TeamState(item) => {
+                web_common::database::tables::TableRow::TeamState(item.into())
+            }
+            TableRow::Team(item) => web_common::database::tables::TableRow::Team(item.into()),
+            TableRow::Unit(item) => web_common::database::tables::TableRow::Unit(item.into()),
+            TableRow::UserAuthorization(item) => {
+                web_common::database::tables::TableRow::UserAuthorization(item.into())
+            }
+            TableRow::UserEmail(item) => {
+                web_common::database::tables::TableRow::UserEmail(item.into())
+            }
+            TableRow::User(item) => web_common::database::tables::TableRow::User(item.into()),
         }
     }
 }

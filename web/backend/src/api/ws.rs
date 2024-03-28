@@ -3,7 +3,6 @@ use crate::DBPool;
 use actix_web::web;
 use actix_web::{get, Error, HttpRequest, HttpResponse};
 use sqlx::{Pool as SQLxPool, Postgres};
-pub mod channels;
 pub mod socket;
 use actix_web_actors::ws::WsResponseBuilder;
 use crate::api::oauth::refresh::refresh_access_token;
@@ -79,18 +78,13 @@ async fn start_auth_websocket(
     let sqlx_pool = sqlx_pool.get_ref().clone();
     let redis_client = redis_client.get_ref().clone();
 
-    let websocket = match socket::WebSocket::authenticated(
+    let websocket = socket::WebSocket::authenticated(
         diesel_pool,
         sqlx_pool,
         redis_client,
         user,
         access_code
-    ) {
-        Ok(websocket) => websocket,
-        Err(error) => {
-            return Ok(error.into());
-        }
-    };
+    );
 
     WsResponseBuilder::new(
         websocket,

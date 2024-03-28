@@ -7,7 +7,7 @@ use std::io::Read;
 use uuid::Uuid;
 use web_common::custom_validators::ImageSize;
 
-use crate::{model_views::DocumentView, models::Document};
+use crate::{views::DocumentsView, models::Document};
 
 #[get("/picture/{user_id}/{image_size}.png")]
 pub async fn user_picture_handler(
@@ -31,7 +31,7 @@ pub async fn user_picture_handler(
         Err(_) => return actix_web::HttpResponse::NotFound().finish(),
     };
     // Now with the document, we can obtain the complete DocumentView
-    let document_view = match DocumentView::get(&mut conn, document.id) {
+    let document_view = match DocumentsView::get(document.id, &mut conn) {
         Ok(document_view) => document_view,
         Err(_) => return actix_web::HttpResponse::InternalServerError().finish(),
     };

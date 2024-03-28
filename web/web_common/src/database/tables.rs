@@ -143,7 +143,7 @@ pub struct Location {
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq)]
 pub struct LoginProvider {
-    pub id: i16,
+    pub id: Uuid,
     pub name: String,
     pub font_awesome_icon: String,
     pub client_id_var_name: String,
@@ -170,6 +170,7 @@ pub struct Notification {
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq)]
 pub struct OrganizationAuthorization {
+    pub id: Uuid,
     pub organization_id: Uuid,
     pub editable_id: Uuid,
     pub role_id: Uuid,
@@ -196,7 +197,7 @@ pub struct Organization {
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq)]
 pub struct PrimaryUserEmail {
-    pub id: i32,
+    pub id: Uuid,
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq)]
 pub struct ProcedureContinuousRequirement {
@@ -265,11 +266,13 @@ pub struct Role {
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq)]
 pub struct SampleTaxa {
+    pub id: Uuid,
     pub sample_id: Uuid,
     pub taxon_id: Uuid,
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq)]
 pub struct SampledIndividualTaxa {
+    pub id: Uuid,
     pub sampled_individual_id: Uuid,
     pub taxon_id: Uuid,
 }
@@ -284,7 +287,7 @@ pub struct Sample {
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq)]
 pub struct Spectra {
-    pub id: i32,
+    pub id: Uuid,
     pub spectra_collection_id: Uuid,
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq)]
@@ -298,6 +301,7 @@ pub struct Taxa {
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq)]
 pub struct TeamAuthorization {
+    pub id: Uuid,
     pub team_id: Uuid,
     pub editable_id: Uuid,
     pub role_id: Uuid,
@@ -320,16 +324,17 @@ pub struct Unit {
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq)]
 pub struct UserAuthorization {
+    pub id: Uuid,
     pub user_id: Uuid,
     pub editable_id: Uuid,
     pub role_id: Uuid,
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq)]
 pub struct UserEmail {
-    pub id: i32,
+    pub id: Uuid,
     pub email: String,
     pub user_id: Uuid,
-    pub login_provider_id: i16,
+    pub login_provider_id: Uuid,
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq)]
 pub struct User {
@@ -451,6 +456,11 @@ impl Table {
             Table::UserEmail => "user_emails",
             Table::User => "users",
         }
+    }
+}
+impl std::fmt::Display for Table {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.name())
     }
 }
 

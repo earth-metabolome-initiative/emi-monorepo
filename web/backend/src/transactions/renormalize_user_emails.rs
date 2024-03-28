@@ -139,7 +139,7 @@ fn update_foreign_user_id_keys(
 
 fn insert_user_emails(
     user: &User,
-    provider_id: i16,
+    provider_id: Uuid,
     emails: &[String],
     pool: &Pool<ConnectionManager<PgConnection>>,
 ) -> QueryResult<()> {
@@ -159,7 +159,7 @@ fn insert_user_emails(
 }
 
 pub(crate) fn renormalize_user_emails(
-    provider_id: i16,
+    provider_id: Uuid,
     emails: Emails,
     potential_new_user: NewUser,
     pool: &Pool<ConnectionManager<PgConnection>>,

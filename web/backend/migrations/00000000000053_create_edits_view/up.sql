@@ -7,7 +7,7 @@
 
 CREATE VIEW edits_view AS
 SELECT
-    edits.id AS edit_id,
+    edits.id,
     edits.editable_id AS editable_id,
     editables.created_at AS edited_at,
     users.id AS editor_id,

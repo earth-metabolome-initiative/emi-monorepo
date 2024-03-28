@@ -5,6 +5,7 @@ use actix_web::{get, HttpResponse, Responder};
 
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
+use uuid::Uuid;
 
 use super::jwt_cookies::build_login_response;
 use crate::model_implementations::*;
@@ -21,7 +22,7 @@ use web_common::api::ApiError;
 struct GitHubConfig {
     client_id: String,
     client_secret: String,
-    provider_id: i16,
+    provider_id: Uuid,
 }
 
 impl GitHubConfig {

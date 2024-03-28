@@ -31,34 +31,3 @@ where
         write!(f, "{}_{}_{}", self.operation(), key.table_name(), key.id())
     }
 }
-
-pub async fn start_listening<C>(
-    pool: &Pool<Postgres>,
-    channels: Vec<C>,
-    address: actix::prelude::Addr<WebSocket>,
-) -> Result<(), Error>
-where
-    C: Channel,
-    WebSocket: actix_web::Handler<C::Message>,
-{
-    let channel_names = channels
-        .iter()
-        .map(|channel| channel.to_string())
-        .collect::<Vec<String>>();
-
-    let channel_references = channel_names
-        .iter()
-        .map(|channel_name| channel_name.as_str())
-        .collect::<Vec<&str>>();
-
-    // Initiate the logger.
-    let mut listener = PgListener::connect_with(pool).await.unwrap();
-    listener.listen_all(channel_references).await?;
-    loop {
-        while let Some(notification) = listener.try_recv().await? {
-            let notification_payload: String = notification.payload().to_owned();
-            let value: C::Message = serde_json::from_str(&notification_payload).unwrap();
-            address.do_send(value);
-        }
-    }
-}

@@ -4,7 +4,7 @@
 -- application using their credentials. The table is used to store the
 -- information about the login providers.
 CREATE TABLE login_providers (
-    id SMALLSERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(255) NOT NULL,
     font_awesome_icon VARCHAR(255) NOT NULL,
     client_id_var_name VARCHAR(255) NOT NULL,

@@ -27,8 +27,11 @@ impl Authorization {
 impl View {
     pub fn roles(&self) -> Vec<Role> {
         match self {
-            View::DocumentView => vec![Role::Viewer],
+            View::DocumentsView => vec![Role::Viewer],
             View::PublicUser => vec![Role::Anonymous],
+            View::EditsView => vec![Role::Editor],
+            View::LastEditsView => vec![Role::Editor],
+            View::FormatsView => vec![Role::Viewer],
         }
     }
 }
@@ -108,7 +111,7 @@ impl Task {
         self.operation.authorizations()
     }
 
-    pub fn requires_authorization(&self) -> bool {
+    pub fn requires_authentication(&self) -> bool {
         self.authorizations().iter().any(|auth| match auth {
             Authorization::LoggedUser => true,
             Authorization::Editable(_, roles) => !roles.contains(&Role::Anonymous),

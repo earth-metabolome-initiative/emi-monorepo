@@ -3,7 +3,7 @@
 -- edit, ordered by the edited_at timestamp.
 CREATE VIEW last_edits_view AS
 SELECT
-    last_edits.edit_id,
+    last_edits.id,
     last_edits.editable_id,
     last_edits.edited_at,
     last_edits.editor_id,
@@ -14,7 +14,7 @@ SELECT
     last_edits.edit_extended_reason
 FROM (
     SELECT
-        edit_id,
+        id,
         editable_id,
         edited_at,
         editor_id,

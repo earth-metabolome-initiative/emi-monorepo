@@ -1,13 +1,6 @@
-use super::views;
-use super::schema::documents_view;
+use super::views::*;
 
-impl DocumentView {
-    pub fn get(conn: &mut DieselConn, id: Uuid) -> Result<DocumentView, diesel::result::Error> {
-        documents_view::table
-            .filter(documents_view::id.eq(id))
-            .first(conn)
-    }
-
+impl DocumentsView {
     pub fn internal_path(&self) -> String {
         format!(
             "{}/{}.{}",

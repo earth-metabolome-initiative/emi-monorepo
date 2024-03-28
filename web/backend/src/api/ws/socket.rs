@@ -1,6 +1,10 @@
 //! Submodule defining the websocket actor and its message handling.
 
-use crate::models::User as DBUser;
+use crate::models::Notification;
+use crate::models::User;
+use crate::views::ViewRow;
+use crate::DBPool;
+use crate::DieselConn;
 use actix::ActorContext;
 use actix::AsyncContext;
 use actix::Message;
@@ -8,29 +12,34 @@ use actix::SpawnHandle;
 use actix::WrapFuture;
 use actix::{Actor, StreamHandler};
 use actix_web_actors::ws;
+use serde::Deserialize;
+use serde::Serialize;
+use sqlx::postgres::PgListener;
 use sqlx::{Pool as SQLxPool, Postgres};
-use std::collections::HashMap;
 use web_common::api::oauth::jwt_cookies::AccessToken;
 use web_common::api::ws::messages::{BackendMessage, FrontendMessage};
-
-use super::channels::*;
-use crate::api::ws::users::UserMessage;
-use crate::DBPool;
-use crate::DieselConn;
+use web_common::database::NotificationMessage;
+use web_common::database::View;
 
 pub struct WebSocket {
-    pg_handlers: HashMap<Vec<Channel>, SpawnHandle>,
-    pub(crate) user: Option<(DBUser, AccessToken)>,
+    notifications_handler: Option<SpawnHandle>,
+    pub(crate) user: Option<(User, AccessToken)>,
     diesel: DBPool,
     pub(crate) diesel_connection: DieselConn,
     redis: redis::Client,
     sqlx: SQLxPool<Postgres>,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+struct NotificationPayload {
+    operation: web_common::database::notification_message::SQLOperation,
+    notification: Notification,
+}
+
 impl WebSocket {
     pub fn new(diesel: DBPool, sqlx: SQLxPool<Postgres>, redis: redis::Client) -> Self {
         Self {
-            pg_handlers: HashMap::new(),
+            notifications_handler: None,
             user: None,
             diesel_connection: diesel.get().unwrap(),
             diesel,
@@ -43,12 +52,12 @@ impl WebSocket {
         diesel: DBPool,
         sqlx: SQLxPool<Postgres>,
         redis: redis::Client,
-        user: DBUser,
+        user: User,
         access_token: AccessToken,
     ) -> Self {
         let diesel_connection = diesel.get().unwrap();
         Self {
-            pg_handlers: HashMap::new(),
+            notifications_handler: None,
             user: Some((user, access_token)),
             diesel_connection,
             diesel,
@@ -57,43 +66,69 @@ impl WebSocket {
         }
     }
 
-    pub fn listen_to_channel(
-        &mut self,
-        channel: Vec<Channel>,
-        ctx: &mut ws::WebsocketContext<Self>,
-    ) {
-        if !self.pg_handlers.contains_key(&channel) {
-            let sqlx_pool = self.sqlx.clone();
-            let recipient = ctx.address();
-            let channel_clone = channel.clone();
+    fn listen_for_notifications(&mut self, ctx: &mut <WebSocket as Actor>::Context) {
+        // If the handler is stopped or was never started, start it.
+        if self.notifications_handler.is_none() {
+            if let Some((user, _)) = &self.user {
+                let address = ctx.address().clone();
+                let channel_name = format!("user_{}", user.id);
+                let pool = self.sqlx.clone();
+                let mut diesel_connection = self.diesel.get().unwrap();
+                self.notifications_handler = Some(
+                    ctx.spawn(
+                        async move {
+                            // Initiate the logger.
+                            let mut listener = PgListener::connect_with(&pool).await.unwrap();
+                            match listener.listen_all([channel_name.as_str()]).await {
+                                Ok(_) => {}
+                                Err(err) => {
+                                    log::error!("Error listening for notifications: {:?}", err);
+                                    return;
+                                }
+                            }
+                            loop {
+                                while let Some(postgres_notification) =
+                                    listener.try_recv().await.unwrap()
+                                {
+                                    let notification_payload: String =
+                                        postgres_notification.payload().to_owned();
+                                    let payload: NotificationPayload =
+                                        serde_json::from_str(&notification_payload).unwrap();
 
-            let channel_handler = ctx.spawn(
-                async move {
-                    match start_listening(&sqlx_pool, channel_clone, recipient).await {
-                        Ok(_) => {}
-                        Err(err) => {
-                            log::error!("Error starting to listen to channel: {:?}", err);
+                                    let row_id = payload.notification.row_id.clone();
+                                    let view: View =
+                                        payload.notification.table_name.as_str().into();
+
+                                    let row = if let Some(id) = row_id {
+                                        match ViewRow::get(id, &mut diesel_connection, &view) {
+                                            Ok(row) => Some(row.into()),
+                                            Err(err) => {
+                                                log::error!(
+                                                    "Error getting row from view {}: {:?}",
+                                                    view,
+                                                    err
+                                                );
+                                                return;
+                                            }
+                                        }
+                                    } else {
+                                        None
+                                    };
+
+                                    address.do_send(BackendMessage::Notification(
+                                        NotificationMessage::new(
+                                            payload.operation,
+                                            payload.notification.into(),
+                                            row,
+                                        ),
+                                    ));
+                                }
+                            }
                         }
-                    }
-                }
-                .into_actor(self),
-            );
-
-            self.pg_handlers.insert(channel, channel_handler);
-        }
-    }
-
-    pub fn get_default_channels(&self) -> Vec<Vec<Channel>> {
-        if let Some((user, _)) = &self.user {
-            vec![vec![Channel::NotifyUser(user.id)]]
-        } else {
-            Vec::new()
-        }
-    }
-
-    pub fn enable_default_channels(&mut self, ctx: &mut ws::WebsocketContext<Self>) {
-        for channel in self.get_default_channels() {
-            self.listen_to_channel(channel, ctx);
+                        .into_actor(self),
+                    ),
+                );
+            }
         }
     }
 }
@@ -114,7 +149,6 @@ impl actix::Handler<BackendMessage> for WebSocket {
 #[rtype(result = "()")]
 enum InternalMessage {
     Unauthorized,
-    ExpiredToken,
 }
 
 impl actix::Handler<InternalMessage> for WebSocket {
@@ -125,16 +159,13 @@ impl actix::Handler<InternalMessage> for WebSocket {
             InternalMessage::Unauthorized => {
                 ctx.close(Some(ws::CloseCode::Policy.into()));
             }
-            InternalMessage::ExpiredToken => {
-                ctx.binary(BackendMessage::ExpiredToken);
-            }
         }
     }
 }
 
 impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
     fn handle(&mut self, msg: Result<ws::Message, ws::ProtocolError>, ctx: &mut Self::Context) {
-        self.enable_default_channels(ctx);
+        self.listen_for_notifications(ctx);
 
         match msg {
             Ok(msg) => {
@@ -144,23 +175,11 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                         ctx.stop();
                     }
                     FrontendMessage::Task(task) => {
-                        if task.requires_authentication() {
-                            match self.must_be_authenticated(ctx) {
-                                Ok(_user) => match task {
-                                    FormAction::CompleteProfile(profile) => {
-                                        ctx.address().do_send(UserMessage::CompleteProfile(
-                                            task_id, profile,
-                                        ));
-                                    }
-                                },
-                                Err(api_error) => {
-                                    ctx.address().do_send(BackendMessage::TaskResult(
-                                        task_id,
-                                        Err(api_error),
-                                    ));
-                                }
-                            }
+                        if task.requires_authentication() && self.user.is_none() {
+                            ctx.address().do_send(InternalMessage::Unauthorized);
+                            return;
                         }
+                        ctx.address().do_send(InternalMessage::Unauthorized);
                     }
                 }
             }

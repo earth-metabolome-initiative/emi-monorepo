@@ -1,7 +1,7 @@
 use crate::diesel::connection::SimpleConnection;
 use crate::models::*;
 use crate::schema::*;
-use crate::views::DocumentView;
+use crate::views::DocumentsView;
 use crate::DieselConn;
 use diesel::prelude::*;
 use diesel::r2d2::ConnectionManager;
@@ -49,14 +49,13 @@ impl Document {
 pub(crate) struct NewUserEmail {
     email: String,
     user_id: Uuid,
-    login_provider_id: i16,
+    login_provider_id: Uuid,
 }
 
 impl NewUserEmail {
-    pub(crate) fn new(email: &str, user_id: Uuid, login_provider_id: i16) -> NewUserEmail {
+    pub(crate) fn new(email: &str, user_id: Uuid, login_provider_id: Uuid) -> NewUserEmail {
         assert!(!email.is_empty());
         assert!(EmailAddress::is_valid(email));
-        assert!(login_provider_id > 0);
 
         NewUserEmail {
             email: email.to_string(),
@@ -85,13 +84,11 @@ impl NewUserEmail {
 #[derive(Queryable, Insertable, Debug)]
 #[diesel(table_name = primary_user_emails)]
 pub(crate) struct NewPrimaryUserEmail {
-    id: i32,
+    id: Uuid,
 }
 
 impl NewPrimaryUserEmail {
-    pub(crate) fn new(id: i32) -> NewPrimaryUserEmail {
-        assert!(id > 0);
-
+    pub(crate) fn new(id: Uuid) -> NewPrimaryUserEmail {
         NewPrimaryUserEmail { id }
     }
 
@@ -107,27 +104,12 @@ impl NewPrimaryUserEmail {
 }
 
 impl UserEmail {
-    pub(crate) fn provider_id(&self) -> i16 {
+    pub(crate) fn provider_id(&self) -> Uuid {
         self.login_provider_id
     }
 }
 
 impl LoginProvider {
-    pub fn get(
-        provider_id: i16,
-        pool: &Pool<ConnectionManager<PgConnection>>,
-    ) -> Result<LoginProvider, String> {
-        use crate::schema::login_providers::dsl::*;
-        let mut conn = pool.get().unwrap();
-        let provider = login_providers
-            .filter(id.eq(provider_id))
-            .first::<LoginProvider>(&mut conn);
-        match provider {
-            Ok(provider) => Ok(provider),
-            Err(_) => Err(format!("No provider with id {} found", provider_id)),
-        }
-    }
-
     pub fn from_provider_name(
         provider_name: &str,
         pool: &Pool<ConnectionManager<PgConnection>>,
@@ -153,23 +135,6 @@ pub(crate) struct NewUser {
 }
 
 impl User {
-    /// Returns the user with the given ID.
-    ///
-    /// # Arguments
-    /// * `user_id` - The ID of the user.
-    /// * `pool` - The database connection pool.
-    pub fn get(
-        user_id: Uuid,
-        conn: &mut PooledConnection<ConnectionManager<PgConnection>>,
-    ) -> Result<User, String> {
-        use crate::schema::users::dsl::*;
-        let user = users.filter(id.eq(user_id)).first::<User>(conn);
-        match user {
-            Ok(user) => Ok(user),
-            Err(_) => Err(format!("No user with id {} found", user_id)),
-        }
-    }
-
     /// Returns the UserMail associated to the provided email if it is associated to the current user.
     ///
     /// # Arguments
@@ -235,9 +200,9 @@ impl User {
             )?;
             // We attempt to save the profile picture and thumbnail
             let profile_picture_path =
-                DocumentView::get(conn, profile_picture_document.id)?.internal_path();
+                DocumentsView::get( profile_picture_document.id, conn,)?.internal_path();
             profile_picture.save_with_format(profile_picture_path, ImageFormat::Png)?;
-            let thumbnail_path = DocumentView::get(conn, thumbnail_document.id)?.internal_path();
+            let thumbnail_path = DocumentsView::get(thumbnail_document.id, conn)?.internal_path();
             thumbnail.save_with_format(thumbnail_path, ImageFormat::Png)?;
             Ok(())
         })

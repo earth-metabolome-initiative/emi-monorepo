@@ -26,7 +26,7 @@ SELECT
     users.first_name AS creator_first_name,
     users.middle_name AS creator_middle_name,
     users.last_name AS creator_last_name,
-    last_edits_view.edit_id AS last_edit_id,
+    last_edits_view.id AS last_edit_id,
     last_edits_view.edited_at AS last_edit_at,
     last_edits_view.editor_id AS last_editor_id,
     last_edits_view.editor_first_name AS last_editor_first_name,

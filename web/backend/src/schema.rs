@@ -182,7 +182,7 @@ diesel::table! {
 
 diesel::table! {
     login_providers (id) {
-        id -> Int2,
+        id -> Uuid,
         #[max_length = 255]
         name -> Varchar,
         #[max_length = 255]
@@ -223,7 +223,8 @@ diesel::table! {
 }
 
 diesel::table! {
-    organization_authorizations (organization_id, editable_id, role_id) {
+    organization_authorizations (id) {
+        id -> Uuid,
         organization_id -> Uuid,
         editable_id -> Uuid,
         role_id -> Uuid,
@@ -260,7 +261,7 @@ diesel::table! {
 
 diesel::table! {
     primary_user_emails (id) {
-        id -> Int4,
+        id -> Uuid,
     }
 }
 
@@ -350,14 +351,16 @@ diesel::table! {
 }
 
 diesel::table! {
-    sample_taxa (sample_id, taxon_id) {
+    sample_taxa (id) {
+        id -> Uuid,
         sample_id -> Uuid,
         taxon_id -> Uuid,
     }
 }
 
 diesel::table! {
-    sampled_individual_taxa (sampled_individual_id, taxon_id) {
+    sampled_individual_taxa (id) {
+        id -> Uuid,
         sampled_individual_id -> Uuid,
         taxon_id -> Uuid,
     }
@@ -378,7 +381,7 @@ diesel::table! {
 
 diesel::table! {
     spectra (id) {
-        id -> Int4,
+        id -> Uuid,
         spectra_collection_id -> Uuid,
     }
 }
@@ -397,7 +400,8 @@ diesel::table! {
 }
 
 diesel::table! {
-    team_authorizations (team_id, editable_id, role_id) {
+    team_authorizations (id) {
+        id -> Uuid,
         team_id -> Uuid,
         editable_id -> Uuid,
         role_id -> Uuid,
@@ -429,7 +433,8 @@ diesel::table! {
 }
 
 diesel::table! {
-    user_authorizations (user_id, editable_id, role_id) {
+    user_authorizations (id) {
+        id -> Uuid,
         user_id -> Uuid,
         editable_id -> Uuid,
         role_id -> Uuid,
@@ -438,11 +443,11 @@ diesel::table! {
 
 diesel::table! {
     user_emails (id) {
-        id -> Int4,
+        id -> Uuid,
         #[max_length = 255]
         email -> Varchar,
         user_id -> Uuid,
-        login_provider_id -> Int2,
+        login_provider_id -> Uuid,
     }
 }
 
@@ -498,7 +503,6 @@ diesel::joinable!(locations -> location_states (state_id));
 diesel::joinable!(manufactured_item_categories -> item_categories (id));
 diesel::joinable!(manufactured_item_categories -> organizations (manifacturer_id));
 diesel::joinable!(notifications -> users (user_id));
-diesel::joinable!(organization_authorizations -> editables (editable_id));
 diesel::joinable!(organization_authorizations -> organizations (organization_id));
 diesel::joinable!(organization_authorizations -> roles (role_id));
 diesel::joinable!(organization_locations -> editables (id));
@@ -540,18 +544,20 @@ diesel::joinable!(projects -> editables (id));
 diesel::joinable!(projects -> project_states (state_id));
 diesel::joinable!(roles -> describables (id));
 diesel::joinable!(roles -> editables (id));
+diesel::joinable!(sample_taxa -> editables (id));
 diesel::joinable!(sample_taxa -> samples (sample_id));
 diesel::joinable!(sample_taxa -> taxa (taxon_id));
+diesel::joinable!(sampled_individual_taxa -> editables (id));
 diesel::joinable!(sampled_individual_taxa -> sampled_individuals (sampled_individual_id));
 diesel::joinable!(sampled_individual_taxa -> taxa (taxon_id));
 diesel::joinable!(sampled_individuals -> items (id));
 diesel::joinable!(samples -> editables (id));
+diesel::joinable!(spectra -> editables (id));
 diesel::joinable!(spectra -> spectra_collection (spectra_collection_id));
 diesel::joinable!(spectra_collection -> editables (id));
 diesel::joinable!(spectra_collection -> samples (sample_id));
 diesel::joinable!(taxa -> describables (id));
 diesel::joinable!(taxa -> editables (id));
-diesel::joinable!(team_authorizations -> editables (editable_id));
 diesel::joinable!(team_authorizations -> roles (role_id));
 diesel::joinable!(team_authorizations -> teams (team_id));
 diesel::joinable!(team_states -> describables (id));
@@ -560,7 +566,6 @@ diesel::joinable!(teams -> describables (id));
 diesel::joinable!(teams -> editables (id));
 diesel::joinable!(teams -> team_states (team_state_id));
 diesel::joinable!(units -> describables (id));
-diesel::joinable!(user_authorizations -> editables (editable_id));
 diesel::joinable!(user_authorizations -> roles (role_id));
 diesel::joinable!(user_authorizations -> users (user_id));
 diesel::joinable!(user_emails -> login_providers (login_provider_id));

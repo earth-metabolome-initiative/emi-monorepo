@@ -22,13 +22,9 @@ pub enum FrontendMessage {
 pub enum BackendMessage {
     Close(Option<CloseReason>),
     RefreshToken(AccessToken),
-    Notification(Notification),
+    Notification(NotificationMessage),
     SelectResult(uuid::Uuid, Result<Vec<ViewRow>, ApiError>),
     TaskResult(Uuid, Result<(), ApiError>),
-}
-
-pub enum DeleteNotification {
-    User(uuid::Uuid),
 }
 
 #[cfg(feature = "backend")]

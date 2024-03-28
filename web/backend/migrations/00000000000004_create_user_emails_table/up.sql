@@ -4,10 +4,10 @@
 -- They are all associated to a login provider.
 
 CREATE TABLE user_emails (
-    id SERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY,
     email VARCHAR(255) NOT NULL,
     user_id UUID NOT NULL REFERENCES users (id) ON DELETE CASCADE,
-    login_provider_id SMALLINT NOT NULL REFERENCES login_providers (id) ON DELETE CASCADE,
+    login_provider_id UUID NOT NULL REFERENCES login_providers (id) ON DELETE CASCADE,
     CONSTRAINT unique_email_provider UNIQUE (email, login_provider_id)
 );
 

@@ -20,7 +20,7 @@ CREATE OR REPLACE FUNCTION notify_user()
 RETURNS TRIGGER AS $$
 BEGIN
     PERFORM pg_notify(
-        'notifications' || '_' || NEW.user_id,
+        'user' || '_' || NEW.user_id,
         json_build_object(
             'operation', TG_OP,
             'notification', row_to_json(NEW)::TEXT
