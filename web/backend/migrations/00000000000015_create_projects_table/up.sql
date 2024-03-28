@@ -23,8 +23,8 @@ CREATE TABLE projects (
         CASCADE REFERENCES describables(id) ON
     DELETE
         CASCADE,
-        public BOOLEAN DEFAULT TRUE,
-        state_id UUID REFERENCES project_states(id),
+        public BOOLEAN NOT NULL DEFAULT TRUE,
+        state_id UUID NOT NULL REFERENCES project_states(id),
         parent_project_id UUID REFERENCES projects(id) ON
     DELETE
         CASCADE,

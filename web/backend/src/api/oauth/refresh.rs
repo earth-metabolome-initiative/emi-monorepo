@@ -40,7 +40,6 @@ pub async fn refresh_access_token(
     pool: &web::Data<Pool<ConnectionManager<PgConnection>>>,
     redis_client: &web::Data<redis::Client>,
 ) -> Result<(User, AccessToken), HttpResponse> {
-    log::info!("Refreshing access token");
     let refresh_cookie = match req.cookie(REFRESH_COOKIE_NAME) {
         Some(cookie) => cookie,
         None => {

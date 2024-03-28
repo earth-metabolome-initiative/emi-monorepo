@@ -5,6 +5,10 @@ use crate::custom_validators::ImageSize;
 use super::PublicUser;
 
 impl PublicUser {
+    pub fn full_name(&self) -> String {
+        format!("{} {}", self.first_name, self.last_name)
+    }
+
     pub fn profile_picture_path(id: Uuid, image_size: &ImageSize) -> String {
         format!(
             "{}/{}/{}.png",

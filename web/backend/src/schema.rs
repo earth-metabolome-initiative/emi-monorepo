@@ -329,8 +329,8 @@ diesel::table! {
 diesel::table! {
     projects (id) {
         id -> Uuid,
-        public -> Nullable<Bool>,
-        state_id -> Nullable<Uuid>,
+        public -> Bool,
+        state_id -> Uuid,
         parent_project_id -> Nullable<Uuid>,
         budget -> Nullable<Float8>,
         expenses -> Nullable<Float8>,
@@ -537,7 +537,6 @@ diesel::joinable!(project_discrete_requirements -> units (unit_id));
 diesel::joinable!(project_milestones -> describables (id));
 diesel::joinable!(project_milestones -> projects (project_id));
 diesel::joinable!(project_states -> describables (id));
-diesel::joinable!(project_states -> editables (id));
 diesel::joinable!(projects -> describables (id));
 diesel::joinable!(projects -> documents (logo_id));
 diesel::joinable!(projects -> editables (id));

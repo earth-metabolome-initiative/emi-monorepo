@@ -28,6 +28,7 @@ impl AccessToken {
     }
 }
 
+#[cfg(feature = "backend")]
 impl From<AccessToken> for actix_web::HttpResponse {
     fn from(token: AccessToken) -> Self {
         actix_web::HttpResponse::Ok().json(token)

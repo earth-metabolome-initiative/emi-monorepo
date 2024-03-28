@@ -94,6 +94,7 @@ impl Component for Navigator {
             websocket: ctx.link().bridge_worker(Callback::from({
                 let link = ctx.link().clone();
                 move |message: BackendMessage| {
+                    log::info!("Received message from websocket: {:?}", message);
                     link.send_message(NavigatorMessage::Backend(message));
                 }
             })),
@@ -157,15 +158,11 @@ impl Component for Navigator {
                 }
                 task_submitted
             }
-            NavigatorMessage::Backend(BackendMessage::SelectResult(_, result)) => {
-                match result {
-                    Ok(rows) => {
-                        // TODO!
-                    }
-                    Err(api_error) => {
-                        log::error!("Failed to fetch rows: {:?}", api_error);
-                    },
-                }
+            NavigatorMessage::Backend(BackendMessage::RefreshToken(refresh_token)) => {
+                log::info!("Received new access token");
+                self.user_dispatch.reduce_mut(|state| {
+                    state.set_access_token(refresh_token);
+                });
                 false
             }
             NavigatorMessage::Backend(BackendMessage::TaskResult(task_id, result)) => {

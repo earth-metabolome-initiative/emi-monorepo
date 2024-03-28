@@ -1680,8 +1680,8 @@ impl ProjectState {
 #[diesel(table_name = projects)]
 pub struct Project {
     pub id: Uuid,
-    pub public: Option<bool>,
-    pub state_id: Option<Uuid>,
+    pub public: bool,
+    pub state_id: Uuid,
     pub parent_project_id: Option<Uuid>,
     pub budget: Option<f64>,
     pub expenses: Option<f64>,

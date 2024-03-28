@@ -93,6 +93,10 @@ impl Task {
         self.id
     }
 
+    pub fn operation(&self) -> &Operation {
+        &self.operation
+    }
+
     /// Returns whether the task should be retried.
     ///
     /// # Implementative details

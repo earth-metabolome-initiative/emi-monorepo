@@ -4,16 +4,13 @@ use actix_web::web;
 use actix_web::{get, Error, HttpRequest, HttpResponse};
 use sqlx::{Pool as SQLxPool, Postgres};
 pub mod socket;
-use actix_web_actors::ws::WsResponseBuilder;
 use crate::api::oauth::refresh::refresh_access_token;
+use actix_web_actors::ws::WsResponseBuilder;
+pub mod projects;
 pub mod users;
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(start_websocket);
-}
-
-pub fn configure_auth(cfg: &mut web::ServiceConfig) {
-    cfg.service(start_auth_websocket);
 }
 
 #[get("/ws")]
@@ -32,67 +29,36 @@ async fn start_websocket(
     diesel_pool: web::Data<DBPool>,
     sqlx_pool: web::Data<SQLxPool<Postgres>>,
 ) -> Result<HttpResponse, Error> {
-    log::info!("Starting websocket");
+    let mut frame_size = None;
 
-    let diesel_pool = diesel_pool.get_ref().clone();
-    let sqlx_pool = sqlx_pool.get_ref().clone();
-    let redis_client = redis_client.get_ref().clone();
-
-    WsResponseBuilder::new(
-        socket::WebSocket::new(diesel_pool, sqlx_pool, redis_client),
-        &req,
-        stream,
-    )
-    .codec(actix_http::ws::Codec::new())
-    // NOTE THAT HERE WE ARE NOT INCREASING THE FRAME SIZE!
-    // AN UNAUTHENTICATED USER SHOULD NOT BE ABLE TO SEND LARGE MESSAGES
-    .start()
-}
-
-#[get("/ws")]
-/// Entrypoint to start the websocket
-///
-/// # Arguments
-/// * `user` - The logged in user that is starting the websocket, as derived from the JWT token middleware
-/// * `req` - The HTTP request
-/// * `stream` - The websocket stream
-/// * `diesel_pool` - The Diesel connection pool
-/// * `sqlx_pool` - The SQLx connection pool
-async fn start_auth_websocket(
-    req: HttpRequest,
-    stream: web::Payload,
-    redis_client: web::Data<redis::Client>,
-    diesel_pool: web::Data<DBPool>,
-    sqlx_pool: web::Data<SQLxPool<Postgres>>,
-) -> Result<HttpResponse, Error> {
-    log::info!("Starting websocket");
-
-    let (user, access_code) = match refresh_access_token(&req, &diesel_pool, &redis_client).await {
-        Ok(token) => token,
-        Err(error) => {
-            return Ok(error);
+    let websocket = match refresh_access_token(&req, &diesel_pool, &redis_client).await {
+        Ok((user, access_code)) => {
+            log::info!("Starting authenticated websocket for user {}", user.id);
+            frame_size = Some(5 * 1024 * 1024);
+            socket::WebSocket::authenticated(
+                diesel_pool.get_ref().clone(),
+                sqlx_pool.get_ref().clone(),
+                redis_client.get_ref().clone(),
+                user,
+                access_code,
+            )
+        }
+        Err(_) => {
+            log::info!("Starting unauthenticated websocket");
+            socket::WebSocket::new(
+                diesel_pool.get_ref().clone(),
+                sqlx_pool.get_ref().clone(),
+                redis_client.get_ref().clone(),
+            )
         }
     };
 
-    let diesel_pool = diesel_pool.get_ref().clone();
-    let sqlx_pool = sqlx_pool.get_ref().clone();
-    let redis_client = redis_client.get_ref().clone();
+    let mut builder =
+        WsResponseBuilder::new(websocket, &req, stream).codec(actix_http::ws::Codec::new());
 
-    let websocket = socket::WebSocket::authenticated(
-        diesel_pool,
-        sqlx_pool,
-        redis_client,
-        user,
-        access_code
-    );
+    if let Some(frame_size) = frame_size {
+        builder = builder.frame_size(frame_size);
+    }
 
-    WsResponseBuilder::new(
-        websocket,
-        &req,
-        stream,
-    )
-    .codec(actix_http::ws::Codec::new())
-    // This will overwrite the codec's max frame-size
-    .frame_size(1024 * 1024 * 5) // 5MB
-    .start()
+    builder.start()
 }

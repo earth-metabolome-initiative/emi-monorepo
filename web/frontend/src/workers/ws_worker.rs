@@ -7,7 +7,6 @@ use wasm_bindgen::UnwrapThrowExt;
 use yew::platform::spawn_local;
 use yew_agent::worker::HandlerId;
 use yew_agent::worker::Worker;
-use crate::cookies::is_logged_in;
 
 const NOMINAL_CLOSURE_CODE: u16 = 1000;
 
@@ -32,12 +31,7 @@ where
     fn connect(
         scope: &yew_agent::prelude::WorkerScope<Self>,
     ) -> Result<futures::channel::mpsc::Sender<FM>, String> {
-        log::debug!("Connecting to websocket");
-        let endpoint = if is_logged_in() {
-            web_common::api::auth::ws::FULL_ENDPOINT
-        } else {
-            web_common::api::ws::FULL_ENDPOINT
-        };
+        let endpoint = web_common::api::ws::FULL_ENDPOINT;
 
         let websocket = WebSocket::open(&format!("wss://emi.local{}", endpoint))
             .map_err(|err| format!("Error opening websocket connection: {:?}", err))?;
@@ -70,6 +64,7 @@ where
                 while let Some(backend_message) = read.next().await {
                     match backend_message {
                         Ok(message) => {
+                            log::debug!("Received message from websocket: {:?}", message);
                             scope.send_message(InternalMessage::Backend(message.into()));
                         }
                         Err(err) => {

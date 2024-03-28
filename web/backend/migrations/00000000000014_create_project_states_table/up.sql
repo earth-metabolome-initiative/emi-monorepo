@@ -1,8 +1,6 @@
 -- SQL defining a state that a project may be in.
 CREATE TABLE project_states (
-    id UUID PRIMARY KEY REFERENCES editables(id) ON
-    DELETE
-        CASCADE REFERENCES describables(id) ON
+    id UUID PRIMARY KEY REFERENCES describables(id) ON
     DELETE
         CASCADE
 );

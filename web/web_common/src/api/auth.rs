@@ -1,5 +1,3 @@
-pub mod ws;
-
 use crate::combine_path;
 
 pub const ENDPOINT: &str = "/auth";

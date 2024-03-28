@@ -1,5 +1,6 @@
 //! Submodule defining the websocket actor and its message handling.
 
+use crate::api::ws::users::UserMessage;
 use crate::models::Notification;
 use crate::models::User;
 use crate::views::ViewRow;
@@ -20,6 +21,8 @@ use web_common::api::oauth::jwt_cookies::AccessToken;
 use web_common::api::ws::messages::{BackendMessage, FrontendMessage};
 use web_common::database::NotificationMessage;
 use web_common::database::View;
+
+use super::projects::ProjectMessage;
 
 pub struct WebSocket {
     notifications_handler: Option<SpawnHandle>,
@@ -66,10 +69,15 @@ impl WebSocket {
         }
     }
 
+    fn is_authenticated(&self) -> bool {
+        self.user.is_some()
+    }
+
     fn listen_for_notifications(&mut self, ctx: &mut <WebSocket as Actor>::Context) {
         // If the handler is stopped or was never started, start it.
         if self.notifications_handler.is_none() {
             if let Some((user, _)) = &self.user {
+                log::info!("Starting notifications handler for user {}", user.id);
                 let address = ctx.address().clone();
                 let channel_name = format!("user_{}", user.id);
                 let pool = self.sqlx.clone();
@@ -135,12 +143,23 @@ impl WebSocket {
 
 impl Actor for WebSocket {
     type Context = ws::WebsocketContext<Self>;
+
+    fn started(&mut self, ctx: &mut Self::Context) {
+        self.listen_for_notifications(ctx); 
+        if self.is_authenticated() {
+            log::info!("Sending refresh token message");
+            ctx.address().do_send(BackendMessage::RefreshToken(
+                self.user.as_ref().unwrap().1.clone(),
+            ));
+        }
+    }
 }
 
 impl actix::Handler<BackendMessage> for WebSocket {
     type Result = ();
 
     fn handle(&mut self, msg: BackendMessage, ctx: &mut Self::Context) {
+        log::info!("Sending message to frontend: {:?}", msg);
         ctx.binary(msg);
     }
 }
@@ -165,8 +184,6 @@ impl actix::Handler<InternalMessage> for WebSocket {
 
 impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
     fn handle(&mut self, msg: Result<ws::Message, ws::ProtocolError>, ctx: &mut Self::Context) {
-        self.listen_for_notifications(ctx);
-
         match msg {
             Ok(msg) => {
                 let frontend_message: FrontendMessage = msg.into();
@@ -179,7 +196,27 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                             ctx.address().do_send(InternalMessage::Unauthorized);
                             return;
                         }
-                        ctx.address().do_send(InternalMessage::Unauthorized);
+                        match task.operation() {
+                            web_common::database::Operation::Insert(insert) => match insert {
+                                web_common::database::Insert::Project(new_project) => {
+                                    ctx.address().do_send(ProjectMessage::NewProject(
+                                        task.id(),
+                                        new_project.clone(),
+                                    ));
+                                }
+                            },
+                            web_common::database::Operation::Update(update) => match update {
+                                web_common::database::Update::CompleteProfile(profile) => {
+                                    ctx.address().do_send(UserMessage::CompleteProfile(
+                                        task.id(),
+                                        profile.clone(),
+                                    ));
+                                }
+                            },
+                            _ => {
+                                unimplemented!("Operation not implemented: {:?}", task.operation())
+                            }
+                        }
                     }
                 }
             }
