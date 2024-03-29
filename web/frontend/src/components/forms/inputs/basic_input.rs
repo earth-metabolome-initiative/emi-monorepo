@@ -189,7 +189,7 @@ where
     fn view(&self, ctx: &Context<Self>) -> Html {
         let props = ctx.props();
 
-        let classes = match self.is_valid {
+        let extra_classes: Option<&str> = match self.is_valid {
             Some(true) => {
                 if let (Some(previous), Some(current)) = (
                     ctx.props().value(),
@@ -198,17 +198,22 @@ where
                         .and_then(|value| Data::try_from(value.clone()).ok()),
                 ) {
                     if previous != current {
-                        "input-group input-group-valid"
+                        Some("input-group-valid")
                     } else {
-                        "input-group"
+                        None
                     }
                 } else {
-                    "input-group input-group-valid"
+                    Some("input-group-valid")
                 }
             }
-            Some(false) => "input-group input-group-invalid",
-            None => "input-group",
+            Some(false) => Some("input-group-invalid"),
+            None => None
         };
+        let classes = format!(
+            "input-group {}{}",
+            props.input_type(),
+            extra_classes.map_or("".to_string(), |classes| format!(" {}", classes))
+        );
 
         // We create a timeout so that when the user stops typing for at least
         // 500ms, the input field is validated.
