@@ -302,52 +302,74 @@ where
             })
         };
 
+        let input_field = html! {
+            <>
+                {if props.show_label {
+                    html! {
+                        <label for={props.normalized_label()} class={"input-label"}>
+                            {props.label()}
+                        </label>
+                    }
+                } else {
+                    html! {}
+                }}
+                {if props.input_type() == "textarea" {
+                    html! {
+                        <textarea
+                            class="input-control"
+                            name={props.normalized_label()}
+                            id={props.normalized_label()}
+                            value={input_value}
+                            placeholder={props.placeholder.clone().unwrap_or_else(|| props.label())}
+                            oninput={on_input}
+                            onblur={on_blur}
+                        ></textarea>
+                    }
+                } else if props.input_type() == "checkbox" {
+                    html! {
+                        <>
+                        <label for={props.normalized_label()} class="checkbox"></label>
+                        <input
+                            type={props.input_type()}
+                            class="input-control"
+                            name={props.normalized_label()}
+                            id={props.normalized_label()}
+                            checked={input_value == "on"}
+                            placeholder={props.placeholder.clone().unwrap_or_else(|| props.label())}
+                            step={props.step.map_or_else(|| "".to_string(), |step| step.to_string())}
+                            oninput={on_input}
+                            onblur={on_blur}
+                        />
+                        </>
+                    }
+                } else {
+                    html! {
+                        <input
+                            type={props.input_type()}
+                            class="input-control"
+                            name={props.normalized_label()}
+                            id={props.normalized_label()}
+                            value={input_value}
+                            placeholder={props.placeholder.clone().unwrap_or_else(|| props.label())}
+                            step={props.step.map_or_else(|| "".to_string(), |step| step.to_string())}
+                            oninput={on_input}
+                            onblur={on_blur}
+                        />
+                    }
+                }}
+            </>
+        };
+
         html! {
             <div class={classes}>
                 {if props.show_label {
                     html! {
-                        <>
-                        <label for={props.normalized_label()} class={"input-label"}>
-                            {props.label()}
-                        </label>
-                        {if props.input_type() == "textarea" {
-                            html! {
-                                <textarea
-                                    class="input-control"
-                                    name={props.normalized_label()}
-                                    id={props.normalized_label()}
-                                    value={input_value}
-                                    placeholder={props.placeholder.clone().unwrap_or_else(|| props.label())}
-                                    oninput={on_input}
-                                    onblur={on_blur}
-                                ></textarea>
-                            }
-                        } else {
-                            html! {
-                                <input
-                                    type={props.input_type()}
-                                    class="input-control"
-                                    name={props.normalized_label()}
-                                    id={props.normalized_label()}
-                                    value={input_value}
-                                    placeholder={props.placeholder.clone().unwrap_or_else(|| props.label())}
-                                    step={props.step.map_or_else(|| "".to_string(), |step| step.to_string())}
-                                    oninput={on_input}
-                                    onblur={on_blur}
-                                />
-                            }
-                        }}
-                        {if props.input_type() == "checkbox" {
-                            html! {
-                                <label for={props.normalized_label()} class="checkbox"></label>
-                            }
-                        } else {
-                            html! {}
-                        }}
-                        </>
+                        <div class="input-container">
+                            {input_field}
+                        </div>
                     }
                 } else {
-                    html! {}
+                    input_field
                 }}
                 <InputErrors errors={self.errors.clone()} on_delete={on_delete} />
             </div>

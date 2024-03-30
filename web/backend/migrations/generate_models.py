@@ -66,7 +66,7 @@ from dotenv import load_dotenv
 def write_from_impls(
     path: str,
     table_type: str,
-    table_structs: Dict[str, str]
+    table_structs: Dict[str, Dict[str, str]]
 ):
     """Write the `From` implementations for the structs in the `src/models.rs` file."""
 
@@ -141,7 +141,8 @@ def write_from_impls(
                 # }
                 # ```
 
-                table_name = table_structs[struct_name]
+                table_data = table_structs[struct_name]
+                table_name = table_data["table_name"]
                 
                 new_content += f"impl {struct_name} {{\n"
                 new_content += f"    /// Get the struct from the database by its ID.\n"
@@ -251,7 +252,7 @@ def write_from_impls(
         file.write(new_content)
 
 
-def write_web_common_structs(path: str, target: str, enumeration: str) -> Dict[str, str]:
+def write_web_common_structs(path: str, target: str, enumeration: str) -> Dict[str, Dict[str, str]]:
     """Write the structs in the target file in the `web_common` crate.
 
     Parameters
@@ -299,6 +300,7 @@ def write_web_common_structs(path: str, target: str, enumeration: str) -> Dict[s
     # respective structs.
     table_names = {}
     last_table_name = None
+    struct_metadata = {}
 
     for line in models.split("\n"):
         # We skip all lines beginning with `//!` as they are comments
@@ -315,7 +317,8 @@ def write_web_common_structs(path: str, target: str, enumeration: str) -> Dict[s
         # in the line.
         if "struct" in line:
             struct_name = line.split(" ")[2]
-            table_names[struct_name] = last_table_name
+            struct_metadata["table_name"] = last_table_name
+            struct_metadata["struct_name"] = struct_name
 
             inside_struct = True
             # If we have just started a new struct, we need to
@@ -326,15 +329,22 @@ def write_web_common_structs(path: str, target: str, enumeration: str) -> Dict[s
             tables.write(f")]\n")
 
         if inside_struct:
+            # If the current line contains the id field,
+            # we store the type of the id field.
+            if "pub id:" in line:
+                struct_metadata["id_type"] = line.split(":")[1].strip(" ,")
+
             # We determine whether the struct has ended
             # by checking if the `}` keyword is present
             # in the line.
             if "}" in line:
                 inside_struct = False
 
+            table_names[struct_name] = struct_metadata
+
             # We write the line to the file
             tables.write(f"{line}\n")
-
+    
     # We create the Table enumeration, containing all
     # the table names. We also implement the `table_name`
     # method for the enumeration, returning the table name
@@ -363,7 +373,8 @@ def write_web_common_structs(path: str, target: str, enumeration: str) -> Dict[s
     tables.write(f"impl {enumeration} {{\n")
     tables.write("    pub fn name(&self) -> &'static str {\n")
     tables.write("        match self {\n")
-    for struct_name, table_name in table_names.items():
+    for struct_name, table_data in table_names.items():
+        table_name = table_data["table_name"]
         tables.write(f'            {enumeration}::{struct_name} => "{table_name}",\n')
     tables.write("        }\n")
     tables.write("    }\n")
@@ -392,7 +403,8 @@ def write_web_common_structs(path: str, target: str, enumeration: str) -> Dict[s
     tables.write(f"impl From<&str> for {enumeration} {{\n")
     tables.write("    fn from(item: &str) -> Self {\n")
     tables.write("        match item {\n")
-    for struct_name, table_name in table_names.items():
+    for struct_name, table_data in table_names.items():
+        table_name = table_data["table_name"]
         tables.write(f'            "{table_name}" => {enumeration}::{struct_name},\n')
     tables.write('            _ => panic!("Unknown table name"),\n')
     tables.write("        }\n")
@@ -793,8 +805,8 @@ if __name__ == "__main__":
     generate_view_schema()
     check_schema_completion()
     generate_view_structs()
-    table_structs: Dict[str, str] = write_web_common_structs("src/models.rs", "tables", "Table")
-    view_structs: Dict[str, str] = write_web_common_structs("src/views/views.rs", "views", "View")
+    table_structs: Dict[str, Dict[str, str]] = write_web_common_structs("src/models.rs", "tables", "Table")
+    view_structs: Dict[str, Dict[str, str]] = write_web_common_structs("src/views/views.rs", "views", "View")
     write_from_impls(
         "src/models.rs",
         "tables",

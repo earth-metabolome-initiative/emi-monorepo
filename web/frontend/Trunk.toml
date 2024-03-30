@@ -16,7 +16,7 @@ frozen = false
 # Require Cargo.lock is up to date
 locked = true
 # Allow disabling minification
-no_minification = true
+no_minification = false
 # Allow disabling sub-resource integrity (SRI)
 no_sri = true
 

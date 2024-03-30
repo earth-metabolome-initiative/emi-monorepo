@@ -14,12 +14,12 @@ impl TryFromCallback<FormData> for FormWrapper<NewProject> {
     where
         C: FnOnce(Result<Self, Vec<String>>) + 'static,
     {
-        let project_name = data.get("new_project_name").as_string().ok_or_else(|| {
+        let project_name = data.get("name").as_string().ok_or_else(|| {
             vec!["The new project name field is missing or not a string.".to_string()]
         })?;
 
         let description = data
-            .get("new_project_description")
+            .get("description")
             .as_string()
             .ok_or_else(|| {
                 vec!["The new project description field is missing or not a string.".to_string()]
@@ -28,7 +28,7 @@ impl TryFromCallback<FormData> for FormWrapper<NewProject> {
         let public = data
             .get("public")
             .as_string()
-            .ok_or_else(|| vec!["The public field is missing or not a string.".to_string()])?;
+            .unwrap_or_else(||"off".to_string());
 
         let public: bool = InputBool::try_from(public.to_string())?.into();
 
@@ -84,8 +84,8 @@ impl ToString for InputBool {
 pub fn complete_profile_form() -> Html {
     html! {
         <BasicForm<NewProject>>
-            <BasicInput<NewProjectName> label="New project name" input_type="text" />
-            <BasicInput<NotEmpty> label="New project description" input_type="textarea" />
+            <BasicInput<NewProjectName> label="Name" input_type="text" />
+            <BasicInput<NotEmpty> label="Description" input_type="textarea" />
             <BasicInput<InputBool> label="Public" value={InputBool::from(true)} input_type="checkbox" />
         </BasicForm<NewProject>>
     }

@@ -97,6 +97,10 @@ impl Task {
         &self.operation
     }
 
+    pub fn increase_attemps(&mut self) {
+        self.attempts += 1;
+    }
+
     /// Returns whether the task should be retried.
     ///
     /// # Implementative details

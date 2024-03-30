@@ -55,9 +55,9 @@ impl Archivable {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::archivables;
-        archivables::dsl::archivables
-            .filter(archivables::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -118,9 +118,9 @@ impl ContainerHorizontalRule {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::container_horizontal_rules;
-        container_horizontal_rules::dsl::container_horizontal_rules
-            .filter(container_horizontal_rules::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -181,9 +181,9 @@ impl ContainerVerticalRule {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::container_vertical_rules;
-        container_vertical_rules::dsl::container_vertical_rules
-            .filter(container_vertical_rules::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -216,9 +216,9 @@ impl ContinuousUnit {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::continuous_units;
-        continuous_units::dsl::continuous_units
-            .filter(continuous_units::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -261,9 +261,9 @@ impl Describable {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::describables;
-        describables::dsl::describables
-            .filter(describables::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -296,9 +296,9 @@ impl DiscreteUnit {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::discrete_units;
-        discrete_units::dsl::discrete_units
-            .filter(discrete_units::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -338,9 +338,9 @@ impl DocumentFormat {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::document_formats;
-        document_formats::dsl::document_formats
-            .filter(document_formats::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -386,9 +386,9 @@ impl Document {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::documents;
-        documents::dsl::documents
-            .filter(documents::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -431,9 +431,9 @@ impl Editable {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::editables;
-        editables::dsl::editables
-            .filter(editables::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -473,9 +473,9 @@ impl Edit {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::edits;
-        edits::dsl::edits
-            .filter(edits::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -508,9 +508,9 @@ impl ItemCategory {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::item_categories;
-        item_categories::dsl::item_categories
-            .filter(item_categories::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -553,9 +553,9 @@ impl ItemCategoryRelationship {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::item_category_relationships;
-        item_category_relationships::dsl::item_category_relationships
-            .filter(item_category_relationships::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -598,9 +598,9 @@ impl ItemCategoryUnit {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::item_category_units;
-        item_category_units::dsl::item_category_units
-            .filter(item_category_units::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -655,9 +655,9 @@ impl ItemContinuousQuantity {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::item_continuous_quantities;
-        item_continuous_quantities::dsl::item_continuous_quantities
-            .filter(item_continuous_quantities::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -709,9 +709,9 @@ impl ItemDiscreteQuantity {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::item_discrete_quantities;
-        item_discrete_quantities::dsl::item_discrete_quantities
-            .filter(item_discrete_quantities::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -757,9 +757,9 @@ impl ItemLocation {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::item_locations;
-        item_locations::dsl::item_locations
-            .filter(item_locations::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -802,9 +802,9 @@ impl ItemUnit {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::item_units;
-        item_units::dsl::item_units
-            .filter(item_units::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -844,9 +844,9 @@ impl Item {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::items;
-        items::dsl::items
-            .filter(items::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -886,9 +886,9 @@ impl LocationState {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::location_states;
-        location_states::dsl::location_states
-            .filter(location_states::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -949,9 +949,9 @@ impl Location {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::locations;
-        locations::dsl::locations
-            .filter(locations::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -1006,9 +1006,9 @@ impl LoginProvider {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::login_providers;
-        login_providers::dsl::login_providers
-            .filter(login_providers::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -1057,9 +1057,9 @@ impl ManufacturedItemCategory {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::manufactured_item_categories;
-        manufactured_item_categories::dsl::manufactured_item_categories
-            .filter(manufactured_item_categories::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -1111,9 +1111,9 @@ impl Notification {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::notifications;
-        notifications::dsl::notifications
-            .filter(notifications::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -1159,9 +1159,9 @@ impl OrganizationAuthorization {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::organization_authorizations;
-        organization_authorizations::dsl::organization_authorizations
-            .filter(organization_authorizations::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -1207,9 +1207,9 @@ impl OrganizationLocation {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::organization_locations;
-        organization_locations::dsl::organization_locations
-            .filter(organization_locations::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -1249,9 +1249,9 @@ impl OrganizationState {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::organization_states;
-        organization_states::dsl::organization_states
-            .filter(organization_states::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -1300,9 +1300,9 @@ impl Organization {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::organizations;
-        organizations::dsl::organizations
-            .filter(organizations::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -1335,9 +1335,9 @@ impl PrimaryUserEmail {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::primary_user_emails;
-        primary_user_emails::dsl::primary_user_emails
-            .filter(primary_user_emails::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -1390,9 +1390,9 @@ impl ProcedureContinuousRequirement {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::procedure_continuous_requirements;
-        procedure_continuous_requirements::dsl::procedure_continuous_requirements
-            .filter(procedure_continuous_requirements::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -1445,9 +1445,9 @@ impl ProcedureDiscreteRequirement {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::procedure_discrete_requirements;
-        procedure_discrete_requirements::dsl::procedure_discrete_requirements
-            .filter(procedure_discrete_requirements::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -1480,9 +1480,9 @@ impl Procedure {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::procedures;
-        procedures::dsl::procedures
-            .filter(procedures::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -1535,9 +1535,9 @@ impl ProjectContinuousRequirement {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::project_continuous_requirements;
-        project_continuous_requirements::dsl::project_continuous_requirements
-            .filter(project_continuous_requirements::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -1586,9 +1586,9 @@ impl ProjectDiscreteRequirement {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::project_discrete_requirements;
-        project_discrete_requirements::dsl::project_discrete_requirements
-            .filter(project_discrete_requirements::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -1634,9 +1634,9 @@ impl ProjectMilestone {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::project_milestones;
-        project_milestones::dsl::project_milestones
-            .filter(project_milestones::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -1645,17 +1645,33 @@ impl ProjectMilestone {
 #[diesel(table_name = project_states)]
 pub struct ProjectState {
     pub id: Uuid,
+    pub name: String,
+    pub description: String,
+    pub font_awesome_icon: String,
+    pub icon_color: String,
 }
 
 impl From<ProjectState> for web_common::database::tables::ProjectState {
     fn from(item: ProjectState) -> Self {
-        Self { id: item.id }
+        Self {
+            id: item.id,
+            name: item.name,
+            description: item.description,
+            font_awesome_icon: item.font_awesome_icon,
+            icon_color: item.icon_color,
+        }
     }
 }
 
 impl From<web_common::database::tables::ProjectState> for ProjectState {
     fn from(item: web_common::database::tables::ProjectState) -> Self {
-        Self { id: item.id }
+        Self {
+            id: item.id,
+            name: item.name,
+            description: item.description,
+            font_awesome_icon: item.font_awesome_icon,
+            icon_color: item.icon_color,
+        }
     }
 }
 
@@ -1669,9 +1685,9 @@ impl ProjectState {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::project_states;
-        project_states::dsl::project_states
-            .filter(project_states::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -1680,32 +1696,36 @@ impl ProjectState {
 #[diesel(table_name = projects)]
 pub struct Project {
     pub id: Uuid,
+    pub name: String,
+    pub description: String,
     pub public: bool,
     pub state_id: Uuid,
     pub parent_project_id: Option<Uuid>,
     pub budget: Option<f64>,
     pub expenses: Option<f64>,
     pub currency: Option<String>,
+    pub created_by: Uuid,
+    pub created_at: DateTime<Utc>,
     pub expected_end_date: Option<DateTime<Utc>>,
     pub end_date: Option<DateTime<Utc>>,
-    pub website_url: Option<String>,
-    pub logo_id: Option<Uuid>,
 }
 
 impl From<Project> for web_common::database::tables::Project {
     fn from(item: Project) -> Self {
         Self {
             id: item.id,
+            name: item.name,
+            description: item.description,
             public: item.public,
             state_id: item.state_id,
             parent_project_id: item.parent_project_id,
             budget: item.budget,
             expenses: item.expenses,
             currency: item.currency,
+            created_by: item.created_by,
+            created_at: item.created_at,
             expected_end_date: item.expected_end_date,
             end_date: item.end_date,
-            website_url: item.website_url,
-            logo_id: item.logo_id,
         }
     }
 }
@@ -1714,16 +1734,18 @@ impl From<web_common::database::tables::Project> for Project {
     fn from(item: web_common::database::tables::Project) -> Self {
         Self {
             id: item.id,
+            name: item.name,
+            description: item.description,
             public: item.public,
             state_id: item.state_id,
             parent_project_id: item.parent_project_id,
             budget: item.budget,
             expenses: item.expenses,
             currency: item.currency,
+            created_by: item.created_by,
+            created_at: item.created_at,
             expected_end_date: item.expected_end_date,
             end_date: item.end_date,
-            website_url: item.website_url,
-            logo_id: item.logo_id,
         }
     }
 }
@@ -1738,9 +1760,9 @@ impl Project {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::projects;
-        projects::dsl::projects
-            .filter(projects::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -1773,9 +1795,9 @@ impl Role {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::roles;
-        roles::dsl::roles
-            .filter(roles::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -1818,9 +1840,9 @@ impl SampleTaxa {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::sample_taxa;
-        sample_taxa::dsl::sample_taxa
-            .filter(sample_taxa::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -1863,9 +1885,9 @@ impl SampledIndividualTaxa {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::sampled_individual_taxa;
-        sampled_individual_taxa::dsl::sampled_individual_taxa
-            .filter(sampled_individual_taxa::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -1898,9 +1920,9 @@ impl SampledIndividual {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::sampled_individuals;
-        sampled_individuals::dsl::sampled_individuals
-            .filter(sampled_individuals::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -1940,9 +1962,9 @@ impl Sample {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::samples;
-        samples::dsl::samples
-            .filter(samples::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -1982,9 +2004,9 @@ impl Spectra {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::spectra;
-        spectra::dsl::spectra
-            .filter(spectra::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -2024,9 +2046,9 @@ impl SpectraCollection {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::spectra_collection;
-        spectra_collection::dsl::spectra_collection
-            .filter(spectra_collection::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -2035,17 +2057,27 @@ impl SpectraCollection {
 #[diesel(table_name = taxa)]
 pub struct Taxa {
     pub id: Uuid,
+    pub name: String,
+    pub ncbi_taxon_id: Option<i32>,
 }
 
 impl From<Taxa> for web_common::database::tables::Taxa {
     fn from(item: Taxa) -> Self {
-        Self { id: item.id }
+        Self {
+            id: item.id,
+            name: item.name,
+            ncbi_taxon_id: item.ncbi_taxon_id,
+        }
     }
 }
 
 impl From<web_common::database::tables::Taxa> for Taxa {
     fn from(item: web_common::database::tables::Taxa) -> Self {
-        Self { id: item.id }
+        Self {
+            id: item.id,
+            name: item.name,
+            ncbi_taxon_id: item.ncbi_taxon_id,
+        }
     }
 }
 
@@ -2059,9 +2091,9 @@ impl Taxa {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::taxa;
-        taxa::dsl::taxa
-            .filter(taxa::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -2107,9 +2139,9 @@ impl TeamAuthorization {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::team_authorizations;
-        team_authorizations::dsl::team_authorizations
-            .filter(team_authorizations::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -2149,9 +2181,9 @@ impl TeamState {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::team_states;
-        team_states::dsl::team_states
-            .filter(team_states::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -2194,9 +2226,9 @@ impl Team {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::teams;
-        teams::dsl::teams
-            .filter(teams::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -2236,9 +2268,9 @@ impl Unit {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::units;
-        units::dsl::units
-            .filter(units::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -2284,9 +2316,9 @@ impl UserAuthorization {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::user_authorizations;
-        user_authorizations::dsl::user_authorizations
-            .filter(user_authorizations::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -2332,9 +2364,9 @@ impl UserEmail {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::user_emails;
-        user_emails::dsl::user_emails
-            .filter(user_emails::dsl::id.eq(id))
+        use crate::schema::users;
+        users::dsl::users
+            .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -2343,9 +2375,9 @@ impl UserEmail {
 #[diesel(table_name = users)]
 pub struct User {
     pub id: Uuid,
-    pub first_name: Option<String>,
+    pub first_name: String,
     pub middle_name: Option<String>,
-    pub last_name: Option<String>,
+    pub last_name: String,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }

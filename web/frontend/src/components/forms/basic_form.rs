@@ -333,7 +333,7 @@ where
         };
 
         html! {
-            <form enctype={ "multipart/form-data" } class={classes} oninput={on_input} onsubmit={on_submit} method={Data::METHOD.to_string()}>
+            <form enctype={ "multipart/form-data" } disabled={self.waiting_for_reply} class={classes} oninput={on_input} onsubmit={on_submit} method={Data::METHOD.to_string()}>
                 <h4>{ Data::title() }</h4>
                 <p class="instructions">{Data::description()}</p>
                 { ctx.props().children.clone() }

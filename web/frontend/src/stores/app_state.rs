@@ -32,6 +32,10 @@ impl AppState {
         &self.tasks
     }
 
+    pub fn tasks_mut(&mut self) -> &mut [Task] {
+        &mut self.tasks
+    }
+
     pub fn connect_to_internet(&self) -> bool {
         self.connect_to_internet
     }

@@ -63,9 +63,9 @@ impl EditsView {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
-        use crate::views::schema::edits_view;
-        edits_view::dsl::edits_view
-            .filter(edits_view::dsl::id.eq(id))
+        use crate::views::schema::public_user;
+        public_user::dsl::public_user
+            .filter(public_user::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -127,9 +127,9 @@ impl LastEditsView {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
-        use crate::views::schema::last_edits_view;
-        last_edits_view::dsl::last_edits_view
-            .filter(last_edits_view::dsl::id.eq(id))
+        use crate::views::schema::public_user;
+        public_user::dsl::public_user
+            .filter(public_user::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -176,9 +176,9 @@ impl FormatsView {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
-        use crate::views::schema::formats_view;
-        formats_view::dsl::formats_view
-            .filter(formats_view::dsl::id.eq(id))
+        use crate::views::schema::public_user;
+        public_user::dsl::public_user
+            .filter(public_user::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -273,9 +273,9 @@ impl DocumentsView {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
-        use crate::views::schema::documents_view;
-        documents_view::dsl::documents_view
-            .filter(documents_view::dsl::id.eq(id))
+        use crate::views::schema::public_user;
+        public_user::dsl::public_user
+            .filter(public_user::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }

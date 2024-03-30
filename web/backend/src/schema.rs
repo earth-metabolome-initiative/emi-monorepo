@@ -323,12 +323,19 @@ diesel::table! {
 diesel::table! {
     project_states (id) {
         id -> Uuid,
+        name -> Varchar,
+        description -> Text,
+        font_awesome_icon -> Varchar,
+        icon_color -> Varchar,
     }
 }
 
 diesel::table! {
     projects (id) {
         id -> Uuid,
+        #[max_length = 255]
+        name -> Varchar,
+        description -> Text,
         public -> Bool,
         state_id -> Uuid,
         parent_project_id -> Nullable<Uuid>,
@@ -336,11 +343,10 @@ diesel::table! {
         expenses -> Nullable<Float8>,
         #[max_length = 3]
         currency -> Nullable<Varchar>,
+        created_by -> Uuid,
+        created_at -> Timestamptz,
         expected_end_date -> Nullable<Timestamptz>,
         end_date -> Nullable<Timestamptz>,
-        #[max_length = 255]
-        website_url -> Nullable<Varchar>,
-        logo_id -> Nullable<Uuid>,
     }
 }
 
@@ -396,6 +402,8 @@ diesel::table! {
 diesel::table! {
     taxa (id) {
         id -> Uuid,
+        name -> Text,
+        ncbi_taxon_id -> Nullable<Int4>,
     }
 }
 
@@ -454,9 +462,9 @@ diesel::table! {
 diesel::table! {
     users (id) {
         id -> Uuid,
-        first_name -> Nullable<Varchar>,
+        first_name -> Varchar,
         middle_name -> Nullable<Varchar>,
-        last_name -> Nullable<Varchar>,
+        last_name -> Varchar,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -536,11 +544,8 @@ diesel::joinable!(project_discrete_requirements -> projects (project_id));
 diesel::joinable!(project_discrete_requirements -> units (unit_id));
 diesel::joinable!(project_milestones -> describables (id));
 diesel::joinable!(project_milestones -> projects (project_id));
-diesel::joinable!(project_states -> describables (id));
-diesel::joinable!(projects -> describables (id));
-diesel::joinable!(projects -> documents (logo_id));
-diesel::joinable!(projects -> editables (id));
 diesel::joinable!(projects -> project_states (state_id));
+diesel::joinable!(projects -> users (created_by));
 diesel::joinable!(roles -> describables (id));
 diesel::joinable!(roles -> editables (id));
 diesel::joinable!(sample_taxa -> editables (id));
@@ -555,8 +560,6 @@ diesel::joinable!(spectra -> editables (id));
 diesel::joinable!(spectra -> spectra_collection (spectra_collection_id));
 diesel::joinable!(spectra_collection -> editables (id));
 diesel::joinable!(spectra_collection -> samples (sample_id));
-diesel::joinable!(taxa -> describables (id));
-diesel::joinable!(taxa -> editables (id));
 diesel::joinable!(team_authorizations -> roles (role_id));
 diesel::joinable!(team_authorizations -> teams (team_id));
 diesel::joinable!(team_states -> describables (id));

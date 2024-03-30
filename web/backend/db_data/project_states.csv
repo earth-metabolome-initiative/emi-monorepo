@@ -1,0 +1,6 @@
+name,description,font_awesome_icon,icon_color
+"Active","The project is currently active.","fa fa-check","green"
+"Paused","The project is no longer active.","fa fa-archive","gray"
+"Completed","The project has been completed.","fa fa-check-square-o","blue"
+"Cancelled","The project has been cancelled.","fa fa-ban","red"
+"Postponed","The project has been postponed.","fa fa-clock-o","orange"

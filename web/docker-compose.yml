@@ -10,6 +10,7 @@ services:
       ADMINISTRATORS_TEAM_NAME: ${ADMINISTRATORS_TEAM_NAME}
     volumes:
       - ${POSTGRES_DATABASE_DIRECTORY}:/var/lib/postgresql/data
+      - ./backend/db_data:/app
     ports:
       - "5432:5432"
     networks:

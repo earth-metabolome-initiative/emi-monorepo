@@ -104,20 +104,13 @@ form.standard-form {
         padding-top: 0.5em;
         padding-bottom: 0.5em;
 
-        label {
-            vertical-align: middle;
-        }
-
         &.input-group-invalid {
-            input[type="text"] {
-                border-color: $red;
+            input[type="text"],
+            textarea,
+            input[type="number"] {
+                border-color: $error;
+                border-style: dashed;
                 animation: small-shake 0.2s;
-            }
-        }
-
-        &.input-group-valid {
-            input[type="text"] {
-                border-color: $green;
             }
         }
 
@@ -296,13 +289,22 @@ form.standard-form {
             min-width: 100px;
         }
 
+        &.text .input-container{
+            display: grid;
+            grid-template-columns: auto 1fr;
+            align-items: center;
+        }
+
+        &.textarea {
+            padding-top: 0.25em;
+        }
+
         input[type="text"],
         textarea,
         input[type="number"] {
             padding: 0.5em;
             box-sizing: border-box;
             max-width: 100%;
-            width: 400px;
             transition: border-color 0.2s;
             border: 1px solid #ccc;
             border-radius: 0.5em;
@@ -332,6 +334,7 @@ form.standard-form {
 
         label.checkbox {
             display: inline-block;
+            vertical-align: middle;
             width: 30px;
             height: 16px;
             background-color: #ccc;
@@ -434,6 +437,12 @@ form.standard-form {
             border-color: $red;
         }
 
+        &.input-group-valid {
+            input[type="text"] {
+                border-color: $red;
+            }
+        }
+
         button[type="submit"] {
             border-color: $red;
             color: $red;
@@ -459,6 +468,12 @@ form.standard-form {
 
         input[type="checkbox"]:checked+label.checkbox::after {
             border-color: $green;
+        }
+
+        &.input-group-valid {
+            input[type="text"] {
+                border-color: $green;
+            }
         }
 
         button[type="submit"] {
@@ -488,6 +503,12 @@ form.standard-form {
             border-color: $blue;
         }
 
+        &.input-group-valid {
+            input[type="text"] {
+                border-color: $blue;
+            }
+        }
+
         button[type="submit"] {
             border-color: $blue;
             color: $blue;
@@ -515,13 +536,13 @@ form.standard-form {
         margin-top: 0.5em;
 
         li.input-error {
-            background-color: $red;
+            background-color: $error;
             color: white;
             padding: 0.5em;
             box-sizing: border-box;
             border-radius: 0.5em;
             position: relative;
-            padding-right: 1em;
+            padding-right: 1.5em;
             animation: pop-in 0.2s;
             transition: margin 0.2s;
 

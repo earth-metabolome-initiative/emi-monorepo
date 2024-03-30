@@ -38,7 +38,6 @@ use crate::components::search_bar::SearchBar;
 use crate::components::sidebar::Sidebar;
 use crate::stores::user_state::refresh_access_token;
 use crate::workers::WebsocketWorker;
-use log::info;
 use std::rc::Rc;
 use yew_agent::prelude::WorkerBridgeHandle;
 
