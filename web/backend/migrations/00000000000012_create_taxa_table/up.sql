@@ -1,7 +1,7 @@
 -- Your SQL goes here
-CREATE TABLE taxa (
+CREATE TABLE IF NOT EXISTS taxa (
     -- The unique identifier for the taxon
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id UUID PRIMARY KEY,
     -- The scientific name of the taxon
     name TEXT NOT NULL,
     -- The NCBI Taxon ID is a unique identifier for a taxon in the NCBI Taxonomy database

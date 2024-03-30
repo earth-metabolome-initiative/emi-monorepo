@@ -118,7 +118,7 @@ diesel::table! {
         weight -> Float8,
         unit_id -> Nullable<Uuid>,
         sensor_id -> Nullable<Uuid>,
-        measured_at -> Timestamptz,
+        measured_at -> Timestamp,
         measured_by -> Nullable<Uuid>,
     }
 }
@@ -129,7 +129,7 @@ diesel::table! {
         item_id -> Nullable<Uuid>,
         quantity -> Int4,
         unit_id -> Nullable<Uuid>,
-        measured_at -> Timestamptz,
+        measured_at -> Timestamp,
         measured_by -> Nullable<Uuid>,
     }
 }
@@ -315,8 +315,8 @@ diesel::table! {
     project_milestones (id) {
         id -> Uuid,
         project_id -> Uuid,
-        due_date -> Timestamptz,
-        completed_at -> Nullable<Timestamptz>,
+        due_date -> Timestamp,
+        completed_at -> Nullable<Timestamp>,
     }
 }
 
@@ -344,9 +344,9 @@ diesel::table! {
         #[max_length = 3]
         currency -> Nullable<Varchar>,
         created_by -> Uuid,
-        created_at -> Timestamptz,
-        expected_end_date -> Nullable<Timestamptz>,
-        end_date -> Nullable<Timestamptz>,
+        created_at -> Timestamp,
+        expected_end_date -> Nullable<Timestamp>,
+        end_date -> Nullable<Timestamp>,
     }
 }
 

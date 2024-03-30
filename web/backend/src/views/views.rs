@@ -342,52 +342,6 @@ pub enum ViewRow {
     PublicUser(PublicUser),
 }
 
-impl ViewRow {
-    /// Get the row from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the row to get.
-    /// * `connection` - The connection to the database.
-    /// * `views` - The variant of the row to get.
-    ///
-    pub fn get(
-        id: Uuid,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-        views: &web_common::database::View
-    ) -> Result<Self, diesel::result::Error> {
-        match views {
-            web_common::database::View::EditsView => Ok(Self::EditsView(EditsView::get(id, connection)?)),
-            web_common::database::View::LastEditsView => Ok(Self::LastEditsView(LastEditsView::get(id, connection)?)),
-            web_common::database::View::FormatsView => Ok(Self::FormatsView(FormatsView::get(id, connection)?)),
-            web_common::database::View::DocumentsView => Ok(Self::DocumentsView(DocumentsView::get(id, connection)?)),
-            web_common::database::View::PublicUser => Ok(Self::PublicUser(PublicUser::get(id, connection)?)),
-        }
-    }
-    /// Search for the row by a given string.
-    ///
-    /// # Arguments
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    /// * `threshold` - The similarity threshold, by default `0.6`.
-    /// * `views` - The variant of the row to search.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn search(
-        query: &str,
-        limit: Option<i32>,
-        threshold: Option<f64>,
-        views: &web_common::database::View,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        match views {
-            web_common::database::View::EditsView => unimplemented!(),
-            web_common::database::View::LastEditsView => unimplemented!(),
-            web_common::database::View::FormatsView => unimplemented!(),
-            web_common::database::View::DocumentsView => unimplemented!(),
-            web_common::database::View::PublicUser => unimplemented!(),
-        }
-    }
-}
 impl From<web_common::database::views::ViewRow> for ViewRow {
     fn from(item: web_common::database::views::ViewRow) -> Self {
         match item {
@@ -407,6 +361,109 @@ impl From<ViewRow> for web_common::database::views::ViewRow {
             ViewRow::FormatsView(item) => web_common::database::views::ViewRow::FormatsView(item.into()),
             ViewRow::DocumentsView(item) => web_common::database::views::ViewRow::DocumentsView(item.into()),
             ViewRow::PublicUser(item) => web_common::database::views::ViewRow::PublicUser(item.into()),
+        }
+    }
+}
+impl From<EditsView> for ViewRow {
+    fn from(item: EditsView) -> Self {
+        ViewRow::EditsView(item)
+    }
+}
+impl From<LastEditsView> for ViewRow {
+    fn from(item: LastEditsView) -> Self {
+        ViewRow::LastEditsView(item)
+    }
+}
+impl From<FormatsView> for ViewRow {
+    fn from(item: FormatsView) -> Self {
+        ViewRow::FormatsView(item)
+    }
+}
+impl From<DocumentsView> for ViewRow {
+    fn from(item: DocumentsView) -> Self {
+        ViewRow::DocumentsView(item)
+    }
+}
+impl From<PublicUser> for ViewRow {
+    fn from(item: PublicUser) -> Self {
+        ViewRow::PublicUser(item)
+    }
+}
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Copy, Eq, )]
+pub enum View {
+    EditsView,
+    LastEditsView,
+    FormatsView,
+    DocumentsView,
+    PublicUser,
+}
+
+impl View {
+    pub fn name(&self) -> &'static str {
+        match self {
+            View::EditsView => "edits_view",
+            View::LastEditsView => "last_edits_view",
+            View::FormatsView => "formats_view",
+            View::DocumentsView => "documents_view",
+            View::PublicUser => "public_user",
+        }
+    }
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn get(
+        &self,
+        id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<ViewRow, diesel::result::Error> {
+        Ok(match self {
+            View::EditsView => ViewRow::EditsView(EditsView::get(id, connection)?),
+            View::LastEditsView => ViewRow::LastEditsView(LastEditsView::get(id, connection)?),
+            View::FormatsView => ViewRow::FormatsView(FormatsView::get(id, connection)?),
+            View::DocumentsView => ViewRow::DocumentsView(DocumentsView::get(id, connection)?),
+            View::PublicUser => ViewRow::PublicUser(PublicUser::get(id, connection)?),
+        })
+    }
+}
+impl std::fmt::Display for View {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.name())
+    }
+}
+impl From<&str> for View {
+    fn from(item: &str) -> Self {
+        match item {
+            "edits_view" => View::EditsView,
+            "last_edits_view" => View::LastEditsView,
+            "formats_view" => View::FormatsView,
+            "documents_view" => View::DocumentsView,
+            "public_user" => View::PublicUser,
+            _ => panic!("Unknown views name"),
+        }
+    }
+}
+impl From<web_common::database::views::View> for View {
+    fn from(item: web_common::database::views::View) -> Self {
+        match item {
+            web_common::database::views::View::EditsView => View::EditsView,
+            web_common::database::views::View::LastEditsView => View::LastEditsView,
+            web_common::database::views::View::FormatsView => View::FormatsView,
+            web_common::database::views::View::DocumentsView => View::DocumentsView,
+            web_common::database::views::View::PublicUser => View::PublicUser,
+        }
+    }
+}
+impl From<View> for web_common::database::views::View {
+    fn from(item: View) -> Self {
+        match item {
+            View::EditsView => web_common::database::views::View::EditsView,
+            View::LastEditsView => web_common::database::views::View::LastEditsView,
+            View::FormatsView => web_common::database::views::View::FormatsView,
+            View::DocumentsView => web_common::database::views::View::DocumentsView,
+            View::PublicUser => web_common::database::views::View::PublicUser,
         }
     }
 }

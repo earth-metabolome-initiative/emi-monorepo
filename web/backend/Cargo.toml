@@ -49,13 +49,3 @@ actix = "0.13.3"
 bincode = "1.3.3"
 image = "0.23.0"
 actix-http = "3.6.0"
-
-[profile.release]
-# Less code to include into binary
-panic = 'abort'
-# Optimization over all codebase ( better optimization, slower build )
-codegen-units = 1
-# Optimization for size ( most aggressive )
-opt-level = 'z'
-# Link time optimization using using whole-program analysis
-lto = true

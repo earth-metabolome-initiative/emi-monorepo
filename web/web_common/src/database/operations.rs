@@ -4,6 +4,7 @@ use uuid::Uuid;
 
 use super::inserts::Insert;
 use super::roles::Role;
+use super::selects::Select;
 use super::tables::Table;
 use super::updates::Update;
 use super::views::View;
@@ -41,7 +42,7 @@ pub enum Operation {
     // When the frontend selects something to show to
     // the user, it sends a Select message to the backend
     // for a specific view.
-    Select(uuid::Uuid, View),
+    Select(Select),
     // When the frontend wants to delete a row from a table
     // it sends a Delete message to the backend. It cannot
     // delete a view because views are not real tables.
@@ -57,9 +58,7 @@ pub enum Operation {
 impl Operation {
     pub fn authorizations(&self) -> Vec<Authorization> {
         match self {
-            Operation::Select(id, view) => {
-                vec![Authorization::new(*id, view.roles())]
-            }
+            Operation::Select(select) => select.authorizations(),
             Operation::Delete(id, _table) => {
                 vec![Authorization::new(*id, vec![Role::Admin, Role::Creator])]
             }

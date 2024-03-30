@@ -11,8 +11,8 @@
 CREATE TABLE project_milestones (
     id UUID PRIMARY KEY REFERENCES describables(id) ON DELETE CASCADE,
     project_id UUID NOT NULL REFERENCES projects (id) ON DELETE CASCADE,
-    due_date TIMESTAMP WITH TIME ZONE NOT NULL,
-    completed_at TIMESTAMP WITH TIME ZONE
+    due_date TIMESTAMP NOT NULL,
+    completed_at TIMESTAMP
 );
 
 -- We also need to add a bi-directional cascade delete constraint to the editables

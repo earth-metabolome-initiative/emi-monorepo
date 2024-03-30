@@ -12,7 +12,7 @@ CREATE TABLE projects (
         expenses FLOAT DEFAULT NULL,
         currency VARCHAR(3) DEFAULT NULL,
         created_by UUID NOT NULL REFERENCES users(id),
-        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        expected_end_date TIMESTAMP WITH TIME ZONE DEFAULT NULL,
-        end_date TIMESTAMP WITH TIME ZONE DEFAULT NULL
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        expected_end_date TIMESTAMP DEFAULT NULL,
+        end_date TIMESTAMP DEFAULT NULL
 );

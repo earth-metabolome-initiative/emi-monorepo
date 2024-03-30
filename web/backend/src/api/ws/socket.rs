@@ -3,7 +3,6 @@
 use crate::api::ws::users::UserMessage;
 use crate::models::Notification;
 use crate::models::User;
-use crate::views::ViewRow;
 use crate::DBPool;
 use crate::DieselConn;
 use actix::ActorContext;
@@ -20,7 +19,6 @@ use sqlx::{Pool as SQLxPool, Postgres};
 use web_common::api::oauth::jwt_cookies::AccessToken;
 use web_common::api::ws::messages::{BackendMessage, FrontendMessage};
 use web_common::database::NotificationMessage;
-use web_common::database::View;
 
 use super::projects::ProjectMessage;
 
@@ -104,11 +102,11 @@ impl WebSocket {
                                         serde_json::from_str(&notification_payload).unwrap();
 
                                     let row_id = payload.notification.row_id.clone();
-                                    let view: View =
+                                    let view: crate::views::View =
                                         payload.notification.table_name.as_str().into();
 
                                     let row = if let Some(id) = row_id {
-                                        match ViewRow::get(id, &mut diesel_connection, &view) {
+                                        match view.get(id, &mut diesel_connection) {
                                             Ok(row) => Some(row.into()),
                                             Err(err) => {
                                                 log::error!(
@@ -145,7 +143,7 @@ impl Actor for WebSocket {
     type Context = ws::WebsocketContext<Self>;
 
     fn started(&mut self, ctx: &mut Self::Context) {
-        self.listen_for_notifications(ctx); 
+        self.listen_for_notifications(ctx);
         if self.is_authenticated() {
             log::info!("Sending refresh token message");
             ctx.address().do_send(BackendMessage::RefreshToken(

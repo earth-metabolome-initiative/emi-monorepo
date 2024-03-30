@@ -11,7 +11,7 @@ CREATE TABLE item_discrete_quantities (
     item_id UUID REFERENCES items(id) ON DELETE CASCADE,
     quantity INTEGER NOT NULL,
     unit_id UUID REFERENCES units(id) ON DELETE CASCADE,
-    measured_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    measured_at TIMESTAMP NOT NULL DEFAULT now(),
     measured_by UUID REFERENCES users(id) ON DELETE SET NULL,
     UNIQUE (item_id, unit_id),
     FOREIGN KEY (item_id, unit_id) REFERENCES item_units(item_id, unit_id) ON DELETE CASCADE,

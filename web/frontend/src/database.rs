@@ -8,9 +8,21 @@
 //! and about IndexedDB [here](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API).
 use gluesql::prelude::*;
 
+pub type Database = Glue<IdbStorage>;
+
 /// Initializes the database.
-pub(crate) async fn init_database() -> Result<Glue<IdbStorage>, Error> {
+pub(crate) async fn init_database() -> Result<Database, Error> {
     let storage = IdbStorage::new(Some("Earth Metabolome Initiative".to_string())).await?;
-    let glue = Glue::new(storage);
+    let mut glue = Glue::new(storage);
+
+    // For most of the tables, we can fortunately reuse the SQL used for the tables creation
+    // in the diesel migration in the backend, which we can load as a static string on compilation,
+    // hence not requiring to either duplicate the code or generate it at runtime when the website
+    // is loaded and server requests would be needed to fetch the schema.
+    let taxa = include_str!("../../backend/migrations/00000000000012_create_taxa_table/up.sql");
+
+    let result = glue.execute(taxa).await?;
+    log::info!("Result of executing the SQL for creating the taxa table: {:?}", result);
+
     Ok(glue)
 }
