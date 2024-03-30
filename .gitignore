@@ -27,3 +27,6 @@ __pycache__/
 # Ignore .idea folder
 .idea
 .DS_Store
+
+# Ignore the rustc-ice dumps
+rustc-ice-*.txt
