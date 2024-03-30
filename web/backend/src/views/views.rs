@@ -1,12 +1,14 @@
 use serde::Deserialize;
 use serde::Serialize;
 use diesel::Queryable;
+use diesel::QueryableByName;
 use uuid::Uuid;
 use chrono::NaiveDateTime;
 use diesel::r2d2::PooledConnection;
 use diesel::r2d2::ConnectionManager;
 use diesel::prelude::*;
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Queryable, )]
+use crate::views::schema::*;
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Queryable, QueryableByName, )]
 #[diesel(table_name = edits_view)]
 pub struct EditsView {
     pub id: Uuid,
@@ -63,14 +65,13 @@ impl EditsView {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
-        use crate::views::schema::public_user;
-        public_user::dsl::public_user
-            .filter(public_user::dsl::id.eq(id))
+        edits_view::dsl::edits_view
+            .filter(edits_view::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Queryable, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Queryable, QueryableByName, )]
 #[diesel(table_name = last_edits_view)]
 pub struct LastEditsView {
     pub id: Uuid,
@@ -127,14 +128,13 @@ impl LastEditsView {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
-        use crate::views::schema::public_user;
-        public_user::dsl::public_user
-            .filter(public_user::dsl::id.eq(id))
+        last_edits_view::dsl::last_edits_view
+            .filter(last_edits_view::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Queryable, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Queryable, QueryableByName, )]
 #[diesel(table_name = formats_view)]
 pub struct FormatsView {
     pub id: Uuid,
@@ -176,14 +176,13 @@ impl FormatsView {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
-        use crate::views::schema::public_user;
-        public_user::dsl::public_user
-            .filter(public_user::dsl::id.eq(id))
+        formats_view::dsl::formats_view
+            .filter(formats_view::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Queryable, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Queryable, QueryableByName, )]
 #[diesel(table_name = documents_view)]
 pub struct DocumentsView {
     pub id: Uuid,
@@ -273,14 +272,13 @@ impl DocumentsView {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
-        use crate::views::schema::public_user;
-        public_user::dsl::public_user
-            .filter(public_user::dsl::id.eq(id))
+        documents_view::dsl::documents_view
+            .filter(documents_view::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Queryable, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Queryable, QueryableByName, )]
 #[diesel(table_name = public_user)]
 pub struct PublicUser {
     pub id: Uuid,
@@ -328,7 +326,6 @@ impl PublicUser {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
-        use crate::views::schema::public_user;
         public_user::dsl::public_user
             .filter(public_user::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -364,6 +361,30 @@ impl ViewRow {
             web_common::database::View::FormatsView => Ok(Self::FormatsView(FormatsView::get(id, connection)?)),
             web_common::database::View::DocumentsView => Ok(Self::DocumentsView(DocumentsView::get(id, connection)?)),
             web_common::database::View::PublicUser => Ok(Self::PublicUser(PublicUser::get(id, connection)?)),
+        }
+    }
+    /// Search for the row by a given string.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `threshold` - The similarity threshold, by default `0.6`.
+    /// * `views` - The variant of the row to search.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn search(
+        query: &str,
+        limit: Option<i32>,
+        threshold: Option<f64>,
+        views: &web_common::database::View,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        match views {
+            web_common::database::View::EditsView => unimplemented!(),
+            web_common::database::View::LastEditsView => unimplemented!(),
+            web_common::database::View::FormatsView => unimplemented!(),
+            web_common::database::View::DocumentsView => unimplemented!(),
+            web_common::database::View::PublicUser => unimplemented!(),
         }
     }
 }

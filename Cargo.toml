@@ -9,12 +9,3 @@ members = [
     "web/web_common/web_common_derive"
 ]
 
-[profile.release]
-# Less code to include into binary
-panic = 'abort'
-# Optimization over all codebase ( better optimization, slower build )
-codegen-units = 1
-# Optimization for size ( most aggressive )
-opt-level = 'z'
-# Link time optimization using using whole-program analysis
-lto = true

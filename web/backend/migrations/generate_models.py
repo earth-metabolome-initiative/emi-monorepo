@@ -63,15 +63,91 @@ import os
 from dotenv import load_dotenv
 
 
+class PGIndex:
+
+    def __init__(self, name: str, table_name: str, columns: List[str]):
+        self.name = name
+        self.table_name = table_name
+        self.columns = columns
+
+
+class PGIndices:
+
+    def __init__(self, indices: List[PGIndex]):
+        self.indices = indices
+
+    def has_table(self, table_name: str) -> bool:
+        for index in self.indices:
+            if index.table_name == table_name:
+                return True
+        return False
+
+    def get_table(self, table_name: str) -> PGIndex:
+        for index in self.indices:
+            if index.table_name == table_name:
+                return index
+        return None
+
+
+def get_cursor():
+    """Get the cursor to the database."""
+    dbname = os.getenv("POSTGRES_DB")
+    user = os.getenv("POSTGRES_USER")
+    password = os.getenv("POSTGRES_PASSWORD")
+    url = os.getenv("POSTGRES_URL")
+
+    # Establishing a connection to the PostgreSQL database
+    conn = psycopg2.connect(
+        dbname=dbname,
+        user=user,
+        password=password,
+        host="localhost",
+        port="5432",
+    )
+
+    return conn, conn.cursor()
+
+
+def find_pg_trgm_indices() -> PGIndices:
+    """Returns the list of indices that are of type `pg_trgm`."""
+    conn, cursor = get_cursor()
+    cursor.execute(
+        """
+        SELECT
+            indexname AS index_name,
+            tablename AS table_name,
+            substring(indexdef from '\((.*)\)') AS columns_involved
+        FROM
+            pg_indexes
+        WHERE
+            indexdef ILIKE '%using gin%'
+            AND indexdef ILIKE '%gin_trgm_ops%';
+        """
+    )
+    indices = cursor.fetchall()
+    pg_indices = []
+    for index in indices:
+        sanitized_coumn_names = []
+        for column in index[2].split(", "):
+            sanitized_coumn_names.append(column.split(" ")[0])
+
+        pg_indices.append(PGIndex(index[0], index[1], sanitized_coumn_names))
+
+    cursor.close()
+    conn.close()
+
+    return PGIndices(pg_indices)
+
+
 def write_from_impls(
-    path: str,
-    table_type: str,
-    table_structs: Dict[str, Dict[str, str]]
+    path: str, table_type: str, table_structs: Dict[str, Dict[str, str]]
 ):
     """Write the `From` implementations for the structs in the `src/models.rs` file."""
 
     if table_type not in ["tables", "views"]:
         raise ValueError("The table type must be either 'tables' or 'views'.")
+
+    similarity_indices: PGIndices = find_pg_trgm_indices()
 
     with open(path, "r") as file:
         content = file.read()
@@ -81,12 +157,8 @@ def write_from_impls(
     # for the struct where we implement the conversion to the struct in the
     # `web_common` crate.
 
-    impl_from_line = (
-        "impl From<{struct_name}> for web_common::database::{table_type}::{struct_name} {{\n"
-    )
-    reverse_from = (
-        "impl From<web_common::database::{table_type}::{struct_name}> for {struct_name} {{\n"
-    )
+    impl_from_line = "impl From<{struct_name}> for web_common::database::{table_type}::{struct_name} {{\n"
+    reverse_from = "impl From<web_common::database::{table_type}::{struct_name}> for {struct_name} {{\n"
 
     struct_name = None
     struct_field_names = []
@@ -107,7 +179,9 @@ def write_from_impls(
                 # We have found the end of the struct, and we write the
                 # `From` implementation.
                 new_content += "\n"
-                new_content += impl_from_line.format(struct_name=struct_name, table_type=table_type)
+                new_content += impl_from_line.format(
+                    struct_name=struct_name, table_type=table_type
+                )
                 new_content += f"    fn from(item: {struct_name}) -> Self {{\n"
                 new_content += "        Self {\n"
                 for field_name in struct_field_names:
@@ -116,7 +190,9 @@ def write_from_impls(
                 new_content += "    }\n"
                 new_content += "}\n\n"
 
-                new_content += reverse_from.format(struct_name=struct_name, table_type=table_type)
+                new_content += reverse_from.format(
+                    struct_name=struct_name, table_type=table_type
+                )
                 new_content += f"    fn from(item: web_common::database::{table_type}::{struct_name}) -> Self {{\n"
                 new_content += "        Self {\n"
                 for field_name in struct_field_names:
@@ -128,13 +204,12 @@ def write_from_impls(
                 # We now generate the `get` method for the diesel struct.
                 # This method receives the ID of the struct and returns the
                 # struct from the database.
-                # 
+                #
                 # ```rust
                 # pub fn get(
                 #     id: Uuid,
                 #     connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
                 # ) -> Result<Self, diesel::Error> {
-                #     use crate::schema::login_providers;
                 #     login_providers::dsl::login_providers
                 #         .filter(login_providers::dsl::id.eq(provider_id))
                 #         .first::<Self>(&mut conn)
@@ -143,31 +218,84 @@ def write_from_impls(
 
                 table_data = table_structs[struct_name]
                 table_name = table_data["table_name"]
-                
+
                 new_content += f"impl {struct_name} {{\n"
                 new_content += f"    /// Get the struct from the database by its ID.\n"
                 new_content += f"    ///\n"
                 new_content += f"    /// # Arguments\n"
                 new_content += f"    /// * `id` - The ID of the struct to get.\n"
-                new_content += f"    /// * `connection` - The connection to the database.\n"
+                new_content += (
+                    f"    /// * `connection` - The connection to the database.\n"
+                )
                 new_content += f"    ///\n"
                 new_content += f"    pub fn get(\n"
                 new_content += f"        id: Uuid,\n"
                 new_content += f"        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
                 new_content += f"    ) -> Result<Self, diesel::result::Error> {{\n"
-
-                if table_type == "tables":
-                    new_content += f"        use crate::schema::{table_name};\n"
-                elif table_type == "views":
-                    new_content += f"        use crate::views::schema::{table_name};\n"
-                else:
-                    raise NotImplementedError("The table type must be either 'tables' or 'views'.")
-
                 new_content += f"        {table_name}::dsl::{table_name}\n"
                 new_content += f"            .filter({table_name}::dsl::id.eq(id))\n"
                 new_content += f"            .first::<Self>(connection)\n"
                 new_content += f"    }}\n"
-                new_content += f"}}\n"                
+
+                # If this table implements the `pg_trgm` index, we also
+                # provide the `search` method to search for the struct
+                # by a given string. The method also receives a limit
+                # parameter to limit the number of results and a threshold
+                # parameter to set the similarity threshold.
+                if similarity_indices.has_table(table_name):
+                    index = similarity_indices.get_table(table_name)
+                    index_columns = index.columns
+                    new_content += f"    /// Search for the struct by a given string.\n"
+                    new_content += f"    ///\n"
+                    new_content += f"    /// # Arguments\n"
+                    new_content += f"    /// * `query` - The string to search for.\n"
+                    new_content += f"    /// * `limit` - The maximum number of results, by default `10`.\n"
+                    new_content += f"    /// * `threshold` - The similarity threshold, by default `0.6`.\n"
+                    new_content += f"    /// * `connection` - The connection to the database.\n"
+                    new_content += f"    ///\n"
+                    new_content += f"    pub fn search(\n"
+                    new_content += f"        query: &str,\n"
+                    new_content += f"        limit: Option<i32>,\n"
+                    new_content += f"        threshold: Option<f64>,\n"
+                    new_content += f"        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+                    new_content += f"    ) -> Result<Vec<Self>, diesel::result::Error> {{\n"
+
+                    if table_type == "tables":
+                        new_content += f"        use crate::schema::{table_name};\n"
+                    elif table_type == "views":
+                        new_content += f"        use crate::views::schema::{table_name};\n"
+                    else:
+                        raise NotImplementedError(
+                            "The table type must be either 'tables' or 'views'."
+                        )
+
+                    new_content += f"        let limit = limit.unwrap_or(10);\n"
+                    new_content += f"        let threshold = threshold.unwrap_or(0.6);\n"
+
+                    # Since Diesel does not support the `similarity` Postgres function natively
+                    # as part of the DSL query builder, we are forced to build the query manually
+                    # in raw SQL. We use the `sql_query` function to execute the raw SQL query.
+                    # Since the `sql_query` function needs to run a raw SQL query, we need to
+                    # sanitize the input to avoid SQL injection attacks. 
+
+                    joined_field_names = ", ".join(struct_field_names)
+
+                    new_content += f"        let similarity_query = format!(concat!(\n"
+                    new_content += f"            r#\"SELECT {joined_field_names} FROM {table_name} WHERE\",\n"
+                    new_content += f"            \"similarity({', '.join(index_columns)}, '$1') > $2\",\n"
+                    new_content += f"            \"ORDER BY similarity({', '.join(index_columns)}, '$1') DESC LIMIT $3;\"#\n"
+                    new_content += f"        ));\n"
+
+                    new_content += f"        diesel::sql_query(similarity_query)\n"
+                    new_content += f"            .bind::<diesel::sql_types::Text, _>(query)\n"
+                    new_content += f"            .bind::<diesel::sql_types::Float8, _>(threshold)\n"
+                    new_content += f"            .bind::<diesel::sql_types::Integer, _>(limit)\n"
+                    new_content += f"            .load(connection)\n"
+
+                    new_content += f"}}\n"
+
+                # Finally, we cluse the struct implementation.
+                new_content += f"}}\n"
 
                 struct_name = None
                 struct_field_names = []
@@ -219,13 +347,46 @@ def write_from_impls(
     new_content += f"    pub fn get(\n"
     new_content += f"        id: Uuid,\n"
     new_content += f"        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
-    new_content += f"        {table_type}: &web_common::database::{capitalized_table_type}\n"
+    new_content += (
+        f"        {table_type}: &web_common::database::{capitalized_table_type}\n"
+    )
     new_content += f"    ) -> Result<Self, diesel::result::Error> {{\n"
     new_content += f"        match {table_type} {{\n"
     for struct_name in table_structs.keys():
         new_content += f"            web_common::database::{capitalized_table_type}::{struct_name} => Ok(Self::{struct_name}({struct_name}::get(id, connection)?)),\n"
     new_content += f"        }}\n"
     new_content += f"    }}\n"
+
+    # Similarly, we implement the search method for each of the variants that
+    # support the `pg_trgm` index. The method receives the query string, the
+    # limit, the threshold, the table type, and the connection to the database.
+    # When the type does not support the method, we raise an unimplemented error.
+    new_content += f"    /// Search for the row by a given string.\n"
+    new_content += f"    ///\n"
+    new_content += f"    /// # Arguments\n"
+    new_content += f"    /// * `query` - The string to search for.\n"
+    new_content += f"    /// * `limit` - The maximum number of results, by default `10`.\n"
+    new_content += f"    /// * `threshold` - The similarity threshold, by default `0.6`.\n"
+    new_content += f"    /// * `{table_type}` - The variant of the row to search.\n"
+    new_content += f"    /// * `connection` - The connection to the database.\n"
+    new_content += f"    ///\n"
+    new_content += f"    pub fn search(\n"
+    new_content += f"        query: &str,\n"
+    new_content += f"        limit: Option<i32>,\n"
+    new_content += f"        threshold: Option<f64>,\n"
+    new_content += f"        {table_type}: &web_common::database::{capitalized_table_type},\n"
+    new_content += f"        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+    new_content += f"    ) -> Result<Vec<Self>, diesel::result::Error> {{\n"
+    new_content += f"        match {table_type} {{\n"
+    for struct_name in table_structs.keys():
+        if similarity_indices.has_table(table_structs[struct_name]["table_name"]):
+            new_content += f"            web_common::database::{capitalized_table_type}::{struct_name} => Ok(Self::{struct_name}({struct_name}::search(query, limit, threshold, connection)?)),\n"
+        else:
+            new_content += f"            web_common::database::{capitalized_table_type}::{struct_name} => unimplemented!(),\n"
+    new_content += f"        }}\n"
+    new_content += f"    }}\n"
+
+    # Then we close the enumeration implementation.
     new_content += f"}}\n"
 
     # Next up, we implement the bidirectional From for the TableRow or ViewRow
@@ -252,7 +413,9 @@ def write_from_impls(
         file.write(new_content)
 
 
-def write_web_common_structs(path: str, target: str, enumeration: str) -> Dict[str, Dict[str, str]]:
+def write_web_common_structs(
+    path: str, target: str, enumeration: str
+) -> Dict[str, Dict[str, str]]:
     """Write the structs in the target file in the `web_common` crate.
 
     Parameters
@@ -340,11 +503,11 @@ def write_web_common_structs(path: str, target: str, enumeration: str) -> Dict[s
             if "}" in line:
                 inside_struct = False
 
-            table_names[struct_name] = struct_metadata
+            table_names[struct_name] = struct_metadata.copy()
 
             # We write the line to the file
             tables.write(f"{line}\n")
-    
+
     # We create the Table enumeration, containing all
     # the table names. We also implement the `table_name`
     # method for the enumeration, returning the table name
@@ -382,8 +545,10 @@ def write_web_common_structs(path: str, target: str, enumeration: str) -> Dict[s
 
     # We implement Display for the enumeration
     tables.write(f"impl std::fmt::Display for {enumeration} {{\n")
-    tables.write("    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {\n")
-    tables.write("        write!(f, \"{}\", self.name())\n")
+    tables.write(
+        "    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {\n"
+    )
+    tables.write('        write!(f, "{}", self.name())\n')
     tables.write("    }\n")
     tables.write("}\n")
 
@@ -490,7 +655,9 @@ def generate_diesel_schema(view_name, columns):
     schema_code = "diesel::table! {\n"
     schema_code += f"    {view_name} (id) {{\n"
     for column in columns:
-        schema_code += f"        {column[0]} -> {map_postgres_to_rust_type(column[1])},\n"
+        schema_code += (
+            f"        {column[0]} -> {map_postgres_to_rust_type(column[1])},\n"
+        )
     schema_code += "    }\n"
     schema_code += "}\n"
     return schema_code
@@ -507,21 +674,7 @@ def generate_view_schema():
     """
     # We load the data from the environment variables from the `.env` file
     # at `../.env`.
-    dbname = os.getenv("POSTGRES_DB")
-    user = os.getenv("POSTGRES_USER")
-    password = os.getenv("POSTGRES_PASSWORD")
-    url = os.getenv("POSTGRES_URL")
-
-    # Establishing a connection to the PostgreSQL database
-    conn = psycopg2.connect(
-        dbname=dbname,
-        user=user,
-        password=password,
-        host="localhost",
-        port="5432",
-    )
-
-    cursor = conn.cursor()
+    conn, cursor = get_cursor()
 
     # Getting the list of views
     views = get_views(cursor)
@@ -601,11 +754,13 @@ def generate_view_structs():
         "use serde::Deserialize;",
         "use serde::Serialize;",
         "use diesel::Queryable;",
+        "use diesel::QueryableByName;",
         "use uuid::Uuid;",
         "use chrono::NaiveDateTime;",
         "use diesel::r2d2::PooledConnection;",
         "use diesel::r2d2::ConnectionManager;",
         "use diesel::prelude::*;",
+        "use crate::views::schema::*;"
     ]
 
     derives = [
@@ -615,6 +770,7 @@ def generate_view_structs():
         "Debug",
         "PartialEq",
         "Queryable",
+        "QueryableByName"
     ]
 
     views = open("src/views/views.rs", "w")
@@ -679,10 +835,12 @@ def generate_view_structs():
         if brackets_count == 0:
             attributes = {}
             view_name = None
-    
+
     view_names_from_sql = get_view_names()
     for view_name in view_names_from_sql:
-        assert view_name in view_names, f"View \"{view_name}\" is not present in the \"schema.rs\" file."
+        assert (
+            view_name in view_names
+        ), f'View "{view_name}" is not present in the "schema.rs" file.'
 
     views.close()
 
@@ -704,6 +862,7 @@ def main():
     # Imports to always add to the file
     imports = [
         "use diesel::Queryable;",
+        "use diesel::QueryableByName;",
         "use diesel::Identifiable;",
         "use diesel::Insertable;",
         "use crate::schema::*;",
@@ -712,7 +871,7 @@ def main():
         "use serde::Serialize;",
         "use diesel::r2d2::ConnectionManager;",
         "use diesel::r2d2::PooledConnection;",
-        "use diesel::prelude::*;"
+        "use diesel::prelude::*;",
     ]
 
     for import_statement in imports:
@@ -722,11 +881,7 @@ def main():
             )
 
     # We need to add some extra derives to the structs
-    derives = [
-        "Selectable",
-        "Clone",
-        "PartialEq"
-    ]
+    derives = ["Selectable", "Clone", "PartialEq"]
 
     for derive in derives:
         content = content.replace("#[derive(", f"#[derive({derive}, ")
@@ -754,7 +909,7 @@ def main():
                         f"#![allow(clippy::all)]\n{import_statement}",
                     )
 
-    complex_derives = ["Serialize", "Deserialize", "Insertable", "PartialEq"]
+    complex_derives = ["Serialize", "Deserialize", "Insertable", "PartialEq", "QueryableByName"]
 
     deny_list = ["Interval", "Range<Numeric>", "Money"]
 
@@ -805,18 +960,14 @@ if __name__ == "__main__":
     generate_view_schema()
     check_schema_completion()
     generate_view_structs()
-    table_structs: Dict[str, Dict[str, str]] = write_web_common_structs("src/models.rs", "tables", "Table")
-    view_structs: Dict[str, Dict[str, str]] = write_web_common_structs("src/views/views.rs", "views", "View")
-    write_from_impls(
-        "src/models.rs",
-        "tables",
-        table_structs
+    table_structs: Dict[str, Dict[str, str]] = write_web_common_structs(
+        "src/models.rs", "tables", "Table"
     )
-    write_from_impls(
-        "src/views/views.rs",
-        "views",
-        view_structs
+    view_structs: Dict[str, Dict[str, str]] = write_web_common_structs(
+        "src/views/views.rs", "views", "View"
     )
+    write_from_impls("src/models.rs", "tables", table_structs)
+    write_from_impls("src/views/views.rs", "views", view_structs)
     # Finally, we format the file
     os.system("rustfmt src/models.rs")
     os.system("rustfmt ../web_common/src/database/tables.rs")

@@ -9,6 +9,7 @@ use diesel::r2d2::PooledConnection;
 use diesel::Identifiable;
 use diesel::Insertable;
 use diesel::Queryable;
+use diesel::QueryableByName;
 use diesel::Selectable;
 use serde::Deserialize;
 use serde::Serialize;
@@ -17,7 +18,17 @@ use chrono::offset::Utc;
 use chrono::DateTime;
 use chrono::NaiveDateTime;
 use uuid::Uuid;
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = archivables)]
 pub struct Archivable {
     pub id: Uuid,
@@ -55,14 +66,23 @@ impl Archivable {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        archivables::dsl::archivables
+            .filter(archivables::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = container_horizontal_rules)]
 pub struct ContainerHorizontalRule {
     pub id: Uuid,
@@ -118,14 +138,23 @@ impl ContainerHorizontalRule {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        container_horizontal_rules::dsl::container_horizontal_rules
+            .filter(container_horizontal_rules::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = container_vertical_rules)]
 pub struct ContainerVerticalRule {
     pub id: Uuid,
@@ -181,14 +210,23 @@ impl ContainerVerticalRule {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        container_vertical_rules::dsl::container_vertical_rules
+            .filter(container_vertical_rules::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = continuous_units)]
 pub struct ContinuousUnit {
     pub id: Uuid,
@@ -216,14 +254,23 @@ impl ContinuousUnit {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        continuous_units::dsl::continuous_units
+            .filter(continuous_units::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = describables)]
 pub struct Describable {
     pub id: Uuid,
@@ -261,14 +308,23 @@ impl Describable {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        describables::dsl::describables
+            .filter(describables::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = discrete_units)]
 pub struct DiscreteUnit {
     pub id: Uuid,
@@ -296,14 +352,23 @@ impl DiscreteUnit {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        discrete_units::dsl::discrete_units
+            .filter(discrete_units::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = document_formats)]
 pub struct DocumentFormat {
     pub id: Uuid,
@@ -338,14 +403,23 @@ impl DocumentFormat {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        document_formats::dsl::document_formats
+            .filter(document_formats::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = documents)]
 pub struct Document {
     pub id: Uuid,
@@ -386,14 +460,23 @@ impl Document {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        documents::dsl::documents
+            .filter(documents::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = editables)]
 pub struct Editable {
     pub id: Uuid,
@@ -431,14 +514,23 @@ impl Editable {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        editables::dsl::editables
+            .filter(editables::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = edits)]
 pub struct Edit {
     pub id: Uuid,
@@ -473,14 +565,23 @@ impl Edit {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        edits::dsl::edits
+            .filter(edits::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = item_categories)]
 pub struct ItemCategory {
     pub id: Uuid,
@@ -508,14 +609,23 @@ impl ItemCategory {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        item_categories::dsl::item_categories
+            .filter(item_categories::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = item_category_relationships)]
 pub struct ItemCategoryRelationship {
     pub id: Uuid,
@@ -553,14 +663,23 @@ impl ItemCategoryRelationship {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        item_category_relationships::dsl::item_category_relationships
+            .filter(item_category_relationships::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = item_category_units)]
 pub struct ItemCategoryUnit {
     pub id: Uuid,
@@ -598,14 +717,23 @@ impl ItemCategoryUnit {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        item_category_units::dsl::item_category_units
+            .filter(item_category_units::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = item_continuous_quantities)]
 pub struct ItemContinuousQuantity {
     pub id: Uuid,
@@ -655,14 +783,23 @@ impl ItemContinuousQuantity {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        item_continuous_quantities::dsl::item_continuous_quantities
+            .filter(item_continuous_quantities::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = item_discrete_quantities)]
 pub struct ItemDiscreteQuantity {
     pub id: Uuid,
@@ -709,14 +846,23 @@ impl ItemDiscreteQuantity {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        item_discrete_quantities::dsl::item_discrete_quantities
+            .filter(item_discrete_quantities::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = item_locations)]
 pub struct ItemLocation {
     pub id: Uuid,
@@ -757,14 +903,23 @@ impl ItemLocation {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        item_locations::dsl::item_locations
+            .filter(item_locations::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = item_units)]
 pub struct ItemUnit {
     pub id: Uuid,
@@ -802,14 +957,23 @@ impl ItemUnit {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        item_units::dsl::item_units
+            .filter(item_units::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = items)]
 pub struct Item {
     pub id: Uuid,
@@ -844,14 +1008,23 @@ impl Item {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        items::dsl::items
+            .filter(items::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = location_states)]
 pub struct LocationState {
     pub id: Uuid,
@@ -886,14 +1059,23 @@ impl LocationState {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        location_states::dsl::location_states
+            .filter(location_states::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = locations)]
 pub struct Location {
     pub id: Uuid,
@@ -949,14 +1131,23 @@ impl Location {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        locations::dsl::locations
+            .filter(locations::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = login_providers)]
 pub struct LoginProvider {
     pub id: Uuid,
@@ -1006,14 +1197,23 @@ impl LoginProvider {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        login_providers::dsl::login_providers
+            .filter(login_providers::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = manufactured_item_categories)]
 pub struct ManufacturedItemCategory {
     pub id: Uuid,
@@ -1057,14 +1257,23 @@ impl ManufacturedItemCategory {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        manufactured_item_categories::dsl::manufactured_item_categories
+            .filter(manufactured_item_categories::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = notifications)]
 pub struct Notification {
     pub id: Uuid,
@@ -1111,14 +1320,23 @@ impl Notification {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        notifications::dsl::notifications
+            .filter(notifications::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = organization_authorizations)]
 pub struct OrganizationAuthorization {
     pub id: Uuid,
@@ -1159,14 +1377,23 @@ impl OrganizationAuthorization {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        organization_authorizations::dsl::organization_authorizations
+            .filter(organization_authorizations::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = organization_locations)]
 pub struct OrganizationLocation {
     pub id: Uuid,
@@ -1207,14 +1434,23 @@ impl OrganizationLocation {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        organization_locations::dsl::organization_locations
+            .filter(organization_locations::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = organization_states)]
 pub struct OrganizationState {
     pub id: Uuid,
@@ -1249,14 +1485,23 @@ impl OrganizationState {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        organization_states::dsl::organization_states
+            .filter(organization_states::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = organizations)]
 pub struct Organization {
     pub id: Uuid,
@@ -1300,14 +1545,23 @@ impl Organization {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        organizations::dsl::organizations
+            .filter(organizations::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = primary_user_emails)]
 pub struct PrimaryUserEmail {
     pub id: Uuid,
@@ -1335,14 +1589,23 @@ impl PrimaryUserEmail {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        primary_user_emails::dsl::primary_user_emails
+            .filter(primary_user_emails::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = procedure_continuous_requirements)]
 pub struct ProcedureContinuousRequirement {
     pub id: Uuid,
@@ -1390,14 +1653,23 @@ impl ProcedureContinuousRequirement {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        procedure_continuous_requirements::dsl::procedure_continuous_requirements
+            .filter(procedure_continuous_requirements::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = procedure_discrete_requirements)]
 pub struct ProcedureDiscreteRequirement {
     pub id: Uuid,
@@ -1445,14 +1717,23 @@ impl ProcedureDiscreteRequirement {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        procedure_discrete_requirements::dsl::procedure_discrete_requirements
+            .filter(procedure_discrete_requirements::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = procedures)]
 pub struct Procedure {
     pub id: Uuid,
@@ -1480,14 +1761,23 @@ impl Procedure {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        procedures::dsl::procedures
+            .filter(procedures::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = project_continuous_requirements)]
 pub struct ProjectContinuousRequirement {
     pub id: Uuid,
@@ -1535,14 +1825,23 @@ impl ProjectContinuousRequirement {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        project_continuous_requirements::dsl::project_continuous_requirements
+            .filter(project_continuous_requirements::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = project_discrete_requirements)]
 pub struct ProjectDiscreteRequirement {
     pub id: Uuid,
@@ -1586,14 +1885,23 @@ impl ProjectDiscreteRequirement {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        project_discrete_requirements::dsl::project_discrete_requirements
+            .filter(project_discrete_requirements::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = project_milestones)]
 pub struct ProjectMilestone {
     pub id: Uuid,
@@ -1634,14 +1942,23 @@ impl ProjectMilestone {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        project_milestones::dsl::project_milestones
+            .filter(project_milestones::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = project_states)]
 pub struct ProjectState {
     pub id: Uuid,
@@ -1685,14 +2002,50 @@ impl ProjectState {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        project_states::dsl::project_states
+            .filter(project_states::dsl::id.eq(id))
             .first::<Self>(connection)
+    }
+    /// Search for the struct by a given string.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `threshold` - The similarity threshold, by default `0.6`.
+    /// * `connection` - The connection to the database.
+    pub fn search(
+        query: &str,
+        limit: Option<i32>,
+        threshold: Option<f64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::project_states;
+        let limit = limit.unwrap_or(10);
+        let threshold = threshold.unwrap_or(0.6);
+        let similarity_query = format!(concat!(
+            r#"SELECT id, name, description, font_awesome_icon, icon_color FROM project_states WHERE",
+            "similarity(name, description, '$1') > $2",
+            "ORDER BY similarity(name, description, '$1') DESC LIMIT $3;"#
+        ));
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Float8, _>(threshold)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = projects)]
 pub struct Project {
     pub id: Uuid,
@@ -1760,14 +2113,50 @@ impl Project {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        projects::dsl::projects
+            .filter(projects::dsl::id.eq(id))
             .first::<Self>(connection)
+    }
+    /// Search for the struct by a given string.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `threshold` - The similarity threshold, by default `0.6`.
+    /// * `connection` - The connection to the database.
+    pub fn search(
+        query: &str,
+        limit: Option<i32>,
+        threshold: Option<f64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::projects;
+        let limit = limit.unwrap_or(10);
+        let threshold = threshold.unwrap_or(0.6);
+        let similarity_query = format!(concat!(
+            r#"SELECT id, name, description, public, state_id, parent_project_id, budget, expenses, currency, created_by, created_at, expected_end_date, end_date FROM projects WHERE",
+            "similarity(name, description, '$1') > $2",
+            "ORDER BY similarity(name, description, '$1') DESC LIMIT $3;"#
+        ));
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Float8, _>(threshold)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = roles)]
 pub struct Role {
     pub id: Uuid,
@@ -1795,14 +2184,23 @@ impl Role {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        roles::dsl::roles
+            .filter(roles::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = sample_taxa)]
 pub struct SampleTaxa {
     pub id: Uuid,
@@ -1840,14 +2238,23 @@ impl SampleTaxa {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        sample_taxa::dsl::sample_taxa
+            .filter(sample_taxa::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = sampled_individual_taxa)]
 pub struct SampledIndividualTaxa {
     pub id: Uuid,
@@ -1885,14 +2292,23 @@ impl SampledIndividualTaxa {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        sampled_individual_taxa::dsl::sampled_individual_taxa
+            .filter(sampled_individual_taxa::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = sampled_individuals)]
 pub struct SampledIndividual {
     pub id: Uuid,
@@ -1920,14 +2336,23 @@ impl SampledIndividual {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        sampled_individuals::dsl::sampled_individuals
+            .filter(sampled_individuals::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = samples)]
 pub struct Sample {
     pub id: Uuid,
@@ -1962,14 +2387,23 @@ impl Sample {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        samples::dsl::samples
+            .filter(samples::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = spectra)]
 pub struct Spectra {
     pub id: Uuid,
@@ -2004,14 +2438,23 @@ impl Spectra {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        spectra::dsl::spectra
+            .filter(spectra::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = spectra_collection)]
 pub struct SpectraCollection {
     pub id: Uuid,
@@ -2046,14 +2489,23 @@ impl SpectraCollection {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        spectra_collection::dsl::spectra_collection
+            .filter(spectra_collection::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = taxa)]
 pub struct Taxa {
     pub id: Uuid,
@@ -2091,14 +2543,50 @@ impl Taxa {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        taxa::dsl::taxa
+            .filter(taxa::dsl::id.eq(id))
             .first::<Self>(connection)
+    }
+    /// Search for the struct by a given string.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `threshold` - The similarity threshold, by default `0.6`.
+    /// * `connection` - The connection to the database.
+    pub fn search(
+        query: &str,
+        limit: Option<i32>,
+        threshold: Option<f64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::taxa;
+        let limit = limit.unwrap_or(10);
+        let threshold = threshold.unwrap_or(0.6);
+        let similarity_query = format!(concat!(
+            r#"SELECT id, name, ncbi_taxon_id FROM taxa WHERE",
+            "similarity(name, '$1') > $2",
+            "ORDER BY similarity(name, '$1') DESC LIMIT $3;"#
+        ));
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Float8, _>(threshold)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = team_authorizations)]
 pub struct TeamAuthorization {
     pub id: Uuid,
@@ -2139,14 +2627,23 @@ impl TeamAuthorization {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        team_authorizations::dsl::team_authorizations
+            .filter(team_authorizations::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = team_states)]
 pub struct TeamState {
     pub id: Uuid,
@@ -2181,14 +2678,23 @@ impl TeamState {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        team_states::dsl::team_states
+            .filter(team_states::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = teams)]
 pub struct Team {
     pub id: Uuid,
@@ -2226,14 +2732,23 @@ impl Team {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        teams::dsl::teams
+            .filter(teams::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = units)]
 pub struct Unit {
     pub id: Uuid,
@@ -2268,14 +2783,23 @@ impl Unit {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        units::dsl::units
+            .filter(units::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = user_authorizations)]
 pub struct UserAuthorization {
     pub id: Uuid,
@@ -2316,14 +2840,23 @@ impl UserAuthorization {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        user_authorizations::dsl::user_authorizations
+            .filter(user_authorizations::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = user_emails)]
 pub struct UserEmail {
     pub id: Uuid,
@@ -2364,14 +2897,23 @@ impl UserEmail {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(id))
+        user_emails::dsl::user_emails
+            .filter(user_emails::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(
+    QueryableByName,
+    Insertable,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Clone,
+    Selectable,
+    Queryable,
+    Debug,
+)]
 #[diesel(table_name = users)]
 pub struct User {
     pub id: Uuid,
@@ -2418,10 +2960,36 @@ impl User {
         id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::users;
         users::dsl::users
             .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
+    }
+    /// Search for the struct by a given string.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `threshold` - The similarity threshold, by default `0.6`.
+    /// * `connection` - The connection to the database.
+    pub fn search(
+        query: &str,
+        limit: Option<i32>,
+        threshold: Option<f64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::users;
+        let limit = limit.unwrap_or(10);
+        let threshold = threshold.unwrap_or(0.6);
+        let similarity_query = format!(concat!(
+            r#"SELECT id, first_name, middle_name, last_name, created_at, updated_at FROM users WHERE",
+            "similarity(first_name, middle_name, last_name, '$1') > $2",
+            "ORDER BY similarity(first_name, middle_name, last_name, '$1') DESC LIMIT $3;"#
+        ));
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Float8, _>(threshold)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
     }
 }
 
@@ -2636,6 +3204,83 @@ impl TableRow {
                 Ok(Self::UserEmail(UserEmail::get(id, connection)?))
             }
             web_common::database::Table::User => Ok(Self::User(User::get(id, connection)?)),
+        }
+    }
+    /// Search for the row by a given string.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `threshold` - The similarity threshold, by default `0.6`.
+    /// * `tables` - The variant of the row to search.
+    /// * `connection` - The connection to the database.
+    pub fn search(
+        query: &str,
+        limit: Option<i32>,
+        threshold: Option<f64>,
+        tables: &web_common::database::Table,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        match tables {
+            web_common::database::Table::Archivable => unimplemented!(),
+            web_common::database::Table::ContainerHorizontalRule => unimplemented!(),
+            web_common::database::Table::ContainerVerticalRule => unimplemented!(),
+            web_common::database::Table::ContinuousUnit => unimplemented!(),
+            web_common::database::Table::Describable => unimplemented!(),
+            web_common::database::Table::DiscreteUnit => unimplemented!(),
+            web_common::database::Table::DocumentFormat => unimplemented!(),
+            web_common::database::Table::Document => unimplemented!(),
+            web_common::database::Table::Editable => unimplemented!(),
+            web_common::database::Table::Edit => unimplemented!(),
+            web_common::database::Table::ItemCategory => unimplemented!(),
+            web_common::database::Table::ItemCategoryRelationship => unimplemented!(),
+            web_common::database::Table::ItemCategoryUnit => unimplemented!(),
+            web_common::database::Table::ItemContinuousQuantity => unimplemented!(),
+            web_common::database::Table::ItemDiscreteQuantity => unimplemented!(),
+            web_common::database::Table::ItemLocation => unimplemented!(),
+            web_common::database::Table::ItemUnit => unimplemented!(),
+            web_common::database::Table::Item => unimplemented!(),
+            web_common::database::Table::LocationState => unimplemented!(),
+            web_common::database::Table::Location => unimplemented!(),
+            web_common::database::Table::LoginProvider => unimplemented!(),
+            web_common::database::Table::ManufacturedItemCategory => unimplemented!(),
+            web_common::database::Table::Notification => unimplemented!(),
+            web_common::database::Table::OrganizationAuthorization => unimplemented!(),
+            web_common::database::Table::OrganizationLocation => unimplemented!(),
+            web_common::database::Table::OrganizationState => unimplemented!(),
+            web_common::database::Table::Organization => unimplemented!(),
+            web_common::database::Table::PrimaryUserEmail => unimplemented!(),
+            web_common::database::Table::ProcedureContinuousRequirement => unimplemented!(),
+            web_common::database::Table::ProcedureDiscreteRequirement => unimplemented!(),
+            web_common::database::Table::Procedure => unimplemented!(),
+            web_common::database::Table::ProjectContinuousRequirement => unimplemented!(),
+            web_common::database::Table::ProjectDiscreteRequirement => unimplemented!(),
+            web_common::database::Table::ProjectMilestone => unimplemented!(),
+            web_common::database::Table::ProjectState => Ok(Self::ProjectState(
+                ProjectState::search(query, limit, threshold, connection)?,
+            )),
+            web_common::database::Table::Project => Ok(Self::Project(Project::search(
+                query, limit, threshold, connection,
+            )?)),
+            web_common::database::Table::Role => unimplemented!(),
+            web_common::database::Table::SampleTaxa => unimplemented!(),
+            web_common::database::Table::SampledIndividualTaxa => unimplemented!(),
+            web_common::database::Table::SampledIndividual => unimplemented!(),
+            web_common::database::Table::Sample => unimplemented!(),
+            web_common::database::Table::Spectra => unimplemented!(),
+            web_common::database::Table::SpectraCollection => unimplemented!(),
+            web_common::database::Table::Taxa => Ok(Self::Taxa(Taxa::search(
+                query, limit, threshold, connection,
+            )?)),
+            web_common::database::Table::TeamAuthorization => unimplemented!(),
+            web_common::database::Table::TeamState => unimplemented!(),
+            web_common::database::Table::Team => unimplemented!(),
+            web_common::database::Table::Unit => unimplemented!(),
+            web_common::database::Table::UserAuthorization => unimplemented!(),
+            web_common::database::Table::UserEmail => unimplemented!(),
+            web_common::database::Table::User => Ok(Self::User(User::search(
+                query, limit, threshold, connection,
+            )?)),
         }
     }
 }

@@ -79,10 +79,10 @@ pub enum View {
 impl View {
     pub fn name(&self) -> &'static str {
         match self {
-            View::EditsView => "public_user",
-            View::LastEditsView => "public_user",
-            View::FormatsView => "public_user",
-            View::DocumentsView => "public_user",
+            View::EditsView => "edits_view",
+            View::LastEditsView => "last_edits_view",
+            View::FormatsView => "formats_view",
+            View::DocumentsView => "documents_view",
             View::PublicUser => "public_user",
         }
     }
@@ -105,10 +105,10 @@ pub enum ViewRow {
 impl From<&str> for View {
     fn from(item: &str) -> Self {
         match item {
-            "public_user" => View::EditsView,
-            "public_user" => View::LastEditsView,
-            "public_user" => View::FormatsView,
-            "public_user" => View::DocumentsView,
+            "edits_view" => View::EditsView,
+            "last_edits_view" => View::LastEditsView,
+            "formats_view" => View::FormatsView,
+            "documents_view" => View::DocumentsView,
             "public_user" => View::PublicUser,
             _ => panic!("Unknown table name"),
         }
