@@ -1,7 +1,7 @@
 //! Submodule providing the Notification Message struct.
 
-use serde::{Deserialize, Serialize};
 use crate::database::Notification;
+use serde::{Deserialize, Serialize};
 
 use super::ViewRow;
 
@@ -25,7 +25,11 @@ pub enum SQLOperation {
 
 impl NotificationMessage {
     /// Create a new notification message.
-    pub fn new(operation: SQLOperation, notification: Notification, view_row: Option<ViewRow>) -> Self {
+    pub fn new(
+        operation: SQLOperation,
+        notification: Notification,
+        view_row: Option<ViewRow>,
+    ) -> Self {
         Self {
             operation,
             notification,

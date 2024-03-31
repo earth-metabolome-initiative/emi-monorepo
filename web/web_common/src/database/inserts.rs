@@ -1,6 +1,6 @@
 pub mod new_project;
-pub use new_project::NewProject;
 use crate::database::Authorization;
+pub use new_project::NewProject;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]

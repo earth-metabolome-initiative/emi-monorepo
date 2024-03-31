@@ -1,4 +1,3 @@
-use chrono::DateTime;
 use chrono::NaiveDateTime;
 use serde::Deserialize;
 use serde::Serialize;
@@ -11,6 +10,31 @@ pub struct Archivable {
 }
 #[cfg(feature = "frontend")]
 impl Archivable {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            gluesql::core::ast_builder::timestamp(self.archived_at.to_string()),
+            gluesql::core::ast_builder::expr(self.archived_by.to_string()),
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("archivables")
+            .insert()
+            .columns("id, archived_at, archived_by")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -28,6 +52,44 @@ impl Archivable {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("archivables")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("archivables").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row = update_row.set(
+            "archived_at",
+            gluesql::core::ast_builder::timestamp(self.archived_at.to_string()),
+        );
+        update_row = update_row.set(
+            "archived_by",
+            gluesql::core::ast_builder::expr(self.archived_by.to_string()),
+        );
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -61,6 +123,63 @@ pub struct ContainerHorizontalRule {
 }
 #[cfg(feature = "frontend")]
 impl ContainerHorizontalRule {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            match self.item_type_id {
+                Some(item_type_id) => gluesql::core::ast_builder::expr(item_type_id.to_string()),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.other_item_type_id {
+                Some(other_item_type_id) => {
+                    gluesql::core::ast_builder::expr(other_item_type_id.to_string())
+                }
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.minimum_temperature {
+                Some(minimum_temperature) => gluesql::core::ast_builder::num(minimum_temperature),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.maximum_temperature {
+                Some(maximum_temperature) => gluesql::core::ast_builder::num(maximum_temperature),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.minimum_humidity {
+                Some(minimum_humidity) => gluesql::core::ast_builder::num(minimum_humidity),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.maximum_humidity {
+                Some(maximum_humidity) => gluesql::core::ast_builder::num(maximum_humidity),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.minimum_pressure {
+                Some(minimum_pressure) => gluesql::core::ast_builder::num(minimum_pressure),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.maximum_pressure {
+                Some(maximum_pressure) => gluesql::core::ast_builder::num(maximum_pressure),
+                None => gluesql::core::ast_builder::null(),
+            },
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("container_horizontal_rules")
+            .insert()
+            .columns("id, item_type_id, other_item_type_id, minimum_temperature, maximum_temperature, minimum_humidity, maximum_humidity, minimum_pressure, maximum_pressure")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -78,6 +197,84 @@ impl ContainerHorizontalRule {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("container_horizontal_rules")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("container_horizontal_rules").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        if let Some(item_type_id) = self.item_type_id {
+            update_row = update_row.set(
+                "item_type_id",
+                gluesql::core::ast_builder::expr(item_type_id.to_string()),
+            );
+        }
+        if let Some(other_item_type_id) = self.other_item_type_id {
+            update_row = update_row.set(
+                "other_item_type_id",
+                gluesql::core::ast_builder::expr(other_item_type_id.to_string()),
+            );
+        }
+        if let Some(minimum_temperature) = self.minimum_temperature {
+            update_row = update_row.set(
+                "minimum_temperature",
+                gluesql::core::ast_builder::num(minimum_temperature),
+            );
+        }
+        if let Some(maximum_temperature) = self.maximum_temperature {
+            update_row = update_row.set(
+                "maximum_temperature",
+                gluesql::core::ast_builder::num(maximum_temperature),
+            );
+        }
+        if let Some(minimum_humidity) = self.minimum_humidity {
+            update_row = update_row.set(
+                "minimum_humidity",
+                gluesql::core::ast_builder::num(minimum_humidity),
+            );
+        }
+        if let Some(maximum_humidity) = self.maximum_humidity {
+            update_row = update_row.set(
+                "maximum_humidity",
+                gluesql::core::ast_builder::num(maximum_humidity),
+            );
+        }
+        if let Some(minimum_pressure) = self.minimum_pressure {
+            update_row = update_row.set(
+                "minimum_pressure",
+                gluesql::core::ast_builder::num(minimum_pressure),
+            );
+        }
+        if let Some(maximum_pressure) = self.maximum_pressure {
+            update_row = update_row.set(
+                "maximum_pressure",
+                gluesql::core::ast_builder::num(maximum_pressure),
+            );
+        }
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -149,6 +346,65 @@ pub struct ContainerVerticalRule {
 }
 #[cfg(feature = "frontend")]
 impl ContainerVerticalRule {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            match self.container_item_type_id {
+                Some(container_item_type_id) => {
+                    gluesql::core::ast_builder::expr(container_item_type_id.to_string())
+                }
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.contained_item_type_id {
+                Some(contained_item_type_id) => {
+                    gluesql::core::ast_builder::expr(contained_item_type_id.to_string())
+                }
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.minimum_temperature {
+                Some(minimum_temperature) => gluesql::core::ast_builder::num(minimum_temperature),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.maximum_temperature {
+                Some(maximum_temperature) => gluesql::core::ast_builder::num(maximum_temperature),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.minimum_humidity {
+                Some(minimum_humidity) => gluesql::core::ast_builder::num(minimum_humidity),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.maximum_humidity {
+                Some(maximum_humidity) => gluesql::core::ast_builder::num(maximum_humidity),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.minimum_pressure {
+                Some(minimum_pressure) => gluesql::core::ast_builder::num(minimum_pressure),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.maximum_pressure {
+                Some(maximum_pressure) => gluesql::core::ast_builder::num(maximum_pressure),
+                None => gluesql::core::ast_builder::null(),
+            },
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("container_vertical_rules")
+            .insert()
+            .columns("id, container_item_type_id, contained_item_type_id, minimum_temperature, maximum_temperature, minimum_humidity, maximum_humidity, minimum_pressure, maximum_pressure")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -166,6 +422,84 @@ impl ContainerVerticalRule {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("container_vertical_rules")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("container_vertical_rules").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        if let Some(container_item_type_id) = self.container_item_type_id {
+            update_row = update_row.set(
+                "container_item_type_id",
+                gluesql::core::ast_builder::expr(container_item_type_id.to_string()),
+            );
+        }
+        if let Some(contained_item_type_id) = self.contained_item_type_id {
+            update_row = update_row.set(
+                "contained_item_type_id",
+                gluesql::core::ast_builder::expr(contained_item_type_id.to_string()),
+            );
+        }
+        if let Some(minimum_temperature) = self.minimum_temperature {
+            update_row = update_row.set(
+                "minimum_temperature",
+                gluesql::core::ast_builder::num(minimum_temperature),
+            );
+        }
+        if let Some(maximum_temperature) = self.maximum_temperature {
+            update_row = update_row.set(
+                "maximum_temperature",
+                gluesql::core::ast_builder::num(maximum_temperature),
+            );
+        }
+        if let Some(minimum_humidity) = self.minimum_humidity {
+            update_row = update_row.set(
+                "minimum_humidity",
+                gluesql::core::ast_builder::num(minimum_humidity),
+            );
+        }
+        if let Some(maximum_humidity) = self.maximum_humidity {
+            update_row = update_row.set(
+                "maximum_humidity",
+                gluesql::core::ast_builder::num(maximum_humidity),
+            );
+        }
+        if let Some(minimum_pressure) = self.minimum_pressure {
+            update_row = update_row.set(
+                "minimum_pressure",
+                gluesql::core::ast_builder::num(minimum_pressure),
+            );
+        }
+        if let Some(maximum_pressure) = self.maximum_pressure {
+            update_row = update_row.set(
+                "maximum_pressure",
+                gluesql::core::ast_builder::num(maximum_pressure),
+            );
+        }
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -231,6 +565,27 @@ pub struct ContinuousUnit {
 }
 #[cfg(feature = "frontend")]
 impl ContinuousUnit {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![gluesql::core::ast_builder::expr(self.id.to_string())]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("continuous_units")
+            .insert()
+            .columns("id")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -250,6 +605,36 @@ impl ContinuousUnit {
         Ok(row.map(|row| Self::from_row(row)))
     }
 
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("continuous_units")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("continuous_units").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row.execute(connection).await?;
+        Ok(())
+    }
+
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
@@ -267,6 +652,34 @@ pub struct Describable {
 }
 #[cfg(feature = "frontend")]
 impl Describable {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            gluesql::core::ast_builder::text(self.name),
+            match self.description {
+                Some(description) => gluesql::core::ast_builder::text(description),
+                None => gluesql::core::ast_builder::null(),
+            },
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("describables")
+            .insert()
+            .columns("id, name, description")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -284,6 +697,41 @@ impl Describable {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("describables")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("describables").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row = update_row.set("name", gluesql::core::ast_builder::text(self.name));
+        if let Some(description) = self.description {
+            update_row =
+                update_row.set("description", gluesql::core::ast_builder::text(description));
+        }
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -310,6 +758,27 @@ pub struct DiscreteUnit {
 }
 #[cfg(feature = "frontend")]
 impl DiscreteUnit {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![gluesql::core::ast_builder::expr(self.id.to_string())]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("discrete_units")
+            .insert()
+            .columns("id")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -329,6 +798,36 @@ impl DiscreteUnit {
         Ok(row.map(|row| Self::from_row(row)))
     }
 
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("discrete_units")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("discrete_units").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row.execute(connection).await?;
+        Ok(())
+    }
+
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
@@ -345,6 +844,30 @@ pub struct DocumentFormat {
 }
 #[cfg(feature = "frontend")]
 impl DocumentFormat {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            gluesql::core::ast_builder::text(self.mime_type),
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("document_formats")
+            .insert()
+            .columns("id, mime_type")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -362,6 +885,40 @@ impl DocumentFormat {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("document_formats")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("document_formats").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row = update_row.set(
+            "mime_type",
+            gluesql::core::ast_builder::text(self.mime_type),
+        );
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -386,6 +943,32 @@ pub struct Document {
 }
 #[cfg(feature = "frontend")]
 impl Document {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            gluesql::core::ast_builder::text(self.path),
+            gluesql::core::ast_builder::expr(self.format_id.to_string()),
+            gluesql::core::ast_builder::num(self.bytes),
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("documents")
+            .insert()
+            .columns("id, path, format_id, bytes")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -403,6 +986,42 @@ impl Document {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("documents")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("documents").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row = update_row.set("path", gluesql::core::ast_builder::text(self.path));
+        update_row = update_row.set(
+            "format_id",
+            gluesql::core::ast_builder::expr(self.format_id.to_string()),
+        );
+        update_row = update_row.set("bytes", gluesql::core::ast_builder::num(self.bytes));
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -434,6 +1053,31 @@ pub struct Editable {
 }
 #[cfg(feature = "frontend")]
 impl Editable {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+            gluesql::core::ast_builder::expr(self.created_by.to_string()),
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("editables")
+            .insert()
+            .columns("id, created_at, created_by")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -451,6 +1095,44 @@ impl Editable {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("editables")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("editables").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row = update_row.set(
+            "created_at",
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+        );
+        update_row = update_row.set(
+            "created_by",
+            gluesql::core::ast_builder::expr(self.created_by.to_string()),
+        );
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -477,6 +1159,30 @@ pub struct Edit {
 }
 #[cfg(feature = "frontend")]
 impl Edit {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            gluesql::core::ast_builder::expr(self.editable_id.to_string()),
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("edits")
+            .insert()
+            .columns("id, editable_id")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -494,6 +1200,40 @@ impl Edit {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("edits")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("edits").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row = update_row.set(
+            "editable_id",
+            gluesql::core::ast_builder::expr(self.editable_id.to_string()),
+        );
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -515,6 +1255,27 @@ pub struct ItemCategory {
 }
 #[cfg(feature = "frontend")]
 impl ItemCategory {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![gluesql::core::ast_builder::expr(self.id.to_string())]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("item_categories")
+            .insert()
+            .columns("id")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -534,6 +1295,36 @@ impl ItemCategory {
         Ok(row.map(|row| Self::from_row(row)))
     }
 
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("item_categories")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("item_categories").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row.execute(connection).await?;
+        Ok(())
+    }
+
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
@@ -551,6 +1342,31 @@ pub struct ItemCategoryRelationship {
 }
 #[cfg(feature = "frontend")]
 impl ItemCategoryRelationship {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            gluesql::core::ast_builder::expr(self.parent_id.to_string()),
+            gluesql::core::ast_builder::expr(self.child_id.to_string()),
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("item_category_relationships")
+            .insert()
+            .columns("id, parent_id, child_id")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -568,6 +1384,44 @@ impl ItemCategoryRelationship {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("item_category_relationships")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("item_category_relationships").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row = update_row.set(
+            "parent_id",
+            gluesql::core::ast_builder::expr(self.parent_id.to_string()),
+        );
+        update_row = update_row.set(
+            "child_id",
+            gluesql::core::ast_builder::expr(self.child_id.to_string()),
+        );
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -595,6 +1449,31 @@ pub struct ItemCategoryUnit {
 }
 #[cfg(feature = "frontend")]
 impl ItemCategoryUnit {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            gluesql::core::ast_builder::expr(self.item_category_id.to_string()),
+            gluesql::core::ast_builder::expr(self.unit_id.to_string()),
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("item_category_units")
+            .insert()
+            .columns("id, item_category_id, unit_id")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -612,6 +1491,44 @@ impl ItemCategoryUnit {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("item_category_units")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("item_category_units").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row = update_row.set(
+            "item_category_id",
+            gluesql::core::ast_builder::expr(self.item_category_id.to_string()),
+        );
+        update_row = update_row.set(
+            "unit_id",
+            gluesql::core::ast_builder::expr(self.unit_id.to_string()),
+        );
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -645,6 +1562,47 @@ pub struct ItemContinuousQuantity {
 }
 #[cfg(feature = "frontend")]
 impl ItemContinuousQuantity {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            match self.item_id {
+                Some(item_id) => gluesql::core::ast_builder::expr(item_id.to_string()),
+                None => gluesql::core::ast_builder::null(),
+            },
+            gluesql::core::ast_builder::num(self.weight),
+            match self.unit_id {
+                Some(unit_id) => gluesql::core::ast_builder::expr(unit_id.to_string()),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.sensor_id {
+                Some(sensor_id) => gluesql::core::ast_builder::expr(sensor_id.to_string()),
+                None => gluesql::core::ast_builder::null(),
+            },
+            gluesql::core::ast_builder::timestamp(self.measured_at.to_string()),
+            match self.measured_by {
+                Some(measured_by) => gluesql::core::ast_builder::expr(measured_by.to_string()),
+                None => gluesql::core::ast_builder::null(),
+            },
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("item_continuous_quantities")
+            .insert()
+            .columns("id, item_id, weight, unit_id, sensor_id, measured_at, measured_by")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -662,6 +1620,65 @@ impl ItemContinuousQuantity {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("item_continuous_quantities")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("item_continuous_quantities").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        if let Some(item_id) = self.item_id {
+            update_row = update_row.set(
+                "item_id",
+                gluesql::core::ast_builder::expr(item_id.to_string()),
+            );
+        }
+        update_row = update_row.set("weight", gluesql::core::ast_builder::num(self.weight));
+        if let Some(unit_id) = self.unit_id {
+            update_row = update_row.set(
+                "unit_id",
+                gluesql::core::ast_builder::expr(unit_id.to_string()),
+            );
+        }
+        if let Some(sensor_id) = self.sensor_id {
+            update_row = update_row.set(
+                "sensor_id",
+                gluesql::core::ast_builder::expr(sensor_id.to_string()),
+            );
+        }
+        update_row = update_row.set(
+            "measured_at",
+            gluesql::core::ast_builder::timestamp(self.measured_at.to_string()),
+        );
+        if let Some(measured_by) = self.measured_by {
+            update_row = update_row.set(
+                "measured_by",
+                gluesql::core::ast_builder::expr(measured_by.to_string()),
+            );
+        }
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -712,6 +1729,43 @@ pub struct ItemDiscreteQuantity {
 }
 #[cfg(feature = "frontend")]
 impl ItemDiscreteQuantity {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            match self.item_id {
+                Some(item_id) => gluesql::core::ast_builder::expr(item_id.to_string()),
+                None => gluesql::core::ast_builder::null(),
+            },
+            gluesql::core::ast_builder::num(self.quantity),
+            match self.unit_id {
+                Some(unit_id) => gluesql::core::ast_builder::expr(unit_id.to_string()),
+                None => gluesql::core::ast_builder::null(),
+            },
+            gluesql::core::ast_builder::timestamp(self.measured_at.to_string()),
+            match self.measured_by {
+                Some(measured_by) => gluesql::core::ast_builder::expr(measured_by.to_string()),
+                None => gluesql::core::ast_builder::null(),
+            },
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("item_discrete_quantities")
+            .insert()
+            .columns("id, item_id, quantity, unit_id, measured_at, measured_by")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -729,6 +1783,59 @@ impl ItemDiscreteQuantity {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("item_discrete_quantities")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("item_discrete_quantities").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        if let Some(item_id) = self.item_id {
+            update_row = update_row.set(
+                "item_id",
+                gluesql::core::ast_builder::expr(item_id.to_string()),
+            );
+        }
+        update_row = update_row.set("quantity", gluesql::core::ast_builder::num(self.quantity));
+        if let Some(unit_id) = self.unit_id {
+            update_row = update_row.set(
+                "unit_id",
+                gluesql::core::ast_builder::expr(unit_id.to_string()),
+            );
+        }
+        update_row = update_row.set(
+            "measured_at",
+            gluesql::core::ast_builder::timestamp(self.measured_at.to_string()),
+        );
+        if let Some(measured_by) = self.measured_by {
+            update_row = update_row.set(
+                "measured_by",
+                gluesql::core::ast_builder::expr(measured_by.to_string()),
+            );
+        }
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -772,6 +1879,43 @@ pub struct ItemLocation {
 }
 #[cfg(feature = "frontend")]
 impl ItemLocation {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            match self.item_id {
+                Some(item_id) => gluesql::core::ast_builder::expr(item_id.to_string()),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.location_id {
+                Some(location_id) => gluesql::core::ast_builder::expr(location_id.to_string()),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.previous_location_id {
+                Some(previous_location_id) => {
+                    gluesql::core::ast_builder::expr(previous_location_id.to_string())
+                }
+                None => gluesql::core::ast_builder::null(),
+            },
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("item_locations")
+            .insert()
+            .columns("id, item_id, location_id, previous_location_id")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -789,6 +1933,54 @@ impl ItemLocation {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("item_locations")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("item_locations").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        if let Some(item_id) = self.item_id {
+            update_row = update_row.set(
+                "item_id",
+                gluesql::core::ast_builder::expr(item_id.to_string()),
+            );
+        }
+        if let Some(location_id) = self.location_id {
+            update_row = update_row.set(
+                "location_id",
+                gluesql::core::ast_builder::expr(location_id.to_string()),
+            );
+        }
+        if let Some(previous_location_id) = self.previous_location_id {
+            update_row = update_row.set(
+                "previous_location_id",
+                gluesql::core::ast_builder::expr(previous_location_id.to_string()),
+            );
+        }
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -825,6 +2017,31 @@ pub struct ItemUnit {
 }
 #[cfg(feature = "frontend")]
 impl ItemUnit {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            gluesql::core::ast_builder::expr(self.item_id.to_string()),
+            gluesql::core::ast_builder::expr(self.unit_id.to_string()),
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("item_units")
+            .insert()
+            .columns("id, item_id, unit_id")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -842,6 +2059,44 @@ impl ItemUnit {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("item_units")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("item_units").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row = update_row.set(
+            "item_id",
+            gluesql::core::ast_builder::expr(self.item_id.to_string()),
+        );
+        update_row = update_row.set(
+            "unit_id",
+            gluesql::core::ast_builder::expr(self.unit_id.to_string()),
+        );
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -868,6 +2123,33 @@ pub struct Item {
 }
 #[cfg(feature = "frontend")]
 impl Item {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            match self.parent_id {
+                Some(parent_id) => gluesql::core::ast_builder::expr(parent_id.to_string()),
+                None => gluesql::core::ast_builder::null(),
+            },
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("items")
+            .insert()
+            .columns("id, parent_id")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -885,6 +2167,42 @@ impl Item {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("items")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("items").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        if let Some(parent_id) = self.parent_id {
+            update_row = update_row.set(
+                "parent_id",
+                gluesql::core::ast_builder::expr(parent_id.to_string()),
+            );
+        }
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -908,6 +2226,33 @@ pub struct LocationState {
 }
 #[cfg(feature = "frontend")]
 impl LocationState {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            match self.font_awesome_icon {
+                Some(font_awesome_icon) => gluesql::core::ast_builder::text(font_awesome_icon),
+                None => gluesql::core::ast_builder::null(),
+            },
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("location_states")
+            .insert()
+            .columns("id, font_awesome_icon")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -925,6 +2270,42 @@ impl LocationState {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("location_states")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("location_states").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        if let Some(font_awesome_icon) = self.font_awesome_icon {
+            update_row = update_row.set(
+                "font_awesome_icon",
+                gluesql::core::ast_builder::text(font_awesome_icon),
+            );
+        }
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -955,6 +2336,64 @@ pub struct Location {
 }
 #[cfg(feature = "frontend")]
 impl Location {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            match self.latitude {
+                Some(latitude) => gluesql::core::ast_builder::num(latitude),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.longitude {
+                Some(longitude) => gluesql::core::ast_builder::num(longitude),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.altitude {
+                Some(altitude) => gluesql::core::ast_builder::num(altitude),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.address {
+                Some(address) => gluesql::core::ast_builder::text(address),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.geolocalization_device_id {
+                Some(geolocalization_device_id) => {
+                    gluesql::core::ast_builder::expr(geolocalization_device_id.to_string())
+                }
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.altitude_device_id {
+                Some(altitude_device_id) => {
+                    gluesql::core::ast_builder::expr(altitude_device_id.to_string())
+                }
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.parent_location_id {
+                Some(parent_location_id) => {
+                    gluesql::core::ast_builder::expr(parent_location_id.to_string())
+                }
+                None => gluesql::core::ast_builder::null(),
+            },
+            gluesql::core::ast_builder::expr(self.state_id.to_string()),
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("locations")
+            .insert()
+            .columns("id, latitude, longitude, altitude, address, geolocalization_device_id, altitude_device_id, parent_location_id, state_id")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -972,6 +2411,70 @@ impl Location {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("locations")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("locations").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        if let Some(latitude) = self.latitude {
+            update_row = update_row.set("latitude", gluesql::core::ast_builder::num(latitude));
+        }
+        if let Some(longitude) = self.longitude {
+            update_row = update_row.set("longitude", gluesql::core::ast_builder::num(longitude));
+        }
+        if let Some(altitude) = self.altitude {
+            update_row = update_row.set("altitude", gluesql::core::ast_builder::num(altitude));
+        }
+        if let Some(address) = self.address {
+            update_row = update_row.set("address", gluesql::core::ast_builder::text(address));
+        }
+        if let Some(geolocalization_device_id) = self.geolocalization_device_id {
+            update_row = update_row.set(
+                "geolocalization_device_id",
+                gluesql::core::ast_builder::expr(geolocalization_device_id.to_string()),
+            );
+        }
+        if let Some(altitude_device_id) = self.altitude_device_id {
+            update_row = update_row.set(
+                "altitude_device_id",
+                gluesql::core::ast_builder::expr(altitude_device_id.to_string()),
+            );
+        }
+        if let Some(parent_location_id) = self.parent_location_id {
+            update_row = update_row.set(
+                "parent_location_id",
+                gluesql::core::ast_builder::expr(parent_location_id.to_string()),
+            );
+        }
+        update_row = update_row.set(
+            "state_id",
+            gluesql::core::ast_builder::expr(self.state_id.to_string()),
+        );
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -1040,6 +2543,35 @@ pub struct LoginProvider {
 }
 #[cfg(feature = "frontend")]
 impl LoginProvider {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            gluesql::core::ast_builder::text(self.name),
+            gluesql::core::ast_builder::text(self.font_awesome_icon),
+            gluesql::core::ast_builder::text(self.client_id_var_name),
+            gluesql::core::ast_builder::text(self.redirect_uri_var_name),
+            gluesql::core::ast_builder::text(self.oauth_url),
+            gluesql::core::ast_builder::text(self.scope),
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("login_providers")
+            .insert()
+            .columns("id, name, font_awesome_icon, client_id_var_name, redirect_uri_var_name, oauth_url, scope")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -1057,6 +2589,54 @@ impl LoginProvider {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("login_providers")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("login_providers").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row = update_row.set("name", gluesql::core::ast_builder::text(self.name));
+        update_row = update_row.set(
+            "font_awesome_icon",
+            gluesql::core::ast_builder::text(self.font_awesome_icon),
+        );
+        update_row = update_row.set(
+            "client_id_var_name",
+            gluesql::core::ast_builder::text(self.client_id_var_name),
+        );
+        update_row = update_row.set(
+            "redirect_uri_var_name",
+            gluesql::core::ast_builder::text(self.redirect_uri_var_name),
+        );
+        update_row = update_row.set(
+            "oauth_url",
+            gluesql::core::ast_builder::text(self.oauth_url),
+        );
+        update_row = update_row.set("scope", gluesql::core::ast_builder::text(self.scope));
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -1104,6 +2684,33 @@ pub struct ManufacturedItemCategory {
 }
 #[cfg(feature = "frontend")]
 impl ManufacturedItemCategory {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            gluesql::core::ast_builder::num(self.cost),
+            gluesql::core::ast_builder::num(self.cost_per_day),
+            gluesql::core::ast_builder::text(self.currency),
+            gluesql::core::ast_builder::expr(self.manifacturer_id.to_string()),
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("manufactured_item_categories")
+            .insert()
+            .columns("id, cost, cost_per_day, currency, manifacturer_id")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -1121,6 +2728,46 @@ impl ManufacturedItemCategory {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("manufactured_item_categories")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("manufactured_item_categories").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row = update_row.set("cost", gluesql::core::ast_builder::num(self.cost));
+        update_row = update_row.set(
+            "cost_per_day",
+            gluesql::core::ast_builder::num(self.cost_per_day),
+        );
+        update_row = update_row.set("currency", gluesql::core::ast_builder::text(self.currency));
+        update_row = update_row.set(
+            "manifacturer_id",
+            gluesql::core::ast_builder::expr(self.manifacturer_id.to_string()),
+        );
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -1159,6 +2806,37 @@ pub struct Notification {
 }
 #[cfg(feature = "frontend")]
 impl Notification {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            gluesql::core::ast_builder::expr(self.user_id.to_string()),
+            gluesql::core::ast_builder::text(self.operation),
+            gluesql::core::ast_builder::text(self.table_name),
+            match self.row_id {
+                Some(row_id) => gluesql::core::ast_builder::expr(row_id.to_string()),
+                None => gluesql::core::ast_builder::null(),
+            },
+            (self.read.into()),
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("notifications")
+            .insert()
+            .columns("id, user_id, operation, table_name, row_id, read")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -1176,6 +2854,55 @@ impl Notification {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("notifications")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("notifications").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row = update_row.set(
+            "user_id",
+            gluesql::core::ast_builder::expr(self.user_id.to_string()),
+        );
+        update_row = update_row.set(
+            "operation",
+            gluesql::core::ast_builder::text(self.operation),
+        );
+        update_row = update_row.set(
+            "table_name",
+            gluesql::core::ast_builder::text(self.table_name),
+        );
+        if let Some(row_id) = self.row_id {
+            update_row = update_row.set(
+                "row_id",
+                gluesql::core::ast_builder::expr(row_id.to_string()),
+            );
+        }
+        update_row = update_row.set("read", self.read);
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -1217,6 +2944,32 @@ pub struct OrganizationAuthorization {
 }
 #[cfg(feature = "frontend")]
 impl OrganizationAuthorization {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            gluesql::core::ast_builder::expr(self.organization_id.to_string()),
+            gluesql::core::ast_builder::expr(self.editable_id.to_string()),
+            gluesql::core::ast_builder::expr(self.role_id.to_string()),
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("organization_authorizations")
+            .insert()
+            .columns("id, organization_id, editable_id, role_id")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -1234,6 +2987,48 @@ impl OrganizationAuthorization {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("organization_authorizations")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("organization_authorizations").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row = update_row.set(
+            "organization_id",
+            gluesql::core::ast_builder::expr(self.organization_id.to_string()),
+        );
+        update_row = update_row.set(
+            "editable_id",
+            gluesql::core::ast_builder::expr(self.editable_id.to_string()),
+        );
+        update_row = update_row.set(
+            "role_id",
+            gluesql::core::ast_builder::expr(self.role_id.to_string()),
+        );
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -1266,6 +3061,45 @@ pub struct OrganizationLocation {
 }
 #[cfg(feature = "frontend")]
 impl OrganizationLocation {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            match self.organization_id {
+                Some(organization_id) => {
+                    gluesql::core::ast_builder::expr(organization_id.to_string())
+                }
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.location_id {
+                Some(location_id) => gluesql::core::ast_builder::expr(location_id.to_string()),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.previous_location_id {
+                Some(previous_location_id) => {
+                    gluesql::core::ast_builder::expr(previous_location_id.to_string())
+                }
+                None => gluesql::core::ast_builder::null(),
+            },
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("organization_locations")
+            .insert()
+            .columns("id, organization_id, location_id, previous_location_id")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -1283,6 +3117,54 @@ impl OrganizationLocation {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("organization_locations")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("organization_locations").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        if let Some(organization_id) = self.organization_id {
+            update_row = update_row.set(
+                "organization_id",
+                gluesql::core::ast_builder::expr(organization_id.to_string()),
+            );
+        }
+        if let Some(location_id) = self.location_id {
+            update_row = update_row.set(
+                "location_id",
+                gluesql::core::ast_builder::expr(location_id.to_string()),
+            );
+        }
+        if let Some(previous_location_id) = self.previous_location_id {
+            update_row = update_row.set(
+                "previous_location_id",
+                gluesql::core::ast_builder::expr(previous_location_id.to_string()),
+            );
+        }
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -1320,6 +3202,33 @@ pub struct OrganizationState {
 }
 #[cfg(feature = "frontend")]
 impl OrganizationState {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            match self.font_awesome_icon {
+                Some(font_awesome_icon) => gluesql::core::ast_builder::text(font_awesome_icon),
+                None => gluesql::core::ast_builder::null(),
+            },
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("organization_states")
+            .insert()
+            .columns("id, font_awesome_icon")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -1337,6 +3246,42 @@ impl OrganizationState {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("organization_states")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("organization_states").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        if let Some(font_awesome_icon) = self.font_awesome_icon {
+            update_row = update_row.set(
+                "font_awesome_icon",
+                gluesql::core::ast_builder::text(font_awesome_icon),
+            );
+        }
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -1363,6 +3308,47 @@ pub struct Organization {
 }
 #[cfg(feature = "frontend")]
 impl Organization {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            match self.state_id {
+                Some(state_id) => gluesql::core::ast_builder::expr(state_id.to_string()),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.parent_organization_id {
+                Some(parent_organization_id) => {
+                    gluesql::core::ast_builder::expr(parent_organization_id.to_string())
+                }
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.logo_id {
+                Some(logo_id) => gluesql::core::ast_builder::expr(logo_id.to_string()),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.website_url {
+                Some(website_url) => gluesql::core::ast_builder::text(website_url),
+                None => gluesql::core::ast_builder::null(),
+            },
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("organizations")
+            .insert()
+            .columns("id, state_id, parent_organization_id, logo_id, website_url")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -1380,6 +3366,58 @@ impl Organization {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("organizations")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("organizations").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        if let Some(state_id) = self.state_id {
+            update_row = update_row.set(
+                "state_id",
+                gluesql::core::ast_builder::expr(state_id.to_string()),
+            );
+        }
+        if let Some(parent_organization_id) = self.parent_organization_id {
+            update_row = update_row.set(
+                "parent_organization_id",
+                gluesql::core::ast_builder::expr(parent_organization_id.to_string()),
+            );
+        }
+        if let Some(logo_id) = self.logo_id {
+            update_row = update_row.set(
+                "logo_id",
+                gluesql::core::ast_builder::expr(logo_id.to_string()),
+            );
+        }
+        if let Some(website_url) = self.website_url {
+            update_row =
+                update_row.set("website_url", gluesql::core::ast_builder::text(website_url));
+        }
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -1419,6 +3457,27 @@ pub struct PrimaryUserEmail {
 }
 #[cfg(feature = "frontend")]
 impl PrimaryUserEmail {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![gluesql::core::ast_builder::expr(self.id.to_string())]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("primary_user_emails")
+            .insert()
+            .columns("id")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -1436,6 +3495,36 @@ impl PrimaryUserEmail {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("primary_user_emails")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("primary_user_emails").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -1457,6 +3546,36 @@ pub struct ProcedureContinuousRequirement {
 }
 #[cfg(feature = "frontend")]
 impl ProcedureContinuousRequirement {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            gluesql::core::ast_builder::expr(self.procedure_id.to_string()),
+            gluesql::core::ast_builder::expr(self.item_category_id.to_string()),
+            gluesql::core::ast_builder::num(self.quantity),
+            match self.unit_id {
+                Some(unit_id) => gluesql::core::ast_builder::expr(unit_id.to_string()),
+                None => gluesql::core::ast_builder::null(),
+            },
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("procedure_continuous_requirements")
+            .insert()
+            .columns("id, procedure_id, item_category_id, quantity, unit_id")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -1474,6 +3593,51 @@ impl ProcedureContinuousRequirement {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("procedure_continuous_requirements")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("procedure_continuous_requirements").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row = update_row.set(
+            "procedure_id",
+            gluesql::core::ast_builder::expr(self.procedure_id.to_string()),
+        );
+        update_row = update_row.set(
+            "item_category_id",
+            gluesql::core::ast_builder::expr(self.item_category_id.to_string()),
+        );
+        update_row = update_row.set("quantity", gluesql::core::ast_builder::num(self.quantity));
+        if let Some(unit_id) = self.unit_id {
+            update_row = update_row.set(
+                "unit_id",
+                gluesql::core::ast_builder::expr(unit_id.to_string()),
+            );
+        }
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -1514,6 +3678,36 @@ pub struct ProcedureDiscreteRequirement {
 }
 #[cfg(feature = "frontend")]
 impl ProcedureDiscreteRequirement {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            gluesql::core::ast_builder::expr(self.procedure_id.to_string()),
+            gluesql::core::ast_builder::expr(self.item_category_id.to_string()),
+            gluesql::core::ast_builder::num(self.quantity),
+            match self.unit_id {
+                Some(unit_id) => gluesql::core::ast_builder::expr(unit_id.to_string()),
+                None => gluesql::core::ast_builder::null(),
+            },
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("procedure_discrete_requirements")
+            .insert()
+            .columns("id, procedure_id, item_category_id, quantity, unit_id")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -1531,6 +3725,51 @@ impl ProcedureDiscreteRequirement {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("procedure_discrete_requirements")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("procedure_discrete_requirements").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row = update_row.set(
+            "procedure_id",
+            gluesql::core::ast_builder::expr(self.procedure_id.to_string()),
+        );
+        update_row = update_row.set(
+            "item_category_id",
+            gluesql::core::ast_builder::expr(self.item_category_id.to_string()),
+        );
+        update_row = update_row.set("quantity", gluesql::core::ast_builder::num(self.quantity));
+        if let Some(unit_id) = self.unit_id {
+            update_row = update_row.set(
+                "unit_id",
+                gluesql::core::ast_builder::expr(unit_id.to_string()),
+            );
+        }
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -1567,6 +3806,27 @@ pub struct Procedure {
 }
 #[cfg(feature = "frontend")]
 impl Procedure {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![gluesql::core::ast_builder::expr(self.id.to_string())]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("procedures")
+            .insert()
+            .columns("id")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -1584,6 +3844,36 @@ impl Procedure {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("procedures")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("procedures").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -1605,6 +3895,36 @@ pub struct ProjectContinuousRequirement {
 }
 #[cfg(feature = "frontend")]
 impl ProjectContinuousRequirement {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            gluesql::core::ast_builder::expr(self.project_id.to_string()),
+            gluesql::core::ast_builder::expr(self.item_id.to_string()),
+            gluesql::core::ast_builder::num(self.quantity),
+            match self.unit_id {
+                Some(unit_id) => gluesql::core::ast_builder::expr(unit_id.to_string()),
+                None => gluesql::core::ast_builder::null(),
+            },
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("project_continuous_requirements")
+            .insert()
+            .columns("id, project_id, item_id, quantity, unit_id")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -1622,6 +3942,51 @@ impl ProjectContinuousRequirement {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("project_continuous_requirements")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("project_continuous_requirements").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row = update_row.set(
+            "project_id",
+            gluesql::core::ast_builder::expr(self.project_id.to_string()),
+        );
+        update_row = update_row.set(
+            "item_id",
+            gluesql::core::ast_builder::expr(self.item_id.to_string()),
+        );
+        update_row = update_row.set("quantity", gluesql::core::ast_builder::num(self.quantity));
+        if let Some(unit_id) = self.unit_id {
+            update_row = update_row.set(
+                "unit_id",
+                gluesql::core::ast_builder::expr(unit_id.to_string()),
+            );
+        }
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -1660,6 +4025,36 @@ pub struct ProjectDiscreteRequirement {
 }
 #[cfg(feature = "frontend")]
 impl ProjectDiscreteRequirement {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            gluesql::core::ast_builder::expr(self.project_id.to_string()),
+            gluesql::core::ast_builder::expr(self.item_id.to_string()),
+            gluesql::core::ast_builder::num(self.quantity),
+            match self.unit_id {
+                Some(unit_id) => gluesql::core::ast_builder::expr(unit_id.to_string()),
+                None => gluesql::core::ast_builder::null(),
+            },
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("project_discrete_requirements")
+            .insert()
+            .columns("id, project_id, item_id, quantity, unit_id")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -1677,6 +4072,51 @@ impl ProjectDiscreteRequirement {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("project_discrete_requirements")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("project_discrete_requirements").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row = update_row.set(
+            "project_id",
+            gluesql::core::ast_builder::expr(self.project_id.to_string()),
+        );
+        update_row = update_row.set(
+            "item_id",
+            gluesql::core::ast_builder::expr(self.item_id.to_string()),
+        );
+        update_row = update_row.set("quantity", gluesql::core::ast_builder::num(self.quantity));
+        if let Some(unit_id) = self.unit_id {
+            update_row = update_row.set(
+                "unit_id",
+                gluesql::core::ast_builder::expr(unit_id.to_string()),
+            );
+        }
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -1714,6 +4154,37 @@ pub struct ProjectMilestone {
 }
 #[cfg(feature = "frontend")]
 impl ProjectMilestone {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            gluesql::core::ast_builder::expr(self.project_id.to_string()),
+            gluesql::core::ast_builder::timestamp(self.due_date.to_string()),
+            match self.completed_at {
+                Some(completed_at) => {
+                    gluesql::core::ast_builder::timestamp(completed_at.to_string())
+                }
+                None => gluesql::core::ast_builder::null(),
+            },
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("project_milestones")
+            .insert()
+            .columns("id, project_id, due_date, completed_at")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -1731,6 +4202,50 @@ impl ProjectMilestone {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("project_milestones")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("project_milestones").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row = update_row.set(
+            "project_id",
+            gluesql::core::ast_builder::expr(self.project_id.to_string()),
+        );
+        update_row = update_row.set(
+            "due_date",
+            gluesql::core::ast_builder::timestamp(self.due_date.to_string()),
+        );
+        if let Some(completed_at) = self.completed_at {
+            update_row = update_row.set(
+                "completed_at",
+                gluesql::core::ast_builder::timestamp(completed_at.to_string()),
+            );
+        }
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -1765,6 +4280,33 @@ pub struct ProjectState {
 }
 #[cfg(feature = "frontend")]
 impl ProjectState {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            gluesql::core::ast_builder::text(self.name),
+            gluesql::core::ast_builder::text(self.description),
+            gluesql::core::ast_builder::text(self.font_awesome_icon),
+            gluesql::core::ast_builder::text(self.icon_color),
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("project_states")
+            .insert()
+            .columns("id, name, description, font_awesome_icon, icon_color")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -1782,6 +4324,49 @@ impl ProjectState {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("project_states")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("project_states").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row = update_row.set("name", gluesql::core::ast_builder::text(self.name));
+        update_row = update_row.set(
+            "description",
+            gluesql::core::ast_builder::text(self.description),
+        );
+        update_row = update_row.set(
+            "font_awesome_icon",
+            gluesql::core::ast_builder::text(self.font_awesome_icon),
+        );
+        update_row = update_row.set(
+            "icon_color",
+            gluesql::core::ast_builder::text(self.icon_color),
+        );
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -1827,6 +4412,63 @@ pub struct Project {
 }
 #[cfg(feature = "frontend")]
 impl Project {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            gluesql::core::ast_builder::text(self.name),
+            gluesql::core::ast_builder::text(self.description),
+            (self.public.into()),
+            gluesql::core::ast_builder::expr(self.state_id.to_string()),
+            match self.parent_project_id {
+                Some(parent_project_id) => {
+                    gluesql::core::ast_builder::expr(parent_project_id.to_string())
+                }
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.budget {
+                Some(budget) => gluesql::core::ast_builder::num(budget),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.expenses {
+                Some(expenses) => gluesql::core::ast_builder::num(expenses),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.currency {
+                Some(currency) => gluesql::core::ast_builder::text(currency),
+                None => gluesql::core::ast_builder::null(),
+            },
+            gluesql::core::ast_builder::expr(self.created_by.to_string()),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+            match self.expected_end_date {
+                Some(expected_end_date) => {
+                    gluesql::core::ast_builder::timestamp(expected_end_date.to_string())
+                }
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.end_date {
+                Some(end_date) => gluesql::core::ast_builder::timestamp(end_date.to_string()),
+                None => gluesql::core::ast_builder::null(),
+            },
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("projects")
+            .insert()
+            .columns("id, name, description, public, state_id, parent_project_id, budget, expenses, currency, created_by, created_at, expected_end_date, end_date")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -1844,6 +4486,81 @@ impl Project {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("projects")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("projects").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row = update_row.set("name", gluesql::core::ast_builder::text(self.name));
+        update_row = update_row.set(
+            "description",
+            gluesql::core::ast_builder::text(self.description),
+        );
+        update_row = update_row.set("public", self.public);
+        update_row = update_row.set(
+            "state_id",
+            gluesql::core::ast_builder::expr(self.state_id.to_string()),
+        );
+        if let Some(parent_project_id) = self.parent_project_id {
+            update_row = update_row.set(
+                "parent_project_id",
+                gluesql::core::ast_builder::expr(parent_project_id.to_string()),
+            );
+        }
+        if let Some(budget) = self.budget {
+            update_row = update_row.set("budget", gluesql::core::ast_builder::num(budget));
+        }
+        if let Some(expenses) = self.expenses {
+            update_row = update_row.set("expenses", gluesql::core::ast_builder::num(expenses));
+        }
+        if let Some(currency) = self.currency {
+            update_row = update_row.set("currency", gluesql::core::ast_builder::text(currency));
+        }
+        update_row = update_row.set(
+            "created_by",
+            gluesql::core::ast_builder::expr(self.created_by.to_string()),
+        );
+        update_row = update_row.set(
+            "created_at",
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+        );
+        if let Some(expected_end_date) = self.expected_end_date {
+            update_row = update_row.set(
+                "expected_end_date",
+                gluesql::core::ast_builder::timestamp(expected_end_date.to_string()),
+            );
+        }
+        if let Some(end_date) = self.end_date {
+            update_row = update_row.set(
+                "end_date",
+                gluesql::core::ast_builder::timestamp(end_date.to_string()),
+            );
+        }
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -1919,6 +4636,27 @@ pub struct Role {
 }
 #[cfg(feature = "frontend")]
 impl Role {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![gluesql::core::ast_builder::expr(self.id.to_string())]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("roles")
+            .insert()
+            .columns("id")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -1938,6 +4676,36 @@ impl Role {
         Ok(row.map(|row| Self::from_row(row)))
     }
 
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("roles")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("roles").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row.execute(connection).await?;
+        Ok(())
+    }
+
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
@@ -1955,6 +4723,31 @@ pub struct SampleTaxa {
 }
 #[cfg(feature = "frontend")]
 impl SampleTaxa {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            gluesql::core::ast_builder::expr(self.sample_id.to_string()),
+            gluesql::core::ast_builder::expr(self.taxon_id.to_string()),
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("sample_taxa")
+            .insert()
+            .columns("id, sample_id, taxon_id")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -1972,6 +4765,44 @@ impl SampleTaxa {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("sample_taxa")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("sample_taxa").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row = update_row.set(
+            "sample_id",
+            gluesql::core::ast_builder::expr(self.sample_id.to_string()),
+        );
+        update_row = update_row.set(
+            "taxon_id",
+            gluesql::core::ast_builder::expr(self.taxon_id.to_string()),
+        );
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -1999,6 +4830,31 @@ pub struct SampledIndividualTaxa {
 }
 #[cfg(feature = "frontend")]
 impl SampledIndividualTaxa {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            gluesql::core::ast_builder::expr(self.sampled_individual_id.to_string()),
+            gluesql::core::ast_builder::expr(self.taxon_id.to_string()),
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("sampled_individual_taxa")
+            .insert()
+            .columns("id, sampled_individual_id, taxon_id")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -2016,6 +4872,44 @@ impl SampledIndividualTaxa {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("sampled_individual_taxa")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("sampled_individual_taxa").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row = update_row.set(
+            "sampled_individual_id",
+            gluesql::core::ast_builder::expr(self.sampled_individual_id.to_string()),
+        );
+        update_row = update_row.set(
+            "taxon_id",
+            gluesql::core::ast_builder::expr(self.taxon_id.to_string()),
+        );
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -2043,6 +4937,27 @@ pub struct SampledIndividual {
 }
 #[cfg(feature = "frontend")]
 impl SampledIndividual {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![gluesql::core::ast_builder::expr(self.id.to_string())]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("sampled_individuals")
+            .insert()
+            .columns("id")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -2062,6 +4977,36 @@ impl SampledIndividual {
         Ok(row.map(|row| Self::from_row(row)))
     }
 
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("sampled_individuals")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("sampled_individuals").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row.execute(connection).await?;
+        Ok(())
+    }
+
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
@@ -2078,6 +5023,33 @@ pub struct Sample {
 }
 #[cfg(feature = "frontend")]
 impl Sample {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            match self.derived_from {
+                Some(derived_from) => gluesql::core::ast_builder::expr(derived_from.to_string()),
+                None => gluesql::core::ast_builder::null(),
+            },
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("samples")
+            .insert()
+            .columns("id, derived_from")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -2095,6 +5067,42 @@ impl Sample {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("samples")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("samples").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        if let Some(derived_from) = self.derived_from {
+            update_row = update_row.set(
+                "derived_from",
+                gluesql::core::ast_builder::expr(derived_from.to_string()),
+            );
+        }
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -2118,6 +5126,30 @@ pub struct Spectra {
 }
 #[cfg(feature = "frontend")]
 impl Spectra {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            gluesql::core::ast_builder::expr(self.spectra_collection_id.to_string()),
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("spectra")
+            .insert()
+            .columns("id, spectra_collection_id")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -2135,6 +5167,40 @@ impl Spectra {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("spectra")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("spectra").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row = update_row.set(
+            "spectra_collection_id",
+            gluesql::core::ast_builder::expr(self.spectra_collection_id.to_string()),
+        );
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -2159,6 +5225,30 @@ pub struct SpectraCollection {
 }
 #[cfg(feature = "frontend")]
 impl SpectraCollection {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            gluesql::core::ast_builder::expr(self.sample_id.to_string()),
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("spectra_collection")
+            .insert()
+            .columns("id, sample_id")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -2176,6 +5266,40 @@ impl SpectraCollection {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("spectra_collection")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("spectra_collection").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row = update_row.set(
+            "sample_id",
+            gluesql::core::ast_builder::expr(self.sample_id.to_string()),
+        );
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -2199,6 +5323,34 @@ pub struct Taxa {
 }
 #[cfg(feature = "frontend")]
 impl Taxa {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            gluesql::core::ast_builder::text(self.name),
+            match self.ncbi_taxon_id {
+                Some(ncbi_taxon_id) => gluesql::core::ast_builder::num(ncbi_taxon_id),
+                None => gluesql::core::ast_builder::null(),
+            },
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("taxa")
+            .insert()
+            .columns("id, name, ncbi_taxon_id")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -2216,6 +5368,43 @@ impl Taxa {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("taxa")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("taxa").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row = update_row.set("name", gluesql::core::ast_builder::text(self.name));
+        if let Some(ncbi_taxon_id) = self.ncbi_taxon_id {
+            update_row = update_row.set(
+                "ncbi_taxon_id",
+                gluesql::core::ast_builder::num(ncbi_taxon_id),
+            );
+        }
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -2245,6 +5434,32 @@ pub struct TeamAuthorization {
 }
 #[cfg(feature = "frontend")]
 impl TeamAuthorization {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            gluesql::core::ast_builder::expr(self.team_id.to_string()),
+            gluesql::core::ast_builder::expr(self.editable_id.to_string()),
+            gluesql::core::ast_builder::expr(self.role_id.to_string()),
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("team_authorizations")
+            .insert()
+            .columns("id, team_id, editable_id, role_id")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -2262,6 +5477,48 @@ impl TeamAuthorization {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("team_authorizations")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("team_authorizations").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row = update_row.set(
+            "team_id",
+            gluesql::core::ast_builder::expr(self.team_id.to_string()),
+        );
+        update_row = update_row.set(
+            "editable_id",
+            gluesql::core::ast_builder::expr(self.editable_id.to_string()),
+        );
+        update_row = update_row.set(
+            "role_id",
+            gluesql::core::ast_builder::expr(self.role_id.to_string()),
+        );
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -2292,6 +5549,30 @@ pub struct TeamState {
 }
 #[cfg(feature = "frontend")]
 impl TeamState {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            gluesql::core::ast_builder::text(self.font_awesome_icon),
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("team_states")
+            .insert()
+            .columns("id, font_awesome_icon")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -2309,6 +5590,40 @@ impl TeamState {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("team_states")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("team_states").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row = update_row.set(
+            "font_awesome_icon",
+            gluesql::core::ast_builder::text(self.font_awesome_icon),
+        );
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -2332,6 +5647,36 @@ pub struct Team {
 }
 #[cfg(feature = "frontend")]
 impl Team {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            match self.parent_team_id {
+                Some(parent_team_id) => {
+                    gluesql::core::ast_builder::expr(parent_team_id.to_string())
+                }
+                None => gluesql::core::ast_builder::null(),
+            },
+            gluesql::core::ast_builder::expr(self.team_state_id.to_string()),
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("teams")
+            .insert()
+            .columns("id, parent_team_id, team_state_id")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -2349,6 +5694,46 @@ impl Team {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("teams")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("teams").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        if let Some(parent_team_id) = self.parent_team_id {
+            update_row = update_row.set(
+                "parent_team_id",
+                gluesql::core::ast_builder::expr(parent_team_id.to_string()),
+            );
+        }
+        update_row = update_row.set(
+            "team_state_id",
+            gluesql::core::ast_builder::expr(self.team_state_id.to_string()),
+        );
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -2378,6 +5763,30 @@ pub struct Unit {
 }
 #[cfg(feature = "frontend")]
 impl Unit {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            gluesql::core::ast_builder::text(self.symbol),
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("units")
+            .insert()
+            .columns("id, symbol")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -2395,6 +5804,37 @@ impl Unit {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("units")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("units").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row = update_row.set("symbol", gluesql::core::ast_builder::text(self.symbol));
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -2419,6 +5859,32 @@ pub struct UserAuthorization {
 }
 #[cfg(feature = "frontend")]
 impl UserAuthorization {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            gluesql::core::ast_builder::expr(self.user_id.to_string()),
+            gluesql::core::ast_builder::expr(self.editable_id.to_string()),
+            gluesql::core::ast_builder::expr(self.role_id.to_string()),
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("user_authorizations")
+            .insert()
+            .columns("id, user_id, editable_id, role_id")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -2436,6 +5902,48 @@ impl UserAuthorization {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("user_authorizations")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("user_authorizations").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row = update_row.set(
+            "user_id",
+            gluesql::core::ast_builder::expr(self.user_id.to_string()),
+        );
+        update_row = update_row.set(
+            "editable_id",
+            gluesql::core::ast_builder::expr(self.editable_id.to_string()),
+        );
+        update_row = update_row.set(
+            "role_id",
+            gluesql::core::ast_builder::expr(self.role_id.to_string()),
+        );
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -2468,6 +5976,32 @@ pub struct UserEmail {
 }
 #[cfg(feature = "frontend")]
 impl UserEmail {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            gluesql::core::ast_builder::text(self.email),
+            gluesql::core::ast_builder::expr(self.user_id.to_string()),
+            gluesql::core::ast_builder::expr(self.login_provider_id.to_string()),
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("user_emails")
+            .insert()
+            .columns("id, email, user_id, login_provider_id")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -2485,6 +6019,45 @@ impl UserEmail {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("user_emails")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("user_emails").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row = update_row.set("email", gluesql::core::ast_builder::text(self.email));
+        update_row = update_row.set(
+            "user_id",
+            gluesql::core::ast_builder::expr(self.user_id.to_string()),
+        );
+        update_row = update_row.set(
+            "login_provider_id",
+            gluesql::core::ast_builder::expr(self.login_provider_id.to_string()),
+        );
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
@@ -2521,6 +6094,37 @@ pub struct User {
 }
 #[cfg(feature = "frontend")]
 impl User {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::expr(self.id.to_string()),
+            gluesql::core::ast_builder::text(self.first_name),
+            match self.middle_name {
+                Some(middle_name) => gluesql::core::ast_builder::text(middle_name),
+                None => gluesql::core::ast_builder::null(),
+            },
+            gluesql::core::ast_builder::text(self.last_name),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+            gluesql::core::ast_builder::timestamp(self.updated_at.to_string()),
+        ]
+    }
+
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("users")
+            .insert()
+            .columns("id, first_name, middle_name, last_name, created_at, updated_at")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get<C>(
         id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -2538,6 +6142,56 @@ impl User {
             .await?;
         let row = select_row.select().unwrap().collect::<Vec<_>>().pop();
         Ok(row.map(|row| Self::from_row(row)))
+    }
+
+    pub async fn delete<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("users")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error>
+    where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("users").update();
+        update_row = update_row.set("id", gluesql::core::ast_builder::expr(self.id.to_string()));
+        update_row = update_row.set(
+            "first_name",
+            gluesql::core::ast_builder::text(self.first_name),
+        );
+        if let Some(middle_name) = self.middle_name {
+            update_row =
+                update_row.set("middle_name", gluesql::core::ast_builder::text(middle_name));
+        }
+        update_row = update_row.set(
+            "last_name",
+            gluesql::core::ast_builder::text(self.last_name),
+        );
+        update_row = update_row.set(
+            "created_at",
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+        );
+        update_row = update_row.set(
+            "updated_at",
+            gluesql::core::ast_builder::timestamp(self.updated_at.to_string()),
+        );
+        update_row.execute(connection).await?;
+        Ok(())
     }
 
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {

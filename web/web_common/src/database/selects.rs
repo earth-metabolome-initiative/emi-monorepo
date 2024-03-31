@@ -1,7 +1,7 @@
 //! Submodule providing select queries, such as `Id` and `Search` queries.
 
-use serde::{Deserialize, Serialize};
 use super::SearcheableTable;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub enum Select {

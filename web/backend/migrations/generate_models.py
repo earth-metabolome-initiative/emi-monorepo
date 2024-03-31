@@ -564,7 +564,6 @@ def write_web_common_structs(
         "use serde::Serialize;",
         "use uuid::Uuid;",
         "use chrono::NaiveDateTime;",
-        "use chrono::DateTime;",
         "use chrono::Utc;",
     ]
 
@@ -612,7 +611,7 @@ def write_web_common_structs(
         # by checking if the `struct` keyword is present
         # in the line.
         if "struct" in line:
-            struct_metadata = {"table_name": None, "struct_name": None, "attributes": []}
+            struct_metadata = {"table_name": None, "struct_name": None, "contains_options": False, "attributes": []}
             struct_name = line.split(" ")[2]
             struct_metadata["table_name"] = last_table_name
             struct_metadata["struct_name"] = struct_name
@@ -629,6 +628,8 @@ def write_web_common_structs(
                     "field_name": field_name,
                     "field_type": field_type,
                 })
+                if "Option" in field_type:
+                    struct_metadata["contains_options"] = True
 
             # We determine whether the struct has ended
             # by checking if the `}` keyword is present
@@ -660,12 +661,88 @@ def write_web_common_structs(
                 # to create yet again another duplicate of the struct.
                 tables.write(f"#[cfg(feature = \"frontend\")]\n")
                 tables.write(f"impl {struct_name} {{\n")
+                columns = ", ".join([attribute["field_name"] for attribute in struct_metadata["attributes"]])
+                table_name = struct_metadata["table_name"]
+
+                # As first thing, we implement the `into_row` method for the struct. This method
+                # converts the struct into a vector of `gluesql::core::ast_builder::ExprList`
+                # variants, which are used to insert the struct into the GlueSQL database.
+                types_and_methods = {
+                    "i8": "gluesql::core::ast_builder::num({})",
+                    "i16": "gluesql::core::ast_builder::num({})",
+                    "i32": "gluesql::core::ast_builder::num({})",
+                    "i64": "gluesql::core::ast_builder::num({})",
+                    "i128": "gluesql::core::ast_builder::num({})",
+                    "u8": "gluesql::core::ast_builder::num({})",
+                    "u16": "gluesql::core::ast_builder::num({})",
+                    "u32": "gluesql::core::ast_builder::num({})",
+                    "u64": "gluesql::core::ast_builder::num({})",
+                    "u128": "gluesql::core::ast_builder::num({})",
+                    "f32": "gluesql::core::ast_builder::num({})",
+                    "f64": "gluesql::core::ast_builder::num({})",
+                    "String": "gluesql::core::ast_builder::text({})",
+                    "Uuid": "gluesql::core::ast_builder::expr({}.to_string())",
+                    "bool": "({}.into())",
+                    "NaiveDateTime": "gluesql::core::ast_builder::timestamp({}.to_string())",
+                    "DateTime<Utc>": "gluesql::core::ast_builder::timestamp({}.to_string())",
+                }
+
+                update_types_and_methods = types_and_methods.copy()
+                update_types_and_methods["bool"] = "{}"
+
+                tables.write(f"    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {{\n")
+
+                tables.write(f"        vec![\n")                
+                for attribute in struct_metadata["attributes"]:
+                    attribute_type = attribute["field_type"]
+                    attribute_name = attribute["field_name"]
+
+                    if attribute_type.startswith("Option<"):
+                        inner_attribute_name = attribute_type[7:-1]
+                        if inner_attribute_name in types_and_methods:
+                            tables.write(f"            match self.{attribute_name} {{\n")
+                            tables.write(f"                Some({attribute_name}) => {types_and_methods[inner_attribute_name].format(attribute_name)},\n")
+                            tables.write(f"                None => gluesql::core::ast_builder::null(),\n")
+                            tables.write("            },\n")
+                        else:
+                            raise NotImplementedError(
+                                f"The type {inner_attribute_name} is not supported. "
+                                f"The struct {struct_name} contains an {attribute_type}. "
+                            )
+                    elif attribute_type in types_and_methods:
+                        tables.write(f"            {types_and_methods[attribute_type].format('self.{}'.format(attribute_name))},\n")
+                    else:
+                        raise NotImplementedError(
+                            f"The type {attribute_type} is not supported."
+                        )
+
+                tables.write(f"        ]\n")
+
+                tables.write("    }\n\n")
+
+                # We implement the `insert` method for the struct. This method
+                # receives a connection to the GlueSQL database and inserts the
+                # struct into the database.
+                tables.write(f"    pub async fn insert<C>(\n")
+                tables.write(f"        self,\n")
+                tables.write(f"        connection: &mut gluesql::prelude::Glue<C>,\n")
+                tables.write(f"    ) -> Result<(), gluesql::prelude::Error> where\n")
+                tables.write(f"        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n")
+                tables.write(f"    {{\n")
+                tables.write(f"        use gluesql::core::ast_builder::*;\n")
+                # We use the AST builder as much as possible so to avoid SQL injection attacks.
+                tables.write(f"        table(\"{table_name}\")\n")
+                tables.write(f"            .insert()\n")
+                tables.write(f"            .columns(\"{columns}\")\n")
+                tables.write(f"            .values(vec![self.into_row()])\n")
+                tables.write(f"            .execute(connection)\n")
+                tables.write(f"            .await?;\n")
+                tables.write(f"        Ok(())\n")
+                tables.write("    }\n\n")
 
                 # We implement the `get` method for the struct. This method
                 # receives the ID of the struct and a connection to the GlueSQL
                 # database. The method returns the struct from the database.
-                columns = ", ".join([attribute["field_name"] for attribute in struct_metadata["attributes"]])
-                table_name = struct_metadata["table_name"]
                 tables.write(f"    pub async fn get<C>(\n")
                 tables.write(f"        id: Uuid,\n")
                 tables.write(f"        connection: &mut gluesql::prelude::Glue<C>,\n")
@@ -687,6 +764,65 @@ def write_web_common_structs(
                 tables.write(f"            .pop();\n")
                 tables.write(f"        Ok(row.map(|row| Self::from_row(row)))\n")
                 tables.write("    }\n\n")
+
+                # We implement the `delete` method for the struct. This method deletes
+                # the struct from the GlueSQL database.
+                tables.write(f"    pub async fn delete<C>(\n")
+                tables.write(f"        id: Uuid,\n")
+                tables.write(f"        connection: &mut gluesql::prelude::Glue<C>,\n")
+                tables.write(f"    ) -> Result<(), gluesql::prelude::Error> where\n")
+                tables.write(f"        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n")
+                tables.write(f"    {{\n")
+                tables.write(f"        use gluesql::core::ast_builder::*;\n")
+                # We use the AST builder as much as possible so to avoid SQL injection attacks.
+                tables.write(f"        table(\"{table_name}\")\n")
+                tables.write(f"            .delete()\n")
+                tables.write(f"            .filter(col(\"id\").eq(id.to_string()))\n")
+                tables.write(f"            .execute(connection)\n")
+                tables.write(f"            .await?;\n")
+                tables.write(f"        Ok(())\n")
+                tables.write("    }\n\n")
+
+                # We implement the `update` method for the struct. This method updates
+                # the struct in the GlueSQL database.
+                tables.write(f"    pub async fn update<C>(\n")
+                tables.write(f"        self,\n")
+                tables.write(f"        connection: &mut gluesql::prelude::Glue<C>,\n")
+                tables.write(f"    ) -> Result<(), gluesql::prelude::Error> where\n")
+                tables.write(f"        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n")
+                tables.write(f"    {{\n")
+                tables.write(f"        use gluesql::core::ast_builder::*;\n")
+                # We use the AST builder as much as possible so to avoid SQL injection attacks.
+                tables.write(f"        let mut update_row = table(\"{table_name}\")\n")
+                tables.write(f"            .update();\n")
+                for attribute in struct_metadata["attributes"]:
+                    attribute_name = attribute["field_name"]
+                    attribute_type = attribute["field_type"]
+                    if attribute_type.startswith("Option<"):
+                        inner_attribute_name = attribute_type[7:-1]
+                        conversion = update_types_and_methods[inner_attribute_name].format('self.{}'.format(attribute_name))
+                        if inner_attribute_name in update_types_and_methods:
+                            tables.write(f"        if let Some({attribute_name}) = self.{attribute_name} {{\n")
+                            tables.write(f"            update_row = update_row.set(\"{attribute_name}\", {update_types_and_methods[inner_attribute_name].format(attribute_name)});\n")
+                            tables.write("        }\n")
+                        else:
+                            raise NotImplementedError(
+                                f"The type {inner_attribute_name} is not supported. "
+                                f"The struct {struct_name} contains an {attribute_type}. "
+                            )
+                    elif attribute_type in update_types_and_methods:
+                        conversion = update_types_and_methods[attribute_type].format('self.{}'.format(attribute_name))
+                        tables.write(f"        update_row = update_row.set(\"{attribute_name}\", {conversion});\n")
+                    else:
+                        raise NotImplementedError(
+                            f"The type {attribute_type} is not supported."
+                            f"The struct {struct_name} contains an {attribute_type}."
+                        ) 
+                tables.write(f"            update_row.execute(connection)\n")
+                tables.write(f"            .await?;\n")
+                tables.write(f"        Ok(())\n")
+                tables.write("    }\n\n")
+
 
                 # We implement the `from_row` method for the struct. This method
                 # receives a row from the GlueSQL database, which is a `HashMap<&str, &&Value>`.
