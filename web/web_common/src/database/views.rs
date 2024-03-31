@@ -1,8 +1,8 @@
-use chrono::NaiveDateTime;
 use serde::Deserialize;
 use serde::Serialize;
 use uuid::Uuid;
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq)]
+use chrono::NaiveDateTime;
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
 pub struct EditsView {
     pub id: Uuid,
     pub editable_id: Uuid,
@@ -14,7 +14,7 @@ pub struct EditsView {
     pub edit_title: String,
     pub edit_extended_reason: String,
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq)]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
 pub struct LastEditsView {
     pub id: Uuid,
     pub editable_id: Uuid,
@@ -26,14 +26,14 @@ pub struct LastEditsView {
     pub edit_title: String,
     pub edit_extended_reason: String,
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq)]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
 pub struct FormatsView {
     pub id: Uuid,
     pub mime_type: String,
     pub extension: String,
     pub format_description: String,
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq)]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
 pub struct DocumentsView {
     pub id: Uuid,
     pub format_id: Uuid,
@@ -56,7 +56,7 @@ pub struct DocumentsView {
     pub extension: String,
     pub mime_type: String,
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq)]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
 pub struct PublicUser {
     pub id: Uuid,
     pub first_name: String,
@@ -66,7 +66,7 @@ pub struct PublicUser {
     pub updated_at: NaiveDateTime,
 }
 
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Copy, Eq)]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Copy, Eq, )]
 pub enum View {
     EditsView,
     LastEditsView,
@@ -92,7 +92,7 @@ impl std::fmt::Display for View {
     }
 }
 
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq)]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
 pub enum ViewRow {
     EditsView(EditsView),
     LastEditsView(LastEditsView),
