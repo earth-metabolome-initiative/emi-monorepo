@@ -36,6 +36,8 @@ services:
       REDIS_PORT: ${REDIS_PORT}
     volumes:
       - ${REDIS_DATABASE_DIRECTORY}:/data
+    ports:
+      - ${REDIS_PORT}:${REDIS_PORT}
     networks:
       - backend
     restart: on-failure
