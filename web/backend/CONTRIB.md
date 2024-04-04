@@ -35,6 +35,29 @@ You can install Diesel with the following command:
 cargo install diesel_cli --no-default-features --features postgres
 ```
 
+### Install Python
+First, check whether you already have python installed by running the following command:
+
+```bash
+python --version
+```
+
+If you do not have Python installed, we suggest you to install it using some package manager
+that also takes care about the environments such as conda. You can install conda by running
+the instructions [detailed here](https://docs.anaconda.com/free/miniconda/).
+
+After having installed conda, you can create a new environment by running the following command:
+
+```bash
+conda create -n emi python=3.9
+```
+
+To activate the environment, run the following command:
+
+```bash
+conda activate emi
+```
+
 ### Install the python dependencies
 To handle some of the Diesel migrations, we have created some Python utilities.
 The Python dependencies are listed in the `requirements.txt` file, which is in the `web/backend` folder.
