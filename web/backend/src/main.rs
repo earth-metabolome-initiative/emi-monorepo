@@ -17,10 +17,10 @@ use std::path::PathBuf;
 
 mod api;
 mod model_implementations;
-mod views;
 mod models;
 mod schema;
 mod transactions;
+mod views;
 
 pub(crate) type DBPool = Pool<ConnectionManager<PgConnection>>;
 pub(crate) type DieselConn = r2d2::PooledConnection<ConnectionManager<PgConnection>>;
@@ -148,7 +148,13 @@ async fn main() -> std::io::Result<()> {
         // limit the maximum amount of data that server will accept
         // .app_data(web::JsonConfig::default().limit(10*1024*1024))
     })
-    .bind_openssl("0.0.0.0:8080", builder)?
+    .bind_openssl(
+        format!(
+            "0.0.0.0:{}",
+            std::env::var("ACTIX_PORT").expect("ACTIX_PORT is not available.")
+        ),
+        builder,
+    )?
     .workers(4)
     .run()
     .await
