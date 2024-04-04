@@ -1541,10 +1541,16 @@ def main():
     replacements = compress_json.local_load("replacements.json")
 
     # We make sure the migrations were fully executed
-    os.system("diesel migration run")
+    status = os.system("diesel migration run")
+
+    if status != 0:
+        raise Exception("The migrations were not fully executed.")
 
     # We run the diesel extended CLI command
-    os.system("diesel_ext --model --add-table-name > src/models.rs")
+    status = os.system("diesel_ext --model --add-table-name > src/models.rs")
+
+    if status != 0:
+        raise Exception("The diesel_ext command failed.")
 
     # Read the generated file
     with open("src/models.rs", "r") as file:
