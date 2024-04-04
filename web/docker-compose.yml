@@ -122,7 +122,7 @@ services:
       DOMAIN: ${DOMAIN}
       NGINX_WORKER_PROCESSES: ${NGINX_WORKER_PROCESSES}
     ports:
-      - "80:80"
+      # - "80:80"
       - "443:443"
     depends_on:
       - actix-server
