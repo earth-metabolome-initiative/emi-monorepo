@@ -60,6 +60,7 @@ from typing import List, Dict
 import psycopg2
 import compress_json
 import os
+import shutil
 from dotenv import load_dotenv
 from retrieve_ncbi_taxon import retrieve_ncbi_taxon
 
