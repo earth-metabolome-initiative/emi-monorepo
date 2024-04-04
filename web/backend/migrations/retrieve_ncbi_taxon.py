@@ -14,6 +14,6 @@ def retrieve_ncbi_taxon():
         [0, 2]
     ]
     df.columns = ["taxon_id", "taxon_name"]
-    df.to_csv("../db_data/taxons.csv", sep="\t", index=False)
+    df.to_csv("./db_data/taxons.csv", sep="\t", index=False)
     shutil.rmtree("downloads/new_taxdump")
     shutil.rmtree("downloads/new_taxdump.tar.gz")
