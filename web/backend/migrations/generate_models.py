@@ -61,6 +61,7 @@ import psycopg2
 import compress_json
 import os
 from dotenv import load_dotenv
+from retrieve_ncbi_taxon import retrieve_ncbi_taxon
 
 
 class PGIndex:
@@ -1656,6 +1657,21 @@ def main():
 if __name__ == "__main__":
     # Load dotenv file
     load_dotenv()
+
+    # We make sure that the ./db_data/taxons.csv file is present
+    # or otherwise we run the script to generate it.
+    if not os.path.exists("./db_data/taxons.csv"):
+        retrieve_ncbi_taxon()
+
+    # If there is a "__pycache__" directory, we remove it as Diesel
+    # seems to be keen to try and run it as a migration, and it will
+    # fail.
+    if os.path.exists("__pycache__"):
+        shutil.rmtree("__pycache__")
+    
+    if os.path.exists("migrations/__pycache__"):
+        shutil.rmtree("migrations/__pycache__")
+
     main()
     generate_view_schema()
     check_schema_completion()
