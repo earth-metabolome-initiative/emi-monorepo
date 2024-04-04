@@ -36,7 +36,10 @@ cargo install diesel_cli --no-default-features --features postgres
 ```
 
 ### Install the python dependencies
-To handle some of the Diesel migrations, we have created some Python utilities. To install the Python dependencies, run the following command:
+To handle some of the Diesel migrations, we have created some Python utilities.
+The Python dependencies are listed in the `requirements.txt` file, which is in the `web/backend` folder.
+
+To install the Python dependencies, run the following command:
 
 ```bash
 pip install -r requirements.txt
