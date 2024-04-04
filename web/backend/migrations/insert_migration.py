@@ -17,7 +17,6 @@ import os
 import sys
 import re
 import shutil
-import datetime
 
 from increase_directory_counter import increase_directory_counter
 

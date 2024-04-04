@@ -19,6 +19,13 @@ On MacOS, you can install Postgres with Homebrew:
 
 `brew install postgresql`
 
+#### Ubuntu
+On Ubuntu, you can install Postgres with the following commands:
+
+```bash
+apt-get update && apt-get install -y libpq-dev tmux
+```
+
 ### Install Diesel
 You can install Diesel with the following command:
 
