@@ -7,7 +7,7 @@ CREATE TEMP TABLE temp_taxon_csv_data (
 
 -- Load the CSV data into the temporary table
 COPY temp_taxon_csv_data(taxon_id, taxon_name)
-FROM '/app/taxons.csv'
+FROM '/app/taxons.tsv'
 WITH (FORMAT CSV, HEADER true, DELIMITER E'\t');
 
 -- We insert in the taxa table the values from the temporary table

@@ -1658,9 +1658,9 @@ if __name__ == "__main__":
     # Load dotenv file
     load_dotenv()
 
-    # We make sure that the ./db_data/taxons.csv file is present
+    # We make sure that the ./db_data/taxons.tsv file is present
     # or otherwise we run the script to generate it.
-    if not os.path.exists("./db_data/taxons.csv"):
+    if not os.path.exists("./db_data/taxons.tsv"):
         retrieve_ncbi_taxon()
 
     # If there is a "__pycache__" directory, we remove it as Diesel
