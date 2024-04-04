@@ -1739,7 +1739,6 @@ pub struct Project {
     pub parent_project_id: Option<Uuid>,
     pub budget: Option<f64>,
     pub expenses: Option<f64>,
-    pub currency: Option<String>,
     pub created_by: Uuid,
     pub created_at: NaiveDateTime,
     pub expected_end_date: Option<NaiveDateTime>,
@@ -1757,7 +1756,6 @@ impl From<Project> for web_common::database::tables::Project {
             parent_project_id: item.parent_project_id,
             budget: item.budget,
             expenses: item.expenses,
-            currency: item.currency,
             created_by: item.created_by,
             created_at: item.created_at,
             expected_end_date: item.expected_end_date,
@@ -1777,7 +1775,6 @@ impl From<web_common::database::tables::Project> for Project {
             parent_project_id: item.parent_project_id,
             budget: item.budget,
             expenses: item.expenses,
-            currency: item.currency,
             created_by: item.created_by,
             created_at: item.created_at,
             expected_end_date: item.expected_end_date,
@@ -1819,7 +1816,7 @@ impl Project {
         let limit = limit.unwrap_or(10);
         let threshold = threshold.unwrap_or(0.6);
         let similarity_query = format!(concat!(
-            r#"SELECT id, name, description, public, state_id, parent_project_id, budget, expenses, currency, created_by, created_at, expected_end_date, end_date FROM projects WHERE",
+            r#"SELECT id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, expected_end_date, end_date FROM projects WHERE",
             "similarity(name, description, '$1') > $2",
             "ORDER BY similarity(name, description, '$1') DESC LIMIT $3;"#
         ));

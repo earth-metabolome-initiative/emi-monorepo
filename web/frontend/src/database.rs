@@ -19,10 +19,10 @@ pub(crate) async fn init_database() -> Result<Database, Error> {
     // in the diesel migration in the backend, which we can load as a static string on compilation,
     // hence not requiring to either duplicate the code or generate it at runtime when the website
     // is loaded and server requests would be needed to fetch the schema.
-    let taxa = include_str!("../../backend/migrations/00000000000012_create_taxa_table/up.sql");
-
-    let result = glue.execute(taxa).await?;
-    log::info!("Result of executing the SQL for creating the taxa table: {:?}", result);
+    let result = glue.execute(include_str!("../../backend/migrations/00000000000012_create_taxa_table/up.sql")).await?;
+    log::info!("Result of executing the SQL for creating the table: {:?}", result);
+    let result = glue.execute(include_str!("../../backend/migrations/00000000000021_create_projects_table/up.sql")).await?;
+    log::info!("Result of executing the SQL for creating the table: {:?}", result);
 
     Ok(glue)
 }

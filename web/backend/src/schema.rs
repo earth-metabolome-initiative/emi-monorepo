@@ -333,16 +333,13 @@ diesel::table! {
 diesel::table! {
     projects (id) {
         id -> Uuid,
-        #[max_length = 255]
-        name -> Varchar,
+        name -> Text,
         description -> Text,
         public -> Bool,
         state_id -> Uuid,
         parent_project_id -> Nullable<Uuid>,
         budget -> Nullable<Float8>,
         expenses -> Nullable<Float8>,
-        #[max_length = 3]
-        currency -> Nullable<Varchar>,
         created_by -> Uuid,
         created_at -> Timestamp,
         expected_end_date -> Nullable<Timestamp>,
