@@ -42,6 +42,12 @@ First, check whether you already have python installed by running the following 
 python --version
 ```
 
+Alternatively, you may have Python 3 installed without an alias. In this case, you can check whether you have Python 3 installed by running the following command:
+
+```bash
+python3 --version
+```
+
 If you do not have Python installed, we suggest you to install it using some package manager
 that also takes care about the environments such as conda. You can install conda by running
 the instructions [detailed here](https://docs.anaconda.com/free/miniconda/).
