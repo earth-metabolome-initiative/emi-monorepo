@@ -70,6 +70,13 @@ class PGIndex:
         self.table_name = table_name
         self.columns = columns
 
+    def human_readable_columns(self) -> str:
+        """Return the columns in a human-readable format."""
+        last_column = self.columns[-1]
+        if len(self.columns) == 1:
+            return last_column
+        return f"{', '.join(self.columns[:-1])} and {last_column}"
+
 
 class PGIndices:
 
@@ -838,11 +845,11 @@ def write_web_common_structs(
                 tables.write(f"            .limit(1)\n")
                 tables.write(f"            .execute(connection)\n")
                 tables.write(f"            .await?;\n")
-                tables.write(f"         let row = select_row.select()\n")
+                tables.write(f"         Ok(select_row.select()\n")
                 tables.write(f"            .unwrap()\n")
+                tables.write(f"            .map(Self::from_row)\n")
                 tables.write(f"            .collect::<Vec<_>>()\n")
-                tables.write(f"            .pop();\n")
-                tables.write(f"        Ok(row.map(|row| Self::from_row(row)))\n")
+                tables.write(f"            .pop())\n")
                 tables.write("    }\n\n")
 
                 # We implement the `delete` method for the struct. This method deletes
@@ -1007,6 +1014,70 @@ def write_web_common_structs(
                 tables.write(f"            Ok(number_of_rows)\n")
                 tables.write(f"        }}\n")
                 tables.write(f"    }}\n")
+
+                # We implement the `all` method for the struct. This method returns all of the
+                # structs in the GlueSQL database.
+                tables.write(f"    /// Get all {struct_name} from the database.\n")
+                tables.write(f"    ///\n")
+                tables.write(f"    /// # Arguments\n")
+                tables.write(f"    /// * `connection` - The connection to the database.\n")
+                tables.write(f"    ///\n")
+                tables.write(f"    pub async fn all<C>(\n")
+                tables.write(f"        connection: &mut gluesql::prelude::Glue<C>,\n")
+                tables.write(f"    ) -> Result<Vec<Self>, gluesql::prelude::Error> where\n")
+                tables.write(f"        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n")
+                tables.write(f"    {{\n")
+                tables.write(f"        use gluesql::core::ast_builder::*;\n")
+                tables.write(f'        let select_row = table("{table_name}")\n')
+                tables.write(f"            .select()\n")
+                tables.write(f"            .project(\"{columns}\")\n")
+                tables.write(f"            .execute(connection)\n")
+                tables.write(f"            .await?;\n")
+                tables.write(f"        Ok(select_row.select()\n")
+                tables.write(f"            .unwrap()\n")
+                tables.write(f"            .map(Self::from_row)\n")
+                tables.write(f"            .collect::<Vec<_>>())\n")
+                tables.write(f"    }}\n")
+
+                # We implement the `search` method for the struct. This method searches for the
+                # struct in the GlueSQL database by a given query string. It is only implemented
+                # for the structs that have the `pg_trgm` index. Of course, since we are in the
+                # gluesql part of the implementation, we do not actually have access to the `pg_trgm`
+                # index, but we can still implement the method for the structs that have the index.
+                # In this case, we search using the Levenshtein distance. This method receives the
+                # query string, the limit, the threshold, and the connection to the database. The method
+                # returns a vector of instances of the struct found, sorted by the similarity to the query.
+                # if similarity_indices.has_table(table_name):
+                #     similarity_index = similarity_indices.get_table(table_name)
+                #     human_readable_columns = similarity_index.get_human_readable_columns()
+                #     columns_to_query = similarity_index.columns
+                #     tables.write(f"    /// Search for {struct_name} by a given string.\n")
+                #     tables.write(f"    ///\n")
+                #     tables.write(f"    /// # Arguments\n")
+                #     tables.write(f"    /// * `query` - The string to search for.\n")
+                #     tables.write(f"    /// * `limit` - The maximum number of results, by default `10`.\n")
+                #     tables.write(f"    /// * `threshold` - The similarity threshold, by default `0.6`.\n")
+                #     tables.write(f"    /// * `connection` - The connection to the database.\n")
+                #     tables.write(f"    ///\n")
+                #     tables.write(f"    /// # Implementative details\n")
+                #     tables.write(f"    /// The search is performed using the Levenshtein distance, and the\n")
+                #     tables.write(f"    /// columns considered are {human_readable_columns}, as defined in the\n")
+                #     tables.write(f"    /// `pg_trgm` index from the PostgreSQL database.\n")
+                #     tables.write(f"    /// This is done so that in the offline mode, the search can still be performed,\n")
+                #     tables.write(f"    /// altough the `pg_trgm` index is not available in the GlueSQL database and\n")
+                #     tables.write(f"    /// therefore we fallback to the Levenshtein distance.\n")
+                #     tables.write(f"    ///\n")
+                #     tables.write(f"    /// # Returns\n")
+                #     tables.write(f"    /// A vector of {struct_name} instances found, sorted by the similarity to the query.\n")
+                #     tables.write(f"    pub async fn search<C>(\n")
+                #     tables.write(f"        query: &str,\n")
+                #     tables.write(f"        limit: Option<i32>,\n")
+                #     tables.write(f"        threshold: Option<f64>,\n")
+                #     tables.write(f"        connection: &mut gluesql::prelude::Glue<C>,\n")
+                #     tables.write(f"    ) -> Result<Vec<Self>, gluesql::prelude::Error> where\n")
+                #     tables.write(f"        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n")
+                #     tables.write(f"    {{\n")
+                #     tables.write(f"        use gluesql::core::ast_builder::*;\n")
 
                 # We implement the `from_row` method for the struct. This method
                 # receives a row from the GlueSQL database, which is a `HashMap<&str, &&Value>`.
