@@ -35,6 +35,13 @@ You can install Diesel with the following command:
 cargo install diesel_cli --no-default-features --features postgres
 ```
 
+### Install the python dependencies
+To handle some of the Diesel migrations, we have created some Python utilities. To install the Python dependencies, run the following command:
+
+```bash
+pip install -r requirements.txt
+```
+
 ### Defining the position of the migrations folder
 Diesel uses migrations to manage the database schema. To define the position of the migrations folder, create a file called `diesel.toml` in the root of the project and add the following content:
 

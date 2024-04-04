@@ -1,0 +1,3 @@
+compress_json
+python-dotenv
+psycopg2
