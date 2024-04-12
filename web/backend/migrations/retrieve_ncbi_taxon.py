@@ -11,7 +11,7 @@ def retrieve_ncbi_taxon():
     url = "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/new_taxdump/new_taxdump.tar.gz"
     BaseDownloader().download(url)
 
-    df = pd.read_csv("downloads/new_taxdump/rankedlineage.dmp", sep="\t", header=None)[
+    df = pd.read_csv("downloads/new_taxdump/rankedlineage.dmp", sep="\t", header=None, low_memory=False)[
         [0, 2]
     ]
     df.columns = ["taxon_id", "taxon_name"]

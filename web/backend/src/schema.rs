@@ -323,10 +323,10 @@ diesel::table! {
 diesel::table! {
     project_states (id) {
         id -> Uuid,
-        name -> Varchar,
+        name -> Text,
         description -> Text,
-        font_awesome_icon -> Varchar,
-        icon_color -> Varchar,
+        font_awesome_icon -> Text,
+        icon_color -> Text,
     }
 }
 

@@ -60,7 +60,9 @@ from typing import List, Dict
 import psycopg2
 import compress_json
 import os
+import re
 import shutil
+from densify_directory_counter import densify_directory_counter
 from dotenv import load_dotenv
 from retrieve_ncbi_taxon import retrieve_ncbi_taxon
 
@@ -1041,46 +1043,6 @@ def write_web_common_structs(
                 tables.write(f"            .collect::<Vec<_>>())\n")
                 tables.write(f"    }}\n")
 
-                # We implement the `search` method for the struct. This method searches for the
-                # struct in the GlueSQL database by a given query string. It is only implemented
-                # for the structs that have the `pg_trgm` index. Of course, since we are in the
-                # gluesql part of the implementation, we do not actually have access to the `pg_trgm`
-                # index, but we can still implement the method for the structs that have the index.
-                # In this case, we search using the Levenshtein distance. This method receives the
-                # query string, the limit, the threshold, and the connection to the database. The method
-                # returns a vector of instances of the struct found, sorted by the similarity to the query.
-                # if similarity_indices.has_table(table_name):
-                #     similarity_index = similarity_indices.get_table(table_name)
-                #     human_readable_columns = similarity_index.get_human_readable_columns()
-                #     columns_to_query = similarity_index.columns
-                #     tables.write(f"    /// Search for {struct_name} by a given string.\n")
-                #     tables.write(f"    ///\n")
-                #     tables.write(f"    /// # Arguments\n")
-                #     tables.write(f"    /// * `query` - The string to search for.\n")
-                #     tables.write(f"    /// * `limit` - The maximum number of results, by default `10`.\n")
-                #     tables.write(f"    /// * `threshold` - The similarity threshold, by default `0.6`.\n")
-                #     tables.write(f"    /// * `connection` - The connection to the database.\n")
-                #     tables.write(f"    ///\n")
-                #     tables.write(f"    /// # Implementative details\n")
-                #     tables.write(f"    /// The search is performed using the Levenshtein distance, and the\n")
-                #     tables.write(f"    /// columns considered are {human_readable_columns}, as defined in the\n")
-                #     tables.write(f"    /// `pg_trgm` index from the PostgreSQL database.\n")
-                #     tables.write(f"    /// This is done so that in the offline mode, the search can still be performed,\n")
-                #     tables.write(f"    /// altough the `pg_trgm` index is not available in the GlueSQL database and\n")
-                #     tables.write(f"    /// therefore we fallback to the Levenshtein distance.\n")
-                #     tables.write(f"    ///\n")
-                #     tables.write(f"    /// # Returns\n")
-                #     tables.write(f"    /// A vector of {struct_name} instances found, sorted by the similarity to the query.\n")
-                #     tables.write(f"    pub async fn search<C>(\n")
-                #     tables.write(f"        query: &str,\n")
-                #     tables.write(f"        limit: Option<i32>,\n")
-                #     tables.write(f"        threshold: Option<f64>,\n")
-                #     tables.write(f"        connection: &mut gluesql::prelude::Glue<C>,\n")
-                #     tables.write(f"    ) -> Result<Vec<Self>, gluesql::prelude::Error> where\n")
-                #     tables.write(f"        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n")
-                #     tables.write(f"    {{\n")
-                #     tables.write(f"        use gluesql::core::ast_builder::*;\n")
-
                 # We implement the `from_row` method for the struct. This method
                 # receives a row from the GlueSQL database, which is a `HashMap<&str, &&Value>`.
                 # The method returns the struct from the row.
@@ -1658,6 +1620,38 @@ def main():
 if __name__ == "__main__":
     # Load dotenv file
     load_dotenv()
+
+    # Due to git collisions, it may happen that a migration has been renamed
+    # but the old directory is still there. For each directory in the migrations
+    # that is composed of the [0-9]+_[a-z_]+ pattern, we check if the directory
+    # as a twin with a different code but the same name. If so, we remove the
+    # empty version of these directories.
+    for directory in os.listdir("migrations"):
+        if not os.path.isdir(f"migrations/{directory}"):
+            continue
+        if re.match(r"^[0-9]+_[a-z_]+$", directory):
+            # We check whether the current directory DOES NOT
+            # contain either a down.sql or an up.sql file.
+            if not os.path.exists(f"migrations/{directory}/down.sql") or not os.path.exists(f"migrations/{directory}/up.sql"):
+                code, migration_name = directory.split("_", maxsplit=1)
+                twin_found = False
+                for directory2 in os.listdir("migrations"):
+                    if not os.path.isdir(f"migrations/{directory2}"):
+                        continue
+                    if re.match(r"^[0-9]+_[a-z_]+$", directory2):
+                        code2, migration_name2 = directory2.split("_",  maxsplit=1)
+                        if code != code2 and migration_name == migration_name2:
+                            print(f"Removing {directory}")
+                            shutil.rmtree(f"migrations/{directory}")
+                            twin_found = True
+                            break
+                if not twin_found:
+                    raise Exception(
+                        f"Directory {directory} does not contain either a `down.sql` or an `up.sql` file "
+                        f"and there is no twin directory with a different code."
+                    )
+    
+    densify_directory_counter()
 
     # We make sure that the ./db_data/taxons.tsv file is present
     # or otherwise we run the script to generate it.
