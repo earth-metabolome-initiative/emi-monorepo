@@ -211,6 +211,35 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                     ));
                                 }
                             },
+                            web_common::database::Operation::Select(select) => match select {
+                                web_common::database::selects::Select::SearchTable(
+                                    table,
+                                    query,
+                                ) => {
+                                    let backend_variant: crate::models::SearcheableTable =
+                                        (*table).into();
+                                    ctx.address().do_send(BackendMessage::SearchTable(
+                                        task.id(),
+                                        match backend_variant.search(
+                                            query,
+                                            None,
+                                            Some(0.0),
+                                            &mut self.diesel_connection,
+                                        ) {
+                                            Ok(rows) => {
+                                                Ok(rows.into_iter().map(Into::into).collect())
+                                            }
+                                            Err(err) => Err(err.into()),
+                                        },
+                                    ));
+                                }
+                                _ => {
+                                    unimplemented!(
+                                        "Operation not implemented: {:?}",
+                                        task.operation()
+                                    )
+                                }
+                            },
                             _ => {
                                 unimplemented!("Operation not implemented: {:?}", task.operation())
                             }

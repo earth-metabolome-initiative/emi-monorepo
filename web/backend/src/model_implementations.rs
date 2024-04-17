@@ -1,4 +1,4 @@
-use crate::diesel::connection::SimpleConnection;
+use diesel::connection::SimpleConnection;
 use crate::models::*;
 use crate::schema::*;
 use crate::views::DocumentsView;

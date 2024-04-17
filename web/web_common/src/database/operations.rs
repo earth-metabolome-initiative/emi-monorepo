@@ -87,6 +87,13 @@ impl From<Operation> for Task {
     }
 }
 
+impl From<Operation> for FrontendMessage {
+    fn from(operation: Operation) -> Self {
+        let task: Task = operation.into();
+        task.into()
+    }
+}
+
 impl Task {
     pub fn id(&self) -> Uuid {
         self.id

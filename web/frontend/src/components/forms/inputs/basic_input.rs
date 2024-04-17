@@ -1,17 +1,33 @@
 //! Module providing a yew component that handles a basic input, which is meant to be used in combination with BasicForm.
 
 use std::collections::HashSet;
+use std::fmt::Display;
 
 use super::InputErrors;
-use crate::workers::WebsocketWorker;
 use gloo::timers::callback::Timeout;
 use validator::Validate;
 use wasm_bindgen::JsCast;
-use web_common::api::ws::messages::*;
 use web_common::custom_validators::validation_errors::ValidationErrorToString;
 use yew::prelude::*;
-use yew_agent::prelude::WorkerBridgeHandle;
-use yew_agent::scope_ext::AgentScopeExt;
+
+#[derive(Clone, PartialEq)]
+pub enum InputType {
+    Text,
+    Number,
+    Checkbox,
+    Textarea,
+}
+
+impl Display for InputType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            InputType::Text => write!(f, "text"),
+            InputType::Number => write!(f, "number"),
+            InputType::Checkbox => write!(f, "checkbox"),
+            InputType::Textarea => write!(f, "textarea"),
+        }
+    }
+}
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct InputProp<Data>
@@ -25,7 +41,7 @@ where
     pub placeholder: Option<String>,
     #[prop_or_default]
     pub value: Option<Data>,
-    pub input_type: String,
+    pub input_type: InputType,
     #[prop_or_default]
     pub step: Option<f64>,
     #[prop_or(false)]
@@ -48,13 +64,12 @@ where
         self.value.clone()
     }
 
-    pub fn input_type(&self) -> String {
+    pub fn input_type(&self) -> InputType {
         self.input_type.clone()
     }
 }
 
 pub struct BasicInput<Data> {
-    _websocket: WorkerBridgeHandle<WebsocketWorker<FrontendMessage, BackendMessage>>,
     errors: HashSet<String>,
     current_value: Option<String>,
     is_valid: Option<bool>,
@@ -63,7 +78,6 @@ pub struct BasicInput<Data> {
 }
 
 pub enum InputMessage<Data> {
-    Backend(BackendMessage),
     RemoveError(String),
     RemoveErrors,
     Validate(Result<Data, Vec<String>>),
@@ -84,14 +98,8 @@ where
     type Message = InputMessage<Data>;
     type Properties = InputProp<Data>;
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
         Self {
-            _websocket: ctx.link().bridge_worker(Callback::from({
-                let link = ctx.link().clone();
-                move |message: BackendMessage| {
-                    link.send_message(InputMessage::Backend(message));
-                }
-            })),
             errors: HashSet::new(),
             is_valid: None,
             current_value: None,
@@ -102,7 +110,6 @@ where
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            InputMessage::Backend(_bm) => false,
             InputMessage::RemoveErrors => {
                 let mut changes = false;
 
@@ -207,7 +214,7 @@ where
                 }
             }
             Some(false) => Some("input-group-invalid"),
-            None => None
+            None => None,
         };
         let classes = format!(
             "input-group {}{}",
@@ -225,8 +232,8 @@ where
                 input_event.prevent_default();
 
                 // We extract the current value of the input field
-                let value = match props.input_type().as_str() {
-                    "textarea" => input_event
+                let value = match props.input_type() {
+                    InputType::Textarea => input_event
                         .target()
                         .unwrap()
                         .dyn_into::<web_sys::HtmlTextAreaElement>()
@@ -260,8 +267,8 @@ where
                 input_event.prevent_default();
 
                 // We extract the current value of the input field
-                let value = match props.input_type().as_str() {
-                    "textarea" => input_event
+                let value = match props.input_type() {
+                    InputType::Textarea => input_event
                         .target()
                         .unwrap()
                         .dyn_into::<web_sys::HtmlTextAreaElement>()
@@ -313,8 +320,8 @@ where
                 } else {
                     html! {}
                 }}
-                {if props.input_type() == "textarea" {
-                    html! {
+                {match props.input_type() {
+                    InputType::Textarea => html! {
                         <textarea
                             class="input-control"
                             name={props.normalized_label()}
@@ -324,28 +331,25 @@ where
                             oninput={on_input}
                             onblur={on_blur}
                         ></textarea>
-                    }
-                } else if props.input_type() == "checkbox" {
-                    html! {
+                    },
+                    InputType::Checkbox => html! {
                         <>
                         <label for={props.normalized_label()} class="checkbox"></label>
                         <input
-                            type={props.input_type()}
+                            type="checkbox"
                             class="input-control"
                             name={props.normalized_label()}
                             id={props.normalized_label()}
                             checked={input_value == "on"}
                             placeholder={props.placeholder.clone().unwrap_or_else(|| props.label())}
-                            step={props.step.map_or_else(|| "".to_string(), |step| step.to_string())}
                             oninput={on_input}
                             onblur={on_blur}
                         />
                         </>
-                    }
-                } else {
-                    html! {
+                    },
+                    InputType::Number | InputType::Text => html! {
                         <input
-                            type={props.input_type()}
+                            type={props.input_type().to_string()}
                             class="input-control"
                             name={props.normalized_label()}
                             id={props.normalized_label()}

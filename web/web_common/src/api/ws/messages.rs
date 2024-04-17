@@ -23,7 +23,7 @@ pub enum BackendMessage {
     Close(Option<CloseReason>),
     RefreshToken(AccessToken),
     Notification(NotificationMessage),
-    SelectResult(uuid::Uuid, Result<Vec<ViewRow>, ApiError>),
+    SearchTable(uuid::Uuid, Result<Vec<SearcheableTableRow>, ApiError>),
     TaskResult(Uuid, Result<(), ApiError>),
 }
 

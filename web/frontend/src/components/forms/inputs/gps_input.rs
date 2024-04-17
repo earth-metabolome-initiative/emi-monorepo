@@ -9,6 +9,7 @@ use validator::Validate;
 use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
 use wasm_bindgen::JsValue;
+use crate::components::forms::InputType;
 use web_sys::{Coordinates, Geolocation, Position, PositionError, PositionOptions};
 use yew::prelude::*;
 
@@ -146,7 +147,7 @@ pub fn gps_input(props: &GPSInputProps) -> Html {
                     <BasicInput<Float64>
                         label={"Latitude".to_string()}
                         value={(*latitude).map(Float64::from)}
-                        input_type="number"
+                        input_type={InputType::Number}
                         step={0.000001}
                     />
                 </li>
@@ -154,7 +155,7 @@ pub fn gps_input(props: &GPSInputProps) -> Html {
                     <BasicInput<Float64>
                         label={"Longitude".to_string()}
                         value={(*longitude).map(Float64::from)}
-                        input_type="number"
+                        input_type={InputType::Number}
                         step={0.000001}
                     />
                 </li>
@@ -162,7 +163,7 @@ pub fn gps_input(props: &GPSInputProps) -> Html {
                     <BasicInput<Float64>
                         label={"Lat/Lng accuracy (meters)".to_string()}
                         value={(*lat_lon_accuracy).map(Float64::from)}
-                        input_type="number"
+                        input_type={InputType::Number}
                         optional={true}
                         step={0.01}
                     />
@@ -173,7 +174,7 @@ pub fn gps_input(props: &GPSInputProps) -> Html {
                     <BasicInput<Float64>
                         label={"Altitude (meters)".to_string()}
                         value={(*altitude).map(Float64::from)}
-                        input_type="number"
+                        input_type={InputType::Number}
                         optional={true}
                         step={0.1}
                     />
@@ -182,7 +183,7 @@ pub fn gps_input(props: &GPSInputProps) -> Html {
                     <BasicInput<Float64>
                         label={"Altitude accuracy (meters)".to_string()}
                         value={(*altitude_accuracy).map(Float64::from)}
-                        input_type="number"
+                        input_type={InputType::Number}
                         optional={true}
                         step={0.1}
                     />

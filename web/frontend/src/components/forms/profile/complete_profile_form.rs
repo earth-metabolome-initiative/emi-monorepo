@@ -88,9 +88,9 @@ pub fn complete_profile_form() -> Html {
                 allowed_formats={vec![GenericFileFormat::Image]}
             />
             <ul class="name-wrapper input-group">
-                <li><BasicInput<ValidatedNameField> show_label={false} label="First name" input_type="text" /></li>
-                <li><BasicInput<ValidatedNameField> show_label={false} label="Middle name" optional={true} input_type="text" /></li>
-                <li><BasicInput<ValidatedNameField> show_label={false} label="Last name" input_type="text" /></li>
+                <li><BasicInput<ValidatedNameField> show_label={false} label="First name" input_type={InputType::Text} /></li>
+                <li><BasicInput<ValidatedNameField> show_label={false} label="Middle name" optional={true} input_type={InputType::Text} /></li>
+                <li><BasicInput<ValidatedNameField> show_label={false} label="Last name" input_type={InputType::Text} /></li>
             </ul>
         </BasicForm<CompleteProfile>>
         }

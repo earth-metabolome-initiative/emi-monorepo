@@ -101,6 +101,76 @@ pub enum ViewRow {
     PublicUser(PublicUser),
 }
 
+impl From<EditsView> for ViewRow {
+    fn from(item: EditsView) -> Self {
+        ViewRow::EditsView(item)
+    }
+}
+impl std::convert::TryFrom<ViewRow> for EditsView {
+    type Error = &'static str;
+    fn try_from(item: ViewRow) -> Result<Self, Self::Error> {
+        match item {
+            ViewRow::EditsView(item) => Ok(item),
+            _ => Err("Invalid conversion"),
+        }
+    }
+}
+impl From<LastEditsView> for ViewRow {
+    fn from(item: LastEditsView) -> Self {
+        ViewRow::LastEditsView(item)
+    }
+}
+impl std::convert::TryFrom<ViewRow> for LastEditsView {
+    type Error = &'static str;
+    fn try_from(item: ViewRow) -> Result<Self, Self::Error> {
+        match item {
+            ViewRow::LastEditsView(item) => Ok(item),
+            _ => Err("Invalid conversion"),
+        }
+    }
+}
+impl From<FormatsView> for ViewRow {
+    fn from(item: FormatsView) -> Self {
+        ViewRow::FormatsView(item)
+    }
+}
+impl std::convert::TryFrom<ViewRow> for FormatsView {
+    type Error = &'static str;
+    fn try_from(item: ViewRow) -> Result<Self, Self::Error> {
+        match item {
+            ViewRow::FormatsView(item) => Ok(item),
+            _ => Err("Invalid conversion"),
+        }
+    }
+}
+impl From<DocumentsView> for ViewRow {
+    fn from(item: DocumentsView) -> Self {
+        ViewRow::DocumentsView(item)
+    }
+}
+impl std::convert::TryFrom<ViewRow> for DocumentsView {
+    type Error = &'static str;
+    fn try_from(item: ViewRow) -> Result<Self, Self::Error> {
+        match item {
+            ViewRow::DocumentsView(item) => Ok(item),
+            _ => Err("Invalid conversion"),
+        }
+    }
+}
+impl From<PublicUser> for ViewRow {
+    fn from(item: PublicUser) -> Self {
+        ViewRow::PublicUser(item)
+    }
+}
+impl std::convert::TryFrom<ViewRow> for PublicUser {
+    type Error = &'static str;
+    fn try_from(item: ViewRow) -> Result<Self, Self::Error> {
+        match item {
+            ViewRow::PublicUser(item) => Ok(item),
+            _ => Err("Invalid conversion"),
+        }
+    }
+}
 impl From<&str> for View {
     fn from(item: &str) -> Self {
         match item {

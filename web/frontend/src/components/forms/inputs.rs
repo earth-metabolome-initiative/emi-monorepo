@@ -8,3 +8,5 @@ pub mod gps_input;
 pub use gps_input::*;
 pub mod map_input;
 pub use map_input::*;
+pub mod datalist;
+pub use datalist::*;

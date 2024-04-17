@@ -1715,11 +1715,10 @@ impl ProjectState {
         use crate::schema::project_states;
         let limit = limit.unwrap_or(10);
         let threshold = threshold.unwrap_or(0.6);
-        let similarity_query = format!(concat!(
-            r#"SELECT id, name, description, font_awesome_icon, icon_color FROM project_states WHERE",
-            "similarity(name, description, '$1') > $2",
-            "ORDER BY similarity(name, description, '$1') DESC LIMIT $3;"#
-        ));
+        let similarity_query = concat!(
+            "SELECT id, name, description, font_awesome_icon, icon_color FROM project_states ",
+            "ORDER BY similarity(name, description, $1) DESC LIMIT $3;"
+        );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Float8, _>(threshold)
@@ -1815,11 +1814,10 @@ impl Project {
         use crate::schema::projects;
         let limit = limit.unwrap_or(10);
         let threshold = threshold.unwrap_or(0.6);
-        let similarity_query = format!(concat!(
-            r#"SELECT id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, expected_end_date, end_date FROM projects WHERE",
-            "similarity(name, description, '$1') > $2",
-            "ORDER BY similarity(name, description, '$1') DESC LIMIT $3;"#
-        ));
+        let similarity_query = concat!(
+            "SELECT id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, expected_end_date, end_date FROM projects ",
+            "ORDER BY similarity(name, description, $1) DESC LIMIT $3;"
+        );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Float8, _>(threshold)
@@ -2182,11 +2180,10 @@ impl Taxa {
         use crate::schema::taxa;
         let limit = limit.unwrap_or(10);
         let threshold = threshold.unwrap_or(0.6);
-        let similarity_query = format!(concat!(
-            r#"SELECT id, name, ncbi_taxon_id FROM taxa WHERE",
-            "similarity(name, '$1') > $2",
-            "ORDER BY similarity(name, '$1') DESC LIMIT $3;"#
-        ));
+        let similarity_query = concat!(
+            "SELECT id, name, ncbi_taxon_id FROM taxa ",
+            "ORDER BY similarity(name, $1) DESC LIMIT $3;"
+        );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Float8, _>(threshold)
@@ -2537,11 +2534,10 @@ impl User {
         use crate::schema::users;
         let limit = limit.unwrap_or(10);
         let threshold = threshold.unwrap_or(0.6);
-        let similarity_query = format!(concat!(
-            r#"SELECT id, first_name, middle_name, last_name, created_at, updated_at FROM users WHERE",
-            "similarity(first_name, middle_name, last_name, '$1') > $2",
-            "ORDER BY similarity(first_name, middle_name, last_name, '$1') DESC LIMIT $3;"#
-        ));
+        let similarity_query = concat!(
+            "SELECT id, first_name, middle_name, last_name, created_at, updated_at FROM users ",
+            "ORDER BY similarity(first_name, middle_name, last_name, $1) DESC LIMIT $3;"
+        );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Float8, _>(threshold)
@@ -2976,6 +2972,54 @@ impl From<User> for TableRow {
         TableRow::User(item)
     }
 }
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq)]
+pub enum SearcheableTableRow {
+    ProjectState(ProjectState),
+    Project(Project),
+    Taxa(Taxa),
+    User(User),
+}
+
+impl From<web_common::database::tables::SearcheableTableRow> for SearcheableTableRow {
+    fn from(item: web_common::database::tables::SearcheableTableRow) -> Self {
+        match item {
+            web_common::database::tables::SearcheableTableRow::ProjectState(item) => SearcheableTableRow::ProjectState(item.into()),
+            web_common::database::tables::SearcheableTableRow::Project(item) => SearcheableTableRow::Project(item.into()),
+            web_common::database::tables::SearcheableTableRow::Taxa(item) => SearcheableTableRow::Taxa(item.into()),
+            web_common::database::tables::SearcheableTableRow::User(item) => SearcheableTableRow::User(item.into()),
+        }
+    }
+}
+impl From<SearcheableTableRow> for web_common::database::tables::SearcheableTableRow {
+    fn from(item: SearcheableTableRow) -> Self {
+        match item {
+            SearcheableTableRow::ProjectState(item) => web_common::database::tables::SearcheableTableRow::ProjectState(item.into()),
+            SearcheableTableRow::Project(item) => web_common::database::tables::SearcheableTableRow::Project(item.into()),
+            SearcheableTableRow::Taxa(item) => web_common::database::tables::SearcheableTableRow::Taxa(item.into()),
+            SearcheableTableRow::User(item) => web_common::database::tables::SearcheableTableRow::User(item.into()),
+        }
+    }
+}
+impl From<ProjectState> for SearcheableTableRow {
+    fn from(item: ProjectState) -> Self {
+        SearcheableTableRow::ProjectState(item)
+    }
+}
+impl From<Project> for SearcheableTableRow {
+    fn from(item: Project) -> Self {
+        SearcheableTableRow::Project(item)
+    }
+}
+impl From<Taxa> for SearcheableTableRow {
+    fn from(item: Taxa) -> Self {
+        SearcheableTableRow::Taxa(item)
+    }
+}
+impl From<User> for SearcheableTableRow {
+    fn from(item: User) -> Self {
+        SearcheableTableRow::User(item)
+    }
+}
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Copy, Eq, )]
 pub enum Table {
     Archivable,
@@ -3353,12 +3397,12 @@ impl SearcheableTable {
         limit: Option<i32>,
         threshold: Option<f64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<TableRow>, diesel::result::Error> {
+    ) -> Result<Vec<SearcheableTableRow>, diesel::result::Error> {
         Ok(match self {
-            SearcheableTable::ProjectState => ProjectState::search(query, limit, threshold, connection)?.into_iter().map(TableRow::from).collect::<Vec<TableRow>>(),
-            SearcheableTable::Project => Project::search(query, limit, threshold, connection)?.into_iter().map(TableRow::from).collect::<Vec<TableRow>>(),
-            SearcheableTable::Taxa => Taxa::search(query, limit, threshold, connection)?.into_iter().map(TableRow::from).collect::<Vec<TableRow>>(),
-            SearcheableTable::User => User::search(query, limit, threshold, connection)?.into_iter().map(TableRow::from).collect::<Vec<TableRow>>(),
+            SearcheableTable::ProjectState => ProjectState::search(query, limit, threshold, connection)?.into_iter().map(SearcheableTableRow::from).collect::<Vec<SearcheableTableRow>>(),
+            SearcheableTable::Project => Project::search(query, limit, threshold, connection)?.into_iter().map(SearcheableTableRow::from).collect::<Vec<SearcheableTableRow>>(),
+            SearcheableTable::Taxa => Taxa::search(query, limit, threshold, connection)?.into_iter().map(SearcheableTableRow::from).collect::<Vec<SearcheableTableRow>>(),
+            SearcheableTable::User => User::search(query, limit, threshold, connection)?.into_iter().map(SearcheableTableRow::from).collect::<Vec<SearcheableTableRow>>(),
         })
     }
 }

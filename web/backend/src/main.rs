@@ -3,7 +3,7 @@ extern crate diesel;
 
 use actix_web::{get, web, App, HttpServer, Responder};
 use diesel::prelude::*;
-use diesel::r2d2::{self, ConnectionManager, Pool};
+use diesel::r2d2::{self, ConnectionManager};
 
 use actix_cors::Cors;
 use actix_files::NamedFile;
@@ -14,16 +14,6 @@ use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 use redis::Client;
 use sqlx::{postgres::PgPoolOptions, Pool as SQLxPool, Postgres};
 use std::path::PathBuf;
-
-mod api;
-mod model_implementations;
-mod models;
-mod schema;
-mod transactions;
-mod views;
-
-pub(crate) type DBPool = Pool<ConnectionManager<PgConnection>>;
-pub(crate) type DieselConn = r2d2::PooledConnection<ConnectionManager<PgConnection>>;
 
 /// Entrypoint to load the index.html file
 async fn index() -> impl Responder {
@@ -48,7 +38,7 @@ async fn main() -> std::io::Result<()> {
 
     // create db connection pool
     let manager = ConnectionManager::<PgConnection>::new(&database_url);
-    let pool: DBPool = match r2d2::Pool::builder()
+    let pool: backend::DBPool = match r2d2::Pool::builder()
         // We set the maximum number of connections in the pool to 10
         .max_size(10)
         .build(manager)
@@ -135,7 +125,7 @@ async fn main() -> std::io::Result<()> {
             // pass in the sqlx pool to all routes
             .app_data(web::Data::new(sqlx_pool.clone()))
             // We register the API handlers
-            .configure(api::configure)
+            .configure(backend::api::configure)
             // We serve the frontend as static files
             .route("/", web::get().to(index))
             .route("/login", web::get().to(index))
