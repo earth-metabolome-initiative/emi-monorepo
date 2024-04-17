@@ -24,9 +24,10 @@ use crate::stores::app_state::AppState;
 use crate::stores::user_state::UserState;
 use crate::utils::is_online;
 use gloo::timers::callback::Interval;
-use web_common::database::PublicUser;
+use gluesql::core::executor::Payload;
 use web_common::api::ws::messages::*;
 use web_common::api::ApiError;
+use web_common::database::PublicUser;
 use yew::prelude::*;
 use yew_agent::scope_ext::AgentScopeExt;
 use yew_router::prelude::*;
@@ -36,7 +37,7 @@ use crate::components::hamburger::Hamburger;
 use crate::components::search_bar::SearchBar;
 use crate::components::sidebar::Sidebar;
 use crate::stores::user_state::refresh_access_token;
-use crate::workers::WebsocketWorker;
+use crate::workers::{DBWorker, WebsocketWorker};
 use std::rc::Rc;
 use yew_agent::prelude::WorkerBridgeHandle;
 
@@ -47,7 +48,7 @@ pub struct Navigator {
     app_state: Rc<AppState>,
     app_dispatch: Dispatch<AppState>,
     connectivity_checked: Option<Interval>,
-    database: Option<crate::database::Database>
+    database: WorkerBridgeHandle<DBWorker>,
 }
 
 impl Navigator {
@@ -68,7 +69,6 @@ pub enum NavigatorMessage {
     Backend(BackendMessage),
     UserState(Rc<UserState>),
     AppState(Rc<AppState>),
-    Database(Result<crate::database::Database, gluesql::prelude::Error>),
     ToggleSidebar,
     ResumeTasks,
 }
@@ -90,13 +90,6 @@ impl Component for Navigator {
             .subscribe(ctx.link().callback(NavigatorMessage::AppState));
         let app_state = app_dispatch.get();
 
-        // We call the db initializer in a callback, so to handle the async operation.
-        let link = ctx.link().clone();
-        wasm_bindgen_futures::spawn_local(async move {
-            let database = crate::database::init_database().await;
-            link.send_message(NavigatorMessage::Database(database));
-        });
-
         Self {
             websocket: ctx.link().bridge_worker(Callback::from({
                 let link = ctx.link().clone();
@@ -105,28 +98,22 @@ impl Component for Navigator {
                     link.send_message(NavigatorMessage::Backend(message));
                 }
             })),
+            database: ctx.link().bridge_worker(Callback::from({
+                let link = ctx.link().clone();
+                move |message: Vec<Payload>| {
+                    log::info!("Received message from database: {:?}", message);
+                }
+            })),
             user_state,
             user_dispatch,
             app_state,
             app_dispatch,
             connectivity_checked: None,
-            database: None
         }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            NavigatorMessage::Database(database) => {
-                match database {
-                    Ok(db) => {
-                        self.database = Some(db);
-                    }
-                    Err(err) => {
-                        log::error!("Error initializing database: {:?}", err);
-                    }
-                }
-                true
-            }
             NavigatorMessage::UserState(user_state) => {
                 // if self.user_state == user_state {
                 //     return false;
