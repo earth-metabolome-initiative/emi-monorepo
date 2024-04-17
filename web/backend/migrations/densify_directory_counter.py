@@ -12,16 +12,17 @@ def densify_directory_counter():
     counter = 0
     directories = os.listdir(migrations_dir)
     directories.sort()
-    for dir in directories:
-        if os.path.isdir(os.path.join(migrations_dir, dir)):
-            match = re.match(r"(\d+)_", dir)
+    for dir_name in directories:
+        if os.path.isdir(os.path.join(migrations_dir, dir_name)):
+            match = re.match(r"(\d+)_", dir_name)
             if match:
                 padded_counter = "0" * (14 - len(str(counter))) + str(counter)
-                new_dir = os.path.join(migrations_dir, padded_counter + dir[len(match.group(1)) :])
-                os.rename(os.path.join(migrations_dir, dir), new_dir)
-                print(f"Renamed {dir} to {new_dir}")
+                new_dir_name = padded_counter + dir_name[len(match.group(1)) :]
+                new_dir = os.path.join(migrations_dir, padded_counter + dir_name[len(match.group(1)) :])
                 counter += 1
-    print("Done")
+                if dir_name != new_dir_name:
+                    print(f"Renamed {dir_name} to {new_dir_name}")
+                    os.rename(os.path.join(migrations_dir, dir_name), new_dir)
 
 
 if __name__ == "__main__":

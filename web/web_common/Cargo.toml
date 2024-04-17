@@ -17,7 +17,7 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 uuid = { version = "1.7", features = ["serde", "v4", "js"] }
 validator = { version = "0.16", features = ["derive"] }
-gluesql = { version = "0.15", features = ["idb-storage"], default-features = false, optional = true }
+gluesql = { git = "https://github.com/gluesql/gluesql.git", features = ["idb-storage"], default-features = false, optional = true }
 log = "0.4"
 
 # We need to be able to implement the From trait for types defined in third

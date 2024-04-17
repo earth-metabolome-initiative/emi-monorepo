@@ -728,7 +728,7 @@ def write_web_common_structs(
                     "f32": "gluesql::core::ast_builder::num({})",
                     "f64": "gluesql::core::ast_builder::num({})",
                     "String": "gluesql::core::ast_builder::text({})",
-                    "Uuid": "gluesql::core::ast_builder::expr({}.to_string())",
+                    "Uuid": "gluesql::core::ast_builder::uuid({}.to_string())",
                     "bool": "({}.into())",
                     "NaiveDateTime": "gluesql::core::ast_builder::timestamp({}.to_string())",
                     "DateTime<Utc>": "gluesql::core::ast_builder::timestamp({}.to_string())",
@@ -940,8 +940,54 @@ def write_web_common_structs(
                 tables.write(f"    {{\n")
                 tables.write(f"        use gluesql::core::ast_builder::*;\n")
                 # We use the AST builder as much as possible so to avoid SQL injection attacks.
-                tables.write(f'        let mut update_row = table("{table_name}")\n')
-                tables.write(f"            .update();\n")
+
+                # First, we determine whether the current struct has at least an optional field.
+                has_optional_fields = False
+
+                for attribute in struct_metadata["attributes"]:
+                    attribute_name = attribute["field_name"]
+                    attribute_type = attribute["field_type"]
+                    if attribute_type.startswith("Option<"):
+                        has_optional_fields = True
+                        break
+
+                if has_optional_fields:
+                    tables.write(f'        let mut update_row = table("{table_name}")\n')
+                else:
+                    tables.write(f'        table("{table_name}")\n')
+                tables.write(f"            .update()")
+
+                at_least_one_attribute = False
+
+                for attribute in struct_metadata["attributes"]:
+                    attribute_name = attribute["field_name"]
+                    attribute_type = attribute["field_type"]
+                    if attribute_type.startswith("Option<"):
+                        # We handle this in the next loop
+                        continue
+                    elif attribute_type in update_types_and_methods:
+                        at_least_one_attribute = True
+                        conversion = update_types_and_methods[attribute_type].format(
+                            "self.{}".format(attribute_name)
+                        )
+                        tables.write(
+                            f'        \n.set("{attribute_name}", {conversion})'
+                        )
+                    else:
+                        raise NotImplementedError(
+                            f"The type {attribute_type} is not supported."
+                            f"The struct {struct_name} contains an {attribute_type}."
+                        )
+                
+                if not at_least_one_attribute:
+                    raise NotImplementedError(
+                        f"The struct {struct_name} does not contain any attributes. "
+                        "It is not well defined how to update a struct without any attributes."
+                    )
+                if has_optional_fields:
+                    tables.write(";\n")
+
+                # After all of the non-optional fields, we handle the optional fields.
                 for attribute in struct_metadata["attributes"]:
                     attribute_name = attribute["field_name"]
                     attribute_type = attribute["field_type"]
@@ -963,19 +1009,11 @@ def write_web_common_structs(
                                 f"The type {inner_attribute_name} is not supported. "
                                 f"The struct {struct_name} contains an {attribute_type}. "
                             )
-                    elif attribute_type in update_types_and_methods:
-                        conversion = update_types_and_methods[attribute_type].format(
-                            "self.{}".format(attribute_name)
-                        )
-                        tables.write(
-                            f'        update_row = update_row.set("{attribute_name}", {conversion});\n'
-                        )
-                    else:
-                        raise NotImplementedError(
-                            f"The type {attribute_type} is not supported."
-                            f"The struct {struct_name} contains an {attribute_type}."
-                        )
-                tables.write(f"            update_row.execute(connection)\n")
+
+                if has_optional_fields:
+                    tables.write(f"            update_row.execute(connection)\n")
+                else:
+                    tables.write(f"            .execute(connection)\n")
                 tables.write(f"            .await\n")
                 tables.write("             .map(|payload| match payload {\n")
                 tables.write(
