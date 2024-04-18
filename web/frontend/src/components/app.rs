@@ -9,8 +9,8 @@ use yew_router::prelude::*;
 #[function_component]
 pub fn App() -> Html {
     html! {
-        <WorkerProvider<WebsocketWorker<FrontendMessage, BackendMessage>> path="web_socket_worker.js">
-            <WorkerProvider<DBWorker> path="db_worker.js">
+        <WorkerProvider<WebsocketWorker<FrontendMessage, BackendMessage>> path="/web_socket_worker.js">
+            <WorkerProvider<DBWorker> path="/db_worker.js">
                 <BrowserRouter>
                     <crate::components::NavigatorWrapper />
                     <div class="app">

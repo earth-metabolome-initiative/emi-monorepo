@@ -92,7 +92,6 @@ where
                 while let Some(backend_message) = read.next().await {
                     match backend_message {
                         Ok(message) => {
-                            log::debug!("Received message from websocket: {:?}", message);
                             scope.send_message(InternalMessage::Backend(message.into()));
                         }
                         Err(err) => {
