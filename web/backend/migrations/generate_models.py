@@ -736,6 +736,11 @@ def write_web_common_structs(
             for derive in derives:
                 tables.write(f"{derive}, ")
             tables.write(f")]\n")
+            # We also write conditional derives for the frontend feature
+            # that ask for the `frontend` feature to be enabled and derive
+            # the yew::html::Properties trait for the struct.
+            tables.write(f"#[cfg_attr(feature = \"frontend\", derive(yew::html::Properties))]\n")
+
             tables.write(f"pub struct {struct_name} {{\n")
             for attribute in struct_metadata["attributes"]:
                 tables.write(

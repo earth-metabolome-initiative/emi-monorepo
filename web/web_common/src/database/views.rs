@@ -3,6 +3,7 @@ use serde::Serialize;
 use uuid::Uuid;
 use chrono::NaiveDateTime;
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct EditsView {
     pub id: Uuid,
     pub editable_id: Uuid,
@@ -15,6 +16,7 @@ pub struct EditsView {
     pub edit_extended_reason: String,
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct LastEditsView {
     pub id: Uuid,
     pub editable_id: Uuid,
@@ -27,6 +29,7 @@ pub struct LastEditsView {
     pub edit_extended_reason: String,
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct FormatsView {
     pub id: Uuid,
     pub mime_type: String,
@@ -34,6 +37,7 @@ pub struct FormatsView {
     pub format_description: String,
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct DocumentsView {
     pub id: Uuid,
     pub format_id: Uuid,
@@ -57,6 +61,7 @@ pub struct DocumentsView {
     pub mime_type: String,
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct PublicUser {
     pub id: Uuid,
     pub first_name: String,

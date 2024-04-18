@@ -4,6 +4,7 @@ use uuid::Uuid;
 use chrono::NaiveDateTime;
 use super::selects::Select;
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Archivable {
     pub id: Uuid,
     pub archived_at: NaiveDateTime,
@@ -198,6 +199,7 @@ impl Archivable {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ContainerHorizontalRule {
     pub id: Uuid,
     pub item_type_id: Option<Uuid>,
@@ -483,6 +485,7 @@ impl ContainerHorizontalRule {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ContainerVerticalRule {
     pub id: Uuid,
     pub container_item_type_id: Option<Uuid>,
@@ -768,6 +771,7 @@ impl ContainerVerticalRule {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ContinuousUnit {
     pub id: Uuid,
 }
@@ -948,6 +952,7 @@ impl ContinuousUnit {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Describable {
     pub id: Uuid,
     pub name: String,
@@ -1149,6 +1154,7 @@ impl Describable {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct DiscreteUnit {
     pub id: Uuid,
 }
@@ -1329,6 +1335,7 @@ impl DiscreteUnit {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct DocumentFormat {
     pub id: Uuid,
     pub mime_type: String,
@@ -1516,6 +1523,7 @@ impl DocumentFormat {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Document {
     pub id: Uuid,
     pub path: String,
@@ -1717,6 +1725,7 @@ impl Document {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Editable {
     pub id: Uuid,
     pub created_at: NaiveDateTime,
@@ -1911,6 +1920,7 @@ impl Editable {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Edit {
     pub id: Uuid,
     pub editable_id: Uuid,
@@ -2098,6 +2108,7 @@ impl Edit {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ItemCategory {
     pub id: Uuid,
 }
@@ -2278,6 +2289,7 @@ impl ItemCategory {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ItemCategoryRelationship {
     pub id: Uuid,
     pub parent_id: Uuid,
@@ -2472,6 +2484,7 @@ impl ItemCategoryRelationship {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ItemCategoryUnit {
     pub id: Uuid,
     pub item_category_id: Uuid,
@@ -2666,6 +2679,7 @@ impl ItemCategoryUnit {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ItemContinuousQuantity {
     pub id: Uuid,
     pub item_id: Option<Uuid>,
@@ -2913,6 +2927,7 @@ impl ItemContinuousQuantity {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ItemDiscreteQuantity {
     pub id: Uuid,
     pub item_id: Option<Uuid>,
@@ -3147,6 +3162,7 @@ impl ItemDiscreteQuantity {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ItemLocation {
     pub id: Uuid,
     pub item_id: Option<Uuid>,
@@ -3367,6 +3383,7 @@ impl ItemLocation {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ItemUnit {
     pub id: Uuid,
     pub item_id: Uuid,
@@ -3561,6 +3578,7 @@ impl ItemUnit {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Item {
     pub id: Uuid,
     pub parent_id: Option<Uuid>,
@@ -3755,6 +3773,7 @@ impl Item {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct LocationState {
     pub id: Uuid,
     pub font_awesome_icon: Option<String>,
@@ -3949,6 +3968,7 @@ impl LocationState {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Location {
     pub id: Uuid,
     pub latitude: Option<f64>,
@@ -4228,6 +4248,7 @@ impl Location {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct LoginProvider {
     pub id: Uuid,
     pub name: String,
@@ -4450,6 +4471,7 @@ impl LoginProvider {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ManufacturedItemCategory {
     pub id: Uuid,
     pub cost: f64,
@@ -4658,6 +4680,7 @@ impl ManufacturedItemCategory {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Notification {
     pub id: Uuid,
     pub user_id: Uuid,
@@ -4880,6 +4903,7 @@ impl Notification {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct OrganizationAuthorization {
     pub id: Uuid,
     pub organization_id: Uuid,
@@ -5081,6 +5105,7 @@ impl OrganizationAuthorization {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct OrganizationLocation {
     pub id: Uuid,
     pub organization_id: Option<Uuid>,
@@ -5301,6 +5326,7 @@ impl OrganizationLocation {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct OrganizationState {
     pub id: Uuid,
     pub font_awesome_icon: Option<String>,
@@ -5495,6 +5521,7 @@ impl OrganizationState {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Organization {
     pub id: Uuid,
     pub state_id: Option<Uuid>,
@@ -5728,6 +5755,7 @@ impl Organization {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct PrimaryUserEmail {
     pub id: Uuid,
 }
@@ -5908,6 +5936,7 @@ impl PrimaryUserEmail {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ProcedureContinuousRequirement {
     pub id: Uuid,
     pub procedure_id: Uuid,
@@ -6123,6 +6152,7 @@ impl ProcedureContinuousRequirement {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ProcedureDiscreteRequirement {
     pub id: Uuid,
     pub procedure_id: Uuid,
@@ -6338,6 +6368,7 @@ impl ProcedureDiscreteRequirement {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Procedure {
     pub id: Uuid,
 }
@@ -6518,6 +6549,7 @@ impl Procedure {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ProjectContinuousRequirement {
     pub id: Uuid,
     pub project_id: Uuid,
@@ -6733,6 +6765,7 @@ impl ProjectContinuousRequirement {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ProjectDiscreteRequirement {
     pub id: Uuid,
     pub project_id: Uuid,
@@ -6948,6 +6981,7 @@ impl ProjectDiscreteRequirement {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ProjectMilestone {
     pub id: Uuid,
     pub project_id: Uuid,
@@ -7156,6 +7190,7 @@ impl ProjectMilestone {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ProjectState {
     pub id: Uuid,
     pub name: String,
@@ -7364,6 +7399,7 @@ impl ProjectState {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Project {
     pub id: Uuid,
     pub name: String,
@@ -7652,6 +7688,7 @@ impl Project {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Role {
     pub id: Uuid,
 }
@@ -7832,6 +7869,7 @@ impl Role {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SampleTaxa {
     pub id: Uuid,
     pub sample_id: Uuid,
@@ -8026,6 +8064,7 @@ impl SampleTaxa {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SampledIndividualTaxa {
     pub id: Uuid,
     pub sampled_individual_id: Uuid,
@@ -8220,6 +8259,7 @@ impl SampledIndividualTaxa {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SampledIndividual {
     pub id: Uuid,
 }
@@ -8400,6 +8440,7 @@ impl SampledIndividual {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Sample {
     pub id: Uuid,
     pub derived_from: Option<Uuid>,
@@ -8594,6 +8635,7 @@ impl Sample {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Spectra {
     pub id: Uuid,
     pub spectra_collection_id: Uuid,
@@ -8781,6 +8823,7 @@ impl Spectra {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SpectraCollection {
     pub id: Uuid,
     pub sample_id: Uuid,
@@ -8968,6 +9011,7 @@ impl SpectraCollection {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Taxa {
     pub id: Uuid,
     pub name: String,
@@ -9169,6 +9213,7 @@ impl Taxa {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct TeamAuthorization {
     pub id: Uuid,
     pub team_id: Uuid,
@@ -9370,6 +9415,7 @@ impl TeamAuthorization {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct TeamState {
     pub id: Uuid,
     pub font_awesome_icon: String,
@@ -9557,6 +9603,7 @@ impl TeamState {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Team {
     pub id: Uuid,
     pub parent_team_id: Option<Uuid>,
@@ -9758,6 +9805,7 @@ impl Team {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Unit {
     pub id: Uuid,
     pub symbol: String,
@@ -9945,6 +9993,7 @@ impl Unit {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct UserAuthorization {
     pub id: Uuid,
     pub user_id: Uuid,
@@ -10146,6 +10195,7 @@ impl UserAuthorization {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct UserEmail {
     pub id: Uuid,
     pub email: String,
@@ -10347,6 +10397,7 @@ impl UserEmail {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct User {
     pub id: Uuid,
     pub first_name: String,

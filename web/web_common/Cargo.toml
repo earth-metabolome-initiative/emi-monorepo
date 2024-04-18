@@ -45,6 +45,7 @@ futures-util = "0.3.30"
 wasm-bindgen = {version="0.2.92", optional = true}
 const_format = "0.2.32"
 chrono = {version="0.4.37", optional = false, features=["serde"]}
+yew = {version="0.21.0" , optional = true}
 
 [dependencies.web-sys]
 version = "0.3.69"
@@ -84,4 +85,4 @@ backend = [ "actix-web", "actix-web-actors", "bytes", "actix", "rustface", "dies
 
 # The `frontend` feature is used to enable the implementation of the From trait
 # for types defined in third party crates in the frontend.
-frontend = ["gloo-net", "web-sys", "wasm-bindgen-futures", "wasm-bindgen", "gluesql"]
+frontend = ["gloo-net", "web-sys", "wasm-bindgen-futures", "wasm-bindgen", "gluesql", "yew"]
