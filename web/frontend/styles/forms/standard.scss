@@ -114,6 +114,39 @@ form.standard-form {
             }
         }
 
+        &.datalist {
+            ul {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+                width: 100%;
+                border: 1px solid #ccc;
+                max-height: 200px;
+                overflow-y: scroll;
+                border-radius: 1em;
+                box-sizing: border-box;
+
+                li {
+                    padding: 0.5em;
+                    width: 100%;
+                    cursor: pointer;
+                    transition: color 0.2s;
+                    border-bottom: 1px solid #ccc;
+                    box-sizing: border-box;
+
+                    &:hover {
+                        color: $primary;
+                        border-color: $primary;
+                    }
+
+                    strong {
+                        font-weight: 800;
+                        color: inherit;
+                    }    
+                }
+            }
+        }
+
         &.file {
             min-height: 100px;
 

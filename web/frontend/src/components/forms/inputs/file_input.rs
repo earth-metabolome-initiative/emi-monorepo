@@ -262,7 +262,8 @@ where
                         if let Err(error) = Data::try_from_callback(file.clone(), move |result| {
                             link.send_message(FileInputMessage::Validate(result.map(|_| file)));
                         }) {
-                            ctx.link().send_message(FileInputMessage::Validate(Err(error)));
+                            ctx.link()
+                                .send_message(FileInputMessage::Validate(Err(error)));
                         }
                     }
                 }

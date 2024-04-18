@@ -5,11 +5,11 @@
 //! These input fields also include the accuracy of the measurement.
 //!
 //! TODO: also handle the registration device!
+use crate::components::forms::InputType;
 use validator::Validate;
 use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
 use wasm_bindgen::JsValue;
-use crate::components::forms::InputType;
 use web_sys::{Coordinates, Geolocation, Position, PositionError, PositionOptions};
 use yew::prelude::*;
 

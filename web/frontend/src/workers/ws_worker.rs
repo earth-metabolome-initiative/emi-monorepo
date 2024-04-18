@@ -1,13 +1,13 @@
 use futures::{SinkExt, StreamExt};
 use gloo::timers::callback::Timeout;
 use gloo_net::websocket::futures::WebSocket;
-use uuid::Uuid;
-use web_common::api::ws::messages::BackendMessage;
-use web_common::api::ws::messages::FrontendMessage;
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::fmt::Debug;
+use uuid::Uuid;
 use wasm_bindgen::UnwrapThrowExt;
+use web_common::api::ws::messages::BackendMessage;
+use web_common::api::ws::messages::FrontendMessage;
 use yew::platform::spawn_local;
 use yew_agent::worker::HandlerId;
 use yew_agent::worker::Worker;
@@ -147,7 +147,7 @@ where
                 } else {
                     for sub in &self.subscribers {
                         scope.respond(*sub, backend_message.clone());
-                    }    
+                    }
                 }
             }
             InternalMessage::Disconnect(_closure_code) => {

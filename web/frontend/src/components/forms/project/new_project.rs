@@ -18,17 +18,14 @@ impl TryFromCallback<FormData> for FormWrapper<NewProject> {
             vec!["The new project name field is missing or not a string.".to_string()]
         })?;
 
-        let description = data
-            .get("description")
-            .as_string()
-            .ok_or_else(|| {
-                vec!["The new project description field is missing or not a string.".to_string()]
-            })?;
+        let description = data.get("description").as_string().ok_or_else(|| {
+            vec!["The new project description field is missing or not a string.".to_string()]
+        })?;
 
         let public = data
             .get("public")
             .as_string()
-            .unwrap_or_else(||"off".to_string());
+            .unwrap_or_else(|| "off".to_string());
 
         let public: bool = InputBool::try_from(public.to_string())?.into();
 
