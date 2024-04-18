@@ -2,7 +2,7 @@ form.standard-form {
     border-radius: 0.5em;
     width: 600px;
     max-width: 100%;
-    margin: 0 auto;
+    margin: 1em auto;
     animation: slide-in-from-bottom 0.3s;
 
     h4 {
@@ -119,11 +119,12 @@ form.standard-form {
                 list-style: none;
                 padding: 0;
                 margin: 0;
+                margin-top: 0.5em;
                 width: 100%;
                 border: 1px solid #ccc;
                 max-height: 200px;
                 overflow-y: scroll;
-                border-radius: 1em;
+                border-radius: 0.5em;
                 box-sizing: border-box;
 
                 li {
@@ -137,6 +138,10 @@ form.standard-form {
                     &:hover {
                         color: $primary;
                         border-color: $primary;
+                    }
+
+                    &:last-child {
+                        border-bottom: none;
                     }
 
                     strong {

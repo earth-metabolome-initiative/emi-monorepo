@@ -1717,7 +1717,7 @@ impl ProjectState {
         let threshold = threshold.unwrap_or(0.6);
         let similarity_query = concat!(
             "SELECT id, name, description, font_awesome_icon, icon_color FROM project_states ",
-            "ORDER BY similarity(name, description, $1) DESC LIMIT $3;"
+            "ORDER BY similarity(name, $1) DESC LIMIT $3;"
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
