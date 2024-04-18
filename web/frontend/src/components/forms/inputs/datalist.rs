@@ -5,6 +5,7 @@ use std::collections::HashSet;
 use super::InputErrors;
 use crate::workers::WebsocketWorker;
 use gloo::timers::callback::Timeout;
+use sublime_fuzzy::{best_match, format_simple};
 use validator::Validate;
 use wasm_bindgen::JsCast;
 use web_common::api::ws::messages::*;
@@ -59,6 +60,7 @@ pub struct Datalist<Data> {
     current_value: Option<String>,
     is_valid: Option<bool>,
     validation_timeout: Option<Timeout>,
+    search_timeout: Option<Timeout>,
     candidates: Vec<Data>,
 }
 
@@ -69,6 +71,8 @@ pub enum DatalistMessage<Data> {
     Validate(Result<Data, Vec<String>>),
     StartValidationTimeout(Result<Data, Vec<String>>),
     UpdateCurrentValue(String),
+    SearchCandidatesTimeout,
+    SearchCandidates,
 }
 
 impl<Data> Component for Datalist<Data>
@@ -96,6 +100,7 @@ where
             is_valid: None,
             current_value: None,
             validation_timeout: None,
+            search_timeout: None,
             candidates: Vec::new(),
         }
     }
@@ -103,22 +108,31 @@ where
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             DatalistMessage::Backend(message) => match message {
-                BackendMessage::SearchTable(_task_id, results) => {
-                    match results {
-                        Ok(results) => {
-                            self.candidates = results
-                                .into_iter()
-                                .map(|row| {
-                                    Data::try_from(row).expect("Failed to convert row to data")
-                                })
-                                .collect();
+                BackendMessage::SearchTable(_task_id, results) => match results {
+                    Ok(results) => {
+                        self.candidates = results
+                            .into_iter()
+                            .map(|row| Data::try_from(row).expect("Failed to convert row to data"))
+                            .collect();
+
+                        // We sort the candidates by their similarity to the current value
+                        if let Some(current_value) = self.current_value.as_ref() {
+                            self.candidates.sort_by(|a, b| {
+                                let a = a.to_string();
+                                let b = b.to_string();
+                                let a = best_match(current_value, &a);
+                                let b = best_match(current_value, &b);
+                                b.partial_cmp(&a).unwrap()
+                            });
                         }
-                        Err(error) => {
-                            log::error!("Error searching table: {:?}", error);
-                        }
+
+                        true
                     }
-                    true
-                }
+                    Err(error) => {
+                        log::error!("Error searching table: {:?}", error);
+                        false
+                    }
+                },
                 _ => false,
             },
             DatalistMessage::RemoveErrors => {
@@ -198,9 +212,31 @@ where
                 }));
                 false
             }
+            DatalistMessage::SearchCandidates => {
+                if let Some(value) = self.current_value.as_ref() {
+                    self.websocket
+                        .send(Data::search(value.clone().into()).into());
+                }
+                false
+            }
+            DatalistMessage::SearchCandidatesTimeout => {
+                let link = ctx.link().clone();
+                if let Some(timeout) = self.search_timeout.take() {
+                    timeout.cancel();
+                }
+                self.search_timeout = Some(Timeout::new(100, move || {
+                    link.send_message(DatalistMessage::SearchCandidates);
+                }));
+                false
+            }
             DatalistMessage::UpdateCurrentValue(value) => {
-                self.websocket.send(Data::search(value.clone()).into());
                 self.current_value = Some(value);
+                if self.candidates.is_empty() {
+                    ctx.link().send_message(DatalistMessage::SearchCandidates);
+                } else {
+                    ctx.link()
+                        .send_message(DatalistMessage::SearchCandidatesTimeout);
+                }
                 false
             }
         }
@@ -277,6 +313,11 @@ where
             })
         };
 
+        let current_value = self
+            .current_value
+            .as_ref()
+            .map_or_else(|| "".to_string(), |value| value.clone());
+
         let input_field = html! {
             <>
                 {if props.show_label {
@@ -288,24 +329,30 @@ where
                 } else {
                     html! {}
                 }}
-                    <input
-                        type="text"
-                        class="input-control"
-                        name={props.normalized_label()}
-                        id={props.normalized_label()}
-                        value={input_value}
-                        placeholder={props.placeholder.clone().unwrap_or_else(|| props.label())}
-                        oninput={on_input}
-                        onblur={on_blur}
-                        list={props.normalized_label()}
-                    />
-                    <datalist id={props.normalized_label()}>
-                        {for self.candidates.iter().map(|candidate| {
+                <input
+                    type="text"
+                    class="input-control"
+                    value={input_value}
+                    placeholder={props.placeholder.clone().unwrap_or_else(|| props.label())}
+                    oninput={on_input}
+                    onblur={on_blur}
+                    id={props.normalized_label()}
+                    name={props.normalized_label()}
+                />
+                {if self.candidates.is_empty() {
+                    html! {}
+                } else {
+                    html!{<ul>
+                        {for self.candidates.iter().enumerate().map(|(i, candidate)| {
+                            let candidate = candidate.to_string();
+                            let formatted = best_match(&current_value, &candidate).map_or_else(|| candidate.clone(), |match_value| format_simple(&match_value, &candidate, "<strong>", "</strong>"));
+                            let formatted = Html::from_html_unchecked(AttrValue::from(formatted));
                             html! {
-                                <option value={candidate.to_string()} />
+                                <li>{formatted}</li>
                             }
                         })}
-                    </datalist>
+                    </ul>}
+                }}
             </>
         };
 

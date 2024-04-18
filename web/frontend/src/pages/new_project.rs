@@ -9,7 +9,6 @@ use yew::prelude::*;
 use yew_router::prelude::*;
 use yewdux::prelude::*;
 
-
 #[function_component(NewProjectPage)]
 pub fn new_project_page() -> Html {
     // We proceed to render the profile page, which contains a form

@@ -3,10 +3,10 @@
 use crate::components::forms::*;
 use crate::stores::user_state::UserState;
 use wasm_bindgen::JsCast;
-use web_common::database::updates::update_profile::{ProfileImage, ValidatedNameField};
-use web_common::database::updates::CompleteProfile;
 use web_common::api::form_traits::TryFromCallback;
 use web_common::custom_validators::image;
+use web_common::database::updates::update_profile::{ProfileImage, ValidatedNameField};
+use web_common::database::updates::CompleteProfile;
 use web_common::file_formats::GenericFileFormat;
 use web_sys::FormData;
 use yew::prelude::*;
@@ -81,17 +81,17 @@ pub fn complete_profile_form() -> Html {
     }
 
     html! {
-        <BasicForm<CompleteProfile>>
-            <FileInput<ProfileImage>
-                label="Profile picture"
-                maximal_size={5*1024_u64.pow(2)}
-                allowed_formats={vec![GenericFileFormat::Image]}
-            />
-            <ul class="name-wrapper input-group">
-                <li><BasicInput<ValidatedNameField> show_label={false} label="First name" input_type={InputType::Text} /></li>
-                <li><BasicInput<ValidatedNameField> show_label={false} label="Middle name" optional={true} input_type={InputType::Text} /></li>
-                <li><BasicInput<ValidatedNameField> show_label={false} label="Last name" input_type={InputType::Text} /></li>
-            </ul>
-        </BasicForm<CompleteProfile>>
-        }
+    <BasicForm<CompleteProfile>>
+        <FileInput<ProfileImage>
+            label="Profile picture"
+            maximal_size={5*1024_u64.pow(2)}
+            allowed_formats={vec![GenericFileFormat::Image]}
+        />
+        <ul class="name-wrapper input-group">
+            <li><BasicInput<ValidatedNameField> show_label={false} label="First name" input_type={InputType::Text} /></li>
+            <li><BasicInput<ValidatedNameField> show_label={false} label="Middle name" optional={true} input_type={InputType::Text} /></li>
+            <li><BasicInput<ValidatedNameField> show_label={false} label="Last name" input_type={InputType::Text} /></li>
+        </ul>
+    </BasicForm<CompleteProfile>>
+    }
 }
