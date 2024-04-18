@@ -14,6 +14,7 @@ pub struct CloseReason {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum FrontendMessage {
+    //PopUp,
     Close(Option<CloseReason>),
     Task(Task),
 }

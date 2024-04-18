@@ -3,6 +3,7 @@
 use std::collections::HashSet;
 
 use super::InputErrors;
+use crate::components::database::row_to_badge::RowToBadge;
 use crate::workers::WebsocketWorker;
 use gloo::timers::callback::Timeout;
 use sublime_fuzzy::{best_match, format_simple};
@@ -83,7 +84,8 @@ where
         + SearchTable
         + Into<SearcheableTableRow>
         + TryFrom<SearcheableTableRow, Error = &'static str>
-        + ToString,
+        + ToString
+        + RowToBadge,
 {
     type Message = DatalistMessage<Data>;
     type Properties = DatalistProp<Data>;
@@ -344,11 +346,8 @@ where
                 } else {
                     html!{<ul>
                         {for self.candidates.iter().enumerate().map(|(i, candidate)| {
-                            let candidate = candidate.to_string();
-                            let formatted = best_match(&current_value, &candidate).map_or_else(|| candidate.clone(), |match_value| format_simple(&match_value, &candidate, "<strong>", "</strong>"));
-                            let formatted = Html::from_html_unchecked(AttrValue::from(formatted));
                             html! {
-                                <li>{formatted}</li>
+                                <li>{candidate.to_badge(self.current_value.as_ref().map(|val| val.as_str()))}</li>
                             }
                         })}
                     </ul>}
