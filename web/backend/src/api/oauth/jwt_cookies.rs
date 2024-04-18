@@ -411,7 +411,10 @@ async fn encode_jwt_refresh_cookie<'a>(
 
     let token = JsonRefreshToken::new(user_id)?;
 
-    token.insert_into_redis(redis_client).await?;
+    token
+        .insert_into_redis(redis_client)
+        .await
+        .map_err(|error| format!("Redis error {}", error))?;
 
     let cookie = Cookie::build(REFRESH_COOKIE_NAME, token.encode()?)
         .same_site(actix_web::cookie::SameSite::Strict)
@@ -455,7 +458,8 @@ pub(crate) async fn build_login_response<'a>(
 ) -> HttpResponse {
     let refresh_cookie = match encode_jwt_refresh_cookie(user_id, redis_client).await {
         Ok(cookie) => cookie,
-        Err(_) => {
+        Err(error) => {
+            log::error!("Error creating refresh token: {}", error);
             return HttpResponse::InternalServerError().json(ApiError::internal_server_error());
         }
     };
