@@ -27,7 +27,10 @@ async fn index() -> impl Responder {
 /// If the path happens to not exist, the server will return a 404 error.
 async fn static_files(req: HttpRequest) -> impl Responder {
     let path: PathBuf = req.match_info().query("filename").parse().unwrap();
-    NamedFile::open(format!("/app/frontend/dist/{}", path.display()))
+    match NamedFile::open(format!("/app/frontend/dist/{}", path.display())) {
+        Ok(file) => file,
+        Err(_) => NamedFile::open("/app/frontend/dist/index.html").unwrap(),
+    }
 }
 
 #[actix_rt::main]

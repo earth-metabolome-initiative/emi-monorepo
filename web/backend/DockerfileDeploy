@@ -8,10 +8,7 @@ ARG DOCUMENTS_DIRECTORY
 EXPOSE $ACTIX_PORT
 
 # We need to install postgresql-dev to build the diesel-cli
-RUN apt-get update && apt-get install -y libpq-dev
-
-# We need to install the `watch` command to run the Actix server
-RUN cargo install cargo-watch
+RUN apt-get update && apt-get install -y libpq-dev tmux
 
 # We need to add the wasm compilation target to the image
 RUN rustup target add wasm32-unknown-unknown
@@ -22,18 +19,9 @@ RUN cargo install --locked trunk
 # We need to compile diesel-cli to run the migrations
 RUN cargo install diesel_cli --no-default-features --features postgres
 
-# Command to run the Actix server application
-CMD rm -rf /app/backend/backend.ready || true && \
-    rm -rf /app/backend/backend.building || true && \
-    touch /app/backend/backend.building && \
-    cd /app/frontend && \
-    echo "Building frontend..." >> /app/backend/backend.building && \
-    trunk build --release && \
-    echo "Building frontend... done" >> /app/backend/backend.ready && \
-    echo "Copying frontend to backend..." >> /app/backend/backend.building && \
-    cd /app/backend && \
-    echo "Running Diesel migrations..." >> /app/backend/backend.ready && \
-    diesel migration run && \
-    echo "Running Diesel migrations... done" >> /app/backend/backend.ready && \
-    echo "Building and running Actix server..." >> /app/backend/backend.ready && \
-    cargo run --release
+# Set the working directory inside the container
+WORKDIR /app/backend
+
+# We run the Actix server by executing inside a TMUX session
+# the bash script called `start_deploy.sh`
+CMD tmux new-session -s actix 'bash /app/backend/start_deploy.sh'

@@ -40,6 +40,8 @@ services:
     restart: on-failure
 
   actix-server:
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
     build:
       context: ./backend
       dockerfile: DockerfileDeploy
@@ -75,7 +77,6 @@ services:
       - redis
     networks:
       - backend
-    restart: on-failure
 
   nginx:
     build:
@@ -94,6 +95,7 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    restart: on-failure
     depends_on:
       - actix-server
     networks:
