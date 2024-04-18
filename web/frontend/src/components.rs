@@ -9,6 +9,7 @@ mod logout;
 pub mod navigator;
 mod search_bar;
 pub mod sidebar;
+pub mod database;
 
 pub use app::App;
 pub use error_page::ErrorPage;
