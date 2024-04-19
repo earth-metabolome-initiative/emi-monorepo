@@ -118,11 +118,57 @@ form.standard-form {
         }
 
         &.datalist {
+            input[type="search"] {
+                animation: pop-in 0.2s;
+                margin-right: 0.5em;
+            }
+
             ul.selected-datalist-badges {
-                display: flex;
+                display: inline-block;
                 flex-wrap: wrap;
                 margin-top: 0.5em;
                 border: none;
+
+                li.datalist-add {
+                    display: inline-block;
+                    margin-left: 0.5em;
+                    box-sizing: border-box;
+                    border-radius: 2em;
+                    cursor: pointer;
+                    transition: border-color 0.2s;
+                    animation: pop-in 0.2s;
+
+                    &.deleting {
+                        animation: pop-out 0.2s;
+                    }
+
+                    button {
+                        padding: 0;
+                        height: 2em;
+                        width: 2em;
+                        background-color: transparent;
+                        cursor: pointer;
+                        border-radius: 100%;
+                        transition: border-color 0.2s;
+                        line-height: 1em;
+                        text-align: center;
+                        border: 1px solid $light_grey;
+                        box-sizing: border-box;
+
+                        i {
+                            font-size: 1.2em;
+                            color: $light_grey;
+                            transition: color 0.2s;
+                        }
+
+                        &:hover {
+                            border-color: $blue;
+                            i {
+                                color: $blue;
+                            }
+                        }
+                    }
+                }
 
                 li.selected-datalist-badge {
                     display: inline-block;
@@ -218,9 +264,9 @@ form.standard-form {
                         cursor: pointer;
                         border-radius: 100%;
                         transition: border-color 0.2s;
-                        line-height: 1em;
                         text-align: center;
                         border: 1px solid $light_grey;
+                        box-sizing: border-box;
 
                         i {
                             font-size: 1em;
@@ -230,10 +276,8 @@ form.standard-form {
 
                         &:hover {
                             border-color: $red;
-
                             i {
                                 color: $red;
-                                font-size: 1.1em;
                             }
                         }
                     }

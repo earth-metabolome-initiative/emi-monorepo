@@ -88,6 +88,8 @@ pub enum DatalistMessage<Data> {
     SelectCandidate(usize),
     DeleteSelection(usize),
     StartDeleteSelectionTimeout(usize),
+    Focus,
+    Blur,
 }
 
 impl<Data> Component for Datalist<Data>
@@ -264,12 +266,22 @@ where
                     self.selections.clear();
                 }
                 self.selections.push(candidate.clone());
-                self.current_value = Some(candidate.to_string());
+                if self.selections.len() == ctx.props().number_of_choices {
+                    self.is_focused = false;
+                }
+                self.current_value = None;
                 true
             }
             DatalistMessage::DeleteSelection(index) => {
                 self.selections_to_delete.retain(|&i| i != index);
                 self.selections.remove(index);
+
+                // If the user has deleted all selections, we want to
+                // reset the current value to None.
+                if self.selections.is_empty() {
+                    self.current_value = None;
+                }
+
                 true
             }
             DatalistMessage::UpdateCurrentValue(value) => {
@@ -296,7 +308,16 @@ where
                 let link = ctx.link().clone();
                 Timeout::new(200, move || {
                     link.send_message(DatalistMessage::DeleteSelection(index));
-                }).forget();
+                })
+                .forget();
+                true
+            }
+            DatalistMessage::Blur => {
+                self.is_focused = false;
+                true
+            }
+            DatalistMessage::Focus => {
+                self.is_focused = true;
                 true
             }
         }
@@ -411,6 +432,9 @@ where
                     />
                 }
                 } else {
+                    html!{}
+                }}
+                {if !self.selections.is_empty() {
                     html! {
                         <ul class="selected-datalist-badges">
                         {for self.selections.iter().enumerate().map(|(i, selection)| {
@@ -432,8 +456,34 @@ where
                                 </li>
                             }
                         })}
+                        {
+                            // If this entry needs more than one selection, we display
+                            // the button to add more selections.
+                            if !self.is_focused && self.selections.len() < ctx.props().number_of_choices {
+                                let classes = format!("datalist-add{}", if self.selections_to_delete.len() == self.selections.len() {" deleting"} else {""});
+                                let on_click = {
+                                    let link = ctx.link().clone();
+                                    Callback::from(move |e: MouseEvent| {
+                                        e.prevent_default();
+                                        e.stop_propagation();
+                                        link.send_message(DatalistMessage::Focus);
+                                    })
+                                };
+                                html! {
+                                    <li onclick={on_click} class={classes}>
+                                        <button>
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </li>
+                                }
+                            } else {
+                                html! {}
+                            }
+                        }
                         </ul>
                     }
+                } else {
+                    html!{}
                 }}
                 {if self.number_of_search_queries > 0{
                     // We display a loading spinner if the system is currently searching for candidates.
@@ -456,6 +506,10 @@ where
                         html!{<ul class="datalist-candidates">
                             {for indices_to_sort.iter().rev().filter(|&&i| {
                                 candidate_score[i] as f64 >= mean_candidate_score
+                            }).filter(|&&i|{
+                                // If the current candidate has already been selected,
+                                // we do not want to display it.
+                                !self.selections.iter().any(|selection| selection == &self.candidates[i])
                             }).map(|&i| {
                                let candidate = &self.candidates[i];
                                 let on_click = {
