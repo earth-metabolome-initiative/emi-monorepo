@@ -6,3 +6,4 @@ mod router;
 mod stores;
 mod utils;
 pub mod workers;
+pub mod traits;
