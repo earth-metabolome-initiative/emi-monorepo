@@ -134,8 +134,13 @@ form.standard-form {
                     font-size: 0.8em;
                     cursor: pointer;
                     position: relative;
-                    border: 1px solid $grey;
+                    border: 1px solid $light_grey;
                     transition: border-color 0.2s;
+                    animation: pop-in 0.2s;
+
+                    &.deleting {
+                        animation: pop-out 0.2s;
+                    }
 
                     &:hover {
                         &.blue {
@@ -215,11 +220,11 @@ form.standard-form {
                         transition: border-color 0.2s;
                         line-height: 1em;
                         text-align: center;
-                        border: 1px solid $grey;
+                        border: 1px solid $light_grey;
 
                         i {
                             font-size: 1em;
-                            color: $grey;
+                            color: $light_grey;
                             transition: color 0.2s, font-size 0.2s;
                         }
 
@@ -245,9 +250,9 @@ form.standard-form {
                 max-height: 200px;
                 overflow-y: scroll;
                 border-radius: 0.5em;
-                border: 1px solid #ccc;
+                border: 1px solid $light_grey;
                 box-sizing: border-box;
-                position: relative;
+                animation: fade-in-up 0.3s;
 
                 li.datalist-candidate {
                     padding: 0.5em;
@@ -565,7 +570,7 @@ form.standard-form {
             box-sizing: border-box;
             max-width: 100%;
             transition: border-color 0.2s;
-            border: 1px solid #ccc;
+            border: 1px solid $light_grey;
             border-radius: 0.5em;
 
             &:focus {
@@ -596,7 +601,7 @@ form.standard-form {
             vertical-align: middle;
             width: 30px;
             height: 16px;
-            background-color: #ccc;
+            background-color: $light_grey;
             border-radius: 1em;
             position: relative;
             cursor: pointer;
@@ -612,7 +617,7 @@ form.standard-form {
                 margin-left: -8px;
                 background-color: #fff;
                 border-radius: 100%;
-                border: 1px solid #ccc;
+                border: 1px solid $light_grey;
                 box-sizing: border-box;
                 transition: left 0.3s, border-color 0.3s;
             }

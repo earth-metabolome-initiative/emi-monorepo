@@ -68,6 +68,8 @@ pub struct Datalist<Data> {
     candidates: Vec<Data>,
     /// The selected candidates.
     selections: Vec<Data>,
+    /// The list of selections being deleted.
+    selections_to_delete: Vec<usize>,
     /// Whether it is currently on focus.
     is_focused: bool,
     /// The number of search queries that are currently being processed.
@@ -85,6 +87,7 @@ pub enum DatalistMessage<Data> {
     SearchCandidates,
     SelectCandidate(usize),
     DeleteSelection(usize),
+    StartDeleteSelectionTimeout(usize),
 }
 
 impl<Data> Component for Datalist<Data>
@@ -116,6 +119,7 @@ where
             search_timeout: None,
             candidates: Vec::new(),
             selections: Vec::new(),
+            selections_to_delete: Vec::new(),
             is_focused: false,
             number_of_search_queries: 0,
         }
@@ -217,7 +221,7 @@ where
                 if let Some(timeout) = self.validation_timeout.take() {
                     timeout.cancel();
                 }
-                self.validation_timeout = Some(Timeout::new(300, move || {
+                self.validation_timeout = Some(Timeout::new(200, move || {
                     link.send_message(DatalistMessage::Validate(data));
                 }));
                 false
@@ -264,6 +268,7 @@ where
                 true
             }
             DatalistMessage::DeleteSelection(index) => {
+                self.selections_to_delete.retain(|&i| i != index);
                 self.selections.remove(index);
                 true
             }
@@ -284,6 +289,14 @@ where
                 ctx.link()
                     .send_message(DatalistMessage::SearchCandidatesTimeout);
 
+                true
+            }
+            DatalistMessage::StartDeleteSelectionTimeout(index) => {
+                self.selections_to_delete.push(index);
+                let link = ctx.link().clone();
+                Timeout::new(200, move || {
+                    link.send_message(DatalistMessage::DeleteSelection(index));
+                }).forget();
                 true
             }
         }
@@ -403,12 +416,15 @@ where
                         {for self.selections.iter().enumerate().map(|(i, selection)| {
                             let on_click = {
                                 let link = ctx.link().clone();
-                                Callback::from(move |_| {
-                                    link.send_message(DatalistMessage::DeleteSelection(i));
+                                Callback::from(move |e: MouseEvent| {
+                                    e.prevent_default();
+                                    e.stop_propagation();
+                                    link.send_message(DatalistMessage::StartDeleteSelectionTimeout(i));
                                 })
                             };
+                            let classes = format!("selected-datalist-badge {}{}", selection.primary_color_class(), if self.selections_to_delete.contains(&i) {" deleting"} else {""});
                             html! {
-                                <li class={format!("selected-datalist-badge {}", selection.primary_color_class())} title={format!("{}", selection.description())}>
+                                <li class={classes} title={format!("{}", selection.description())}>
                                     {selection.to_selected_datalist_badge()}
                                     <button onclick={on_click} class="delete-button">
                                         <i class="fas fa-times"></i>
@@ -444,7 +460,9 @@ where
                                let candidate = &self.candidates[i];
                                 let on_click = {
                                     let link = ctx.link().clone();
-                                    Callback::from(move |_| {
+                                    Callback::from(move |e: MouseEvent| {
+                                        e.prevent_default();
+                                        e.stop_propagation();
                                         link.send_message(DatalistMessage::SelectCandidate(i));
                                     })
                                 };
