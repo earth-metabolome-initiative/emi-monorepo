@@ -363,6 +363,13 @@ where
             })
         };
 
+        let on_focus = {
+            let link = ctx.link().clone();
+            Callback::from(move |_: FocusEvent| {
+                link.send_message(DatalistMessage::Focus);
+            })
+        };
+
         let on_blur = {
             let link = ctx.link().clone();
             let props = ctx.props().clone();
@@ -381,7 +388,7 @@ where
                     link.send_message(DatalistMessage::RemoveErrors);
                     return;
                 }
-
+                // link.send_message(DatalistMessage::Blur);
                 // link.send_message(DatalistMessage::StartValidationTimeout(data));
             })
         };
@@ -426,6 +433,7 @@ where
                         value={input_value}
                         placeholder={props.placeholder.clone().unwrap_or_else(|| props.label())}
                         oninput={on_input}
+                        onfocus={on_focus}
                         onblur={on_blur}
                         id={props.normalized_label()}
                         name={props.normalized_label()}
@@ -491,7 +499,7 @@ where
                         <div class="loading-spinner"></div>
                     }
                 } else {
-                    {if self.candidates.is_empty() || self.selections.len() == ctx.props().number_of_choices{
+                    {if !self.is_focused || self.candidates.is_empty() || self.selections.len() == ctx.props().number_of_choices{
                         html! {}
                     } else {
                         let mut total_candidate_score = 0.0;
@@ -503,14 +511,18 @@ where
                         let mean_candidate_score = total_candidate_score / self.candidates.len() as f64;
                         let mut indices_to_sort: Vec<usize> = (0..self.candidates.len()).collect::<Vec<usize>>();
                         indices_to_sort.sort_by_key(|&i| candidate_score[i]);
-                        html!{<ul class="datalist-candidates">
-                            {for indices_to_sort.iter().rev().filter(|&&i| {
-                                candidate_score[i] as f64 >= mean_candidate_score
-                            }).filter(|&&i|{
-                                // If the current candidate has already been selected,
-                                // we do not want to display it.
-                                !self.selections.iter().any(|selection| selection == &self.candidates[i])
-                            }).map(|&i| {
+                        let filtered_indices = indices_to_sort.into_iter().filter(|&i| {
+                            candidate_score[i] as f64 >= mean_candidate_score
+                        }).filter(|&i|{
+                            // If the current candidate has already been selected,
+                            // we do not want to display it.
+                            !self.selections.iter().any(|selection| selection == &self.candidates[i])
+                        }).collect::<Vec<usize>>();
+                        if filtered_indices.is_empty() {
+                            html!{}
+                        } else {
+                            html!{<ul class="datalist-candidates">
+                            {for filtered_indices.iter().rev().map(|&i| {
                                let candidate = &self.candidates[i];
                                 let on_click = {
                                     let link = ctx.link().clone();
@@ -525,6 +537,7 @@ where
                                 }
                             })}
                         </ul>
+                        }
                         }
                     }}
                 }}

@@ -98,11 +98,11 @@ where
     type Message = InputMessage<Data>;
     type Properties = InputProp<Data>;
 
-    fn create(_ctx: &Context<Self>) -> Self {
+    fn create(ctx: &Context<Self>) -> Self {
         Self {
             errors: HashSet::new(),
             is_valid: None,
-            current_value: None,
+            current_value: ctx.props().value().map(|value| value.to_string()),
             validation_timeout: None,
             _data: std::marker::PhantomData,
         }
@@ -239,6 +239,19 @@ where
                         .dyn_into::<web_sys::HtmlTextAreaElement>()
                         .unwrap()
                         .value(),
+                    InputType::Checkbox => {
+                        if input_event
+                            .target()
+                            .unwrap()
+                            .dyn_into::<web_sys::HtmlInputElement>()
+                            .unwrap()
+                            .checked()
+                        {
+                            "on".to_string()
+                        } else {
+                            "off".to_string()
+                        }
+                    }
                     _ => input_event
                         .target()
                         .unwrap()
@@ -274,6 +287,19 @@ where
                         .dyn_into::<web_sys::HtmlTextAreaElement>()
                         .unwrap()
                         .value(),
+                    InputType::Checkbox => {
+                        if input_event
+                            .target()
+                            .unwrap()
+                            .dyn_into::<web_sys::HtmlInputElement>()
+                            .unwrap()
+                            .checked()
+                        {
+                            "on".to_string()
+                        } else {
+                            "off".to_string()
+                        }
+                    }
                     _ => input_event
                         .target()
                         .unwrap()
@@ -334,17 +360,16 @@ where
                     },
                     InputType::Checkbox => html! {
                         <>
-                        <label for={props.normalized_label()} class="checkbox"></label>
                         <input
                             type="checkbox"
                             class="input-control"
                             name={props.normalized_label()}
                             id={props.normalized_label()}
-                            checked={input_value == "on"}
-                            placeholder={props.placeholder.clone().unwrap_or_else(|| props.label())}
                             oninput={on_input}
                             onblur={on_blur}
+                            checked={input_value == "on"}
                         />
+                        <label for={props.normalized_label()} class="checkbox"></label>
                         </>
                     },
                     InputType::Number | InputType::Text => html! {

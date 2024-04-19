@@ -16,7 +16,6 @@ pub fn new_project_page() -> Html {
     html! {
         // <div class="fullscreen_center_app">
             <div class="new_project">
-                <h2>{ "New Project" }</h2>
                 <NewProjectForm />
             </div>
         // </div>

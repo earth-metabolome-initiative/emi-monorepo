@@ -83,7 +83,7 @@ pub fn complete_profile_form() -> Html {
         <BasicForm<NewProject>>
             <BasicInput<NewProjectName> label="Name" input_type={InputType::Text} />
             <BasicInput<NotEmpty> label="Description" input_type={InputType::Textarea} />
-            <BasicInput<InputBool> label="Public" value={InputBool::from(true)} input_type={InputType::Checkbox} />
+            <BasicInput<InputBool> label="Public" value={InputBool::from(false)} input_type={InputType::Checkbox} />
             <Datalist<web_common::database::ProjectState> number_of_choices=2 label="Project State" />
         </BasicForm<NewProject>>
     }
