@@ -1402,12 +1402,13 @@ def write_web_common_structs(
         tables.write(f"    ///\n")
         tables.write(f"    /// # Arguments\n")
         tables.write(f"    /// * `query` - The query to search.\n")
-        tables.write(f"    pub fn search(&self, query: String) -> Select {{\n")
+        tables.write(f"    /// * `number_of_results` - The number of results to return.\n")
+        tables.write(f"    pub fn search(&self, query: String, number_of_results: usize) -> Select {{\n")
         tables.write(f"        match self {{\n")
         for struct_name in table_names.keys():
             if similarity_indices.has_table(table_names[struct_name]["table_name"]):
                 tables.write(
-                    f'            Searcheable{enumeration}::{struct_name} => Select::search(Searcheable{enumeration}::{struct_name}, query),\n'
+                    f'            Searcheable{enumeration}::{struct_name} => Select::search(Searcheable{enumeration}::{struct_name}, query, number_of_results),\n'
                 )
         tables.write(f"        }}\n")
         tables.write(f"    }}\n")
@@ -1436,14 +1437,15 @@ def write_web_common_structs(
         tables.write(f"    ///\n")
         tables.write(f"    /// # Arguments\n")
         tables.write(f"    /// * `query` - The query to search.\n")
-        tables.write(f"    fn search(query: String) -> Select;\n")
+        tables.write(f"    /// * `number_of_results` - The number of results to return.\n")
+        tables.write(f"    fn search(query: String, number_of_results: usize) -> Select;\n")
         tables.write(f"}}\n")
 
         # We implement the Search{enumeration} trait as a blanket implementation
         # for all structs that implement the Searchable{enumeration}Name trait.
         tables.write(f"impl<T> Search{enumeration} for T where T: Searcheable{enumeration}Name {{\n")
-        tables.write(f"    fn search(query: String) -> Select {{\n")
-        tables.write(f"        Self::parent_enum().search(query)\n")
+        tables.write(f"    fn search(query: String, number_of_results: usize) -> Select {{\n")
+        tables.write(f"        Self::parent_enum().search(query, number_of_results)\n")
         tables.write(f"    }}\n")
         tables.write(f"}}\n")
 

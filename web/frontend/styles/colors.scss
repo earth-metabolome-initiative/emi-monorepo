@@ -14,3 +14,62 @@ $near_black: #444;
 $grey: #777;
 $light_grey: #aaa;
 $primary: #aa9639;
+
+
+i {
+    &.blue {
+        color: $blue;
+    }
+
+    &.orange {
+        color: $orange;
+    }
+
+    &.red {
+        color: $red;
+    }
+
+    &.teal {
+        color: $teal;
+    }
+
+    &.green {
+        color: $green;
+    }
+
+    &.yellow {
+        color: $yellow;
+    }
+
+    &.purple {
+        color: $purple;
+    }
+
+    &.pink {
+        color: $pink;
+    }
+
+    &.brown {
+        color: $brown;
+    }
+
+    &.grey {
+        color: $grey;
+    }
+
+    &.black {
+        color: $black;
+    }
+
+    &.near-black {
+        color: $near_black;
+    }
+
+    &.grey {
+        color: $grey;
+    }
+
+    &.primary {
+        color: $primary;
+    }
+}

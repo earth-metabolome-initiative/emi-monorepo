@@ -49,6 +49,7 @@ form.standard-form {
                 }
 
                 input[type="number"],
+                input[type="search"],
                 input[type="text"] {
                     width: 100%;
                 }
@@ -105,7 +106,9 @@ form.standard-form {
         padding-bottom: 0.5em;
 
         &.input-group-invalid {
+
             input[type="text"],
+            input[type="search"],
             textarea,
             input[type="number"] {
                 border-color: $error;
@@ -115,29 +118,216 @@ form.standard-form {
         }
 
         &.datalist {
-            ul {
+            ul.selected-datalist-badges {
+                display: flex;
+                flex-wrap: wrap;
+                margin-top: 0.5em;
+                border: none;
+
+                li.selected-datalist-badge {
+                    display: inline-block;
+                    padding: 0.5em 2em 0.5em 0.5em;
+                    box-sizing: border-box;
+                    border-radius: 2em;
+                    margin-right: 0.5em;
+                    margin-bottom: 0.5em;
+                    font-size: 0.8em;
+                    cursor: pointer;
+                    position: relative;
+                    border: 1px solid $grey;
+                    transition: border-color 0.2s;
+
+                    &:hover {
+                        &.blue {
+                            border-color: $blue;
+                        }
+
+                        &.orange {
+                            border-color: $orange;
+                        }
+
+                        &.red {
+                            border-color: $red;
+                        }
+
+                        &.teal {
+                            border-color: $teal;
+                        }
+
+                        &.green {
+                            border-color: $green;
+                        }
+
+                        &.yellow {
+                            border-color: $yellow;
+                        }
+
+                        &.purple {
+                            border-color: $purple;
+                        }
+
+                        &.pink {
+                            border-color: $pink;
+                        }
+
+                        &.brown {
+                            border-color: $brown;
+                        }
+
+                        &.grey {
+                            border-color: $grey;
+                        }
+
+                        &.black {
+                            border-color: $black;
+                        }
+
+                        &.near-black {
+                            border-color: $near_black;
+                        }
+
+                        &.grey {
+                            border-color: $grey;
+                        }
+
+                        &.primary {
+                            border-color: $primary;
+                        }
+                    }
+
+                    p {
+                        i {
+                            margin-right: 0.5em;
+                        }
+                    }
+
+                    button {
+                        padding: 0;
+                        position: absolute;
+                        right: 0.4em;
+                        top: 50%;
+                        margin-top: -0.6em;
+                        height: 1.2em;
+                        width: 1.2em;
+                        background-color: transparent;
+                        cursor: pointer;
+                        border-radius: 100%;
+                        transition: border-color 0.2s;
+                        line-height: 1em;
+                        text-align: center;
+                        border: 1px solid $grey;
+
+                        i {
+                            font-size: 1em;
+                            color: $grey;
+                            transition: color 0.2s, font-size 0.2s;
+                        }
+
+                        &:hover {
+                            border-color: $red;
+
+                            i {
+                                color: $red;
+                                font-size: 1.1em;
+                            }
+                        }
+                    }
+
+                }
+            }
+
+            ul.datalist-candidates {
                 list-style: none;
                 padding: 0;
                 margin: 0;
                 margin-top: 0.5em;
                 width: 100%;
-                border: 1px solid #ccc;
                 max-height: 200px;
                 overflow-y: scroll;
                 border-radius: 0.5em;
+                border: 1px solid #ccc;
                 box-sizing: border-box;
+                position: relative;
 
-                li {
+                li.datalist-candidate {
                     padding: 0.5em;
                     width: 100%;
                     cursor: pointer;
-                    transition: color 0.2s;
-                    border-bottom: 1px solid #ccc;
+                    transition: border-color 0.2s;
                     box-sizing: border-box;
+                    border-bottom: 1px solid transparent;
+                    border-top: 1px solid transparent;
+
+                    &:first-child {
+                        border-top-left-radius: 0.5em;
+                        border-top-right-radius: 0.5em;
+                    }
+
+                    &:last-child {
+                        border-bottom-left-radius: 0.5em;
+                        border-bottom-right-radius: 0.5em;
+                    }
 
                     &:hover {
-                        color: $primary;
-                        border-color: $primary;
+                        &.blue {
+                            border-color: $blue;
+                        }
+
+                        &.orange {
+                            border-color: $orange;
+                        }
+
+                        &.red {
+                            border-color: $red;
+                        }
+
+                        &.teal {
+                            border-color: $teal;
+                        }
+
+                        &.green {
+                            border-color: $green;
+                        }
+
+                        &.yellow {
+                            border-color: $yellow;
+                        }
+
+                        &.purple {
+                            border-color: $purple;
+                        }
+
+                        &.pink {
+                            border-color: $pink;
+                        }
+
+                        &.brown {
+                            border-color: $brown;
+                        }
+
+                        &.grey {
+                            border-color: $grey;
+                        }
+
+                        &.black {
+                            border-color: $black;
+                        }
+
+                        &.near-black {
+                            border-color: $near_black;
+                        }
+
+                        &.grey {
+                            border-color: $grey;
+                        }
+
+                        &.primary {
+                            border-color: $primary;
+                        }
+                    }
+
+                    &:first-child {
+                        border-top: none;
                     }
 
                     &:last-child {
@@ -146,7 +336,37 @@ form.standard-form {
 
                     strong {
                         font-weight: 800;
-                    }    
+                    }
+
+                    p {
+                        &:first-child {
+                            margin-bottom: 0.5em;
+                        }
+
+                        strong {
+                            color: $black;
+                        }
+                    }
+
+                    p.description {
+                        color: $grey;
+
+                        strong {
+                            color: $black;
+                        }
+                    }
+
+                    span {
+                        color: $near_black;
+
+                        strong {
+                            color: $black;
+                        }
+                    }
+
+                    i {
+                        margin-right: 0.5em;
+                    }
                 }
             }
         }
@@ -326,7 +546,7 @@ form.standard-form {
             min-width: 100px;
         }
 
-        &.text .input-container{
+        &.text .input-container {
             display: grid;
             grid-template-columns: auto 1fr;
             align-items: center;
@@ -337,6 +557,8 @@ form.standard-form {
         }
 
         input[type="text"],
+        input[type="search"],
+        input[type="search"],
         textarea,
         input[type="number"] {
             padding: 0.5em;
@@ -475,7 +697,9 @@ form.standard-form {
         }
 
         &.input-group-valid {
-            input[type="text"] {
+
+            input[type="text"],
+            input[type="search"] {
                 border-color: $red;
             }
         }
@@ -508,7 +732,9 @@ form.standard-form {
         }
 
         &.input-group-valid {
-            input[type="text"] {
+
+            input[type="text"],
+            input[type="search"] {
                 border-color: $green;
             }
         }
@@ -541,7 +767,9 @@ form.standard-form {
         }
 
         &.input-group-valid {
-            input[type="text"] {
+
+            input[type="text"],
+            input[type="search"] {
                 border-color: $blue;
             }
         }

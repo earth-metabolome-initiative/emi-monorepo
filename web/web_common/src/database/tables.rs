@@ -11704,12 +11704,13 @@ impl SearcheableTable {
     ///
     /// # Arguments
     /// * `query` - The query to search.
-    pub fn search(&self, query: String) -> Select {
+    /// * `number_of_results` - The number of results to return.
+    pub fn search(&self, query: String, number_of_results: usize) -> Select {
         match self {
-            SearcheableTable::ProjectState => Select::search(SearcheableTable::ProjectState, query),
-            SearcheableTable::Project => Select::search(SearcheableTable::Project, query),
-            SearcheableTable::Taxa => Select::search(SearcheableTable::Taxa, query),
-            SearcheableTable::User => Select::search(SearcheableTable::User, query),
+            SearcheableTable::ProjectState => Select::search(SearcheableTable::ProjectState, query, number_of_results),
+            SearcheableTable::Project => Select::search(SearcheableTable::Project, query, number_of_results),
+            SearcheableTable::Taxa => Select::search(SearcheableTable::Taxa, query, number_of_results),
+            SearcheableTable::User => Select::search(SearcheableTable::User, query, number_of_results),
         }
     }
 }
@@ -11742,10 +11743,11 @@ pub trait SearchTable {
     ///
     /// # Arguments
     /// * `query` - The query to search.
-    fn search(query: String) -> Select;
+    /// * `number_of_results` - The number of results to return.
+    fn search(query: String, number_of_results: usize) -> Select;
 }
 impl<T> SearchTable for T where T: SearcheableTableName {
-    fn search(query: String) -> Select {
-        Self::parent_enum().search(query)
+    fn search(query: String, number_of_results: usize) -> Select {
+        Self::parent_enum().search(query, number_of_results)
     }
 }

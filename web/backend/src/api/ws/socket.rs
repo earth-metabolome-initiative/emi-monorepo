@@ -215,6 +215,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                 web_common::database::selects::Select::SearchTable(
                                     table,
                                     query,
+                                    number_of_results,
                                 ) => {
                                     let backend_variant: crate::models::SearcheableTable =
                                         (*table).into();
@@ -222,7 +223,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                         task.id(),
                                         match backend_variant.search(
                                             query,
-                                            None,
+                                            Some(*number_of_results as i32),
                                             Some(0.0),
                                             &mut self.diesel_connection,
                                         ) {

@@ -5,15 +5,41 @@ use web_common::database::ProjectState;
 use yew::prelude::*;
 
 impl RowToBadge for ProjectState {
-    fn to_badge(&self, query: Option<&str>) -> Html {
+    fn to_datalist_badge(&self, query: &str) -> Html {
         html! {
-            <div class="datalist-badge">
-                <div>
+            <div>
+                <p>
                     <i class={format!("{} {}", self.font_awesome_icon, self.icon_color)}></i>
                     <span>{self.name.format_match(query)}</span>
-                </div>
-                <p>{self.description.format_match(query)}</p>
+                </p>
+                <p class="description">{self.description.format_match(query)}</p>
             </div>
         }
+    }
+
+    fn to_selected_datalist_badge(&self) -> Html {
+        html! {
+            <p>
+                <i class={format!("{} {}", self.font_awesome_icon, self.icon_color)}></i>
+                <span>{&self.name}</span>
+            </p>
+        }
+    }
+    
+
+    fn matches(&self, query: &str) -> bool {
+        self.name == query
+    }
+
+    fn similarity_score(&self, query: &str) -> isize {
+        self.name.similarity_score(query) + self.description.similarity_score(query)
+    }
+
+    fn primary_color_class(&self) -> &str {
+        &self.icon_color
+    }
+
+    fn description(&self) -> &str {
+        &self.description
     }
 }

@@ -9,7 +9,7 @@ use crate::database::Task;
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub enum Select {
     Id(super::Table, uuid::Uuid),
-    SearchTable(SearcheableTable, String),
+    SearchTable(SearcheableTable, String, usize),
 }
 
 impl Select {
@@ -18,8 +18,14 @@ impl Select {
         Vec::new()
     }
 
-    pub fn search(table: SearcheableTable, query: String) -> Self {
-        Self::SearchTable(table, query)
+    /// Create a new `Select` query for a given `Table`, query, and number of results.
+    /// 
+    /// # Arguments
+    /// * `table` - The table to select from.
+    /// * `query` - The query to search for.
+    /// * `number_of_results` - The number of results to return.
+    pub fn search(table: SearcheableTable, query: String, number_of_results: usize) -> Self {
+        Self::SearchTable(table, query, number_of_results)
     }
 }
 

@@ -32,10 +32,12 @@ where
     pub placeholder: Option<String>,
     #[prop_or_default]
     pub value: Option<Data>,
-    #[prop_or_default]
-    pub step: Option<f64>,
     #[prop_or(false)]
     pub optional: bool,
+    #[prop_or(1)]
+    pub number_of_choices: usize,
+    #[prop_or(10)]
+    pub number_of_candidates: usize,
 }
 
 impl<Data> DatalistProp<Data>
@@ -62,7 +64,14 @@ pub struct Datalist<Data> {
     is_valid: Option<bool>,
     validation_timeout: Option<Timeout>,
     search_timeout: Option<Timeout>,
+    /// The candidates that are displayed in the datalist.
     candidates: Vec<Data>,
+    /// The selected candidates.
+    selections: Vec<Data>,
+    /// Whether it is currently on focus.
+    is_focused: bool,
+    /// The number of search queries that are currently being processed.
+    number_of_search_queries: usize,
 }
 
 pub enum DatalistMessage<Data> {
@@ -74,6 +83,8 @@ pub enum DatalistMessage<Data> {
     UpdateCurrentValue(String),
     SearchCandidatesTimeout,
     SearchCandidates,
+    SelectCandidate(usize),
+    DeleteSelection(usize),
 }
 
 impl<Data> Component for Datalist<Data>
@@ -104,37 +115,34 @@ where
             validation_timeout: None,
             search_timeout: None,
             candidates: Vec::new(),
+            selections: Vec::new(),
+            is_focused: false,
+            number_of_search_queries: 0,
         }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             DatalistMessage::Backend(message) => match message {
-                BackendMessage::SearchTable(_task_id, results) => match results {
-                    Ok(results) => {
-                        self.candidates = results
-                            .into_iter()
-                            .map(|row| Data::try_from(row).expect("Failed to convert row to data"))
-                            .collect();
+                BackendMessage::SearchTable(_task_id, results) => {
+                    self.number_of_search_queries -= 1;
+                    match results {
+                        Ok(results) => {
+                            self.candidates = results
+                                .into_iter()
+                                .map(|row| {
+                                    Data::try_from(row).expect("Failed to convert row to data")
+                                })
+                                .collect();
 
-                        // We sort the candidates by their similarity to the current value
-                        if let Some(current_value) = self.current_value.as_ref() {
-                            self.candidates.sort_by(|a, b| {
-                                let a = a.to_string();
-                                let b = b.to_string();
-                                let a = best_match(current_value, &a);
-                                let b = best_match(current_value, &b);
-                                b.partial_cmp(&a).unwrap()
-                            });
+                            true
                         }
-
-                        true
+                        Err(error) => {
+                            log::error!("Error searching table: {:?}", error);
+                            false
+                        }
                     }
-                    Err(error) => {
-                        log::error!("Error searching table: {:?}", error);
-                        false
-                    }
-                },
+                }
                 _ => false,
             },
             DatalistMessage::RemoveErrors => {
@@ -215,10 +223,25 @@ where
                 false
             }
             DatalistMessage::SearchCandidates => {
-                if let Some(value) = self.current_value.as_ref() {
-                    self.websocket
-                        .send(Data::search(value.clone().into()).into());
+                // If ths system has already returned a list of candidates that is
+                // less than the maximum number of candidates, we do not want to
+                // pester the server with another request, as the list will not change.
+                if !self.candidates.is_empty()
+                    && self.candidates.len() <= ctx.props().number_of_candidates
+                {
+                    return false;
                 }
+                let query = self.current_value.as_ref().map_or_else(
+                    || {
+                        ctx.props()
+                            .value()
+                            .map_or_else(|| "".to_string(), |value| value.to_string())
+                    },
+                    |query| query.to_string(),
+                );
+                self.websocket
+                    .send(Data::search(query, ctx.props().number_of_candidates).into());
+                self.number_of_search_queries += 1;
                 false
             }
             DatalistMessage::SearchCandidatesTimeout => {
@@ -231,16 +254,46 @@ where
                 }));
                 false
             }
-            DatalistMessage::UpdateCurrentValue(value) => {
-                self.current_value = Some(value);
-                if self.candidates.is_empty() {
-                    ctx.link().send_message(DatalistMessage::SearchCandidates);
-                } else {
-                    ctx.link()
-                        .send_message(DatalistMessage::SearchCandidatesTimeout);
+            DatalistMessage::SelectCandidate(index) => {
+                let candidate = self.candidates.get(index).unwrap();
+                if ctx.props().number_of_choices == 1 {
+                    self.selections.clear();
                 }
-                false
+                self.selections.push(candidate.clone());
+                self.current_value = Some(candidate.to_string());
+                true
             }
+            DatalistMessage::DeleteSelection(index) => {
+                self.selections.remove(index);
+                true
+            }
+            DatalistMessage::UpdateCurrentValue(value) => {
+                // We check if any of the candidates match the current value
+                // exactly. If so, we select that candidate.
+                if let Some(candidate) = self
+                    .candidates
+                    .iter()
+                    .find(|candidate| candidate.matches(&value))
+                {
+                    if ctx.props().number_of_choices == 1 {
+                        self.selections.clear();
+                    }
+                    self.selections.push(candidate.clone());
+                }
+                self.current_value = Some(value);
+                ctx.link()
+                    .send_message(DatalistMessage::SearchCandidatesTimeout);
+
+                true
+            }
+        }
+    }
+
+    fn rendered(&mut self, ctx: &Context<Self>, first_render: bool) {
+        // If this is the first time the component is rendered, we want to
+        // send a message to the server to get the list of candidates.
+        if first_render {
+            ctx.link().send_message(DatalistMessage::SearchCandidates);
         }
     }
 
@@ -331,27 +384,79 @@ where
                 } else {
                     html! {}
                 }}
-                <input
-                    type="text"
-                    class="input-control"
-                    value={input_value}
-                    placeholder={props.placeholder.clone().unwrap_or_else(|| props.label())}
-                    oninput={on_input}
-                    onblur={on_blur}
-                    id={props.normalized_label()}
-                    name={props.normalized_label()}
-                />
-                {if self.candidates.is_empty() {
-                    html! {}
+                {if self.is_focused || self.selections.is_empty(){
+                html!{
+                    <input
+                        type="search"
+                        class="input-control"
+                        value={input_value}
+                        placeholder={props.placeholder.clone().unwrap_or_else(|| props.label())}
+                        oninput={on_input}
+                        onblur={on_blur}
+                        id={props.normalized_label()}
+                        name={props.normalized_label()}
+                    />
+                }
                 } else {
-                    html!{<ul>
-                        {for self.candidates.iter().enumerate().map(|(i, candidate)| {
+                    html! {
+                        <ul class="selected-datalist-badges">
+                        {for self.selections.iter().enumerate().map(|(i, selection)| {
+                            let on_click = {
+                                let link = ctx.link().clone();
+                                Callback::from(move |_| {
+                                    link.send_message(DatalistMessage::DeleteSelection(i));
+                                })
+                            };
                             html! {
-                                <li>{candidate.to_badge(self.current_value.as_ref().map(|val| val.as_str()))}</li>
+                                <li class={format!("selected-datalist-badge {}", selection.primary_color_class())} title={format!("{}", selection.description())}>
+                                    {selection.to_selected_datalist_badge()}
+                                    <button onclick={on_click} class="delete-button">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </li>
                             }
                         })}
-                    </ul>}
+                        </ul>
+                    }
                 }}
+                {if self.number_of_search_queries > 0{
+                    // We display a loading spinner if the system is currently searching for candidates.
+                    html! {
+                        <div class="loading-spinner"></div>
+                    }
+                } else {
+                    {if self.candidates.is_empty() || self.selections.len() == ctx.props().number_of_choices{
+                        html! {}
+                    } else {
+                        let mut total_candidate_score = 0.0;
+                        let candidate_score: Vec<isize> = self.candidates.iter().map(|candidate| {
+                            let candidate_score = candidate.similarity_score(&current_value);
+                            total_candidate_score += candidate_score as f64;
+                            candidate_score
+                        }).collect();
+                        let mean_candidate_score = total_candidate_score / self.candidates.len() as f64;
+                        let mut indices_to_sort: Vec<usize> = (0..self.candidates.len()).collect::<Vec<usize>>();
+                        indices_to_sort.sort_by_key(|&i| candidate_score[i]);
+                        html!{<ul class="datalist-candidates">
+                            {for indices_to_sort.iter().rev().filter(|&&i| {
+                                candidate_score[i] as f64 >= mean_candidate_score
+                            }).map(|&i| {
+                               let candidate = &self.candidates[i];
+                                let on_click = {
+                                    let link = ctx.link().clone();
+                                    Callback::from(move |_| {
+                                        link.send_message(DatalistMessage::SelectCandidate(i));
+                                    })
+                                };
+                                html! {
+                                    <li onclick={on_click} class={format!("datalist-candidate {}", candidate.primary_color_class())}>{candidate.to_datalist_badge(&current_value)}</li>
+                                }
+                            })}
+                        </ul>
+                        }
+                    }}
+                }}
+
             </>
         };
 
