@@ -38,7 +38,7 @@ where
 
 impl<Data> DatalistProp<Data>
 where
-    Data: 'static + Clone + PartialEq + ToString,
+    Data: 'static + Clone + PartialEq,
 {
     pub fn label(&self) -> String {
         self.label.clone()
@@ -81,6 +81,7 @@ pub enum DatalistMessage<Data> {
     UpdateCurrentValue(String),
     SearchCandidatesTimeout,
     SearchCandidates,
+    UpdateCandidated(Vec<Data>),
     SelectCandidate(usize),
     DeleteSelection(usize),
     StartDeleteSelectionTimeout(usize),
@@ -96,7 +97,6 @@ where
         + SearchTable
         + Into<SearcheableTableRow>
         + TryFrom<SearcheableTableRow, Error = &'static str>
-        + ToString
         + RowToBadge,
 {
     type Message = DatalistMessage<Data>;
@@ -130,12 +130,12 @@ where
                     self.number_of_search_queries -= 1;
                     match results {
                         Ok(results) => {
-                            self.candidates = results
+                            ctx.link().send_message(DatalistMessage::UpdateCandidated(results
                                 .into_iter()
                                 .map(|row| {
                                     Data::try_from(row).expect("Failed to convert row to data")
                                 })
-                                .collect();
+                                .collect()));
 
                             true
                         }
@@ -147,6 +147,18 @@ where
                 }
                 _ => false,
             },
+            DatalistMessage::UpdateCandidated(candidates) => {
+                if candidates.is_empty() {
+                    self.errors.insert("No candidates found".to_string());
+                } else {
+                    self.errors.remove("No candidates found");
+                }
+                if self.candidates == candidates {
+                    return false;
+                }
+                self.candidates = candidates;
+                true
+            }
             DatalistMessage::RemoveErrors => {
                 let mut changes = false;
 

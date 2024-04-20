@@ -202,8 +202,8 @@ impl Archivable {
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ContainerHorizontalRule {
     pub id: Uuid,
-    pub item_type_id: Option<Uuid>,
-    pub other_item_type_id: Option<Uuid>,
+    pub item_type_id: Uuid,
+    pub other_item_type_id: Uuid,
     pub minimum_temperature: Option<f64>,
     pub maximum_temperature: Option<f64>,
     pub minimum_humidity: Option<f64>,
@@ -216,14 +216,8 @@ impl ContainerHorizontalRule {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
             gluesql::core::ast_builder::uuid(self.id.to_string()),
-            match self.item_type_id {
-                Some(item_type_id) => gluesql::core::ast_builder::uuid(item_type_id.to_string()),
-                None => gluesql::core::ast_builder::null(),
-            },
-            match self.other_item_type_id {
-                Some(other_item_type_id) => gluesql::core::ast_builder::uuid(other_item_type_id.to_string()),
-                None => gluesql::core::ast_builder::null(),
-            },
+            gluesql::core::ast_builder::uuid(self.item_type_id.to_string()),
+            gluesql::core::ast_builder::uuid(self.other_item_type_id.to_string()),
             match self.minimum_temperature {
                 Some(minimum_temperature) => gluesql::core::ast_builder::num(minimum_temperature),
                 None => gluesql::core::ast_builder::null(),
@@ -361,13 +355,9 @@ impl ContainerHorizontalRule {
         use gluesql::core::ast_builder::*;
         let mut update_row = table("container_horizontal_rules")
             .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()));
-        if let Some(item_type_id) = self.item_type_id {
-            update_row = update_row.set("item_type_id", gluesql::core::ast_builder::uuid(item_type_id.to_string()));
-        }
-        if let Some(other_item_type_id) = self.other_item_type_id {
-            update_row = update_row.set("other_item_type_id", gluesql::core::ast_builder::uuid(other_item_type_id.to_string()));
-        }
+.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
+.set("item_type_id", gluesql::core::ast_builder::uuid(self.item_type_id.to_string()))        
+.set("other_item_type_id", gluesql::core::ast_builder::uuid(self.other_item_type_id.to_string()));
         if let Some(minimum_temperature) = self.minimum_temperature {
             update_row = update_row.set("minimum_temperature", gluesql::core::ast_builder::num(minimum_temperature));
         }
@@ -442,13 +432,11 @@ impl ContainerHorizontalRule {
                 _ => unreachable!("Expected Uuid"),
             },
             item_type_id: match row.get("item_type_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(item_type_id) => Some(Uuid::from_u128(*item_type_id)),
+                gluesql::prelude::Value::Uuid(item_type_id) => Uuid::from_u128(*item_type_id),
                 _ => unreachable!("Expected Uuid"),
             },
             other_item_type_id: match row.get("other_item_type_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(other_item_type_id) => Some(Uuid::from_u128(*other_item_type_id)),
+                gluesql::prelude::Value::Uuid(other_item_type_id) => Uuid::from_u128(*other_item_type_id),
                 _ => unreachable!("Expected Uuid"),
             },
             minimum_temperature: match row.get("minimum_temperature").unwrap() {
@@ -488,8 +476,8 @@ impl ContainerHorizontalRule {
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ContainerVerticalRule {
     pub id: Uuid,
-    pub container_item_type_id: Option<Uuid>,
-    pub contained_item_type_id: Option<Uuid>,
+    pub container_item_type_id: Uuid,
+    pub contained_item_type_id: Uuid,
     pub minimum_temperature: Option<f64>,
     pub maximum_temperature: Option<f64>,
     pub minimum_humidity: Option<f64>,
@@ -502,14 +490,8 @@ impl ContainerVerticalRule {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
             gluesql::core::ast_builder::uuid(self.id.to_string()),
-            match self.container_item_type_id {
-                Some(container_item_type_id) => gluesql::core::ast_builder::uuid(container_item_type_id.to_string()),
-                None => gluesql::core::ast_builder::null(),
-            },
-            match self.contained_item_type_id {
-                Some(contained_item_type_id) => gluesql::core::ast_builder::uuid(contained_item_type_id.to_string()),
-                None => gluesql::core::ast_builder::null(),
-            },
+            gluesql::core::ast_builder::uuid(self.container_item_type_id.to_string()),
+            gluesql::core::ast_builder::uuid(self.contained_item_type_id.to_string()),
             match self.minimum_temperature {
                 Some(minimum_temperature) => gluesql::core::ast_builder::num(minimum_temperature),
                 None => gluesql::core::ast_builder::null(),
@@ -647,13 +629,9 @@ impl ContainerVerticalRule {
         use gluesql::core::ast_builder::*;
         let mut update_row = table("container_vertical_rules")
             .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()));
-        if let Some(container_item_type_id) = self.container_item_type_id {
-            update_row = update_row.set("container_item_type_id", gluesql::core::ast_builder::uuid(container_item_type_id.to_string()));
-        }
-        if let Some(contained_item_type_id) = self.contained_item_type_id {
-            update_row = update_row.set("contained_item_type_id", gluesql::core::ast_builder::uuid(contained_item_type_id.to_string()));
-        }
+.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
+.set("container_item_type_id", gluesql::core::ast_builder::uuid(self.container_item_type_id.to_string()))        
+.set("contained_item_type_id", gluesql::core::ast_builder::uuid(self.contained_item_type_id.to_string()));
         if let Some(minimum_temperature) = self.minimum_temperature {
             update_row = update_row.set("minimum_temperature", gluesql::core::ast_builder::num(minimum_temperature));
         }
@@ -728,13 +706,11 @@ impl ContainerVerticalRule {
                 _ => unreachable!("Expected Uuid"),
             },
             container_item_type_id: match row.get("container_item_type_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(container_item_type_id) => Some(Uuid::from_u128(*container_item_type_id)),
+                gluesql::prelude::Value::Uuid(container_item_type_id) => Uuid::from_u128(*container_item_type_id),
                 _ => unreachable!("Expected Uuid"),
             },
             contained_item_type_id: match row.get("contained_item_type_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(contained_item_type_id) => Some(Uuid::from_u128(*contained_item_type_id)),
+                gluesql::prelude::Value::Uuid(contained_item_type_id) => Uuid::from_u128(*contained_item_type_id),
                 _ => unreachable!("Expected Uuid"),
             },
             minimum_temperature: match row.get("minimum_temperature").unwrap() {
@@ -2682,9 +2658,9 @@ impl ItemCategoryUnit {
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ItemContinuousQuantity {
     pub id: Uuid,
-    pub item_id: Option<Uuid>,
+    pub item_id: Uuid,
     pub weight: f64,
-    pub unit_id: Option<Uuid>,
+    pub unit_id: Uuid,
     pub sensor_id: Option<Uuid>,
     pub measured_at: NaiveDateTime,
     pub measured_by: Option<Uuid>,
@@ -2694,15 +2670,9 @@ impl ItemContinuousQuantity {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
             gluesql::core::ast_builder::uuid(self.id.to_string()),
-            match self.item_id {
-                Some(item_id) => gluesql::core::ast_builder::uuid(item_id.to_string()),
-                None => gluesql::core::ast_builder::null(),
-            },
+            gluesql::core::ast_builder::uuid(self.item_id.to_string()),
             gluesql::core::ast_builder::num(self.weight),
-            match self.unit_id {
-                Some(unit_id) => gluesql::core::ast_builder::uuid(unit_id.to_string()),
-                None => gluesql::core::ast_builder::null(),
-            },
+            gluesql::core::ast_builder::uuid(self.unit_id.to_string()),
             match self.sensor_id {
                 Some(sensor_id) => gluesql::core::ast_builder::uuid(sensor_id.to_string()),
                 None => gluesql::core::ast_builder::null(),
@@ -2826,14 +2796,10 @@ impl ItemContinuousQuantity {
         let mut update_row = table("item_continuous_quantities")
             .update()        
 .set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
+.set("item_id", gluesql::core::ast_builder::uuid(self.item_id.to_string()))        
 .set("weight", gluesql::core::ast_builder::num(self.weight))        
+.set("unit_id", gluesql::core::ast_builder::uuid(self.unit_id.to_string()))        
 .set("measured_at", gluesql::core::ast_builder::timestamp(self.measured_at.to_string()));
-        if let Some(item_id) = self.item_id {
-            update_row = update_row.set("item_id", gluesql::core::ast_builder::uuid(item_id.to_string()));
-        }
-        if let Some(unit_id) = self.unit_id {
-            update_row = update_row.set("unit_id", gluesql::core::ast_builder::uuid(unit_id.to_string()));
-        }
         if let Some(sensor_id) = self.sensor_id {
             update_row = update_row.set("sensor_id", gluesql::core::ast_builder::uuid(sensor_id.to_string()));
         }
@@ -2896,8 +2862,7 @@ impl ItemContinuousQuantity {
                 _ => unreachable!("Expected Uuid"),
             },
             item_id: match row.get("item_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(item_id) => Some(Uuid::from_u128(*item_id)),
+                gluesql::prelude::Value::Uuid(item_id) => Uuid::from_u128(*item_id),
                 _ => unreachable!("Expected Uuid"),
             },
             weight: match row.get("weight").unwrap() {
@@ -2905,8 +2870,7 @@ impl ItemContinuousQuantity {
                 _ => unreachable!("Expected F64")
             },
             unit_id: match row.get("unit_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(unit_id) => Some(Uuid::from_u128(*unit_id)),
+                gluesql::prelude::Value::Uuid(unit_id) => Uuid::from_u128(*unit_id),
                 _ => unreachable!("Expected Uuid"),
             },
             sensor_id: match row.get("sensor_id").unwrap() {
@@ -2930,9 +2894,9 @@ impl ItemContinuousQuantity {
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ItemDiscreteQuantity {
     pub id: Uuid,
-    pub item_id: Option<Uuid>,
+    pub item_id: Uuid,
     pub quantity: i32,
-    pub unit_id: Option<Uuid>,
+    pub unit_id: Uuid,
     pub measured_at: NaiveDateTime,
     pub measured_by: Option<Uuid>,
 }
@@ -2941,15 +2905,9 @@ impl ItemDiscreteQuantity {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
             gluesql::core::ast_builder::uuid(self.id.to_string()),
-            match self.item_id {
-                Some(item_id) => gluesql::core::ast_builder::uuid(item_id.to_string()),
-                None => gluesql::core::ast_builder::null(),
-            },
+            gluesql::core::ast_builder::uuid(self.item_id.to_string()),
             gluesql::core::ast_builder::num(self.quantity),
-            match self.unit_id {
-                Some(unit_id) => gluesql::core::ast_builder::uuid(unit_id.to_string()),
-                None => gluesql::core::ast_builder::null(),
-            },
+            gluesql::core::ast_builder::uuid(self.unit_id.to_string()),
             gluesql::core::ast_builder::timestamp(self.measured_at.to_string()),
             match self.measured_by {
                 Some(measured_by) => gluesql::core::ast_builder::uuid(measured_by.to_string()),
@@ -3069,14 +3027,10 @@ impl ItemDiscreteQuantity {
         let mut update_row = table("item_discrete_quantities")
             .update()        
 .set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
+.set("item_id", gluesql::core::ast_builder::uuid(self.item_id.to_string()))        
 .set("quantity", gluesql::core::ast_builder::num(self.quantity))        
+.set("unit_id", gluesql::core::ast_builder::uuid(self.unit_id.to_string()))        
 .set("measured_at", gluesql::core::ast_builder::timestamp(self.measured_at.to_string()));
-        if let Some(item_id) = self.item_id {
-            update_row = update_row.set("item_id", gluesql::core::ast_builder::uuid(item_id.to_string()));
-        }
-        if let Some(unit_id) = self.unit_id {
-            update_row = update_row.set("unit_id", gluesql::core::ast_builder::uuid(unit_id.to_string()));
-        }
         if let Some(measured_by) = self.measured_by {
             update_row = update_row.set("measured_by", gluesql::core::ast_builder::uuid(measured_by.to_string()));
         }
@@ -3136,8 +3090,7 @@ impl ItemDiscreteQuantity {
                 _ => unreachable!("Expected Uuid"),
             },
             item_id: match row.get("item_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(item_id) => Some(Uuid::from_u128(*item_id)),
+                gluesql::prelude::Value::Uuid(item_id) => Uuid::from_u128(*item_id),
                 _ => unreachable!("Expected Uuid"),
             },
             quantity: match row.get("quantity").unwrap() {
@@ -3145,8 +3098,7 @@ impl ItemDiscreteQuantity {
                 _ => unreachable!("Expected I32")
             },
             unit_id: match row.get("unit_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(unit_id) => Some(Uuid::from_u128(*unit_id)),
+                gluesql::prelude::Value::Uuid(unit_id) => Uuid::from_u128(*unit_id),
                 _ => unreachable!("Expected Uuid"),
             },
             measured_at: match row.get("measured_at").unwrap() {

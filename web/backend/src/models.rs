@@ -66,8 +66,8 @@ impl Archivable {
 #[diesel(table_name = container_horizontal_rules)]
 pub struct ContainerHorizontalRule {
     pub id: Uuid,
-    pub item_type_id: Option<Uuid>,
-    pub other_item_type_id: Option<Uuid>,
+    pub item_type_id: Uuid,
+    pub other_item_type_id: Uuid,
     pub minimum_temperature: Option<f64>,
     pub maximum_temperature: Option<f64>,
     pub minimum_humidity: Option<f64>,
@@ -129,8 +129,8 @@ impl ContainerHorizontalRule {
 #[diesel(table_name = container_vertical_rules)]
 pub struct ContainerVerticalRule {
     pub id: Uuid,
-    pub container_item_type_id: Option<Uuid>,
-    pub contained_item_type_id: Option<Uuid>,
+    pub container_item_type_id: Uuid,
+    pub contained_item_type_id: Uuid,
     pub minimum_temperature: Option<f64>,
     pub maximum_temperature: Option<f64>,
     pub minimum_humidity: Option<f64>,
@@ -621,9 +621,9 @@ impl ItemCategoryUnit {
 #[diesel(table_name = item_continuous_quantities)]
 pub struct ItemContinuousQuantity {
     pub id: Uuid,
-    pub item_id: Option<Uuid>,
+    pub item_id: Uuid,
     pub weight: f64,
-    pub unit_id: Option<Uuid>,
+    pub unit_id: Uuid,
     pub sensor_id: Option<Uuid>,
     pub measured_at: NaiveDateTime,
     pub measured_by: Option<Uuid>,
@@ -678,9 +678,9 @@ impl ItemContinuousQuantity {
 #[diesel(table_name = item_discrete_quantities)]
 pub struct ItemDiscreteQuantity {
     pub id: Uuid,
-    pub item_id: Option<Uuid>,
+    pub item_id: Uuid,
     pub quantity: i32,
-    pub unit_id: Option<Uuid>,
+    pub unit_id: Uuid,
     pub measured_at: NaiveDateTime,
     pub measured_by: Option<Uuid>,
 }
@@ -1816,7 +1816,7 @@ impl Project {
         let threshold = threshold.unwrap_or(0.6);
         let similarity_query = concat!(
             "SELECT id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, expected_end_date, end_date FROM projects ",
-            "ORDER BY similarity(name, description, $1) DESC LIMIT $3;"
+            "ORDER BY similarity(name, $1) + similarity(description, $1) DESC LIMIT $3;"
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -2536,7 +2536,7 @@ impl User {
         let threshold = threshold.unwrap_or(0.6);
         let similarity_query = concat!(
             "SELECT id, first_name, middle_name, last_name, created_at, updated_at FROM users ",
-            "ORDER BY similarity(first_name, middle_name, last_name, $1) DESC LIMIT $3;"
+            "ORDER BY similarity(first_name, $1) + similarity(middle_name, $1) + similarity(last_name, $1) DESC LIMIT $3;"
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)

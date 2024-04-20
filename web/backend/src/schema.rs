@@ -11,8 +11,8 @@ diesel::table! {
 diesel::table! {
     container_horizontal_rules (id) {
         id -> Uuid,
-        item_type_id -> Nullable<Uuid>,
-        other_item_type_id -> Nullable<Uuid>,
+        item_type_id -> Uuid,
+        other_item_type_id -> Uuid,
         minimum_temperature -> Nullable<Float8>,
         maximum_temperature -> Nullable<Float8>,
         minimum_humidity -> Nullable<Float8>,
@@ -25,8 +25,8 @@ diesel::table! {
 diesel::table! {
     container_vertical_rules (id) {
         id -> Uuid,
-        container_item_type_id -> Nullable<Uuid>,
-        contained_item_type_id -> Nullable<Uuid>,
+        container_item_type_id -> Uuid,
+        contained_item_type_id -> Uuid,
         minimum_temperature -> Nullable<Float8>,
         maximum_temperature -> Nullable<Float8>,
         minimum_humidity -> Nullable<Float8>,
@@ -114,9 +114,9 @@ diesel::table! {
 diesel::table! {
     item_continuous_quantities (id) {
         id -> Uuid,
-        item_id -> Nullable<Uuid>,
+        item_id -> Uuid,
         weight -> Float8,
-        unit_id -> Nullable<Uuid>,
+        unit_id -> Uuid,
         sensor_id -> Nullable<Uuid>,
         measured_at -> Timestamp,
         measured_by -> Nullable<Uuid>,
@@ -126,9 +126,9 @@ diesel::table! {
 diesel::table! {
     item_discrete_quantities (id) {
         id -> Uuid,
-        item_id -> Nullable<Uuid>,
+        item_id -> Uuid,
         quantity -> Int4,
-        unit_id -> Nullable<Uuid>,
+        unit_id -> Uuid,
         measured_at -> Timestamp,
         measured_by -> Nullable<Uuid>,
     }

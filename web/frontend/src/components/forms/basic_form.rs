@@ -27,6 +27,15 @@ pub trait FormBuilder: Clone + Store + PartialEq + Serialize {
     /// Returns whether the form is buildable.
     fn buildable(&self) -> Result<(), ApiError>;
 
+    /// Returns the form level errors.
+    /// 
+    /// # Implementation details
+    /// These errors are NOT meant to be errors associated
+    /// to specific fields, but rather errors that are related
+    /// to form-level validation. For example, if the values in
+    /// two fields are incompatible, this is a form-level error.
+    fn form_level_errors(&self) -> Vec<String>;
+
     /// Returns the data built by the form.
     /// 
     /// # Implementation details

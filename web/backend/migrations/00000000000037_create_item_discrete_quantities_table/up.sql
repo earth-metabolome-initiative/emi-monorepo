@@ -8,9 +8,9 @@
 -- the item. For example, a counter unit may be a box, a tube, or a vial.
 CREATE TABLE item_discrete_quantities (
     id UUID PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE,
-    item_id UUID REFERENCES items(id) ON DELETE CASCADE,
+    item_id UUID REFERENCES items(id) ON DELETE CASCADE NOT NULL,
     quantity INTEGER NOT NULL,
-    unit_id UUID REFERENCES units(id) ON DELETE CASCADE,
+    unit_id UUID REFERENCES units(id) ON DELETE CASCADE NOT NULL,
     measured_at TIMESTAMP NOT NULL DEFAULT now(),
     measured_by UUID REFERENCES users(id) ON DELETE SET NULL,
     UNIQUE (item_id, unit_id),

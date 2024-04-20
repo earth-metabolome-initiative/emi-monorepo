@@ -1,6 +1,7 @@
 pub mod api;
 pub mod model_implementations;
 pub mod models;
+pub mod nested_models;
 pub mod schema;
 pub mod transactions;
 pub mod views;

@@ -32,11 +32,9 @@ pub fn profile() -> Html {
     // We proceed to render the profile page, which contains a form
     // to edit the user's name and surname.
     html! {
-        // <div class="fullscreen_center_app">
-            <div class="profile">
-                <h2>{ "Profile" }</h2>
-                <CompleteProfileForm />
-            </div>
-        // </div>
+        <div class="profile">
+            <h2>{ "Profile" }</h2>
+            <CompleteProfileForm />
+        </div>
     }
 }

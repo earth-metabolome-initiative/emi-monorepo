@@ -4,9 +4,9 @@
 -- different people.
 CREATE TABLE item_continuous_quantities (
     id UUID PRIMARY KEY REFERENCES editables(id) ON DELETE CASCADE,
-    item_id UUID REFERENCES items(id) ON DELETE CASCADE,
+    item_id UUID REFERENCES items(id) ON DELETE CASCADE NOT NULL,
     weight FLOAT NOT NULL,
-    unit_id UUID REFERENCES units(id) ON DELETE CASCADE,
+    unit_id UUID REFERENCES units(id) ON DELETE CASCADE NOT NULL,
     sensor_id UUID REFERENCES items(id) ON DELETE SET NULL,
     measured_at TIMESTAMP NOT NULL DEFAULT now(),
     measured_by UUID REFERENCES users(id) ON DELETE SET NULL,

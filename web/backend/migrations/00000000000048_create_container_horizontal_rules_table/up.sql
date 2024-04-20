@@ -11,10 +11,10 @@ CREATE TABLE container_horizontal_rules (
     id UUID PRIMARY KEY REFERENCES describables(id) ON DELETE CASCADE,
     item_type_id UUID REFERENCES item_categories(id) ON
     DELETE
-        CASCADE,
+        CASCADE NOT NULL,
         other_item_type_id UUID REFERENCES item_categories(id) ON
     DELETE
-        CASCADE,
+        CASCADE NOT NULL,
         minimum_temperature FLOAT DEFAULT NULL,
         maximum_temperature FLOAT DEFAULT NULL,
         minimum_humidity FLOAT DEFAULT NULL,
