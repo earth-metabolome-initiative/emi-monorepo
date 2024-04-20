@@ -1,8 +1,6 @@
-use crate::api::form_traits::FormResult;
-use crate::custom_validators::*;
+use crate::{custom_validators::*, database::ProjectState};
 use crate::database::Insert;
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 use validator::Validate;
 
 pub type NewProjectName = NoSpecialCharacters<MustBeCapitalized<NotEmpty>>;
@@ -14,39 +12,25 @@ pub struct NewProject {
     #[validate]
     pub description: NotEmpty,
     pub public: bool,
-    // pub state_id: Uuid,
+    pub project_state: ProjectState
     // pub parent_project_id: Option<Uuid>,
 }
 
 impl NewProject {
-    pub fn new(name: String, description: String, public: bool) -> Result<Self, Vec<String>> {
+    pub fn new(
+        name: String,
+        description: String,
+        public: bool,
+        project_state: ProjectState
+    ) -> Result<Self, Vec<String>> {
         let new_project = Self {
             name: NewProjectName::try_from(name)?,
             description: NotEmpty::try_from(description)?,
             public,
+            project_state
         };
 
         Ok(new_project)
-    }
-}
-
-impl FormResult for NewProject {
-    const METHOD: crate::api::form_traits::FormMethod = crate::api::form_traits::FormMethod::POST;
-
-    fn title() -> &'static str {
-        "New Project"
-    }
-
-    fn task_target() -> &'static str {
-        "Project"
-    }
-
-    fn description() -> &'static str {
-        concat!("Crate a new project.\n",)
-    }
-
-    fn requires_authentication() -> bool {
-        true
     }
 }
 

@@ -102,23 +102,3 @@ pub trait TryFromCallback<T>: Sized {
         C: FnOnce(Result<Self, Vec<String>>) + 'static;
 }
 
-pub trait FormResult: Clone + PartialEq + Into<Task> {
-    const METHOD: FormMethod;
-
-    /// Returns the title to use for the Form.
-    fn title() -> &'static str;
-
-    /// Returns the name of the task target.
-    ///
-    /// # Examples
-    /// The task target is what is being inserted/deleted/updated.
-    /// If you are creating a form to insert a new Taxon, the task target is "Taxon".
-    /// If you are creating a form to update a Taxon, the task target is "Taxon".
-    /// If you are creating a form to delete a Taxon, the task target is "Taxon".
-    fn task_target() -> &'static str;
-
-    /// Returns the description to use for the Form.
-    fn description() -> &'static str;
-
-    fn requires_authentication() -> bool;
-}

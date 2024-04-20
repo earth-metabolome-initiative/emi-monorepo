@@ -55,7 +55,6 @@ impl From<serde_json::Error> for ApiError {
 
 impl From<ValidationErrors> for ApiError {
     fn from(e: ValidationErrors) -> Self {
-        log::error!("Validation error: {:?}", e);
         Self::BadRequest(e.convert_to_string())
     }
 }

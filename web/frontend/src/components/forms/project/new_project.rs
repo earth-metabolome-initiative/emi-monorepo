@@ -1,90 +1,148 @@
 //! Component for the form requiring user name and surname.
 
 use crate::components::forms::*;
+use std::{ops::Deref, rc::Rc};
+use serde::{Deserialize, Serialize};
 use validator::Validate;
-use web_common::api::form_traits::TryFromCallback;
+use web_common::api::form_traits::FormMethod;
 use web_common::custom_validators::NotEmpty;
 use web_common::database::inserts::new_project::NewProjectName;
 use web_common::database::inserts::NewProject;
-use web_sys::FormData;
+use web_common::database::ProjectState;
 use yew::prelude::*;
+use yewdux::{use_store, Reducer, Store};
 
-impl TryFromCallback<FormData> for FormWrapper<NewProject> {
-    fn try_from_callback<C>(data: FormData, callback: C) -> Result<(), Vec<String>>
-    where
-        C: FnOnce(Result<Self, Vec<String>>) + 'static,
-    {
-        let project_name = data.get("name").as_string().ok_or_else(|| {
-            vec!["The new project name field is missing or not a string.".to_string()]
-        })?;
+#[derive(Debug, PartialEq, Clone, Default, Store, Serialize, Deserialize)]
+#[store(storage = "session")]
+pub struct NewProjectBuilder {
+    pub name: NewProjectName,
+    pub description: NotEmpty,
+    pub public: bool,
+    pub project_state: Option<ProjectState>,
+}
 
-        let description = data.get("description").as_string().ok_or_else(|| {
-            vec!["The new project description field is missing or not a string.".to_string()]
-        })?;
+impl FormBuilder for NewProjectBuilder {
+    type Data = NewProject;
+    type Actions = NewProjectBuilderActions;
 
-        let public = data
-            .get("public")
-            .as_string()
-            .unwrap_or_else(|| "off".to_string());
-
-        let public: bool = InputBool::try_from(public.to_string())?.into();
-
-        let new_project = NewProject::new(project_name, description, public)?;
-
-        callback(Ok(FormWrapper::from(new_project)));
-
+    fn buildable(&self) -> Result<(), web_common::api::ApiError> {
+        self.name.validate()?;
+        self.description.validate()?;
+        if self.project_state.is_none() {
+            return Err(web_common::api::ApiError::BadRequest(vec![
+                "Project state is required.".to_string(),
+            ]));
+        }
         Ok(())
     }
-}
 
-#[derive(Clone, Debug, PartialEq, Eq, Copy, Default, Validate)]
-#[repr(transparent)]
-pub struct InputBool {
-    value: bool,
-}
-
-impl From<InputBool> for bool {
-    fn from(value: InputBool) -> bool {
-        value.value
-    }
-}
-
-impl From<bool> for InputBool {
-    fn from(value: bool) -> InputBool {
-        InputBool { value }
-    }
-}
-
-impl TryFrom<String> for InputBool {
-    type Error = Vec<String>;
-
-    fn try_from(value: String) -> Result<Self, Self::Error> {
-        match value.as_str() {
-            "on" => Ok(InputBool { value: true }),
-            "off" => Ok(InputBool { value: false }),
-            _ => Err(vec!["Invalid value for boolean.".to_string()]),
+    fn build(&self) -> Self::Data {
+        NewProject {
+            name: self.name.clone(),
+            description: self.description.clone(),
+            public: self.public,
+            project_state: self.project_state.clone().unwrap(),
         }
     }
 }
 
-impl ToString for InputBool {
-    fn to_string(&self) -> String {
-        if self.value {
-            "on".to_string()
-        } else {
-            "off".to_string()
+pub enum NewProjectBuilderActions {
+    SetName(NewProjectName),
+    SetDescription(NotEmpty),
+    SetPublic(bool),
+    SetProjectState(Option<ProjectState>),
+}
+
+impl Reducer<NewProjectBuilder> for NewProjectBuilderActions {
+    fn apply(self, mut state: std::rc::Rc<NewProjectBuilder>) -> std::rc::Rc<NewProjectBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            NewProjectBuilderActions::SetName(name) => {
+                state_mut.name = name;
+            }
+            NewProjectBuilderActions::SetDescription(description) => {
+                state_mut.description = description;
+            }
+            NewProjectBuilderActions::SetPublic(public) => {
+                state_mut.public = public;
+            }
+            NewProjectBuilderActions::SetProjectState(project_state) => {
+                state_mut.project_state = project_state;
+            }
         }
+        state
     }
 }
+
+impl FormBuildable for NewProject {
+    type Builder = NewProjectBuilder;
+
+    const METHOD: FormMethod = FormMethod::POST;
+
+    fn title() -> &'static str {
+        "New Project"
+    }
+
+    fn task_target() -> &'static str {
+        "Project"
+    }
+
+    fn description() -> &'static str {
+        concat!("Crate a new project.\n",)
+    }
+
+    fn requires_authentication() -> bool {
+        true
+    }
+}
+
+// impl TryFromCallback<FormData> for FormWrapper<NewProject> {
+//     fn try_from_callback<C>(data: FormData, callback: C) -> Result<(), Vec<String>>
+//     where
+//         C: FnOnce(Result<Self, Vec<String>>) + 'static,
+//     {
+//         let project_name = data.get("name").as_string().ok_or_else(|| {
+//             vec!["The new project name field is missing or not a string.".to_string()]
+//         })?;
+
+//         let description = data.get("description").as_string().ok_or_else(|| {
+//             vec!["The new project description field is missing or not a string.".to_string()]
+//         })?;
+
+//         let public = data
+//             .get("public")
+//             .as_string()
+//             .unwrap_or_else(|| "off".to_string());
+
+//         let public: bool = InputBool::try_from(public.to_string())?.into();
+
+//         let new_project = NewProject::new(project_name, description, public)?;
+
+//         callback(Ok(FormWrapper::from(new_project)));
+
+//         Ok(())
+//     }
+// }
 
 #[function_component(NewProjectForm)]
 pub fn complete_profile_form() -> Html {
+    // The use_reducer hook takes an initialization function which will be called only once.
+    let (store, dispatch) = use_store::<NewProjectBuilder>();
+
+    let set_name = dispatch.apply_callback(|name| NewProjectBuilderActions::SetName(name));
+    let set_description = dispatch
+        .apply_callback(|description| NewProjectBuilderActions::SetDescription(description));
+    let set_public = dispatch.apply_callback(|public| NewProjectBuilderActions::SetPublic(public));
+    let set_project_state = dispatch.apply_callback(|mut project_states: Vec<ProjectState>| {
+        NewProjectBuilderActions::SetProjectState(project_states.pop())
+    });
+
     html! {
-        <BasicForm<NewProject>>
-            <BasicInput<NewProjectName> label="Name" input_type={InputType::Text} />
-            <BasicInput<NotEmpty> label="Description" input_type={InputType::Textarea} />
-            <BasicInput<InputBool> label="Public" value={InputBool::from(false)} input_type={InputType::Checkbox} />
-            <Datalist<web_common::database::ProjectState> number_of_choices=2 label="Project State" />
+        <BasicForm<NewProject> builder={store.deref().clone()}>
+            <BasicInput<NewProjectName> label="Name" builder={set_name} value={store.name.clone()} input_type={InputType::Text} />
+            <BasicInput<NotEmpty> label="Description" builder={set_description} value={store.description.clone()} input_type={InputType::Textarea} />
+            <Checkbox label="Public" builder={set_public} value={store.public} />
+            <Datalist<web_common::database::ProjectState> builder={set_project_state} value={store.project_state.clone().map_or_else(|| Vec::new(), |value| vec![value])} label="Project State" />
         </BasicForm<NewProject>>
     }
 }

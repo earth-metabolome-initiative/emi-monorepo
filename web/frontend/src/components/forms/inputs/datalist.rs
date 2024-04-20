@@ -6,15 +6,10 @@ use super::InputErrors;
 use crate::components::database::row_to_badge::RowToBadge;
 use crate::workers::WebsocketWorker;
 use gloo::timers::callback::Timeout;
-use sublime_fuzzy::{best_match, format_simple};
-use validator::Validate;
 use wasm_bindgen::JsCast;
 use web_common::api::ws::messages::*;
-use web_common::custom_validators::validation_errors::ValidationErrorToString;
 use web_common::database::SearchTable;
-use web_common::database::SearcheableTable;
 use web_common::database::SearcheableTableRow;
-use web_common::database::TableRow;
 
 use yew::prelude::*;
 use yew_agent::prelude::WorkerBridgeHandle;
@@ -26,12 +21,13 @@ where
     Data: 'static + Clone + PartialEq,
 {
     pub label: String,
+    pub builder: Callback<Vec<Data>>,
     #[prop_or(true)]
     pub show_label: bool,
     #[prop_or_default]
     pub placeholder: Option<String>,
     #[prop_or_default]
-    pub value: Option<Data>,
+    pub value: Vec<Data>,
     #[prop_or(false)]
     pub optional: bool,
     #[prop_or(1)]
@@ -52,7 +48,7 @@ where
         self.label.replace(" ", "_").to_lowercase()
     }
 
-    pub fn value(&self) -> Option<Data> {
+    pub fn value(&self) -> Vec<Data> {
         self.value.clone()
     }
 }
@@ -120,7 +116,7 @@ where
             validation_timeout: None,
             search_timeout: None,
             candidates: Vec::new(),
-            selections: Vec::new(),
+            selections: ctx.props().value(),
             selections_to_delete: Vec::new(),
             is_focused: false,
             number_of_search_queries: 0,
@@ -206,16 +202,6 @@ where
                     change = true;
                 }
 
-                // If the current value of the input field is equal to
-                // the default value, we do not want to display the field
-                // as being valid, but back to its initial state.
-                if let Some(value) = ctx.props().value() {
-                    if value == data {
-                        self.is_valid = None;
-                        change = true;
-                    }
-                }
-
                 change
             }
             DatalistMessage::StartValidationTimeout(data) => {
@@ -237,14 +223,7 @@ where
                 {
                     return false;
                 }
-                let query = self.current_value.as_ref().map_or_else(
-                    || {
-                        ctx.props()
-                            .value()
-                            .map_or_else(|| "".to_string(), |value| value.to_string())
-                    },
-                    |query| query.to_string(),
-                );
+                let query = self.current_value.clone().unwrap_or_else(|| "".to_string());
                 self.websocket
                     .send(Data::search(query, ctx.props().number_of_candidates).into());
                 self.number_of_search_queries += 1;
@@ -267,6 +246,7 @@ where
                 }
                 self.selections.push(candidate.clone());
                 if self.selections.len() == ctx.props().number_of_choices {
+                    ctx.props().builder.emit(self.selections.clone());
                     self.is_focused = false;
                 }
                 self.current_value = None;
@@ -282,22 +262,22 @@ where
                     self.current_value = None;
                 }
 
+                ctx.props().builder.emit(self.selections.clone());
+
                 true
             }
             DatalistMessage::UpdateCurrentValue(value) => {
                 // We check if any of the candidates match the current value
                 // exactly. If so, we select that candidate.
-                if let Some(candidate) = self
+                if let Some(candidate_index) = self
                     .candidates
                     .iter()
-                    .find(|candidate| candidate.matches(&value))
+                    .position(|candidate| candidate.matches(&value))
                 {
-                    if ctx.props().number_of_choices == 1 {
-                        self.selections.clear();
-                    }
-                    self.selections.push(candidate.clone());
+                    ctx.link().send_message(DatalistMessage::SelectCandidate(candidate_index));
+                } else {
+                    self.current_value = Some(value);
                 }
-                self.current_value = Some(value);
                 ctx.link()
                     .send_message(DatalistMessage::SearchCandidatesTimeout);
 
@@ -359,7 +339,6 @@ where
                     return;
                 }
 
-                // link.send_message(DatalistMessage::StartValidationTimeout(data));
             })
         };
 
@@ -393,14 +372,7 @@ where
             })
         };
 
-        let input_value = self.current_value.as_ref().map_or_else(
-            || {
-                props
-                    .value()
-                    .map_or_else(|| "".to_string(), |value| value.to_string())
-            },
-            |value| value.to_string(),
-        );
+        let input_value = self.current_value.clone().unwrap_or_else(|| "".to_string());
 
         let on_delete = {
             let link = ctx.link().clone();

@@ -653,6 +653,9 @@ def write_web_common_structs(
     # The derives to apply to the structs in the `src/database/tables.rs` document
     derives = ["Deserialize", "Serialize", "Clone", "Debug", "PartialEq"]
 
+    # Types that cannot implement the `Eq` trait
+    no_eq = ["f32", "f64"]
+
     # We check that we are currently executing in the `backend` crate
     # so to make sure that the relative path to the `web_common` crate
     # is correct.
@@ -698,6 +701,7 @@ def write_web_common_structs(
                 "table_name": None,
                 "struct_name": None,
                 "contains_options": False,
+                "contains_no_eq": False,
                 "attributes": [],
             }
             struct_name = line.split(" ")[2]
@@ -720,6 +724,9 @@ def write_web_common_structs(
                 )
                 if "Option" in field_type:
                     struct_metadata["contains_options"] = True
+                for no_eq_type in no_eq:
+                    if no_eq_type in field_type:
+                        struct_metadata["contains_no_eq"] = True
 
             # We determine whether the struct has ended
             # by checking if the `}` keyword is present
@@ -735,6 +742,8 @@ def write_web_common_structs(
             tables.write(f"#[derive(")
             for derive in derives:
                 tables.write(f"{derive}, ")
+            if not struct_metadata["contains_no_eq"]:
+                tables.write(f"Eq, ")
             tables.write(f")]\n")
             # We also write conditional derives for the frontend feature
             # that ask for the `frontend` feature to be enabled and derive

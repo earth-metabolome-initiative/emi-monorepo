@@ -1,6 +1,6 @@
 //! Submodule providing the version of the User Profile to be used with the CompleteProfile form.
 use super::Update;
-use crate::{api::form_traits::FormResult, custom_validators::*};
+use crate::{custom_validators::*};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
@@ -40,29 +40,6 @@ impl CompleteProfile {
     }
 }
 
-impl FormResult for CompleteProfile {
-    const METHOD: crate::api::form_traits::FormMethod = crate::api::form_traits::FormMethod::PUT;
-
-    fn title() -> &'static str {
-        "Complete Profile"
-    }
-
-    fn task_target() -> &'static str {
-        "Profile"
-    }
-
-    fn description() -> &'static str {
-        concat!(
-            "Hello and welcome to the Earth Metabolome Initiative! ",
-            "As a new user, we need you to complete your profile. ",
-            "Please provide your given name and profile piture."
-        )
-    }
-
-    fn requires_authentication() -> bool {
-        true
-    }
-}
 
 impl From<CompleteProfile> for Update {
     fn from(update_profile: CompleteProfile) -> Self {

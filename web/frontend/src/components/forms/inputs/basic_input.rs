@@ -5,16 +5,13 @@ use std::fmt::Display;
 
 use super::InputErrors;
 use gloo::timers::callback::Timeout;
-use validator::Validate;
 use wasm_bindgen::JsCast;
-use web_common::custom_validators::validation_errors::ValidationErrorToString;
 use yew::prelude::*;
 
 #[derive(Clone, PartialEq)]
 pub enum InputType {
     Text,
     Number,
-    Checkbox,
     Textarea,
 }
 
@@ -23,7 +20,6 @@ impl Display for InputType {
         match self {
             InputType::Text => write!(f, "text"),
             InputType::Number => write!(f, "number"),
-            InputType::Checkbox => write!(f, "checkbox"),
             InputType::Textarea => write!(f, "textarea"),
         }
     }
@@ -35,6 +31,7 @@ where
     Data: 'static + Clone + PartialEq,
 {
     pub label: String,
+    pub builder: Callback<Data>,
     #[prop_or(true)]
     pub show_label: bool,
     #[prop_or_default]
@@ -91,7 +88,6 @@ where
         + Clone
         + PartialEq
         + Default
-        + Validate
         + TryFrom<String, Error = Vec<String>>
         + ToString,
 {
@@ -151,13 +147,7 @@ where
 
                 let data = data.unwrap();
 
-                if let Err(errors) = data.validate() {
-                    for error in errors.convert_to_string() {
-                        self.errors.insert(error);
-                    }
-                    self.is_valid = Some(false);
-                    change = true;
-                }
+                ctx.props().builder.emit(data.clone());
 
                 if self.is_valid != Some(true) {
                     self.is_valid = Some(true);
@@ -239,19 +229,6 @@ where
                         .dyn_into::<web_sys::HtmlTextAreaElement>()
                         .unwrap()
                         .value(),
-                    InputType::Checkbox => {
-                        if input_event
-                            .target()
-                            .unwrap()
-                            .dyn_into::<web_sys::HtmlInputElement>()
-                            .unwrap()
-                            .checked()
-                        {
-                            "on".to_string()
-                        } else {
-                            "off".to_string()
-                        }
-                    }
                     _ => input_event
                         .target()
                         .unwrap()
@@ -287,19 +264,6 @@ where
                         .dyn_into::<web_sys::HtmlTextAreaElement>()
                         .unwrap()
                         .value(),
-                    InputType::Checkbox => {
-                        if input_event
-                            .target()
-                            .unwrap()
-                            .dyn_into::<web_sys::HtmlInputElement>()
-                            .unwrap()
-                            .checked()
-                        {
-                            "on".to_string()
-                        } else {
-                            "off".to_string()
-                        }
-                    }
                     _ => input_event
                         .target()
                         .unwrap()
@@ -357,20 +321,6 @@ where
                             oninput={on_input}
                             onblur={on_blur}
                         ></textarea>
-                    },
-                    InputType::Checkbox => html! {
-                        <>
-                        <input
-                            type="checkbox"
-                            class="input-control"
-                            name={props.normalized_label()}
-                            id={props.normalized_label()}
-                            oninput={on_input}
-                            onblur={on_blur}
-                            checked={input_value == "on"}
-                        />
-                        <label for={props.normalized_label()} class="checkbox"></label>
-                        </>
                     },
                     InputType::Number | InputType::Text => html! {
                         <input
