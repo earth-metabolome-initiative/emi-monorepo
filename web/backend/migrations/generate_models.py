@@ -2086,15 +2086,18 @@ def generate_nested_structs(
 
         tables.write(
             f"impl Nested{struct_name} {{\n"
+            f"    /// Get the nested struct from the provided primary key.\n"
+            f"    ///\n"
+            f"    /// # Arguments\n"
+            f"    /// * `id` - The primary key of the row.\n"
+            f"    /// * `connection` - The database connection.\n"
             f"    pub fn get(\n"
             f"        id: {rust_primary_key_type},\n"
             f"        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
             f"    ) -> Result<Self, diesel::result::Error>\n"
             f"    {{\n"
             f"        use crate::schema::{table_name};\n"
-            f"        let flat_struct: {struct_name} = {table_name}::dsl::{table_name}\n"
-            f"            .filter({table_name}::dsl::{primary_key_attribute}.eq({primary_key_attribute}))\n"
-            f"            .first(connection)?;\n"
+            f"        let flat_struct = {struct_name}::get(id, connection)?;\n"
             f"        Ok(Self {{\n"
         )
         for attribute_name, original_attribute_name, attribute_type, foreign, boxed, optional in new_struct_attributes:
@@ -2108,7 +2111,7 @@ def generate_nested_structs(
                     tables.write(",\n")
                 else:
                     tables.write(
-                        f"            {attribute_name}: {attribute_type}::get(flat_struct.{original_attribute_name}, connection)?\n"
+                        f"            {attribute_name}: {attribute_type}::get(flat_struct.{original_attribute_name}, connection)?"
                     )
                     if boxed:
                         tables.write(".map(Box::new)")
