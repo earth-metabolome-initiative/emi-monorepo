@@ -8,7 +8,6 @@ use serde::Serialize;
 use chrono::NaiveDateTime;
 use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::PooledConnection;
-use diesel::prelude::*;
 use crate::models::*;
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct NestedArchivable {
@@ -28,7 +27,6 @@ impl NestedArchivable {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        use crate::schema::archivables;
         let flat_struct = Archivable::get(id, connection)?;
         Ok(Self {
             id: flat_struct.id,
@@ -61,7 +59,6 @@ impl NestedContainerHorizontalRule {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        use crate::schema::container_horizontal_rules;
         let flat_struct = ContainerHorizontalRule::get(id, connection)?;
         Ok(Self {
             id: flat_struct.id,
@@ -100,7 +97,6 @@ impl NestedContainerVerticalRule {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        use crate::schema::container_vertical_rules;
         let flat_struct = ContainerVerticalRule::get(id, connection)?;
         Ok(Self {
             id: flat_struct.id,
@@ -134,7 +130,6 @@ impl NestedDocument {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        use crate::schema::documents;
         let flat_struct = Document::get(id, connection)?;
         Ok(Self {
             id: flat_struct.id,
@@ -162,7 +157,6 @@ impl NestedEditable {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        use crate::schema::editables;
         let flat_struct = Editable::get(id, connection)?;
         Ok(Self {
             id: flat_struct.id,
@@ -188,7 +182,6 @@ impl NestedEdit {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        use crate::schema::edits;
         let flat_struct = Edit::get(id, connection)?;
         Ok(Self {
             id: flat_struct.id,
@@ -214,7 +207,6 @@ impl NestedItemCategoryRelationship {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        use crate::schema::item_category_relationships;
         let flat_struct = ItemCategoryRelationship::get(id, connection)?;
         Ok(Self {
             id: flat_struct.id,
@@ -241,7 +233,6 @@ impl NestedItemCategoryUnit {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        use crate::schema::item_category_units;
         let flat_struct = ItemCategoryUnit::get(id, connection)?;
         Ok(Self {
             id: flat_struct.id,
@@ -272,7 +263,6 @@ impl NestedItemContinuousQuantity {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        use crate::schema::item_continuous_quantities;
         let flat_struct = ItemContinuousQuantity::get(id, connection)?;
         Ok(Self {
             id: flat_struct.id,
@@ -306,7 +296,6 @@ impl NestedItemDiscreteQuantity {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        use crate::schema::item_discrete_quantities;
         let flat_struct = ItemDiscreteQuantity::get(id, connection)?;
         Ok(Self {
             id: flat_struct.id,
@@ -337,7 +326,6 @@ impl NestedItemLocation {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        use crate::schema::item_locations;
         let flat_struct = ItemLocation::get(id, connection)?;
         Ok(Self {
             id: flat_struct.id,
@@ -365,7 +353,6 @@ impl NestedItemUnit {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        use crate::schema::item_units;
         let flat_struct = ItemUnit::get(id, connection)?;
         Ok(Self {
             id: flat_struct.id,
@@ -391,7 +378,6 @@ impl NestedItem {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        use crate::schema::items;
         let flat_struct = Item::get(id, connection)?;
         Ok(Self {
             id: flat_struct.id,
@@ -423,7 +409,6 @@ impl NestedLocation {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        use crate::schema::locations;
         let flat_struct = Location::get(id, connection)?;
         Ok(Self {
             id: flat_struct.id,
@@ -458,7 +443,6 @@ impl NestedManufacturedItemCategory {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        use crate::schema::manufactured_item_categories;
         let flat_struct = ManufacturedItemCategory::get(id, connection)?;
         Ok(Self {
             id: flat_struct.id,
@@ -490,7 +474,6 @@ impl NestedNotification {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        use crate::schema::notifications;
         let flat_struct = Notification::get(id, connection)?;
         Ok(Self {
             id: flat_struct.id,
@@ -521,7 +504,6 @@ impl NestedOrganizationAuthorization {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        use crate::schema::organization_authorizations;
         let flat_struct = OrganizationAuthorization::get(id, connection)?;
         Ok(Self {
             id: flat_struct.id,
@@ -550,7 +532,6 @@ impl NestedOrganizationLocation {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        use crate::schema::organization_locations;
         let flat_struct = OrganizationLocation::get(id, connection)?;
         Ok(Self {
             id: flat_struct.id,
@@ -580,7 +561,6 @@ impl NestedOrganization {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        use crate::schema::organizations;
         let flat_struct = Organization::get(id, connection)?;
         Ok(Self {
             id: flat_struct.id,
@@ -611,7 +591,6 @@ impl NestedProcedureContinuousRequirement {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        use crate::schema::procedure_continuous_requirements;
         let flat_struct = ProcedureContinuousRequirement::get(id, connection)?;
         Ok(Self {
             id: flat_struct.id,
@@ -642,7 +621,6 @@ impl NestedProcedureDiscreteRequirement {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        use crate::schema::procedure_discrete_requirements;
         let flat_struct = ProcedureDiscreteRequirement::get(id, connection)?;
         Ok(Self {
             id: flat_struct.id,
@@ -673,7 +651,6 @@ impl NestedProjectContinuousRequirement {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        use crate::schema::project_continuous_requirements;
         let flat_struct = ProjectContinuousRequirement::get(id, connection)?;
         Ok(Self {
             id: flat_struct.id,
@@ -704,7 +681,6 @@ impl NestedProjectDiscreteRequirement {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        use crate::schema::project_discrete_requirements;
         let flat_struct = ProjectDiscreteRequirement::get(id, connection)?;
         Ok(Self {
             id: flat_struct.id,
@@ -734,7 +710,6 @@ impl NestedProjectMilestone {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        use crate::schema::project_milestones;
         let flat_struct = ProjectMilestone::get(id, connection)?;
         Ok(Self {
             id: flat_struct.id,
@@ -771,7 +746,6 @@ impl NestedProject {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        use crate::schema::projects;
         let flat_struct = Project::get(id, connection)?;
         Ok(Self {
             id: flat_struct.id,
@@ -787,6 +761,27 @@ impl NestedProject {
             expected_end_date: flat_struct.expected_end_date,
             end_date: flat_struct.end_date,
         })
+    }
+}
+impl NestedProject {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `threshold` - The similarity threshold, by default `0.6`.
+    pub fn search(
+        query: &str,
+        limit: Option<i32>,
+        threshold: Option<f64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = Project::search(query, limit, threshold, connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self::get(flat_struct.id, connection)?);
+        }
+        Ok(nested_structs)
     }
 }
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -807,7 +802,6 @@ impl NestedSampleTaxa {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        use crate::schema::sample_taxa;
         let flat_struct = SampleTaxa::get(id, connection)?;
         Ok(Self {
             id: flat_struct.id,
@@ -834,7 +828,6 @@ impl NestedSampledIndividualTaxa {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        use crate::schema::sampled_individual_taxa;
         let flat_struct = SampledIndividualTaxa::get(id, connection)?;
         Ok(Self {
             id: flat_struct.id,
@@ -860,7 +853,6 @@ impl NestedSample {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        use crate::schema::samples;
         let flat_struct = Sample::get(id, connection)?;
         Ok(Self {
             id: flat_struct.id,
@@ -885,7 +877,6 @@ impl NestedSpectra {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        use crate::schema::spectra;
         let flat_struct = Spectra::get(id, connection)?;
         Ok(Self {
             id: flat_struct.id,
@@ -910,7 +901,6 @@ impl NestedSpectraCollection {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        use crate::schema::spectra_collection;
         let flat_struct = SpectraCollection::get(id, connection)?;
         Ok(Self {
             id: flat_struct.id,
@@ -937,7 +927,6 @@ impl NestedTeamAuthorization {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        use crate::schema::team_authorizations;
         let flat_struct = TeamAuthorization::get(id, connection)?;
         Ok(Self {
             id: flat_struct.id,
@@ -965,7 +954,6 @@ impl NestedTeam {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        use crate::schema::teams;
         let flat_struct = Team::get(id, connection)?;
         Ok(Self {
             id: flat_struct.id,
@@ -993,7 +981,6 @@ impl NestedUserAuthorization {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        use crate::schema::user_authorizations;
         let flat_struct = UserAuthorization::get(id, connection)?;
         Ok(Self {
             id: flat_struct.id,
@@ -1022,7 +1009,6 @@ impl NestedUserEmail {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        use crate::schema::user_emails;
         let flat_struct = UserEmail::get(id, connection)?;
         Ok(Self {
             id: flat_struct.id,

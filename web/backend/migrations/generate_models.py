@@ -1960,6 +1960,7 @@ def generate_nested_structs(
     structs for the referenced tables. The nested structs are written to the file `src/models.rs`.
     """
     tables_metadata = find_foreign_keys()
+    similarity_indices: PGIndices = find_pg_trgm_indices()
 
     # We open the file to write the nested structs
     tables = open(path, "w")
@@ -1985,7 +1986,6 @@ def generate_nested_structs(
         "use chrono::NaiveDateTime;",
         "use diesel::r2d2::ConnectionManager;",
         "use diesel::r2d2::PooledConnection;",
-        "use diesel::prelude::*;",
         "use crate::models::*;",
     ]
 
@@ -2096,7 +2096,6 @@ def generate_nested_structs(
             f"        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
             f"    ) -> Result<Self, diesel::result::Error>\n"
             f"    {{\n"
-            f"        use crate::schema::{table_name};\n"
             f"        let flat_struct = {struct_name}::get(id, connection)?;\n"
             f"        Ok(Self {{\n"
         )
@@ -2123,6 +2122,35 @@ def generate_nested_structs(
             f"    }}\n"
             f"}}\n"
         )
+        
+        # If there is an index on the table, we implement the search method that
+        # calls search on the flat version of the struct and then iterates on the
+        # primary keys of the results and constructs the nested structs by calling
+        # the `get` method several times.
+        if similarity_indices.has_table(table_name):
+            tables.write(
+                f"impl Nested{struct_name} {{\n"
+                f"    /// Search the table by the query.\n"
+                f"    ///\n"
+                f"    /// # Arguments\n"
+                f"    /// * `query` - The string to search for.\n"
+                f"    /// * `limit` - The maximum number of results, by default `10`.\n"
+                f"    /// * `threshold` - The similarity threshold, by default `0.6`.\n"
+                f"    pub fn search(\n"
+                f"        query: &str,\n"
+                f"        limit: Option<i32>,\n"
+                f"        threshold: Option<f64>,\n"
+                f"        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
+                f"    ) -> Result<Vec<Self>, diesel::result::Error> {{\n"
+                f"        let flat_structs = {struct_name}::search(query, limit, threshold, connection)?;\n"
+                f"        let mut nested_structs = Vec::new();\n"
+                f"        for flat_struct in flat_structs {{\n"
+                f"            nested_structs.push(Self::get(flat_struct.id, connection)?);\n"
+                f"        }}\n"
+                f"        Ok(nested_structs)\n"
+                f"    }}\n"
+                f"}}\n"
+            )
 
     tables.close()
 
