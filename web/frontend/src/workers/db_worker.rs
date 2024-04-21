@@ -6,6 +6,7 @@ use wasm_bindgen::UnwrapThrowExt;
 use yew::platform::spawn_local;
 use yew_agent::worker::HandlerId;
 use yew_agent::worker::Worker;
+
 pub type Database = Glue<IdbStorage>;
 
 pub enum DataBaseMessage {

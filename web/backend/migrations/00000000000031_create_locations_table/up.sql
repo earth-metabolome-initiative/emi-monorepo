@@ -16,31 +16,45 @@
 -- - created_by: the unique identifier of the user who created the location.
 -- - updated_by: the unique identifier of the user who last updated the location.
 CREATE TABLE locations (
-  id UUID PRIMARY KEY REFERENCES describables(id) ON DELETE CASCADE,
-  latitude Float,
-  longitude Float,
-  altitude Float,
-  address TEXT,
-  geolocalization_device_id UUID REFERENCES items(id) ON DELETE SET NULL,
-  altitude_device_id UUID REFERENCES items(id) ON DELETE SET NULL,
-  parent_location_id UUID REFERENCES locations(id) ON DELETE SET NULL,
-  state_id UUID NOT NULL REFERENCES location_states(id)
+    id UUID PRIMARY KEY REFERENCES describables(id) ON
+    DELETE
+        CASCADE,
+        latitude_degrees INTEGER,
+        latitude_minutes INTEGER,
+        latitude_seconds INTEGER,
+        longitude_degrees INTEGER,
+        longitude_minutes INTEGER,
+        longitude_seconds INTEGER,
+        altitude INTEGER,
+        address TEXT,
+        geolocalization_device_id UUID REFERENCES items(id) ON
+    DELETE
+    SET
+        NULL,
+        altitude_device_id UUID REFERENCES items(id) ON
+    DELETE
+    SET
+        NULL,
+        parent_location_id UUID REFERENCES locations(id) ON
+    DELETE
+    SET
+        NULL,
+        state_id UUID NOT NULL REFERENCES location_states(id)
 );
-
 
 -- We also need to add a bi-directional cascade delete constraint to the editables
 -- table, so that when a location is deleted, the corresponding editable is also deleted.
 -- Since the editables table is referenced by several other tables, we cannot add a cascade
 -- delete constraint to the editables table. Instead, we add a trigger to delete the corresponding
 -- record in the editables table when a location is deleted.
-CREATE OR REPLACE FUNCTION delete_editables() RETURNS TRIGGER AS $$
-BEGIN
+CREATE
+OR REPLACE FUNCTION delete_editables() RETURNS TRIGGER AS $$ BEGIN
     DELETE FROM
         editables
     WHERE
-        id = OLD.id;
+        id = OLD .id;
 
-    RETURN OLD;
+RETURN OLD;
 
 END;
 

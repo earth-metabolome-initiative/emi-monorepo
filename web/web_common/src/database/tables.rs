@@ -3919,13 +3919,17 @@ impl LocationState {
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Location {
     pub id: Uuid,
-    pub latitude: Option<f64>,
-    pub longitude: Option<f64>,
-    pub altitude: Option<f64>,
+    pub latitude_degrees: Option<i32>,
+    pub latitude_minutes: Option<i32>,
+    pub latitude_seconds: Option<i32>,
+    pub longitude_degrees: Option<i32>,
+    pub longitude_minutes: Option<i32>,
+    pub longitude_seconds: Option<i32>,
+    pub altitude: Option<i32>,
     pub address: Option<String>,
     pub geolocalization_device_id: Option<Uuid>,
     pub altitude_device_id: Option<Uuid>,
@@ -3937,12 +3941,28 @@ impl Location {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
             gluesql::core::ast_builder::uuid(self.id.to_string()),
-            match self.latitude {
-                Some(latitude) => gluesql::core::ast_builder::num(latitude),
+            match self.latitude_degrees {
+                Some(latitude_degrees) => gluesql::core::ast_builder::num(latitude_degrees),
                 None => gluesql::core::ast_builder::null(),
             },
-            match self.longitude {
-                Some(longitude) => gluesql::core::ast_builder::num(longitude),
+            match self.latitude_minutes {
+                Some(latitude_minutes) => gluesql::core::ast_builder::num(latitude_minutes),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.latitude_seconds {
+                Some(latitude_seconds) => gluesql::core::ast_builder::num(latitude_seconds),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.longitude_degrees {
+                Some(longitude_degrees) => gluesql::core::ast_builder::num(longitude_degrees),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.longitude_minutes {
+                Some(longitude_minutes) => gluesql::core::ast_builder::num(longitude_minutes),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.longitude_seconds {
+                Some(longitude_seconds) => gluesql::core::ast_builder::num(longitude_seconds),
                 None => gluesql::core::ast_builder::null(),
             },
             match self.altitude {
@@ -3985,7 +4005,7 @@ impl Location {
         use gluesql::core::ast_builder::*;
         table("locations")
             .insert()
-            .columns("id, latitude, longitude, altitude, address, geolocalization_device_id, altitude_device_id, parent_location_id, state_id")
+            .columns("id, latitude_degrees, latitude_minutes, latitude_seconds, longitude_degrees, longitude_minutes, longitude_seconds, altitude, address, geolocalization_device_id, altitude_device_id, parent_location_id, state_id")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -4011,7 +4031,7 @@ impl Location {
         let select_row = table("locations")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, latitude, longitude, altitude, address, geolocalization_device_id, altitude_device_id, parent_location_id, state_id")
+            .project("id, latitude_degrees, latitude_minutes, latitude_seconds, longitude_degrees, longitude_minutes, longitude_seconds, altitude, address, geolocalization_device_id, altitude_device_id, parent_location_id, state_id")
             .limit(1)
             .execute(connection)
             .await?;
@@ -4081,11 +4101,23 @@ impl Location {
             .update()        
 .set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
 .set("state_id", gluesql::core::ast_builder::uuid(self.state_id.to_string()));
-        if let Some(latitude) = self.latitude {
-            update_row = update_row.set("latitude", gluesql::core::ast_builder::num(latitude));
+        if let Some(latitude_degrees) = self.latitude_degrees {
+            update_row = update_row.set("latitude_degrees", gluesql::core::ast_builder::num(latitude_degrees));
         }
-        if let Some(longitude) = self.longitude {
-            update_row = update_row.set("longitude", gluesql::core::ast_builder::num(longitude));
+        if let Some(latitude_minutes) = self.latitude_minutes {
+            update_row = update_row.set("latitude_minutes", gluesql::core::ast_builder::num(latitude_minutes));
+        }
+        if let Some(latitude_seconds) = self.latitude_seconds {
+            update_row = update_row.set("latitude_seconds", gluesql::core::ast_builder::num(latitude_seconds));
+        }
+        if let Some(longitude_degrees) = self.longitude_degrees {
+            update_row = update_row.set("longitude_degrees", gluesql::core::ast_builder::num(longitude_degrees));
+        }
+        if let Some(longitude_minutes) = self.longitude_minutes {
+            update_row = update_row.set("longitude_minutes", gluesql::core::ast_builder::num(longitude_minutes));
+        }
+        if let Some(longitude_seconds) = self.longitude_seconds {
+            update_row = update_row.set("longitude_seconds", gluesql::core::ast_builder::num(longitude_seconds));
         }
         if let Some(altitude) = self.altitude {
             update_row = update_row.set("altitude", gluesql::core::ast_builder::num(altitude));
@@ -4143,7 +4175,7 @@ impl Location {
         use gluesql::core::ast_builder::*;
         let select_row = table("locations")
             .select()
-            .project("id, latitude, longitude, altitude, address, geolocalization_device_id, altitude_device_id, parent_location_id, state_id")
+            .project("id, latitude_degrees, latitude_minutes, latitude_seconds, longitude_degrees, longitude_minutes, longitude_seconds, altitude, address, geolocalization_device_id, altitude_device_id, parent_location_id, state_id")
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -4157,20 +4189,40 @@ impl Location {
                 gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
                 _ => unreachable!("Expected Uuid"),
             },
-            latitude: match row.get("latitude").unwrap() {
+            latitude_degrees: match row.get("latitude_degrees").unwrap() {
                 gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::F64(latitude) => Some(latitude.clone()),
-                _ => unreachable!("Expected F64")
+                gluesql::prelude::Value::I32(latitude_degrees) => Some(latitude_degrees.clone()),
+                _ => unreachable!("Expected I32")
             },
-            longitude: match row.get("longitude").unwrap() {
+            latitude_minutes: match row.get("latitude_minutes").unwrap() {
                 gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::F64(longitude) => Some(longitude.clone()),
-                _ => unreachable!("Expected F64")
+                gluesql::prelude::Value::I32(latitude_minutes) => Some(latitude_minutes.clone()),
+                _ => unreachable!("Expected I32")
+            },
+            latitude_seconds: match row.get("latitude_seconds").unwrap() {
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::I32(latitude_seconds) => Some(latitude_seconds.clone()),
+                _ => unreachable!("Expected I32")
+            },
+            longitude_degrees: match row.get("longitude_degrees").unwrap() {
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::I32(longitude_degrees) => Some(longitude_degrees.clone()),
+                _ => unreachable!("Expected I32")
+            },
+            longitude_minutes: match row.get("longitude_minutes").unwrap() {
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::I32(longitude_minutes) => Some(longitude_minutes.clone()),
+                _ => unreachable!("Expected I32")
+            },
+            longitude_seconds: match row.get("longitude_seconds").unwrap() {
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::I32(longitude_seconds) => Some(longitude_seconds.clone()),
+                _ => unreachable!("Expected I32")
             },
             altitude: match row.get("altitude").unwrap() {
                 gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::F64(altitude) => Some(altitude.clone()),
-                _ => unreachable!("Expected F64")
+                gluesql::prelude::Value::I32(altitude) => Some(altitude.clone()),
+                _ => unreachable!("Expected I32")
             },
             address: match row.get("address").unwrap() {
                 gluesql::prelude::Value::Null => None,
@@ -7350,7 +7402,7 @@ impl ProjectState {
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Project {
     pub id: Uuid,
@@ -7359,8 +7411,8 @@ pub struct Project {
     pub public: bool,
     pub state_id: Uuid,
     pub parent_project_id: Option<Uuid>,
-    pub budget: Option<f64>,
-    pub expenses: Option<f64>,
+    pub budget: Option<i64>,
+    pub expenses: Option<i64>,
     pub created_by: Uuid,
     pub created_at: NaiveDateTime,
     pub expected_end_date: Option<NaiveDateTime>,
@@ -7610,13 +7662,13 @@ impl Project {
             },
             budget: match row.get("budget").unwrap() {
                 gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::F64(budget) => Some(budget.clone()),
-                _ => unreachable!("Expected F64")
+                gluesql::prelude::Value::I64(budget) => Some(budget.clone()),
+                _ => unreachable!("Expected I64")
             },
             expenses: match row.get("expenses").unwrap() {
                 gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::F64(expenses) => Some(expenses.clone()),
-                _ => unreachable!("Expected F64")
+                gluesql::prelude::Value::I64(expenses) => Some(expenses.clone()),
+                _ => unreachable!("Expected I64")
             },
             created_by: match row.get("created_by").unwrap() {
                 gluesql::prelude::Value::Uuid(created_by) => Uuid::from_u128(*created_by),

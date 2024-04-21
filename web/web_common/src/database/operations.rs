@@ -28,10 +28,7 @@ impl Authorization {
 impl View {
     pub fn roles(&self) -> Vec<Role> {
         match self {
-            View::DocumentsView => vec![Role::Viewer],
             View::PublicUser => vec![Role::Anonymous],
-            View::EditsView => vec![Role::Editor],
-            View::LastEditsView => vec![Role::Editor],
             View::FormatsView => vec![Role::Viewer],
         }
     }

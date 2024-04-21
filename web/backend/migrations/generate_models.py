@@ -56,7 +56,7 @@ will make use of the full path to the struct in the `web_common` crate so to avo
 
 """
 
-from typing import List, Dict, Tuple, Any
+from typing import List, Dict, Tuple, Any, Optional
 import psycopg2
 import compress_json
 import os
@@ -100,6 +100,30 @@ class PGIndices:
                 return index
         return None
 
+class AttributeMetadata:
+
+    def __init__(self, attribute_name: str, data_type: str, optional: bool, boxed: bool):
+        self.attribute_name = attribute_name
+        self.data_type = data_type
+        self.optional = optional
+        self.boxed = boxed
+
+class StructMetadata:
+
+    def __init__(self, struct_name: str, primary_table_name: str):
+        self.struct_name = struct_name
+        self.primary_table_name = primary_table_name
+        self.attributes: List[AttributeMetadata] = []
+        self.derives: List[str] = []
+
+    def add_attribute(self, attribute_metadata: AttributeMetadata):
+        self.attributes.append(attribute_metadata)
+
+    def add_derive(self, derive: str):
+        self.derives.append(derive)
+
+    def contains_boxed_fields(self) -> bool:
+        return any(attribute.boxed for attribute in self.attributes)
 
 def get_cursor():
     """Get the cursor to the database."""
@@ -162,6 +186,88 @@ class TableMetadata:
     def __init__(self, table_metadata: pd.DataFrame):
         self.table_metadata = table_metadata
 
+    def is_view(self, table_name: str) -> bool:
+        """Returns whether the table is a view."""
+        conn, cursor = get_cursor()
+        cursor.execute(
+            f"""
+            SELECT
+                table_name
+            FROM
+                information_schema.tables
+            WHERE
+                table_name = '{table_name}'
+                AND table_type = 'VIEW';
+            """
+        )
+        is_view = cursor.fetchone() is not None
+        cursor.close()
+        conn.close()
+        return is_view
+
+    def extract_view_columns(self, view_name: str) -> List[Tuple[str, str, str]]:
+        """Returns list of columns, their alias and the original table name from a provided view name.
+        
+        # Example
+        Suppose you have a simple view creation statement like this:
+
+        ```sql
+        CREATE VIEW view_name AS
+        SELECT
+            table_name.column_name AS alias_name
+        FROM
+            table_name;
+        ```
+
+        This function will return a list of tuples like this:
+            
+            ```python
+            [("column_name", "alias_name", "table_name")]
+            ```
+        """
+        conn, cursor = get_cursor()
+        cursor.execute(
+            f"""
+            SELECT
+                view_definition
+            FROM
+                information_schema.views
+            WHERE
+                table_name = '{view_name}';
+            """
+        )
+        view_definition = cursor.fetchall()
+        cursor.close()
+        conn.close()
+
+        if len(view_definition) == 0:
+            raise ValueError(f"The view {view_name} does not exist.")
+
+        view_definition = view_definition[0][0]
+        view_definition = view_definition.replace("\n", " ")
+
+        # Extract the columns from the view definition
+        columns = re.findall(r"SELECT (.*?) FROM", view_definition)[0]
+        columns = columns.split(", ")
+
+        extracted_columns = []
+        for column in columns:
+            if " AS " in column:
+                original_column_name, alias_column_name = column.split(" AS ")
+                if "." in original_column_name:
+                    original_table_name, original_column_name = original_column_name.split(".")
+                else:
+                    continue
+                extracted_columns.append((original_column_name.strip(), alias_column_name.strip(), original_table_name.strip()))
+            else:
+                if "." in column:
+                    original_table_name, original_column_name = column.split(".")
+                else:
+                    continue
+                extracted_columns.append((original_column_name.strip(), original_column_name.strip(), original_table_name.strip()))
+
+        return extracted_columns
+
     def has_foreign_keys(self, table_name: str) -> bool:
         """Returns whether the table has foreign keys.
 
@@ -177,6 +283,12 @@ class TableMetadata:
         `referenced_table` column. If any of the columns have a non-null
         value, then the table has foreign keys.
         """
+        if self.is_view(table_name):
+            for original_column_name, alias_column_name, original_table_name in self.extract_view_columns(table_name):
+                if original_column_name in self.get_foreign_keys(original_table_name):
+                    return True
+            return False
+
         primary_key_name, _ = self.get_primary_key_name_and_type(table_name)
         foreign_keys = self.get_foreign_keys(table_name)
         return any(
@@ -199,6 +311,13 @@ class TableMetadata:
         `referenced_table` column. These columns are the foreign keys
         of the table.
         """
+        if self.is_view(table_name):
+            foreign_keys = []
+            for original_column_name, alias_column_name, original_table_name in self.extract_view_columns(table_name):
+                if original_column_name in self.get_foreign_keys(original_table_name):
+                    foreign_keys.append(alias_column_name)
+            return foreign_keys
+
         table_columns = self.table_metadata[
             self.table_metadata["referencing_table"] == table_name
         ]
@@ -222,6 +341,11 @@ class TableMetadata:
         in the table metadata associated with the table name and column
         name. This value is the table that the foreign key references.
         """
+        if self.is_view(table_name):
+            for original_column_name, alias_column_name, original_table_name in self.extract_view_columns(table_name):
+                if alias_column_name == column_name:
+                    return self.get_foreign_key_table_name(original_table_name, original_column_name)
+            raise ValueError(f"The column {column_name} does not exist in the view {table_name}.")
         table_columns = self.table_metadata[
             (self.table_metadata["referencing_table"] == table_name) &
             (self.table_metadata["referencing_column"] == column_name)
@@ -248,8 +372,22 @@ class TableMetadata:
         """
         return self.has_foreign_keys(self.get_foreign_key_table_name(table_name, foreign_key_column))
 
+    def has_primary_key(self, table_name: str) -> bool:
+        """Returns whether the table has a primary key.
 
-    def get_primary_key_name_and_type(self, table_name: str) -> Tuple[str, str]:
+        Parameters
+        ----------
+        table_name : str
+            The name of the table.
+
+        Implementation details
+        ----------------------
+        This method returns whether the table metadata associated with
+        the table name has a non-null value in the `column_key` column.
+        """
+        return self.get_primary_key_name_and_type(table_name) is not None
+
+    def get_primary_key_name_and_type(self, table_name: str) -> Optional[Tuple[str, str]]:
         """Returns the name and type of the primary key of the table.
 
         Parameters
@@ -264,6 +402,8 @@ class TableMetadata:
         `PRI` in the `column_key` column. This column is the primary key
         of the table.
         """
+        if self.is_view(table_name):
+            return None
         conn, cursor = get_cursor()
 
         cursor.execute(
@@ -538,7 +678,7 @@ def write_from_impls(
     elif table_type == "views":
         capitalized_table_type = "View"
 
-    table_deribes = "#[derive(" "Deserialize, Serialize, Clone, Debug, PartialEq" ")]\n"
+    table_deribes = "#[derive(Deserialize, Serialize, Clone, Debug, PartialEq)]\n"
 
     # We start by writing the enumeration
     new_content += table_deribes
@@ -819,7 +959,9 @@ def write_from_impls(
 
 
 def write_web_common_structs(
-    path: str, target: str, enumeration: str
+    path: str,
+    target: str,
+    enumeration: str
 ) -> Dict[str, Dict[str, str]]:
     """Write the structs in the target file in the `web_common` crate.
 
@@ -1945,7 +2087,8 @@ def generate_nested_structs(
     path: str,
     struct_name: str,
     struct_metadatas: Dict[str, Any],
-):
+    struct_table_metadatas: Optional[Dict[str, Any]] = None
+) -> List[StructMetadata]:
     """Generate the nested structs.
 
     Implementative details
@@ -1959,6 +2102,9 @@ def generate_nested_structs(
     For each table, we query the postgres to get the foreign keys. We then generate the nested
     structs for the referenced tables. The nested structs are written to the file `src/models.rs`.
     """
+    if struct_table_metadatas is None:
+        struct_table_metadatas = struct_metadatas
+
     tables_metadata = find_foreign_keys()
     similarity_indices: PGIndices = find_pg_trgm_indices()
 
@@ -1980,10 +2126,8 @@ def generate_nested_structs(
 
     # We start with the necessary imports.
     imports = [
-        "use uuid::Uuid;",
         "use serde::Deserialize;",
         "use serde::Serialize;",
-        "use chrono::NaiveDateTime;",
         "use diesel::r2d2::ConnectionManager;",
         "use diesel::r2d2::PooledConnection;",
         "use crate::models::*;",
@@ -1993,10 +2137,15 @@ def generate_nested_structs(
         tables.write(f"{import_statement}\n")
 
     def get_struct_name_by_table_name(table_name: str) -> str:
+        for struct_name, struct_metadata in struct_table_metadatas.items():
+            if struct_metadata["table_name"] == table_name:
+                return struct_name
         for struct_name, struct_metadata in struct_metadatas.items():
             if struct_metadata["table_name"] == table_name:
                 return struct_name
         raise ValueError(f"Table name {table_name} not found in the struct metadata.")
+
+    new_struct_metadatas = []
 
     # For each of the struct, we generated the Nested{struct_name} version
     # if the struct contains a reference to another struct.
@@ -2009,26 +2158,56 @@ def generate_nested_structs(
         struct_attributes = struct_metadata["attributes"]
         foreign_keys = tables_metadata.get_foreign_keys(table_name)
 
-        # We implement the `get` method, which returns the nested struct
-        # from a provided row primary key.
-        primary_key_attribute, primary_key_type = tables_metadata.get_primary_key_name_and_type(
-            table_name
-        )
-        rust_primary_key_type = sql_type_to_rust_type(primary_key_type)
+        primary_key_attribute = None
+        if tables_metadata.has_primary_key(table_name):
+            # We implement the `get` method, which returns the nested struct
+            # from a provided row primary key.
+            primary_key_attribute, primary_key_type = tables_metadata.get_primary_key_name_and_type(
+                table_name
+            )
+            rust_primary_key_type = sql_type_to_rust_type(primary_key_type)
 
-        # If all of the foreign keys are equal to the primary key, we skip
-        # the struct as it is a self-referencing struct.
-        if all(fk == primary_key_attribute for fk in foreign_keys):
-            continue
+            # If all of the foreign keys are equal to the primary key, we skip
+            # the struct as it is a self-referencing struct.
+            if all(fk == primary_key_attribute for fk in foreign_keys):
+                continue
 
-        # The new list of attribute names and their types
-        new_struct_attributes = []
+            if primary_key_attribute not in foreign_keys:
+                foreign_keys.append(primary_key_attribute)
+        else:
+            # If the table does not have a primary key, as may happen in the context
+            # of a view, we use the attribyte `id` as the primary key.
+            for attribute in struct_attributes:
+                if attribute["field_name"] == "id":
+                    primary_key_attribute = "id"
+                    primary_key_type = attribute["field_type"]
+                    rust_primary_key_type = primary_key_type
+                    break
+            if primary_key_attribute is None:
+                raise ValueError(
+                    f"Table {table_name} does not have a primary key nor an `id` attribute. "
+                    f"It has the following attributes: {struct_attributes}"
+                )
+
+        nested_struct_name = f"Nested{struct_name}"
+        new_struct_metadata = StructMetadata(nested_struct_name, table_name)
 
         # We write the Nested{struct_name} struct
         tables.write(
-            f"#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]\n"
+            "#[derive("
+            "Debug, Clone, Serialize, Deserialize, PartialEq"
         )
-        nested_struct_name = f"Nested{struct_name}"
+        new_struct_metadata.add_derive("Debug")
+        new_struct_metadata.add_derive("Clone")
+        new_struct_metadata.add_derive("Serialize")
+        new_struct_metadata.add_derive("Deserialize")
+        new_struct_metadata.add_derive("PartialEq")
+        if not struct_metadata["contains_no_eq"]:
+            tables.write(", Eq")
+            new_struct_metadata.add_derive("Eq")
+        tables.write(")]\n")
+        new_struct_attributes = []
+
         tables.write(f"pub struct {nested_struct_name} {{\n")
         for attribute in struct_attributes:
             attribute_name = attribute["field_name"]
@@ -2039,15 +2218,19 @@ def generate_nested_structs(
             # with the foreign struct. This struct may be also nested if the foreign
             # table has foreign keys, which we check by using the `has_foreign_keys`
             # method of the `tables_metadata` object.
-            if attribute_name in foreign_keys and primary_key_attribute != attribute_name:
-                foreign_key_table_name = tables_metadata.get_foreign_key_table_name(
-                    table_name, attribute_name
-                )
-                foreign_struct_name = get_struct_name_by_table_name(foreign_key_table_name)
-                normalized_attribute_name = attribute_name
+            if attribute_name in foreign_keys:
+                if attribute_name == primary_key_attribute:
+                    foreign_struct_name = struct_name
+                    normalized_attribute_name = "inner"
+                else:
+                    foreign_key_table_name = tables_metadata.get_foreign_key_table_name(
+                        table_name, attribute_name
+                    )
+                    normalized_attribute_name = attribute_name
+                    foreign_struct_name = get_struct_name_by_table_name(foreign_key_table_name)
                 if normalized_attribute_name.endswith("_id"):
                     normalized_attribute_name = normalized_attribute_name[:-3]
-                if tables_metadata.foreign_key_table_has_foreign_keys(
+                if attribute_name != primary_key_attribute and tables_metadata.foreign_key_table_has_foreign_keys(
                     table_name, attribute_name
                 ):  
                     new_attribute_type = f"Nested{foreign_struct_name}"
@@ -2062,14 +2245,19 @@ def generate_nested_structs(
                         f"    pub {normalized_attribute_name}: {new_attribute_type},\n"
                     )
                     new_struct_attributes.append(
-                        (normalized_attribute_name, attribute_name, f"Nested{foreign_struct_name}", True, boxed, optional)
+                        (normalized_attribute_name, attribute_name, f"Nested{foreign_struct_name}", boxed, optional)
+                    )
+                    new_struct_metadata.add_attribute(
+                        AttributeMetadata(
+                            attribute_name=normalized_attribute_name,
+                            data_type=f"Nested{foreign_struct_name}",
+                            optional=optional,
+                            boxed=boxed,
+                        )
                     )
                 else:
                     new_attribute_type = foreign_struct_name
                     boxed = False
-                    if foreign_struct_name == struct_name:
-                        new_attribute_type = f"Box<{new_attribute_type}>"
-                        boxed = True
                     if optional:
                         new_attribute_type = f"Option<{new_attribute_type}>"
                         optional = True
@@ -2077,11 +2265,18 @@ def generate_nested_structs(
                         f"    pub {normalized_attribute_name}: {new_attribute_type},\n"
                     )
                     new_struct_attributes.append(
-                        (normalized_attribute_name, attribute_name, foreign_struct_name, True, boxed, optional)
+                        (normalized_attribute_name, attribute_name, foreign_struct_name, boxed, optional)
+                    )
+                    new_struct_metadata.add_attribute(
+                        AttributeMetadata(
+                            attribute_name=normalized_attribute_name,
+                            data_type=foreign_struct_name,
+                            optional=optional,
+                            boxed=boxed,
+                        )
                     )
             else:
-                tables.write(f"    pub {attribute_name}: {attribute_type},\n")
-                new_struct_attributes.append((attribute_name, attribute_name, attribute_type, False, False, False))
+                continue
         tables.write("}\n\n")
 
         tables.write(
@@ -2099,24 +2294,21 @@ def generate_nested_structs(
             f"        let flat_struct = {struct_name}::get(id, connection)?;\n"
             f"        Ok(Self {{\n"
         )
-        for attribute_name, original_attribute_name, attribute_type, foreign, boxed, optional in new_struct_attributes:
-            if foreign:
-                if optional:
-                    tables.write(
-                        f"            {attribute_name}: flat_struct.{original_attribute_name}.map(|flat_struct| {attribute_type}::get(flat_struct, connection)).transpose()?"
-                    )
-                    if boxed:
-                        tables.write(".map(Box::new)")
-                    tables.write(",\n")
-                else:
-                    tables.write(
-                        f"            {attribute_name}: {attribute_type}::get(flat_struct.{original_attribute_name}, connection)?"
-                    )
-                    if boxed:
-                        tables.write(".map(Box::new)")
-                    tables.write(",\n")
+        for attribute_name, original_attribute_name, attribute_type, boxed, optional in new_struct_attributes:
+            if optional:
+                tables.write(
+                    f"            {attribute_name}: flat_struct.{original_attribute_name}.map(|flat_struct| {attribute_type}::get(flat_struct, connection)).transpose()?"
+                )
+                if boxed:
+                    tables.write(".map(Box::new)")
+                tables.write(",\n")
             else:
-                tables.write(f"            {attribute_name}: flat_struct.{original_attribute_name},\n")
+                tables.write(
+                    f"            {attribute_name}: {attribute_type}::get(flat_struct.{original_attribute_name}, connection)?"
+                )
+                if boxed:
+                    tables.write(".map(Box::new)")
+                tables.write(",\n")
         tables.write(
             f"        }})\n"
             f"    }}\n"
@@ -2151,9 +2343,161 @@ def generate_nested_structs(
                 f"    }}\n"
                 f"}}\n"
             )
+        
+        # We implement the bidirectional From methods for the nested struct
+        # present in the web_common crate, which does not use Diesel or its
+        # structs, but the web_common version of the structs.
+        tables.write(
+            f"impl From<web_common::database::nested_models::Nested{struct_name}> for Nested{struct_name} {{\n"
+            f"    fn from(item: web_common::database::nested_models::Nested{struct_name}) -> Self {{\n"
+            f"        Self {{\n"
+        )
+        for attribute_name, original_attribute_name, attribute_type, boxed, optional in new_struct_attributes:
+            if optional:
+                tables.write(
+                    f"            {attribute_name}: item.{attribute_name}.map(|item| item.into())"
+                )
+                tables.write(",\n")
+            else:
+                tables.write(
+                    f"            {attribute_name}: item.{attribute_name}.into(),\n"
+                )
+        tables.write(
+            f"        }}\n"
+            f"    }}\n"
+            f"}}\n"
+        )
+
+        # If this struct contains boxed fields, we implement the From trait
+        # for the boxed versions of the nested structs.
+        if new_struct_metadata.contains_boxed_fields():
+            tables.write(
+                f"impl From<Box<web_common::database::nested_models::Nested{struct_name}>> for Box<Nested{struct_name}> {{\n"
+                f"    fn from(item: Box<web_common::database::nested_models::Nested{struct_name}>) -> Self {{\n"
+                f"        Box::new(Nested{struct_name} {{\n"
+            )
+            for attribute_name, original_attribute_name, attribute_type, boxed, optional in new_struct_attributes:
+                if optional:
+                    tables.write(
+                        f"            {attribute_name}: item.{attribute_name}.map(|item| item.into())"
+                    )
+                    tables.write(",\n")
+                else:
+                    tables.write(
+                        f"            {attribute_name}: item.{attribute_name}.into(),\n"
+                    )
+            tables.write(
+                f"        }})\n"
+                f"    }}\n"
+                f"}}\n"
+            )            
+
+        tables.write(
+            f"impl From<Nested{struct_name}> for web_common::database::nested_models::Nested{struct_name} {{\n"
+            f"    fn from(item: Nested{struct_name}) -> Self {{\n"
+            f"        Self {{\n"
+        )
+        for attribute_name, original_attribute_name, attribute_type, boxed, optional in new_struct_attributes:
+            if optional:
+                tables.write(
+                    f"            {attribute_name}: item.{attribute_name}.map(|item| item.into())"
+                )
+                tables.write(",\n")
+            else:
+                tables.write(
+                    f"            {attribute_name}: item.{attribute_name}.into(),\n"
+                )
+        tables.write(
+            f"        }}\n"
+            f"    }}\n"
+            f"}}\n"
+        )
+
+        # If this struct contains boxed fields, we implement the From trait
+        # for the boxed versions of the nested structs.
+        if new_struct_metadata.contains_boxed_fields():
+            tables.write(
+                f"impl From<Box<Nested{struct_name}>> for Box<web_common::database::nested_models::Nested{struct_name}> {{\n"
+                f"    fn from(item: Box<Nested{struct_name}>) -> Self {{\n"
+                f"        Box::new(web_common::database::nested_models::Nested{struct_name} {{\n"
+            )
+            for attribute_name, original_attribute_name, attribute_type, boxed, optional in new_struct_attributes:
+                if optional:
+                    tables.write(
+                        f"            {attribute_name}: item.{attribute_name}.map(|item| item.into())"
+                    )
+                    tables.write(",\n")
+                else:
+                    tables.write(
+                        f"            {attribute_name}: item.{attribute_name}.into(),\n"
+                    )
+            tables.write(
+                f"        }})\n"
+                f"    }}\n"
+                f"}}\n"
+            )
+
+        new_struct_metadatas.append(new_struct_metadata)
 
     tables.close()
 
+    return new_struct_metadatas
+
+def write_web_common_nested_structs(
+    path: str,
+    nested_structs: List[StructMetadata]
+):
+    """Writes the nested structs to the web_common crate."""
+
+    # We open the file to write the nested structs
+    tables = open(f"../web_common/src/database/{path}", "w")
+
+    # Preliminarly, we write a docstring at the very head
+    # of this submodule to explain what it does and warn the
+    # reader not to write anything in this file as it is
+    # automatically generated.
+    tables.write(
+        "//! This module contains the nested structs for the database tables.\n"
+    )
+    tables.write("//!\n")
+    tables.write(
+        "//! This file is automatically generated. Do not write anything here.\n"
+    )
+    tables.write("\n")
+
+    # We start with the necessary imports.
+    imports = [
+        "use serde::Deserialize;",
+        "use serde::Serialize;",
+        "use super::tables::*;",
+    ]
+
+    for import_statement in imports:
+        tables.write(f"{import_statement}\n")
+
+    for struct_metadata in nested_structs:
+        struct_name = struct_metadata.struct_name
+        table_name = struct_metadata.primary_table_name
+        attributes = struct_metadata.attributes
+
+        tables.write(
+            f"#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]\n"
+        )
+        tables.write(f"pub struct {struct_name} {{\n")
+        for attribute in attributes:
+            attribute_name = attribute.attribute_name
+            attribute_type = attribute.data_type
+            optional = attribute.optional
+            boxed = attribute.boxed
+            if boxed:
+                attribute_type = f"Box<{attribute_type}>"
+
+            if optional:
+                attribute_type = f"Option<{attribute_type}>"
+            tables.write(f"    pub {attribute_name}: {attribute_type},\n")
+        tables.write("}\n\n")
+
+    tables.close()
 
 def main():
     # Read the replacements from the JSON file
@@ -2228,12 +2572,14 @@ def main():
     complex_derives = [
         "Serialize",
         "Deserialize",
+        "Eq",
         "Insertable",
-        "PartialEq",
         "QueryableByName",
     ]
 
     deny_list = ["Interval", "Range<Numeric>", "Money"]
+
+    unequables = ["f32", "f64"]
 
     # Some derives are more complex, and we only add them if within
     # the struct we are currently processing there is NOT in the deny list.
@@ -2250,6 +2596,7 @@ def main():
             # types in the deny list in the next lines up until
             # we find the closing bracket of the struct.
             found_deny = False
+            found_unequable = False
 
             for look_ahead_line in content.split("\n")[line_number:]:
                 if "}" in look_ahead_line:
@@ -2259,9 +2606,15 @@ def main():
                     if deny in look_ahead_line:
                         found_deny = True
                         break
+                for unequable in unequables:
+                    if unequable in look_ahead_line:
+                        found_unequable = True
+                        break
             if not found_deny:
                 for derive in complex_derives:
-                    if derive not in line:
+                    if derive == "Eq" and found_unequable:
+                        continue
+                    if f", {derive}," not in line and f"({derive}," not in line:
                         line = line.replace("#[derive(", f"#[derive({derive}, ")
 
         new_content += line + "\n"
@@ -2337,4 +2690,6 @@ if __name__ == "__main__":
     write_from_impls("src/models.rs", "tables", table_structs)
     write_from_impls("src/views/views.rs", "views", view_structs)
 
-    generate_nested_structs("src/nested_models.rs", "tables", table_structs)
+    table_nested_structs: List[StructMetadata]  = generate_nested_structs("src/nested_models.rs", "tables", table_structs)
+    view_nested_structs: List[StructMetadata] = generate_nested_structs("src/views/nested_views.rs", "views", view_structs, table_structs)
+    write_web_common_nested_structs("nested_models.rs", table_nested_structs)

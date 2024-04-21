@@ -1,7 +1,7 @@
 use diesel::connection::SimpleConnection;
 use crate::models::*;
+use crate::nested_models::NestedDocument;
 use crate::schema::*;
-use crate::views::DocumentsView;
 use crate::DieselConn;
 use diesel::prelude::*;
 use diesel::r2d2::ConnectionManager;
@@ -41,6 +41,18 @@ impl Document {
         documents::dsl::documents
             .filter(documents::dsl::path.eq(path))
             .first::<Document>(conn)
+    }
+}
+
+
+impl NestedDocument {
+    pub fn internal_path(&self) -> String {
+        format!(
+            "{}/{}.{}",
+            std::env::var("DOCUMENTS_DIRECTORY").unwrap(),
+            self.inner.id,
+            self.format.mime_type
+        )
     }
 }
 
@@ -200,9 +212,9 @@ impl User {
             )?;
             // We attempt to save the profile picture and thumbnail
             let profile_picture_path =
-                DocumentsView::get( profile_picture_document.id, conn,)?.internal_path();
+                NestedDocument::get( profile_picture_document.id, conn,)?.internal_path();
             profile_picture.save_with_format(profile_picture_path, ImageFormat::Png)?;
-            let thumbnail_path = DocumentsView::get(thumbnail_document.id, conn)?.internal_path();
+            let thumbnail_path = NestedDocument::get(thumbnail_document.id, conn)?.internal_path();
             thumbnail.save_with_format(thumbnail_path, ImageFormat::Png)?;
             Ok(())
         })

@@ -8,8 +8,8 @@ CREATE TABLE projects (
     parent_project_id UUID REFERENCES projects(id) ON
     DELETE
         CASCADE,
-        budget FLOAT DEFAULT NULL,
-        expenses FLOAT DEFAULT NULL,
+        budget BIGINT DEFAULT NULL,
+        expenses BIGINT DEFAULT NULL,
         created_by UUID NOT NULL REFERENCES users(id),
         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         expected_end_date TIMESTAMP DEFAULT NULL,

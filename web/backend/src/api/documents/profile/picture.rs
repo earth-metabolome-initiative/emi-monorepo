@@ -7,7 +7,7 @@ use std::io::Read;
 use uuid::Uuid;
 use web_common::custom_validators::ImageSize;
 
-use crate::{views::DocumentsView, models::Document};
+use crate::{models::Document, nested_models::NestedDocument};
 
 #[get("/picture/{user_id}/{image_size}.png")]
 pub async fn user_picture_handler(
@@ -31,12 +31,12 @@ pub async fn user_picture_handler(
         Err(_) => return actix_web::HttpResponse::NotFound().finish(),
     };
     // Now with the document, we can obtain the complete DocumentView
-    let document_view = match DocumentsView::get(document.id, &mut conn) {
-        Ok(document_view) => document_view,
+    let document = match NestedDocument::get(document.id, &mut conn) {
+        Ok(document) => document,
         Err(_) => return actix_web::HttpResponse::InternalServerError().finish(),
     };
     // From the document view, we obtain the path to the image.
-    let image_path = document_view.internal_path();
+    let image_path = document.internal_path();
 
     // Finally, we return the image
     if let Ok(mut file) = File::open(image_path) {
@@ -45,7 +45,7 @@ pub async fn user_picture_handler(
         if let Ok(_) = file.read_to_end(&mut buffer) {
             // Set the content type to image/jpeg
             HttpResponse::Ok()
-                .content_type(document_view.mime_type)
+                .content_type(document.format.mime_type)
                 // Stream the image data as the response body
                 .body(buffer)
         } else {
