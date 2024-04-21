@@ -9,7 +9,7 @@ impl PublicUser {
         format!("{} {}", self.first_name, self.last_name)
     }
 
-    pub fn profile_picture_path(id: Uuid, image_size: &ImageSize) -> String {
+    pub fn profile_picture_path<I>(id: I, image_size: &ImageSize) -> String where I: ToString{
         format!(
             "{}/{}/{}.png",
             crate::api::documents::profile::picture::FULL_ENDPOINT,

@@ -5,7 +5,6 @@ use actix_web::{get, HttpResponse, Responder};
 
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
-use uuid::Uuid;
 
 use super::jwt_cookies::build_login_response;
 use crate::model_implementations::*;
@@ -22,7 +21,7 @@ use web_common::api::ApiError;
 struct GitHubConfig {
     client_id: String,
     client_secret: String,
-    provider_id: Uuid,
+    provider_id: i32,
 }
 
 impl GitHubConfig {
@@ -123,7 +122,7 @@ async fn github_oauth_handler(
         return HttpResponse::InternalServerError().json(ApiError::internal_server_error());
     }
 
-    let user_id = user_query.unwrap().id();
+    let user_id = user_query.unwrap().id;
 
     build_login_response(user_id, state, &redis_client).await
 }

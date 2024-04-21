@@ -12,7 +12,6 @@ use crate::models::*;
 use crate::transactions::renormalize_user_emails::Emails;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
-use uuid::Uuid;
 
 /// Return a newly created user.
 ///
@@ -26,7 +25,7 @@ use uuid::Uuid;
 /// If multiple emails are provided, each one of them is inserted
 /// separately into the user_emails table.
 pub(crate) fn create_user(
-    provider_id: Uuid,
+    provider_id: i32,
     new_user: NewUser,
     user_emails: Emails,
     pool: &Pool<ConnectionManager<PgConnection>>,

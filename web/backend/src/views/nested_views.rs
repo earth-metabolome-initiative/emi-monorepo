@@ -7,39 +7,3 @@ use serde::Serialize;
 use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::PooledConnection;
 use crate::models::*;
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
-pub struct NestedFormatsView {
-    pub inner: FormatsView,
-}
-
-impl NestedFormatsView {
-    /// Get the nested struct from the provided primary key.
-    ///
-    /// # Arguments
-    /// * `id` - The primary key of the row.
-    /// * `connection` - The database connection.
-    pub fn get(
-        id: Uuid,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-        let flat_struct = FormatsView::get(id, connection)?;
-        Ok(Self {
-            inner: FormatsView::get(flat_struct.id, connection)?,
-        })
-    }
-}
-impl From<web_common::database::nested_models::NestedFormatsView> for NestedFormatsView {
-    fn from(item: web_common::database::nested_models::NestedFormatsView) -> Self {
-        Self {
-            inner: item.inner.into(),
-        }
-    }
-}
-impl From<NestedFormatsView> for web_common::database::nested_models::NestedFormatsView {
-    fn from(item: NestedFormatsView) -> Self {
-        Self {
-            inner: item.inner.into(),
-        }
-    }
-}

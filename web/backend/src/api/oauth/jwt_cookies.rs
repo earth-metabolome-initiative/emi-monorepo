@@ -115,14 +115,14 @@ impl JWTConfig {
 
 #[derive(Deserialize, Serialize, PartialEq, Debug)]
 struct JsonWebToken {
-    sub: Uuid,
+    sub: i32,
     token_id: Uuid,
     exp: usize,
     created_at: usize,
 }
 
 impl JsonWebToken {
-    fn new(user_id: Uuid, minutes: i64) -> JsonWebToken {
+    fn new(user_id: i32, minutes: i64) -> JsonWebToken {
         let token_id = Uuid::new_v4();
         let now = Utc::now();
         let created_at = now.timestamp() as usize;
@@ -201,7 +201,7 @@ impl JsonWebToken {
             .map_err(|e| e.to_string())
     }
 
-    fn user_id(&self) -> Uuid {
+    fn user_id(&self) -> i32 {
         self.sub
     }
 
@@ -241,7 +241,7 @@ pub(crate) struct JsonRefreshToken {
 }
 
 impl JsonRefreshToken {
-    pub fn new(user_id: Uuid) -> Result<JsonRefreshToken, String> {
+    pub fn new(user_id: i32) -> Result<JsonRefreshToken, String> {
         let config = JWTConfig::from_env()?;
         Ok(JsonRefreshToken {
             web_token: JsonWebToken::new(user_id, config.refresh_token_minutes()),
@@ -278,7 +278,7 @@ impl JsonRefreshToken {
         self.web_token.delete_from_redis(redis_client).await
     }
 
-    pub fn user_id(&self) -> Uuid {
+    pub fn user_id(&self) -> i32 {
         self.web_token.user_id()
     }
 
@@ -308,7 +308,7 @@ mod refresh_token_tests {
     #[test]
     fn test_encode_decode() {
         dotenvy::dotenv().ok();
-        let user_id = Uuid::new_v4();
+        let user_id = 45678;
         let token = JsonRefreshToken::new(user_id).unwrap();
         let encoded = token.encode().unwrap();
         let decoded = JsonRefreshToken::decode(&encoded).unwrap();
@@ -322,7 +322,7 @@ pub(crate) struct JsonAccessToken {
 }
 
 impl JsonAccessToken {
-    pub fn new(user_id: Uuid) -> Result<JsonAccessToken, String> {
+    pub fn new(user_id: i32) -> Result<JsonAccessToken, String> {
         let config = JWTConfig::from_env()?;
         Ok(JsonAccessToken {
             web_token: JsonWebToken::new(user_id, config.access_token_minutes()),
@@ -359,7 +359,7 @@ impl JsonAccessToken {
         self.web_token.delete_from_redis(redis_client).await
     }
 
-    fn user_id(&self) -> Uuid {
+    fn user_id(&self) -> i32 {
         self.web_token.user_id()
     }
 
@@ -389,7 +389,7 @@ mod access_token_tests {
     #[test]
     fn test_encode_decode() {
         dotenvy::dotenv().ok();
-        let user_id = Uuid::new_v4();
+        let user_id = 987654;
         let token = JsonAccessToken::new(user_id).unwrap();
         let encoded = token.encode().unwrap();
         let decoded = JsonAccessToken::decode(&encoded).unwrap();
@@ -403,7 +403,7 @@ mod access_token_tests {
 /// * `user_id` - The ID of the user to create the JWT for.
 /// * `redis_client` - The redis client to use for the login.
 async fn encode_jwt_refresh_cookie<'a>(
-    user_id: Uuid,
+    user_id: i32,
     redis_client: &redis::Client,
 ) -> Result<Cookie<'a>, String> {
     log::info!("Creating refresh token");
@@ -452,7 +452,7 @@ fn encode_user_online_cookie<'a>() -> Result<Cookie<'a>, String> {
 /// * `state` - The state to redirect to after the login.
 /// * `redis_client` - The redis client to use for the login.
 pub(crate) async fn build_login_response<'a>(
-    user_id: Uuid,
+    user_id: i32,
     state: &str,
     redis_client: &redis::Client,
 ) -> HttpResponse {

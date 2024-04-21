@@ -6,54 +6,46 @@ use serde::Deserialize;
 use serde::Serialize;
 use super::tables::*;
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub struct NestedArchivable {
-    pub inner: Archivable,
-    pub archived_by: User,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct NestedContainerHorizontalRule {
     pub inner: ContainerHorizontalRule,
-    pub item_type: ItemCategory,
-    pub other_item_type: ItemCategory,
+    pub created_by: User,
+    pub item_type: NestedItemCategory,
+    pub other_item_type: NestedItemCategory,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct NestedContainerVerticalRule {
     pub inner: ContainerVerticalRule,
-    pub container_item_type: ItemCategory,
-    pub contained_item_type: ItemCategory,
+    pub created_by: User,
+    pub container_item_type: NestedItemCategory,
+    pub contained_item_type: NestedItemCategory,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct NestedDocument {
     pub inner: Document,
+    pub author: User,
     pub format: DocumentFormat,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub struct NestedEditable {
-    pub inner: Editable,
+pub struct NestedItemCategory {
+    pub inner: ItemCategory,
     pub created_by: User,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub struct NestedEdit {
-    pub inner: Edit,
-    pub editable: NestedEditable,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct NestedItemCategoryRelationship {
     pub inner: ItemCategoryRelationship,
-    pub parent: ItemCategory,
-    pub child: ItemCategory,
+    pub parent: NestedItemCategory,
+    pub child: NestedItemCategory,
+    pub added_by: User,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct NestedItemCategoryUnit {
     pub inner: ItemCategoryUnit,
-    pub item_category: ItemCategory,
+    pub item_category: NestedItemCategory,
     pub unit: Unit,
 }
 
@@ -78,8 +70,8 @@ pub struct NestedItemDiscreteQuantity {
 pub struct NestedItemLocation {
     pub inner: ItemLocation,
     pub item: Option<NestedItem>,
+    pub located_by: Option<User>,
     pub location: Option<NestedLocation>,
-    pub previous_location: Option<NestedLocation>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -101,7 +93,6 @@ pub struct NestedLocation {
     pub geolocalization_device: Option<NestedItem>,
     pub altitude_device: Option<NestedItem>,
     pub parent_location: Option<Box<NestedLocation>>,
-    pub state: LocationState,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -114,69 +105,45 @@ pub struct NestedManufacturedItemCategory {
 pub struct NestedNotification {
     pub inner: Notification,
     pub user: User,
-    pub row: Option<NestedEditable>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub struct NestedOrganizationAuthorization {
-    pub inner: OrganizationAuthorization,
-    pub organization: NestedOrganization,
-    pub editable: NestedEditable,
-    pub role: Role,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub struct NestedOrganizationLocation {
-    pub inner: OrganizationLocation,
-    pub organization: Option<NestedOrganization>,
-    pub location: Option<NestedLocation>,
-    pub previous_location: Option<Box<NestedOrganizationLocation>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct NestedOrganization {
     pub inner: Organization,
-    pub state: Option<OrganizationState>,
     pub parent_organization: Option<Box<NestedOrganization>>,
-    pub logo: Option<NestedDocument>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct NestedProcedureContinuousRequirement {
     pub inner: ProcedureContinuousRequirement,
-    pub procedure: Procedure,
-    pub item_category: ItemCategory,
+    pub created_by: User,
+    pub procedure: NestedProcedure,
+    pub item_category: NestedItemCategory,
     pub unit: Option<Unit>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct NestedProcedureDiscreteRequirement {
     pub inner: ProcedureDiscreteRequirement,
-    pub procedure: Procedure,
-    pub item_category: ItemCategory,
+    pub created_by: User,
+    pub procedure: NestedProcedure,
+    pub item_category: NestedItemCategory,
     pub unit: Option<Unit>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub struct NestedProjectContinuousRequirement {
-    pub inner: ProjectContinuousRequirement,
-    pub project: NestedProject,
-    pub item: ItemCategory,
-    pub unit: Option<Unit>,
+pub struct NestedProcedure {
+    pub inner: Procedure,
+    pub created_by: Option<User>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub struct NestedProjectDiscreteRequirement {
-    pub inner: ProjectDiscreteRequirement,
+pub struct NestedProjectRequirement {
+    pub inner: ProjectRequirement,
+    pub created_by: User,
     pub project: NestedProject,
-    pub item: ItemCategory,
+    pub item_category: NestedItemCategory,
     pub unit: Option<Unit>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub struct NestedProjectMilestone {
-    pub inner: ProjectMilestone,
-    pub project: NestedProject,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -190,6 +157,7 @@ pub struct NestedProject {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct NestedSampleTaxa {
     pub inner: SampleTaxa,
+    pub created_by: User,
     pub sample: NestedSample,
     pub taxon: Taxa,
 }
@@ -197,6 +165,7 @@ pub struct NestedSampleTaxa {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct NestedSampledIndividualTaxa {
     pub inner: SampledIndividualTaxa,
+    pub created_by: User,
     pub sampled_individual: SampledIndividual,
     pub taxon: Taxa,
 }
@@ -204,6 +173,7 @@ pub struct NestedSampledIndividualTaxa {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct NestedSample {
     pub inner: Sample,
+    pub created_by: Option<User>,
     pub derived_from: Option<Box<NestedSample>>,
 }
 
@@ -217,29 +187,13 @@ pub struct NestedSpectra {
 pub struct NestedSpectraCollection {
     pub inner: SpectraCollection,
     pub sample: NestedSample,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub struct NestedTeamAuthorization {
-    pub inner: TeamAuthorization,
-    pub team: NestedTeam,
-    pub editable: NestedEditable,
-    pub role: Role,
+    pub created_by: User,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct NestedTeam {
     pub inner: Team,
     pub parent_team: Option<Box<NestedTeam>>,
-    pub team_state: TeamState,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub struct NestedUserAuthorization {
-    pub inner: UserAuthorization,
-    pub user: User,
-    pub editable: NestedEditable,
-    pub role: Role,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]

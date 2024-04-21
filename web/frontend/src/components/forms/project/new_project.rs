@@ -1,14 +1,15 @@
 //! Component for the form requiring user name and surname.
 
 use crate::components::forms::*;
-use std::{ops::Deref, rc::Rc};
 use serde::{Deserialize, Serialize};
+use std::{ops::Deref, rc::Rc};
 use validator::Validate;
-use web_common::{api::form_traits::FormMethod, database::Project};
+use web_common::api::form_traits::FormMethod;
 use web_common::custom_validators::NotEmpty;
 use web_common::database::inserts::new_project::NewProjectName;
 use web_common::database::inserts::NewProject;
-use web_common::database::ProjectState;
+use web_common::database::*;
+use web_common::database::{NestedProject, ProjectState};
 use yew::prelude::*;
 use yewdux::{use_store, Reducer, Store};
 
@@ -18,7 +19,7 @@ pub struct NewProjectBuilder {
     pub name: NewProjectName,
     pub description: NotEmpty,
     pub public: bool,
-    pub parent_project: Option<Project>,
+    pub parent_project: Option<NestedProject>,
     pub project_state: Option<ProjectState>,
 }
 
@@ -55,7 +56,7 @@ pub enum NewProjectBuilderActions {
     SetName(NewProjectName),
     SetDescription(NotEmpty),
     SetPublic(bool),
-    SetParentProject(Option<Project>),
+    SetParentProject(Option<NestedProject>),
     SetProjectState(Option<ProjectState>),
 }
 
@@ -142,7 +143,7 @@ pub fn complete_profile_form() -> Html {
     let set_description = dispatch
         .apply_callback(|description| NewProjectBuilderActions::SetDescription(description));
     let set_public = dispatch.apply_callback(|public| NewProjectBuilderActions::SetPublic(public));
-    let set_parent_project = dispatch.apply_callback(|mut projects: Vec<Project>| {
+    let set_parent_project = dispatch.apply_callback(|mut projects: Vec<NestedProject>| {
         NewProjectBuilderActions::SetParentProject(projects.pop())
     });
     let set_project_state = dispatch.apply_callback(|mut project_states: Vec<ProjectState>| {
@@ -154,7 +155,7 @@ pub fn complete_profile_form() -> Html {
             <BasicInput<NewProjectName> label="Name" builder={set_name} value={store.name.clone()} input_type={InputType::Text} />
             <BasicInput<NotEmpty> label="Description" builder={set_description} value={store.description.clone()} input_type={InputType::Textarea} />
             <Checkbox label="Public" builder={set_public} value={store.public} />
-            <Datalist<web_common::database::Project> builder={set_parent_project} value={store.parent_project.clone().map_or_else(|| Vec::new(), |value| vec![value])} label="Project" />
+            <Datalist<Editable<web_common::database::NestedProject>> builder={set_parent_project} value={store.parent_project.clone().map_or_else(|| Vec::new(), |value| vec![value])} label="Project" />
             <Datalist<web_common::database::ProjectState> builder={set_project_state} value={store.project_state.clone().map_or_else(|| Vec::new(), |value| vec![value])} label="Project State" />
         </BasicForm<NewProject>>
     }

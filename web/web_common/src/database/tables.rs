@@ -5,219 +5,28 @@ use chrono::NaiveDateTime;
 use super::selects::Select;
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
-pub struct Archivable {
-    pub id: Uuid,
-    pub archived_at: NaiveDateTime,
-    pub archived_by: Uuid,
-}
-#[cfg(feature = "frontend")]
-impl Archivable {
-    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
-        vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
-            gluesql::core::ast_builder::timestamp(self.archived_at.to_string()),
-            gluesql::core::ast_builder::uuid(self.archived_by.to_string()),
-        ]
-    }
-
-    /// Insert the Archivable into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows inserted in table archivables
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("archivables")
-            .insert()
-            .columns("id, archived_at, archived_by")
-            .values(vec![self.into_row()])
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
-                 _ => unreachable!("Payload must be an Insert"),
-             })
-    }
-
-    /// Get Archivable from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of Archivable to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn get<C>(
-        id: Uuid,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Option<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("archivables")
-            .select()
-            .filter(col("id").eq(id.to_string()))
-            .project("id, archived_at, archived_by")
-            .limit(1)
-            .execute(connection)
-            .await?;
-         Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>()
-            .pop())
-    }
-
-    /// Delete Archivable from the database.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete_from_id<C>(
-        id: Uuid,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("archivables")
-            .delete()
-            .filter(col("id").eq(id.to_string()))
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
-                 _ => unreachable!("Payload must be a Delete"),
-             })
-    }
-
-    /// Delete the current instance of Archivable from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        Self::delete_from_id(self.id, connection).await
-    }
-    /// Update the struct in the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated.
-    pub async fn update<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("archivables")
-            .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
-.set("archived_at", gluesql::core::ast_builder::timestamp(self.archived_at.to_string()))        
-.set("archived_by", gluesql::core::ast_builder::uuid(self.archived_by.to_string()))            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
-                 _ => unreachable!("Expected Payload::Update")
-})
-    }
-
-    /// Update the struct in the database if it exists, otherwise insert it.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated or inserted.
-    pub async fn update_or_insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        let number_of_rows = self.clone().update(connection).await?;
-        if number_of_rows == 0 {
-            self.insert(connection).await
-        } else {
-            Ok(number_of_rows)
-        }
-    }
-    /// Get all Archivable from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn all<C>(
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("archivables")
-            .select()
-            .project("id, archived_at, archived_by")
-            .execute(connection)
-            .await?;
-        Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>())
-    }
-    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
-        Self {
-            id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
-            },
-            archived_at: match row.get("archived_at").unwrap() {
-                gluesql::prelude::Value::Timestamp(archived_at) => archived_at.clone(),
-                _ => unreachable!("Expected Timestamp")
-            },
-            archived_by: match row.get("archived_by").unwrap() {
-                gluesql::prelude::Value::Uuid(archived_by) => Uuid::from_u128(*archived_by),
-                _ => unreachable!("Expected Uuid"),
-            },
-        }
-    }
-}
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ContainerHorizontalRule {
-    pub id: Uuid,
-    pub item_type_id: Uuid,
-    pub other_item_type_id: Uuid,
-    pub minimum_temperature: Option<f64>,
-    pub maximum_temperature: Option<f64>,
-    pub minimum_humidity: Option<f64>,
-    pub maximum_humidity: Option<f64>,
-    pub minimum_pressure: Option<f64>,
-    pub maximum_pressure: Option<f64>,
+    pub id: i32,
+    pub created_by: i32,
+    pub name: String,
+    pub item_type_id: i32,
+    pub other_item_type_id: i32,
+    pub minimum_temperature: Option<i32>,
+    pub maximum_temperature: Option<i32>,
+    pub minimum_humidity: Option<i32>,
+    pub maximum_humidity: Option<i32>,
+    pub minimum_pressure: Option<i32>,
+    pub maximum_pressure: Option<i32>,
 }
 #[cfg(feature = "frontend")]
 impl ContainerHorizontalRule {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
-            gluesql::core::ast_builder::uuid(self.item_type_id.to_string()),
-            gluesql::core::ast_builder::uuid(self.other_item_type_id.to_string()),
+            gluesql::core::ast_builder::num(self.id),
+            gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::text(self.name),
+            gluesql::core::ast_builder::num(self.item_type_id),
+            gluesql::core::ast_builder::num(self.other_item_type_id),
             match self.minimum_temperature {
                 Some(minimum_temperature) => gluesql::core::ast_builder::num(minimum_temperature),
                 None => gluesql::core::ast_builder::null(),
@@ -261,7 +70,7 @@ impl ContainerHorizontalRule {
         use gluesql::core::ast_builder::*;
         table("container_horizontal_rules")
             .insert()
-            .columns("id, item_type_id, other_item_type_id, minimum_temperature, maximum_temperature, minimum_humidity, maximum_humidity, minimum_pressure, maximum_pressure")
+            .columns("id, created_by, name, item_type_id, other_item_type_id, minimum_temperature, maximum_temperature, minimum_humidity, maximum_humidity, minimum_pressure, maximum_pressure")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -278,7 +87,7 @@ impl ContainerHorizontalRule {
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -287,7 +96,7 @@ impl ContainerHorizontalRule {
         let select_row = table("container_horizontal_rules")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, item_type_id, other_item_type_id, minimum_temperature, maximum_temperature, minimum_humidity, maximum_humidity, minimum_pressure, maximum_pressure")
+            .project("id, created_by, name, item_type_id, other_item_type_id, minimum_temperature, maximum_temperature, minimum_humidity, maximum_humidity, minimum_pressure, maximum_pressure")
             .limit(1)
             .execute(connection)
             .await?;
@@ -307,7 +116,7 @@ impl ContainerHorizontalRule {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -355,9 +164,11 @@ impl ContainerHorizontalRule {
         use gluesql::core::ast_builder::*;
         let mut update_row = table("container_horizontal_rules")
             .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
-.set("item_type_id", gluesql::core::ast_builder::uuid(self.item_type_id.to_string()))        
-.set("other_item_type_id", gluesql::core::ast_builder::uuid(self.other_item_type_id.to_string()));
+.set("id", gluesql::core::ast_builder::num(self.id))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("name", gluesql::core::ast_builder::text(self.name))        
+.set("item_type_id", gluesql::core::ast_builder::num(self.item_type_id))        
+.set("other_item_type_id", gluesql::core::ast_builder::num(self.other_item_type_id));
         if let Some(minimum_temperature) = self.minimum_temperature {
             update_row = update_row.set("minimum_temperature", gluesql::core::ast_builder::num(minimum_temperature));
         }
@@ -417,7 +228,7 @@ impl ContainerHorizontalRule {
         use gluesql::core::ast_builder::*;
         let select_row = table("container_horizontal_rules")
             .select()
-            .project("id, item_type_id, other_item_type_id, minimum_temperature, maximum_temperature, minimum_humidity, maximum_humidity, minimum_pressure, maximum_pressure")
+            .project("id, created_by, name, item_type_id, other_item_type_id, minimum_temperature, maximum_temperature, minimum_humidity, maximum_humidity, minimum_pressure, maximum_pressure")
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -428,70 +239,82 @@ impl ContainerHorizontalRule {
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(id) => id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            name: match row.get("name").unwrap() {
+                gluesql::prelude::Value::Str(name) => name.clone(),
+                _ => unreachable!("Expected Str")
             },
             item_type_id: match row.get("item_type_id").unwrap() {
-                gluesql::prelude::Value::Uuid(item_type_id) => Uuid::from_u128(*item_type_id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(item_type_id) => item_type_id.clone(),
+                _ => unreachable!("Expected I32")
             },
             other_item_type_id: match row.get("other_item_type_id").unwrap() {
-                gluesql::prelude::Value::Uuid(other_item_type_id) => Uuid::from_u128(*other_item_type_id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(other_item_type_id) => other_item_type_id.clone(),
+                _ => unreachable!("Expected I32")
             },
             minimum_temperature: match row.get("minimum_temperature").unwrap() {
                 gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::F64(minimum_temperature) => Some(minimum_temperature.clone()),
-                _ => unreachable!("Expected F64")
+                gluesql::prelude::Value::I32(minimum_temperature) => Some(minimum_temperature.clone()),
+                _ => unreachable!("Expected I32")
             },
             maximum_temperature: match row.get("maximum_temperature").unwrap() {
                 gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::F64(maximum_temperature) => Some(maximum_temperature.clone()),
-                _ => unreachable!("Expected F64")
+                gluesql::prelude::Value::I32(maximum_temperature) => Some(maximum_temperature.clone()),
+                _ => unreachable!("Expected I32")
             },
             minimum_humidity: match row.get("minimum_humidity").unwrap() {
                 gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::F64(minimum_humidity) => Some(minimum_humidity.clone()),
-                _ => unreachable!("Expected F64")
+                gluesql::prelude::Value::I32(minimum_humidity) => Some(minimum_humidity.clone()),
+                _ => unreachable!("Expected I32")
             },
             maximum_humidity: match row.get("maximum_humidity").unwrap() {
                 gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::F64(maximum_humidity) => Some(maximum_humidity.clone()),
-                _ => unreachable!("Expected F64")
+                gluesql::prelude::Value::I32(maximum_humidity) => Some(maximum_humidity.clone()),
+                _ => unreachable!("Expected I32")
             },
             minimum_pressure: match row.get("minimum_pressure").unwrap() {
                 gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::F64(minimum_pressure) => Some(minimum_pressure.clone()),
-                _ => unreachable!("Expected F64")
+                gluesql::prelude::Value::I32(minimum_pressure) => Some(minimum_pressure.clone()),
+                _ => unreachable!("Expected I32")
             },
             maximum_pressure: match row.get("maximum_pressure").unwrap() {
                 gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::F64(maximum_pressure) => Some(maximum_pressure.clone()),
-                _ => unreachable!("Expected F64")
+                gluesql::prelude::Value::I32(maximum_pressure) => Some(maximum_pressure.clone()),
+                _ => unreachable!("Expected I32")
             },
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ContainerVerticalRule {
-    pub id: Uuid,
-    pub container_item_type_id: Uuid,
-    pub contained_item_type_id: Uuid,
-    pub minimum_temperature: Option<f64>,
-    pub maximum_temperature: Option<f64>,
-    pub minimum_humidity: Option<f64>,
-    pub maximum_humidity: Option<f64>,
-    pub minimum_pressure: Option<f64>,
-    pub maximum_pressure: Option<f64>,
+    pub id: i32,
+    pub created_by: i32,
+    pub name: String,
+    pub container_item_type_id: i32,
+    pub contained_item_type_id: i32,
+    pub minimum_temperature: Option<i32>,
+    pub maximum_temperature: Option<i32>,
+    pub minimum_humidity: Option<i32>,
+    pub maximum_humidity: Option<i32>,
+    pub minimum_pressure: Option<i32>,
+    pub maximum_pressure: Option<i32>,
 }
 #[cfg(feature = "frontend")]
 impl ContainerVerticalRule {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
-            gluesql::core::ast_builder::uuid(self.container_item_type_id.to_string()),
-            gluesql::core::ast_builder::uuid(self.contained_item_type_id.to_string()),
+            gluesql::core::ast_builder::num(self.id),
+            gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::text(self.name),
+            gluesql::core::ast_builder::num(self.container_item_type_id),
+            gluesql::core::ast_builder::num(self.contained_item_type_id),
             match self.minimum_temperature {
                 Some(minimum_temperature) => gluesql::core::ast_builder::num(minimum_temperature),
                 None => gluesql::core::ast_builder::null(),
@@ -535,7 +358,7 @@ impl ContainerVerticalRule {
         use gluesql::core::ast_builder::*;
         table("container_vertical_rules")
             .insert()
-            .columns("id, container_item_type_id, contained_item_type_id, minimum_temperature, maximum_temperature, minimum_humidity, maximum_humidity, minimum_pressure, maximum_pressure")
+            .columns("id, created_by, name, container_item_type_id, contained_item_type_id, minimum_temperature, maximum_temperature, minimum_humidity, maximum_humidity, minimum_pressure, maximum_pressure")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -552,7 +375,7 @@ impl ContainerVerticalRule {
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -561,7 +384,7 @@ impl ContainerVerticalRule {
         let select_row = table("container_vertical_rules")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, container_item_type_id, contained_item_type_id, minimum_temperature, maximum_temperature, minimum_humidity, maximum_humidity, minimum_pressure, maximum_pressure")
+            .project("id, created_by, name, container_item_type_id, contained_item_type_id, minimum_temperature, maximum_temperature, minimum_humidity, maximum_humidity, minimum_pressure, maximum_pressure")
             .limit(1)
             .execute(connection)
             .await?;
@@ -581,7 +404,7 @@ impl ContainerVerticalRule {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -629,9 +452,11 @@ impl ContainerVerticalRule {
         use gluesql::core::ast_builder::*;
         let mut update_row = table("container_vertical_rules")
             .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
-.set("container_item_type_id", gluesql::core::ast_builder::uuid(self.container_item_type_id.to_string()))        
-.set("contained_item_type_id", gluesql::core::ast_builder::uuid(self.contained_item_type_id.to_string()));
+.set("id", gluesql::core::ast_builder::num(self.id))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("name", gluesql::core::ast_builder::text(self.name))        
+.set("container_item_type_id", gluesql::core::ast_builder::num(self.container_item_type_id))        
+.set("contained_item_type_id", gluesql::core::ast_builder::num(self.contained_item_type_id));
         if let Some(minimum_temperature) = self.minimum_temperature {
             update_row = update_row.set("minimum_temperature", gluesql::core::ast_builder::num(minimum_temperature));
         }
@@ -691,7 +516,7 @@ impl ContainerVerticalRule {
         use gluesql::core::ast_builder::*;
         let select_row = table("container_vertical_rules")
             .select()
-            .project("id, container_item_type_id, contained_item_type_id, minimum_temperature, maximum_temperature, minimum_humidity, maximum_humidity, minimum_pressure, maximum_pressure")
+            .project("id, created_by, name, container_item_type_id, contained_item_type_id, minimum_temperature, maximum_temperature, minimum_humidity, maximum_humidity, minimum_pressure, maximum_pressure")
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -702,46 +527,54 @@ impl ContainerVerticalRule {
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(id) => id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            name: match row.get("name").unwrap() {
+                gluesql::prelude::Value::Str(name) => name.clone(),
+                _ => unreachable!("Expected Str")
             },
             container_item_type_id: match row.get("container_item_type_id").unwrap() {
-                gluesql::prelude::Value::Uuid(container_item_type_id) => Uuid::from_u128(*container_item_type_id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(container_item_type_id) => container_item_type_id.clone(),
+                _ => unreachable!("Expected I32")
             },
             contained_item_type_id: match row.get("contained_item_type_id").unwrap() {
-                gluesql::prelude::Value::Uuid(contained_item_type_id) => Uuid::from_u128(*contained_item_type_id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(contained_item_type_id) => contained_item_type_id.clone(),
+                _ => unreachable!("Expected I32")
             },
             minimum_temperature: match row.get("minimum_temperature").unwrap() {
                 gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::F64(minimum_temperature) => Some(minimum_temperature.clone()),
-                _ => unreachable!("Expected F64")
+                gluesql::prelude::Value::I32(minimum_temperature) => Some(minimum_temperature.clone()),
+                _ => unreachable!("Expected I32")
             },
             maximum_temperature: match row.get("maximum_temperature").unwrap() {
                 gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::F64(maximum_temperature) => Some(maximum_temperature.clone()),
-                _ => unreachable!("Expected F64")
+                gluesql::prelude::Value::I32(maximum_temperature) => Some(maximum_temperature.clone()),
+                _ => unreachable!("Expected I32")
             },
             minimum_humidity: match row.get("minimum_humidity").unwrap() {
                 gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::F64(minimum_humidity) => Some(minimum_humidity.clone()),
-                _ => unreachable!("Expected F64")
+                gluesql::prelude::Value::I32(minimum_humidity) => Some(minimum_humidity.clone()),
+                _ => unreachable!("Expected I32")
             },
             maximum_humidity: match row.get("maximum_humidity").unwrap() {
                 gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::F64(maximum_humidity) => Some(maximum_humidity.clone()),
-                _ => unreachable!("Expected F64")
+                gluesql::prelude::Value::I32(maximum_humidity) => Some(maximum_humidity.clone()),
+                _ => unreachable!("Expected I32")
             },
             minimum_pressure: match row.get("minimum_pressure").unwrap() {
                 gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::F64(minimum_pressure) => Some(minimum_pressure.clone()),
-                _ => unreachable!("Expected F64")
+                gluesql::prelude::Value::I32(minimum_pressure) => Some(minimum_pressure.clone()),
+                _ => unreachable!("Expected I32")
             },
             maximum_pressure: match row.get("maximum_pressure").unwrap() {
                 gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::F64(maximum_pressure) => Some(maximum_pressure.clone()),
-                _ => unreachable!("Expected F64")
+                gluesql::prelude::Value::I32(maximum_pressure) => Some(maximum_pressure.clone()),
+                _ => unreachable!("Expected I32")
             },
         }
     }
@@ -749,13 +582,13 @@ impl ContainerVerticalRule {
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ContinuousUnit {
-    pub id: Uuid,
+    pub id: i32,
 }
 #[cfg(feature = "frontend")]
 impl ContinuousUnit {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
+            gluesql::core::ast_builder::num(self.id),
         ]
     }
 
@@ -792,7 +625,7 @@ impl ContinuousUnit {
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -821,7 +654,7 @@ impl ContinuousUnit {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -869,7 +702,7 @@ impl ContinuousUnit {
         use gluesql::core::ast_builder::*;
         table("continuous_units")
             .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))            .execute(connection)
+.set("id", gluesql::core::ast_builder::num(self.id))            .execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -921,210 +754,8 @@ impl ContinuousUnit {
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
-            },
-        }
-    }
-}
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
-pub struct Describable {
-    pub id: Uuid,
-    pub name: String,
-    pub description: Option<String>,
-}
-#[cfg(feature = "frontend")]
-impl Describable {
-    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
-        vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
-            gluesql::core::ast_builder::text(self.name),
-            match self.description {
-                Some(description) => gluesql::core::ast_builder::text(description),
-                None => gluesql::core::ast_builder::null(),
-            },
-        ]
-    }
-
-    /// Insert the Describable into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows inserted in table describables
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("describables")
-            .insert()
-            .columns("id, name, description")
-            .values(vec![self.into_row()])
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
-                 _ => unreachable!("Payload must be an Insert"),
-             })
-    }
-
-    /// Get Describable from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of Describable to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn get<C>(
-        id: Uuid,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Option<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("describables")
-            .select()
-            .filter(col("id").eq(id.to_string()))
-            .project("id, name, description")
-            .limit(1)
-            .execute(connection)
-            .await?;
-         Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>()
-            .pop())
-    }
-
-    /// Delete Describable from the database.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete_from_id<C>(
-        id: Uuid,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("describables")
-            .delete()
-            .filter(col("id").eq(id.to_string()))
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
-                 _ => unreachable!("Payload must be a Delete"),
-             })
-    }
-
-    /// Delete the current instance of Describable from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        Self::delete_from_id(self.id, connection).await
-    }
-    /// Update the struct in the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated.
-    pub async fn update<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let mut update_row = table("describables")
-            .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
-.set("name", gluesql::core::ast_builder::text(self.name));
-        if let Some(description) = self.description {
-            update_row = update_row.set("description", gluesql::core::ast_builder::text(description));
-        }
-            update_row.execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
-                 _ => unreachable!("Expected Payload::Update")
-})
-    }
-
-    /// Update the struct in the database if it exists, otherwise insert it.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated or inserted.
-    pub async fn update_or_insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        let number_of_rows = self.clone().update(connection).await?;
-        if number_of_rows == 0 {
-            self.insert(connection).await
-        } else {
-            Ok(number_of_rows)
-        }
-    }
-    /// Get all Describable from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn all<C>(
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("describables")
-            .select()
-            .project("id, name, description")
-            .execute(connection)
-            .await?;
-        Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>())
-    }
-    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
-        Self {
-            id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
-            },
-            name: match row.get("name").unwrap() {
-                gluesql::prelude::Value::Str(name) => name.clone(),
-                _ => unreachable!("Expected Str")
-            },
-            description: match row.get("description").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Str(description) => Some(description.clone()),
-                _ => unreachable!("Expected Str")
+                gluesql::prelude::Value::I32(id) => id.clone(),
+                _ => unreachable!("Expected I32")
             },
         }
     }
@@ -1132,13 +763,13 @@ impl Describable {
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct DiscreteUnit {
-    pub id: Uuid,
+    pub id: i32,
 }
 #[cfg(feature = "frontend")]
 impl DiscreteUnit {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
+            gluesql::core::ast_builder::num(self.id),
         ]
     }
 
@@ -1175,7 +806,7 @@ impl DiscreteUnit {
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -1204,7 +835,7 @@ impl DiscreteUnit {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -1252,7 +883,7 @@ impl DiscreteUnit {
         use gluesql::core::ast_builder::*;
         table("discrete_units")
             .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))            .execute(connection)
+.set("id", gluesql::core::ast_builder::num(self.id))            .execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -1304,8 +935,8 @@ impl DiscreteUnit {
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(id) => id.clone(),
+                _ => unreachable!("Expected I32")
             },
         }
     }
@@ -1313,14 +944,16 @@ impl DiscreteUnit {
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct DocumentFormat {
-    pub id: Uuid,
+    pub id: i32,
+    pub extension: String,
     pub mime_type: String,
 }
 #[cfg(feature = "frontend")]
 impl DocumentFormat {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
+            gluesql::core::ast_builder::num(self.id),
+            gluesql::core::ast_builder::text(self.extension),
             gluesql::core::ast_builder::text(self.mime_type),
         ]
     }
@@ -1341,7 +974,7 @@ impl DocumentFormat {
         use gluesql::core::ast_builder::*;
         table("document_formats")
             .insert()
-            .columns("id, mime_type")
+            .columns("id, extension, mime_type")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -1358,7 +991,7 @@ impl DocumentFormat {
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -1367,7 +1000,7 @@ impl DocumentFormat {
         let select_row = table("document_formats")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, mime_type")
+            .project("id, extension, mime_type")
             .limit(1)
             .execute(connection)
             .await?;
@@ -1387,7 +1020,7 @@ impl DocumentFormat {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -1435,7 +1068,8 @@ impl DocumentFormat {
         use gluesql::core::ast_builder::*;
         table("document_formats")
             .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
+.set("id", gluesql::core::ast_builder::num(self.id))        
+.set("extension", gluesql::core::ast_builder::text(self.extension))        
 .set("mime_type", gluesql::core::ast_builder::text(self.mime_type))            .execute(connection)
             .await
              .map(|payload| match payload {
@@ -1477,7 +1111,7 @@ impl DocumentFormat {
         use gluesql::core::ast_builder::*;
         let select_row = table("document_formats")
             .select()
-            .project("id, mime_type")
+            .project("id, extension, mime_type")
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -1488,8 +1122,12 @@ impl DocumentFormat {
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(id) => id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            extension: match row.get("extension").unwrap() {
+                gluesql::prelude::Value::Str(extension) => extension.clone(),
+                _ => unreachable!("Expected Str")
             },
             mime_type: match row.get("mime_type").unwrap() {
                 gluesql::prelude::Value::Str(mime_type) => mime_type.clone(),
@@ -1502,8 +1140,9 @@ impl DocumentFormat {
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Document {
     pub id: Uuid,
+    pub author_id: i32,
     pub path: String,
-    pub format_id: Uuid,
+    pub format_id: i32,
     pub bytes: i32,
 }
 #[cfg(feature = "frontend")]
@@ -1511,8 +1150,9 @@ impl Document {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
             gluesql::core::ast_builder::uuid(self.id.to_string()),
+            gluesql::core::ast_builder::num(self.author_id),
             gluesql::core::ast_builder::text(self.path),
-            gluesql::core::ast_builder::uuid(self.format_id.to_string()),
+            gluesql::core::ast_builder::num(self.format_id),
             gluesql::core::ast_builder::num(self.bytes),
         ]
     }
@@ -1533,7 +1173,7 @@ impl Document {
         use gluesql::core::ast_builder::*;
         table("documents")
             .insert()
-            .columns("id, path, format_id, bytes")
+            .columns("id, author_id, path, format_id, bytes")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -1550,7 +1190,7 @@ impl Document {
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -1559,7 +1199,7 @@ impl Document {
         let select_row = table("documents")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, path, format_id, bytes")
+            .project("id, author_id, path, format_id, bytes")
             .limit(1)
             .execute(connection)
             .await?;
@@ -1579,7 +1219,7 @@ impl Document {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -1628,8 +1268,9 @@ impl Document {
         table("documents")
             .update()        
 .set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
+.set("author_id", gluesql::core::ast_builder::num(self.author_id))        
 .set("path", gluesql::core::ast_builder::text(self.path))        
-.set("format_id", gluesql::core::ast_builder::uuid(self.format_id.to_string()))        
+.set("format_id", gluesql::core::ast_builder::num(self.format_id))        
 .set("bytes", gluesql::core::ast_builder::num(self.bytes))            .execute(connection)
             .await
              .map(|payload| match payload {
@@ -1671,7 +1312,7 @@ impl Document {
         use gluesql::core::ast_builder::*;
         let select_row = table("documents")
             .select()
-            .project("id, path, format_id, bytes")
+            .project("id, author_id, path, format_id, bytes")
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -1685,13 +1326,17 @@ impl Document {
                 gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
                 _ => unreachable!("Expected Uuid"),
             },
+            author_id: match row.get("author_id").unwrap() {
+                gluesql::prelude::Value::I32(author_id) => author_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
             path: match row.get("path").unwrap() {
                 gluesql::prelude::Value::Str(path) => path.clone(),
                 _ => unreachable!("Expected Str")
             },
             format_id: match row.get("format_id").unwrap() {
-                gluesql::prelude::Value::Uuid(format_id) => Uuid::from_u128(*format_id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(format_id) => format_id.clone(),
+                _ => unreachable!("Expected I32")
             },
             bytes: match row.get("bytes").unwrap() {
                 gluesql::prelude::Value::I32(bytes) => bytes.clone(),
@@ -1702,397 +1347,20 @@ impl Document {
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
-pub struct Editable {
-    pub id: Uuid,
-    pub created_at: NaiveDateTime,
-    pub created_by: Uuid,
-}
-#[cfg(feature = "frontend")]
-impl Editable {
-    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
-        vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
-            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
-            gluesql::core::ast_builder::uuid(self.created_by.to_string()),
-        ]
-    }
-
-    /// Insert the Editable into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows inserted in table editables
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("editables")
-            .insert()
-            .columns("id, created_at, created_by")
-            .values(vec![self.into_row()])
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
-                 _ => unreachable!("Payload must be an Insert"),
-             })
-    }
-
-    /// Get Editable from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of Editable to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn get<C>(
-        id: Uuid,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Option<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("editables")
-            .select()
-            .filter(col("id").eq(id.to_string()))
-            .project("id, created_at, created_by")
-            .limit(1)
-            .execute(connection)
-            .await?;
-         Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>()
-            .pop())
-    }
-
-    /// Delete Editable from the database.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete_from_id<C>(
-        id: Uuid,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("editables")
-            .delete()
-            .filter(col("id").eq(id.to_string()))
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
-                 _ => unreachable!("Payload must be a Delete"),
-             })
-    }
-
-    /// Delete the current instance of Editable from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        Self::delete_from_id(self.id, connection).await
-    }
-    /// Update the struct in the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated.
-    pub async fn update<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("editables")
-            .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
-.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
-.set("created_by", gluesql::core::ast_builder::uuid(self.created_by.to_string()))            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
-                 _ => unreachable!("Expected Payload::Update")
-})
-    }
-
-    /// Update the struct in the database if it exists, otherwise insert it.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated or inserted.
-    pub async fn update_or_insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        let number_of_rows = self.clone().update(connection).await?;
-        if number_of_rows == 0 {
-            self.insert(connection).await
-        } else {
-            Ok(number_of_rows)
-        }
-    }
-    /// Get all Editable from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn all<C>(
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("editables")
-            .select()
-            .project("id, created_at, created_by")
-            .execute(connection)
-            .await?;
-        Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>())
-    }
-    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
-        Self {
-            id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
-            },
-            created_at: match row.get("created_at").unwrap() {
-                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
-                _ => unreachable!("Expected Timestamp")
-            },
-            created_by: match row.get("created_by").unwrap() {
-                gluesql::prelude::Value::Uuid(created_by) => Uuid::from_u128(*created_by),
-                _ => unreachable!("Expected Uuid"),
-            },
-        }
-    }
-}
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
-pub struct Edit {
-    pub id: Uuid,
-    pub editable_id: Uuid,
-}
-#[cfg(feature = "frontend")]
-impl Edit {
-    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
-        vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
-            gluesql::core::ast_builder::uuid(self.editable_id.to_string()),
-        ]
-    }
-
-    /// Insert the Edit into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows inserted in table edits
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("edits")
-            .insert()
-            .columns("id, editable_id")
-            .values(vec![self.into_row()])
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
-                 _ => unreachable!("Payload must be an Insert"),
-             })
-    }
-
-    /// Get Edit from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of Edit to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn get<C>(
-        id: Uuid,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Option<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("edits")
-            .select()
-            .filter(col("id").eq(id.to_string()))
-            .project("id, editable_id")
-            .limit(1)
-            .execute(connection)
-            .await?;
-         Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>()
-            .pop())
-    }
-
-    /// Delete Edit from the database.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete_from_id<C>(
-        id: Uuid,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("edits")
-            .delete()
-            .filter(col("id").eq(id.to_string()))
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
-                 _ => unreachable!("Payload must be a Delete"),
-             })
-    }
-
-    /// Delete the current instance of Edit from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        Self::delete_from_id(self.id, connection).await
-    }
-    /// Update the struct in the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated.
-    pub async fn update<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("edits")
-            .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
-.set("editable_id", gluesql::core::ast_builder::uuid(self.editable_id.to_string()))            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
-                 _ => unreachable!("Expected Payload::Update")
-})
-    }
-
-    /// Update the struct in the database if it exists, otherwise insert it.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated or inserted.
-    pub async fn update_or_insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        let number_of_rows = self.clone().update(connection).await?;
-        if number_of_rows == 0 {
-            self.insert(connection).await
-        } else {
-            Ok(number_of_rows)
-        }
-    }
-    /// Get all Edit from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn all<C>(
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("edits")
-            .select()
-            .project("id, editable_id")
-            .execute(connection)
-            .await?;
-        Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>())
-    }
-    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
-        Self {
-            id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
-            },
-            editable_id: match row.get("editable_id").unwrap() {
-                gluesql::prelude::Value::Uuid(editable_id) => Uuid::from_u128(*editable_id),
-                _ => unreachable!("Expected Uuid"),
-            },
-        }
-    }
-}
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ItemCategory {
-    pub id: Uuid,
+    pub id: i32,
+    pub name: String,
+    pub description: String,
+    pub created_by: i32,
 }
 #[cfg(feature = "frontend")]
 impl ItemCategory {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
+            gluesql::core::ast_builder::num(self.id),
+            gluesql::core::ast_builder::text(self.name),
+            gluesql::core::ast_builder::text(self.description),
+            gluesql::core::ast_builder::num(self.created_by),
         ]
     }
 
@@ -2112,7 +1380,7 @@ impl ItemCategory {
         use gluesql::core::ast_builder::*;
         table("item_categories")
             .insert()
-            .columns("id")
+            .columns("id, name, description, created_by")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -2129,7 +1397,7 @@ impl ItemCategory {
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -2138,7 +1406,7 @@ impl ItemCategory {
         let select_row = table("item_categories")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id")
+            .project("id, name, description, created_by")
             .limit(1)
             .execute(connection)
             .await?;
@@ -2158,7 +1426,7 @@ impl ItemCategory {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -2206,7 +1474,10 @@ impl ItemCategory {
         use gluesql::core::ast_builder::*;
         table("item_categories")
             .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))            .execute(connection)
+.set("id", gluesql::core::ast_builder::num(self.id))        
+.set("name", gluesql::core::ast_builder::text(self.name))        
+.set("description", gluesql::core::ast_builder::text(self.description))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))            .execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -2247,7 +1518,7 @@ impl ItemCategory {
         use gluesql::core::ast_builder::*;
         let select_row = table("item_categories")
             .select()
-            .project("id")
+            .project("id, name, description, created_by")
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -2258,8 +1529,20 @@ impl ItemCategory {
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(id) => id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            name: match row.get("name").unwrap() {
+                gluesql::prelude::Value::Str(name) => name.clone(),
+                _ => unreachable!("Expected Str")
+            },
+            description: match row.get("description").unwrap() {
+                gluesql::prelude::Value::Str(description) => description.clone(),
+                _ => unreachable!("Expected Str")
+            },
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
+                _ => unreachable!("Expected I32")
             },
         }
     }
@@ -2267,17 +1550,19 @@ impl ItemCategory {
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ItemCategoryRelationship {
-    pub id: Uuid,
-    pub parent_id: Uuid,
-    pub child_id: Uuid,
+    pub id: i32,
+    pub parent_id: i32,
+    pub child_id: i32,
+    pub added_by: i32,
 }
 #[cfg(feature = "frontend")]
 impl ItemCategoryRelationship {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
-            gluesql::core::ast_builder::uuid(self.parent_id.to_string()),
-            gluesql::core::ast_builder::uuid(self.child_id.to_string()),
+            gluesql::core::ast_builder::num(self.id),
+            gluesql::core::ast_builder::num(self.parent_id),
+            gluesql::core::ast_builder::num(self.child_id),
+            gluesql::core::ast_builder::num(self.added_by),
         ]
     }
 
@@ -2297,7 +1582,7 @@ impl ItemCategoryRelationship {
         use gluesql::core::ast_builder::*;
         table("item_category_relationships")
             .insert()
-            .columns("id, parent_id, child_id")
+            .columns("id, parent_id, child_id, added_by")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -2314,7 +1599,7 @@ impl ItemCategoryRelationship {
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -2323,7 +1608,7 @@ impl ItemCategoryRelationship {
         let select_row = table("item_category_relationships")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, parent_id, child_id")
+            .project("id, parent_id, child_id, added_by")
             .limit(1)
             .execute(connection)
             .await?;
@@ -2343,7 +1628,7 @@ impl ItemCategoryRelationship {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -2391,9 +1676,10 @@ impl ItemCategoryRelationship {
         use gluesql::core::ast_builder::*;
         table("item_category_relationships")
             .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
-.set("parent_id", gluesql::core::ast_builder::uuid(self.parent_id.to_string()))        
-.set("child_id", gluesql::core::ast_builder::uuid(self.child_id.to_string()))            .execute(connection)
+.set("id", gluesql::core::ast_builder::num(self.id))        
+.set("parent_id", gluesql::core::ast_builder::num(self.parent_id))        
+.set("child_id", gluesql::core::ast_builder::num(self.child_id))        
+.set("added_by", gluesql::core::ast_builder::num(self.added_by))            .execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -2434,7 +1720,7 @@ impl ItemCategoryRelationship {
         use gluesql::core::ast_builder::*;
         let select_row = table("item_category_relationships")
             .select()
-            .project("id, parent_id, child_id")
+            .project("id, parent_id, child_id, added_by")
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -2445,16 +1731,20 @@ impl ItemCategoryRelationship {
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(id) => id.clone(),
+                _ => unreachable!("Expected I32")
             },
             parent_id: match row.get("parent_id").unwrap() {
-                gluesql::prelude::Value::Uuid(parent_id) => Uuid::from_u128(*parent_id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(parent_id) => parent_id.clone(),
+                _ => unreachable!("Expected I32")
             },
             child_id: match row.get("child_id").unwrap() {
-                gluesql::prelude::Value::Uuid(child_id) => Uuid::from_u128(*child_id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(child_id) => child_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            added_by: match row.get("added_by").unwrap() {
+                gluesql::prelude::Value::I32(added_by) => added_by.clone(),
+                _ => unreachable!("Expected I32")
             },
         }
     }
@@ -2462,17 +1752,17 @@ impl ItemCategoryRelationship {
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ItemCategoryUnit {
-    pub id: Uuid,
-    pub item_category_id: Uuid,
-    pub unit_id: Uuid,
+    pub id: i32,
+    pub item_category_id: i32,
+    pub unit_id: i32,
 }
 #[cfg(feature = "frontend")]
 impl ItemCategoryUnit {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
-            gluesql::core::ast_builder::uuid(self.item_category_id.to_string()),
-            gluesql::core::ast_builder::uuid(self.unit_id.to_string()),
+            gluesql::core::ast_builder::num(self.id),
+            gluesql::core::ast_builder::num(self.item_category_id),
+            gluesql::core::ast_builder::num(self.unit_id),
         ]
     }
 
@@ -2509,7 +1799,7 @@ impl ItemCategoryUnit {
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -2538,7 +1828,7 @@ impl ItemCategoryUnit {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -2586,9 +1876,9 @@ impl ItemCategoryUnit {
         use gluesql::core::ast_builder::*;
         table("item_category_units")
             .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
-.set("item_category_id", gluesql::core::ast_builder::uuid(self.item_category_id.to_string()))        
-.set("unit_id", gluesql::core::ast_builder::uuid(self.unit_id.to_string()))            .execute(connection)
+.set("id", gluesql::core::ast_builder::num(self.id))        
+.set("item_category_id", gluesql::core::ast_builder::num(self.item_category_id))        
+.set("unit_id", gluesql::core::ast_builder::num(self.unit_id))            .execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -2640,30 +1930,30 @@ impl ItemCategoryUnit {
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(id) => id.clone(),
+                _ => unreachable!("Expected I32")
             },
             item_category_id: match row.get("item_category_id").unwrap() {
-                gluesql::prelude::Value::Uuid(item_category_id) => Uuid::from_u128(*item_category_id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(item_category_id) => item_category_id.clone(),
+                _ => unreachable!("Expected I32")
             },
             unit_id: match row.get("unit_id").unwrap() {
-                gluesql::prelude::Value::Uuid(unit_id) => Uuid::from_u128(*unit_id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(unit_id) => unit_id.clone(),
+                _ => unreachable!("Expected I32")
             },
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ItemContinuousQuantity {
     pub id: Uuid,
     pub item_id: Uuid,
-    pub weight: f64,
-    pub unit_id: Uuid,
+    pub amount: i32,
+    pub unit_id: i32,
     pub sensor_id: Option<Uuid>,
     pub measured_at: NaiveDateTime,
-    pub measured_by: Option<Uuid>,
+    pub measured_by: Option<i32>,
 }
 #[cfg(feature = "frontend")]
 impl ItemContinuousQuantity {
@@ -2671,15 +1961,15 @@ impl ItemContinuousQuantity {
         vec![
             gluesql::core::ast_builder::uuid(self.id.to_string()),
             gluesql::core::ast_builder::uuid(self.item_id.to_string()),
-            gluesql::core::ast_builder::num(self.weight),
-            gluesql::core::ast_builder::uuid(self.unit_id.to_string()),
+            gluesql::core::ast_builder::num(self.amount),
+            gluesql::core::ast_builder::num(self.unit_id),
             match self.sensor_id {
                 Some(sensor_id) => gluesql::core::ast_builder::uuid(sensor_id.to_string()),
                 None => gluesql::core::ast_builder::null(),
             },
             gluesql::core::ast_builder::timestamp(self.measured_at.to_string()),
             match self.measured_by {
-                Some(measured_by) => gluesql::core::ast_builder::uuid(measured_by.to_string()),
+                Some(measured_by) => gluesql::core::ast_builder::num(measured_by),
                 None => gluesql::core::ast_builder::null(),
             },
         ]
@@ -2701,7 +1991,7 @@ impl ItemContinuousQuantity {
         use gluesql::core::ast_builder::*;
         table("item_continuous_quantities")
             .insert()
-            .columns("id, item_id, weight, unit_id, sensor_id, measured_at, measured_by")
+            .columns("id, item_id, amount, unit_id, sensor_id, measured_at, measured_by")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -2718,7 +2008,7 @@ impl ItemContinuousQuantity {
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -2727,7 +2017,7 @@ impl ItemContinuousQuantity {
         let select_row = table("item_continuous_quantities")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, item_id, weight, unit_id, sensor_id, measured_at, measured_by")
+            .project("id, item_id, amount, unit_id, sensor_id, measured_at, measured_by")
             .limit(1)
             .execute(connection)
             .await?;
@@ -2747,7 +2037,7 @@ impl ItemContinuousQuantity {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -2797,14 +2087,14 @@ impl ItemContinuousQuantity {
             .update()        
 .set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
 .set("item_id", gluesql::core::ast_builder::uuid(self.item_id.to_string()))        
-.set("weight", gluesql::core::ast_builder::num(self.weight))        
-.set("unit_id", gluesql::core::ast_builder::uuid(self.unit_id.to_string()))        
+.set("amount", gluesql::core::ast_builder::num(self.amount))        
+.set("unit_id", gluesql::core::ast_builder::num(self.unit_id))        
 .set("measured_at", gluesql::core::ast_builder::timestamp(self.measured_at.to_string()));
         if let Some(sensor_id) = self.sensor_id {
             update_row = update_row.set("sensor_id", gluesql::core::ast_builder::uuid(sensor_id.to_string()));
         }
         if let Some(measured_by) = self.measured_by {
-            update_row = update_row.set("measured_by", gluesql::core::ast_builder::uuid(measured_by.to_string()));
+            update_row = update_row.set("measured_by", gluesql::core::ast_builder::num(measured_by));
         }
             update_row.execute(connection)
             .await
@@ -2847,7 +2137,7 @@ impl ItemContinuousQuantity {
         use gluesql::core::ast_builder::*;
         let select_row = table("item_continuous_quantities")
             .select()
-            .project("id, item_id, weight, unit_id, sensor_id, measured_at, measured_by")
+            .project("id, item_id, amount, unit_id, sensor_id, measured_at, measured_by")
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -2865,13 +2155,13 @@ impl ItemContinuousQuantity {
                 gluesql::prelude::Value::Uuid(item_id) => Uuid::from_u128(*item_id),
                 _ => unreachable!("Expected Uuid"),
             },
-            weight: match row.get("weight").unwrap() {
-                gluesql::prelude::Value::F64(weight) => weight.clone(),
-                _ => unreachable!("Expected F64")
+            amount: match row.get("amount").unwrap() {
+                gluesql::prelude::Value::I32(amount) => amount.clone(),
+                _ => unreachable!("Expected I32")
             },
             unit_id: match row.get("unit_id").unwrap() {
-                gluesql::prelude::Value::Uuid(unit_id) => Uuid::from_u128(*unit_id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(unit_id) => unit_id.clone(),
+                _ => unreachable!("Expected I32")
             },
             sensor_id: match row.get("sensor_id").unwrap() {
                 gluesql::prelude::Value::Null => None,
@@ -2884,8 +2174,8 @@ impl ItemContinuousQuantity {
             },
             measured_by: match row.get("measured_by").unwrap() {
                 gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(measured_by) => Some(Uuid::from_u128(*measured_by)),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(measured_by) => Some(measured_by.clone()),
+                _ => unreachable!("Expected I32")
             },
         }
     }
@@ -2896,9 +2186,9 @@ pub struct ItemDiscreteQuantity {
     pub id: Uuid,
     pub item_id: Uuid,
     pub quantity: i32,
-    pub unit_id: Uuid,
+    pub unit_id: i32,
     pub measured_at: NaiveDateTime,
-    pub measured_by: Option<Uuid>,
+    pub measured_by: Option<i32>,
 }
 #[cfg(feature = "frontend")]
 impl ItemDiscreteQuantity {
@@ -2907,10 +2197,10 @@ impl ItemDiscreteQuantity {
             gluesql::core::ast_builder::uuid(self.id.to_string()),
             gluesql::core::ast_builder::uuid(self.item_id.to_string()),
             gluesql::core::ast_builder::num(self.quantity),
-            gluesql::core::ast_builder::uuid(self.unit_id.to_string()),
+            gluesql::core::ast_builder::num(self.unit_id),
             gluesql::core::ast_builder::timestamp(self.measured_at.to_string()),
             match self.measured_by {
-                Some(measured_by) => gluesql::core::ast_builder::uuid(measured_by.to_string()),
+                Some(measured_by) => gluesql::core::ast_builder::num(measured_by),
                 None => gluesql::core::ast_builder::null(),
             },
         ]
@@ -2949,7 +2239,7 @@ impl ItemDiscreteQuantity {
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -2978,7 +2268,7 @@ impl ItemDiscreteQuantity {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -3029,10 +2319,10 @@ impl ItemDiscreteQuantity {
 .set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
 .set("item_id", gluesql::core::ast_builder::uuid(self.item_id.to_string()))        
 .set("quantity", gluesql::core::ast_builder::num(self.quantity))        
-.set("unit_id", gluesql::core::ast_builder::uuid(self.unit_id.to_string()))        
+.set("unit_id", gluesql::core::ast_builder::num(self.unit_id))        
 .set("measured_at", gluesql::core::ast_builder::timestamp(self.measured_at.to_string()));
         if let Some(measured_by) = self.measured_by {
-            update_row = update_row.set("measured_by", gluesql::core::ast_builder::uuid(measured_by.to_string()));
+            update_row = update_row.set("measured_by", gluesql::core::ast_builder::num(measured_by));
         }
             update_row.execute(connection)
             .await
@@ -3098,8 +2388,8 @@ impl ItemDiscreteQuantity {
                 _ => unreachable!("Expected I32")
             },
             unit_id: match row.get("unit_id").unwrap() {
-                gluesql::prelude::Value::Uuid(unit_id) => Uuid::from_u128(*unit_id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(unit_id) => unit_id.clone(),
+                _ => unreachable!("Expected I32")
             },
             measured_at: match row.get("measured_at").unwrap() {
                 gluesql::prelude::Value::Timestamp(measured_at) => measured_at.clone(),
@@ -3107,8 +2397,8 @@ impl ItemDiscreteQuantity {
             },
             measured_by: match row.get("measured_by").unwrap() {
                 gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(measured_by) => Some(Uuid::from_u128(*measured_by)),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(measured_by) => Some(measured_by.clone()),
+                _ => unreachable!("Expected I32")
             },
         }
     }
@@ -3118,8 +2408,9 @@ impl ItemDiscreteQuantity {
 pub struct ItemLocation {
     pub id: Uuid,
     pub item_id: Option<Uuid>,
+    pub located_by: Option<i32>,
+    pub located_at: NaiveDateTime,
     pub location_id: Option<Uuid>,
-    pub previous_location_id: Option<Uuid>,
 }
 #[cfg(feature = "frontend")]
 impl ItemLocation {
@@ -3130,12 +2421,13 @@ impl ItemLocation {
                 Some(item_id) => gluesql::core::ast_builder::uuid(item_id.to_string()),
                 None => gluesql::core::ast_builder::null(),
             },
-            match self.location_id {
-                Some(location_id) => gluesql::core::ast_builder::uuid(location_id.to_string()),
+            match self.located_by {
+                Some(located_by) => gluesql::core::ast_builder::num(located_by),
                 None => gluesql::core::ast_builder::null(),
             },
-            match self.previous_location_id {
-                Some(previous_location_id) => gluesql::core::ast_builder::uuid(previous_location_id.to_string()),
+            gluesql::core::ast_builder::timestamp(self.located_at.to_string()),
+            match self.location_id {
+                Some(location_id) => gluesql::core::ast_builder::uuid(location_id.to_string()),
                 None => gluesql::core::ast_builder::null(),
             },
         ]
@@ -3157,7 +2449,7 @@ impl ItemLocation {
         use gluesql::core::ast_builder::*;
         table("item_locations")
             .insert()
-            .columns("id, item_id, location_id, previous_location_id")
+            .columns("id, item_id, located_by, located_at, location_id")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -3174,7 +2466,7 @@ impl ItemLocation {
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -3183,7 +2475,7 @@ impl ItemLocation {
         let select_row = table("item_locations")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, item_id, location_id, previous_location_id")
+            .project("id, item_id, located_by, located_at, location_id")
             .limit(1)
             .execute(connection)
             .await?;
@@ -3203,7 +2495,7 @@ impl ItemLocation {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -3251,15 +2543,16 @@ impl ItemLocation {
         use gluesql::core::ast_builder::*;
         let mut update_row = table("item_locations")
             .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()));
+.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
+.set("located_at", gluesql::core::ast_builder::timestamp(self.located_at.to_string()));
         if let Some(item_id) = self.item_id {
             update_row = update_row.set("item_id", gluesql::core::ast_builder::uuid(item_id.to_string()));
         }
+        if let Some(located_by) = self.located_by {
+            update_row = update_row.set("located_by", gluesql::core::ast_builder::num(located_by));
+        }
         if let Some(location_id) = self.location_id {
             update_row = update_row.set("location_id", gluesql::core::ast_builder::uuid(location_id.to_string()));
-        }
-        if let Some(previous_location_id) = self.previous_location_id {
-            update_row = update_row.set("previous_location_id", gluesql::core::ast_builder::uuid(previous_location_id.to_string()));
         }
             update_row.execute(connection)
             .await
@@ -3302,7 +2595,7 @@ impl ItemLocation {
         use gluesql::core::ast_builder::*;
         let select_row = table("item_locations")
             .select()
-            .project("id, item_id, location_id, previous_location_id")
+            .project("id, item_id, located_by, located_at, location_id")
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -3321,14 +2614,18 @@ impl ItemLocation {
                 gluesql::prelude::Value::Uuid(item_id) => Some(Uuid::from_u128(*item_id)),
                 _ => unreachable!("Expected Uuid"),
             },
+            located_by: match row.get("located_by").unwrap() {
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::I32(located_by) => Some(located_by.clone()),
+                _ => unreachable!("Expected I32")
+            },
+            located_at: match row.get("located_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(located_at) => located_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
             location_id: match row.get("location_id").unwrap() {
                 gluesql::prelude::Value::Null => None,
                 gluesql::prelude::Value::Uuid(location_id) => Some(Uuid::from_u128(*location_id)),
-                _ => unreachable!("Expected Uuid"),
-            },
-            previous_location_id: match row.get("previous_location_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(previous_location_id) => Some(Uuid::from_u128(*previous_location_id)),
                 _ => unreachable!("Expected Uuid"),
             },
         }
@@ -3339,7 +2636,7 @@ impl ItemLocation {
 pub struct ItemUnit {
     pub id: Uuid,
     pub item_id: Uuid,
-    pub unit_id: Uuid,
+    pub unit_id: i32,
 }
 #[cfg(feature = "frontend")]
 impl ItemUnit {
@@ -3347,7 +2644,7 @@ impl ItemUnit {
         vec![
             gluesql::core::ast_builder::uuid(self.id.to_string()),
             gluesql::core::ast_builder::uuid(self.item_id.to_string()),
-            gluesql::core::ast_builder::uuid(self.unit_id.to_string()),
+            gluesql::core::ast_builder::num(self.unit_id),
         ]
     }
 
@@ -3384,7 +2681,7 @@ impl ItemUnit {
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -3413,7 +2710,7 @@ impl ItemUnit {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -3463,7 +2760,7 @@ impl ItemUnit {
             .update()        
 .set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
 .set("item_id", gluesql::core::ast_builder::uuid(self.item_id.to_string()))        
-.set("unit_id", gluesql::core::ast_builder::uuid(self.unit_id.to_string()))            .execute(connection)
+.set("unit_id", gluesql::core::ast_builder::num(self.unit_id))            .execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -3523,8 +2820,8 @@ impl ItemUnit {
                 _ => unreachable!("Expected Uuid"),
             },
             unit_id: match row.get("unit_id").unwrap() {
-                gluesql::prelude::Value::Uuid(unit_id) => Uuid::from_u128(*unit_id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(unit_id) => unit_id.clone(),
+                _ => unreachable!("Expected I32")
             },
         }
     }
@@ -3580,7 +2877,7 @@ impl Item {
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -3609,7 +2906,7 @@ impl Item {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -3726,201 +3023,6 @@ impl Item {
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
-pub struct LocationState {
-    pub id: Uuid,
-    pub font_awesome_icon: Option<String>,
-}
-#[cfg(feature = "frontend")]
-impl LocationState {
-    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
-        vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
-            match self.font_awesome_icon {
-                Some(font_awesome_icon) => gluesql::core::ast_builder::text(font_awesome_icon),
-                None => gluesql::core::ast_builder::null(),
-            },
-        ]
-    }
-
-    /// Insert the LocationState into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows inserted in table location_states
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("location_states")
-            .insert()
-            .columns("id, font_awesome_icon")
-            .values(vec![self.into_row()])
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
-                 _ => unreachable!("Payload must be an Insert"),
-             })
-    }
-
-    /// Get LocationState from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of LocationState to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn get<C>(
-        id: Uuid,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Option<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("location_states")
-            .select()
-            .filter(col("id").eq(id.to_string()))
-            .project("id, font_awesome_icon")
-            .limit(1)
-            .execute(connection)
-            .await?;
-         Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>()
-            .pop())
-    }
-
-    /// Delete LocationState from the database.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete_from_id<C>(
-        id: Uuid,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("location_states")
-            .delete()
-            .filter(col("id").eq(id.to_string()))
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
-                 _ => unreachable!("Payload must be a Delete"),
-             })
-    }
-
-    /// Delete the current instance of LocationState from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        Self::delete_from_id(self.id, connection).await
-    }
-    /// Update the struct in the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated.
-    pub async fn update<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let mut update_row = table("location_states")
-            .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()));
-        if let Some(font_awesome_icon) = self.font_awesome_icon {
-            update_row = update_row.set("font_awesome_icon", gluesql::core::ast_builder::text(font_awesome_icon));
-        }
-            update_row.execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
-                 _ => unreachable!("Expected Payload::Update")
-})
-    }
-
-    /// Update the struct in the database if it exists, otherwise insert it.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated or inserted.
-    pub async fn update_or_insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        let number_of_rows = self.clone().update(connection).await?;
-        if number_of_rows == 0 {
-            self.insert(connection).await
-        } else {
-            Ok(number_of_rows)
-        }
-    }
-    /// Get all LocationState from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn all<C>(
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("location_states")
-            .select()
-            .project("id, font_awesome_icon")
-            .execute(connection)
-            .await?;
-        Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>())
-    }
-    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
-        Self {
-            id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
-            },
-            font_awesome_icon: match row.get("font_awesome_icon").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Str(font_awesome_icon) => Some(font_awesome_icon.clone()),
-                _ => unreachable!("Expected Str")
-            },
-        }
-    }
-}
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Location {
     pub id: Uuid,
     pub latitude_degrees: Option<i32>,
@@ -3934,7 +3036,6 @@ pub struct Location {
     pub geolocalization_device_id: Option<Uuid>,
     pub altitude_device_id: Option<Uuid>,
     pub parent_location_id: Option<Uuid>,
-    pub state_id: Uuid,
 }
 #[cfg(feature = "frontend")]
 impl Location {
@@ -3985,7 +3086,6 @@ impl Location {
                 Some(parent_location_id) => gluesql::core::ast_builder::uuid(parent_location_id.to_string()),
                 None => gluesql::core::ast_builder::null(),
             },
-            gluesql::core::ast_builder::uuid(self.state_id.to_string()),
         ]
     }
 
@@ -4005,7 +3105,7 @@ impl Location {
         use gluesql::core::ast_builder::*;
         table("locations")
             .insert()
-            .columns("id, latitude_degrees, latitude_minutes, latitude_seconds, longitude_degrees, longitude_minutes, longitude_seconds, altitude, address, geolocalization_device_id, altitude_device_id, parent_location_id, state_id")
+            .columns("id, latitude_degrees, latitude_minutes, latitude_seconds, longitude_degrees, longitude_minutes, longitude_seconds, altitude, address, geolocalization_device_id, altitude_device_id, parent_location_id")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -4022,7 +3122,7 @@ impl Location {
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -4031,7 +3131,7 @@ impl Location {
         let select_row = table("locations")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, latitude_degrees, latitude_minutes, latitude_seconds, longitude_degrees, longitude_minutes, longitude_seconds, altitude, address, geolocalization_device_id, altitude_device_id, parent_location_id, state_id")
+            .project("id, latitude_degrees, latitude_minutes, latitude_seconds, longitude_degrees, longitude_minutes, longitude_seconds, altitude, address, geolocalization_device_id, altitude_device_id, parent_location_id")
             .limit(1)
             .execute(connection)
             .await?;
@@ -4051,7 +3151,7 @@ impl Location {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -4099,8 +3199,7 @@ impl Location {
         use gluesql::core::ast_builder::*;
         let mut update_row = table("locations")
             .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
-.set("state_id", gluesql::core::ast_builder::uuid(self.state_id.to_string()));
+.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()));
         if let Some(latitude_degrees) = self.latitude_degrees {
             update_row = update_row.set("latitude_degrees", gluesql::core::ast_builder::num(latitude_degrees));
         }
@@ -4175,7 +3274,7 @@ impl Location {
         use gluesql::core::ast_builder::*;
         let select_row = table("locations")
             .select()
-            .project("id, latitude_degrees, latitude_minutes, latitude_seconds, longitude_degrees, longitude_minutes, longitude_seconds, altitude, address, geolocalization_device_id, altitude_device_id, parent_location_id, state_id")
+            .project("id, latitude_degrees, latitude_minutes, latitude_seconds, longitude_degrees, longitude_minutes, longitude_seconds, altitude, address, geolocalization_device_id, altitude_device_id, parent_location_id")
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -4244,17 +3343,13 @@ impl Location {
                 gluesql::prelude::Value::Uuid(parent_location_id) => Some(Uuid::from_u128(*parent_location_id)),
                 _ => unreachable!("Expected Uuid"),
             },
-            state_id: match row.get("state_id").unwrap() {
-                gluesql::prelude::Value::Uuid(state_id) => Uuid::from_u128(*state_id),
-                _ => unreachable!("Expected Uuid"),
-            },
         }
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct LoginProvider {
-    pub id: Uuid,
+    pub id: i32,
     pub name: String,
     pub font_awesome_icon: String,
     pub client_id_var_name: String,
@@ -4266,7 +3361,7 @@ pub struct LoginProvider {
 impl LoginProvider {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
+            gluesql::core::ast_builder::num(self.id),
             gluesql::core::ast_builder::text(self.name),
             gluesql::core::ast_builder::text(self.font_awesome_icon),
             gluesql::core::ast_builder::text(self.client_id_var_name),
@@ -4309,7 +3404,7 @@ impl LoginProvider {
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -4338,7 +3433,7 @@ impl LoginProvider {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -4386,7 +3481,7 @@ impl LoginProvider {
         use gluesql::core::ast_builder::*;
         table("login_providers")
             .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
+.set("id", gluesql::core::ast_builder::num(self.id))        
 .set("name", gluesql::core::ast_builder::text(self.name))        
 .set("font_awesome_icon", gluesql::core::ast_builder::text(self.font_awesome_icon))        
 .set("client_id_var_name", gluesql::core::ast_builder::text(self.client_id_var_name))        
@@ -4444,8 +3539,8 @@ impl LoginProvider {
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(id) => id.clone(),
+                _ => unreachable!("Expected I32")
             },
             name: match row.get("name").unwrap() {
                 gluesql::prelude::Value::Str(name) => name.clone(),
@@ -4474,24 +3569,24 @@ impl LoginProvider {
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ManufacturedItemCategory {
-    pub id: Uuid,
-    pub cost: f64,
-    pub cost_per_day: f64,
+    pub id: i32,
+    pub cost: i32,
+    pub cost_per_day: i32,
     pub currency: String,
-    pub manifacturer_id: Uuid,
+    pub manifacturer_id: i32,
 }
 #[cfg(feature = "frontend")]
 impl ManufacturedItemCategory {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
+            gluesql::core::ast_builder::num(self.id),
             gluesql::core::ast_builder::num(self.cost),
             gluesql::core::ast_builder::num(self.cost_per_day),
             gluesql::core::ast_builder::text(self.currency),
-            gluesql::core::ast_builder::uuid(self.manifacturer_id.to_string()),
+            gluesql::core::ast_builder::num(self.manifacturer_id),
         ]
     }
 
@@ -4528,7 +3623,7 @@ impl ManufacturedItemCategory {
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -4557,7 +3652,7 @@ impl ManufacturedItemCategory {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -4605,11 +3700,11 @@ impl ManufacturedItemCategory {
         use gluesql::core::ast_builder::*;
         table("manufactured_item_categories")
             .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
+.set("id", gluesql::core::ast_builder::num(self.id))        
 .set("cost", gluesql::core::ast_builder::num(self.cost))        
 .set("cost_per_day", gluesql::core::ast_builder::num(self.cost_per_day))        
 .set("currency", gluesql::core::ast_builder::text(self.currency))        
-.set("manifacturer_id", gluesql::core::ast_builder::uuid(self.manifacturer_id.to_string()))            .execute(connection)
+.set("manifacturer_id", gluesql::core::ast_builder::num(self.manifacturer_id))            .execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -4661,24 +3756,24 @@ impl ManufacturedItemCategory {
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(id) => id.clone(),
+                _ => unreachable!("Expected I32")
             },
             cost: match row.get("cost").unwrap() {
-                gluesql::prelude::Value::F64(cost) => cost.clone(),
-                _ => unreachable!("Expected F64")
+                gluesql::prelude::Value::I32(cost) => cost.clone(),
+                _ => unreachable!("Expected I32")
             },
             cost_per_day: match row.get("cost_per_day").unwrap() {
-                gluesql::prelude::Value::F64(cost_per_day) => cost_per_day.clone(),
-                _ => unreachable!("Expected F64")
+                gluesql::prelude::Value::I32(cost_per_day) => cost_per_day.clone(),
+                _ => unreachable!("Expected I32")
             },
             currency: match row.get("currency").unwrap() {
                 gluesql::prelude::Value::Str(currency) => currency.clone(),
                 _ => unreachable!("Expected Str")
             },
             manifacturer_id: match row.get("manifacturer_id").unwrap() {
-                gluesql::prelude::Value::Uuid(manifacturer_id) => Uuid::from_u128(*manifacturer_id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(manifacturer_id) => manifacturer_id.clone(),
+                _ => unreachable!("Expected I32")
             },
         }
     }
@@ -4686,25 +3781,20 @@ impl ManufacturedItemCategory {
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Notification {
-    pub id: Uuid,
-    pub user_id: Uuid,
+    pub id: i32,
+    pub user_id: i32,
     pub operation: String,
     pub table_name: String,
-    pub row_id: Option<Uuid>,
     pub read: bool,
 }
 #[cfg(feature = "frontend")]
 impl Notification {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
-            gluesql::core::ast_builder::uuid(self.user_id.to_string()),
+            gluesql::core::ast_builder::num(self.id),
+            gluesql::core::ast_builder::num(self.user_id),
             gluesql::core::ast_builder::text(self.operation),
             gluesql::core::ast_builder::text(self.table_name),
-            match self.row_id {
-                Some(row_id) => gluesql::core::ast_builder::uuid(row_id.to_string()),
-                None => gluesql::core::ast_builder::null(),
-            },
             (self.read.into()),
         ]
     }
@@ -4725,7 +3815,7 @@ impl Notification {
         use gluesql::core::ast_builder::*;
         table("notifications")
             .insert()
-            .columns("id, user_id, operation, table_name, row_id, read")
+            .columns("id, user_id, operation, table_name, read")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -4742,7 +3832,7 @@ impl Notification {
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -4751,7 +3841,7 @@ impl Notification {
         let select_row = table("notifications")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, user_id, operation, table_name, row_id, read")
+            .project("id, user_id, operation, table_name, read")
             .limit(1)
             .execute(connection)
             .await?;
@@ -4771,7 +3861,7 @@ impl Notification {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -4817,17 +3907,13 @@ impl Notification {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
-        let mut update_row = table("notifications")
+        table("notifications")
             .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
-.set("user_id", gluesql::core::ast_builder::uuid(self.user_id.to_string()))        
+.set("id", gluesql::core::ast_builder::num(self.id))        
+.set("user_id", gluesql::core::ast_builder::num(self.user_id))        
 .set("operation", gluesql::core::ast_builder::text(self.operation))        
 .set("table_name", gluesql::core::ast_builder::text(self.table_name))        
-.set("read", self.read);
-        if let Some(row_id) = self.row_id {
-            update_row = update_row.set("row_id", gluesql::core::ast_builder::uuid(row_id.to_string()));
-        }
-            update_row.execute(connection)
+.set("read", self.read)            .execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -4868,7 +3954,7 @@ impl Notification {
         use gluesql::core::ast_builder::*;
         let select_row = table("notifications")
             .select()
-            .project("id, user_id, operation, table_name, row_id, read")
+            .project("id, user_id, operation, table_name, read")
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -4879,12 +3965,12 @@ impl Notification {
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(id) => id.clone(),
+                _ => unreachable!("Expected I32")
             },
             user_id: match row.get("user_id").unwrap() {
-                gluesql::prelude::Value::Uuid(user_id) => Uuid::from_u128(*user_id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(user_id) => user_id.clone(),
+                _ => unreachable!("Expected I32")
             },
             operation: match row.get("operation").unwrap() {
                 gluesql::prelude::Value::Str(operation) => operation.clone(),
@@ -4893,11 +3979,6 @@ impl Notification {
             table_name: match row.get("table_name").unwrap() {
                 gluesql::prelude::Value::Str(table_name) => table_name.clone(),
                 _ => unreachable!("Expected Str")
-            },
-            row_id: match row.get("row_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(row_id) => Some(Uuid::from_u128(*row_id)),
-                _ => unreachable!("Expected Uuid"),
             },
             read: match row.get("read").unwrap() {
                 gluesql::prelude::Value::Bool(read) => read.clone(),
@@ -4908,652 +3989,21 @@ impl Notification {
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
-pub struct OrganizationAuthorization {
-    pub id: Uuid,
-    pub organization_id: Uuid,
-    pub editable_id: Uuid,
-    pub role_id: Uuid,
-}
-#[cfg(feature = "frontend")]
-impl OrganizationAuthorization {
-    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
-        vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
-            gluesql::core::ast_builder::uuid(self.organization_id.to_string()),
-            gluesql::core::ast_builder::uuid(self.editable_id.to_string()),
-            gluesql::core::ast_builder::uuid(self.role_id.to_string()),
-        ]
-    }
-
-    /// Insert the OrganizationAuthorization into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows inserted in table organization_authorizations
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("organization_authorizations")
-            .insert()
-            .columns("id, organization_id, editable_id, role_id")
-            .values(vec![self.into_row()])
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
-                 _ => unreachable!("Payload must be an Insert"),
-             })
-    }
-
-    /// Get OrganizationAuthorization from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of OrganizationAuthorization to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn get<C>(
-        id: Uuid,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Option<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("organization_authorizations")
-            .select()
-            .filter(col("id").eq(id.to_string()))
-            .project("id, organization_id, editable_id, role_id")
-            .limit(1)
-            .execute(connection)
-            .await?;
-         Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>()
-            .pop())
-    }
-
-    /// Delete OrganizationAuthorization from the database.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete_from_id<C>(
-        id: Uuid,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("organization_authorizations")
-            .delete()
-            .filter(col("id").eq(id.to_string()))
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
-                 _ => unreachable!("Payload must be a Delete"),
-             })
-    }
-
-    /// Delete the current instance of OrganizationAuthorization from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        Self::delete_from_id(self.id, connection).await
-    }
-    /// Update the struct in the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated.
-    pub async fn update<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("organization_authorizations")
-            .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
-.set("organization_id", gluesql::core::ast_builder::uuid(self.organization_id.to_string()))        
-.set("editable_id", gluesql::core::ast_builder::uuid(self.editable_id.to_string()))        
-.set("role_id", gluesql::core::ast_builder::uuid(self.role_id.to_string()))            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
-                 _ => unreachable!("Expected Payload::Update")
-})
-    }
-
-    /// Update the struct in the database if it exists, otherwise insert it.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated or inserted.
-    pub async fn update_or_insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        let number_of_rows = self.clone().update(connection).await?;
-        if number_of_rows == 0 {
-            self.insert(connection).await
-        } else {
-            Ok(number_of_rows)
-        }
-    }
-    /// Get all OrganizationAuthorization from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn all<C>(
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("organization_authorizations")
-            .select()
-            .project("id, organization_id, editable_id, role_id")
-            .execute(connection)
-            .await?;
-        Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>())
-    }
-    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
-        Self {
-            id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
-            },
-            organization_id: match row.get("organization_id").unwrap() {
-                gluesql::prelude::Value::Uuid(organization_id) => Uuid::from_u128(*organization_id),
-                _ => unreachable!("Expected Uuid"),
-            },
-            editable_id: match row.get("editable_id").unwrap() {
-                gluesql::prelude::Value::Uuid(editable_id) => Uuid::from_u128(*editable_id),
-                _ => unreachable!("Expected Uuid"),
-            },
-            role_id: match row.get("role_id").unwrap() {
-                gluesql::prelude::Value::Uuid(role_id) => Uuid::from_u128(*role_id),
-                _ => unreachable!("Expected Uuid"),
-            },
-        }
-    }
-}
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
-pub struct OrganizationLocation {
-    pub id: Uuid,
-    pub organization_id: Option<Uuid>,
-    pub location_id: Option<Uuid>,
-    pub previous_location_id: Option<Uuid>,
-}
-#[cfg(feature = "frontend")]
-impl OrganizationLocation {
-    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
-        vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
-            match self.organization_id {
-                Some(organization_id) => gluesql::core::ast_builder::uuid(organization_id.to_string()),
-                None => gluesql::core::ast_builder::null(),
-            },
-            match self.location_id {
-                Some(location_id) => gluesql::core::ast_builder::uuid(location_id.to_string()),
-                None => gluesql::core::ast_builder::null(),
-            },
-            match self.previous_location_id {
-                Some(previous_location_id) => gluesql::core::ast_builder::uuid(previous_location_id.to_string()),
-                None => gluesql::core::ast_builder::null(),
-            },
-        ]
-    }
-
-    /// Insert the OrganizationLocation into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows inserted in table organization_locations
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("organization_locations")
-            .insert()
-            .columns("id, organization_id, location_id, previous_location_id")
-            .values(vec![self.into_row()])
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
-                 _ => unreachable!("Payload must be an Insert"),
-             })
-    }
-
-    /// Get OrganizationLocation from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of OrganizationLocation to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn get<C>(
-        id: Uuid,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Option<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("organization_locations")
-            .select()
-            .filter(col("id").eq(id.to_string()))
-            .project("id, organization_id, location_id, previous_location_id")
-            .limit(1)
-            .execute(connection)
-            .await?;
-         Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>()
-            .pop())
-    }
-
-    /// Delete OrganizationLocation from the database.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete_from_id<C>(
-        id: Uuid,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("organization_locations")
-            .delete()
-            .filter(col("id").eq(id.to_string()))
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
-                 _ => unreachable!("Payload must be a Delete"),
-             })
-    }
-
-    /// Delete the current instance of OrganizationLocation from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        Self::delete_from_id(self.id, connection).await
-    }
-    /// Update the struct in the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated.
-    pub async fn update<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let mut update_row = table("organization_locations")
-            .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()));
-        if let Some(organization_id) = self.organization_id {
-            update_row = update_row.set("organization_id", gluesql::core::ast_builder::uuid(organization_id.to_string()));
-        }
-        if let Some(location_id) = self.location_id {
-            update_row = update_row.set("location_id", gluesql::core::ast_builder::uuid(location_id.to_string()));
-        }
-        if let Some(previous_location_id) = self.previous_location_id {
-            update_row = update_row.set("previous_location_id", gluesql::core::ast_builder::uuid(previous_location_id.to_string()));
-        }
-            update_row.execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
-                 _ => unreachable!("Expected Payload::Update")
-})
-    }
-
-    /// Update the struct in the database if it exists, otherwise insert it.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated or inserted.
-    pub async fn update_or_insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        let number_of_rows = self.clone().update(connection).await?;
-        if number_of_rows == 0 {
-            self.insert(connection).await
-        } else {
-            Ok(number_of_rows)
-        }
-    }
-    /// Get all OrganizationLocation from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn all<C>(
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("organization_locations")
-            .select()
-            .project("id, organization_id, location_id, previous_location_id")
-            .execute(connection)
-            .await?;
-        Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>())
-    }
-    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
-        Self {
-            id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
-            },
-            organization_id: match row.get("organization_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(organization_id) => Some(Uuid::from_u128(*organization_id)),
-                _ => unreachable!("Expected Uuid"),
-            },
-            location_id: match row.get("location_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(location_id) => Some(Uuid::from_u128(*location_id)),
-                _ => unreachable!("Expected Uuid"),
-            },
-            previous_location_id: match row.get("previous_location_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(previous_location_id) => Some(Uuid::from_u128(*previous_location_id)),
-                _ => unreachable!("Expected Uuid"),
-            },
-        }
-    }
-}
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
-pub struct OrganizationState {
-    pub id: Uuid,
-    pub font_awesome_icon: Option<String>,
-}
-#[cfg(feature = "frontend")]
-impl OrganizationState {
-    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
-        vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
-            match self.font_awesome_icon {
-                Some(font_awesome_icon) => gluesql::core::ast_builder::text(font_awesome_icon),
-                None => gluesql::core::ast_builder::null(),
-            },
-        ]
-    }
-
-    /// Insert the OrganizationState into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows inserted in table organization_states
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("organization_states")
-            .insert()
-            .columns("id, font_awesome_icon")
-            .values(vec![self.into_row()])
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
-                 _ => unreachable!("Payload must be an Insert"),
-             })
-    }
-
-    /// Get OrganizationState from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of OrganizationState to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn get<C>(
-        id: Uuid,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Option<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("organization_states")
-            .select()
-            .filter(col("id").eq(id.to_string()))
-            .project("id, font_awesome_icon")
-            .limit(1)
-            .execute(connection)
-            .await?;
-         Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>()
-            .pop())
-    }
-
-    /// Delete OrganizationState from the database.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete_from_id<C>(
-        id: Uuid,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("organization_states")
-            .delete()
-            .filter(col("id").eq(id.to_string()))
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
-                 _ => unreachable!("Payload must be a Delete"),
-             })
-    }
-
-    /// Delete the current instance of OrganizationState from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        Self::delete_from_id(self.id, connection).await
-    }
-    /// Update the struct in the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated.
-    pub async fn update<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let mut update_row = table("organization_states")
-            .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()));
-        if let Some(font_awesome_icon) = self.font_awesome_icon {
-            update_row = update_row.set("font_awesome_icon", gluesql::core::ast_builder::text(font_awesome_icon));
-        }
-            update_row.execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
-                 _ => unreachable!("Expected Payload::Update")
-})
-    }
-
-    /// Update the struct in the database if it exists, otherwise insert it.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated or inserted.
-    pub async fn update_or_insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        let number_of_rows = self.clone().update(connection).await?;
-        if number_of_rows == 0 {
-            self.insert(connection).await
-        } else {
-            Ok(number_of_rows)
-        }
-    }
-    /// Get all OrganizationState from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn all<C>(
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("organization_states")
-            .select()
-            .project("id, font_awesome_icon")
-            .execute(connection)
-            .await?;
-        Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>())
-    }
-    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
-        Self {
-            id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
-            },
-            font_awesome_icon: match row.get("font_awesome_icon").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Str(font_awesome_icon) => Some(font_awesome_icon.clone()),
-                _ => unreachable!("Expected Str")
-            },
-        }
-    }
-}
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Organization {
-    pub id: Uuid,
-    pub state_id: Option<Uuid>,
-    pub parent_organization_id: Option<Uuid>,
-    pub logo_id: Option<Uuid>,
-    pub website_url: Option<String>,
+    pub id: i32,
+    pub parent_organization_id: Option<i32>,
+    pub name: String,
 }
 #[cfg(feature = "frontend")]
 impl Organization {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
-            match self.state_id {
-                Some(state_id) => gluesql::core::ast_builder::uuid(state_id.to_string()),
-                None => gluesql::core::ast_builder::null(),
-            },
+            gluesql::core::ast_builder::num(self.id),
             match self.parent_organization_id {
-                Some(parent_organization_id) => gluesql::core::ast_builder::uuid(parent_organization_id.to_string()),
+                Some(parent_organization_id) => gluesql::core::ast_builder::num(parent_organization_id),
                 None => gluesql::core::ast_builder::null(),
             },
-            match self.logo_id {
-                Some(logo_id) => gluesql::core::ast_builder::uuid(logo_id.to_string()),
-                None => gluesql::core::ast_builder::null(),
-            },
-            match self.website_url {
-                Some(website_url) => gluesql::core::ast_builder::text(website_url),
-                None => gluesql::core::ast_builder::null(),
-            },
+            gluesql::core::ast_builder::text(self.name),
         ]
     }
 
@@ -5573,7 +4023,7 @@ impl Organization {
         use gluesql::core::ast_builder::*;
         table("organizations")
             .insert()
-            .columns("id, state_id, parent_organization_id, logo_id, website_url")
+            .columns("id, parent_organization_id, name")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -5590,7 +4040,7 @@ impl Organization {
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -5599,7 +4049,7 @@ impl Organization {
         let select_row = table("organizations")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, state_id, parent_organization_id, logo_id, website_url")
+            .project("id, parent_organization_id, name")
             .limit(1)
             .execute(connection)
             .await?;
@@ -5619,7 +4069,7 @@ impl Organization {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -5667,18 +4117,10 @@ impl Organization {
         use gluesql::core::ast_builder::*;
         let mut update_row = table("organizations")
             .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()));
-        if let Some(state_id) = self.state_id {
-            update_row = update_row.set("state_id", gluesql::core::ast_builder::uuid(state_id.to_string()));
-        }
+.set("id", gluesql::core::ast_builder::num(self.id))        
+.set("name", gluesql::core::ast_builder::text(self.name));
         if let Some(parent_organization_id) = self.parent_organization_id {
-            update_row = update_row.set("parent_organization_id", gluesql::core::ast_builder::uuid(parent_organization_id.to_string()));
-        }
-        if let Some(logo_id) = self.logo_id {
-            update_row = update_row.set("logo_id", gluesql::core::ast_builder::uuid(logo_id.to_string()));
-        }
-        if let Some(website_url) = self.website_url {
-            update_row = update_row.set("website_url", gluesql::core::ast_builder::text(website_url));
+            update_row = update_row.set("parent_organization_id", gluesql::core::ast_builder::num(parent_organization_id));
         }
             update_row.execute(connection)
             .await
@@ -5721,7 +4163,7 @@ impl Organization {
         use gluesql::core::ast_builder::*;
         let select_row = table("organizations")
             .select()
-            .project("id, state_id, parent_organization_id, logo_id, website_url")
+            .project("id, parent_organization_id, name")
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -5732,27 +4174,16 @@ impl Organization {
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
-            },
-            state_id: match row.get("state_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(state_id) => Some(Uuid::from_u128(*state_id)),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(id) => id.clone(),
+                _ => unreachable!("Expected I32")
             },
             parent_organization_id: match row.get("parent_organization_id").unwrap() {
                 gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(parent_organization_id) => Some(Uuid::from_u128(*parent_organization_id)),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(parent_organization_id) => Some(parent_organization_id.clone()),
+                _ => unreachable!("Expected I32")
             },
-            logo_id: match row.get("logo_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(logo_id) => Some(Uuid::from_u128(*logo_id)),
-                _ => unreachable!("Expected Uuid"),
-            },
-            website_url: match row.get("website_url").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Str(website_url) => Some(website_url.clone()),
+            name: match row.get("name").unwrap() {
+                gluesql::prelude::Value::Str(name) => name.clone(),
                 _ => unreachable!("Expected Str")
             },
         }
@@ -5761,13 +4192,13 @@ impl Organization {
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct PrimaryUserEmail {
-    pub id: Uuid,
+    pub id: i32,
 }
 #[cfg(feature = "frontend")]
 impl PrimaryUserEmail {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
+            gluesql::core::ast_builder::num(self.id),
         ]
     }
 
@@ -5804,7 +4235,7 @@ impl PrimaryUserEmail {
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -5833,7 +4264,7 @@ impl PrimaryUserEmail {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -5881,7 +4312,7 @@ impl PrimaryUserEmail {
         use gluesql::core::ast_builder::*;
         table("primary_user_emails")
             .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))            .execute(connection)
+.set("id", gluesql::core::ast_builder::num(self.id))            .execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -5933,8 +4364,8 @@ impl PrimaryUserEmail {
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(id) => id.clone(),
+                _ => unreachable!("Expected I32")
             },
         }
     }
@@ -5942,22 +4373,24 @@ impl PrimaryUserEmail {
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ProcedureContinuousRequirement {
-    pub id: Uuid,
-    pub procedure_id: Uuid,
-    pub item_category_id: Uuid,
+    pub id: i32,
+    pub created_by: i32,
+    pub procedure_id: i32,
+    pub item_category_id: i32,
     pub quantity: f64,
-    pub unit_id: Option<Uuid>,
+    pub unit_id: Option<i32>,
 }
 #[cfg(feature = "frontend")]
 impl ProcedureContinuousRequirement {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
-            gluesql::core::ast_builder::uuid(self.procedure_id.to_string()),
-            gluesql::core::ast_builder::uuid(self.item_category_id.to_string()),
+            gluesql::core::ast_builder::num(self.id),
+            gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::num(self.procedure_id),
+            gluesql::core::ast_builder::num(self.item_category_id),
             gluesql::core::ast_builder::num(self.quantity),
             match self.unit_id {
-                Some(unit_id) => gluesql::core::ast_builder::uuid(unit_id.to_string()),
+                Some(unit_id) => gluesql::core::ast_builder::num(unit_id),
                 None => gluesql::core::ast_builder::null(),
             },
         ]
@@ -5979,7 +4412,7 @@ impl ProcedureContinuousRequirement {
         use gluesql::core::ast_builder::*;
         table("procedure_continuous_requirements")
             .insert()
-            .columns("id, procedure_id, item_category_id, quantity, unit_id")
+            .columns("id, created_by, procedure_id, item_category_id, quantity, unit_id")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -5996,7 +4429,7 @@ impl ProcedureContinuousRequirement {
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -6005,7 +4438,7 @@ impl ProcedureContinuousRequirement {
         let select_row = table("procedure_continuous_requirements")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, procedure_id, item_category_id, quantity, unit_id")
+            .project("id, created_by, procedure_id, item_category_id, quantity, unit_id")
             .limit(1)
             .execute(connection)
             .await?;
@@ -6025,7 +4458,7 @@ impl ProcedureContinuousRequirement {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -6073,12 +4506,13 @@ impl ProcedureContinuousRequirement {
         use gluesql::core::ast_builder::*;
         let mut update_row = table("procedure_continuous_requirements")
             .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
-.set("procedure_id", gluesql::core::ast_builder::uuid(self.procedure_id.to_string()))        
-.set("item_category_id", gluesql::core::ast_builder::uuid(self.item_category_id.to_string()))        
+.set("id", gluesql::core::ast_builder::num(self.id))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("procedure_id", gluesql::core::ast_builder::num(self.procedure_id))        
+.set("item_category_id", gluesql::core::ast_builder::num(self.item_category_id))        
 .set("quantity", gluesql::core::ast_builder::num(self.quantity));
         if let Some(unit_id) = self.unit_id {
-            update_row = update_row.set("unit_id", gluesql::core::ast_builder::uuid(unit_id.to_string()));
+            update_row = update_row.set("unit_id", gluesql::core::ast_builder::num(unit_id));
         }
             update_row.execute(connection)
             .await
@@ -6121,7 +4555,7 @@ impl ProcedureContinuousRequirement {
         use gluesql::core::ast_builder::*;
         let select_row = table("procedure_continuous_requirements")
             .select()
-            .project("id, procedure_id, item_category_id, quantity, unit_id")
+            .project("id, created_by, procedure_id, item_category_id, quantity, unit_id")
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -6132,16 +4566,20 @@ impl ProcedureContinuousRequirement {
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(id) => id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
+                _ => unreachable!("Expected I32")
             },
             procedure_id: match row.get("procedure_id").unwrap() {
-                gluesql::prelude::Value::Uuid(procedure_id) => Uuid::from_u128(*procedure_id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(procedure_id) => procedure_id.clone(),
+                _ => unreachable!("Expected I32")
             },
             item_category_id: match row.get("item_category_id").unwrap() {
-                gluesql::prelude::Value::Uuid(item_category_id) => Uuid::from_u128(*item_category_id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(item_category_id) => item_category_id.clone(),
+                _ => unreachable!("Expected I32")
             },
             quantity: match row.get("quantity").unwrap() {
                 gluesql::prelude::Value::F64(quantity) => quantity.clone(),
@@ -6149,8 +4587,8 @@ impl ProcedureContinuousRequirement {
             },
             unit_id: match row.get("unit_id").unwrap() {
                 gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(unit_id) => Some(Uuid::from_u128(*unit_id)),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(unit_id) => Some(unit_id.clone()),
+                _ => unreachable!("Expected I32")
             },
         }
     }
@@ -6158,22 +4596,24 @@ impl ProcedureContinuousRequirement {
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ProcedureDiscreteRequirement {
-    pub id: Uuid,
-    pub procedure_id: Uuid,
-    pub item_category_id: Uuid,
+    pub id: i32,
+    pub created_by: i32,
+    pub procedure_id: i32,
+    pub item_category_id: i32,
     pub quantity: i32,
-    pub unit_id: Option<Uuid>,
+    pub unit_id: Option<i32>,
 }
 #[cfg(feature = "frontend")]
 impl ProcedureDiscreteRequirement {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
-            gluesql::core::ast_builder::uuid(self.procedure_id.to_string()),
-            gluesql::core::ast_builder::uuid(self.item_category_id.to_string()),
+            gluesql::core::ast_builder::num(self.id),
+            gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::num(self.procedure_id),
+            gluesql::core::ast_builder::num(self.item_category_id),
             gluesql::core::ast_builder::num(self.quantity),
             match self.unit_id {
-                Some(unit_id) => gluesql::core::ast_builder::uuid(unit_id.to_string()),
+                Some(unit_id) => gluesql::core::ast_builder::num(unit_id),
                 None => gluesql::core::ast_builder::null(),
             },
         ]
@@ -6195,7 +4635,7 @@ impl ProcedureDiscreteRequirement {
         use gluesql::core::ast_builder::*;
         table("procedure_discrete_requirements")
             .insert()
-            .columns("id, procedure_id, item_category_id, quantity, unit_id")
+            .columns("id, created_by, procedure_id, item_category_id, quantity, unit_id")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -6212,7 +4652,7 @@ impl ProcedureDiscreteRequirement {
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -6221,7 +4661,7 @@ impl ProcedureDiscreteRequirement {
         let select_row = table("procedure_discrete_requirements")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, procedure_id, item_category_id, quantity, unit_id")
+            .project("id, created_by, procedure_id, item_category_id, quantity, unit_id")
             .limit(1)
             .execute(connection)
             .await?;
@@ -6241,7 +4681,7 @@ impl ProcedureDiscreteRequirement {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -6289,12 +4729,13 @@ impl ProcedureDiscreteRequirement {
         use gluesql::core::ast_builder::*;
         let mut update_row = table("procedure_discrete_requirements")
             .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
-.set("procedure_id", gluesql::core::ast_builder::uuid(self.procedure_id.to_string()))        
-.set("item_category_id", gluesql::core::ast_builder::uuid(self.item_category_id.to_string()))        
+.set("id", gluesql::core::ast_builder::num(self.id))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("procedure_id", gluesql::core::ast_builder::num(self.procedure_id))        
+.set("item_category_id", gluesql::core::ast_builder::num(self.item_category_id))        
 .set("quantity", gluesql::core::ast_builder::num(self.quantity));
         if let Some(unit_id) = self.unit_id {
-            update_row = update_row.set("unit_id", gluesql::core::ast_builder::uuid(unit_id.to_string()));
+            update_row = update_row.set("unit_id", gluesql::core::ast_builder::num(unit_id));
         }
             update_row.execute(connection)
             .await
@@ -6337,7 +4778,7 @@ impl ProcedureDiscreteRequirement {
         use gluesql::core::ast_builder::*;
         let select_row = table("procedure_discrete_requirements")
             .select()
-            .project("id, procedure_id, item_category_id, quantity, unit_id")
+            .project("id, created_by, procedure_id, item_category_id, quantity, unit_id")
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -6348,16 +4789,20 @@ impl ProcedureDiscreteRequirement {
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(id) => id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
+                _ => unreachable!("Expected I32")
             },
             procedure_id: match row.get("procedure_id").unwrap() {
-                gluesql::prelude::Value::Uuid(procedure_id) => Uuid::from_u128(*procedure_id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(procedure_id) => procedure_id.clone(),
+                _ => unreachable!("Expected I32")
             },
             item_category_id: match row.get("item_category_id").unwrap() {
-                gluesql::prelude::Value::Uuid(item_category_id) => Uuid::from_u128(*item_category_id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(item_category_id) => item_category_id.clone(),
+                _ => unreachable!("Expected I32")
             },
             quantity: match row.get("quantity").unwrap() {
                 gluesql::prelude::Value::I32(quantity) => quantity.clone(),
@@ -6365,8 +4810,8 @@ impl ProcedureDiscreteRequirement {
             },
             unit_id: match row.get("unit_id").unwrap() {
                 gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(unit_id) => Some(Uuid::from_u128(*unit_id)),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(unit_id) => Some(unit_id.clone()),
+                _ => unreachable!("Expected I32")
             },
         }
     }
@@ -6374,13 +4819,25 @@ impl ProcedureDiscreteRequirement {
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Procedure {
-    pub id: Uuid,
+    pub id: i32,
+    pub name: String,
+    pub description: Option<String>,
+    pub created_by: Option<i32>,
 }
 #[cfg(feature = "frontend")]
 impl Procedure {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
+            gluesql::core::ast_builder::num(self.id),
+            gluesql::core::ast_builder::text(self.name),
+            match self.description {
+                Some(description) => gluesql::core::ast_builder::text(description),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.created_by {
+                Some(created_by) => gluesql::core::ast_builder::num(created_by),
+                None => gluesql::core::ast_builder::null(),
+            },
         ]
     }
 
@@ -6400,7 +4857,7 @@ impl Procedure {
         use gluesql::core::ast_builder::*;
         table("procedures")
             .insert()
-            .columns("id")
+            .columns("id, name, description, created_by")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -6417,7 +4874,7 @@ impl Procedure {
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -6426,7 +4883,7 @@ impl Procedure {
         let select_row = table("procedures")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id")
+            .project("id, name, description, created_by")
             .limit(1)
             .execute(connection)
             .await?;
@@ -6446,7 +4903,7 @@ impl Procedure {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -6492,9 +4949,17 @@ impl Procedure {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
-        table("procedures")
+        let mut update_row = table("procedures")
             .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))            .execute(connection)
+.set("id", gluesql::core::ast_builder::num(self.id))        
+.set("name", gluesql::core::ast_builder::text(self.name));
+        if let Some(description) = self.description {
+            update_row = update_row.set("description", gluesql::core::ast_builder::text(description));
+        }
+        if let Some(created_by) = self.created_by {
+            update_row = update_row.set("created_by", gluesql::core::ast_builder::num(created_by));
+        }
+            update_row.execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -6535,7 +5000,7 @@ impl Procedure {
         use gluesql::core::ast_builder::*;
         let select_row = table("procedures")
             .select()
-            .project("id")
+            .project("id, name, description, created_by")
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -6546,473 +5011,59 @@ impl Procedure {
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(id) => id.clone(),
+                _ => unreachable!("Expected I32")
             },
-        }
-    }
-}
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
-pub struct ProjectContinuousRequirement {
-    pub id: Uuid,
-    pub project_id: Uuid,
-    pub item_id: Uuid,
-    pub quantity: f64,
-    pub unit_id: Option<Uuid>,
-}
-#[cfg(feature = "frontend")]
-impl ProjectContinuousRequirement {
-    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
-        vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
-            gluesql::core::ast_builder::uuid(self.project_id.to_string()),
-            gluesql::core::ast_builder::uuid(self.item_id.to_string()),
-            gluesql::core::ast_builder::num(self.quantity),
-            match self.unit_id {
-                Some(unit_id) => gluesql::core::ast_builder::uuid(unit_id.to_string()),
-                None => gluesql::core::ast_builder::null(),
+            name: match row.get("name").unwrap() {
+                gluesql::prelude::Value::Str(name) => name.clone(),
+                _ => unreachable!("Expected Str")
             },
-        ]
-    }
-
-    /// Insert the ProjectContinuousRequirement into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows inserted in table project_continuous_requirements
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("project_continuous_requirements")
-            .insert()
-            .columns("id, project_id, item_id, quantity, unit_id")
-            .values(vec![self.into_row()])
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
-                 _ => unreachable!("Payload must be an Insert"),
-             })
-    }
-
-    /// Get ProjectContinuousRequirement from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of ProjectContinuousRequirement to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn get<C>(
-        id: Uuid,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Option<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("project_continuous_requirements")
-            .select()
-            .filter(col("id").eq(id.to_string()))
-            .project("id, project_id, item_id, quantity, unit_id")
-            .limit(1)
-            .execute(connection)
-            .await?;
-         Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>()
-            .pop())
-    }
-
-    /// Delete ProjectContinuousRequirement from the database.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete_from_id<C>(
-        id: Uuid,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("project_continuous_requirements")
-            .delete()
-            .filter(col("id").eq(id.to_string()))
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
-                 _ => unreachable!("Payload must be a Delete"),
-             })
-    }
-
-    /// Delete the current instance of ProjectContinuousRequirement from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        Self::delete_from_id(self.id, connection).await
-    }
-    /// Update the struct in the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated.
-    pub async fn update<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let mut update_row = table("project_continuous_requirements")
-            .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
-.set("project_id", gluesql::core::ast_builder::uuid(self.project_id.to_string()))        
-.set("item_id", gluesql::core::ast_builder::uuid(self.item_id.to_string()))        
-.set("quantity", gluesql::core::ast_builder::num(self.quantity));
-        if let Some(unit_id) = self.unit_id {
-            update_row = update_row.set("unit_id", gluesql::core::ast_builder::uuid(unit_id.to_string()));
-        }
-            update_row.execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
-                 _ => unreachable!("Expected Payload::Update")
-})
-    }
-
-    /// Update the struct in the database if it exists, otherwise insert it.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated or inserted.
-    pub async fn update_or_insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        let number_of_rows = self.clone().update(connection).await?;
-        if number_of_rows == 0 {
-            self.insert(connection).await
-        } else {
-            Ok(number_of_rows)
-        }
-    }
-    /// Get all ProjectContinuousRequirement from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn all<C>(
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("project_continuous_requirements")
-            .select()
-            .project("id, project_id, item_id, quantity, unit_id")
-            .execute(connection)
-            .await?;
-        Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>())
-    }
-    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
-        Self {
-            id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
-            },
-            project_id: match row.get("project_id").unwrap() {
-                gluesql::prelude::Value::Uuid(project_id) => Uuid::from_u128(*project_id),
-                _ => unreachable!("Expected Uuid"),
-            },
-            item_id: match row.get("item_id").unwrap() {
-                gluesql::prelude::Value::Uuid(item_id) => Uuid::from_u128(*item_id),
-                _ => unreachable!("Expected Uuid"),
-            },
-            quantity: match row.get("quantity").unwrap() {
-                gluesql::prelude::Value::F64(quantity) => quantity.clone(),
-                _ => unreachable!("Expected F64")
-            },
-            unit_id: match row.get("unit_id").unwrap() {
+            description: match row.get("description").unwrap() {
                 gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(unit_id) => Some(Uuid::from_u128(*unit_id)),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::Str(description) => Some(description.clone()),
+                _ => unreachable!("Expected Str")
             },
-        }
-    }
-}
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
-pub struct ProjectDiscreteRequirement {
-    pub id: Uuid,
-    pub project_id: Uuid,
-    pub item_id: Uuid,
-    pub quantity: f64,
-    pub unit_id: Option<Uuid>,
-}
-#[cfg(feature = "frontend")]
-impl ProjectDiscreteRequirement {
-    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
-        vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
-            gluesql::core::ast_builder::uuid(self.project_id.to_string()),
-            gluesql::core::ast_builder::uuid(self.item_id.to_string()),
-            gluesql::core::ast_builder::num(self.quantity),
-            match self.unit_id {
-                Some(unit_id) => gluesql::core::ast_builder::uuid(unit_id.to_string()),
-                None => gluesql::core::ast_builder::null(),
-            },
-        ]
-    }
-
-    /// Insert the ProjectDiscreteRequirement into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows inserted in table project_discrete_requirements
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("project_discrete_requirements")
-            .insert()
-            .columns("id, project_id, item_id, quantity, unit_id")
-            .values(vec![self.into_row()])
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
-                 _ => unreachable!("Payload must be an Insert"),
-             })
-    }
-
-    /// Get ProjectDiscreteRequirement from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of ProjectDiscreteRequirement to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn get<C>(
-        id: Uuid,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Option<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("project_discrete_requirements")
-            .select()
-            .filter(col("id").eq(id.to_string()))
-            .project("id, project_id, item_id, quantity, unit_id")
-            .limit(1)
-            .execute(connection)
-            .await?;
-         Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>()
-            .pop())
-    }
-
-    /// Delete ProjectDiscreteRequirement from the database.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete_from_id<C>(
-        id: Uuid,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("project_discrete_requirements")
-            .delete()
-            .filter(col("id").eq(id.to_string()))
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
-                 _ => unreachable!("Payload must be a Delete"),
-             })
-    }
-
-    /// Delete the current instance of ProjectDiscreteRequirement from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        Self::delete_from_id(self.id, connection).await
-    }
-    /// Update the struct in the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated.
-    pub async fn update<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let mut update_row = table("project_discrete_requirements")
-            .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
-.set("project_id", gluesql::core::ast_builder::uuid(self.project_id.to_string()))        
-.set("item_id", gluesql::core::ast_builder::uuid(self.item_id.to_string()))        
-.set("quantity", gluesql::core::ast_builder::num(self.quantity));
-        if let Some(unit_id) = self.unit_id {
-            update_row = update_row.set("unit_id", gluesql::core::ast_builder::uuid(unit_id.to_string()));
-        }
-            update_row.execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
-                 _ => unreachable!("Expected Payload::Update")
-})
-    }
-
-    /// Update the struct in the database if it exists, otherwise insert it.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated or inserted.
-    pub async fn update_or_insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        let number_of_rows = self.clone().update(connection).await?;
-        if number_of_rows == 0 {
-            self.insert(connection).await
-        } else {
-            Ok(number_of_rows)
-        }
-    }
-    /// Get all ProjectDiscreteRequirement from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn all<C>(
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("project_discrete_requirements")
-            .select()
-            .project("id, project_id, item_id, quantity, unit_id")
-            .execute(connection)
-            .await?;
-        Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>())
-    }
-    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
-        Self {
-            id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
-            },
-            project_id: match row.get("project_id").unwrap() {
-                gluesql::prelude::Value::Uuid(project_id) => Uuid::from_u128(*project_id),
-                _ => unreachable!("Expected Uuid"),
-            },
-            item_id: match row.get("item_id").unwrap() {
-                gluesql::prelude::Value::Uuid(item_id) => Uuid::from_u128(*item_id),
-                _ => unreachable!("Expected Uuid"),
-            },
-            quantity: match row.get("quantity").unwrap() {
-                gluesql::prelude::Value::F64(quantity) => quantity.clone(),
-                _ => unreachable!("Expected F64")
-            },
-            unit_id: match row.get("unit_id").unwrap() {
+            created_by: match row.get("created_by").unwrap() {
                 gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(unit_id) => Some(Uuid::from_u128(*unit_id)),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(created_by) => Some(created_by.clone()),
+                _ => unreachable!("Expected I32")
             },
         }
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
-pub struct ProjectMilestone {
-    pub id: Uuid,
-    pub project_id: Uuid,
-    pub due_date: NaiveDateTime,
-    pub completed_at: Option<NaiveDateTime>,
+pub struct ProjectRequirement {
+    pub id: i32,
+    pub created_by: i32,
+    pub project_id: i32,
+    pub item_category_id: i32,
+    pub quantity: i32,
+    pub unit_id: Option<i32>,
 }
 #[cfg(feature = "frontend")]
-impl ProjectMilestone {
+impl ProjectRequirement {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
-            gluesql::core::ast_builder::uuid(self.project_id.to_string()),
-            gluesql::core::ast_builder::timestamp(self.due_date.to_string()),
-            match self.completed_at {
-                Some(completed_at) => gluesql::core::ast_builder::timestamp(completed_at.to_string()),
+            gluesql::core::ast_builder::num(self.id),
+            gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::num(self.project_id),
+            gluesql::core::ast_builder::num(self.item_category_id),
+            gluesql::core::ast_builder::num(self.quantity),
+            match self.unit_id {
+                Some(unit_id) => gluesql::core::ast_builder::num(unit_id),
                 None => gluesql::core::ast_builder::null(),
             },
         ]
     }
 
-    /// Insert the ProjectMilestone into the database.
+    /// Insert the ProjectRequirement into the database.
     ///
     /// # Arguments
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table project_milestones
+    /// The number of rows inserted in table project_requirements
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -7020,9 +5071,9 @@ impl ProjectMilestone {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
-        table("project_milestones")
+        table("project_requirements")
             .insert()
-            .columns("id, project_id, due_date, completed_at")
+            .columns("id, created_by, project_id, item_category_id, quantity, unit_id")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -7032,23 +5083,23 @@ impl ProjectMilestone {
              })
     }
 
-    /// Get ProjectMilestone from the database by its ID.
+    /// Get ProjectRequirement from the database by its ID.
     ///
     /// # Arguments
-    /// * `id` - The ID of ProjectMilestone to get.
+    /// * `id` - The ID of ProjectRequirement to get.
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
-        let select_row = table("project_milestones")
+        let select_row = table("project_requirements")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, project_id, due_date, completed_at")
+            .project("id, created_by, project_id, item_category_id, quantity, unit_id")
             .limit(1)
             .execute(connection)
             .await?;
@@ -7059,7 +5110,7 @@ impl ProjectMilestone {
             .pop())
     }
 
-    /// Delete ProjectMilestone from the database.
+    /// Delete ProjectRequirement from the database.
     ///
     /// # Arguments
     /// * `id` - The ID of the struct to delete.
@@ -7068,13 +5119,13 @@ impl ProjectMilestone {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
-        table("project_milestones")
+        table("project_requirements")
             .delete()
             .filter(col("id").eq(id.to_string()))
             .execute(connection)
@@ -7085,7 +5136,7 @@ impl ProjectMilestone {
              })
     }
 
-    /// Delete the current instance of ProjectMilestone from the database.
+    /// Delete the current instance of ProjectRequirement from the database.
     ///
     /// # Arguments
     /// * `connection` - The connection to the database.
@@ -7114,13 +5165,15 @@ impl ProjectMilestone {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
-        let mut update_row = table("project_milestones")
+        let mut update_row = table("project_requirements")
             .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
-.set("project_id", gluesql::core::ast_builder::uuid(self.project_id.to_string()))        
-.set("due_date", gluesql::core::ast_builder::timestamp(self.due_date.to_string()));
-        if let Some(completed_at) = self.completed_at {
-            update_row = update_row.set("completed_at", gluesql::core::ast_builder::timestamp(completed_at.to_string()));
+.set("id", gluesql::core::ast_builder::num(self.id))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("project_id", gluesql::core::ast_builder::num(self.project_id))        
+.set("item_category_id", gluesql::core::ast_builder::num(self.item_category_id))        
+.set("quantity", gluesql::core::ast_builder::num(self.quantity));
+        if let Some(unit_id) = self.unit_id {
+            update_row = update_row.set("unit_id", gluesql::core::ast_builder::num(unit_id));
         }
             update_row.execute(connection)
             .await
@@ -7150,7 +5203,7 @@ impl ProjectMilestone {
             Ok(number_of_rows)
         }
     }
-    /// Get all ProjectMilestone from the database.
+    /// Get all ProjectRequirement from the database.
     ///
     /// # Arguments
     /// * `connection` - The connection to the database.
@@ -7161,9 +5214,9 @@ impl ProjectMilestone {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
-        let select_row = table("project_milestones")
+        let select_row = table("project_requirements")
             .select()
-            .project("id, project_id, due_date, completed_at")
+            .project("id, created_by, project_id, item_category_id, quantity, unit_id")
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -7174,21 +5227,29 @@ impl ProjectMilestone {
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(id) => id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
+                _ => unreachable!("Expected I32")
             },
             project_id: match row.get("project_id").unwrap() {
-                gluesql::prelude::Value::Uuid(project_id) => Uuid::from_u128(*project_id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(project_id) => project_id.clone(),
+                _ => unreachable!("Expected I32")
             },
-            due_date: match row.get("due_date").unwrap() {
-                gluesql::prelude::Value::Timestamp(due_date) => due_date.clone(),
-                _ => unreachable!("Expected Timestamp")
+            item_category_id: match row.get("item_category_id").unwrap() {
+                gluesql::prelude::Value::I32(item_category_id) => item_category_id.clone(),
+                _ => unreachable!("Expected I32")
             },
-            completed_at: match row.get("completed_at").unwrap() {
+            quantity: match row.get("quantity").unwrap() {
+                gluesql::prelude::Value::I32(quantity) => quantity.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            unit_id: match row.get("unit_id").unwrap() {
                 gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Timestamp(completed_at) => Some(completed_at.clone()),
-                _ => unreachable!("Expected Timestamp")
+                gluesql::prelude::Value::I32(unit_id) => Some(unit_id.clone()),
+                _ => unreachable!("Expected I32")
             },
         }
     }
@@ -7196,7 +5257,7 @@ impl ProjectMilestone {
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ProjectState {
-    pub id: Uuid,
+    pub id: i32,
     pub name: String,
     pub description: String,
     pub font_awesome_icon: String,
@@ -7206,7 +5267,7 @@ pub struct ProjectState {
 impl ProjectState {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
+            gluesql::core::ast_builder::num(self.id),
             gluesql::core::ast_builder::text(self.name),
             gluesql::core::ast_builder::text(self.description),
             gluesql::core::ast_builder::text(self.font_awesome_icon),
@@ -7247,7 +5308,7 @@ impl ProjectState {
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -7276,7 +5337,7 @@ impl ProjectState {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -7324,7 +5385,7 @@ impl ProjectState {
         use gluesql::core::ast_builder::*;
         table("project_states")
             .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
+.set("id", gluesql::core::ast_builder::num(self.id))        
 .set("name", gluesql::core::ast_builder::text(self.name))        
 .set("description", gluesql::core::ast_builder::text(self.description))        
 .set("font_awesome_icon", gluesql::core::ast_builder::text(self.font_awesome_icon))        
@@ -7380,8 +5441,8 @@ impl ProjectState {
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(id) => id.clone(),
+                _ => unreachable!("Expected I32")
             },
             name: match row.get("name").unwrap() {
                 gluesql::prelude::Value::Str(name) => name.clone(),
@@ -7405,15 +5466,15 @@ impl ProjectState {
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Project {
-    pub id: Uuid,
+    pub id: i32,
     pub name: String,
     pub description: String,
     pub public: bool,
-    pub state_id: Uuid,
-    pub parent_project_id: Option<Uuid>,
+    pub state_id: i32,
+    pub parent_project_id: Option<i32>,
     pub budget: Option<i64>,
     pub expenses: Option<i64>,
-    pub created_by: Uuid,
+    pub created_by: i32,
     pub created_at: NaiveDateTime,
     pub expected_end_date: Option<NaiveDateTime>,
     pub end_date: Option<NaiveDateTime>,
@@ -7422,13 +5483,13 @@ pub struct Project {
 impl Project {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
+            gluesql::core::ast_builder::num(self.id),
             gluesql::core::ast_builder::text(self.name),
             gluesql::core::ast_builder::text(self.description),
             (self.public.into()),
-            gluesql::core::ast_builder::uuid(self.state_id.to_string()),
+            gluesql::core::ast_builder::num(self.state_id),
             match self.parent_project_id {
-                Some(parent_project_id) => gluesql::core::ast_builder::uuid(parent_project_id.to_string()),
+                Some(parent_project_id) => gluesql::core::ast_builder::num(parent_project_id),
                 None => gluesql::core::ast_builder::null(),
             },
             match self.budget {
@@ -7439,7 +5500,7 @@ impl Project {
                 Some(expenses) => gluesql::core::ast_builder::num(expenses),
                 None => gluesql::core::ast_builder::null(),
             },
-            gluesql::core::ast_builder::uuid(self.created_by.to_string()),
+            gluesql::core::ast_builder::num(self.created_by),
             gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
             match self.expected_end_date {
                 Some(expected_end_date) => gluesql::core::ast_builder::timestamp(expected_end_date.to_string()),
@@ -7485,7 +5546,7 @@ impl Project {
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -7514,7 +5575,7 @@ impl Project {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -7562,15 +5623,15 @@ impl Project {
         use gluesql::core::ast_builder::*;
         let mut update_row = table("projects")
             .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
+.set("id", gluesql::core::ast_builder::num(self.id))        
 .set("name", gluesql::core::ast_builder::text(self.name))        
 .set("description", gluesql::core::ast_builder::text(self.description))        
 .set("public", self.public)        
-.set("state_id", gluesql::core::ast_builder::uuid(self.state_id.to_string()))        
-.set("created_by", gluesql::core::ast_builder::uuid(self.created_by.to_string()))        
+.set("state_id", gluesql::core::ast_builder::num(self.state_id))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
 .set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()));
         if let Some(parent_project_id) = self.parent_project_id {
-            update_row = update_row.set("parent_project_id", gluesql::core::ast_builder::uuid(parent_project_id.to_string()));
+            update_row = update_row.set("parent_project_id", gluesql::core::ast_builder::num(parent_project_id));
         }
         if let Some(budget) = self.budget {
             update_row = update_row.set("budget", gluesql::core::ast_builder::num(budget));
@@ -7636,8 +5697,8 @@ impl Project {
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(id) => id.clone(),
+                _ => unreachable!("Expected I32")
             },
             name: match row.get("name").unwrap() {
                 gluesql::prelude::Value::Str(name) => name.clone(),
@@ -7652,13 +5713,13 @@ impl Project {
                 _ => unreachable!("Expected Bool")
             },
             state_id: match row.get("state_id").unwrap() {
-                gluesql::prelude::Value::Uuid(state_id) => Uuid::from_u128(*state_id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(state_id) => state_id.clone(),
+                _ => unreachable!("Expected I32")
             },
             parent_project_id: match row.get("parent_project_id").unwrap() {
                 gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(parent_project_id) => Some(Uuid::from_u128(*parent_project_id)),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(parent_project_id) => Some(parent_project_id.clone()),
+                _ => unreachable!("Expected I32")
             },
             budget: match row.get("budget").unwrap() {
                 gluesql::prelude::Value::Null => None,
@@ -7671,8 +5732,8 @@ impl Project {
                 _ => unreachable!("Expected I64")
             },
             created_by: match row.get("created_by").unwrap() {
-                gluesql::prelude::Value::Uuid(created_by) => Uuid::from_u128(*created_by),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
+                _ => unreachable!("Expected I32")
             },
             created_at: match row.get("created_at").unwrap() {
                 gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
@@ -7694,13 +5755,15 @@ impl Project {
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Role {
-    pub id: Uuid,
+    pub id: i32,
+    pub name: String,
 }
 #[cfg(feature = "frontend")]
 impl Role {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
+            gluesql::core::ast_builder::num(self.id),
+            gluesql::core::ast_builder::text(self.name),
         ]
     }
 
@@ -7720,7 +5783,7 @@ impl Role {
         use gluesql::core::ast_builder::*;
         table("roles")
             .insert()
-            .columns("id")
+            .columns("id, name")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -7737,7 +5800,7 @@ impl Role {
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -7746,7 +5809,7 @@ impl Role {
         let select_row = table("roles")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id")
+            .project("id, name")
             .limit(1)
             .execute(connection)
             .await?;
@@ -7766,7 +5829,7 @@ impl Role {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -7814,7 +5877,8 @@ impl Role {
         use gluesql::core::ast_builder::*;
         table("roles")
             .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))            .execute(connection)
+.set("id", gluesql::core::ast_builder::num(self.id))        
+.set("name", gluesql::core::ast_builder::text(self.name))            .execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -7855,7 +5919,7 @@ impl Role {
         use gluesql::core::ast_builder::*;
         let select_row = table("roles")
             .select()
-            .project("id")
+            .project("id, name")
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -7866,8 +5930,12 @@ impl Role {
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(id) => id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            name: match row.get("name").unwrap() {
+                gluesql::prelude::Value::Str(name) => name.clone(),
+                _ => unreachable!("Expected Str")
             },
         }
     }
@@ -7876,16 +5944,18 @@ impl Role {
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SampleTaxa {
     pub id: Uuid,
+    pub created_by: i32,
     pub sample_id: Uuid,
-    pub taxon_id: Uuid,
+    pub taxon_id: i32,
 }
 #[cfg(feature = "frontend")]
 impl SampleTaxa {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
             gluesql::core::ast_builder::uuid(self.id.to_string()),
+            gluesql::core::ast_builder::num(self.created_by),
             gluesql::core::ast_builder::uuid(self.sample_id.to_string()),
-            gluesql::core::ast_builder::uuid(self.taxon_id.to_string()),
+            gluesql::core::ast_builder::num(self.taxon_id),
         ]
     }
 
@@ -7905,7 +5975,7 @@ impl SampleTaxa {
         use gluesql::core::ast_builder::*;
         table("sample_taxa")
             .insert()
-            .columns("id, sample_id, taxon_id")
+            .columns("id, created_by, sample_id, taxon_id")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -7922,7 +5992,7 @@ impl SampleTaxa {
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -7931,7 +6001,7 @@ impl SampleTaxa {
         let select_row = table("sample_taxa")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, sample_id, taxon_id")
+            .project("id, created_by, sample_id, taxon_id")
             .limit(1)
             .execute(connection)
             .await?;
@@ -7951,7 +6021,7 @@ impl SampleTaxa {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -8000,8 +6070,9 @@ impl SampleTaxa {
         table("sample_taxa")
             .update()        
 .set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
 .set("sample_id", gluesql::core::ast_builder::uuid(self.sample_id.to_string()))        
-.set("taxon_id", gluesql::core::ast_builder::uuid(self.taxon_id.to_string()))            .execute(connection)
+.set("taxon_id", gluesql::core::ast_builder::num(self.taxon_id))            .execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -8042,7 +6113,7 @@ impl SampleTaxa {
         use gluesql::core::ast_builder::*;
         let select_row = table("sample_taxa")
             .select()
-            .project("id, sample_id, taxon_id")
+            .project("id, created_by, sample_id, taxon_id")
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -8056,13 +6127,17 @@ impl SampleTaxa {
                 gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
                 _ => unreachable!("Expected Uuid"),
             },
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
             sample_id: match row.get("sample_id").unwrap() {
                 gluesql::prelude::Value::Uuid(sample_id) => Uuid::from_u128(*sample_id),
                 _ => unreachable!("Expected Uuid"),
             },
             taxon_id: match row.get("taxon_id").unwrap() {
-                gluesql::prelude::Value::Uuid(taxon_id) => Uuid::from_u128(*taxon_id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(taxon_id) => taxon_id.clone(),
+                _ => unreachable!("Expected I32")
             },
         }
     }
@@ -8071,16 +6146,18 @@ impl SampleTaxa {
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SampledIndividualTaxa {
     pub id: Uuid,
+    pub created_by: i32,
     pub sampled_individual_id: Uuid,
-    pub taxon_id: Uuid,
+    pub taxon_id: i32,
 }
 #[cfg(feature = "frontend")]
 impl SampledIndividualTaxa {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
             gluesql::core::ast_builder::uuid(self.id.to_string()),
+            gluesql::core::ast_builder::num(self.created_by),
             gluesql::core::ast_builder::uuid(self.sampled_individual_id.to_string()),
-            gluesql::core::ast_builder::uuid(self.taxon_id.to_string()),
+            gluesql::core::ast_builder::num(self.taxon_id),
         ]
     }
 
@@ -8100,7 +6177,7 @@ impl SampledIndividualTaxa {
         use gluesql::core::ast_builder::*;
         table("sampled_individual_taxa")
             .insert()
-            .columns("id, sampled_individual_id, taxon_id")
+            .columns("id, created_by, sampled_individual_id, taxon_id")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -8117,7 +6194,7 @@ impl SampledIndividualTaxa {
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -8126,7 +6203,7 @@ impl SampledIndividualTaxa {
         let select_row = table("sampled_individual_taxa")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, sampled_individual_id, taxon_id")
+            .project("id, created_by, sampled_individual_id, taxon_id")
             .limit(1)
             .execute(connection)
             .await?;
@@ -8146,7 +6223,7 @@ impl SampledIndividualTaxa {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -8195,8 +6272,9 @@ impl SampledIndividualTaxa {
         table("sampled_individual_taxa")
             .update()        
 .set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
 .set("sampled_individual_id", gluesql::core::ast_builder::uuid(self.sampled_individual_id.to_string()))        
-.set("taxon_id", gluesql::core::ast_builder::uuid(self.taxon_id.to_string()))            .execute(connection)
+.set("taxon_id", gluesql::core::ast_builder::num(self.taxon_id))            .execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -8237,7 +6315,7 @@ impl SampledIndividualTaxa {
         use gluesql::core::ast_builder::*;
         let select_row = table("sampled_individual_taxa")
             .select()
-            .project("id, sampled_individual_id, taxon_id")
+            .project("id, created_by, sampled_individual_id, taxon_id")
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -8251,13 +6329,17 @@ impl SampledIndividualTaxa {
                 gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
                 _ => unreachable!("Expected Uuid"),
             },
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
             sampled_individual_id: match row.get("sampled_individual_id").unwrap() {
                 gluesql::prelude::Value::Uuid(sampled_individual_id) => Uuid::from_u128(*sampled_individual_id),
                 _ => unreachable!("Expected Uuid"),
             },
             taxon_id: match row.get("taxon_id").unwrap() {
-                gluesql::prelude::Value::Uuid(taxon_id) => Uuid::from_u128(*taxon_id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(taxon_id) => taxon_id.clone(),
+                _ => unreachable!("Expected I32")
             },
         }
     }
@@ -8308,7 +6390,7 @@ impl SampledIndividual {
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -8337,7 +6419,7 @@ impl SampledIndividual {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -8447,6 +6529,7 @@ impl SampledIndividual {
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Sample {
     pub id: Uuid,
+    pub created_by: Option<i32>,
     pub derived_from: Option<Uuid>,
 }
 #[cfg(feature = "frontend")]
@@ -8454,6 +6537,10 @@ impl Sample {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
             gluesql::core::ast_builder::uuid(self.id.to_string()),
+            match self.created_by {
+                Some(created_by) => gluesql::core::ast_builder::num(created_by),
+                None => gluesql::core::ast_builder::null(),
+            },
             match self.derived_from {
                 Some(derived_from) => gluesql::core::ast_builder::uuid(derived_from.to_string()),
                 None => gluesql::core::ast_builder::null(),
@@ -8477,7 +6564,7 @@ impl Sample {
         use gluesql::core::ast_builder::*;
         table("samples")
             .insert()
-            .columns("id, derived_from")
+            .columns("id, created_by, derived_from")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -8494,7 +6581,7 @@ impl Sample {
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -8503,7 +6590,7 @@ impl Sample {
         let select_row = table("samples")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, derived_from")
+            .project("id, created_by, derived_from")
             .limit(1)
             .execute(connection)
             .await?;
@@ -8523,7 +6610,7 @@ impl Sample {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -8572,6 +6659,9 @@ impl Sample {
         let mut update_row = table("samples")
             .update()        
 .set("id", gluesql::core::ast_builder::uuid(self.id.to_string()));
+        if let Some(created_by) = self.created_by {
+            update_row = update_row.set("created_by", gluesql::core::ast_builder::num(created_by));
+        }
         if let Some(derived_from) = self.derived_from {
             update_row = update_row.set("derived_from", gluesql::core::ast_builder::uuid(derived_from.to_string()));
         }
@@ -8616,7 +6706,7 @@ impl Sample {
         use gluesql::core::ast_builder::*;
         let select_row = table("samples")
             .select()
-            .project("id, derived_from")
+            .project("id, created_by, derived_from")
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -8630,6 +6720,11 @@ impl Sample {
                 gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
                 _ => unreachable!("Expected Uuid"),
             },
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::I32(created_by) => Some(created_by.clone()),
+                _ => unreachable!("Expected I32")
+            },
             derived_from: match row.get("derived_from").unwrap() {
                 gluesql::prelude::Value::Null => None,
                 gluesql::prelude::Value::Uuid(derived_from) => Some(Uuid::from_u128(*derived_from)),
@@ -8641,15 +6736,15 @@ impl Sample {
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Spectra {
-    pub id: Uuid,
-    pub spectra_collection_id: Uuid,
+    pub id: i32,
+    pub spectra_collection_id: i32,
 }
 #[cfg(feature = "frontend")]
 impl Spectra {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
-            gluesql::core::ast_builder::uuid(self.spectra_collection_id.to_string()),
+            gluesql::core::ast_builder::num(self.id),
+            gluesql::core::ast_builder::num(self.spectra_collection_id),
         ]
     }
 
@@ -8686,7 +6781,7 @@ impl Spectra {
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -8715,7 +6810,7 @@ impl Spectra {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -8763,8 +6858,8 @@ impl Spectra {
         use gluesql::core::ast_builder::*;
         table("spectra")
             .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
-.set("spectra_collection_id", gluesql::core::ast_builder::uuid(self.spectra_collection_id.to_string()))            .execute(connection)
+.set("id", gluesql::core::ast_builder::num(self.id))        
+.set("spectra_collection_id", gluesql::core::ast_builder::num(self.spectra_collection_id))            .execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -8816,12 +6911,12 @@ impl Spectra {
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(id) => id.clone(),
+                _ => unreachable!("Expected I32")
             },
             spectra_collection_id: match row.get("spectra_collection_id").unwrap() {
-                gluesql::prelude::Value::Uuid(spectra_collection_id) => Uuid::from_u128(*spectra_collection_id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(spectra_collection_id) => spectra_collection_id.clone(),
+                _ => unreachable!("Expected I32")
             },
         }
     }
@@ -8829,15 +6924,17 @@ impl Spectra {
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SpectraCollection {
-    pub id: Uuid,
+    pub id: i32,
     pub sample_id: Uuid,
+    pub created_by: i32,
 }
 #[cfg(feature = "frontend")]
 impl SpectraCollection {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
+            gluesql::core::ast_builder::num(self.id),
             gluesql::core::ast_builder::uuid(self.sample_id.to_string()),
+            gluesql::core::ast_builder::num(self.created_by),
         ]
     }
 
@@ -8857,7 +6954,7 @@ impl SpectraCollection {
         use gluesql::core::ast_builder::*;
         table("spectra_collection")
             .insert()
-            .columns("id, sample_id")
+            .columns("id, sample_id, created_by")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -8874,7 +6971,7 @@ impl SpectraCollection {
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -8883,7 +6980,7 @@ impl SpectraCollection {
         let select_row = table("spectra_collection")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, sample_id")
+            .project("id, sample_id, created_by")
             .limit(1)
             .execute(connection)
             .await?;
@@ -8903,7 +7000,7 @@ impl SpectraCollection {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -8951,8 +7048,9 @@ impl SpectraCollection {
         use gluesql::core::ast_builder::*;
         table("spectra_collection")
             .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
-.set("sample_id", gluesql::core::ast_builder::uuid(self.sample_id.to_string()))            .execute(connection)
+.set("id", gluesql::core::ast_builder::num(self.id))        
+.set("sample_id", gluesql::core::ast_builder::uuid(self.sample_id.to_string()))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))            .execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -8993,7 +7091,7 @@ impl SpectraCollection {
         use gluesql::core::ast_builder::*;
         let select_row = table("spectra_collection")
             .select()
-            .project("id, sample_id")
+            .project("id, sample_id, created_by")
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -9004,12 +7102,16 @@ impl SpectraCollection {
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(id) => id.clone(),
+                _ => unreachable!("Expected I32")
             },
             sample_id: match row.get("sample_id").unwrap() {
                 gluesql::prelude::Value::Uuid(sample_id) => Uuid::from_u128(*sample_id),
                 _ => unreachable!("Expected Uuid"),
+            },
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
+                _ => unreachable!("Expected I32")
             },
         }
     }
@@ -9017,7 +7119,7 @@ impl SpectraCollection {
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Taxa {
-    pub id: Uuid,
+    pub id: i32,
     pub name: String,
     pub ncbi_taxon_id: Option<i32>,
 }
@@ -9025,7 +7127,7 @@ pub struct Taxa {
 impl Taxa {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
+            gluesql::core::ast_builder::num(self.id),
             gluesql::core::ast_builder::text(self.name),
             match self.ncbi_taxon_id {
                 Some(ncbi_taxon_id) => gluesql::core::ast_builder::num(ncbi_taxon_id),
@@ -9067,7 +7169,7 @@ impl Taxa {
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -9096,7 +7198,7 @@ impl Taxa {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -9144,7 +7246,7 @@ impl Taxa {
         use gluesql::core::ast_builder::*;
         let mut update_row = table("taxa")
             .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
+.set("id", gluesql::core::ast_builder::num(self.id))        
 .set("name", gluesql::core::ast_builder::text(self.name));
         if let Some(ncbi_taxon_id) = self.ncbi_taxon_id {
             update_row = update_row.set("ncbi_taxon_id", gluesql::core::ast_builder::num(ncbi_taxon_id));
@@ -9201,8 +7303,8 @@ impl Taxa {
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(id) => id.clone(),
+                _ => unreachable!("Expected I32")
             },
             name: match row.get("name").unwrap() {
                 gluesql::prelude::Value::Str(name) => name.clone(),
@@ -9218,411 +7320,19 @@ impl Taxa {
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
-pub struct TeamAuthorization {
-    pub id: Uuid,
-    pub team_id: Uuid,
-    pub editable_id: Uuid,
-    pub role_id: Uuid,
-}
-#[cfg(feature = "frontend")]
-impl TeamAuthorization {
-    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
-        vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
-            gluesql::core::ast_builder::uuid(self.team_id.to_string()),
-            gluesql::core::ast_builder::uuid(self.editable_id.to_string()),
-            gluesql::core::ast_builder::uuid(self.role_id.to_string()),
-        ]
-    }
-
-    /// Insert the TeamAuthorization into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows inserted in table team_authorizations
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("team_authorizations")
-            .insert()
-            .columns("id, team_id, editable_id, role_id")
-            .values(vec![self.into_row()])
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
-                 _ => unreachable!("Payload must be an Insert"),
-             })
-    }
-
-    /// Get TeamAuthorization from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of TeamAuthorization to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn get<C>(
-        id: Uuid,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Option<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("team_authorizations")
-            .select()
-            .filter(col("id").eq(id.to_string()))
-            .project("id, team_id, editable_id, role_id")
-            .limit(1)
-            .execute(connection)
-            .await?;
-         Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>()
-            .pop())
-    }
-
-    /// Delete TeamAuthorization from the database.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete_from_id<C>(
-        id: Uuid,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("team_authorizations")
-            .delete()
-            .filter(col("id").eq(id.to_string()))
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
-                 _ => unreachable!("Payload must be a Delete"),
-             })
-    }
-
-    /// Delete the current instance of TeamAuthorization from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        Self::delete_from_id(self.id, connection).await
-    }
-    /// Update the struct in the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated.
-    pub async fn update<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("team_authorizations")
-            .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
-.set("team_id", gluesql::core::ast_builder::uuid(self.team_id.to_string()))        
-.set("editable_id", gluesql::core::ast_builder::uuid(self.editable_id.to_string()))        
-.set("role_id", gluesql::core::ast_builder::uuid(self.role_id.to_string()))            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
-                 _ => unreachable!("Expected Payload::Update")
-})
-    }
-
-    /// Update the struct in the database if it exists, otherwise insert it.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated or inserted.
-    pub async fn update_or_insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        let number_of_rows = self.clone().update(connection).await?;
-        if number_of_rows == 0 {
-            self.insert(connection).await
-        } else {
-            Ok(number_of_rows)
-        }
-    }
-    /// Get all TeamAuthorization from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn all<C>(
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("team_authorizations")
-            .select()
-            .project("id, team_id, editable_id, role_id")
-            .execute(connection)
-            .await?;
-        Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>())
-    }
-    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
-        Self {
-            id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
-            },
-            team_id: match row.get("team_id").unwrap() {
-                gluesql::prelude::Value::Uuid(team_id) => Uuid::from_u128(*team_id),
-                _ => unreachable!("Expected Uuid"),
-            },
-            editable_id: match row.get("editable_id").unwrap() {
-                gluesql::prelude::Value::Uuid(editable_id) => Uuid::from_u128(*editable_id),
-                _ => unreachable!("Expected Uuid"),
-            },
-            role_id: match row.get("role_id").unwrap() {
-                gluesql::prelude::Value::Uuid(role_id) => Uuid::from_u128(*role_id),
-                _ => unreachable!("Expected Uuid"),
-            },
-        }
-    }
-}
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
-pub struct TeamState {
-    pub id: Uuid,
-    pub font_awesome_icon: String,
-}
-#[cfg(feature = "frontend")]
-impl TeamState {
-    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
-        vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
-            gluesql::core::ast_builder::text(self.font_awesome_icon),
-        ]
-    }
-
-    /// Insert the TeamState into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows inserted in table team_states
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("team_states")
-            .insert()
-            .columns("id, font_awesome_icon")
-            .values(vec![self.into_row()])
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
-                 _ => unreachable!("Payload must be an Insert"),
-             })
-    }
-
-    /// Get TeamState from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of TeamState to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn get<C>(
-        id: Uuid,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Option<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("team_states")
-            .select()
-            .filter(col("id").eq(id.to_string()))
-            .project("id, font_awesome_icon")
-            .limit(1)
-            .execute(connection)
-            .await?;
-         Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>()
-            .pop())
-    }
-
-    /// Delete TeamState from the database.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete_from_id<C>(
-        id: Uuid,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("team_states")
-            .delete()
-            .filter(col("id").eq(id.to_string()))
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
-                 _ => unreachable!("Payload must be a Delete"),
-             })
-    }
-
-    /// Delete the current instance of TeamState from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        Self::delete_from_id(self.id, connection).await
-    }
-    /// Update the struct in the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated.
-    pub async fn update<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("team_states")
-            .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
-.set("font_awesome_icon", gluesql::core::ast_builder::text(self.font_awesome_icon))            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
-                 _ => unreachable!("Expected Payload::Update")
-})
-    }
-
-    /// Update the struct in the database if it exists, otherwise insert it.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated or inserted.
-    pub async fn update_or_insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        let number_of_rows = self.clone().update(connection).await?;
-        if number_of_rows == 0 {
-            self.insert(connection).await
-        } else {
-            Ok(number_of_rows)
-        }
-    }
-    /// Get all TeamState from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn all<C>(
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("team_states")
-            .select()
-            .project("id, font_awesome_icon")
-            .execute(connection)
-            .await?;
-        Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>())
-    }
-    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
-        Self {
-            id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
-            },
-            font_awesome_icon: match row.get("font_awesome_icon").unwrap() {
-                gluesql::prelude::Value::Str(font_awesome_icon) => font_awesome_icon.clone(),
-                _ => unreachable!("Expected Str")
-            },
-        }
-    }
-}
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Team {
-    pub id: Uuid,
-    pub parent_team_id: Option<Uuid>,
-    pub team_state_id: Uuid,
+    pub id: i32,
+    pub parent_team_id: Option<i32>,
 }
 #[cfg(feature = "frontend")]
 impl Team {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
+            gluesql::core::ast_builder::num(self.id),
             match self.parent_team_id {
-                Some(parent_team_id) => gluesql::core::ast_builder::uuid(parent_team_id.to_string()),
+                Some(parent_team_id) => gluesql::core::ast_builder::num(parent_team_id),
                 None => gluesql::core::ast_builder::null(),
             },
-            gluesql::core::ast_builder::uuid(self.team_state_id.to_string()),
         ]
     }
 
@@ -9642,7 +7352,7 @@ impl Team {
         use gluesql::core::ast_builder::*;
         table("teams")
             .insert()
-            .columns("id, parent_team_id, team_state_id")
+            .columns("id, parent_team_id")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -9659,7 +7369,7 @@ impl Team {
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -9668,7 +7378,7 @@ impl Team {
         let select_row = table("teams")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, parent_team_id, team_state_id")
+            .project("id, parent_team_id")
             .limit(1)
             .execute(connection)
             .await?;
@@ -9688,7 +7398,7 @@ impl Team {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -9736,10 +7446,9 @@ impl Team {
         use gluesql::core::ast_builder::*;
         let mut update_row = table("teams")
             .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
-.set("team_state_id", gluesql::core::ast_builder::uuid(self.team_state_id.to_string()));
+.set("id", gluesql::core::ast_builder::num(self.id));
         if let Some(parent_team_id) = self.parent_team_id {
-            update_row = update_row.set("parent_team_id", gluesql::core::ast_builder::uuid(parent_team_id.to_string()));
+            update_row = update_row.set("parent_team_id", gluesql::core::ast_builder::num(parent_team_id));
         }
             update_row.execute(connection)
             .await
@@ -9782,7 +7491,7 @@ impl Team {
         use gluesql::core::ast_builder::*;
         let select_row = table("teams")
             .select()
-            .project("id, parent_team_id, team_state_id")
+            .project("id, parent_team_id")
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -9793,17 +7502,13 @@ impl Team {
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(id) => id.clone(),
+                _ => unreachable!("Expected I32")
             },
             parent_team_id: match row.get("parent_team_id").unwrap() {
                 gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(parent_team_id) => Some(Uuid::from_u128(*parent_team_id)),
-                _ => unreachable!("Expected Uuid"),
-            },
-            team_state_id: match row.get("team_state_id").unwrap() {
-                gluesql::prelude::Value::Uuid(team_state_id) => Uuid::from_u128(*team_state_id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(parent_team_id) => Some(parent_team_id.clone()),
+                _ => unreachable!("Expected I32")
             },
         }
     }
@@ -9811,14 +7516,18 @@ impl Team {
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Unit {
-    pub id: Uuid,
+    pub id: i32,
+    pub name: String,
+    pub description: String,
     pub symbol: String,
 }
 #[cfg(feature = "frontend")]
 impl Unit {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
+            gluesql::core::ast_builder::num(self.id),
+            gluesql::core::ast_builder::text(self.name),
+            gluesql::core::ast_builder::text(self.description),
             gluesql::core::ast_builder::text(self.symbol),
         ]
     }
@@ -9839,7 +7548,7 @@ impl Unit {
         use gluesql::core::ast_builder::*;
         table("units")
             .insert()
-            .columns("id, symbol")
+            .columns("id, name, description, symbol")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -9856,7 +7565,7 @@ impl Unit {
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -9865,7 +7574,7 @@ impl Unit {
         let select_row = table("units")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, symbol")
+            .project("id, name, description, symbol")
             .limit(1)
             .execute(connection)
             .await?;
@@ -9885,7 +7594,7 @@ impl Unit {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -9933,7 +7642,9 @@ impl Unit {
         use gluesql::core::ast_builder::*;
         table("units")
             .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
+.set("id", gluesql::core::ast_builder::num(self.id))        
+.set("name", gluesql::core::ast_builder::text(self.name))        
+.set("description", gluesql::core::ast_builder::text(self.description))        
 .set("symbol", gluesql::core::ast_builder::text(self.symbol))            .execute(connection)
             .await
              .map(|payload| match payload {
@@ -9975,7 +7686,7 @@ impl Unit {
         use gluesql::core::ast_builder::*;
         let select_row = table("units")
             .select()
-            .project("id, symbol")
+            .project("id, name, description, symbol")
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -9986,8 +7697,16 @@ impl Unit {
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(id) => id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            name: match row.get("name").unwrap() {
+                gluesql::prelude::Value::Str(name) => name.clone(),
+                _ => unreachable!("Expected Str")
+            },
+            description: match row.get("description").unwrap() {
+                gluesql::prelude::Value::Str(description) => description.clone(),
+                _ => unreachable!("Expected Str")
             },
             symbol: match row.get("symbol").unwrap() {
                 gluesql::prelude::Value::Str(symbol) => symbol.clone(),
@@ -9998,222 +7717,20 @@ impl Unit {
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
-pub struct UserAuthorization {
-    pub id: Uuid,
-    pub user_id: Uuid,
-    pub editable_id: Uuid,
-    pub role_id: Uuid,
-}
-#[cfg(feature = "frontend")]
-impl UserAuthorization {
-    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
-        vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
-            gluesql::core::ast_builder::uuid(self.user_id.to_string()),
-            gluesql::core::ast_builder::uuid(self.editable_id.to_string()),
-            gluesql::core::ast_builder::uuid(self.role_id.to_string()),
-        ]
-    }
-
-    /// Insert the UserAuthorization into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows inserted in table user_authorizations
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("user_authorizations")
-            .insert()
-            .columns("id, user_id, editable_id, role_id")
-            .values(vec![self.into_row()])
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
-                 _ => unreachable!("Payload must be an Insert"),
-             })
-    }
-
-    /// Get UserAuthorization from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of UserAuthorization to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn get<C>(
-        id: Uuid,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Option<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("user_authorizations")
-            .select()
-            .filter(col("id").eq(id.to_string()))
-            .project("id, user_id, editable_id, role_id")
-            .limit(1)
-            .execute(connection)
-            .await?;
-         Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>()
-            .pop())
-    }
-
-    /// Delete UserAuthorization from the database.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete_from_id<C>(
-        id: Uuid,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("user_authorizations")
-            .delete()
-            .filter(col("id").eq(id.to_string()))
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
-                 _ => unreachable!("Payload must be a Delete"),
-             })
-    }
-
-    /// Delete the current instance of UserAuthorization from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        Self::delete_from_id(self.id, connection).await
-    }
-    /// Update the struct in the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated.
-    pub async fn update<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("user_authorizations")
-            .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
-.set("user_id", gluesql::core::ast_builder::uuid(self.user_id.to_string()))        
-.set("editable_id", gluesql::core::ast_builder::uuid(self.editable_id.to_string()))        
-.set("role_id", gluesql::core::ast_builder::uuid(self.role_id.to_string()))            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
-                 _ => unreachable!("Expected Payload::Update")
-})
-    }
-
-    /// Update the struct in the database if it exists, otherwise insert it.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated or inserted.
-    pub async fn update_or_insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        let number_of_rows = self.clone().update(connection).await?;
-        if number_of_rows == 0 {
-            self.insert(connection).await
-        } else {
-            Ok(number_of_rows)
-        }
-    }
-    /// Get all UserAuthorization from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn all<C>(
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("user_authorizations")
-            .select()
-            .project("id, user_id, editable_id, role_id")
-            .execute(connection)
-            .await?;
-        Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>())
-    }
-    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
-        Self {
-            id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
-            },
-            user_id: match row.get("user_id").unwrap() {
-                gluesql::prelude::Value::Uuid(user_id) => Uuid::from_u128(*user_id),
-                _ => unreachable!("Expected Uuid"),
-            },
-            editable_id: match row.get("editable_id").unwrap() {
-                gluesql::prelude::Value::Uuid(editable_id) => Uuid::from_u128(*editable_id),
-                _ => unreachable!("Expected Uuid"),
-            },
-            role_id: match row.get("role_id").unwrap() {
-                gluesql::prelude::Value::Uuid(role_id) => Uuid::from_u128(*role_id),
-                _ => unreachable!("Expected Uuid"),
-            },
-        }
-    }
-}
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct UserEmail {
-    pub id: Uuid,
+    pub id: i32,
     pub email: String,
-    pub user_id: Uuid,
-    pub login_provider_id: Uuid,
+    pub user_id: i32,
+    pub login_provider_id: i32,
 }
 #[cfg(feature = "frontend")]
 impl UserEmail {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
+            gluesql::core::ast_builder::num(self.id),
             gluesql::core::ast_builder::text(self.email),
-            gluesql::core::ast_builder::uuid(self.user_id.to_string()),
-            gluesql::core::ast_builder::uuid(self.login_provider_id.to_string()),
+            gluesql::core::ast_builder::num(self.user_id),
+            gluesql::core::ast_builder::num(self.login_provider_id),
         ]
     }
 
@@ -10250,7 +7767,7 @@ impl UserEmail {
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -10279,7 +7796,7 @@ impl UserEmail {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -10327,10 +7844,10 @@ impl UserEmail {
         use gluesql::core::ast_builder::*;
         table("user_emails")
             .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
+.set("id", gluesql::core::ast_builder::num(self.id))        
 .set("email", gluesql::core::ast_builder::text(self.email))        
-.set("user_id", gluesql::core::ast_builder::uuid(self.user_id.to_string()))        
-.set("login_provider_id", gluesql::core::ast_builder::uuid(self.login_provider_id.to_string()))            .execute(connection)
+.set("user_id", gluesql::core::ast_builder::num(self.user_id))        
+.set("login_provider_id", gluesql::core::ast_builder::num(self.login_provider_id))            .execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -10382,20 +7899,20 @@ impl UserEmail {
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(id) => id.clone(),
+                _ => unreachable!("Expected I32")
             },
             email: match row.get("email").unwrap() {
                 gluesql::prelude::Value::Str(email) => email.clone(),
                 _ => unreachable!("Expected Str")
             },
             user_id: match row.get("user_id").unwrap() {
-                gluesql::prelude::Value::Uuid(user_id) => Uuid::from_u128(*user_id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(user_id) => user_id.clone(),
+                _ => unreachable!("Expected I32")
             },
             login_provider_id: match row.get("login_provider_id").unwrap() {
-                gluesql::prelude::Value::Uuid(login_provider_id) => Uuid::from_u128(*login_provider_id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(login_provider_id) => login_provider_id.clone(),
+                _ => unreachable!("Expected I32")
             },
         }
     }
@@ -10403,7 +7920,7 @@ impl UserEmail {
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct User {
-    pub id: Uuid,
+    pub id: i32,
     pub first_name: String,
     pub middle_name: Option<String>,
     pub last_name: String,
@@ -10414,7 +7931,7 @@ pub struct User {
 impl User {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
+            gluesql::core::ast_builder::num(self.id),
             gluesql::core::ast_builder::text(self.first_name),
             match self.middle_name {
                 Some(middle_name) => gluesql::core::ast_builder::text(middle_name),
@@ -10459,7 +7976,7 @@ impl User {
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -10488,7 +8005,7 @@ impl User {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -10536,7 +8053,7 @@ impl User {
         use gluesql::core::ast_builder::*;
         let mut update_row = table("users")
             .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
+.set("id", gluesql::core::ast_builder::num(self.id))        
 .set("first_name", gluesql::core::ast_builder::text(self.first_name))        
 .set("last_name", gluesql::core::ast_builder::text(self.last_name))        
 .set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
@@ -10596,8 +8113,8 @@ impl User {
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
+                gluesql::prelude::Value::I32(id) => id.clone(),
+                _ => unreachable!("Expected I32")
             },
             first_name: match row.get("first_name").unwrap() {
                 gluesql::prelude::Value::Str(first_name) => first_name.clone(),
@@ -10626,16 +8143,12 @@ impl User {
 
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Copy, Eq, )]
 pub enum Table {
-    Archivable,
     ContainerHorizontalRule,
     ContainerVerticalRule,
     ContinuousUnit,
-    Describable,
     DiscreteUnit,
     DocumentFormat,
     Document,
-    Editable,
-    Edit,
     ItemCategory,
     ItemCategoryRelationship,
     ItemCategoryUnit,
@@ -10644,22 +8157,16 @@ pub enum Table {
     ItemLocation,
     ItemUnit,
     Item,
-    LocationState,
     Location,
     LoginProvider,
     ManufacturedItemCategory,
     Notification,
-    OrganizationAuthorization,
-    OrganizationLocation,
-    OrganizationState,
     Organization,
     PrimaryUserEmail,
     ProcedureContinuousRequirement,
     ProcedureDiscreteRequirement,
     Procedure,
-    ProjectContinuousRequirement,
-    ProjectDiscreteRequirement,
-    ProjectMilestone,
+    ProjectRequirement,
     ProjectState,
     Project,
     Role,
@@ -10670,11 +8177,8 @@ pub enum Table {
     Spectra,
     SpectraCollection,
     Taxa,
-    TeamAuthorization,
-    TeamState,
     Team,
     Unit,
-    UserAuthorization,
     UserEmail,
     User,
 }
@@ -10682,16 +8186,12 @@ pub enum Table {
 impl Table {
     pub fn name(&self) -> &'static str {
         match self {
-            Table::Archivable => "archivables",
             Table::ContainerHorizontalRule => "container_horizontal_rules",
             Table::ContainerVerticalRule => "container_vertical_rules",
             Table::ContinuousUnit => "continuous_units",
-            Table::Describable => "describables",
             Table::DiscreteUnit => "discrete_units",
             Table::DocumentFormat => "document_formats",
             Table::Document => "documents",
-            Table::Editable => "editables",
-            Table::Edit => "edits",
             Table::ItemCategory => "item_categories",
             Table::ItemCategoryRelationship => "item_category_relationships",
             Table::ItemCategoryUnit => "item_category_units",
@@ -10700,22 +8200,16 @@ impl Table {
             Table::ItemLocation => "item_locations",
             Table::ItemUnit => "item_units",
             Table::Item => "items",
-            Table::LocationState => "location_states",
             Table::Location => "locations",
             Table::LoginProvider => "login_providers",
             Table::ManufacturedItemCategory => "manufactured_item_categories",
             Table::Notification => "notifications",
-            Table::OrganizationAuthorization => "organization_authorizations",
-            Table::OrganizationLocation => "organization_locations",
-            Table::OrganizationState => "organization_states",
             Table::Organization => "organizations",
             Table::PrimaryUserEmail => "primary_user_emails",
             Table::ProcedureContinuousRequirement => "procedure_continuous_requirements",
             Table::ProcedureDiscreteRequirement => "procedure_discrete_requirements",
             Table::Procedure => "procedures",
-            Table::ProjectContinuousRequirement => "project_continuous_requirements",
-            Table::ProjectDiscreteRequirement => "project_discrete_requirements",
-            Table::ProjectMilestone => "project_milestones",
+            Table::ProjectRequirement => "project_requirements",
             Table::ProjectState => "project_states",
             Table::Project => "projects",
             Table::Role => "roles",
@@ -10726,11 +8220,8 @@ impl Table {
             Table::Spectra => "spectra",
             Table::SpectraCollection => "spectra_collection",
             Table::Taxa => "taxa",
-            Table::TeamAuthorization => "team_authorizations",
-            Table::TeamState => "team_states",
             Table::Team => "teams",
             Table::Unit => "units",
-            Table::UserAuthorization => "user_authorizations",
             Table::UserEmail => "user_emails",
             Table::User => "users",
         }
@@ -10744,16 +8235,12 @@ impl std::fmt::Display for Table {
 
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
 pub enum TableRow {
-    Archivable(Archivable),
     ContainerHorizontalRule(ContainerHorizontalRule),
     ContainerVerticalRule(ContainerVerticalRule),
     ContinuousUnit(ContinuousUnit),
-    Describable(Describable),
     DiscreteUnit(DiscreteUnit),
     DocumentFormat(DocumentFormat),
     Document(Document),
-    Editable(Editable),
-    Edit(Edit),
     ItemCategory(ItemCategory),
     ItemCategoryRelationship(ItemCategoryRelationship),
     ItemCategoryUnit(ItemCategoryUnit),
@@ -10762,22 +8249,16 @@ pub enum TableRow {
     ItemLocation(ItemLocation),
     ItemUnit(ItemUnit),
     Item(Item),
-    LocationState(LocationState),
     Location(Location),
     LoginProvider(LoginProvider),
     ManufacturedItemCategory(ManufacturedItemCategory),
     Notification(Notification),
-    OrganizationAuthorization(OrganizationAuthorization),
-    OrganizationLocation(OrganizationLocation),
-    OrganizationState(OrganizationState),
     Organization(Organization),
     PrimaryUserEmail(PrimaryUserEmail),
     ProcedureContinuousRequirement(ProcedureContinuousRequirement),
     ProcedureDiscreteRequirement(ProcedureDiscreteRequirement),
     Procedure(Procedure),
-    ProjectContinuousRequirement(ProjectContinuousRequirement),
-    ProjectDiscreteRequirement(ProjectDiscreteRequirement),
-    ProjectMilestone(ProjectMilestone),
+    ProjectRequirement(ProjectRequirement),
     ProjectState(ProjectState),
     Project(Project),
     Role(Role),
@@ -10788,29 +8269,12 @@ pub enum TableRow {
     Spectra(Spectra),
     SpectraCollection(SpectraCollection),
     Taxa(Taxa),
-    TeamAuthorization(TeamAuthorization),
-    TeamState(TeamState),
     Team(Team),
     Unit(Unit),
-    UserAuthorization(UserAuthorization),
     UserEmail(UserEmail),
     User(User),
 }
 
-impl From<Archivable> for TableRow {
-    fn from(item: Archivable) -> Self {
-        TableRow::Archivable(item)
-    }
-}
-impl std::convert::TryFrom<TableRow> for Archivable {
-    type Error = &'static str;
-    fn try_from(item: TableRow) -> Result<Self, Self::Error> {
-        match item {
-            TableRow::Archivable(item) => Ok(item),
-            _ => Err("Invalid conversion"),
-        }
-    }
-}
 impl From<ContainerHorizontalRule> for TableRow {
     fn from(item: ContainerHorizontalRule) -> Self {
         TableRow::ContainerHorizontalRule(item)
@@ -10853,20 +8317,6 @@ impl std::convert::TryFrom<TableRow> for ContinuousUnit {
         }
     }
 }
-impl From<Describable> for TableRow {
-    fn from(item: Describable) -> Self {
-        TableRow::Describable(item)
-    }
-}
-impl std::convert::TryFrom<TableRow> for Describable {
-    type Error = &'static str;
-    fn try_from(item: TableRow) -> Result<Self, Self::Error> {
-        match item {
-            TableRow::Describable(item) => Ok(item),
-            _ => Err("Invalid conversion"),
-        }
-    }
-}
 impl From<DiscreteUnit> for TableRow {
     fn from(item: DiscreteUnit) -> Self {
         TableRow::DiscreteUnit(item)
@@ -10905,34 +8355,6 @@ impl std::convert::TryFrom<TableRow> for Document {
     fn try_from(item: TableRow) -> Result<Self, Self::Error> {
         match item {
             TableRow::Document(item) => Ok(item),
-            _ => Err("Invalid conversion"),
-        }
-    }
-}
-impl From<Editable> for TableRow {
-    fn from(item: Editable) -> Self {
-        TableRow::Editable(item)
-    }
-}
-impl std::convert::TryFrom<TableRow> for Editable {
-    type Error = &'static str;
-    fn try_from(item: TableRow) -> Result<Self, Self::Error> {
-        match item {
-            TableRow::Editable(item) => Ok(item),
-            _ => Err("Invalid conversion"),
-        }
-    }
-}
-impl From<Edit> for TableRow {
-    fn from(item: Edit) -> Self {
-        TableRow::Edit(item)
-    }
-}
-impl std::convert::TryFrom<TableRow> for Edit {
-    type Error = &'static str;
-    fn try_from(item: TableRow) -> Result<Self, Self::Error> {
-        match item {
-            TableRow::Edit(item) => Ok(item),
             _ => Err("Invalid conversion"),
         }
     }
@@ -11049,20 +8471,6 @@ impl std::convert::TryFrom<TableRow> for Item {
         }
     }
 }
-impl From<LocationState> for TableRow {
-    fn from(item: LocationState) -> Self {
-        TableRow::LocationState(item)
-    }
-}
-impl std::convert::TryFrom<TableRow> for LocationState {
-    type Error = &'static str;
-    fn try_from(item: TableRow) -> Result<Self, Self::Error> {
-        match item {
-            TableRow::LocationState(item) => Ok(item),
-            _ => Err("Invalid conversion"),
-        }
-    }
-}
 impl From<Location> for TableRow {
     fn from(item: Location) -> Self {
         TableRow::Location(item)
@@ -11115,48 +8523,6 @@ impl std::convert::TryFrom<TableRow> for Notification {
     fn try_from(item: TableRow) -> Result<Self, Self::Error> {
         match item {
             TableRow::Notification(item) => Ok(item),
-            _ => Err("Invalid conversion"),
-        }
-    }
-}
-impl From<OrganizationAuthorization> for TableRow {
-    fn from(item: OrganizationAuthorization) -> Self {
-        TableRow::OrganizationAuthorization(item)
-    }
-}
-impl std::convert::TryFrom<TableRow> for OrganizationAuthorization {
-    type Error = &'static str;
-    fn try_from(item: TableRow) -> Result<Self, Self::Error> {
-        match item {
-            TableRow::OrganizationAuthorization(item) => Ok(item),
-            _ => Err("Invalid conversion"),
-        }
-    }
-}
-impl From<OrganizationLocation> for TableRow {
-    fn from(item: OrganizationLocation) -> Self {
-        TableRow::OrganizationLocation(item)
-    }
-}
-impl std::convert::TryFrom<TableRow> for OrganizationLocation {
-    type Error = &'static str;
-    fn try_from(item: TableRow) -> Result<Self, Self::Error> {
-        match item {
-            TableRow::OrganizationLocation(item) => Ok(item),
-            _ => Err("Invalid conversion"),
-        }
-    }
-}
-impl From<OrganizationState> for TableRow {
-    fn from(item: OrganizationState) -> Self {
-        TableRow::OrganizationState(item)
-    }
-}
-impl std::convert::TryFrom<TableRow> for OrganizationState {
-    type Error = &'static str;
-    fn try_from(item: TableRow) -> Result<Self, Self::Error> {
-        match item {
-            TableRow::OrganizationState(item) => Ok(item),
             _ => Err("Invalid conversion"),
         }
     }
@@ -11231,44 +8597,16 @@ impl std::convert::TryFrom<TableRow> for Procedure {
         }
     }
 }
-impl From<ProjectContinuousRequirement> for TableRow {
-    fn from(item: ProjectContinuousRequirement) -> Self {
-        TableRow::ProjectContinuousRequirement(item)
+impl From<ProjectRequirement> for TableRow {
+    fn from(item: ProjectRequirement) -> Self {
+        TableRow::ProjectRequirement(item)
     }
 }
-impl std::convert::TryFrom<TableRow> for ProjectContinuousRequirement {
+impl std::convert::TryFrom<TableRow> for ProjectRequirement {
     type Error = &'static str;
     fn try_from(item: TableRow) -> Result<Self, Self::Error> {
         match item {
-            TableRow::ProjectContinuousRequirement(item) => Ok(item),
-            _ => Err("Invalid conversion"),
-        }
-    }
-}
-impl From<ProjectDiscreteRequirement> for TableRow {
-    fn from(item: ProjectDiscreteRequirement) -> Self {
-        TableRow::ProjectDiscreteRequirement(item)
-    }
-}
-impl std::convert::TryFrom<TableRow> for ProjectDiscreteRequirement {
-    type Error = &'static str;
-    fn try_from(item: TableRow) -> Result<Self, Self::Error> {
-        match item {
-            TableRow::ProjectDiscreteRequirement(item) => Ok(item),
-            _ => Err("Invalid conversion"),
-        }
-    }
-}
-impl From<ProjectMilestone> for TableRow {
-    fn from(item: ProjectMilestone) -> Self {
-        TableRow::ProjectMilestone(item)
-    }
-}
-impl std::convert::TryFrom<TableRow> for ProjectMilestone {
-    type Error = &'static str;
-    fn try_from(item: TableRow) -> Result<Self, Self::Error> {
-        match item {
-            TableRow::ProjectMilestone(item) => Ok(item),
+            TableRow::ProjectRequirement(item) => Ok(item),
             _ => Err("Invalid conversion"),
         }
     }
@@ -11413,34 +8751,6 @@ impl std::convert::TryFrom<TableRow> for Taxa {
         }
     }
 }
-impl From<TeamAuthorization> for TableRow {
-    fn from(item: TeamAuthorization) -> Self {
-        TableRow::TeamAuthorization(item)
-    }
-}
-impl std::convert::TryFrom<TableRow> for TeamAuthorization {
-    type Error = &'static str;
-    fn try_from(item: TableRow) -> Result<Self, Self::Error> {
-        match item {
-            TableRow::TeamAuthorization(item) => Ok(item),
-            _ => Err("Invalid conversion"),
-        }
-    }
-}
-impl From<TeamState> for TableRow {
-    fn from(item: TeamState) -> Self {
-        TableRow::TeamState(item)
-    }
-}
-impl std::convert::TryFrom<TableRow> for TeamState {
-    type Error = &'static str;
-    fn try_from(item: TableRow) -> Result<Self, Self::Error> {
-        match item {
-            TableRow::TeamState(item) => Ok(item),
-            _ => Err("Invalid conversion"),
-        }
-    }
-}
 impl From<Team> for TableRow {
     fn from(item: Team) -> Self {
         TableRow::Team(item)
@@ -11465,20 +8775,6 @@ impl std::convert::TryFrom<TableRow> for Unit {
     fn try_from(item: TableRow) -> Result<Self, Self::Error> {
         match item {
             TableRow::Unit(item) => Ok(item),
-            _ => Err("Invalid conversion"),
-        }
-    }
-}
-impl From<UserAuthorization> for TableRow {
-    fn from(item: UserAuthorization) -> Self {
-        TableRow::UserAuthorization(item)
-    }
-}
-impl std::convert::TryFrom<TableRow> for UserAuthorization {
-    type Error = &'static str;
-    fn try_from(item: TableRow) -> Result<Self, Self::Error> {
-        match item {
-            TableRow::UserAuthorization(item) => Ok(item),
             _ => Err("Invalid conversion"),
         }
     }
@@ -11514,16 +8810,12 @@ impl std::convert::TryFrom<TableRow> for User {
 impl From<&str> for Table {
     fn from(item: &str) -> Self {
         match item {
-            "archivables" => Table::Archivable,
             "container_horizontal_rules" => Table::ContainerHorizontalRule,
             "container_vertical_rules" => Table::ContainerVerticalRule,
             "continuous_units" => Table::ContinuousUnit,
-            "describables" => Table::Describable,
             "discrete_units" => Table::DiscreteUnit,
             "document_formats" => Table::DocumentFormat,
             "documents" => Table::Document,
-            "editables" => Table::Editable,
-            "edits" => Table::Edit,
             "item_categories" => Table::ItemCategory,
             "item_category_relationships" => Table::ItemCategoryRelationship,
             "item_category_units" => Table::ItemCategoryUnit,
@@ -11532,22 +8824,16 @@ impl From<&str> for Table {
             "item_locations" => Table::ItemLocation,
             "item_units" => Table::ItemUnit,
             "items" => Table::Item,
-            "location_states" => Table::LocationState,
             "locations" => Table::Location,
             "login_providers" => Table::LoginProvider,
             "manufactured_item_categories" => Table::ManufacturedItemCategory,
             "notifications" => Table::Notification,
-            "organization_authorizations" => Table::OrganizationAuthorization,
-            "organization_locations" => Table::OrganizationLocation,
-            "organization_states" => Table::OrganizationState,
             "organizations" => Table::Organization,
             "primary_user_emails" => Table::PrimaryUserEmail,
             "procedure_continuous_requirements" => Table::ProcedureContinuousRequirement,
             "procedure_discrete_requirements" => Table::ProcedureDiscreteRequirement,
             "procedures" => Table::Procedure,
-            "project_continuous_requirements" => Table::ProjectContinuousRequirement,
-            "project_discrete_requirements" => Table::ProjectDiscreteRequirement,
-            "project_milestones" => Table::ProjectMilestone,
+            "project_requirements" => Table::ProjectRequirement,
             "project_states" => Table::ProjectState,
             "projects" => Table::Project,
             "roles" => Table::Role,
@@ -11558,11 +8844,8 @@ impl From<&str> for Table {
             "spectra" => Table::Spectra,
             "spectra_collection" => Table::SpectraCollection,
             "taxa" => Table::Taxa,
-            "team_authorizations" => Table::TeamAuthorization,
-            "team_states" => Table::TeamState,
             "teams" => Table::Team,
             "units" => Table::Unit,
-            "user_authorizations" => Table::UserAuthorization,
             "user_emails" => Table::UserEmail,
             "users" => Table::User,
             _ => panic!("Unknown table name"),
@@ -11572,16 +8855,12 @@ impl From<&str> for Table {
 impl TableRow {
     pub fn table(&self) -> &'static Table {
         match self {
-            TableRow::Archivable(_) => &Table::Archivable,
             TableRow::ContainerHorizontalRule(_) => &Table::ContainerHorizontalRule,
             TableRow::ContainerVerticalRule(_) => &Table::ContainerVerticalRule,
             TableRow::ContinuousUnit(_) => &Table::ContinuousUnit,
-            TableRow::Describable(_) => &Table::Describable,
             TableRow::DiscreteUnit(_) => &Table::DiscreteUnit,
             TableRow::DocumentFormat(_) => &Table::DocumentFormat,
             TableRow::Document(_) => &Table::Document,
-            TableRow::Editable(_) => &Table::Editable,
-            TableRow::Edit(_) => &Table::Edit,
             TableRow::ItemCategory(_) => &Table::ItemCategory,
             TableRow::ItemCategoryRelationship(_) => &Table::ItemCategoryRelationship,
             TableRow::ItemCategoryUnit(_) => &Table::ItemCategoryUnit,
@@ -11590,22 +8869,16 @@ impl TableRow {
             TableRow::ItemLocation(_) => &Table::ItemLocation,
             TableRow::ItemUnit(_) => &Table::ItemUnit,
             TableRow::Item(_) => &Table::Item,
-            TableRow::LocationState(_) => &Table::LocationState,
             TableRow::Location(_) => &Table::Location,
             TableRow::LoginProvider(_) => &Table::LoginProvider,
             TableRow::ManufacturedItemCategory(_) => &Table::ManufacturedItemCategory,
             TableRow::Notification(_) => &Table::Notification,
-            TableRow::OrganizationAuthorization(_) => &Table::OrganizationAuthorization,
-            TableRow::OrganizationLocation(_) => &Table::OrganizationLocation,
-            TableRow::OrganizationState(_) => &Table::OrganizationState,
             TableRow::Organization(_) => &Table::Organization,
             TableRow::PrimaryUserEmail(_) => &Table::PrimaryUserEmail,
             TableRow::ProcedureContinuousRequirement(_) => &Table::ProcedureContinuousRequirement,
             TableRow::ProcedureDiscreteRequirement(_) => &Table::ProcedureDiscreteRequirement,
             TableRow::Procedure(_) => &Table::Procedure,
-            TableRow::ProjectContinuousRequirement(_) => &Table::ProjectContinuousRequirement,
-            TableRow::ProjectDiscreteRequirement(_) => &Table::ProjectDiscreteRequirement,
-            TableRow::ProjectMilestone(_) => &Table::ProjectMilestone,
+            TableRow::ProjectRequirement(_) => &Table::ProjectRequirement,
             TableRow::ProjectState(_) => &Table::ProjectState,
             TableRow::Project(_) => &Table::Project,
             TableRow::Role(_) => &Table::Role,
@@ -11616,11 +8889,8 @@ impl TableRow {
             TableRow::Spectra(_) => &Table::Spectra,
             TableRow::SpectraCollection(_) => &Table::SpectraCollection,
             TableRow::Taxa(_) => &Table::Taxa,
-            TableRow::TeamAuthorization(_) => &Table::TeamAuthorization,
-            TableRow::TeamState(_) => &Table::TeamState,
             TableRow::Team(_) => &Table::Team,
             TableRow::Unit(_) => &Table::Unit,
-            TableRow::UserAuthorization(_) => &Table::UserAuthorization,
             TableRow::UserEmail(_) => &Table::UserEmail,
             TableRow::User(_) => &Table::User,
         }

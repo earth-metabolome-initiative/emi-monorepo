@@ -18,68 +18,27 @@ use diesel::Queryable;
 use chrono::NaiveDateTime;
 use uuid::Uuid;
 #[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
-#[diesel(table_name = archivables)]
-pub struct Archivable {
-    pub id: Uuid,
-    pub archived_at: NaiveDateTime,
-    pub archived_by: Uuid,
-}
-
-impl From<Archivable> for web_common::database::tables::Archivable {
-    fn from(item: Archivable) -> Self {
-        Self {
-            id: item.id,
-            archived_at: item.archived_at,
-            archived_by: item.archived_by,
-        }
-    }
-}
-
-impl From<web_common::database::tables::Archivable> for Archivable {
-    fn from(item: web_common::database::tables::Archivable) -> Self {
-        Self {
-            id: item.id,
-            archived_at: item.archived_at,
-            archived_by: item.archived_by,
-        }
-    }
-}
-
-impl Archivable {
-    /// Get the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn get(
-        id: Uuid,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        archivables::dsl::archivables
-            .filter(archivables::dsl::id.eq(id))
-            .first::<Self>(connection)
-    }
-}
-
-#[derive(QueryableByName, Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = container_horizontal_rules)]
 pub struct ContainerHorizontalRule {
-    pub id: Uuid,
-    pub item_type_id: Uuid,
-    pub other_item_type_id: Uuid,
-    pub minimum_temperature: Option<f64>,
-    pub maximum_temperature: Option<f64>,
-    pub minimum_humidity: Option<f64>,
-    pub maximum_humidity: Option<f64>,
-    pub minimum_pressure: Option<f64>,
-    pub maximum_pressure: Option<f64>,
+    pub id: i32,
+    pub created_by: i32,
+    pub name: String,
+    pub item_type_id: i32,
+    pub other_item_type_id: i32,
+    pub minimum_temperature: Option<i32>,
+    pub maximum_temperature: Option<i32>,
+    pub minimum_humidity: Option<i32>,
+    pub maximum_humidity: Option<i32>,
+    pub minimum_pressure: Option<i32>,
+    pub maximum_pressure: Option<i32>,
 }
 
 impl From<ContainerHorizontalRule> for web_common::database::tables::ContainerHorizontalRule {
     fn from(item: ContainerHorizontalRule) -> Self {
         Self {
             id: item.id,
+            created_by: item.created_by,
+            name: item.name,
             item_type_id: item.item_type_id,
             other_item_type_id: item.other_item_type_id,
             minimum_temperature: item.minimum_temperature,
@@ -96,6 +55,8 @@ impl From<web_common::database::tables::ContainerHorizontalRule> for ContainerHo
     fn from(item: web_common::database::tables::ContainerHorizontalRule) -> Self {
         Self {
             id: item.id,
+            created_by: item.created_by,
+            name: item.name,
             item_type_id: item.item_type_id,
             other_item_type_id: item.other_item_type_id,
             minimum_temperature: item.minimum_temperature,
@@ -116,7 +77,7 @@ impl ContainerHorizontalRule {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         container_horizontal_rules::dsl::container_horizontal_rules
@@ -125,24 +86,28 @@ impl ContainerHorizontalRule {
     }
 }
 
-#[derive(QueryableByName, Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = container_vertical_rules)]
 pub struct ContainerVerticalRule {
-    pub id: Uuid,
-    pub container_item_type_id: Uuid,
-    pub contained_item_type_id: Uuid,
-    pub minimum_temperature: Option<f64>,
-    pub maximum_temperature: Option<f64>,
-    pub minimum_humidity: Option<f64>,
-    pub maximum_humidity: Option<f64>,
-    pub minimum_pressure: Option<f64>,
-    pub maximum_pressure: Option<f64>,
+    pub id: i32,
+    pub created_by: i32,
+    pub name: String,
+    pub container_item_type_id: i32,
+    pub contained_item_type_id: i32,
+    pub minimum_temperature: Option<i32>,
+    pub maximum_temperature: Option<i32>,
+    pub minimum_humidity: Option<i32>,
+    pub maximum_humidity: Option<i32>,
+    pub minimum_pressure: Option<i32>,
+    pub maximum_pressure: Option<i32>,
 }
 
 impl From<ContainerVerticalRule> for web_common::database::tables::ContainerVerticalRule {
     fn from(item: ContainerVerticalRule) -> Self {
         Self {
             id: item.id,
+            created_by: item.created_by,
+            name: item.name,
             container_item_type_id: item.container_item_type_id,
             contained_item_type_id: item.contained_item_type_id,
             minimum_temperature: item.minimum_temperature,
@@ -159,6 +124,8 @@ impl From<web_common::database::tables::ContainerVerticalRule> for ContainerVert
     fn from(item: web_common::database::tables::ContainerVerticalRule) -> Self {
         Self {
             id: item.id,
+            created_by: item.created_by,
+            name: item.name,
             container_item_type_id: item.container_item_type_id,
             contained_item_type_id: item.contained_item_type_id,
             minimum_temperature: item.minimum_temperature,
@@ -179,7 +146,7 @@ impl ContainerVerticalRule {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         container_vertical_rules::dsl::container_vertical_rules
@@ -191,7 +158,7 @@ impl ContainerVerticalRule {
 #[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = continuous_units)]
 pub struct ContinuousUnit {
-    pub id: Uuid,
+    pub id: i32,
 }
 
 impl From<ContinuousUnit> for web_common::database::tables::ContinuousUnit {
@@ -218,7 +185,7 @@ impl ContinuousUnit {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         continuous_units::dsl::continuous_units
@@ -228,54 +195,9 @@ impl ContinuousUnit {
 }
 
 #[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
-#[diesel(table_name = describables)]
-pub struct Describable {
-    pub id: Uuid,
-    pub name: String,
-    pub description: Option<String>,
-}
-
-impl From<Describable> for web_common::database::tables::Describable {
-    fn from(item: Describable) -> Self {
-        Self {
-            id: item.id,
-            name: item.name,
-            description: item.description,
-        }
-    }
-}
-
-impl From<web_common::database::tables::Describable> for Describable {
-    fn from(item: web_common::database::tables::Describable) -> Self {
-        Self {
-            id: item.id,
-            name: item.name,
-            description: item.description,
-        }
-    }
-}
-
-impl Describable {
-    /// Get the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn get(
-        id: Uuid,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        describables::dsl::describables
-            .filter(describables::dsl::id.eq(id))
-            .first::<Self>(connection)
-    }
-}
-
-#[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = discrete_units)]
 pub struct DiscreteUnit {
-    pub id: Uuid,
+    pub id: i32,
 }
 
 impl From<DiscreteUnit> for web_common::database::tables::DiscreteUnit {
@@ -302,7 +224,7 @@ impl DiscreteUnit {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         discrete_units::dsl::discrete_units
@@ -314,7 +236,8 @@ impl DiscreteUnit {
 #[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = document_formats)]
 pub struct DocumentFormat {
-    pub id: Uuid,
+    pub id: i32,
+    pub extension: String,
     pub mime_type: String,
 }
 
@@ -322,6 +245,7 @@ impl From<DocumentFormat> for web_common::database::tables::DocumentFormat {
     fn from(item: DocumentFormat) -> Self {
         Self {
             id: item.id,
+            extension: item.extension,
             mime_type: item.mime_type,
         }
     }
@@ -331,6 +255,7 @@ impl From<web_common::database::tables::DocumentFormat> for DocumentFormat {
     fn from(item: web_common::database::tables::DocumentFormat) -> Self {
         Self {
             id: item.id,
+            extension: item.extension,
             mime_type: item.mime_type,
         }
     }
@@ -344,7 +269,7 @@ impl DocumentFormat {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         document_formats::dsl::document_formats
@@ -357,8 +282,9 @@ impl DocumentFormat {
 #[diesel(table_name = documents)]
 pub struct Document {
     pub id: Uuid,
+    pub author_id: i32,
     pub path: String,
-    pub format_id: Uuid,
+    pub format_id: i32,
     pub bytes: i32,
 }
 
@@ -366,6 +292,7 @@ impl From<Document> for web_common::database::tables::Document {
     fn from(item: Document) -> Self {
         Self {
             id: item.id,
+            author_id: item.author_id,
             path: item.path,
             format_id: item.format_id,
             bytes: item.bytes,
@@ -377,6 +304,7 @@ impl From<web_common::database::tables::Document> for Document {
     fn from(item: web_common::database::tables::Document) -> Self {
         Self {
             id: item.id,
+            author_id: item.author_id,
             path: item.path,
             format_id: item.format_id,
             bytes: item.bytes,
@@ -392,7 +320,7 @@ impl Document {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         documents::dsl::documents
@@ -402,102 +330,21 @@ impl Document {
 }
 
 #[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
-#[diesel(table_name = editables)]
-pub struct Editable {
-    pub id: Uuid,
-    pub created_at: NaiveDateTime,
-    pub created_by: Uuid,
-}
-
-impl From<Editable> for web_common::database::tables::Editable {
-    fn from(item: Editable) -> Self {
-        Self {
-            id: item.id,
-            created_at: item.created_at,
-            created_by: item.created_by,
-        }
-    }
-}
-
-impl From<web_common::database::tables::Editable> for Editable {
-    fn from(item: web_common::database::tables::Editable) -> Self {
-        Self {
-            id: item.id,
-            created_at: item.created_at,
-            created_by: item.created_by,
-        }
-    }
-}
-
-impl Editable {
-    /// Get the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn get(
-        id: Uuid,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        editables::dsl::editables
-            .filter(editables::dsl::id.eq(id))
-            .first::<Self>(connection)
-    }
-}
-
-#[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
-#[diesel(table_name = edits)]
-pub struct Edit {
-    pub id: Uuid,
-    pub editable_id: Uuid,
-}
-
-impl From<Edit> for web_common::database::tables::Edit {
-    fn from(item: Edit) -> Self {
-        Self {
-            id: item.id,
-            editable_id: item.editable_id,
-        }
-    }
-}
-
-impl From<web_common::database::tables::Edit> for Edit {
-    fn from(item: web_common::database::tables::Edit) -> Self {
-        Self {
-            id: item.id,
-            editable_id: item.editable_id,
-        }
-    }
-}
-
-impl Edit {
-    /// Get the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn get(
-        id: Uuid,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        edits::dsl::edits
-            .filter(edits::dsl::id.eq(id))
-            .first::<Self>(connection)
-    }
-}
-
-#[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = item_categories)]
 pub struct ItemCategory {
-    pub id: Uuid,
+    pub id: i32,
+    pub name: String,
+    pub description: String,
+    pub created_by: i32,
 }
 
 impl From<ItemCategory> for web_common::database::tables::ItemCategory {
     fn from(item: ItemCategory) -> Self {
         Self {
             id: item.id,
+            name: item.name,
+            description: item.description,
+            created_by: item.created_by,
         }
     }
 }
@@ -506,6 +353,9 @@ impl From<web_common::database::tables::ItemCategory> for ItemCategory {
     fn from(item: web_common::database::tables::ItemCategory) -> Self {
         Self {
             id: item.id,
+            name: item.name,
+            description: item.description,
+            created_by: item.created_by,
         }
     }
 }
@@ -518,7 +368,7 @@ impl ItemCategory {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         item_categories::dsl::item_categories
@@ -530,9 +380,10 @@ impl ItemCategory {
 #[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = item_category_relationships)]
 pub struct ItemCategoryRelationship {
-    pub id: Uuid,
-    pub parent_id: Uuid,
-    pub child_id: Uuid,
+    pub id: i32,
+    pub parent_id: i32,
+    pub child_id: i32,
+    pub added_by: i32,
 }
 
 impl From<ItemCategoryRelationship> for web_common::database::tables::ItemCategoryRelationship {
@@ -541,6 +392,7 @@ impl From<ItemCategoryRelationship> for web_common::database::tables::ItemCatego
             id: item.id,
             parent_id: item.parent_id,
             child_id: item.child_id,
+            added_by: item.added_by,
         }
     }
 }
@@ -551,6 +403,7 @@ impl From<web_common::database::tables::ItemCategoryRelationship> for ItemCatego
             id: item.id,
             parent_id: item.parent_id,
             child_id: item.child_id,
+            added_by: item.added_by,
         }
     }
 }
@@ -563,7 +416,7 @@ impl ItemCategoryRelationship {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         item_category_relationships::dsl::item_category_relationships
@@ -575,9 +428,9 @@ impl ItemCategoryRelationship {
 #[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = item_category_units)]
 pub struct ItemCategoryUnit {
-    pub id: Uuid,
-    pub item_category_id: Uuid,
-    pub unit_id: Uuid,
+    pub id: i32,
+    pub item_category_id: i32,
+    pub unit_id: i32,
 }
 
 impl From<ItemCategoryUnit> for web_common::database::tables::ItemCategoryUnit {
@@ -608,7 +461,7 @@ impl ItemCategoryUnit {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         item_category_units::dsl::item_category_units
@@ -617,16 +470,16 @@ impl ItemCategoryUnit {
     }
 }
 
-#[derive(QueryableByName, Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = item_continuous_quantities)]
 pub struct ItemContinuousQuantity {
     pub id: Uuid,
     pub item_id: Uuid,
-    pub weight: f64,
-    pub unit_id: Uuid,
+    pub amount: i32,
+    pub unit_id: i32,
     pub sensor_id: Option<Uuid>,
     pub measured_at: NaiveDateTime,
-    pub measured_by: Option<Uuid>,
+    pub measured_by: Option<i32>,
 }
 
 impl From<ItemContinuousQuantity> for web_common::database::tables::ItemContinuousQuantity {
@@ -634,7 +487,7 @@ impl From<ItemContinuousQuantity> for web_common::database::tables::ItemContinuo
         Self {
             id: item.id,
             item_id: item.item_id,
-            weight: item.weight,
+            amount: item.amount,
             unit_id: item.unit_id,
             sensor_id: item.sensor_id,
             measured_at: item.measured_at,
@@ -648,7 +501,7 @@ impl From<web_common::database::tables::ItemContinuousQuantity> for ItemContinuo
         Self {
             id: item.id,
             item_id: item.item_id,
-            weight: item.weight,
+            amount: item.amount,
             unit_id: item.unit_id,
             sensor_id: item.sensor_id,
             measured_at: item.measured_at,
@@ -665,7 +518,7 @@ impl ItemContinuousQuantity {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         item_continuous_quantities::dsl::item_continuous_quantities
@@ -680,9 +533,9 @@ pub struct ItemDiscreteQuantity {
     pub id: Uuid,
     pub item_id: Uuid,
     pub quantity: i32,
-    pub unit_id: Uuid,
+    pub unit_id: i32,
     pub measured_at: NaiveDateTime,
-    pub measured_by: Option<Uuid>,
+    pub measured_by: Option<i32>,
 }
 
 impl From<ItemDiscreteQuantity> for web_common::database::tables::ItemDiscreteQuantity {
@@ -719,7 +572,7 @@ impl ItemDiscreteQuantity {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         item_discrete_quantities::dsl::item_discrete_quantities
@@ -733,8 +586,9 @@ impl ItemDiscreteQuantity {
 pub struct ItemLocation {
     pub id: Uuid,
     pub item_id: Option<Uuid>,
+    pub located_by: Option<i32>,
+    pub located_at: NaiveDateTime,
     pub location_id: Option<Uuid>,
-    pub previous_location_id: Option<Uuid>,
 }
 
 impl From<ItemLocation> for web_common::database::tables::ItemLocation {
@@ -742,8 +596,9 @@ impl From<ItemLocation> for web_common::database::tables::ItemLocation {
         Self {
             id: item.id,
             item_id: item.item_id,
+            located_by: item.located_by,
+            located_at: item.located_at,
             location_id: item.location_id,
-            previous_location_id: item.previous_location_id,
         }
     }
 }
@@ -753,8 +608,9 @@ impl From<web_common::database::tables::ItemLocation> for ItemLocation {
         Self {
             id: item.id,
             item_id: item.item_id,
+            located_by: item.located_by,
+            located_at: item.located_at,
             location_id: item.location_id,
-            previous_location_id: item.previous_location_id,
         }
     }
 }
@@ -767,7 +623,7 @@ impl ItemLocation {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         item_locations::dsl::item_locations
@@ -781,7 +637,7 @@ impl ItemLocation {
 pub struct ItemUnit {
     pub id: Uuid,
     pub item_id: Uuid,
-    pub unit_id: Uuid,
+    pub unit_id: i32,
 }
 
 impl From<ItemUnit> for web_common::database::tables::ItemUnit {
@@ -812,7 +668,7 @@ impl ItemUnit {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         item_units::dsl::item_units
@@ -854,53 +710,11 @@ impl Item {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         items::dsl::items
             .filter(items::dsl::id.eq(id))
-            .first::<Self>(connection)
-    }
-}
-
-#[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
-#[diesel(table_name = location_states)]
-pub struct LocationState {
-    pub id: Uuid,
-    pub font_awesome_icon: Option<String>,
-}
-
-impl From<LocationState> for web_common::database::tables::LocationState {
-    fn from(item: LocationState) -> Self {
-        Self {
-            id: item.id,
-            font_awesome_icon: item.font_awesome_icon,
-        }
-    }
-}
-
-impl From<web_common::database::tables::LocationState> for LocationState {
-    fn from(item: web_common::database::tables::LocationState) -> Self {
-        Self {
-            id: item.id,
-            font_awesome_icon: item.font_awesome_icon,
-        }
-    }
-}
-
-impl LocationState {
-    /// Get the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn get(
-        id: Uuid,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        location_states::dsl::location_states
-            .filter(location_states::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -920,7 +734,6 @@ pub struct Location {
     pub geolocalization_device_id: Option<Uuid>,
     pub altitude_device_id: Option<Uuid>,
     pub parent_location_id: Option<Uuid>,
-    pub state_id: Uuid,
 }
 
 impl From<Location> for web_common::database::tables::Location {
@@ -938,7 +751,6 @@ impl From<Location> for web_common::database::tables::Location {
             geolocalization_device_id: item.geolocalization_device_id,
             altitude_device_id: item.altitude_device_id,
             parent_location_id: item.parent_location_id,
-            state_id: item.state_id,
         }
     }
 }
@@ -958,7 +770,6 @@ impl From<web_common::database::tables::Location> for Location {
             geolocalization_device_id: item.geolocalization_device_id,
             altitude_device_id: item.altitude_device_id,
             parent_location_id: item.parent_location_id,
-            state_id: item.state_id,
         }
     }
 }
@@ -971,7 +782,7 @@ impl Location {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         locations::dsl::locations
@@ -983,7 +794,7 @@ impl Location {
 #[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = login_providers)]
 pub struct LoginProvider {
-    pub id: Uuid,
+    pub id: i32,
     pub name: String,
     pub font_awesome_icon: String,
     pub client_id_var_name: String,
@@ -1028,7 +839,7 @@ impl LoginProvider {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         login_providers::dsl::login_providers
@@ -1037,14 +848,14 @@ impl LoginProvider {
     }
 }
 
-#[derive(QueryableByName, Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = manufactured_item_categories)]
 pub struct ManufacturedItemCategory {
-    pub id: Uuid,
-    pub cost: f64,
-    pub cost_per_day: f64,
+    pub id: i32,
+    pub cost: i32,
+    pub cost_per_day: i32,
     pub currency: String,
-    pub manifacturer_id: Uuid,
+    pub manifacturer_id: i32,
 }
 
 impl From<ManufacturedItemCategory> for web_common::database::tables::ManufacturedItemCategory {
@@ -1079,7 +890,7 @@ impl ManufacturedItemCategory {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         manufactured_item_categories::dsl::manufactured_item_categories
@@ -1091,11 +902,10 @@ impl ManufacturedItemCategory {
 #[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = notifications)]
 pub struct Notification {
-    pub id: Uuid,
-    pub user_id: Uuid,
+    pub id: i32,
+    pub user_id: i32,
     pub operation: String,
     pub table_name: String,
-    pub row_id: Option<Uuid>,
     pub read: bool,
 }
 
@@ -1106,7 +916,6 @@ impl From<Notification> for web_common::database::tables::Notification {
             user_id: item.user_id,
             operation: item.operation,
             table_name: item.table_name,
-            row_id: item.row_id,
             read: item.read,
         }
     }
@@ -1119,7 +928,6 @@ impl From<web_common::database::tables::Notification> for Notification {
             user_id: item.user_id,
             operation: item.operation,
             table_name: item.table_name,
-            row_id: item.row_id,
             read: item.read,
         }
     }
@@ -1133,7 +941,7 @@ impl Notification {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         notifications::dsl::notifications
@@ -1143,161 +951,19 @@ impl Notification {
 }
 
 #[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
-#[diesel(table_name = organization_authorizations)]
-pub struct OrganizationAuthorization {
-    pub id: Uuid,
-    pub organization_id: Uuid,
-    pub editable_id: Uuid,
-    pub role_id: Uuid,
-}
-
-impl From<OrganizationAuthorization> for web_common::database::tables::OrganizationAuthorization {
-    fn from(item: OrganizationAuthorization) -> Self {
-        Self {
-            id: item.id,
-            organization_id: item.organization_id,
-            editable_id: item.editable_id,
-            role_id: item.role_id,
-        }
-    }
-}
-
-impl From<web_common::database::tables::OrganizationAuthorization> for OrganizationAuthorization {
-    fn from(item: web_common::database::tables::OrganizationAuthorization) -> Self {
-        Self {
-            id: item.id,
-            organization_id: item.organization_id,
-            editable_id: item.editable_id,
-            role_id: item.role_id,
-        }
-    }
-}
-
-impl OrganizationAuthorization {
-    /// Get the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn get(
-        id: Uuid,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        organization_authorizations::dsl::organization_authorizations
-            .filter(organization_authorizations::dsl::id.eq(id))
-            .first::<Self>(connection)
-    }
-}
-
-#[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
-#[diesel(table_name = organization_locations)]
-pub struct OrganizationLocation {
-    pub id: Uuid,
-    pub organization_id: Option<Uuid>,
-    pub location_id: Option<Uuid>,
-    pub previous_location_id: Option<Uuid>,
-}
-
-impl From<OrganizationLocation> for web_common::database::tables::OrganizationLocation {
-    fn from(item: OrganizationLocation) -> Self {
-        Self {
-            id: item.id,
-            organization_id: item.organization_id,
-            location_id: item.location_id,
-            previous_location_id: item.previous_location_id,
-        }
-    }
-}
-
-impl From<web_common::database::tables::OrganizationLocation> for OrganizationLocation {
-    fn from(item: web_common::database::tables::OrganizationLocation) -> Self {
-        Self {
-            id: item.id,
-            organization_id: item.organization_id,
-            location_id: item.location_id,
-            previous_location_id: item.previous_location_id,
-        }
-    }
-}
-
-impl OrganizationLocation {
-    /// Get the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn get(
-        id: Uuid,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        organization_locations::dsl::organization_locations
-            .filter(organization_locations::dsl::id.eq(id))
-            .first::<Self>(connection)
-    }
-}
-
-#[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
-#[diesel(table_name = organization_states)]
-pub struct OrganizationState {
-    pub id: Uuid,
-    pub font_awesome_icon: Option<String>,
-}
-
-impl From<OrganizationState> for web_common::database::tables::OrganizationState {
-    fn from(item: OrganizationState) -> Self {
-        Self {
-            id: item.id,
-            font_awesome_icon: item.font_awesome_icon,
-        }
-    }
-}
-
-impl From<web_common::database::tables::OrganizationState> for OrganizationState {
-    fn from(item: web_common::database::tables::OrganizationState) -> Self {
-        Self {
-            id: item.id,
-            font_awesome_icon: item.font_awesome_icon,
-        }
-    }
-}
-
-impl OrganizationState {
-    /// Get the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn get(
-        id: Uuid,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        organization_states::dsl::organization_states
-            .filter(organization_states::dsl::id.eq(id))
-            .first::<Self>(connection)
-    }
-}
-
-#[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = organizations)]
 pub struct Organization {
-    pub id: Uuid,
-    pub state_id: Option<Uuid>,
-    pub parent_organization_id: Option<Uuid>,
-    pub logo_id: Option<Uuid>,
-    pub website_url: Option<String>,
+    pub id: i32,
+    pub parent_organization_id: Option<i32>,
+    pub name: String,
 }
 
 impl From<Organization> for web_common::database::tables::Organization {
     fn from(item: Organization) -> Self {
         Self {
             id: item.id,
-            state_id: item.state_id,
             parent_organization_id: item.parent_organization_id,
-            logo_id: item.logo_id,
-            website_url: item.website_url,
+            name: item.name,
         }
     }
 }
@@ -1306,10 +972,8 @@ impl From<web_common::database::tables::Organization> for Organization {
     fn from(item: web_common::database::tables::Organization) -> Self {
         Self {
             id: item.id,
-            state_id: item.state_id,
             parent_organization_id: item.parent_organization_id,
-            logo_id: item.logo_id,
-            website_url: item.website_url,
+            name: item.name,
         }
     }
 }
@@ -1322,7 +986,7 @@ impl Organization {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         organizations::dsl::organizations
@@ -1334,7 +998,7 @@ impl Organization {
 #[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = primary_user_emails)]
 pub struct PrimaryUserEmail {
-    pub id: Uuid,
+    pub id: i32,
 }
 
 impl From<PrimaryUserEmail> for web_common::database::tables::PrimaryUserEmail {
@@ -1361,7 +1025,7 @@ impl PrimaryUserEmail {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         primary_user_emails::dsl::primary_user_emails
@@ -1373,17 +1037,19 @@ impl PrimaryUserEmail {
 #[derive(QueryableByName, Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = procedure_continuous_requirements)]
 pub struct ProcedureContinuousRequirement {
-    pub id: Uuid,
-    pub procedure_id: Uuid,
-    pub item_category_id: Uuid,
+    pub id: i32,
+    pub created_by: i32,
+    pub procedure_id: i32,
+    pub item_category_id: i32,
     pub quantity: f64,
-    pub unit_id: Option<Uuid>,
+    pub unit_id: Option<i32>,
 }
 
 impl From<ProcedureContinuousRequirement> for web_common::database::tables::ProcedureContinuousRequirement {
     fn from(item: ProcedureContinuousRequirement) -> Self {
         Self {
             id: item.id,
+            created_by: item.created_by,
             procedure_id: item.procedure_id,
             item_category_id: item.item_category_id,
             quantity: item.quantity,
@@ -1396,6 +1062,7 @@ impl From<web_common::database::tables::ProcedureContinuousRequirement> for Proc
     fn from(item: web_common::database::tables::ProcedureContinuousRequirement) -> Self {
         Self {
             id: item.id,
+            created_by: item.created_by,
             procedure_id: item.procedure_id,
             item_category_id: item.item_category_id,
             quantity: item.quantity,
@@ -1412,7 +1079,7 @@ impl ProcedureContinuousRequirement {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         procedure_continuous_requirements::dsl::procedure_continuous_requirements
@@ -1424,17 +1091,19 @@ impl ProcedureContinuousRequirement {
 #[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = procedure_discrete_requirements)]
 pub struct ProcedureDiscreteRequirement {
-    pub id: Uuid,
-    pub procedure_id: Uuid,
-    pub item_category_id: Uuid,
+    pub id: i32,
+    pub created_by: i32,
+    pub procedure_id: i32,
+    pub item_category_id: i32,
     pub quantity: i32,
-    pub unit_id: Option<Uuid>,
+    pub unit_id: Option<i32>,
 }
 
 impl From<ProcedureDiscreteRequirement> for web_common::database::tables::ProcedureDiscreteRequirement {
     fn from(item: ProcedureDiscreteRequirement) -> Self {
         Self {
             id: item.id,
+            created_by: item.created_by,
             procedure_id: item.procedure_id,
             item_category_id: item.item_category_id,
             quantity: item.quantity,
@@ -1447,6 +1116,7 @@ impl From<web_common::database::tables::ProcedureDiscreteRequirement> for Proced
     fn from(item: web_common::database::tables::ProcedureDiscreteRequirement) -> Self {
         Self {
             id: item.id,
+            created_by: item.created_by,
             procedure_id: item.procedure_id,
             item_category_id: item.item_category_id,
             quantity: item.quantity,
@@ -1463,7 +1133,7 @@ impl ProcedureDiscreteRequirement {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         procedure_discrete_requirements::dsl::procedure_discrete_requirements
@@ -1475,13 +1145,19 @@ impl ProcedureDiscreteRequirement {
 #[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = procedures)]
 pub struct Procedure {
-    pub id: Uuid,
+    pub id: i32,
+    pub name: String,
+    pub description: Option<String>,
+    pub created_by: Option<i32>,
 }
 
 impl From<Procedure> for web_common::database::tables::Procedure {
     fn from(item: Procedure) -> Self {
         Self {
             id: item.id,
+            name: item.name,
+            description: item.description,
+            created_by: item.created_by,
         }
     }
 }
@@ -1490,6 +1166,9 @@ impl From<web_common::database::tables::Procedure> for Procedure {
     fn from(item: web_common::database::tables::Procedure) -> Self {
         Self {
             id: item.id,
+            name: item.name,
+            description: item.description,
+            created_by: item.created_by,
         }
     }
 }
@@ -1502,7 +1181,7 @@ impl Procedure {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         procedures::dsl::procedures
@@ -1511,140 +1190,44 @@ impl Procedure {
     }
 }
 
-#[derive(QueryableByName, Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
-#[diesel(table_name = project_continuous_requirements)]
-pub struct ProjectContinuousRequirement {
-    pub id: Uuid,
-    pub project_id: Uuid,
-    pub item_id: Uuid,
-    pub quantity: f64,
-    pub unit_id: Option<Uuid>,
-}
-
-impl From<ProjectContinuousRequirement> for web_common::database::tables::ProjectContinuousRequirement {
-    fn from(item: ProjectContinuousRequirement) -> Self {
-        Self {
-            id: item.id,
-            project_id: item.project_id,
-            item_id: item.item_id,
-            quantity: item.quantity,
-            unit_id: item.unit_id,
-        }
-    }
-}
-
-impl From<web_common::database::tables::ProjectContinuousRequirement> for ProjectContinuousRequirement {
-    fn from(item: web_common::database::tables::ProjectContinuousRequirement) -> Self {
-        Self {
-            id: item.id,
-            project_id: item.project_id,
-            item_id: item.item_id,
-            quantity: item.quantity,
-            unit_id: item.unit_id,
-        }
-    }
-}
-
-impl ProjectContinuousRequirement {
-    /// Get the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn get(
-        id: Uuid,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        project_continuous_requirements::dsl::project_continuous_requirements
-            .filter(project_continuous_requirements::dsl::id.eq(id))
-            .first::<Self>(connection)
-    }
-}
-
-#[derive(QueryableByName, Insertable, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
-#[diesel(table_name = project_discrete_requirements)]
-pub struct ProjectDiscreteRequirement {
-    pub id: Uuid,
-    pub project_id: Uuid,
-    pub item_id: Uuid,
-    pub quantity: f64,
-    pub unit_id: Option<Uuid>,
-}
-
-impl From<ProjectDiscreteRequirement> for web_common::database::tables::ProjectDiscreteRequirement {
-    fn from(item: ProjectDiscreteRequirement) -> Self {
-        Self {
-            id: item.id,
-            project_id: item.project_id,
-            item_id: item.item_id,
-            quantity: item.quantity,
-            unit_id: item.unit_id,
-        }
-    }
-}
-
-impl From<web_common::database::tables::ProjectDiscreteRequirement> for ProjectDiscreteRequirement {
-    fn from(item: web_common::database::tables::ProjectDiscreteRequirement) -> Self {
-        Self {
-            id: item.id,
-            project_id: item.project_id,
-            item_id: item.item_id,
-            quantity: item.quantity,
-            unit_id: item.unit_id,
-        }
-    }
-}
-
-impl ProjectDiscreteRequirement {
-    /// Get the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn get(
-        id: Uuid,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        project_discrete_requirements::dsl::project_discrete_requirements
-            .filter(project_discrete_requirements::dsl::id.eq(id))
-            .first::<Self>(connection)
-    }
-}
-
 #[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
-#[diesel(table_name = project_milestones)]
-pub struct ProjectMilestone {
-    pub id: Uuid,
-    pub project_id: Uuid,
-    pub due_date: NaiveDateTime,
-    pub completed_at: Option<NaiveDateTime>,
+#[diesel(table_name = project_requirements)]
+pub struct ProjectRequirement {
+    pub id: i32,
+    pub created_by: i32,
+    pub project_id: i32,
+    pub item_category_id: i32,
+    pub quantity: i32,
+    pub unit_id: Option<i32>,
 }
 
-impl From<ProjectMilestone> for web_common::database::tables::ProjectMilestone {
-    fn from(item: ProjectMilestone) -> Self {
+impl From<ProjectRequirement> for web_common::database::tables::ProjectRequirement {
+    fn from(item: ProjectRequirement) -> Self {
         Self {
             id: item.id,
+            created_by: item.created_by,
             project_id: item.project_id,
-            due_date: item.due_date,
-            completed_at: item.completed_at,
+            item_category_id: item.item_category_id,
+            quantity: item.quantity,
+            unit_id: item.unit_id,
         }
     }
 }
 
-impl From<web_common::database::tables::ProjectMilestone> for ProjectMilestone {
-    fn from(item: web_common::database::tables::ProjectMilestone) -> Self {
+impl From<web_common::database::tables::ProjectRequirement> for ProjectRequirement {
+    fn from(item: web_common::database::tables::ProjectRequirement) -> Self {
         Self {
             id: item.id,
+            created_by: item.created_by,
             project_id: item.project_id,
-            due_date: item.due_date,
-            completed_at: item.completed_at,
+            item_category_id: item.item_category_id,
+            quantity: item.quantity,
+            unit_id: item.unit_id,
         }
     }
 }
 
-impl ProjectMilestone {
+impl ProjectRequirement {
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -1652,11 +1235,11 @@ impl ProjectMilestone {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
-        project_milestones::dsl::project_milestones
-            .filter(project_milestones::dsl::id.eq(id))
+        project_requirements::dsl::project_requirements
+            .filter(project_requirements::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -1664,7 +1247,7 @@ impl ProjectMilestone {
 #[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = project_states)]
 pub struct ProjectState {
-    pub id: Uuid,
+    pub id: i32,
     pub name: String,
     pub description: String,
     pub font_awesome_icon: String,
@@ -1703,7 +1286,7 @@ impl ProjectState {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         project_states::dsl::project_states
@@ -1729,7 +1312,7 @@ impl ProjectState {
         let threshold = threshold.unwrap_or(0.6);
         let similarity_query = concat!(
             "SELECT id, name, description, font_awesome_icon, icon_color FROM project_states ",
-            "ORDER BY similarity(name, $1) DESC LIMIT $3;"
+            "ORDER BY similarity(name, $1) + similarity(description, $1) DESC LIMIT $3;"
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -1742,15 +1325,15 @@ impl ProjectState {
 #[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = projects)]
 pub struct Project {
-    pub id: Uuid,
+    pub id: i32,
     pub name: String,
     pub description: String,
     pub public: bool,
-    pub state_id: Uuid,
-    pub parent_project_id: Option<Uuid>,
+    pub state_id: i32,
+    pub parent_project_id: Option<i32>,
     pub budget: Option<i64>,
     pub expenses: Option<i64>,
-    pub created_by: Uuid,
+    pub created_by: i32,
     pub created_at: NaiveDateTime,
     pub expected_end_date: Option<NaiveDateTime>,
     pub end_date: Option<NaiveDateTime>,
@@ -1802,7 +1385,7 @@ impl Project {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         projects::dsl::projects
@@ -1841,13 +1424,15 @@ impl Project {
 #[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = roles)]
 pub struct Role {
-    pub id: Uuid,
+    pub id: i32,
+    pub name: String,
 }
 
 impl From<Role> for web_common::database::tables::Role {
     fn from(item: Role) -> Self {
         Self {
             id: item.id,
+            name: item.name,
         }
     }
 }
@@ -1856,6 +1441,7 @@ impl From<web_common::database::tables::Role> for Role {
     fn from(item: web_common::database::tables::Role) -> Self {
         Self {
             id: item.id,
+            name: item.name,
         }
     }
 }
@@ -1868,7 +1454,7 @@ impl Role {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         roles::dsl::roles
@@ -1881,14 +1467,16 @@ impl Role {
 #[diesel(table_name = sample_taxa)]
 pub struct SampleTaxa {
     pub id: Uuid,
+    pub created_by: i32,
     pub sample_id: Uuid,
-    pub taxon_id: Uuid,
+    pub taxon_id: i32,
 }
 
 impl From<SampleTaxa> for web_common::database::tables::SampleTaxa {
     fn from(item: SampleTaxa) -> Self {
         Self {
             id: item.id,
+            created_by: item.created_by,
             sample_id: item.sample_id,
             taxon_id: item.taxon_id,
         }
@@ -1899,6 +1487,7 @@ impl From<web_common::database::tables::SampleTaxa> for SampleTaxa {
     fn from(item: web_common::database::tables::SampleTaxa) -> Self {
         Self {
             id: item.id,
+            created_by: item.created_by,
             sample_id: item.sample_id,
             taxon_id: item.taxon_id,
         }
@@ -1913,7 +1502,7 @@ impl SampleTaxa {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         sample_taxa::dsl::sample_taxa
@@ -1926,14 +1515,16 @@ impl SampleTaxa {
 #[diesel(table_name = sampled_individual_taxa)]
 pub struct SampledIndividualTaxa {
     pub id: Uuid,
+    pub created_by: i32,
     pub sampled_individual_id: Uuid,
-    pub taxon_id: Uuid,
+    pub taxon_id: i32,
 }
 
 impl From<SampledIndividualTaxa> for web_common::database::tables::SampledIndividualTaxa {
     fn from(item: SampledIndividualTaxa) -> Self {
         Self {
             id: item.id,
+            created_by: item.created_by,
             sampled_individual_id: item.sampled_individual_id,
             taxon_id: item.taxon_id,
         }
@@ -1944,6 +1535,7 @@ impl From<web_common::database::tables::SampledIndividualTaxa> for SampledIndivi
     fn from(item: web_common::database::tables::SampledIndividualTaxa) -> Self {
         Self {
             id: item.id,
+            created_by: item.created_by,
             sampled_individual_id: item.sampled_individual_id,
             taxon_id: item.taxon_id,
         }
@@ -1958,7 +1550,7 @@ impl SampledIndividualTaxa {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         sampled_individual_taxa::dsl::sampled_individual_taxa
@@ -1997,7 +1589,7 @@ impl SampledIndividual {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         sampled_individuals::dsl::sampled_individuals
@@ -2010,6 +1602,7 @@ impl SampledIndividual {
 #[diesel(table_name = samples)]
 pub struct Sample {
     pub id: Uuid,
+    pub created_by: Option<i32>,
     pub derived_from: Option<Uuid>,
 }
 
@@ -2017,6 +1610,7 @@ impl From<Sample> for web_common::database::tables::Sample {
     fn from(item: Sample) -> Self {
         Self {
             id: item.id,
+            created_by: item.created_by,
             derived_from: item.derived_from,
         }
     }
@@ -2026,6 +1620,7 @@ impl From<web_common::database::tables::Sample> for Sample {
     fn from(item: web_common::database::tables::Sample) -> Self {
         Self {
             id: item.id,
+            created_by: item.created_by,
             derived_from: item.derived_from,
         }
     }
@@ -2039,7 +1634,7 @@ impl Sample {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         samples::dsl::samples
@@ -2051,8 +1646,8 @@ impl Sample {
 #[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = spectra)]
 pub struct Spectra {
-    pub id: Uuid,
-    pub spectra_collection_id: Uuid,
+    pub id: i32,
+    pub spectra_collection_id: i32,
 }
 
 impl From<Spectra> for web_common::database::tables::Spectra {
@@ -2081,7 +1676,7 @@ impl Spectra {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         spectra::dsl::spectra
@@ -2093,8 +1688,9 @@ impl Spectra {
 #[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = spectra_collection)]
 pub struct SpectraCollection {
-    pub id: Uuid,
+    pub id: i32,
     pub sample_id: Uuid,
+    pub created_by: i32,
 }
 
 impl From<SpectraCollection> for web_common::database::tables::SpectraCollection {
@@ -2102,6 +1698,7 @@ impl From<SpectraCollection> for web_common::database::tables::SpectraCollection
         Self {
             id: item.id,
             sample_id: item.sample_id,
+            created_by: item.created_by,
         }
     }
 }
@@ -2111,6 +1708,7 @@ impl From<web_common::database::tables::SpectraCollection> for SpectraCollection
         Self {
             id: item.id,
             sample_id: item.sample_id,
+            created_by: item.created_by,
         }
     }
 }
@@ -2123,7 +1721,7 @@ impl SpectraCollection {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         spectra_collection::dsl::spectra_collection
@@ -2135,7 +1733,7 @@ impl SpectraCollection {
 #[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = taxa)]
 pub struct Taxa {
-    pub id: Uuid,
+    pub id: i32,
     pub name: String,
     pub ncbi_taxon_id: Option<i32>,
 }
@@ -2168,7 +1766,7 @@ impl Taxa {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         taxa::dsl::taxa
@@ -2205,101 +1803,10 @@ impl Taxa {
 }
 
 #[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
-#[diesel(table_name = team_authorizations)]
-pub struct TeamAuthorization {
-    pub id: Uuid,
-    pub team_id: Uuid,
-    pub editable_id: Uuid,
-    pub role_id: Uuid,
-}
-
-impl From<TeamAuthorization> for web_common::database::tables::TeamAuthorization {
-    fn from(item: TeamAuthorization) -> Self {
-        Self {
-            id: item.id,
-            team_id: item.team_id,
-            editable_id: item.editable_id,
-            role_id: item.role_id,
-        }
-    }
-}
-
-impl From<web_common::database::tables::TeamAuthorization> for TeamAuthorization {
-    fn from(item: web_common::database::tables::TeamAuthorization) -> Self {
-        Self {
-            id: item.id,
-            team_id: item.team_id,
-            editable_id: item.editable_id,
-            role_id: item.role_id,
-        }
-    }
-}
-
-impl TeamAuthorization {
-    /// Get the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn get(
-        id: Uuid,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        team_authorizations::dsl::team_authorizations
-            .filter(team_authorizations::dsl::id.eq(id))
-            .first::<Self>(connection)
-    }
-}
-
-#[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
-#[diesel(table_name = team_states)]
-pub struct TeamState {
-    pub id: Uuid,
-    pub font_awesome_icon: String,
-}
-
-impl From<TeamState> for web_common::database::tables::TeamState {
-    fn from(item: TeamState) -> Self {
-        Self {
-            id: item.id,
-            font_awesome_icon: item.font_awesome_icon,
-        }
-    }
-}
-
-impl From<web_common::database::tables::TeamState> for TeamState {
-    fn from(item: web_common::database::tables::TeamState) -> Self {
-        Self {
-            id: item.id,
-            font_awesome_icon: item.font_awesome_icon,
-        }
-    }
-}
-
-impl TeamState {
-    /// Get the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn get(
-        id: Uuid,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        team_states::dsl::team_states
-            .filter(team_states::dsl::id.eq(id))
-            .first::<Self>(connection)
-    }
-}
-
-#[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = teams)]
 pub struct Team {
-    pub id: Uuid,
-    pub parent_team_id: Option<Uuid>,
-    pub team_state_id: Uuid,
+    pub id: i32,
+    pub parent_team_id: Option<i32>,
 }
 
 impl From<Team> for web_common::database::tables::Team {
@@ -2307,7 +1814,6 @@ impl From<Team> for web_common::database::tables::Team {
         Self {
             id: item.id,
             parent_team_id: item.parent_team_id,
-            team_state_id: item.team_state_id,
         }
     }
 }
@@ -2317,7 +1823,6 @@ impl From<web_common::database::tables::Team> for Team {
         Self {
             id: item.id,
             parent_team_id: item.parent_team_id,
-            team_state_id: item.team_state_id,
         }
     }
 }
@@ -2330,7 +1835,7 @@ impl Team {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         teams::dsl::teams
@@ -2342,7 +1847,9 @@ impl Team {
 #[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = units)]
 pub struct Unit {
-    pub id: Uuid,
+    pub id: i32,
+    pub name: String,
+    pub description: String,
     pub symbol: String,
 }
 
@@ -2350,6 +1857,8 @@ impl From<Unit> for web_common::database::tables::Unit {
     fn from(item: Unit) -> Self {
         Self {
             id: item.id,
+            name: item.name,
+            description: item.description,
             symbol: item.symbol,
         }
     }
@@ -2359,6 +1868,8 @@ impl From<web_common::database::tables::Unit> for Unit {
     fn from(item: web_common::database::tables::Unit) -> Self {
         Self {
             id: item.id,
+            name: item.name,
+            description: item.description,
             symbol: item.symbol,
         }
     }
@@ -2372,7 +1883,7 @@ impl Unit {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         units::dsl::units
@@ -2382,60 +1893,12 @@ impl Unit {
 }
 
 #[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
-#[diesel(table_name = user_authorizations)]
-pub struct UserAuthorization {
-    pub id: Uuid,
-    pub user_id: Uuid,
-    pub editable_id: Uuid,
-    pub role_id: Uuid,
-}
-
-impl From<UserAuthorization> for web_common::database::tables::UserAuthorization {
-    fn from(item: UserAuthorization) -> Self {
-        Self {
-            id: item.id,
-            user_id: item.user_id,
-            editable_id: item.editable_id,
-            role_id: item.role_id,
-        }
-    }
-}
-
-impl From<web_common::database::tables::UserAuthorization> for UserAuthorization {
-    fn from(item: web_common::database::tables::UserAuthorization) -> Self {
-        Self {
-            id: item.id,
-            user_id: item.user_id,
-            editable_id: item.editable_id,
-            role_id: item.role_id,
-        }
-    }
-}
-
-impl UserAuthorization {
-    /// Get the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn get(
-        id: Uuid,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        user_authorizations::dsl::user_authorizations
-            .filter(user_authorizations::dsl::id.eq(id))
-            .first::<Self>(connection)
-    }
-}
-
-#[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = user_emails)]
 pub struct UserEmail {
-    pub id: Uuid,
+    pub id: i32,
     pub email: String,
-    pub user_id: Uuid,
-    pub login_provider_id: Uuid,
+    pub user_id: i32,
+    pub login_provider_id: i32,
 }
 
 impl From<UserEmail> for web_common::database::tables::UserEmail {
@@ -2468,7 +1931,7 @@ impl UserEmail {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         user_emails::dsl::user_emails
@@ -2480,7 +1943,7 @@ impl UserEmail {
 #[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = users)]
 pub struct User {
-    pub id: Uuid,
+    pub id: i32,
     pub first_name: String,
     pub middle_name: Option<String>,
     pub last_name: String,
@@ -2522,7 +1985,7 @@ impl User {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: Uuid,
+        id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         users::dsl::users
@@ -2562,16 +2025,12 @@ impl User {
 
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq)]
 pub enum TableRow {
-    Archivable(Archivable),
     ContainerHorizontalRule(ContainerHorizontalRule),
     ContainerVerticalRule(ContainerVerticalRule),
     ContinuousUnit(ContinuousUnit),
-    Describable(Describable),
     DiscreteUnit(DiscreteUnit),
     DocumentFormat(DocumentFormat),
     Document(Document),
-    Editable(Editable),
-    Edit(Edit),
     ItemCategory(ItemCategory),
     ItemCategoryRelationship(ItemCategoryRelationship),
     ItemCategoryUnit(ItemCategoryUnit),
@@ -2580,22 +2039,16 @@ pub enum TableRow {
     ItemLocation(ItemLocation),
     ItemUnit(ItemUnit),
     Item(Item),
-    LocationState(LocationState),
     Location(Location),
     LoginProvider(LoginProvider),
     ManufacturedItemCategory(ManufacturedItemCategory),
     Notification(Notification),
-    OrganizationAuthorization(OrganizationAuthorization),
-    OrganizationLocation(OrganizationLocation),
-    OrganizationState(OrganizationState),
     Organization(Organization),
     PrimaryUserEmail(PrimaryUserEmail),
     ProcedureContinuousRequirement(ProcedureContinuousRequirement),
     ProcedureDiscreteRequirement(ProcedureDiscreteRequirement),
     Procedure(Procedure),
-    ProjectContinuousRequirement(ProjectContinuousRequirement),
-    ProjectDiscreteRequirement(ProjectDiscreteRequirement),
-    ProjectMilestone(ProjectMilestone),
+    ProjectRequirement(ProjectRequirement),
     ProjectState(ProjectState),
     Project(Project),
     Role(Role),
@@ -2606,11 +2059,8 @@ pub enum TableRow {
     Spectra(Spectra),
     SpectraCollection(SpectraCollection),
     Taxa(Taxa),
-    TeamAuthorization(TeamAuthorization),
-    TeamState(TeamState),
     Team(Team),
     Unit(Unit),
-    UserAuthorization(UserAuthorization),
     UserEmail(UserEmail),
     User(User),
 }
@@ -2618,16 +2068,12 @@ pub enum TableRow {
 impl From<web_common::database::tables::TableRow> for TableRow {
     fn from(item: web_common::database::tables::TableRow) -> Self {
         match item {
-            web_common::database::tables::TableRow::Archivable(item) => TableRow::Archivable(item.into()),
             web_common::database::tables::TableRow::ContainerHorizontalRule(item) => TableRow::ContainerHorizontalRule(item.into()),
             web_common::database::tables::TableRow::ContainerVerticalRule(item) => TableRow::ContainerVerticalRule(item.into()),
             web_common::database::tables::TableRow::ContinuousUnit(item) => TableRow::ContinuousUnit(item.into()),
-            web_common::database::tables::TableRow::Describable(item) => TableRow::Describable(item.into()),
             web_common::database::tables::TableRow::DiscreteUnit(item) => TableRow::DiscreteUnit(item.into()),
             web_common::database::tables::TableRow::DocumentFormat(item) => TableRow::DocumentFormat(item.into()),
             web_common::database::tables::TableRow::Document(item) => TableRow::Document(item.into()),
-            web_common::database::tables::TableRow::Editable(item) => TableRow::Editable(item.into()),
-            web_common::database::tables::TableRow::Edit(item) => TableRow::Edit(item.into()),
             web_common::database::tables::TableRow::ItemCategory(item) => TableRow::ItemCategory(item.into()),
             web_common::database::tables::TableRow::ItemCategoryRelationship(item) => TableRow::ItemCategoryRelationship(item.into()),
             web_common::database::tables::TableRow::ItemCategoryUnit(item) => TableRow::ItemCategoryUnit(item.into()),
@@ -2636,22 +2082,16 @@ impl From<web_common::database::tables::TableRow> for TableRow {
             web_common::database::tables::TableRow::ItemLocation(item) => TableRow::ItemLocation(item.into()),
             web_common::database::tables::TableRow::ItemUnit(item) => TableRow::ItemUnit(item.into()),
             web_common::database::tables::TableRow::Item(item) => TableRow::Item(item.into()),
-            web_common::database::tables::TableRow::LocationState(item) => TableRow::LocationState(item.into()),
             web_common::database::tables::TableRow::Location(item) => TableRow::Location(item.into()),
             web_common::database::tables::TableRow::LoginProvider(item) => TableRow::LoginProvider(item.into()),
             web_common::database::tables::TableRow::ManufacturedItemCategory(item) => TableRow::ManufacturedItemCategory(item.into()),
             web_common::database::tables::TableRow::Notification(item) => TableRow::Notification(item.into()),
-            web_common::database::tables::TableRow::OrganizationAuthorization(item) => TableRow::OrganizationAuthorization(item.into()),
-            web_common::database::tables::TableRow::OrganizationLocation(item) => TableRow::OrganizationLocation(item.into()),
-            web_common::database::tables::TableRow::OrganizationState(item) => TableRow::OrganizationState(item.into()),
             web_common::database::tables::TableRow::Organization(item) => TableRow::Organization(item.into()),
             web_common::database::tables::TableRow::PrimaryUserEmail(item) => TableRow::PrimaryUserEmail(item.into()),
             web_common::database::tables::TableRow::ProcedureContinuousRequirement(item) => TableRow::ProcedureContinuousRequirement(item.into()),
             web_common::database::tables::TableRow::ProcedureDiscreteRequirement(item) => TableRow::ProcedureDiscreteRequirement(item.into()),
             web_common::database::tables::TableRow::Procedure(item) => TableRow::Procedure(item.into()),
-            web_common::database::tables::TableRow::ProjectContinuousRequirement(item) => TableRow::ProjectContinuousRequirement(item.into()),
-            web_common::database::tables::TableRow::ProjectDiscreteRequirement(item) => TableRow::ProjectDiscreteRequirement(item.into()),
-            web_common::database::tables::TableRow::ProjectMilestone(item) => TableRow::ProjectMilestone(item.into()),
+            web_common::database::tables::TableRow::ProjectRequirement(item) => TableRow::ProjectRequirement(item.into()),
             web_common::database::tables::TableRow::ProjectState(item) => TableRow::ProjectState(item.into()),
             web_common::database::tables::TableRow::Project(item) => TableRow::Project(item.into()),
             web_common::database::tables::TableRow::Role(item) => TableRow::Role(item.into()),
@@ -2662,11 +2102,8 @@ impl From<web_common::database::tables::TableRow> for TableRow {
             web_common::database::tables::TableRow::Spectra(item) => TableRow::Spectra(item.into()),
             web_common::database::tables::TableRow::SpectraCollection(item) => TableRow::SpectraCollection(item.into()),
             web_common::database::tables::TableRow::Taxa(item) => TableRow::Taxa(item.into()),
-            web_common::database::tables::TableRow::TeamAuthorization(item) => TableRow::TeamAuthorization(item.into()),
-            web_common::database::tables::TableRow::TeamState(item) => TableRow::TeamState(item.into()),
             web_common::database::tables::TableRow::Team(item) => TableRow::Team(item.into()),
             web_common::database::tables::TableRow::Unit(item) => TableRow::Unit(item.into()),
-            web_common::database::tables::TableRow::UserAuthorization(item) => TableRow::UserAuthorization(item.into()),
             web_common::database::tables::TableRow::UserEmail(item) => TableRow::UserEmail(item.into()),
             web_common::database::tables::TableRow::User(item) => TableRow::User(item.into()),
         }
@@ -2675,16 +2112,12 @@ impl From<web_common::database::tables::TableRow> for TableRow {
 impl From<TableRow> for web_common::database::tables::TableRow {
     fn from(item: TableRow) -> Self {
         match item {
-            TableRow::Archivable(item) => web_common::database::tables::TableRow::Archivable(item.into()),
             TableRow::ContainerHorizontalRule(item) => web_common::database::tables::TableRow::ContainerHorizontalRule(item.into()),
             TableRow::ContainerVerticalRule(item) => web_common::database::tables::TableRow::ContainerVerticalRule(item.into()),
             TableRow::ContinuousUnit(item) => web_common::database::tables::TableRow::ContinuousUnit(item.into()),
-            TableRow::Describable(item) => web_common::database::tables::TableRow::Describable(item.into()),
             TableRow::DiscreteUnit(item) => web_common::database::tables::TableRow::DiscreteUnit(item.into()),
             TableRow::DocumentFormat(item) => web_common::database::tables::TableRow::DocumentFormat(item.into()),
             TableRow::Document(item) => web_common::database::tables::TableRow::Document(item.into()),
-            TableRow::Editable(item) => web_common::database::tables::TableRow::Editable(item.into()),
-            TableRow::Edit(item) => web_common::database::tables::TableRow::Edit(item.into()),
             TableRow::ItemCategory(item) => web_common::database::tables::TableRow::ItemCategory(item.into()),
             TableRow::ItemCategoryRelationship(item) => web_common::database::tables::TableRow::ItemCategoryRelationship(item.into()),
             TableRow::ItemCategoryUnit(item) => web_common::database::tables::TableRow::ItemCategoryUnit(item.into()),
@@ -2693,22 +2126,16 @@ impl From<TableRow> for web_common::database::tables::TableRow {
             TableRow::ItemLocation(item) => web_common::database::tables::TableRow::ItemLocation(item.into()),
             TableRow::ItemUnit(item) => web_common::database::tables::TableRow::ItemUnit(item.into()),
             TableRow::Item(item) => web_common::database::tables::TableRow::Item(item.into()),
-            TableRow::LocationState(item) => web_common::database::tables::TableRow::LocationState(item.into()),
             TableRow::Location(item) => web_common::database::tables::TableRow::Location(item.into()),
             TableRow::LoginProvider(item) => web_common::database::tables::TableRow::LoginProvider(item.into()),
             TableRow::ManufacturedItemCategory(item) => web_common::database::tables::TableRow::ManufacturedItemCategory(item.into()),
             TableRow::Notification(item) => web_common::database::tables::TableRow::Notification(item.into()),
-            TableRow::OrganizationAuthorization(item) => web_common::database::tables::TableRow::OrganizationAuthorization(item.into()),
-            TableRow::OrganizationLocation(item) => web_common::database::tables::TableRow::OrganizationLocation(item.into()),
-            TableRow::OrganizationState(item) => web_common::database::tables::TableRow::OrganizationState(item.into()),
             TableRow::Organization(item) => web_common::database::tables::TableRow::Organization(item.into()),
             TableRow::PrimaryUserEmail(item) => web_common::database::tables::TableRow::PrimaryUserEmail(item.into()),
             TableRow::ProcedureContinuousRequirement(item) => web_common::database::tables::TableRow::ProcedureContinuousRequirement(item.into()),
             TableRow::ProcedureDiscreteRequirement(item) => web_common::database::tables::TableRow::ProcedureDiscreteRequirement(item.into()),
             TableRow::Procedure(item) => web_common::database::tables::TableRow::Procedure(item.into()),
-            TableRow::ProjectContinuousRequirement(item) => web_common::database::tables::TableRow::ProjectContinuousRequirement(item.into()),
-            TableRow::ProjectDiscreteRequirement(item) => web_common::database::tables::TableRow::ProjectDiscreteRequirement(item.into()),
-            TableRow::ProjectMilestone(item) => web_common::database::tables::TableRow::ProjectMilestone(item.into()),
+            TableRow::ProjectRequirement(item) => web_common::database::tables::TableRow::ProjectRequirement(item.into()),
             TableRow::ProjectState(item) => web_common::database::tables::TableRow::ProjectState(item.into()),
             TableRow::Project(item) => web_common::database::tables::TableRow::Project(item.into()),
             TableRow::Role(item) => web_common::database::tables::TableRow::Role(item.into()),
@@ -2719,19 +2146,11 @@ impl From<TableRow> for web_common::database::tables::TableRow {
             TableRow::Spectra(item) => web_common::database::tables::TableRow::Spectra(item.into()),
             TableRow::SpectraCollection(item) => web_common::database::tables::TableRow::SpectraCollection(item.into()),
             TableRow::Taxa(item) => web_common::database::tables::TableRow::Taxa(item.into()),
-            TableRow::TeamAuthorization(item) => web_common::database::tables::TableRow::TeamAuthorization(item.into()),
-            TableRow::TeamState(item) => web_common::database::tables::TableRow::TeamState(item.into()),
             TableRow::Team(item) => web_common::database::tables::TableRow::Team(item.into()),
             TableRow::Unit(item) => web_common::database::tables::TableRow::Unit(item.into()),
-            TableRow::UserAuthorization(item) => web_common::database::tables::TableRow::UserAuthorization(item.into()),
             TableRow::UserEmail(item) => web_common::database::tables::TableRow::UserEmail(item.into()),
             TableRow::User(item) => web_common::database::tables::TableRow::User(item.into()),
         }
-    }
-}
-impl From<Archivable> for TableRow {
-    fn from(item: Archivable) -> Self {
-        TableRow::Archivable(item)
     }
 }
 impl From<ContainerHorizontalRule> for TableRow {
@@ -2749,11 +2168,6 @@ impl From<ContinuousUnit> for TableRow {
         TableRow::ContinuousUnit(item)
     }
 }
-impl From<Describable> for TableRow {
-    fn from(item: Describable) -> Self {
-        TableRow::Describable(item)
-    }
-}
 impl From<DiscreteUnit> for TableRow {
     fn from(item: DiscreteUnit) -> Self {
         TableRow::DiscreteUnit(item)
@@ -2767,16 +2181,6 @@ impl From<DocumentFormat> for TableRow {
 impl From<Document> for TableRow {
     fn from(item: Document) -> Self {
         TableRow::Document(item)
-    }
-}
-impl From<Editable> for TableRow {
-    fn from(item: Editable) -> Self {
-        TableRow::Editable(item)
-    }
-}
-impl From<Edit> for TableRow {
-    fn from(item: Edit) -> Self {
-        TableRow::Edit(item)
     }
 }
 impl From<ItemCategory> for TableRow {
@@ -2819,11 +2223,6 @@ impl From<Item> for TableRow {
         TableRow::Item(item)
     }
 }
-impl From<LocationState> for TableRow {
-    fn from(item: LocationState) -> Self {
-        TableRow::LocationState(item)
-    }
-}
 impl From<Location> for TableRow {
     fn from(item: Location) -> Self {
         TableRow::Location(item)
@@ -2842,21 +2241,6 @@ impl From<ManufacturedItemCategory> for TableRow {
 impl From<Notification> for TableRow {
     fn from(item: Notification) -> Self {
         TableRow::Notification(item)
-    }
-}
-impl From<OrganizationAuthorization> for TableRow {
-    fn from(item: OrganizationAuthorization) -> Self {
-        TableRow::OrganizationAuthorization(item)
-    }
-}
-impl From<OrganizationLocation> for TableRow {
-    fn from(item: OrganizationLocation) -> Self {
-        TableRow::OrganizationLocation(item)
-    }
-}
-impl From<OrganizationState> for TableRow {
-    fn from(item: OrganizationState) -> Self {
-        TableRow::OrganizationState(item)
     }
 }
 impl From<Organization> for TableRow {
@@ -2884,19 +2268,9 @@ impl From<Procedure> for TableRow {
         TableRow::Procedure(item)
     }
 }
-impl From<ProjectContinuousRequirement> for TableRow {
-    fn from(item: ProjectContinuousRequirement) -> Self {
-        TableRow::ProjectContinuousRequirement(item)
-    }
-}
-impl From<ProjectDiscreteRequirement> for TableRow {
-    fn from(item: ProjectDiscreteRequirement) -> Self {
-        TableRow::ProjectDiscreteRequirement(item)
-    }
-}
-impl From<ProjectMilestone> for TableRow {
-    fn from(item: ProjectMilestone) -> Self {
-        TableRow::ProjectMilestone(item)
+impl From<ProjectRequirement> for TableRow {
+    fn from(item: ProjectRequirement) -> Self {
+        TableRow::ProjectRequirement(item)
     }
 }
 impl From<ProjectState> for TableRow {
@@ -2949,16 +2323,6 @@ impl From<Taxa> for TableRow {
         TableRow::Taxa(item)
     }
 }
-impl From<TeamAuthorization> for TableRow {
-    fn from(item: TeamAuthorization) -> Self {
-        TableRow::TeamAuthorization(item)
-    }
-}
-impl From<TeamState> for TableRow {
-    fn from(item: TeamState) -> Self {
-        TableRow::TeamState(item)
-    }
-}
 impl From<Team> for TableRow {
     fn from(item: Team) -> Self {
         TableRow::Team(item)
@@ -2967,11 +2331,6 @@ impl From<Team> for TableRow {
 impl From<Unit> for TableRow {
     fn from(item: Unit) -> Self {
         TableRow::Unit(item)
-    }
-}
-impl From<UserAuthorization> for TableRow {
-    fn from(item: UserAuthorization) -> Self {
-        TableRow::UserAuthorization(item)
     }
 }
 impl From<UserEmail> for TableRow {
@@ -3034,16 +2393,12 @@ impl From<User> for SearcheableTableRow {
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Copy, Eq, )]
 pub enum Table {
-    Archivable,
     ContainerHorizontalRule,
     ContainerVerticalRule,
     ContinuousUnit,
-    Describable,
     DiscreteUnit,
     DocumentFormat,
     Document,
-    Editable,
-    Edit,
     ItemCategory,
     ItemCategoryRelationship,
     ItemCategoryUnit,
@@ -3052,22 +2407,16 @@ pub enum Table {
     ItemLocation,
     ItemUnit,
     Item,
-    LocationState,
     Location,
     LoginProvider,
     ManufacturedItemCategory,
     Notification,
-    OrganizationAuthorization,
-    OrganizationLocation,
-    OrganizationState,
     Organization,
     PrimaryUserEmail,
     ProcedureContinuousRequirement,
     ProcedureDiscreteRequirement,
     Procedure,
-    ProjectContinuousRequirement,
-    ProjectDiscreteRequirement,
-    ProjectMilestone,
+    ProjectRequirement,
     ProjectState,
     Project,
     Role,
@@ -3078,11 +2427,8 @@ pub enum Table {
     Spectra,
     SpectraCollection,
     Taxa,
-    TeamAuthorization,
-    TeamState,
     Team,
     Unit,
-    UserAuthorization,
     UserEmail,
     User,
 }
@@ -3090,16 +2436,12 @@ pub enum Table {
 impl Table {
     pub fn name(&self) -> &'static str {
         match self {
-            Table::Archivable => "archivables",
             Table::ContainerHorizontalRule => "container_horizontal_rules",
             Table::ContainerVerticalRule => "container_vertical_rules",
             Table::ContinuousUnit => "continuous_units",
-            Table::Describable => "describables",
             Table::DiscreteUnit => "discrete_units",
             Table::DocumentFormat => "document_formats",
             Table::Document => "documents",
-            Table::Editable => "editables",
-            Table::Edit => "edits",
             Table::ItemCategory => "item_categories",
             Table::ItemCategoryRelationship => "item_category_relationships",
             Table::ItemCategoryUnit => "item_category_units",
@@ -3108,22 +2450,16 @@ impl Table {
             Table::ItemLocation => "item_locations",
             Table::ItemUnit => "item_units",
             Table::Item => "items",
-            Table::LocationState => "location_states",
             Table::Location => "locations",
             Table::LoginProvider => "login_providers",
             Table::ManufacturedItemCategory => "manufactured_item_categories",
             Table::Notification => "notifications",
-            Table::OrganizationAuthorization => "organization_authorizations",
-            Table::OrganizationLocation => "organization_locations",
-            Table::OrganizationState => "organization_states",
             Table::Organization => "organizations",
             Table::PrimaryUserEmail => "primary_user_emails",
             Table::ProcedureContinuousRequirement => "procedure_continuous_requirements",
             Table::ProcedureDiscreteRequirement => "procedure_discrete_requirements",
             Table::Procedure => "procedures",
-            Table::ProjectContinuousRequirement => "project_continuous_requirements",
-            Table::ProjectDiscreteRequirement => "project_discrete_requirements",
-            Table::ProjectMilestone => "project_milestones",
+            Table::ProjectRequirement => "project_requirements",
             Table::ProjectState => "project_states",
             Table::Project => "projects",
             Table::Role => "roles",
@@ -3134,79 +2470,11 @@ impl Table {
             Table::Spectra => "spectra",
             Table::SpectraCollection => "spectra_collection",
             Table::Taxa => "taxa",
-            Table::TeamAuthorization => "team_authorizations",
-            Table::TeamState => "team_states",
             Table::Team => "teams",
             Table::Unit => "units",
-            Table::UserAuthorization => "user_authorizations",
             Table::UserEmail => "user_emails",
             Table::User => "users",
         }
-    }
-    /// Get the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn get(
-        &self,
-        id: Uuid,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<TableRow, diesel::result::Error> {
-        Ok(match self {
-            Table::Archivable => TableRow::Archivable(Archivable::get(id, connection)?),
-            Table::ContainerHorizontalRule => TableRow::ContainerHorizontalRule(ContainerHorizontalRule::get(id, connection)?),
-            Table::ContainerVerticalRule => TableRow::ContainerVerticalRule(ContainerVerticalRule::get(id, connection)?),
-            Table::ContinuousUnit => TableRow::ContinuousUnit(ContinuousUnit::get(id, connection)?),
-            Table::Describable => TableRow::Describable(Describable::get(id, connection)?),
-            Table::DiscreteUnit => TableRow::DiscreteUnit(DiscreteUnit::get(id, connection)?),
-            Table::DocumentFormat => TableRow::DocumentFormat(DocumentFormat::get(id, connection)?),
-            Table::Document => TableRow::Document(Document::get(id, connection)?),
-            Table::Editable => TableRow::Editable(Editable::get(id, connection)?),
-            Table::Edit => TableRow::Edit(Edit::get(id, connection)?),
-            Table::ItemCategory => TableRow::ItemCategory(ItemCategory::get(id, connection)?),
-            Table::ItemCategoryRelationship => TableRow::ItemCategoryRelationship(ItemCategoryRelationship::get(id, connection)?),
-            Table::ItemCategoryUnit => TableRow::ItemCategoryUnit(ItemCategoryUnit::get(id, connection)?),
-            Table::ItemContinuousQuantity => TableRow::ItemContinuousQuantity(ItemContinuousQuantity::get(id, connection)?),
-            Table::ItemDiscreteQuantity => TableRow::ItemDiscreteQuantity(ItemDiscreteQuantity::get(id, connection)?),
-            Table::ItemLocation => TableRow::ItemLocation(ItemLocation::get(id, connection)?),
-            Table::ItemUnit => TableRow::ItemUnit(ItemUnit::get(id, connection)?),
-            Table::Item => TableRow::Item(Item::get(id, connection)?),
-            Table::LocationState => TableRow::LocationState(LocationState::get(id, connection)?),
-            Table::Location => TableRow::Location(Location::get(id, connection)?),
-            Table::LoginProvider => TableRow::LoginProvider(LoginProvider::get(id, connection)?),
-            Table::ManufacturedItemCategory => TableRow::ManufacturedItemCategory(ManufacturedItemCategory::get(id, connection)?),
-            Table::Notification => TableRow::Notification(Notification::get(id, connection)?),
-            Table::OrganizationAuthorization => TableRow::OrganizationAuthorization(OrganizationAuthorization::get(id, connection)?),
-            Table::OrganizationLocation => TableRow::OrganizationLocation(OrganizationLocation::get(id, connection)?),
-            Table::OrganizationState => TableRow::OrganizationState(OrganizationState::get(id, connection)?),
-            Table::Organization => TableRow::Organization(Organization::get(id, connection)?),
-            Table::PrimaryUserEmail => TableRow::PrimaryUserEmail(PrimaryUserEmail::get(id, connection)?),
-            Table::ProcedureContinuousRequirement => TableRow::ProcedureContinuousRequirement(ProcedureContinuousRequirement::get(id, connection)?),
-            Table::ProcedureDiscreteRequirement => TableRow::ProcedureDiscreteRequirement(ProcedureDiscreteRequirement::get(id, connection)?),
-            Table::Procedure => TableRow::Procedure(Procedure::get(id, connection)?),
-            Table::ProjectContinuousRequirement => TableRow::ProjectContinuousRequirement(ProjectContinuousRequirement::get(id, connection)?),
-            Table::ProjectDiscreteRequirement => TableRow::ProjectDiscreteRequirement(ProjectDiscreteRequirement::get(id, connection)?),
-            Table::ProjectMilestone => TableRow::ProjectMilestone(ProjectMilestone::get(id, connection)?),
-            Table::ProjectState => TableRow::ProjectState(ProjectState::get(id, connection)?),
-            Table::Project => TableRow::Project(Project::get(id, connection)?),
-            Table::Role => TableRow::Role(Role::get(id, connection)?),
-            Table::SampleTaxa => TableRow::SampleTaxa(SampleTaxa::get(id, connection)?),
-            Table::SampledIndividualTaxa => TableRow::SampledIndividualTaxa(SampledIndividualTaxa::get(id, connection)?),
-            Table::SampledIndividual => TableRow::SampledIndividual(SampledIndividual::get(id, connection)?),
-            Table::Sample => TableRow::Sample(Sample::get(id, connection)?),
-            Table::Spectra => TableRow::Spectra(Spectra::get(id, connection)?),
-            Table::SpectraCollection => TableRow::SpectraCollection(SpectraCollection::get(id, connection)?),
-            Table::Taxa => TableRow::Taxa(Taxa::get(id, connection)?),
-            Table::TeamAuthorization => TableRow::TeamAuthorization(TeamAuthorization::get(id, connection)?),
-            Table::TeamState => TableRow::TeamState(TeamState::get(id, connection)?),
-            Table::Team => TableRow::Team(Team::get(id, connection)?),
-            Table::Unit => TableRow::Unit(Unit::get(id, connection)?),
-            Table::UserAuthorization => TableRow::UserAuthorization(UserAuthorization::get(id, connection)?),
-            Table::UserEmail => TableRow::UserEmail(UserEmail::get(id, connection)?),
-            Table::User => TableRow::User(User::get(id, connection)?),
-        })
     }
 }
 impl std::fmt::Display for Table {
@@ -3217,16 +2485,12 @@ impl std::fmt::Display for Table {
 impl From<&str> for Table {
     fn from(item: &str) -> Self {
         match item {
-            "archivables" => Table::Archivable,
             "container_horizontal_rules" => Table::ContainerHorizontalRule,
             "container_vertical_rules" => Table::ContainerVerticalRule,
             "continuous_units" => Table::ContinuousUnit,
-            "describables" => Table::Describable,
             "discrete_units" => Table::DiscreteUnit,
             "document_formats" => Table::DocumentFormat,
             "documents" => Table::Document,
-            "editables" => Table::Editable,
-            "edits" => Table::Edit,
             "item_categories" => Table::ItemCategory,
             "item_category_relationships" => Table::ItemCategoryRelationship,
             "item_category_units" => Table::ItemCategoryUnit,
@@ -3235,22 +2499,16 @@ impl From<&str> for Table {
             "item_locations" => Table::ItemLocation,
             "item_units" => Table::ItemUnit,
             "items" => Table::Item,
-            "location_states" => Table::LocationState,
             "locations" => Table::Location,
             "login_providers" => Table::LoginProvider,
             "manufactured_item_categories" => Table::ManufacturedItemCategory,
             "notifications" => Table::Notification,
-            "organization_authorizations" => Table::OrganizationAuthorization,
-            "organization_locations" => Table::OrganizationLocation,
-            "organization_states" => Table::OrganizationState,
             "organizations" => Table::Organization,
             "primary_user_emails" => Table::PrimaryUserEmail,
             "procedure_continuous_requirements" => Table::ProcedureContinuousRequirement,
             "procedure_discrete_requirements" => Table::ProcedureDiscreteRequirement,
             "procedures" => Table::Procedure,
-            "project_continuous_requirements" => Table::ProjectContinuousRequirement,
-            "project_discrete_requirements" => Table::ProjectDiscreteRequirement,
-            "project_milestones" => Table::ProjectMilestone,
+            "project_requirements" => Table::ProjectRequirement,
             "project_states" => Table::ProjectState,
             "projects" => Table::Project,
             "roles" => Table::Role,
@@ -3261,11 +2519,8 @@ impl From<&str> for Table {
             "spectra" => Table::Spectra,
             "spectra_collection" => Table::SpectraCollection,
             "taxa" => Table::Taxa,
-            "team_authorizations" => Table::TeamAuthorization,
-            "team_states" => Table::TeamState,
             "teams" => Table::Team,
             "units" => Table::Unit,
-            "user_authorizations" => Table::UserAuthorization,
             "user_emails" => Table::UserEmail,
             "users" => Table::User,
             _ => panic!("Unknown tables name"),
@@ -3275,16 +2530,12 @@ impl From<&str> for Table {
 impl From<web_common::database::tables::Table> for Table {
     fn from(item: web_common::database::tables::Table) -> Self {
         match item {
-            web_common::database::tables::Table::Archivable => Table::Archivable,
             web_common::database::tables::Table::ContainerHorizontalRule => Table::ContainerHorizontalRule,
             web_common::database::tables::Table::ContainerVerticalRule => Table::ContainerVerticalRule,
             web_common::database::tables::Table::ContinuousUnit => Table::ContinuousUnit,
-            web_common::database::tables::Table::Describable => Table::Describable,
             web_common::database::tables::Table::DiscreteUnit => Table::DiscreteUnit,
             web_common::database::tables::Table::DocumentFormat => Table::DocumentFormat,
             web_common::database::tables::Table::Document => Table::Document,
-            web_common::database::tables::Table::Editable => Table::Editable,
-            web_common::database::tables::Table::Edit => Table::Edit,
             web_common::database::tables::Table::ItemCategory => Table::ItemCategory,
             web_common::database::tables::Table::ItemCategoryRelationship => Table::ItemCategoryRelationship,
             web_common::database::tables::Table::ItemCategoryUnit => Table::ItemCategoryUnit,
@@ -3293,22 +2544,16 @@ impl From<web_common::database::tables::Table> for Table {
             web_common::database::tables::Table::ItemLocation => Table::ItemLocation,
             web_common::database::tables::Table::ItemUnit => Table::ItemUnit,
             web_common::database::tables::Table::Item => Table::Item,
-            web_common::database::tables::Table::LocationState => Table::LocationState,
             web_common::database::tables::Table::Location => Table::Location,
             web_common::database::tables::Table::LoginProvider => Table::LoginProvider,
             web_common::database::tables::Table::ManufacturedItemCategory => Table::ManufacturedItemCategory,
             web_common::database::tables::Table::Notification => Table::Notification,
-            web_common::database::tables::Table::OrganizationAuthorization => Table::OrganizationAuthorization,
-            web_common::database::tables::Table::OrganizationLocation => Table::OrganizationLocation,
-            web_common::database::tables::Table::OrganizationState => Table::OrganizationState,
             web_common::database::tables::Table::Organization => Table::Organization,
             web_common::database::tables::Table::PrimaryUserEmail => Table::PrimaryUserEmail,
             web_common::database::tables::Table::ProcedureContinuousRequirement => Table::ProcedureContinuousRequirement,
             web_common::database::tables::Table::ProcedureDiscreteRequirement => Table::ProcedureDiscreteRequirement,
             web_common::database::tables::Table::Procedure => Table::Procedure,
-            web_common::database::tables::Table::ProjectContinuousRequirement => Table::ProjectContinuousRequirement,
-            web_common::database::tables::Table::ProjectDiscreteRequirement => Table::ProjectDiscreteRequirement,
-            web_common::database::tables::Table::ProjectMilestone => Table::ProjectMilestone,
+            web_common::database::tables::Table::ProjectRequirement => Table::ProjectRequirement,
             web_common::database::tables::Table::ProjectState => Table::ProjectState,
             web_common::database::tables::Table::Project => Table::Project,
             web_common::database::tables::Table::Role => Table::Role,
@@ -3319,11 +2564,8 @@ impl From<web_common::database::tables::Table> for Table {
             web_common::database::tables::Table::Spectra => Table::Spectra,
             web_common::database::tables::Table::SpectraCollection => Table::SpectraCollection,
             web_common::database::tables::Table::Taxa => Table::Taxa,
-            web_common::database::tables::Table::TeamAuthorization => Table::TeamAuthorization,
-            web_common::database::tables::Table::TeamState => Table::TeamState,
             web_common::database::tables::Table::Team => Table::Team,
             web_common::database::tables::Table::Unit => Table::Unit,
-            web_common::database::tables::Table::UserAuthorization => Table::UserAuthorization,
             web_common::database::tables::Table::UserEmail => Table::UserEmail,
             web_common::database::tables::Table::User => Table::User,
         }
@@ -3332,16 +2574,12 @@ impl From<web_common::database::tables::Table> for Table {
 impl From<Table> for web_common::database::tables::Table {
     fn from(item: Table) -> Self {
         match item {
-            Table::Archivable => web_common::database::tables::Table::Archivable,
             Table::ContainerHorizontalRule => web_common::database::tables::Table::ContainerHorizontalRule,
             Table::ContainerVerticalRule => web_common::database::tables::Table::ContainerVerticalRule,
             Table::ContinuousUnit => web_common::database::tables::Table::ContinuousUnit,
-            Table::Describable => web_common::database::tables::Table::Describable,
             Table::DiscreteUnit => web_common::database::tables::Table::DiscreteUnit,
             Table::DocumentFormat => web_common::database::tables::Table::DocumentFormat,
             Table::Document => web_common::database::tables::Table::Document,
-            Table::Editable => web_common::database::tables::Table::Editable,
-            Table::Edit => web_common::database::tables::Table::Edit,
             Table::ItemCategory => web_common::database::tables::Table::ItemCategory,
             Table::ItemCategoryRelationship => web_common::database::tables::Table::ItemCategoryRelationship,
             Table::ItemCategoryUnit => web_common::database::tables::Table::ItemCategoryUnit,
@@ -3350,22 +2588,16 @@ impl From<Table> for web_common::database::tables::Table {
             Table::ItemLocation => web_common::database::tables::Table::ItemLocation,
             Table::ItemUnit => web_common::database::tables::Table::ItemUnit,
             Table::Item => web_common::database::tables::Table::Item,
-            Table::LocationState => web_common::database::tables::Table::LocationState,
             Table::Location => web_common::database::tables::Table::Location,
             Table::LoginProvider => web_common::database::tables::Table::LoginProvider,
             Table::ManufacturedItemCategory => web_common::database::tables::Table::ManufacturedItemCategory,
             Table::Notification => web_common::database::tables::Table::Notification,
-            Table::OrganizationAuthorization => web_common::database::tables::Table::OrganizationAuthorization,
-            Table::OrganizationLocation => web_common::database::tables::Table::OrganizationLocation,
-            Table::OrganizationState => web_common::database::tables::Table::OrganizationState,
             Table::Organization => web_common::database::tables::Table::Organization,
             Table::PrimaryUserEmail => web_common::database::tables::Table::PrimaryUserEmail,
             Table::ProcedureContinuousRequirement => web_common::database::tables::Table::ProcedureContinuousRequirement,
             Table::ProcedureDiscreteRequirement => web_common::database::tables::Table::ProcedureDiscreteRequirement,
             Table::Procedure => web_common::database::tables::Table::Procedure,
-            Table::ProjectContinuousRequirement => web_common::database::tables::Table::ProjectContinuousRequirement,
-            Table::ProjectDiscreteRequirement => web_common::database::tables::Table::ProjectDiscreteRequirement,
-            Table::ProjectMilestone => web_common::database::tables::Table::ProjectMilestone,
+            Table::ProjectRequirement => web_common::database::tables::Table::ProjectRequirement,
             Table::ProjectState => web_common::database::tables::Table::ProjectState,
             Table::Project => web_common::database::tables::Table::Project,
             Table::Role => web_common::database::tables::Table::Role,
@@ -3376,11 +2608,8 @@ impl From<Table> for web_common::database::tables::Table {
             Table::Spectra => web_common::database::tables::Table::Spectra,
             Table::SpectraCollection => web_common::database::tables::Table::SpectraCollection,
             Table::Taxa => web_common::database::tables::Table::Taxa,
-            Table::TeamAuthorization => web_common::database::tables::Table::TeamAuthorization,
-            Table::TeamState => web_common::database::tables::Table::TeamState,
             Table::Team => web_common::database::tables::Table::Team,
             Table::Unit => web_common::database::tables::Table::Unit,
-            Table::UserAuthorization => web_common::database::tables::Table::UserAuthorization,
             Table::UserEmail => web_common::database::tables::Table::UserEmail,
             Table::User => web_common::database::tables::Table::User,
         }

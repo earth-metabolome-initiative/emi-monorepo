@@ -22,12 +22,10 @@ impl DocumentFormat {
         extension: &str,
         conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>,
     ) -> Result<DocumentFormat, diesel::result::Error> {
-        use crate::schema::describables::dsl::*;
-        use crate::schema::document_formats::dsl::*;
+        use crate::schema::document_formats;
         // The extension of the format is stored as the name of the describable.
-        document_formats
-            .inner_join(describables)
-            .filter(name.eq(extension))
+        document_formats::dsl::document_formats
+            .filter(document_formats::dsl::extension.eq(extension))
             .select(DocumentFormat::as_select())
             .first::<DocumentFormat>(conn)
     }
@@ -58,19 +56,19 @@ impl NestedDocument {
 
 #[derive(Queryable, Insertable, Debug)]
 #[diesel(table_name = user_emails)]
-pub(crate) struct NewUserEmail {
-    email: String,
-    user_id: Uuid,
-    login_provider_id: Uuid,
+pub(crate) struct NewUserEmail<'a> {
+    email: &'a str,
+    user_id: i32,
+    login_provider_id: i32,
 }
 
-impl NewUserEmail {
-    pub(crate) fn new(email: &str, user_id: Uuid, login_provider_id: Uuid) -> NewUserEmail {
+impl<'a> NewUserEmail<'a> {
+    pub(crate) fn new(email: &str, user_id: i32, login_provider_id: i32) -> NewUserEmail<'_> {
         assert!(!email.is_empty());
         assert!(EmailAddress::is_valid(email));
 
         NewUserEmail {
-            email: email.to_string(),
+            email,
             user_id,
             login_provider_id,
         }
@@ -80,13 +78,13 @@ impl NewUserEmail {
         &self,
         conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>,
     ) -> Result<UserEmail, diesel::result::Error> {
-        use crate::schema::user_emails::dsl::*;
-        let result = diesel::insert_into(user_emails).values(self).execute(conn);
+        use crate::schema::user_emails;
+        let result = diesel::insert_into(user_emails::dsl::user_emails).values(self).execute(conn);
         match result {
-            Ok(_) => user_emails
-                .filter(email.eq(&self.email))
-                .filter(user_id.eq(self.user_id))
-                .filter(login_provider_id.eq(self.login_provider_id))
+            Ok(_) => user_emails::dsl::user_emails
+                .filter(user_emails::dsl::email.eq(&self.email))
+                .filter(user_emails::dsl::user_id.eq(self.user_id))
+                .filter(user_emails::dsl::login_provider_id.eq(self.login_provider_id))
                 .first::<UserEmail>(conn),
             Err(e) => Err(e),
         }
@@ -96,11 +94,11 @@ impl NewUserEmail {
 #[derive(Queryable, Insertable, Debug)]
 #[diesel(table_name = primary_user_emails)]
 pub(crate) struct NewPrimaryUserEmail {
-    id: Uuid,
+    id: i32,
 }
 
 impl NewPrimaryUserEmail {
-    pub(crate) fn new(id: Uuid) -> NewPrimaryUserEmail {
+    pub(crate) fn new(id: i32) -> NewPrimaryUserEmail {
         NewPrimaryUserEmail { id }
     }
 
@@ -116,7 +114,7 @@ impl NewPrimaryUserEmail {
 }
 
 impl UserEmail {
-    pub(crate) fn provider_id(&self) -> Uuid {
+    pub(crate) fn provider_id(&self) -> i32 {
         self.login_provider_id
     }
 }
@@ -157,16 +155,11 @@ impl User {
         user_email: &str,
         conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>,
     ) -> QueryResult<UserEmail> {
-        use crate::schema::user_emails::dsl::*;
-        user_emails
-            .filter(email.eq(user_email))
-            .filter(user_id.eq(self.id))
+        use crate::schema::user_emails;
+        user_emails::dsl::user_emails
+            .filter(user_emails::dsl::email.eq(user_email))
+            .filter(user_emails::dsl::user_id.eq(self.id))
             .first::<UserEmail>(conn)
-    }
-
-    /// Returns the user's id.
-    pub fn id(&self) -> Uuid {
-        self.id
     }
 
     /// Inserts the user new profile and thumbnail pictures in the database.
@@ -188,28 +181,21 @@ impl User {
 
         conn.transaction::<_, ApiError, _>(|conn| {
             // First, we create the document for the profile picture.
-            let profile_picture_document = NewDocument::new(
+            let profile_picture_document = Document::new(
+                None,
+                self.id,
                 self.standard_profile_picture_path(),
                 png_format.id,
                 profile_picture.as_bytes().len() as i32,
-            );
-            let new_editable = NewEditable::new(self.id);
-            let profile_picture_document = profile_picture_document.insert(
-                conn,
-                &new_editable,
-                NewDescribable::new("Profile Picture", None),
-            )?;
+            ).insert(conn)?;
             // Similarly, we create the document for the thumbnail.
-            let thumbnail_document = NewDocument::new(
+            let thumbnail_document = Document::new(
+                None,
+                self.id,
                 self.thumbnail_path(),
                 png_format.id,
                 thumbnail.as_bytes().len() as i32,
-            );
-            let thumbnail_document = thumbnail_document.insert(
-                conn,
-                &new_editable,
-                NewDescribable::new("Profile Picture Thumbnail", None),
-            )?;
+            ).insert(conn)?;
             // We attempt to save the profile picture and thumbnail
             let profile_picture_path =
                 NestedDocument::get( profile_picture_document.id, conn,)?.internal_path();
@@ -229,21 +215,6 @@ impl User {
 
     pub fn standard_profile_picture_path(&self) -> String {
         web_common::database::views::PublicUser::profile_picture_path(self.id, &ImageSize::Standard)
-    }
-
-    pub fn has_profile_picture(&self, conn: &mut crate::DieselConn) -> bool {
-        // In order to determine whether a user has a profile picture, we need to check whether
-        // the user is the author, in the field created_by from the editables table, of any
-        // document from the documents table as determined by the path column.
-        let profile_picture_path = self.standard_profile_picture_path();
-        use crate::schema::documents::dsl::*;
-        use crate::schema::editables::dsl::*;
-        editables
-            .inner_join(documents)
-            .filter(created_by.eq(self.id))
-            .filter(path.eq(profile_picture_path))
-            .first::<(Editable, Document)>(conn)
-            .is_ok()
     }
 
     /// Method to update a user's name.
@@ -303,85 +274,21 @@ impl LoginProvider {
     }
 }
 
-#[derive(Queryable, Insertable, Debug)]
-#[diesel(table_name = editables)]
-pub struct NewEditable {
-    pub created_by: Uuid,
-}
 
-impl NewEditable {
-    pub fn new(created_by: Uuid) -> NewEditable {
-        NewEditable { created_by }
-    }
-
-    /// Insert the editable into the database.
-    pub fn insert(
-        &self,
-        conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>,
-    ) -> Result<Editable, diesel::result::Error> {
-        diesel::insert_into(editables::table)
-            .values(self)
-            .get_result::<Editable>(conn)
-    }
-}
-
-impl Describable {
-    pub fn insert(
-        &self,
-        conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>,
-    ) -> Result<Describable, diesel::result::Error> {
-        diesel::insert_into(describables::table)
-            .values(self)
-            .get_result::<Describable>(conn)
-    }
-}
-
-#[derive(Queryable, Insertable, Debug, Clone)]
-#[diesel(table_name = describables)]
-pub struct NewDescribable {
-    pub name: String,
-    pub description: Option<String>,
-}
-
-impl NewDescribable {
-    pub fn new(name: &str, description: Option<&str>) -> NewDescribable {
-        NewDescribable {
-            name: name.to_string(),
-            description: description.map(|s| s.to_string()),
-        }
-    }
-
-    pub fn into_describable(self, editable: Editable) -> Describable {
-        Describable {
-            id: editable.id,
-            name: self.name,
-            description: self.description,
-        }
-    }
-}
-
-#[derive(Debug)]
-pub struct NewDocument {
-    pub path: String,
-    pub format_id: Uuid,
-    pub bytes: i32,
-}
-
-impl NewDocument {
-    pub fn new(path: String, format_id: Uuid, bytes: i32) -> NewDocument {
-        NewDocument {
+impl Document {
+    pub fn new(
+        id: Option<Uuid>,
+        author_id: i32,
+        path: String,
+        format_id: i32,
+        bytes: i32,
+    ) -> Self {
+        Document {
+            id: id.unwrap_or_else(Uuid::new_v4),
+            author_id,
             path,
             format_id,
             bytes,
-        }
-    }
-
-    fn into_document(self, editable: Editable) -> Document {
-        Document {
-            id: editable.id,
-            path: self.path,
-            format_id: self.format_id,
-            bytes: self.bytes,
         }
     }
 
@@ -389,22 +296,10 @@ impl NewDocument {
     pub fn insert(
         self,
         conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>,
-        new_editable: &NewEditable,
-        new_describable: NewDescribable,
     ) -> Result<Document, diesel::result::Error> {
         conn.transaction::<_, diesel::result::Error, _>(|conn| {
-            let editable = diesel::insert_into(editables::table)
-                .values(new_editable)
-                .get_result::<Editable>(conn)?;
-
-            let new_document = self.into_document(editable.clone());
-            let new_describable = new_describable.into_describable(editable);
-
-            // We insert the description of the document.
-            new_describable.insert(conn)?;
-
             diesel::insert_into(documents::table)
-                .values(&new_document)
+                .values(&self)
                 .get_result::<Document>(conn)
         })
     }

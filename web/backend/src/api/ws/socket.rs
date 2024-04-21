@@ -71,79 +71,79 @@ impl WebSocket {
         self.user.is_some()
     }
 
-    fn listen_for_notifications(&mut self, ctx: &mut <WebSocket as Actor>::Context) {
-        // If the handler is stopped or was never started, start it.
-        if self.notifications_handler.is_none() {
-            if let Some((user, _)) = &self.user {
-                log::info!("Starting notifications handler for user {}", user.id);
-                let address = ctx.address().clone();
-                let channel_name = format!("user_{}", user.id);
-                let pool = self.sqlx.clone();
-                let mut diesel_connection = self.diesel.get().unwrap();
-                self.notifications_handler = Some(
-                    ctx.spawn(
-                        async move {
-                            // Initiate the logger.
-                            let mut listener = PgListener::connect_with(&pool).await.unwrap();
-                            match listener.listen_all([channel_name.as_str()]).await {
-                                Ok(_) => {}
-                                Err(err) => {
-                                    log::error!("Error listening for notifications: {:?}", err);
-                                    return;
-                                }
-                            }
-                            loop {
-                                while let Some(postgres_notification) =
-                                    listener.try_recv().await.unwrap()
-                                {
-                                    let notification_payload: String =
-                                        postgres_notification.payload().to_owned();
-                                    let payload: NotificationPayload =
-                                        serde_json::from_str(&notification_payload).unwrap();
+    // fn listen_for_notifications(&mut self, ctx: &mut <WebSocket as Actor>::Context) {
+    //     // If the handler is stopped or was never started, start it.
+    //     if self.notifications_handler.is_none() {
+    //         if let Some((user, _)) = &self.user {
+    //             log::info!("Starting notifications handler for user {}", user.id);
+    //             let address = ctx.address().clone();
+    //             let channel_name = format!("user_{}", user.id);
+    //             let pool = self.sqlx.clone();
+    //             let mut diesel_connection = self.diesel.get().unwrap();
+    //             self.notifications_handler = Some(
+    //                 ctx.spawn(
+    //                     async move {
+    //                         // Initiate the logger.
+    //                         let mut listener = PgListener::connect_with(&pool).await.unwrap();
+    //                         match listener.listen_all([channel_name.as_str()]).await {
+    //                             Ok(_) => {}
+    //                             Err(err) => {
+    //                                 log::error!("Error listening for notifications: {:?}", err);
+    //                                 return;
+    //                             }
+    //                         }
+    //                         loop {
+    //                             while let Some(postgres_notification) =
+    //                                 listener.try_recv().await.unwrap()
+    //                             {
+    //                                 let notification_payload: String =
+    //                                     postgres_notification.payload().to_owned();
+    //                                 let payload: NotificationPayload =
+    //                                     serde_json::from_str(&notification_payload).unwrap();
 
-                                    let row_id = payload.notification.row_id.clone();
-                                    let view: crate::views::View =
-                                        payload.notification.table_name.as_str().into();
+    //                                 let row_id = payload.notification.row_id.clone();
+    //                                 let view: crate::views::View =
+    //                                     payload.notification.table_name.as_str().into();
 
-                                    let row = if let Some(id) = row_id {
-                                        match view.get(id, &mut diesel_connection) {
-                                            Ok(row) => Some(row.into()),
-                                            Err(err) => {
-                                                log::error!(
-                                                    "Error getting row from view {}: {:?}",
-                                                    view,
-                                                    err
-                                                );
-                                                return;
-                                            }
-                                        }
-                                    } else {
-                                        None
-                                    };
+    //                                 let row = if let Some(id) = row_id {
+    //                                     match view.get(id, &mut diesel_connection) {
+    //                                         Ok(row) => Some(row.into()),
+    //                                         Err(err) => {
+    //                                             log::error!(
+    //                                                 "Error getting row from view {}: {:?}",
+    //                                                 view,
+    //                                                 err
+    //                                             );
+    //                                             return;
+    //                                         }
+    //                                     }
+    //                                 } else {
+    //                                     None
+    //                                 };
 
-                                    address.do_send(BackendMessage::Notification(
-                                        NotificationMessage::new(
-                                            payload.operation,
-                                            payload.notification.into(),
-                                            row,
-                                        ),
-                                    ));
-                                }
-                            }
-                        }
-                        .into_actor(self),
-                    ),
-                );
-            }
-        }
-    }
+    //                                 address.do_send(BackendMessage::Notification(
+    //                                     NotificationMessage::new(
+    //                                         payload.operation,
+    //                                         payload.notification.into(),
+    //                                         row,
+    //                                     ),
+    //                                 ));
+    //                             }
+    //                         }
+    //                     }
+    //                     .into_actor(self),
+    //                 ),
+    //             );
+    //         }
+    //     }
+    // }
 }
 
 impl Actor for WebSocket {
     type Context = ws::WebsocketContext<Self>;
 
     fn started(&mut self, ctx: &mut Self::Context) {
-        self.listen_for_notifications(ctx);
+        // self.listen_for_notifications(ctx);
         if self.is_authenticated() {
             log::info!("Sending refresh token message");
             ctx.address().do_send(BackendMessage::RefreshToken(

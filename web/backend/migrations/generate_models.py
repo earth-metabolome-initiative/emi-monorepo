@@ -178,6 +178,8 @@ def sql_type_to_rust_type(sql_type: str) -> str:
     """Convert the SQL type to the Rust type."""
     if sql_type == "uuid":
         return "uuid::Uuid"
+    if sql_type == "integer":
+        return "i32"
     raise NotImplementedError(f"The SQL type {sql_type} is not supported.")
 
 
@@ -482,6 +484,7 @@ def write_from_impls(
         raise ValueError("The table type must be either 'tables' or 'views'.")
 
     similarity_indices: PGIndices = find_pg_trgm_indices()
+    table_metadatas = find_foreign_keys()
 
     with open(path, "r") as file:
         content = file.read()
@@ -552,24 +555,29 @@ def write_from_impls(
 
                 table_data = table_structs[struct_name]
                 table_name = table_data["table_name"]
-
                 new_content += f"impl {struct_name} {{\n"
-                new_content += f"    /// Get the struct from the database by its ID.\n"
-                new_content += f"    ///\n"
-                new_content += f"    /// # Arguments\n"
-                new_content += f"    /// * `id` - The ID of the struct to get.\n"
-                new_content += (
-                    f"    /// * `connection` - The connection to the database.\n"
-                )
-                new_content += f"    ///\n"
-                new_content += f"    pub fn get(\n"
-                new_content += f"        id: Uuid,\n"
-                new_content += f"        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
-                new_content += f"    ) -> Result<Self, diesel::result::Error> {{\n"
-                new_content += f"        {table_name}::dsl::{table_name}\n"
-                new_content += f"            .filter({table_name}::dsl::id.eq(id))\n"
-                new_content += f"            .first::<Self>(connection)\n"
-                new_content += f"    }}\n"
+
+                if table_metadatas.has_primary_key(table_name):
+
+                    primary_key_name, primary_key_type = table_metadatas.get_primary_key_name_and_type(table_name)
+                    rust_primary_key_type = sql_type_to_rust_type(primary_key_type)
+
+                    new_content += f"    /// Get the struct from the database by its ID.\n"
+                    new_content += f"    ///\n"
+                    new_content += f"    /// # Arguments\n"
+                    new_content += f"    /// * `{primary_key_name}` - The ID of the struct to get.\n"
+                    new_content += (
+                        f"    /// * `connection` - The connection to the database.\n"
+                    )
+                    new_content += f"    ///\n"
+                    new_content += f"    pub fn get(\n"
+                    new_content += f"        {primary_key_name}: {rust_primary_key_type},\n"
+                    new_content += f"        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+                    new_content += f"    ) -> Result<Self, diesel::result::Error> {{\n"
+                    new_content += f"        {table_name}::dsl::{table_name}\n"
+                    new_content += f"            .filter({table_name}::dsl::id.eq({primary_key_name}))\n"
+                    new_content += f"            .first::<Self>(connection)\n"
+                    new_content += f"    }}\n"
 
                 # If this table implements the `pg_trgm` index, we also
                 # provide the `search` method to search for the struct
@@ -808,24 +816,6 @@ def write_from_impls(
     new_content += f"        }}\n"
     new_content += f"    }}\n"
 
-    new_content += f"    /// Get the struct from the database by its ID.\n"
-    new_content += f"    ///\n"
-    new_content += f"    /// # Arguments\n"
-    new_content += f"    /// * `id` - The ID of the struct to get.\n"
-    new_content += f"    /// * `connection` - The connection to the database.\n"
-    new_content += f"    ///\n"
-    new_content += f"    pub fn get(\n"
-    new_content += f"        &self,\n"
-    new_content += f"        id: Uuid,\n"
-    new_content += f"        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
-    new_content += (
-        f"    ) -> Result<{capitalized_table_type}Row, diesel::result::Error> {{\n"
-    )
-    new_content += f"        Ok(match self {{\n"
-    for struct_name in table_structs.keys():
-        new_content += f"            {capitalized_table_type}::{struct_name} => {capitalized_table_type}Row::{struct_name}({struct_name}::get(id, connection)?),\n"
-    new_content += f"        }})\n"
-    new_content += f"    }}\n"
     new_content += f"}}\n"
 
     new_content += f"impl std::fmt::Display for {capitalized_table_type} {{\n"
@@ -983,6 +973,8 @@ def write_web_common_structs(
         "use chrono::Utc;",
         "use super::selects::Select;",
     ]
+
+    table_metadatas = find_foreign_keys()
 
     # The derives to apply to the structs in the `src/database/tables.rs` document
     derives = ["Deserialize", "Serialize", "Clone", "Debug", "PartialEq"]
@@ -1226,13 +1218,18 @@ def write_web_common_structs(
                 )
                 tables.write(f"    ///\n")
                 tables.write(f"    /// # Arguments\n")
-                tables.write(f"    /// * `id` - The ID of {struct_name} to get.\n")
+                primary_key_name, primary_key_type = table_metadatas.get_primary_key_name_and_type(
+                    table_name
+                )
+                rust_primary_key_type = sql_type_to_rust_type(primary_key_type)
+
+                tables.write(f"    /// * `{primary_key_name}` - The ID of {struct_name} to get.\n")
                 tables.write(
                     f"    /// * `connection` - The connection to the database.\n"
                 )
                 tables.write(f"    ///\n")
                 tables.write(f"    pub async fn get<C>(\n")
-                tables.write(f"        id: Uuid,\n")
+                tables.write(f"        {primary_key_name}: {rust_primary_key_type},\n")
                 tables.write(f"        connection: &mut gluesql::prelude::Glue<C>,\n")
                 tables.write(
                     f"    ) -> Result<Option<Self>, gluesql::prelude::Error> where\n"
@@ -1245,7 +1242,7 @@ def write_web_common_structs(
                 # We use the AST builder as much as possible so to avoid SQL injection attacks.
                 tables.write(f'        let select_row = table("{table_name}")\n')
                 tables.write(f"            .select()\n")
-                tables.write(f'            .filter(col("id").eq(id.to_string()))\n')
+                tables.write(f'            .filter(col("id").eq({primary_key_name}.to_string()))\n')
                 tables.write(f'            .project("{columns}")\n')
                 tables.write(f"            .limit(1)\n")
                 tables.write(f"            .execute(connection)\n")
@@ -1262,7 +1259,7 @@ def write_web_common_structs(
                 tables.write(f"    /// Delete {struct_name} from the database.\n")
                 tables.write(f"    ///\n")
                 tables.write(f"    /// # Arguments\n")
-                tables.write(f"    /// * `id` - The ID of the struct to delete.\n")
+                tables.write(f"    /// * `{primary_key_name}` - The ID of the struct to delete.\n")
                 tables.write(
                     f"    /// * `connection` - The connection to the database.\n"
                 )
@@ -1270,7 +1267,7 @@ def write_web_common_structs(
                 tables.write(f"    /// # Returns\n")
                 tables.write(f"    /// The number of rows deleted.\n")
                 tables.write(f"    pub async fn delete_from_id<C>(\n")
-                tables.write(f"        id: Uuid,\n")
+                tables.write(f"        {primary_key_name}: {rust_primary_key_type},\n")
                 tables.write(f"        connection: &mut gluesql::prelude::Glue<C>,\n")
                 tables.write(f"    ) -> Result<usize, gluesql::prelude::Error> where\n")
                 tables.write(

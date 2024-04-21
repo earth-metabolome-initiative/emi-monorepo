@@ -32,7 +32,6 @@ use diesel::r2d2::{ConnectionManager, Pool};
 use diesel::sql_query;
 use diesel::sql_types::Text;
 use email_address::EmailAddress;
-use uuid::Uuid;
 
 pub(crate) struct Emails {
     emails: Vec<String>,
@@ -94,8 +93,8 @@ struct ForeignKeyInfo {
 /// * `new_user_id` - The ID of the user that is kept.
 /// * `conn` - The connection to the database.
 fn update_foreign_user_id_keys(
-    old_user_id: Uuid,
-    new_user_id: Uuid,
+    old_user_id: i32,
+    new_user_id: i32,
     pool: &Pool<ConnectionManager<PgConnection>>,
 ) -> QueryResult<()> {
     let mut conn = pool.get().unwrap();
@@ -128,8 +127,8 @@ fn update_foreign_user_id_keys(
             );
 
             sql_query(&update_statement)
-                .bind::<diesel::sql_types::Uuid, _>(new_user_id)
-                .bind::<diesel::sql_types::Uuid, _>(old_user_id)
+                .bind::<diesel::sql_types::Integer, _>(new_user_id)
+                .bind::<diesel::sql_types::Integer, _>(old_user_id)
                 .execute(conn)?;
         }
 
@@ -139,7 +138,7 @@ fn update_foreign_user_id_keys(
 
 fn insert_user_emails(
     user: &User,
-    provider_id: Uuid,
+    provider_id: i32,
     emails: &[String],
     pool: &Pool<ConnectionManager<PgConnection>>,
 ) -> QueryResult<()> {
@@ -150,7 +149,7 @@ fn insert_user_emails(
         let user_email = user.get_user_email_from_email(email, &mut conn);
 
         if user_email.is_err() || user_email.unwrap().provider_id() != provider_id {
-            let new_user_email = NewUserEmail::new(email, user.id(), provider_id);
+            let new_user_email = NewUserEmail::new(email, user.id, provider_id);
             new_user_email.insert(&mut conn)?;
         }
     }
@@ -159,7 +158,7 @@ fn insert_user_emails(
 }
 
 pub(crate) fn renormalize_user_emails(
-    provider_id: Uuid,
+    provider_id: i32,
     emails: Emails,
     potential_new_user: NewUser,
     pool: &Pool<ConnectionManager<PgConnection>>,
@@ -208,8 +207,8 @@ pub(crate) fn renormalize_user_emails(
             let mut conn = pool.get().unwrap();
 
             for mail_user in mail_users {
-                update_foreign_user_id_keys(mail_user.id(), user_to_keep.id(), pool)?;
-                diesel::delete(users.filter(id.eq(mail_user.id()))).execute(&mut conn)?;
+                update_foreign_user_id_keys(mail_user.id, user_to_keep.id, pool)?;
+                diesel::delete(users.filter(id.eq(mail_user.id))).execute(&mut conn)?;
             }
 
             // And now that we have merged the users, we find ourselves in the same situation as in case 1.

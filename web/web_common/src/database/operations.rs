@@ -29,7 +29,6 @@ impl View {
     pub fn roles(&self) -> Vec<Role> {
         match self {
             View::PublicUser => vec![Role::Anonymous],
-            View::FormatsView => vec![Role::Viewer],
         }
     }
 }
