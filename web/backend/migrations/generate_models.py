@@ -56,7 +56,7 @@ will make use of the full path to the struct in the `web_common` crate so to avo
 
 """
 
-from typing import List, Dict, Tuple, Any, Optional
+from typing import List, Tuple, Optional
 import psycopg2
 import compress_json
 import os
@@ -2118,9 +2118,7 @@ def generate_view_structs():
 
 def generate_nested_structs(
     path: str,
-    struct_name: str,
-    struct_metadatas: Dict[str, Any],
-    struct_table_metadatas: Optional[Dict[str, Any]] = None
+    struct_metadatas: List[StructMetadata]
 ) -> List[StructMetadata]:
     """Generate the nested structs.
 
@@ -2135,9 +2133,6 @@ def generate_nested_structs(
     For each table, we query the postgres to get the foreign keys. We then generate the nested
     structs for the referenced tables. The nested structs are written to the file `src/models.rs`.
     """
-    if struct_table_metadatas is None:
-        struct_table_metadatas = struct_metadatas
-
     tables_metadata = find_foreign_keys()
     similarity_indices: PGIndices = find_pg_trgm_indices()
 
@@ -2170,33 +2165,28 @@ def generate_nested_structs(
         tables.write(f"{import_statement}\n")
 
     def get_struct_name_by_table_name(table_name: str) -> str:
-        for struct_name, struct_metadata in struct_table_metadatas.items():
-            if struct_metadata["table_name"] == table_name:
-                return struct_name
-        for struct_name, struct_metadata in struct_metadatas.items():
-            if struct_metadata["table_name"] == table_name:
-                return struct_name
+        for struct in struct_metadatas:
+            if struct.table_name == table_name:
+                return struct.name
         raise ValueError(f"Table name {table_name} not found in the struct metadata.")
 
     new_struct_metadatas = []
 
     # For each of the struct, we generated the Nested{struct_name} version
     # if the struct contains a reference to another struct.
-    for struct_name, struct_metadata in struct_metadatas.items():
-        table_name = struct_metadata["table_name"]
+    for struct in struct_metadatas:
         # If the struct does not have any foreign keys, we skip it
-        if not tables_metadata.has_foreign_keys(table_name):
+        if not tables_metadata.has_foreign_keys(struct.table_name):
             continue
 
-        struct_attributes = struct_metadata["attributes"]
-        foreign_keys = tables_metadata.get_foreign_keys(table_name)
+        foreign_keys = tables_metadata.get_foreign_keys(struct.table_name)
 
         primary_key_attribute = None
-        if tables_metadata.has_primary_key(table_name):
+        if tables_metadata.has_primary_key(struct.table_name):
             # We implement the `get` method, which returns the nested struct
             # from a provided row primary key.
             primary_key_attribute, primary_key_type = tables_metadata.get_primary_key_name_and_type(
-                table_name
+                struct.table_name
             )
             rust_primary_key_type = sql_type_to_rust_type(primary_key_type)
 
@@ -2210,7 +2200,7 @@ def generate_nested_structs(
         else:
             # If the table does not have a primary key, as may happen in the context
             # of a view, we use the attribyte `id` as the primary key.
-            for attribute in struct_attributes:
+            for attribute in struct.attributes:
                 if attribute["field_name"] == "id":
                     primary_key_attribute = "id"
                     primary_key_type = attribute["field_type"]
@@ -2218,71 +2208,66 @@ def generate_nested_structs(
                     break
             if primary_key_attribute is None:
                 raise ValueError(
-                    f"Table {table_name} does not have a primary key nor an `id` attribute. "
-                    f"It has the following attributes: {struct_attributes}"
+                    f"Table {struct.table_name} does not have a primary key nor an `id` attribute. "
+                    f"It has the following attributes: {struct.attributes}"
                 )
 
-        nested_struct_name = f"Nested{struct_name}"
-        new_struct_metadata = StructMetadata(nested_struct_name, table_name)
+        nested_struct_name = f"Nested{struct.struct_name}"
+        new_struct_metadata = StructMetadata(nested_struct_name, struct.table_name)
 
         # We write the Nested{struct_name} struct
         tables.write(
             "#[derive("
-            "Debug, Clone, Serialize, Deserialize, PartialEq"
         )
         new_struct_metadata.add_derive("Debug")
-        new_struct_metadata.add_derive("Clone")
         new_struct_metadata.add_derive("Serialize")
         new_struct_metadata.add_derive("Deserialize")
         new_struct_metadata.add_derive("PartialEq")
-        if not struct_metadata["contains_no_eq"]:
-            tables.write(", Eq")
-            new_struct_metadata.add_derive("Eq")
+        tables.write(", ".join(new_struct_metadata.derives()))
         tables.write(")]\n")
 
         tables.write(f"pub struct {nested_struct_name} {{\n")
-        for attribute in struct_attributes:
-            attribute_name = attribute["field_name"]
-            attribute_type = attribute["field_type"]
-            optional = attribute_type.startswith("Option<")
-            if optional:
-                attribute_type = attribute_type[7:-1]
+        for attribute in struct.attributes:
             
             # If the current attribute is among the foreign keys, we replace it
             # with the foreign struct. This struct may be also nested if the foreign
             # table has foreign keys, which we check by using the `has_foreign_keys`
             # method of the `tables_metadata` object.
-            if attribute_name in foreign_keys:
-                if attribute_name == primary_key_attribute:
-                    foreign_struct_name = struct_name
+            if attribute.name in foreign_keys:
+                if attribute.name == primary_key_attribute:
+                    foreign_struct_name = struct.name
                     normalized_attribute_name = "inner"
                 else:
                     foreign_key_table_name = tables_metadata.get_foreign_key_table_name(
-                        table_name, attribute_name
+                        struct.table_name, attribute.name
                     )
-                    normalized_attribute_name = attribute_name
+                    normalized_attribute_name = attribute.name
                     foreign_struct_name = get_struct_name_by_table_name(foreign_key_table_name)
                 if normalized_attribute_name.endswith("_id"):
                     normalized_attribute_name = normalized_attribute_name[:-3]
-                if attribute_name != primary_key_attribute and tables_metadata.foreign_key_table_has_foreign_keys(
-                    table_name, attribute_name
+                if attribute.name != primary_key_attribute and tables_metadata.foreign_key_table_has_foreign_keys(
+                    struct.table_name, attribute.name
                 ):  
                     new_attribute_type = f"Nested{foreign_struct_name}"
                     # If the nested version of the foreign struct is already present,
                     # we cannot use it save risking the struct be extremely nested.
                     # Think for instance a leaf taxon struct containing its parent taxon
                     # and the parent taxon containing its parent taxon and so on.
-                    if struct_name == foreign_struct_name:
-                        new_attribute_type = attribute_type
-                    tables.write(
-                        f"    pub {normalized_attribute_name}: {new_attribute_type},\n"
-                    )
+                    if struct.name == foreign_struct_name:
+                        new_attribute_type = attribute.data_type
+                        tables.write(
+                            f"    pub {normalized_attribute_name}: {attribute.format_attribute_type()},\n"
+                        )
+                    else:
+                        tables.write(
+                            f"    pub {normalized_attribute_name}: {attribute.format_attribute_type()},\n"
+                        )
                     new_struct_metadata.add_attribute(
                         AttributeMetadata(
-                            original_name=attribute_name,
+                            original_name=attribute.name,
                             name=normalized_attribute_name,
                             data_type=new_attribute_type,
-                            optional=optional,
+                            optional=attribute.optional,
                         )
                     )
                 else:
@@ -2291,10 +2276,10 @@ def generate_nested_structs(
                     )
                     new_struct_metadata.add_attribute(
                         AttributeMetadata(
-                            original_name=attribute_name,
+                            original_name=attribute.name,
                             name=normalized_attribute_name,
                             data_type=foreign_struct_name,
-                            optional=optional,
+                            optional=attribute.optional,
                         )
                     )
             else:
@@ -2302,7 +2287,7 @@ def generate_nested_structs(
         tables.write("}\n\n")
 
         tables.write(
-            f"impl Nested{struct_name} {{\n"
+            f"impl Nested{struct.name} {{\n"
             "    /// Get the nested struct from the provided primary key.\n"
             "    ///\n"
             "    /// # Arguments\n"
@@ -2313,7 +2298,7 @@ def generate_nested_structs(
             "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
             "    ) -> Result<Self, diesel::result::Error>\n"
             "    {\n"
-            f"        let flat_struct = {struct_name}::get(id, connection)?;\n"
+            f"        let flat_struct = {struct.name}::get(id, connection)?;\n"
             "        Ok(Self {\n"
         )
         for attribute in new_struct_metadata.attributes:
@@ -2335,9 +2320,9 @@ def generate_nested_structs(
         # calls search on the flat version of the struct and then iterates on the
         # primary keys of the results and constructs the nested structs by calling
         # the `get` method several times.
-        if similarity_indices.has_table(table_name):
+        if similarity_indices.has_table(struct.table_name):
             tables.write(
-                f"impl Nested{struct_name} {{\n"
+                f"impl Nested{struct.name} {{\n"
                 "    /// Search the table by the query.\n"
                 "    ///\n"
                 "    /// # Arguments\n"
@@ -2350,7 +2335,7 @@ def generate_nested_structs(
                 "        threshold: Option<f64>,\n"
                 "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
                 "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
-                f"        let flat_structs = {struct_name}::search(query, limit, threshold, connection)?;\n"
+                f"        let flat_structs = {struct.name}::search(query, limit, threshold, connection)?;\n"
                 "        let mut nested_structs = Vec::new();\n"
                 "        for flat_struct in flat_structs {\n"
                 "            nested_structs.push(Self::get(flat_struct.id, connection)?);\n"
@@ -2364,8 +2349,8 @@ def generate_nested_structs(
         # present in the web_common crate, which does not use Diesel or its
         # structs, but the web_common version of the structs.
         tables.write(
-            f"impl From<web_common::database::nested_models::Nested{struct_name}> for Nested{struct_name} {{\n"
-            f"    fn from(item: web_common::database::nested_models::Nested{struct_name}) -> Self {{\n"
+            f"impl From<web_common::database::nested_models::Nested{struct.name}> for Nested{struct.name} {{\n"
+            f"    fn from(item: web_common::database::nested_models::Nested{struct.name}) -> Self {{\n"
             "        Self {\n"
         )
         for attribute in new_struct_metadata.attributes:
@@ -2384,8 +2369,8 @@ def generate_nested_structs(
         )       
 
         tables.write(
-            f"impl From<Nested{struct_name}> for web_common::database::nested_models::Nested{struct_name} {{\n"
-            f"    fn from(item: Nested{struct_name}) -> Self {{\n"
+            f"impl From<Nested{struct.name}> for web_common::database::nested_models::Nested{struct.name} {{\n"
+            f"    fn from(item: Nested{struct.name}) -> Self {{\n"
             "        Self {\n"
         )
         for attribute in new_struct_metadata.attributes:
@@ -2643,6 +2628,5 @@ if __name__ == "__main__":
     write_from_impls("src/models.rs", "tables", table_structs)
     write_from_impls("src/views/views.rs", "views", view_structs)
 
-    table_nested_structs: List[StructMetadata]  = generate_nested_structs("src/nested_models.rs", "tables", table_structs)
-    view_nested_structs: List[StructMetadata] = generate_nested_structs("src/views/nested_views.rs", "views", view_structs, table_structs)
-    write_web_common_nested_structs("nested_models.rs", table_nested_structs + view_nested_structs)
+    nested_structs: List[StructMetadata]  = generate_nested_structs("src/nested_models.rs", table_structs + view_structs)
+    write_web_common_nested_structs("nested_models.rs", nested_structs)
