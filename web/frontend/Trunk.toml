@@ -29,6 +29,3 @@ no_autoreload = false
 no_error_reporting = false
 # Protocol used for autoreload WebSockets connection.
 ws_protocol = "wss"
-# The certificate/private key pair to use for TLS, which is enabled if both are set.
-tls_key_path = "../nginx/${DOMAIN}-key.pem"
-tls_cert_path = "../nginx/${DOMAIN}.pem"
