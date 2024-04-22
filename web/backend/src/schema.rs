@@ -217,7 +217,7 @@ diesel::table! {
         created_by -> Int4,
         procedure_id -> Int4,
         item_category_id -> Int4,
-        quantity -> Float8,
+        quantity -> Int4,
         unit_id -> Nullable<Int4>,
     }
 }

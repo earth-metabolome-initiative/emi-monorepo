@@ -12,7 +12,7 @@ CREATE TABLE procedure_continuous_requirements (
         item_category_id INTEGER NOT NULL REFERENCES item_categories(id) ON
     DELETE
         CASCADE,
-        quantity FLOAT NOT NULL,
+        quantity INTEGER NOT NULL,
         unit_id INTEGER REFERENCES units(id) ON
     DELETE
         CASCADE,

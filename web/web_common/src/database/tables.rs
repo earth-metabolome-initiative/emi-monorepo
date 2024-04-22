@@ -11,12 +11,12 @@ pub struct ContainerHorizontalRule {
     pub name: String,
     pub item_type_id: i32,
     pub other_item_type_id: i32,
-    pub minimum_temperature: i32,
-    pub maximum_temperature: i32,
-    pub minimum_humidity: i32,
-    pub maximum_humidity: i32,
-    pub minimum_pressure: i32,
-    pub maximum_pressure: i32,
+    pub minimum_temperature: Option<i32>,
+    pub maximum_temperature: Option<i32>,
+    pub minimum_humidity: Option<i32>,
+    pub maximum_humidity: Option<i32>,
+    pub minimum_pressure: Option<i32>,
+    pub maximum_pressure: Option<i32>,
 }
 #[cfg(feature = "frontend")]
 impl ContainerHorizontalRule {
@@ -116,7 +116,7 @@ impl ContainerHorizontalRule {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -299,12 +299,12 @@ pub struct ContainerVerticalRule {
     pub name: String,
     pub container_item_type_id: i32,
     pub contained_item_type_id: i32,
-    pub minimum_temperature: i32,
-    pub maximum_temperature: i32,
-    pub minimum_humidity: i32,
-    pub maximum_humidity: i32,
-    pub minimum_pressure: i32,
-    pub maximum_pressure: i32,
+    pub minimum_temperature: Option<i32>,
+    pub maximum_temperature: Option<i32>,
+    pub minimum_humidity: Option<i32>,
+    pub maximum_humidity: Option<i32>,
+    pub minimum_pressure: Option<i32>,
+    pub maximum_pressure: Option<i32>,
 }
 #[cfg(feature = "frontend")]
 impl ContainerVerticalRule {
@@ -404,7 +404,7 @@ impl ContainerVerticalRule {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -654,7 +654,7 @@ impl ContinuousUnit {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -835,7 +835,7 @@ impl DiscreteUnit {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -1020,7 +1020,7 @@ impl DocumentFormat {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -1219,7 +1219,7 @@ impl Document {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -1426,7 +1426,7 @@ impl ItemCategory {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -1628,7 +1628,7 @@ impl ItemCategoryRelationship {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -1828,7 +1828,7 @@ impl ItemCategoryUnit {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -1951,9 +1951,9 @@ pub struct ItemContinuousQuantity {
     pub item_id: Uuid,
     pub amount: i32,
     pub unit_id: i32,
-    pub sensor_id: Uuid,
+    pub sensor_id: Option<Uuid>,
     pub measured_at: NaiveDateTime,
-    pub measured_by: i32,
+    pub measured_by: Option<i32>,
 }
 #[cfg(feature = "frontend")]
 impl ItemContinuousQuantity {
@@ -2037,7 +2037,7 @@ impl ItemContinuousQuantity {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -2164,7 +2164,8 @@ impl ItemContinuousQuantity {
                 _ => unreachable!("Expected I32")
             },
             sensor_id: match row.get("sensor_id").unwrap() {
-                gluesql::prelude::Value::Uuid(sensor_id) => Uuid::from_u128(*sensor_id),
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::Uuid(sensor_id) => Some(Uuid::from_u128(*sensor_id)),
                 _ => unreachable!("Expected Uuid"),
             },
             measured_at: match row.get("measured_at").unwrap() {
@@ -2187,7 +2188,7 @@ pub struct ItemDiscreteQuantity {
     pub quantity: i32,
     pub unit_id: i32,
     pub measured_at: NaiveDateTime,
-    pub measured_by: i32,
+    pub measured_by: Option<i32>,
 }
 #[cfg(feature = "frontend")]
 impl ItemDiscreteQuantity {
@@ -2267,7 +2268,7 @@ impl ItemDiscreteQuantity {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -2406,10 +2407,10 @@ impl ItemDiscreteQuantity {
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ItemLocation {
     pub id: Uuid,
-    pub item_id: Uuid,
-    pub located_by: i32,
+    pub item_id: Option<Uuid>,
+    pub located_by: Option<i32>,
     pub located_at: NaiveDateTime,
-    pub location_id: Uuid,
+    pub location_id: Option<Uuid>,
 }
 #[cfg(feature = "frontend")]
 impl ItemLocation {
@@ -2494,7 +2495,7 @@ impl ItemLocation {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -2609,7 +2610,8 @@ impl ItemLocation {
                 _ => unreachable!("Expected Uuid"),
             },
             item_id: match row.get("item_id").unwrap() {
-                gluesql::prelude::Value::Uuid(item_id) => Uuid::from_u128(*item_id),
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::Uuid(item_id) => Some(Uuid::from_u128(*item_id)),
                 _ => unreachable!("Expected Uuid"),
             },
             located_by: match row.get("located_by").unwrap() {
@@ -2622,7 +2624,8 @@ impl ItemLocation {
                 _ => unreachable!("Expected Timestamp")
             },
             location_id: match row.get("location_id").unwrap() {
-                gluesql::prelude::Value::Uuid(location_id) => Uuid::from_u128(*location_id),
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::Uuid(location_id) => Some(Uuid::from_u128(*location_id)),
                 _ => unreachable!("Expected Uuid"),
             },
         }
@@ -2707,7 +2710,7 @@ impl ItemUnit {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -2827,7 +2830,7 @@ impl ItemUnit {
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Item {
     pub id: Uuid,
-    pub parent_id: Uuid,
+    pub parent_id: Option<Uuid>,
 }
 #[cfg(feature = "frontend")]
 impl Item {
@@ -2903,7 +2906,7 @@ impl Item {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -3011,7 +3014,8 @@ impl Item {
                 _ => unreachable!("Expected Uuid"),
             },
             parent_id: match row.get("parent_id").unwrap() {
-                gluesql::prelude::Value::Uuid(parent_id) => Uuid::from_u128(*parent_id),
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::Uuid(parent_id) => Some(Uuid::from_u128(*parent_id)),
                 _ => unreachable!("Expected Uuid"),
             },
         }
@@ -3021,17 +3025,17 @@ impl Item {
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Location {
     pub id: Uuid,
-    pub latitude_degrees: i32,
-    pub latitude_minutes: i32,
-    pub latitude_seconds: i32,
-    pub longitude_degrees: i32,
-    pub longitude_minutes: i32,
-    pub longitude_seconds: i32,
-    pub altitude: i32,
-    pub address: String,
-    pub geolocalization_device_id: Uuid,
-    pub altitude_device_id: Uuid,
-    pub parent_location_id: Uuid,
+    pub latitude_degrees: Option<i32>,
+    pub latitude_minutes: Option<i32>,
+    pub latitude_seconds: Option<i32>,
+    pub longitude_degrees: Option<i32>,
+    pub longitude_minutes: Option<i32>,
+    pub longitude_seconds: Option<i32>,
+    pub altitude: Option<i32>,
+    pub address: Option<String>,
+    pub geolocalization_device_id: Option<Uuid>,
+    pub altitude_device_id: Option<Uuid>,
+    pub parent_location_id: Option<Uuid>,
 }
 #[cfg(feature = "frontend")]
 impl Location {
@@ -3147,7 +3151,7 @@ impl Location {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -3325,15 +3329,18 @@ impl Location {
                 _ => unreachable!("Expected Str")
             },
             geolocalization_device_id: match row.get("geolocalization_device_id").unwrap() {
-                gluesql::prelude::Value::Uuid(geolocalization_device_id) => Uuid::from_u128(*geolocalization_device_id),
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::Uuid(geolocalization_device_id) => Some(Uuid::from_u128(*geolocalization_device_id)),
                 _ => unreachable!("Expected Uuid"),
             },
             altitude_device_id: match row.get("altitude_device_id").unwrap() {
-                gluesql::prelude::Value::Uuid(altitude_device_id) => Uuid::from_u128(*altitude_device_id),
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::Uuid(altitude_device_id) => Some(Uuid::from_u128(*altitude_device_id)),
                 _ => unreachable!("Expected Uuid"),
             },
             parent_location_id: match row.get("parent_location_id").unwrap() {
-                gluesql::prelude::Value::Uuid(parent_location_id) => Uuid::from_u128(*parent_location_id),
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::Uuid(parent_location_id) => Some(Uuid::from_u128(*parent_location_id)),
                 _ => unreachable!("Expected Uuid"),
             },
         }
@@ -3426,7 +3433,7 @@ impl LoginProvider {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -3645,7 +3652,7 @@ impl ManufacturedItemCategory {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -3854,7 +3861,7 @@ impl Notification {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -3984,7 +3991,7 @@ impl Notification {
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Organization {
     pub id: i32,
-    pub parent_organization_id: i32,
+    pub parent_organization_id: Option<i32>,
     pub name: String,
 }
 #[cfg(feature = "frontend")]
@@ -4062,7 +4069,7 @@ impl Organization {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -4257,7 +4264,7 @@ impl PrimaryUserEmail {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -4363,15 +4370,15 @@ impl PrimaryUserEmail {
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq)]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ProcedureContinuousRequirement {
     pub id: i32,
     pub created_by: i32,
     pub procedure_id: i32,
     pub item_category_id: i32,
-    pub quantity: f64,
-    pub unit_id: i32,
+    pub quantity: i32,
+    pub unit_id: Option<i32>,
 }
 #[cfg(feature = "frontend")]
 impl ProcedureContinuousRequirement {
@@ -4451,7 +4458,7 @@ impl ProcedureContinuousRequirement {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -4575,8 +4582,8 @@ impl ProcedureContinuousRequirement {
                 _ => unreachable!("Expected I32")
             },
             quantity: match row.get("quantity").unwrap() {
-                gluesql::prelude::Value::F64(quantity) => quantity.clone(),
-                _ => unreachable!("Expected F64")
+                gluesql::prelude::Value::I32(quantity) => quantity.clone(),
+                _ => unreachable!("Expected I32")
             },
             unit_id: match row.get("unit_id").unwrap() {
                 gluesql::prelude::Value::Null => None,
@@ -4594,7 +4601,7 @@ pub struct ProcedureDiscreteRequirement {
     pub procedure_id: i32,
     pub item_category_id: i32,
     pub quantity: i32,
-    pub unit_id: i32,
+    pub unit_id: Option<i32>,
 }
 #[cfg(feature = "frontend")]
 impl ProcedureDiscreteRequirement {
@@ -4674,7 +4681,7 @@ impl ProcedureDiscreteRequirement {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -4814,8 +4821,8 @@ impl ProcedureDiscreteRequirement {
 pub struct Procedure {
     pub id: i32,
     pub name: String,
-    pub description: String,
-    pub created_by: i32,
+    pub description: Option<String>,
+    pub created_by: Option<i32>,
 }
 #[cfg(feature = "frontend")]
 impl Procedure {
@@ -4896,7 +4903,7 @@ impl Procedure {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -5032,7 +5039,7 @@ pub struct ProjectRequirement {
     pub project_id: i32,
     pub item_category_id: i32,
     pub quantity: i32,
-    pub unit_id: i32,
+    pub unit_id: Option<i32>,
 }
 #[cfg(feature = "frontend")]
 impl ProjectRequirement {
@@ -5112,7 +5119,7 @@ impl ProjectRequirement {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -5330,7 +5337,7 @@ impl ProjectState {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -5464,13 +5471,13 @@ pub struct Project {
     pub description: String,
     pub public: bool,
     pub state_id: i32,
-    pub parent_project_id: i32,
-    pub budget: i64,
-    pub expenses: i64,
+    pub parent_project_id: Option<i32>,
+    pub budget: Option<i64>,
+    pub expenses: Option<i64>,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
-    pub expected_end_date: NaiveDateTime,
-    pub end_date: NaiveDateTime,
+    pub expected_end_date: Option<NaiveDateTime>,
+    pub end_date: Option<NaiveDateTime>,
 }
 #[cfg(feature = "frontend")]
 impl Project {
@@ -5568,7 +5575,7 @@ impl Project {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -5822,7 +5829,7 @@ impl Role {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -6014,7 +6021,7 @@ impl SampleTaxa {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -6216,7 +6223,7 @@ impl SampledIndividualTaxa {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -6412,7 +6419,7 @@ impl SampledIndividual {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -6522,8 +6529,8 @@ impl SampledIndividual {
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Sample {
     pub id: Uuid,
-    pub created_by: i32,
-    pub derived_from: Uuid,
+    pub created_by: Option<i32>,
+    pub derived_from: Option<Uuid>,
 }
 #[cfg(feature = "frontend")]
 impl Sample {
@@ -6603,7 +6610,7 @@ impl Sample {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -6719,7 +6726,8 @@ impl Sample {
                 _ => unreachable!("Expected I32")
             },
             derived_from: match row.get("derived_from").unwrap() {
-                gluesql::prelude::Value::Uuid(derived_from) => Uuid::from_u128(*derived_from),
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::Uuid(derived_from) => Some(Uuid::from_u128(*derived_from)),
                 _ => unreachable!("Expected Uuid"),
             },
         }
@@ -6802,7 +6810,7 @@ impl Spectra {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -6992,7 +7000,7 @@ impl SpectraCollection {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -7113,7 +7121,7 @@ impl SpectraCollection {
 pub struct Taxa {
     pub id: i32,
     pub name: String,
-    pub ncbi_taxon_id: i32,
+    pub ncbi_taxon_id: Option<i32>,
 }
 #[cfg(feature = "frontend")]
 impl Taxa {
@@ -7190,7 +7198,7 @@ impl Taxa {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -7314,7 +7322,7 @@ impl Taxa {
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Team {
     pub id: i32,
-    pub parent_team_id: i32,
+    pub parent_team_id: Option<i32>,
 }
 #[cfg(feature = "frontend")]
 impl Team {
@@ -7390,7 +7398,7 @@ impl Team {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -7586,7 +7594,7 @@ impl Unit {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -7788,7 +7796,7 @@ impl UserEmail {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -7914,7 +7922,7 @@ impl UserEmail {
 pub struct User {
     pub id: i32,
     pub first_name: String,
-    pub middle_name: String,
+    pub middle_name: Option<String>,
     pub last_name: String,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
@@ -7997,7 +8005,7 @@ impl User {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        {primary_key_name}: {rust_primary_key_type},
+        id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -8971,12 +8979,12 @@ impl SearcheableTable {
     /// # Arguments
     /// * `query` - The query to search.
     /// * `number_of_results` - The number of results to return.
-    pub fn search(&self, query: String, number_of_results: usize) -> Select {
+    pub fn search(&self, query: String, number_of_results: usize) -> super::selects::Select {
         match self {
-            SearcheableTable::ProjectState => Select::search(SearcheableTable::ProjectState, query, number_of_results),
-            SearcheableTable::Project => Select::search(SearcheableTable::Project, query, number_of_results),
-            SearcheableTable::Taxa => Select::search(SearcheableTable::Taxa, query, number_of_results),
-            SearcheableTable::User => Select::search(SearcheableTable::User, query, number_of_results),
+            SearcheableTable::ProjectState => super::selects::Select::search(SearcheableTable::ProjectState, query, number_of_results),
+            SearcheableTable::Project => super::selects::Select::search(SearcheableTable::Project, query, number_of_results),
+            SearcheableTable::Taxa => super::selects::Select::search(SearcheableTable::Taxa, query, number_of_results),
+            SearcheableTable::User => super::selects::Select::search(SearcheableTable::User, query, number_of_results),
         }
     }
 }
@@ -9010,10 +9018,10 @@ pub trait SearchTable {
     /// # Arguments
     /// * `query` - The query to search.
     /// * `number_of_results` - The number of results to return.
-    fn search(query: String, number_of_results: usize) -> Select;
+    fn search(query: String, number_of_results: usize) -> super::selects::Select;
 }
 impl<T> SearchTable for T where T: SearcheableTableName {
-    fn search(query: String, number_of_results: usize) -> Select {
+    fn search(query: String, number_of_results: usize) -> super::selects::Select {
         Self::parent_enum().search(query, number_of_results)
     }
 }

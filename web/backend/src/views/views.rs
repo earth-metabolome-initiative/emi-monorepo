@@ -51,26 +51,26 @@ impl PublicUser {
 
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq)]
 pub enum ViewRow {
-    None(None),
+    PublicUser(PublicUser),
 }
 
 impl From<web_common::database::views::ViewRow> for ViewRow {
     fn from(item: web_common::database::views::ViewRow) -> Self {
         match item {
-            web_common::database::views::ViewRow::None(item) => ViewRow::None(item.into()),
+            web_common::database::views::ViewRow::PublicUser(item) => ViewRow::PublicUser(item.into()),
         }
     }
 }
 impl From<ViewRow> for web_common::database::views::ViewRow {
     fn from(item: ViewRow) -> Self {
         match item {
-            ViewRow::None(item) => web_common::database::views::ViewRow::None(item.into()),
+            ViewRow::PublicUser(item) => web_common::database::views::ViewRow::PublicUser(item.into()),
         }
     }
 }
-impl From<None> for ViewRow {
-    fn from(item: None) -> Self {
-        ViewRow::None(item)
+impl From<PublicUser> for ViewRow {
+    fn from(item: PublicUser) -> Self {
+        ViewRow::PublicUser(item)
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Copy, Eq, )]
@@ -86,7 +86,7 @@ impl View {
     }
 }
 impl std::fmt::Display for View {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.name())
     }
 }

@@ -100,6 +100,7 @@ class PGIndices:
                 return index
         return None
 
+
 class AttributeMetadata:
 
     def __init__(self, original_name: str, name: str, data_type: str, optional: bool):
@@ -115,6 +116,13 @@ class AttributeMetadata:
 
     def implements_eq(self) -> bool:
         return self.data_type not in ["f32", "f64"]
+
+    def __eq__(self, other: "AttributeMetadata") -> bool:
+        return (
+            self.name == other.name
+            and self.data_type == other.data_type
+            and self.optional == other.optional
+        )
 
     def implements_clone(self) -> bool:
         return self.data_type in [
@@ -151,16 +159,10 @@ class StructMetadata:
         self._derives.append(derive)
 
     def contains_optional_fields(self) -> bool:
-        return any(
-            attribute.optional
-            for attribute in self.attributes
-        )
+        return any(attribute.optional for attribute in self.attributes)
 
     def contains_only_optional_fields(self) -> bool:
-        return all(
-            attribute.optional
-            for attribute in self.attributes
-        )
+        return all(attribute.optional for attribute in self.attributes)
 
     def derives(self) -> List[str]:
         derives = self._derives.copy()
@@ -168,7 +170,7 @@ class StructMetadata:
             derives.append("Eq")
         if self.can_implement_clone() and "Clone" not in self._derives:
             derives.append("Clone")
-        
+
         return derives
 
     def can_implement_clone(self) -> bool:
@@ -177,6 +179,13 @@ class StructMetadata:
     def can_implement_eq(self) -> bool:
         return all(attribute.implements_eq() for attribute in self.attributes)
 
+    def has_attribute(self, attribute: AttributeMetadata) -> bool:
+        """Returns the type of the attribute"""
+        return any(
+            attribute == existing_attribute
+            for existing_attribute in self.attributes
+        )
+        
 
 def get_cursor():
     """Get the cursor to the database."""
@@ -227,6 +236,7 @@ def find_pg_trgm_indices() -> PGIndices:
 
     return PGIndices(pg_indices)
 
+
 def sql_type_to_rust_type(sql_type: str) -> str:
     """Convert the SQL type to the Rust type."""
     if sql_type == "uuid":
@@ -262,7 +272,7 @@ class TableMetadata:
 
     def extract_view_columns(self, view_name: str) -> List[Tuple[str, str, str]]:
         """Returns list of columns, their alias and the original table name from a provided view name.
-        
+
         # Example
         Suppose you have a simple view creation statement like this:
 
@@ -275,7 +285,7 @@ class TableMetadata:
         ```
 
         This function will return a list of tuples like this:
-            
+
             ```python
             [("column_name", "alias_name", "table_name")]
             ```
@@ -310,16 +320,30 @@ class TableMetadata:
             if " AS " in column:
                 original_column_name, alias_column_name = column.split(" AS ")
                 if "." in original_column_name:
-                    original_table_name, original_column_name = original_column_name.split(".")
+                    original_table_name, original_column_name = (
+                        original_column_name.split(".")
+                    )
                 else:
                     continue
-                extracted_columns.append((original_column_name.strip(), alias_column_name.strip(), original_table_name.strip()))
+                extracted_columns.append(
+                    (
+                        original_column_name.strip(),
+                        alias_column_name.strip(),
+                        original_table_name.strip(),
+                    )
+                )
             else:
                 if "." in column:
                     original_table_name, original_column_name = column.split(".")
                 else:
                     continue
-                extracted_columns.append((original_column_name.strip(), original_column_name.strip(), original_table_name.strip()))
+                extracted_columns.append(
+                    (
+                        original_column_name.strip(),
+                        original_column_name.strip(),
+                        original_table_name.strip(),
+                    )
+                )
 
         return extracted_columns
 
@@ -339,17 +363,18 @@ class TableMetadata:
         value, then the table has foreign keys.
         """
         if self.is_view(table_name):
-            for original_column_name, _alias_column_name, original_table_name in self.extract_view_columns(table_name):
+            for (
+                original_column_name,
+                _alias_column_name,
+                original_table_name,
+            ) in self.extract_view_columns(table_name):
                 if original_column_name in self.get_foreign_keys(original_table_name):
                     return True
             return False
 
         primary_key_name, _ = self.get_primary_key_name_and_type(table_name)
         foreign_keys = self.get_foreign_keys(table_name)
-        return any(
-            foreign_key != primary_key_name
-            for foreign_key in foreign_keys
-        )
+        return any(foreign_key != primary_key_name for foreign_key in foreign_keys)
 
     def get_foreign_keys(self, table_name: str) -> List[str]:
         """Returns the foreign keys of the table.
@@ -368,7 +393,11 @@ class TableMetadata:
         """
         if self.is_view(table_name):
             foreign_keys = []
-            for original_column_name, alias_column_name, original_table_name in self.extract_view_columns(table_name):
+            for (
+                original_column_name,
+                alias_column_name,
+                original_table_name,
+            ) in self.extract_view_columns(table_name):
                 if original_column_name in self.get_foreign_keys(original_table_name):
                     foreign_keys.append(alias_column_name)
             return foreign_keys
@@ -397,17 +426,23 @@ class TableMetadata:
         name. This value is the table that the foreign key references.
         """
         if self.is_view(table_name):
-            for original_column_name, alias_column_name, original_table_name in self.extract_view_columns(table_name):
+            for (
+                original_column_name,
+                alias_column_name,
+                original_table_name,
+            ) in self.extract_view_columns(table_name):
                 if alias_column_name == column_name:
-                    return self.get_foreign_key_table_name(original_table_name, original_column_name)
-            raise ValueError(f"The column {column_name} does not exist in the view {table_name}.")
+                    return self.get_foreign_key_table_name(
+                        original_table_name, original_column_name
+                    )
+            raise ValueError(
+                f"The column {column_name} does not exist in the view {table_name}."
+            )
         table_columns = self.table_metadata[
-            (self.table_metadata["referencing_table"] == table_name) &
-            (self.table_metadata["referencing_column"] == column_name)
+            (self.table_metadata["referencing_table"] == table_name)
+            & (self.table_metadata["referencing_column"] == column_name)
         ]
-        return table_columns[
-            "referenced_table"
-        ].values[0]
+        return table_columns["referenced_table"].values[0]
 
     def foreign_key_table_has_foreign_keys(
         self, table_name: str, foreign_key_column: str
@@ -425,7 +460,9 @@ class TableMetadata:
         ----------------------
         This method checks if the foreign key table has foreign keys.
         """
-        return self.has_foreign_keys(self.get_foreign_key_table_name(table_name, foreign_key_column))
+        return self.has_foreign_keys(
+            self.get_foreign_key_table_name(table_name, foreign_key_column)
+        )
 
     def has_primary_key(self, table_name: str) -> bool:
         """Returns whether the table has a primary key.
@@ -442,7 +479,9 @@ class TableMetadata:
         """
         return self.get_primary_key_name_and_type(table_name) is not None
 
-    def get_primary_key_name_and_type(self, table_name: str) -> Optional[Tuple[str, str]]:
+    def get_primary_key_name_and_type(
+        self, table_name: str
+    ) -> Optional[Tuple[str, str]]:
         """Returns the name and type of the primary key of the table.
 
         Parameters
@@ -529,9 +568,7 @@ def find_foreign_keys() -> TableMetadata:
 
 
 def write_from_impls(
-    path: str,
-    table_type: str,
-    struct_metadatas: List[StructMetadata]
+    path: str, table_type: str, struct_metadatas: List[StructMetadata]
 ):
     """Write the `From` implementations for the structs in the `src/models.rs` file."""
 
@@ -543,8 +580,7 @@ def write_from_impls(
             if struct.name == struct_metadata:
                 return struct
         raise ValueError(
-            f"The provided struct {struct_metadata} could "
-            "not be found."
+            f"The provided struct {struct_metadata} could " "not be found."
         )
 
     similarity_indices: PGIndices = find_pg_trgm_indices()
@@ -622,10 +658,14 @@ def write_from_impls(
 
                 if table_metadatas.has_primary_key(struct.table_name):
 
-                    primary_key_name, primary_key_type = table_metadatas.get_primary_key_name_and_type(struct.table_name)
+                    primary_key_name, primary_key_type = (
+                        table_metadatas.get_primary_key_name_and_type(struct.table_name)
+                    )
                     rust_primary_key_type = sql_type_to_rust_type(primary_key_type)
 
-                    new_content += "    /// Get the struct from the database by its ID.\n"
+                    new_content += (
+                        "    /// Get the struct from the database by its ID.\n"
+                    )
                     new_content += "    ///\n"
                     new_content += "    /// # Arguments\n"
                     new_content += f"    /// * `{primary_key_name}` - The ID of the struct to get.\n"
@@ -634,10 +674,14 @@ def write_from_impls(
                     )
                     new_content += "    ///\n"
                     new_content += "    pub fn get(\n"
-                    new_content += f"        {primary_key_name}: {rust_primary_key_type},\n"
+                    new_content += (
+                        f"        {primary_key_name}: {rust_primary_key_type},\n"
+                    )
                     new_content += "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
-                    new_content += "    ) -> Result<Self, diesel::result::Error> {{\n"
-                    new_content += f"        {struct.table_name}::dsl::{struct.table_name}\n"
+                    new_content += "    ) -> Result<Self, diesel::result::Error> {\n"
+                    new_content += (
+                        f"        {struct.table_name}::dsl::{struct.table_name}\n"
+                    )
                     new_content += f"            .filter({struct.table_name}::dsl::id.eq({primary_key_name}))\n"
                     new_content += "            .first::<Self>(connection)\n"
                     new_content += "    }\n"
@@ -670,7 +714,9 @@ def write_from_impls(
                     )
 
                     if table_type == "tables":
-                        new_content += f"        use crate::schema::{struct.table_name};\n"
+                        new_content += (
+                            f"        use crate::schema::{struct.table_name};\n"
+                        )
                     elif table_type == "views":
                         new_content += (
                             f"        use crate::views::schema::{struct.table_name};\n"
@@ -681,9 +727,7 @@ def write_from_impls(
                         )
 
                     new_content += "        let limit = limit.unwrap_or(10);\n"
-                    new_content += (
-                        "        let threshold = threshold.unwrap_or(0.6);\n"
-                    )
+                    new_content += "        let threshold = threshold.unwrap_or(0.6);\n"
 
                     # Since Diesel does not support the `similarity` Postgres function natively
                     # as part of the DSL query builder, we are forced to build the query manually
@@ -711,7 +755,9 @@ def write_from_impls(
                     new_content += (
                         "            .bind::<diesel::sql_types::Text, _>(query)\n"
                     )
-                    new_content += "            .bind::<diesel::sql_types::Float8, _>(threshold)\n"
+                    new_content += (
+                        "            .bind::<diesel::sql_types::Float8, _>(threshold)\n"
+                    )
                     new_content += (
                         "            .bind::<diesel::sql_types::Integer, _>(limit)\n"
                     )
@@ -754,7 +800,7 @@ def write_from_impls(
     new_content += table_deribes
     new_content += f"pub enum {capitalized_table_type}Row {{\n"
     for struct in struct_metadatas:
-        new_content += f"    {struct_name}({struct_name}),\n"
+        new_content += f"    {struct.name}({struct.name}),\n"
     new_content += "}\n\n"
 
     # Next up, we implement the bidirectional From for the TableRow or ViewRow
@@ -763,7 +809,7 @@ def write_from_impls(
     new_content += f"    fn from(item: web_common::database::{table_type}::{capitalized_table_type}Row) -> Self {{\n"
     new_content += "        match item {\n"
     for struct in struct_metadatas:
-        new_content += f"            web_common::database::{table_type}::{capitalized_table_type}Row::{struct_name}(item) => {capitalized_table_type}Row::{struct_name}(item.into()),\n"
+        new_content += f"            web_common::database::{table_type}::{capitalized_table_type}Row::{struct.name}(item) => {capitalized_table_type}Row::{struct.name}(item.into()),\n"
     new_content += "        }\n"
     new_content += "    }\n"
     new_content += "}\n"
@@ -772,7 +818,7 @@ def write_from_impls(
     new_content += f"    fn from(item: {capitalized_table_type}Row) -> Self {{\n"
     new_content += "        match item {\n"
     for struct in struct_metadatas:
-        new_content += f"            {capitalized_table_type}Row::{struct_name}(item) => web_common::database::{table_type}::{capitalized_table_type}Row::{struct_name}(item.into()),\n"
+        new_content += f"            {capitalized_table_type}Row::{struct.name}(item) => web_common::database::{table_type}::{capitalized_table_type}Row::{struct.name}(item.into()),\n"
     new_content += "        }\n"
     new_content += "    }\n"
     new_content += "}\n"
@@ -781,9 +827,9 @@ def write_from_impls(
     # any of the Row structs into the ViewRow or TableRow structs.
 
     for struct in struct_metadatas:
-        new_content += f"impl From<{struct_name}> for {capitalized_table_type}Row {{\n"
-        new_content += f"    fn from(item: {struct_name}) -> Self {{\n"
-        new_content += f"        {capitalized_table_type}Row::{struct_name}(item)\n"
+        new_content += f"impl From<{struct.name}> for {capitalized_table_type}Row {{\n"
+        new_content += f"    fn from(item: {struct.name}) -> Self {{\n"
+        new_content += f"        {capitalized_table_type}Row::{struct.name}(item)\n"
         new_content += "    }\n"
         new_content += "}\n"
 
@@ -791,8 +837,7 @@ def write_from_impls(
     # which are the tables or views that implement the `pg_trgm` index.
 
     has_any_searchables = any(
-        similarity_indices.has_table(struct.table_name)
-        for struct in struct_metadatas
+        similarity_indices.has_table(struct.table_name) for struct in struct_metadatas
     )
 
     if has_any_searchables:
@@ -871,9 +916,7 @@ def write_from_impls(
     new_content += "    pub fn name(&self) -> &'static str {\n"
     new_content += "        match self {\n"
     for struct in struct_metadatas:
-        new_content += (
-            f'            {capitalized_table_type}::{struct.name} => "{struct.table_name}",\n'
-        )
+        new_content += f'            {capitalized_table_type}::{struct.name} => "{struct.table_name}",\n'
     new_content += "        }\n"
     new_content += "    }\n"
 
@@ -881,9 +924,9 @@ def write_from_impls(
 
     new_content += f"impl std::fmt::Display for {capitalized_table_type} {{\n"
     new_content += (
-        "    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {{\n"
+        "    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {\n"
     )
-    new_content += "        write!(f, \"{}\", self.name())\n"
+    new_content += '        write!(f, "{}", self.name())\n'
     new_content += "    }\n"
     new_content += "}\n"
 
@@ -891,9 +934,7 @@ def write_from_impls(
     new_content += "    fn from(item: &str) -> Self {\n"
     new_content += "        match item {\n"
     for struct in struct_metadatas:
-        new_content += (
-            f'            "{struct.table_name}" => {capitalized_table_type}::{struct.name},\n'
-        )
+        new_content += f'            "{struct.table_name}" => {capitalized_table_type}::{struct.name},\n'
     new_content += f'            _ => panic!("Unknown {table_type} name"),\n'
     new_content += "        }\n"
     new_content += "    }\n"
@@ -927,8 +968,7 @@ def write_from_impls(
     # present in the web_common crate.
 
     has_any_searchables = any(
-        similarity_indices.has_table(struct.table_name)
-        for struct in struct_metadatas
+        similarity_indices.has_table(struct.table_name) for struct in struct_metadatas
     )
 
     if has_any_searchables:
@@ -940,7 +980,7 @@ def write_from_impls(
         new_content += f"pub enum Searcheable{capitalized_table_type} {{\n"
         for struct in struct_metadatas:
             if similarity_indices.has_table(struct.table_name):
-                new_content += f"    {struct_name},\n"
+                new_content += f"    {struct.name},\n"
         new_content += "}\n\n"
 
         new_content += f"impl Searcheable{capitalized_table_type} {{\n"
@@ -962,8 +1002,8 @@ def write_from_impls(
         new_content += "        limit: Option<i32>,\n"
         new_content += "        threshold: Option<f64>,\n"
         new_content += "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
-        new_content += "    ) -> Result<Vec<Searcheable{capitalized_table_type}Row>, diesel::result::Error> {{\n"
-        new_content += "        Ok(match self {{\n"
+        new_content += f"    ) -> Result<Vec<Searcheable{capitalized_table_type}Row>, diesel::result::Error> {{\n"
+        new_content += "        Ok(match self {\n"
         for struct in struct_metadatas:
             if similarity_indices.has_table(struct.table_name):
                 new_content += f"            Searcheable{capitalized_table_type}::{struct.name} => {struct.name}::search(query, limit, threshold, connection)?.into_iter().map(Searcheable{capitalized_table_type}Row::from).collect::<Vec<Searcheable{capitalized_table_type}Row>>(),\n"
@@ -1009,9 +1049,7 @@ def write_from_impls(
 
 
 def write_web_common_structs(
-    path: str,
-    target: str,
-    enumeration: str
+    path: str, target: str, enumeration: str
 ) -> List[StructMetadata]:
     """Write the structs in the target file in the `web_common` crate.
 
@@ -1031,7 +1069,6 @@ def write_web_common_structs(
         "use uuid::Uuid;",
         "use chrono::NaiveDateTime;",
         "use chrono::Utc;",
-        "use super::selects::Select;",
     ]
 
     table_metadatas = find_foreign_keys()
@@ -1083,8 +1120,7 @@ def write_web_common_structs(
             struct_name = line.split(" ")[2]
 
             struct_metadata = StructMetadata(
-                table_name=last_table_name,
-                struct_name=struct_name
+                table_name=last_table_name, struct_name=struct_name
             )
 
             inside_struct = True
@@ -1104,7 +1140,7 @@ def write_web_common_structs(
                         original_name=field_name,
                         name=field_name,
                         data_type=field_type,
-                        optional=option
+                        optional=option,
                     )
                 )
 
@@ -1135,7 +1171,7 @@ def write_web_common_structs(
             tables.write(f"pub struct {struct_metadata.name} {{\n")
             for attribute in struct_metadata.attributes:
                 tables.write(
-                    f"    pub {attribute.name}: {attribute.data_type},\n"
+                    f"    pub {attribute.name}: {attribute.format_attribute_type()},\n"
                 )
             tables.write("}\n")
 
@@ -1150,10 +1186,7 @@ def write_web_common_structs(
                 tables.write('#[cfg(feature = "frontend")]\n')
                 tables.write(f"impl {struct_metadata.name} {{\n")
                 columns = ", ".join(
-                    [
-                        attribute.name
-                        for attribute in struct_metadata.attributes
-                    ]
+                    [attribute.name for attribute in struct_metadata.attributes]
                 )
 
                 # As first thing, we implement the `into_row` method for the struct. This method
@@ -1222,7 +1255,9 @@ def write_web_common_structs(
                 # We implement the `insert` method for the struct. This method
                 # receives a connection to the GlueSQL database and inserts the
                 # struct into the database.
-                tables.write(f"    /// Insert the {struct_metadata.name} into the database.\n")
+                tables.write(
+                    f"    /// Insert the {struct_metadata.name} into the database.\n"
+                )
                 tables.write("    ///\n")
                 tables.write("    /// # Arguments\n")
                 tables.write(
@@ -1267,12 +1302,16 @@ def write_web_common_structs(
                 )
                 tables.write("    ///\n")
                 tables.write("    /// # Arguments\n")
-                primary_key_name, primary_key_type = table_metadatas.get_primary_key_name_and_type(
-                    struct_metadata.table_name
+                primary_key_name, primary_key_type = (
+                    table_metadatas.get_primary_key_name_and_type(
+                        struct_metadata.table_name
+                    )
                 )
                 rust_primary_key_type = sql_type_to_rust_type(primary_key_type)
 
-                tables.write(f"    /// * `{primary_key_name}` - The ID of {struct_metadata.name} to get.\n")
+                tables.write(
+                    f"    /// * `{primary_key_name}` - The ID of {struct_metadata.name} to get.\n"
+                )
                 tables.write(
                     "    /// * `connection` - The connection to the database.\n"
                 )
@@ -1289,9 +1328,13 @@ def write_web_common_structs(
                 tables.write("    {\n")
                 tables.write("        use gluesql::core::ast_builder::*;\n")
                 # We use the AST builder as much as possible so to avoid SQL injection attacks.
-                tables.write(f'        let select_row = table("{struct_metadata.table_name}")\n')
+                tables.write(
+                    f'        let select_row = table("{struct_metadata.table_name}")\n'
+                )
                 tables.write("            .select()\n")
-                tables.write(f'            .filter(col("id").eq({primary_key_name}.to_string()))\n')
+                tables.write(
+                    f'            .filter(col("id").eq({primary_key_name}.to_string()))\n'
+                )
                 tables.write(f'            .project("{columns}")\n')
                 tables.write("            .limit(1)\n")
                 tables.write("            .execute(connection)\n")
@@ -1305,10 +1348,14 @@ def write_web_common_structs(
 
                 # We implement the `delete` method for the struct. This method deletes
                 # the struct from the GlueSQL database.
-                tables.write(f"    /// Delete {struct_metadata.name} from the database.\n")
+                tables.write(
+                    f"    /// Delete {struct_metadata.name} from the database.\n"
+                )
                 tables.write("    ///\n")
                 tables.write("    /// # Arguments\n")
-                tables.write(f"    /// * `{primary_key_name}` - The ID of the struct to delete.\n")
+                tables.write(
+                    f"    /// * `{primary_key_name}` - The ID of the struct to delete.\n"
+                )
                 tables.write(
                     "    /// * `connection` - The connection to the database.\n"
                 )
@@ -1316,7 +1363,7 @@ def write_web_common_structs(
                 tables.write("    /// # Returns\n")
                 tables.write("    /// The number of rows deleted.\n")
                 tables.write("    pub async fn delete_from_id<C>(\n")
-                tables.write("        {primary_key_name}: {rust_primary_key_type},\n")
+                tables.write(f"        {primary_key_name}: {rust_primary_key_type},\n")
                 tables.write("        connection: &mut gluesql::prelude::Glue<C>,\n")
                 tables.write("    ) -> Result<usize, gluesql::prelude::Error> where\n")
                 tables.write(
@@ -1409,9 +1456,9 @@ def write_web_common_structs(
                         # We handle this in the next loop
                         continue
                     if attribute.data_type in update_types_and_methods:
-                        conversion = update_types_and_methods[attribute.data_type].format(
-                            f"self.{attribute.name}"
-                        )
+                        conversion = update_types_and_methods[
+                            attribute.data_type
+                        ].format(f"self.{attribute.name}")
                         tables.write(
                             f'        \n.set("{attribute.name}", {conversion})'
                         )
@@ -1428,9 +1475,9 @@ def write_web_common_structs(
                 for attribute in struct_metadata.attributes:
                     if not attribute.optional:
                         continue
-                    conversion = update_types_and_methods[
-                        attribute.data_type
-                    ].format(f"self.{attribute.name}")
+                    conversion = update_types_and_methods[attribute.data_type].format(
+                        f"self.{attribute.name}"
+                    )
                     if attribute.data_type in update_types_and_methods:
                         tables.write(
                             f"        if let Some({attribute.name}) = self.{attribute.name} {{\n"
@@ -1494,7 +1541,9 @@ def write_web_common_structs(
 
                 # We implement the `all` method for the struct. This method returns all of the
                 # structs in the GlueSQL database.
-                tables.write(f"    /// Get all {struct_metadata.name} from the database.\n")
+                tables.write(
+                    f"    /// Get all {struct_metadata.name} from the database.\n"
+                )
                 tables.write("    ///\n")
                 tables.write("    /// # Arguments\n")
                 tables.write(
@@ -1511,7 +1560,9 @@ def write_web_common_structs(
                 )
                 tables.write("    {\n")
                 tables.write("        use gluesql::core::ast_builder::*;\n")
-                tables.write(f'        let select_row = table("{struct_metadata.table_name}")\n')
+                tables.write(
+                    f'        let select_row = table("{struct_metadata.table_name}")\n'
+                )
                 tables.write("            .select()\n")
                 tables.write(f'            .project("{columns}")\n')
                 tables.write("            .execute(connection)\n")
@@ -1549,7 +1600,7 @@ def write_web_common_structs(
                 }
 
                 for attribute in struct_metadata.attributes:
-                    if attribute.data_type == "Uuid":
+                    if attribute.format_attribute_type() == "Uuid":
                         tables.write(
                             f'            {attribute.name}: match row.get("{attribute.name}").unwrap() {{\n'
                         )
@@ -1560,7 +1611,7 @@ def write_web_common_structs(
                             '                _ => unreachable!("Expected Uuid"),\n'
                         )
                         tables.write("            },\n")
-                    elif attribute.data_type == "Option<Uuid>":
+                    elif attribute.format_attribute_type() == "Option<Uuid>":
                         tables.write(
                             f'            {attribute.name}: match row.get("{attribute.name}").unwrap() {{\n'
                         )
@@ -1640,7 +1691,9 @@ def write_web_common_structs(
     tables.write("    pub fn name(&self) -> &'static str {\n")
     tables.write("        match self {\n")
     for struct in struct_metadatas:
-        tables.write(f'            {enumeration}::{struct.name} => "{struct.table_name}",\n')
+        tables.write(
+            f'            {enumeration}::{struct.name} => "{struct.table_name}",\n'
+        )
     tables.write("        }\n")
     tables.write("    }\n")
     tables.write("}\n")
@@ -1697,7 +1750,9 @@ def write_web_common_structs(
     tables.write("    fn from(item: &str) -> Self {\n")
     tables.write("        match item {\n")
     for struct in struct_metadatas:
-        tables.write(f'            "{struct.table_name}" => {enumeration}::{struct.name},\n')
+        tables.write(
+            f'            "{struct.table_name}" => {enumeration}::{struct.name},\n'
+        )
     tables.write('            _ => panic!("Unknown table name"),\n')
     tables.write("        }\n")
     tables.write("    }\n")
@@ -1727,8 +1782,7 @@ def write_web_common_structs(
     # methods are solely available in the backend.
 
     has_any_searchables = any(
-        similarity_indices.has_table(struct.table_name)
-        for struct in struct_metadatas
+        similarity_indices.has_table(struct.table_name) for struct in struct_metadatas
     )
 
     if has_any_searchables:
@@ -1797,13 +1851,13 @@ def write_web_common_structs(
             "    /// * `number_of_results` - The number of results to return.\n"
         )
         tables.write(
-            "    pub fn search(&self, query: String, number_of_results: usize) -> Select {\n"
+            "    pub fn search(&self, query: String, number_of_results: usize) -> super::selects::Select {\n"
         )
         tables.write("        match self {\n")
         for struct in struct_metadatas:
             if similarity_indices.has_table(struct.table_name):
                 tables.write(
-                    f"            Searcheable{enumeration}::{struct.name} => Select::search(Searcheable{enumeration}::{struct.name}, query, number_of_results),\n"
+                    f"            Searcheable{enumeration}::{struct.name} => super::selects::Select::search(Searcheable{enumeration}::{struct.name}, query, number_of_results),\n"
                 )
         tables.write("        }\n")
         tables.write("    }\n")
@@ -1838,7 +1892,7 @@ def write_web_common_structs(
             "    /// * `number_of_results` - The number of results to return.\n"
         )
         tables.write(
-            "    fn search(query: String, number_of_results: usize) -> Select;\n"
+            "    fn search(query: String, number_of_results: usize) -> super::selects::Select;\n"
         )
         tables.write("}\n")
 
@@ -1848,7 +1902,7 @@ def write_web_common_structs(
             f"impl<T> Search{enumeration} for T where T: Searcheable{enumeration}Name {{\n"
         )
         tables.write(
-            "    fn search(query: String, number_of_results: usize) -> Select {\n"
+            "    fn search(query: String, number_of_results: usize) -> super::selects::Select {\n"
         )
         tables.write("        Self::parent_enum().search(query, number_of_results)\n")
         tables.write("    }\n")
@@ -1892,7 +1946,7 @@ def get_views(cursor) -> List[str]:
 
 def get_view_columns(cursor, view_name: str):
     """Returns the columns of a given view
-    
+
     Parameters
     ------------
     view_name: str
@@ -2115,8 +2169,7 @@ def generate_view_structs():
 
 
 def generate_nested_structs(
-    path: str,
-    struct_metadatas: List[StructMetadata]
+    path: str, struct_metadatas: List[StructMetadata]
 ) -> List[StructMetadata]:
     """Generate the nested structs.
 
@@ -2156,6 +2209,7 @@ def generate_nested_structs(
         "use serde::Serialize;",
         "use diesel::r2d2::ConnectionManager;",
         "use diesel::r2d2::PooledConnection;",
+        "use uuid::Uuid;",
         "use crate::models::*;",
     ]
 
@@ -2183,8 +2237,8 @@ def generate_nested_structs(
         if tables_metadata.has_primary_key(struct.table_name):
             # We implement the `get` method, which returns the nested struct
             # from a provided row primary key.
-            primary_key_attribute, primary_key_type = tables_metadata.get_primary_key_name_and_type(
-                struct.table_name
+            primary_key_attribute, primary_key_type = (
+                tables_metadata.get_primary_key_name_and_type(struct.table_name)
             )
             rust_primary_key_type = sql_type_to_rust_type(primary_key_type)
 
@@ -2214,9 +2268,7 @@ def generate_nested_structs(
         new_struct_metadata = StructMetadata(nested_struct_name, struct.table_name)
 
         # We write the Nested{struct_name} struct
-        tables.write(
-            "#[derive("
-        )
+        tables.write("#[derive(")
         new_struct_metadata.add_derive("Debug")
         new_struct_metadata.add_derive("Serialize")
         new_struct_metadata.add_derive("Deserialize")
@@ -2226,7 +2278,7 @@ def generate_nested_structs(
 
         tables.write(f"pub struct {nested_struct_name} {{\n")
         for attribute in struct.attributes:
-            
+
             # If the current attribute is among the foreign keys, we replace it
             # with the foreign struct. This struct may be also nested if the foreign
             # table has foreign keys, which we check by using the `has_foreign_keys`
@@ -2240,46 +2292,50 @@ def generate_nested_structs(
                         struct.table_name, attribute.name
                     )
                     normalized_attribute_name = attribute.name
-                    foreign_struct_name = get_struct_name_by_table_name(foreign_key_table_name)
+                    foreign_struct_name = get_struct_name_by_table_name(
+                        foreign_key_table_name
+                    )
                 if normalized_attribute_name.endswith("_id"):
                     normalized_attribute_name = normalized_attribute_name[:-3]
-                if attribute.name != primary_key_attribute and tables_metadata.foreign_key_table_has_foreign_keys(
-                    struct.table_name, attribute.name
-                ):  
-                    new_attribute_type = f"Nested{foreign_struct_name}"
+                if (
+                    attribute.name != primary_key_attribute
+                    and tables_metadata.foreign_key_table_has_foreign_keys(
+                        struct.table_name, attribute.name
+                    )
+                ):
                     # If the nested version of the foreign struct is already present,
                     # we cannot use it save risking the struct be extremely nested.
                     # Think for instance a leaf taxon struct containing its parent taxon
                     # and the parent taxon containing its parent taxon and so on.
                     if struct.name == foreign_struct_name:
-                        new_attribute_type = attribute.data_type
-                        tables.write(
-                            f"    pub {normalized_attribute_name}: {attribute.format_attribute_type()},\n"
+                        new_attribute = AttributeMetadata(
+                            original_name=attribute.name,
+                            name=attribute.name,
+                            data_type=attribute.data_type,
+                            optional=attribute.optional,
                         )
                     else:
-                        tables.write(
-                            f"    pub {normalized_attribute_name}: {attribute.format_attribute_type()},\n"
-                        )
-                    new_struct_metadata.add_attribute(
-                        AttributeMetadata(
+                        new_attribute = AttributeMetadata(
                             original_name=attribute.name,
                             name=normalized_attribute_name,
-                            data_type=new_attribute_type,
+                            data_type=f"Nested{foreign_struct_name}",
                             optional=attribute.optional,
                         )
-                    )
-                else:
                     tables.write(
-                        f"    pub {normalized_attribute_name}: {foreign_struct_name},\n"
+                        f"    pub {new_attribute.name}: {new_attribute.format_attribute_type()},\n"
                     )
-                    new_struct_metadata.add_attribute(
-                        AttributeMetadata(
-                            original_name=attribute.name,
-                            name=normalized_attribute_name,
-                            data_type=foreign_struct_name,
-                            optional=attribute.optional,
-                        )
+                    new_struct_metadata.add_attribute(new_attribute)
+                else:
+                    new_attribute = AttributeMetadata(
+                        original_name=attribute.name,
+                        name=normalized_attribute_name,
+                        data_type=foreign_struct_name,
+                        optional=attribute.optional,
                     )
+                    tables.write(
+                        f"    pub {new_attribute.name}: {new_attribute.format_attribute_type()},\n"
+                    )
+                    new_struct_metadata.add_attribute(new_attribute)
             else:
                 continue
         tables.write("}\n\n")
@@ -2300,6 +2356,11 @@ def generate_nested_structs(
             "        Ok(Self {\n"
         )
         for attribute in new_struct_metadata.attributes:
+            if attribute.data_type == new_struct_metadata.name or struct.has_attribute(attribute):
+                tables.write(
+                    f"            {attribute.name}: flat_struct.{attribute.name},\n"
+                )
+                continue
             if attribute.optional:
                 tables.write(
                     f"            {attribute.name}: flat_struct.{attribute.original_name}.map(|flat_struct| {attribute.data_type}::get(flat_struct, connection)).transpose()?,\n"
@@ -2308,12 +2369,8 @@ def generate_nested_structs(
                 tables.write(
                     f"            {attribute.name}: {attribute.data_type}::get(flat_struct.{attribute.original_name}, connection)?,\n"
                 )
-        tables.write(
-            "        })\n"
-            "    }\n"
-            "}\n"
-        )
-        
+        tables.write("        })\n" "    }\n" "}\n")
+
         # If there is an index on the table, we implement the search method that
         # calls search on the flat version of the struct and then iterates on the
         # primary keys of the results and constructs the nested structs by calling
@@ -2342,7 +2399,7 @@ def generate_nested_structs(
                 "    }\n"
                 "}\n"
             )
-        
+
         # We implement the bidirectional From methods for the nested struct
         # present in the web_common crate, which does not use Diesel or its
         # structs, but the web_common version of the structs.
@@ -2360,11 +2417,7 @@ def generate_nested_structs(
                 tables.write(
                     f"            {attribute.name}: item.{attribute.name}.into(),\n"
                 )
-        tables.write(
-            "        }\n"
-            "    }\n"
-            "}\n"
-        )       
+        tables.write("        }\n" "    }\n" "}\n")
 
         tables.write(
             f"impl From<Nested{struct.name}> for web_common::database::nested_models::Nested{struct.name} {{\n"
@@ -2380,11 +2433,7 @@ def generate_nested_structs(
                 tables.write(
                     f"            {attribute.name}: item.{attribute.name}.into(),\n"
                 )
-        tables.write(
-            "        }\n"
-            "    }\n"
-            "}\n"
-        )
+        tables.write("        }\n" "    }\n" "}\n")
 
         new_struct_metadatas.append(new_struct_metadata)
 
@@ -2392,10 +2441,8 @@ def generate_nested_structs(
 
     return new_struct_metadatas
 
-def write_web_common_nested_structs(
-    path: str,
-    nested_structs: List[StructMetadata]
-):
+
+def write_web_common_nested_structs(path: str, nested_structs: List[StructMetadata]):
     """Writes the nested structs to the web_common crate."""
 
     # We open the file to write the nested structs
@@ -2419,21 +2466,23 @@ def write_web_common_nested_structs(
         "use serde::Deserialize;",
         "use serde::Serialize;",
         "use super::tables::*;",
+        "use uuid::Uuid;",
     ]
 
     for import_statement in imports:
         tables.write(f"{import_statement}\n")
 
     for struct_metadata in nested_structs:
-        tables.write(
-            "#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]\n"
-        )
+        tables.write("#[derive(" + ", ".join(struct_metadata.derives()) + ")]\n")
         tables.write(f"pub struct {struct_metadata.name} {{\n")
         for attribute in struct_metadata.attributes:
-            tables.write(f"    pub {attribute.name}: {attribute.format_attribute_type()},\n")
+            tables.write(
+                f"    pub {attribute.name}: {attribute.format_attribute_type()},\n"
+            )
         tables.write("}\n\n")
 
     tables.close()
+
 
 def main():
     # Read the replacements from the JSON file
@@ -2515,7 +2564,10 @@ def main():
 
     deny_list = ["Interval", "Range<Numeric>", "Money"]
 
-    unequables = ["f32", "f64"]
+    unequables = [
+        "f32",
+        "f64",
+    ]
 
     # Some derives are more complex, and we only add them if within
     # the struct we are currently processing there is NOT in the deny list.
@@ -2626,5 +2678,7 @@ if __name__ == "__main__":
     write_from_impls("src/models.rs", "tables", table_structs)
     write_from_impls("src/views/views.rs", "views", view_structs)
 
-    nested_structs: List[StructMetadata]  = generate_nested_structs("src/nested_models.rs", table_structs + view_structs)
+    nested_structs: List[StructMetadata] = generate_nested_structs(
+        "src/nested_models.rs", table_structs + view_structs
+    )
     write_web_common_nested_structs("nested_models.rs", nested_structs)
