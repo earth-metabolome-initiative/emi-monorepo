@@ -155,7 +155,7 @@ pub fn complete_profile_form() -> Html {
             <BasicInput<NewProjectName> label="Name" builder={set_name} value={store.name.clone()} input_type={InputType::Text} />
             <BasicInput<NotEmpty> label="Description" builder={set_description} value={store.description.clone()} input_type={InputType::Textarea} />
             <Checkbox label="Public" builder={set_public} value={store.public} />
-            <Datalist<Editable<web_common::database::NestedProject>> builder={set_parent_project} value={store.parent_project.clone().map_or_else(|| Vec::new(), |value| vec![value])} label="Project" />
+            // <Datalist<Editable<web_common::database::NestedProject>> builder={set_parent_project} value={store.parent_project.clone().map_or_else(|| Vec::new(), |value| vec![value])} label="Project" />
             <Datalist<web_common::database::ProjectState> builder={set_project_state} value={store.project_state.clone().map_or_else(|| Vec::new(), |value| vec![value])} label="Project State" />
         </BasicForm<NewProject>>
     }

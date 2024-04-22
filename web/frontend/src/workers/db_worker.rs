@@ -43,7 +43,7 @@ impl DBWorker {
             database
                 .execute(
                     [load_sql!(
-                        "../backend/migrations/00000000000012_create_taxa_table/up.sql"
+                        "../backend/migrations/00000000000008_create_taxa_table/up.sql"
                     )]
                     .join(";"),
                 )
