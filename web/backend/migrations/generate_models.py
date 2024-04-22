@@ -192,6 +192,7 @@ def get_cursor():
     dbname = os.getenv("POSTGRES_DB")
     user = os.getenv("POSTGRES_USER")
     password = os.getenv("POSTGRES_PASSWORD")
+    port = os.getenv("PGPORT")
     # url = os.getenv("POSTGRES_URL")
 
     # Establishing a connection to the PostgreSQL database
@@ -200,7 +201,7 @@ def get_cursor():
         user=user,
         password=password,
         host="localhost",
-        port="5432",
+        port=port,
     )
 
     return conn, conn.cursor()
