@@ -84,7 +84,7 @@ pub struct NestedItemUnit {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct NestedItem {
     pub inner: Item,
-    pub parent: Option<Option<Uuid>>,
+    pub parent: Option<Uuid>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -92,7 +92,7 @@ pub struct NestedLocation {
     pub inner: Location,
     pub geolocalization_device: Option<NestedItem>,
     pub altitude_device: Option<NestedItem>,
-    pub parent_location: Option<Option<Uuid>>,
+    pub parent_location: Option<Uuid>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -110,7 +110,7 @@ pub struct NestedNotification {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct NestedOrganization {
     pub inner: Organization,
-    pub parent_organization: Option<Option<i32>>,
+    pub parent_organization: Option<i32>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -150,7 +150,7 @@ pub struct NestedProjectRequirement {
 pub struct NestedProject {
     pub inner: Project,
     pub state: ProjectState,
-    pub parent_project: Option<Option<i32>>,
+    pub parent_project: Option<i32>,
     pub created_by: User,
 }
 
@@ -174,7 +174,7 @@ pub struct NestedSampledIndividualTaxa {
 pub struct NestedSample {
     pub inner: Sample,
     pub created_by: Option<User>,
-    pub derived_from: Option<Option<Uuid>>,
+    pub derived_from: Option<Uuid>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -193,7 +193,7 @@ pub struct NestedSpectraCollection {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct NestedTeam {
     pub inner: Team,
-    pub parent_team: Option<Option<i32>>,
+    pub parent_team: Option<i32>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]

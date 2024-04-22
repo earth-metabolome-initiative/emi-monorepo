@@ -2207,6 +2207,8 @@ def generate_nested_structs(
             attribute_name = attribute["field_name"]
             attribute_type = attribute["field_type"]
             optional = attribute_type.startswith("Option<")
+            if optional:
+                attribute_type = attribute_type[7:-1]
             
             # If the current attribute is among the foreign keys, we replace it
             # with the foreign struct. This struct may be also nested if the foreign
