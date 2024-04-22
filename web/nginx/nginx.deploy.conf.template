@@ -11,7 +11,7 @@ http {
     }
 
     server {
-        listen 80;
+        listen ${NGINX_HTTP_PORT};
         server_name ${DOMAIN};
 
         # Redirect HTTP requests to HTTPS
@@ -19,7 +19,7 @@ http {
     }
 
     server {
-        listen 443 ssl;
+        listen ${NGINX_HTTPS_PORT} ssl;
         server_name ${DOMAIN};
 
         ssl_certificate /app/emi.local.pem;

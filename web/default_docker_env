@@ -1,8 +1,11 @@
+DOCKER_PROJECT_NAME='emi' # This name should be customized if several docker networks are deployed on the same system
 # Domain of the website
 DOMAIN='emi.local'
 ACTIX_PORT=8080
 TRUNK_PORT=3000
 NGINX_WORKER_PROCESSES=4
+NGINX_HTTP_PORT=80
+NGINX_HTTPS_PORT=443
 ACTIX_WORKER_THREADS=4
 # We set the RUST_LOG environment variable to debug
 # so that we can see the logs of the application
@@ -14,11 +17,14 @@ RUST_BACKTRACE=1
 POSTGRES_DB='development.db'
 POSTGRES_USER='user'
 POSTGRES_PASSWORD='password'
+PGPORT=15032
+PGADMIN_PORT=15050
 ADMINISTRATORS_TEAM_NAME='Administrators'
+POSTGRES_DOCKER_NAME='postgres'
 # The database url is composed from the previous
 # variables. It is important to not change this
 # variable, as it is used by the application
-DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB}
+DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_DOCKER_NAME}:${PGPORT}/${POSTGRES_DB}
 # This is the directory where the database will be stored
 # It is recommended to use a large disk for this
 # as the database can grow to be very large

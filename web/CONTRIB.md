@@ -40,7 +40,7 @@ mkcert -install
 Now, we can create the certificates for the platform:
 
 ```bash
-mkcert -cert-file nginx/emi.local.pem -key-file nginx/emi.local-key.pem emi.local
+mkcert -cert-file nginx/${DOMAIN}.pem -key-file nginx/${DOMAIN}-key.pem ${DOMAIN}
 ```
 
 ## Setting up the environment variables
