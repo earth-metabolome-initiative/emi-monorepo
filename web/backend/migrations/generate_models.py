@@ -142,13 +142,13 @@ class StructMetadata:
         self.struct_name = struct_name
         self.table_name = table_name
         self.attributes: List[AttributeMetadata] = []
-        self.derives: List[str] = []
+        self._derives: List[str] = []
 
     def add_attribute(self, attribute_metadata: AttributeMetadata):
         self.attributes.append(attribute_metadata)
 
     def add_derive(self, derive: str):
-        self.derives.append(derive)
+        self._derives.append(derive)
 
     def contains_optional_fields(self) -> bool:
         return any(
@@ -163,10 +163,10 @@ class StructMetadata:
         )
 
     def derives(self) -> List[str]:
-        derives = self.derives.copy()
-        if self.can_implement_eq() and "Eq" not in self.derives:
+        derives = self._derives.copy()
+        if self.can_implement_eq() and "Eq" not in self._derives:
             derives.append("Eq")
-        if self.can_implement_clone() and "Clone" not in self.derives:
+        if self.can_implement_clone() and "Clone" not in self._derives:
             derives.append("Clone")
         
         return derives
@@ -183,7 +183,7 @@ def get_cursor():
     dbname = os.getenv("POSTGRES_DB")
     user = os.getenv("POSTGRES_USER")
     password = os.getenv("POSTGRES_PASSWORD")
-    url = os.getenv("POSTGRES_URL")
+    # url = os.getenv("POSTGRES_URL")
 
     # Establishing a connection to the PostgreSQL database
     conn = psycopg2.connect(
@@ -339,7 +339,7 @@ class TableMetadata:
         value, then the table has foreign keys.
         """
         if self.is_view(table_name):
-            for original_column_name, alias_column_name, original_table_name in self.extract_view_columns(table_name):
+            for original_column_name, _alias_column_name, original_table_name in self.extract_view_columns(table_name):
                 if original_column_name in self.get_foreign_keys(original_table_name):
                     return True
             return False
@@ -459,7 +459,7 @@ class TableMetadata:
         """
         if self.is_view(table_name):
             return None
-        conn, cursor = get_cursor()
+        _conn, cursor = get_cursor()
 
         cursor.execute(
             f"""
@@ -529,17 +529,28 @@ def find_foreign_keys() -> TableMetadata:
 
 
 def write_from_impls(
-    path: str, table_type: str, struct_metadatas: List[StructMetadata]
+    path: str,
+    table_type: str,
+    struct_metadatas: List[StructMetadata]
 ):
     """Write the `From` implementations for the structs in the `src/models.rs` file."""
 
     if table_type not in ["tables", "views"]:
         raise ValueError("The table type must be either 'tables' or 'views'.")
 
+    def get_struct_metadata(struct_metadata: str) -> StructMetadata:
+        for struct in struct_metadatas:
+            if struct.name == struct_metadata:
+                return struct
+        raise ValueError(
+            f"The provided struct {struct_metadata} could "
+            "not be found."
+        )
+
     similarity_indices: PGIndices = find_pg_trgm_indices()
     table_metadatas = find_foreign_keys()
 
-    with open(path, "r") as file:
+    with open(path, "r", encoding="utf8") as file:
         content = file.read()
 
     # After each struct ends, as defined by the `}` character, after
@@ -606,73 +617,72 @@ def write_from_impls(
                 # }
                 # ```
 
-                table_data = table_structs[struct_name]
-                table_name = table_data["table_name"]
-                new_content += f"impl {struct_name} {{\n"
+                struct = get_struct_metadata(struct_name)
+                new_content += f"impl {struct.name} {{\n"
 
-                if table_metadatas.has_primary_key(table_name):
+                if table_metadatas.has_primary_key(struct.table_name):
 
-                    primary_key_name, primary_key_type = table_metadatas.get_primary_key_name_and_type(table_name)
+                    primary_key_name, primary_key_type = table_metadatas.get_primary_key_name_and_type(struct.table_name)
                     rust_primary_key_type = sql_type_to_rust_type(primary_key_type)
 
-                    new_content += f"    /// Get the struct from the database by its ID.\n"
-                    new_content += f"    ///\n"
-                    new_content += f"    /// # Arguments\n"
+                    new_content += "    /// Get the struct from the database by its ID.\n"
+                    new_content += "    ///\n"
+                    new_content += "    /// # Arguments\n"
                     new_content += f"    /// * `{primary_key_name}` - The ID of the struct to get.\n"
                     new_content += (
-                        f"    /// * `connection` - The connection to the database.\n"
+                        "    /// * `connection` - The connection to the database.\n"
                     )
-                    new_content += f"    ///\n"
-                    new_content += f"    pub fn get(\n"
+                    new_content += "    ///\n"
+                    new_content += "    pub fn get(\n"
                     new_content += f"        {primary_key_name}: {rust_primary_key_type},\n"
-                    new_content += f"        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
-                    new_content += f"    ) -> Result<Self, diesel::result::Error> {{\n"
-                    new_content += f"        {table_name}::dsl::{table_name}\n"
-                    new_content += f"            .filter({table_name}::dsl::id.eq({primary_key_name}))\n"
-                    new_content += f"            .first::<Self>(connection)\n"
-                    new_content += f"    }}\n"
+                    new_content += "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+                    new_content += "    ) -> Result<Self, diesel::result::Error> {{\n"
+                    new_content += f"        {struct.table_name}::dsl::{struct.table_name}\n"
+                    new_content += f"            .filter({struct.table_name}::dsl::id.eq({primary_key_name}))\n"
+                    new_content += "            .first::<Self>(connection)\n"
+                    new_content += "    }\n"
 
                 # If this table implements the `pg_trgm` index, we also
                 # provide the `search` method to search for the struct
                 # by a given string. The method also receives a limit
                 # parameter to limit the number of results and a threshold
                 # parameter to set the similarity threshold.
-                if similarity_indices.has_table(table_name):
-                    index = similarity_indices.get_table(table_name)
+                if similarity_indices.has_table(struct.table_name):
+                    index = similarity_indices.get_table(struct.table_name)
                     index_columns = index.columns
-                    new_content += f"    /// Search for the struct by a given string.\n"
-                    new_content += f"    ///\n"
-                    new_content += f"    /// # Arguments\n"
-                    new_content += f"    /// * `query` - The string to search for.\n"
-                    new_content += f"    /// * `limit` - The maximum number of results, by default `10`.\n"
-                    new_content += f"    /// * `threshold` - The similarity threshold, by default `0.6`.\n"
+                    new_content += "    /// Search for the struct by a given string.\n"
+                    new_content += "    ///\n"
+                    new_content += "    /// # Arguments\n"
+                    new_content += "    /// * `query` - The string to search for.\n"
+                    new_content += "    /// * `limit` - The maximum number of results, by default `10`.\n"
+                    new_content += "    /// * `threshold` - The similarity threshold, by default `0.6`.\n"
                     new_content += (
-                        f"    /// * `connection` - The connection to the database.\n"
+                        "    /// * `connection` - The connection to the database.\n"
                     )
-                    new_content += f"    ///\n"
-                    new_content += f"    pub fn search(\n"
-                    new_content += f"        query: &str,\n"
-                    new_content += f"        limit: Option<i32>,\n"
-                    new_content += f"        threshold: Option<f64>,\n"
-                    new_content += f"        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+                    new_content += "    ///\n"
+                    new_content += "    pub fn search(\n"
+                    new_content += "        query: &str,\n"
+                    new_content += "        limit: Option<i32>,\n"
+                    new_content += "        threshold: Option<f64>,\n"
+                    new_content += "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
                     new_content += (
-                        f"    ) -> Result<Vec<Self>, diesel::result::Error> {{\n"
+                        "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
                     )
 
                     if table_type == "tables":
-                        new_content += f"        use crate::schema::{table_name};\n"
+                        new_content += f"        use crate::schema::{struct.table_name};\n"
                     elif table_type == "views":
                         new_content += (
-                            f"        use crate::views::schema::{table_name};\n"
+                            f"        use crate::views::schema::{struct.table_name};\n"
                         )
                     else:
                         raise NotImplementedError(
                             "The table type must be either 'tables' or 'views'."
                         )
 
-                    new_content += f"        let limit = limit.unwrap_or(10);\n"
+                    new_content += "        let limit = limit.unwrap_or(10);\n"
                     new_content += (
-                        f"        let threshold = threshold.unwrap_or(0.6);\n"
+                        "        let threshold = threshold.unwrap_or(0.6);\n"
                     )
 
                     # Since Diesel does not support the `similarity` Postgres function natively
@@ -690,27 +700,26 @@ def write_from_impls(
                         f"similarity({column}, $1)" for column in index_columns
                     )
 
-                    new_content += f"        let similarity_query = concat!(\n"
-                    new_content += f'            "SELECT {joined_field_names} FROM {table_name} ",\n'
+                    new_content += "        let similarity_query = concat!(\n"
+                    new_content += f'            "SELECT {joined_field_names} FROM {struct.table_name} ",\n'
                     new_content += (
                         f'            "ORDER BY {similarity_function} DESC LIMIT $3;"\n'
                     )
-                    new_content += f"        );\n"
+                    new_content += "        );\n"
 
-                    new_content += f"        diesel::sql_query(similarity_query)\n"
+                    new_content += "        diesel::sql_query(similarity_query)\n"
                     new_content += (
-                        f"            .bind::<diesel::sql_types::Text, _>(query)\n"
+                        "            .bind::<diesel::sql_types::Text, _>(query)\n"
                     )
-                    new_content += f"            .bind::<diesel::sql_types::Float8, _>(threshold)\n"
+                    new_content += "            .bind::<diesel::sql_types::Float8, _>(threshold)\n"
                     new_content += (
-                        f"            .bind::<diesel::sql_types::Integer, _>(limit)\n"
+                        "            .bind::<diesel::sql_types::Integer, _>(limit)\n"
                     )
-                    new_content += f"            .load(connection)\n"
-
-                    new_content += f"}}\n"
+                    new_content += "            .load(connection)\n"
+                    new_content += "}\n"
 
                 # Finally, we cluse the struct implementation.
-                new_content += f"}}\n"
+                new_content += "}\n"
 
                 struct_name = None
                 struct_field_names = []
@@ -744,90 +753,90 @@ def write_from_impls(
     # We start by writing the enumeration
     new_content += table_deribes
     new_content += f"pub enum {capitalized_table_type}Row {{\n"
-    for struct_name in table_structs.keys():
+    for struct in struct_metadatas:
         new_content += f"    {struct_name}({struct_name}),\n"
-    new_content += f"}}\n\n"
+    new_content += "}\n\n"
 
     # Next up, we implement the bidirectional From for the TableRow or ViewRow
     # of their respective structs in the `web_common` crate.
     new_content += f"impl From<web_common::database::{table_type}::{capitalized_table_type}Row> for {capitalized_table_type}Row {{\n"
     new_content += f"    fn from(item: web_common::database::{table_type}::{capitalized_table_type}Row) -> Self {{\n"
-    new_content += f"        match item {{\n"
-    for struct_name in table_structs.keys():
+    new_content += "        match item {\n"
+    for struct in struct_metadatas:
         new_content += f"            web_common::database::{table_type}::{capitalized_table_type}Row::{struct_name}(item) => {capitalized_table_type}Row::{struct_name}(item.into()),\n"
-    new_content += f"        }}\n"
-    new_content += f"    }}\n"
-    new_content += f"}}\n"
+    new_content += "        }\n"
+    new_content += "    }\n"
+    new_content += "}\n"
 
     new_content += f"impl From<{capitalized_table_type}Row> for web_common::database::{table_type}::{capitalized_table_type}Row {{\n"
     new_content += f"    fn from(item: {capitalized_table_type}Row) -> Self {{\n"
-    new_content += f"        match item {{\n"
-    for struct_name in table_structs.keys():
+    new_content += "        match item {\n"
+    for struct in struct_metadatas:
         new_content += f"            {capitalized_table_type}Row::{struct_name}(item) => web_common::database::{table_type}::{capitalized_table_type}Row::{struct_name}(item.into()),\n"
-    new_content += f"        }}\n"
-    new_content += f"    }}\n"
-    new_content += f"}}\n"
+    new_content += "        }\n"
+    new_content += "    }\n"
+    new_content += "}\n"
 
     # For each of the structs, we implement the From method so that it is possible to easily convert
     # any of the Row structs into the ViewRow or TableRow structs.
 
-    for struct_name in table_structs.keys():
+    for struct in struct_metadatas:
         new_content += f"impl From<{struct_name}> for {capitalized_table_type}Row {{\n"
         new_content += f"    fn from(item: {struct_name}) -> Self {{\n"
         new_content += f"        {capitalized_table_type}Row::{struct_name}(item)\n"
-        new_content += f"    }}\n"
-        new_content += f"}}\n"
+        new_content += "    }\n"
+        new_content += "}\n"
 
     # We write the enumeration of the Searchable tables or views rows
     # which are the tables or views that implement the `pg_trgm` index.
 
     has_any_searchables = any(
-        similarity_indices.has_table(table_data["table_name"])
-        for table_data in table_structs.values()
+        similarity_indices.has_table(struct.table_name)
+        for struct in struct_metadatas
     )
 
     if has_any_searchables:
         new_content += table_deribes
         new_content += f"pub enum Searcheable{capitalized_table_type}Row {{\n"
-        for struct_name in table_structs.keys():
-            if similarity_indices.has_table(table_structs[struct_name]["table_name"]):
-                new_content += f"    {struct_name}({struct_name}),\n"
-        new_content += f"}}\n\n"
+        for struct in struct_metadatas:
+            if similarity_indices.has_table(struct.table_name):
+                new_content += f"    {struct.name}({struct.name}),\n"
+        new_content += "}\n\n"
 
         # We implement the bidierectional From for the SearcheableTableRow or SearcheableViewRow
         # of their respective structs in the `web_common` crate.
         new_content += f"impl From<web_common::database::{table_type}::Searcheable{capitalized_table_type}Row> for Searcheable{capitalized_table_type}Row {{\n"
         new_content += f"    fn from(item: web_common::database::{table_type}::Searcheable{capitalized_table_type}Row) -> Self {{\n"
-        new_content += f"        match item {{\n"
-        for struct_name in table_structs.keys():
-            if similarity_indices.has_table(table_structs[struct_name]["table_name"]):
-                new_content += f"            web_common::database::{table_type}::Searcheable{capitalized_table_type}Row::{struct_name}(item) => Searcheable{capitalized_table_type}Row::{struct_name}(item.into()),\n"
-        new_content += f"        }}\n"
-        new_content += f"    }}\n"
-        new_content += f"}}\n"
+        new_content += "        match item {\n"
+        for struct in struct_metadatas:
+            if similarity_indices.has_table(struct.table_name):
+                new_content += f"            web_common::database::{table_type}::Searcheable{capitalized_table_type}Row::{struct.name}(item) => Searcheable{capitalized_table_type}Row::{struct.name}(item.into()),\n"
+        new_content += "        }\n"
+        new_content += "    }\n"
+        new_content += "}\n"
 
         new_content += f"impl From<Searcheable{capitalized_table_type}Row> for web_common::database::{table_type}::Searcheable{capitalized_table_type}Row {{\n"
         new_content += (
             f"    fn from(item: Searcheable{capitalized_table_type}Row) -> Self {{\n"
         )
-        new_content += f"        match item {{\n"
-        for struct_name in table_structs.keys():
-            if similarity_indices.has_table(table_structs[struct_name]["table_name"]):
-                new_content += f"            Searcheable{capitalized_table_type}Row::{struct_name}(item) => web_common::database::{table_type}::Searcheable{capitalized_table_type}Row::{struct_name}(item.into()),\n"
-        new_content += f"        }}\n"
-        new_content += f"    }}\n"
-        new_content += f"}}\n"
+        new_content += "        match item {\n"
+        for struct in struct_metadatas:
+            if similarity_indices.has_table(struct.table_name):
+                new_content += f"            Searcheable{capitalized_table_type}Row::{struct.name}(item) => web_common::database::{table_type}::Searcheable{capitalized_table_type}Row::{struct.name}(item.into()),\n"
+        new_content += "        }\n"
+        new_content += "    }\n"
+        new_content += "}\n"
 
         # For each of the searchable structs, we implement the From method so that it is possible to easily convert
         # any of the Row structs into the SearchableViewRow or SearchableTableRow structs.
 
-        for struct_name in table_structs.keys():
-            if similarity_indices.has_table(table_structs[struct_name]["table_name"]):
-                new_content += f"impl From<{struct_name}> for Searcheable{capitalized_table_type}Row {{\n"
-                new_content += f"    fn from(item: {struct_name}) -> Self {{\n"
-                new_content += f"        Searcheable{capitalized_table_type}Row::{struct_name}(item)\n"
-                new_content += f"    }}\n"
-                new_content += f"}}\n"
+        for struct in struct_metadatas:
+            if similarity_indices.has_table(struct.table_name):
+                new_content += f"impl From<{struct.name}> for Searcheable{capitalized_table_type}Row {{\n"
+                new_content += f"    fn from(item: {struct.name}) -> Self {{\n"
+                new_content += f"        Searcheable{capitalized_table_type}Row::{struct.name}(item)\n"
+                new_content += "    }\n"
+                new_content += "}\n"
 
     # Now we write the enum for the table or view names, analogous to the `Table` or `View`
     # enumeration in the `web_common` crate. We implement also the bidirectional From method
@@ -848,69 +857,67 @@ def write_from_impls(
         "Eq",
     ]
 
-    new_content += f"#[derive("
+    new_content += "#[derive("
     for derive in derives:
         new_content += f"{derive}, "
-    new_content += f")]\n"
+    new_content += ")]\n"
 
     new_content += f"pub enum {capitalized_table_type} {{\n"
-    for struct_name in table_structs.keys():
-        new_content += f"    {struct_name},\n"
-    new_content += f"}}\n\n"
+    for struct in struct_metadatas:
+        new_content += f"    {struct.name},\n"
+    new_content += "}\n\n"
 
     new_content += f"impl {capitalized_table_type} {{\n"
-    new_content += f"    pub fn name(&self) -> &'static str {{\n"
-    new_content += f"        match self {{\n"
-    for struct_name, table_data in table_structs.items():
-        table_name = table_data["table_name"]
+    new_content += "    pub fn name(&self) -> &'static str {\n"
+    new_content += "        match self {\n"
+    for struct in struct_metadatas:
         new_content += (
-            f'            {capitalized_table_type}::{struct_name} => "{table_name}",\n'
+            f'            {capitalized_table_type}::{struct.name} => "{struct.table_name}",\n'
         )
-    new_content += f"        }}\n"
-    new_content += f"    }}\n"
+    new_content += "        }\n"
+    new_content += "    }\n"
 
-    new_content += f"}}\n"
+    new_content += "}\n"
 
     new_content += f"impl std::fmt::Display for {capitalized_table_type} {{\n"
     new_content += (
-        f"    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {{\n"
+        "    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {{\n"
     )
-    new_content += f'        write!(f, "{{}}", self.name())\n'
-    new_content += f"    }}\n"
-    new_content += f"}}\n"
+    new_content += "        write!(f, \"{}\", self.name())\n"
+    new_content += "    }\n"
+    new_content += "}\n"
 
     new_content += f"impl From<&str> for {capitalized_table_type} {{\n"
-    new_content += f"    fn from(item: &str) -> Self {{\n"
-    new_content += f"        match item {{\n"
-    for struct_name, table_data in table_structs.items():
-        table_name = table_data["table_name"]
+    new_content += "    fn from(item: &str) -> Self {\n"
+    new_content += "        match item {\n"
+    for struct in struct_metadatas:
         new_content += (
-            f'            "{table_name}" => {capitalized_table_type}::{struct_name},\n'
+            f'            "{struct.table_name}" => {capitalized_table_type}::{struct.name},\n'
         )
     new_content += f'            _ => panic!("Unknown {table_type} name"),\n'
-    new_content += f"        }}\n"
-    new_content += f"    }}\n"
-    new_content += f"}}\n"
+    new_content += "        }\n"
+    new_content += "    }\n"
+    new_content += "}\n"
 
     # We implement the bidirectional From statement for the Table or View
     # enumerations with their correspective from the web_common crate.
     new_content += f"impl From<web_common::database::{table_type}::{capitalized_table_type}> for {capitalized_table_type} {{\n"
     new_content += f"    fn from(item: web_common::database::{table_type}::{capitalized_table_type}) -> Self {{\n"
-    new_content += f"        match item {{\n"
-    for struct_name in table_structs.keys():
-        new_content += f"            web_common::database::{table_type}::{capitalized_table_type}::{struct_name} => {capitalized_table_type}::{struct_name},\n"
-    new_content += f"        }}\n"
-    new_content += f"    }}\n"
-    new_content += f"}}\n"
+    new_content += "        match item {\n"
+    for struct in struct_metadatas:
+        new_content += f"            web_common::database::{table_type}::{capitalized_table_type}::{struct.name} => {capitalized_table_type}::{struct.name},\n"
+    new_content += "        }\n"
+    new_content += "    }\n"
+    new_content += "}\n"
 
     new_content += f"impl From<{capitalized_table_type}> for web_common::database::{table_type}::{capitalized_table_type} {{\n"
     new_content += f"    fn from(item: {capitalized_table_type}) -> Self {{\n"
-    new_content += f"        match item {{\n"
-    for struct_name in table_structs.keys():
-        new_content += f"            {capitalized_table_type}::{struct_name} => web_common::database::{table_type}::{capitalized_table_type}::{struct_name},\n"
-    new_content += f"        }}\n"
-    new_content += f"    }}\n"
-    new_content += f"}}\n"
+    new_content += "        match item {\n"
+    for struct in struct_metadatas:
+        new_content += f"            {capitalized_table_type}::{struct.name} => web_common::database::{table_type}::{capitalized_table_type}::{struct.name},\n"
+    new_content += "        }\n"
+    new_content += "    }\n"
+    new_content += "}\n"
 
     # Finally, we create the SearcheableTable or SearcheableView enumeration to cover all of the
     # tables or views that implement the `pg_trgm` index. We implement the `search` method for the
@@ -920,84 +927,84 @@ def write_from_impls(
     # present in the web_common crate.
 
     has_any_searchables = any(
-        similarity_indices.has_table(table_data["table_name"])
-        for table_data in table_structs.values()
+        similarity_indices.has_table(struct.table_name)
+        for struct in struct_metadatas
     )
 
     if has_any_searchables:
-        new_content += f"#[derive("
+        new_content += "#[derive("
         for derive in derives:
             new_content += f"{derive}, "
-        new_content += f")]\n"
+        new_content += ")]\n"
 
         new_content += f"pub enum Searcheable{capitalized_table_type} {{\n"
-        for struct_name in table_structs.keys():
-            if similarity_indices.has_table(table_structs[struct_name]["table_name"]):
+        for struct in struct_metadatas:
+            if similarity_indices.has_table(struct.table_name):
                 new_content += f"    {struct_name},\n"
-        new_content += f"}}\n\n"
+        new_content += "}\n\n"
 
         new_content += f"impl Searcheable{capitalized_table_type} {{\n"
-        new_content += f"    /// Search for the struct by a given string.\n"
-        new_content += f"    ///\n"
-        new_content += f"    /// # Arguments\n"
-        new_content += f"    /// * `query` - The string to search for.\n"
+        new_content += "    /// Search for the struct by a given string.\n"
+        new_content += "    ///\n"
+        new_content += "    /// # Arguments\n"
+        new_content += "    /// * `query` - The string to search for.\n"
         new_content += (
-            f"    /// * `limit` - The maximum number of results, by default `10`.\n"
+            "    /// * `limit` - The maximum number of results, by default `10`.\n"
         )
         new_content += (
-            f"    /// * `threshold` - The similarity threshold, by default `0.6`.\n"
+            "    /// * `threshold` - The similarity threshold, by default `0.6`.\n"
         )
-        new_content += f"    /// * `connection` - The connection to the database.\n"
-        new_content += f"    ///\n"
-        new_content += f"    pub fn search(\n"
-        new_content += f"        &self,\n"
-        new_content += f"        query: &str,\n"
-        new_content += f"        limit: Option<i32>,\n"
-        new_content += f"        threshold: Option<f64>,\n"
-        new_content += f"        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
-        new_content += f"    ) -> Result<Vec<Searcheable{capitalized_table_type}Row>, diesel::result::Error> {{\n"
-        new_content += f"        Ok(match self {{\n"
-        for struct_name in table_structs.keys():
-            if similarity_indices.has_table(table_structs[struct_name]["table_name"]):
-                new_content += f"            Searcheable{capitalized_table_type}::{struct_name} => {struct_name}::search(query, limit, threshold, connection)?.into_iter().map(Searcheable{capitalized_table_type}Row::from).collect::<Vec<Searcheable{capitalized_table_type}Row>>(),\n"
-        new_content += f"        }})\n"
-        new_content += f"    }}\n"
-        new_content += f"}}\n"
+        new_content += "    /// * `connection` - The connection to the database.\n"
+        new_content += "    ///\n"
+        new_content += "    pub fn search(\n"
+        new_content += "        &self,\n"
+        new_content += "        query: &str,\n"
+        new_content += "        limit: Option<i32>,\n"
+        new_content += "        threshold: Option<f64>,\n"
+        new_content += "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+        new_content += "    ) -> Result<Vec<Searcheable{capitalized_table_type}Row>, diesel::result::Error> {{\n"
+        new_content += "        Ok(match self {{\n"
+        for struct in struct_metadatas:
+            if similarity_indices.has_table(struct.table_name):
+                new_content += f"            Searcheable{capitalized_table_type}::{struct.name} => {struct.name}::search(query, limit, threshold, connection)?.into_iter().map(Searcheable{capitalized_table_type}Row::from).collect::<Vec<Searcheable{capitalized_table_type}Row>>(),\n"
+        new_content += "        })\n"
+        new_content += "    }\n"
+        new_content += "}\n"
 
         new_content += f"impl From<&str> for Searcheable{capitalized_table_type} {{\n"
-        new_content += f"    fn from(item: &str) -> Self {{\n"
-        new_content += f"        match item {{\n"
-        for struct_name in table_structs.keys():
-            if similarity_indices.has_table(table_structs[struct_name]["table_name"]):
-                new_content += f'            "{table_structs[struct_name]["table_name"]}" => Searcheable{capitalized_table_type}::{struct_name},\n'
+        new_content += "    fn from(item: &str) -> Self {\n"
+        new_content += "        match item {\n"
+        for struct in struct_metadatas:
+            if similarity_indices.has_table(struct.table_name):
+                new_content += f'            "{struct.table_name}" => Searcheable{capitalized_table_type}::{struct.name},\n'
         new_content += f'            _ => panic!("Unknown {table_type} name"),\n'
-        new_content += f"        }}\n"
-        new_content += f"    }}\n"
-        new_content += f"}}\n"
+        new_content += "        }\n"
+        new_content += "    }\n"
+        new_content += "}\n"
 
         new_content += f"impl From<Searcheable{capitalized_table_type}> for web_common::database::{table_type}::Searcheable{capitalized_table_type} {{\n"
         new_content += (
             f"    fn from(item: Searcheable{capitalized_table_type}) -> Self {{\n"
         )
-        new_content += f"        match item {{\n"
-        for struct_name in table_structs.keys():
-            if similarity_indices.has_table(table_structs[struct_name]["table_name"]):
-                new_content += f"            Searcheable{capitalized_table_type}::{struct_name} => web_common::database::{table_type}::Searcheable{capitalized_table_type}::{struct_name},\n"
-        new_content += f"        }}\n"
-        new_content += f"    }}\n"
-        new_content += f"}}\n"
+        new_content += "        match item {\n"
+        for struct in struct_metadatas:
+            if similarity_indices.has_table(struct.table_name):
+                new_content += f"            Searcheable{capitalized_table_type}::{struct.name} => web_common::database::{table_type}::Searcheable{capitalized_table_type}::{struct.name},\n"
+        new_content += "        }\n"
+        new_content += "    }\n"
+        new_content += "}\n"
 
         new_content += f"impl From<web_common::database::{table_type}::Searcheable{capitalized_table_type}> for Searcheable{capitalized_table_type} {{\n"
         new_content += f"    fn from(item: web_common::database::{table_type}::Searcheable{capitalized_table_type}) -> Self {{\n"
-        new_content += f"        match item {{\n"
-        for struct_name in table_structs.keys():
-            if similarity_indices.has_table(table_structs[struct_name]["table_name"]):
-                new_content += f"            web_common::database::{table_type}::Searcheable{capitalized_table_type}::{struct_name} => Searcheable{capitalized_table_type}::{struct_name},\n"
-        new_content += f"        }}\n"
-        new_content += f"    }}\n"
-        new_content += f"}}\n"
+        new_content += "        match item {\n"
+        for struct in struct_metadatas:
+            if similarity_indices.has_table(struct.table_name):
+                new_content += f"            web_common::database::{table_type}::Searcheable{capitalized_table_type}::{struct.name} => Searcheable{capitalized_table_type}::{struct.name},\n"
+        new_content += "        }\n"
+        new_content += "    }\n"
+        new_content += "}\n"
 
-    with open(path, "w") as file:
+    with open(path, "w", encoding="utf8") as file:
         file.write(new_content)
 
 
@@ -1032,24 +1039,21 @@ def write_web_common_structs(
     # The derives to apply to the structs in the `src/database/tables.rs` document
     derives = ["Deserialize", "Serialize", "Clone", "Debug", "PartialEq"]
 
-    # Types that cannot implement the `Eq` trait
-    no_eq = ["f32", "f64"]
-
     # We check that we are currently executing in the `backend` crate
     # so to make sure that the relative path to the `web_common` crate
     # is correct.
     if not os.getcwd().endswith("backend"):
         raise Exception("This script must be executed in the `backend` crate.")
 
-    tables = open(f"../web_common/src/database/{target}.rs", "w")
+    tables = open(f"../web_common/src/database/{target}.rs", "w", encoding="utf8")
 
     similarity_indices: PGIndices = find_pg_trgm_indices()
 
-    with open(path, "r") as file:
+    with open(path, "r", encoding="utf8") as file:
         models = file.read()
 
     for import_statement in imports:
-        struct_imported = import_statement.split(":")[-1].strip(";")
+        struct_imported = import_statement.rsplit(":", maxsplit=1).strip(";")
         if struct_imported not in models:
             continue
         tables.write(f"{import_statement}\n")
@@ -1120,14 +1124,14 @@ def write_web_common_structs(
             for derive in derives:
                 struct_metadata.add_derive(derive)
 
-            tables.write(f"#[derive(")
+            tables.write("#[derive(")
             tables.write(", ".join(struct_metadata.derives()))
-            tables.write(f")]\n")
+            tables.write(")]\n")
             # We also write conditional derives for the frontend feature
             # that ask for the `frontend` feature to be enabled and derive
             # the yew::html::Properties trait for the struct.
             tables.write(
-                f'#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]\n'
+                '#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]\n'
             )
 
             tables.write(f"pub struct {struct_metadata.name} {{\n")
@@ -1145,7 +1149,7 @@ def write_web_common_structs(
                 # feature. It provides several methods including the use
                 # of GlueSQL. Fortunately, it does not force us like Diesel
                 # to create yet again another duplicate of the struct.
-                tables.write(f'#[cfg(feature = "frontend")]\n')
+                tables.write('#[cfg(feature = "frontend")]\n')
                 tables.write(f"impl {struct_metadata.name} {{\n")
                 columns = ", ".join(
                     [
@@ -1181,10 +1185,10 @@ def write_web_common_structs(
                 update_types_and_methods["bool"] = "{}"
 
                 tables.write(
-                    f"    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {{\n"
+                    "    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {\n"
                 )
 
-                tables.write(f"        vec![\n")
+                tables.write("        vec![\n")
                 for attribute in struct_metadata.attributes:
 
                     if attribute.optional:
@@ -1196,7 +1200,7 @@ def write_web_common_structs(
                                 f"                Some({attribute.name}) => {types_and_methods[attribute.data_type].format(attribute.name)},\n"
                             )
                             tables.write(
-                                f"                None => gluesql::core::ast_builder::null(),\n"
+                                "                None => gluesql::core::ast_builder::null(),\n"
                             )
                             tables.write("            },\n")
                         else:
@@ -1206,14 +1210,14 @@ def write_web_common_structs(
                             )
                     elif attribute.data_type in types_and_methods:
                         tables.write(
-                            f"            {types_and_methods[attribute.data_type].format('self.{}'.format(attribute.name))},\n"
+                            f"            {types_and_methods[attribute.data_type].format(f'self.{attribute.name}')},\n"
                         )
                     else:
                         raise NotImplementedError(
                             f"The type {attribute.data_type} is not supported."
                         )
 
-                tables.write(f"        ]\n")
+                tables.write("        ]\n")
 
                 tables.write("    }\n\n")
 
@@ -1221,32 +1225,32 @@ def write_web_common_structs(
                 # receives a connection to the GlueSQL database and inserts the
                 # struct into the database.
                 tables.write(f"    /// Insert the {struct_metadata.name} into the database.\n")
-                tables.write(f"    ///\n")
-                tables.write(f"    /// # Arguments\n")
+                tables.write("    ///\n")
+                tables.write("    /// # Arguments\n")
                 tables.write(
-                    f"    /// * `connection` - The connection to the database.\n"
+                    "    /// * `connection` - The connection to the database.\n"
                 )
-                tables.write(f"    ///\n")
-                tables.write(f"    /// # Returns\n")
+                tables.write("    ///\n")
+                tables.write("    /// # Returns\n")
                 tables.write(
                     f"    /// The number of rows inserted in table {struct_metadata.name}\n"
                 )
-                tables.write(f"    pub async fn insert<C>(\n")
-                tables.write(f"        self,\n")
-                tables.write(f"        connection: &mut gluesql::prelude::Glue<C>,\n")
-                tables.write(f"    ) -> Result<usize, gluesql::prelude::Error> where\n")
+                tables.write("    pub async fn insert<C>(\n")
+                tables.write("        self,\n")
+                tables.write("        connection: &mut gluesql::prelude::Glue<C>,\n")
+                tables.write("    ) -> Result<usize, gluesql::prelude::Error> where\n")
                 tables.write(
-                    f"        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
+                    "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
                 )
-                tables.write(f"    {{\n")
-                tables.write(f"        use gluesql::core::ast_builder::*;\n")
+                tables.write("    {\n")
+                tables.write("        use gluesql::core::ast_builder::*;\n")
                 # We use the AST builder as much as possible so to avoid SQL injection attacks.
                 tables.write(f'        table("{struct_metadata.table_name}")\n')
-                tables.write(f"            .insert()\n")
+                tables.write("            .insert()\n")
                 tables.write(f'            .columns("{columns}")\n')
-                tables.write(f"            .values(vec![self.into_row()])\n")
-                tables.write(f"            .execute(connection)\n")
-                tables.write(f"            .await\n")
+                tables.write("            .values(vec![self.into_row()])\n")
+                tables.write("            .execute(connection)\n")
+                tables.write("            .await\n")
                 tables.write("             .map(|payload| match payload {\n")
                 tables.write(
                     "                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,\n"
@@ -1263,8 +1267,8 @@ def write_web_common_structs(
                 tables.write(
                     f"    /// Get {struct_metadata.name} from the database by its ID.\n"
                 )
-                tables.write(f"    ///\n")
-                tables.write(f"    /// # Arguments\n")
+                tables.write("    ///\n")
+                tables.write("    /// # Arguments\n")
                 primary_key_name, primary_key_type = table_metadatas.get_primary_key_name_and_type(
                     struct_metadata.table_name
                 )
@@ -1272,62 +1276,62 @@ def write_web_common_structs(
 
                 tables.write(f"    /// * `{primary_key_name}` - The ID of {struct_metadata.name} to get.\n")
                 tables.write(
-                    f"    /// * `connection` - The connection to the database.\n"
+                    "    /// * `connection` - The connection to the database.\n"
                 )
-                tables.write(f"    ///\n")
-                tables.write(f"    pub async fn get<C>(\n")
+                tables.write("    ///\n")
+                tables.write("    pub async fn get<C>(\n")
                 tables.write(f"        {primary_key_name}: {rust_primary_key_type},\n")
-                tables.write(f"        connection: &mut gluesql::prelude::Glue<C>,\n")
+                tables.write("        connection: &mut gluesql::prelude::Glue<C>,\n")
                 tables.write(
-                    f"    ) -> Result<Option<Self>, gluesql::prelude::Error> where\n"
+                    "    ) -> Result<Option<Self>, gluesql::prelude::Error> where\n"
                 )
                 tables.write(
-                    f"        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
+                    "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
                 )
-                tables.write(f"    {{\n")
-                tables.write(f"        use gluesql::core::ast_builder::*;\n")
+                tables.write("    {\n")
+                tables.write("        use gluesql::core::ast_builder::*;\n")
                 # We use the AST builder as much as possible so to avoid SQL injection attacks.
                 tables.write(f'        let select_row = table("{struct_metadata.table_name}")\n')
-                tables.write(f"            .select()\n")
+                tables.write("            .select()\n")
                 tables.write(f'            .filter(col("id").eq({primary_key_name}.to_string()))\n')
                 tables.write(f'            .project("{columns}")\n')
-                tables.write(f"            .limit(1)\n")
-                tables.write(f"            .execute(connection)\n")
-                tables.write(f"            .await?;\n")
-                tables.write(f"         Ok(select_row.select()\n")
-                tables.write(f"            .unwrap()\n")
-                tables.write(f"            .map(Self::from_row)\n")
-                tables.write(f"            .collect::<Vec<_>>()\n")
-                tables.write(f"            .pop())\n")
+                tables.write("            .limit(1)\n")
+                tables.write("            .execute(connection)\n")
+                tables.write("            .await?;\n")
+                tables.write("         Ok(select_row.select()\n")
+                tables.write("            .unwrap()\n")
+                tables.write("            .map(Self::from_row)\n")
+                tables.write("            .collect::<Vec<_>>()\n")
+                tables.write("            .pop())\n")
                 tables.write("    }\n\n")
 
                 # We implement the `delete` method for the struct. This method deletes
                 # the struct from the GlueSQL database.
                 tables.write(f"    /// Delete {struct_metadata.name} from the database.\n")
-                tables.write(f"    ///\n")
-                tables.write(f"    /// # Arguments\n")
+                tables.write("    ///\n")
+                tables.write("    /// # Arguments\n")
                 tables.write(f"    /// * `{primary_key_name}` - The ID of the struct to delete.\n")
                 tables.write(
-                    f"    /// * `connection` - The connection to the database.\n"
+                    "    /// * `connection` - The connection to the database.\n"
                 )
-                tables.write(f"    ///\n")
-                tables.write(f"    /// # Returns\n")
-                tables.write(f"    /// The number of rows deleted.\n")
-                tables.write(f"    pub async fn delete_from_id<C>(\n")
-                tables.write(f"        {primary_key_name}: {rust_primary_key_type},\n")
-                tables.write(f"        connection: &mut gluesql::prelude::Glue<C>,\n")
-                tables.write(f"    ) -> Result<usize, gluesql::prelude::Error> where\n")
+                tables.write("    ///\n")
+                tables.write("    /// # Returns\n")
+                tables.write("    /// The number of rows deleted.\n")
+                tables.write("    pub async fn delete_from_id<C>(\n")
+                tables.write("        {primary_key_name}: {rust_primary_key_type},\n")
+                tables.write("        connection: &mut gluesql::prelude::Glue<C>,\n")
+                tables.write("    ) -> Result<usize, gluesql::prelude::Error> where\n")
                 tables.write(
-                    f"        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
+                    "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
                 )
-                tables.write(f"    {{\n")
-                tables.write(f"        use gluesql::core::ast_builder::*;\n")
+                tables.write("    {\n")
+                tables.write("        use gluesql::core::ast_builder::*;\n")
                 # We use the AST builder as much as possible so to avoid SQL injection attacks.
                 tables.write(f'        table("{struct_metadata.table_name}")\n')
-                tables.write(f"            .delete()\n")
-                tables.write(f'            .filter(col("id").eq(id.to_string()))\n')
-                tables.write(f"            .execute(connection)\n")
-                tables.write(f"            .await\n")
+                tables.write("            .delete()\n")
+                tables.write('            .filter(col("id").eq(id.to_string()))\n')
+                tables.write("            .execute(connection)\n")
+                tables.write("            .await\n")
                 tables.write("             .map(|payload| match payload {\n")
                 tables.write(
                     "                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,\n"
@@ -1343,47 +1347,47 @@ def write_web_common_structs(
                 tables.write(
                     f"    /// Delete the current instance of {struct_metadata.name} from the database.\n"
                 )
-                tables.write(f"    ///\n")
-                tables.write(f"    /// # Arguments\n")
+                tables.write("    ///\n")
+                tables.write("    /// # Arguments\n")
                 tables.write(
-                    f"    /// * `connection` - The connection to the database.\n"
+                    "    /// * `connection` - The connection to the database.\n"
                 )
-                tables.write(f"    ///\n")
-                tables.write(f"    /// # Returns\n")
-                tables.write(f"    /// The number of rows deleted.\n")
-                tables.write(f"    pub async fn delete<C>(\n")
-                tables.write(f"        self,\n")
-                tables.write(f"        connection: &mut gluesql::prelude::Glue<C>,\n")
-                tables.write(f"    ) -> Result<usize, gluesql::prelude::Error> where\n")
+                tables.write("    ///\n")
+                tables.write("    /// # Returns\n")
+                tables.write("    /// The number of rows deleted.\n")
+                tables.write("    pub async fn delete<C>(\n")
+                tables.write("        self,\n")
+                tables.write("        connection: &mut gluesql::prelude::Glue<C>,\n")
+                tables.write("    ) -> Result<usize, gluesql::prelude::Error> where\n")
                 tables.write(
-                    f"        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
+                    "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
                 )
-                tables.write(f"    {{\n")
+                tables.write("    {\n")
                 tables.write(
-                    f"        Self::delete_from_id(self.id, connection).await\n"
+                    "        Self::delete_from_id(self.id, connection).await\n"
                 )
                 tables.write("    }\n")
 
                 # We implement the `update` method for the struct. This method updates
                 # the struct in the GlueSQL database.
-                tables.write(f"    /// Update the struct in the database.\n")
-                tables.write(f"    ///\n")
-                tables.write(f"    /// # Arguments\n")
+                tables.write("    /// Update the struct in the database.\n")
+                tables.write("    ///\n")
+                tables.write("    /// # Arguments\n")
                 tables.write(
-                    f"    /// * `connection` - The connection to the database.\n"
+                    "    /// * `connection` - The connection to the database.\n"
                 )
-                tables.write(f"    ///\n")
-                tables.write(f"    /// # Returns\n")
-                tables.write(f"    /// The number of rows updated.\n")
-                tables.write(f"    pub async fn update<C>(\n")
-                tables.write(f"        self,\n")
-                tables.write(f"        connection: &mut gluesql::prelude::Glue<C>,\n")
-                tables.write(f"    ) -> Result<usize, gluesql::prelude::Error> where\n")
+                tables.write("    ///\n")
+                tables.write("    /// # Returns\n")
+                tables.write("    /// The number of rows updated.\n")
+                tables.write("    pub async fn update<C>(\n")
+                tables.write("        self,\n")
+                tables.write("        connection: &mut gluesql::prelude::Glue<C>,\n")
+                tables.write("    ) -> Result<usize, gluesql::prelude::Error> where\n")
                 tables.write(
-                    f"        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
+                    "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
                 )
-                tables.write(f"    {{\n")
-                tables.write(f"        use gluesql::core::ast_builder::*;\n")
+                tables.write("    {\n")
+                tables.write("        use gluesql::core::ast_builder::*;\n")
                 # We use the AST builder as much as possible so to avoid SQL injection attacks.
 
                 # First, we determine whether the current struct has at least an optional field.
@@ -1394,7 +1398,7 @@ def write_web_common_structs(
                     )
                 else:
                     tables.write(f'        table("{struct_metadata.table_name}")\n')
-                tables.write(f"            .update()")
+                tables.write("            .update()")
 
                 if struct_metadata.contains_only_optional_fields():
                     raise NotImplementedError(
@@ -1408,7 +1412,7 @@ def write_web_common_structs(
                         continue
                     if attribute.data_type in update_types_and_methods:
                         conversion = update_types_and_methods[attribute.data_type].format(
-                            "self.{}".format(attribute.name)
+                            f"self.{attribute.name}"
                         )
                         tables.write(
                             f'        \n.set("{attribute.name}", {conversion})'
@@ -1419,7 +1423,7 @@ def write_web_common_structs(
                             f"The struct {struct_metadata.name} contains an {attribute.data_type}."
                         )
 
-                if has_optional_fields:
+                if struct_metadata.optional:
                     tables.write(";\n")
 
                 # After all of the non-optional fields, we handle the optional fields.
@@ -1428,7 +1432,7 @@ def write_web_common_structs(
                         continue
                     conversion = update_types_and_methods[
                         attribute.data_type
-                    ].format("self.{}".format(attribute.name))
+                    ].format(f"self.{attribute.name}")
                     if attribute.data_type in update_types_and_methods:
                         tables.write(
                             f"        if let Some({attribute.name}) = self.{attribute.name} {{\n"
@@ -1443,11 +1447,11 @@ def write_web_common_structs(
                             f"The struct {attribute.name} contains an {attribute.data_type}. "
                         )
 
-                if has_optional_fields:
-                    tables.write(f"            update_row.execute(connection)\n")
+                if struct_metadata.optional:
+                    tables.write("            update_row.execute(connection)\n")
                 else:
-                    tables.write(f"            .execute(connection)\n")
-                tables.write(f"            .await\n")
+                    tables.write("            .execute(connection)\n")
+                tables.write("            .await\n")
                 tables.write("             .map(|payload| match payload {\n")
                 tables.write(
                     "                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,\n"
@@ -1462,69 +1466,69 @@ def write_web_common_structs(
                 # inserts the struct into the GlueSQL database if it does not exist, otherwise
                 # it updates the struct in the database.
                 tables.write(
-                    f"    /// Update the struct in the database if it exists, otherwise insert it.\n"
+                    "    /// Update the struct in the database if it exists, otherwise insert it.\n"
                 )
-                tables.write(f"    ///\n")
-                tables.write(f"    /// # Arguments\n")
+                tables.write("    ///\n")
+                tables.write("    /// # Arguments\n")
                 tables.write(
-                    f"    /// * `connection` - The connection to the database.\n"
+                    "    /// * `connection` - The connection to the database.\n"
                 )
-                tables.write(f"    ///\n")
-                tables.write(f"    /// # Returns\n")
-                tables.write(f"    /// The number of rows updated or inserted.\n")
-                tables.write(f"    pub async fn update_or_insert<C>(\n")
-                tables.write(f"        self,\n")
-                tables.write(f"        connection: &mut gluesql::prelude::Glue<C>,\n")
-                tables.write(f"    ) -> Result<usize, gluesql::prelude::Error> where\n")
+                tables.write("    ///\n")
+                tables.write("    /// # Returns\n")
+                tables.write("    /// The number of rows updated or inserted.\n")
+                tables.write("    pub async fn update_or_insert<C>(\n")
+                tables.write("        self,\n")
+                tables.write("        connection: &mut gluesql::prelude::Glue<C>,\n")
+                tables.write("    ) -> Result<usize, gluesql::prelude::Error> where\n")
                 tables.write(
-                    f"        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
+                    "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
                 )
-                tables.write(f"    {{\n")
+                tables.write("    {\n")
                 tables.write(
-                    f"        let number_of_rows = self.clone().update(connection).await?;\n"
+                    "        let number_of_rows = self.clone().update(connection).await?;\n"
                 )
-                tables.write(f"        if number_of_rows == 0 {{\n")
-                tables.write(f"            self.insert(connection).await\n")
-                tables.write(f"        }} else {{\n")
-                tables.write(f"            Ok(number_of_rows)\n")
-                tables.write(f"        }}\n")
-                tables.write(f"    }}\n")
+                tables.write("        if number_of_rows == 0 {\n")
+                tables.write("            self.insert(connection).await\n")
+                tables.write("        } else {\n")
+                tables.write("            Ok(number_of_rows)\n")
+                tables.write("        }\n")
+                tables.write("    }\n")
 
                 # We implement the `all` method for the struct. This method returns all of the
                 # structs in the GlueSQL database.
                 tables.write(f"    /// Get all {struct_metadata.name} from the database.\n")
-                tables.write(f"    ///\n")
-                tables.write(f"    /// # Arguments\n")
+                tables.write("    ///\n")
+                tables.write("    /// # Arguments\n")
                 tables.write(
-                    f"    /// * `connection` - The connection to the database.\n"
+                    "    /// * `connection` - The connection to the database.\n"
                 )
-                tables.write(f"    ///\n")
-                tables.write(f"    pub async fn all<C>(\n")
-                tables.write(f"        connection: &mut gluesql::prelude::Glue<C>,\n")
+                tables.write("    ///\n")
+                tables.write("    pub async fn all<C>(\n")
+                tables.write("        connection: &mut gluesql::prelude::Glue<C>,\n")
                 tables.write(
-                    f"    ) -> Result<Vec<Self>, gluesql::prelude::Error> where\n"
+                    "    ) -> Result<Vec<Self>, gluesql::prelude::Error> where\n"
                 )
                 tables.write(
-                    f"        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
+                    "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
                 )
-                tables.write(f"    {{\n")
-                tables.write(f"        use gluesql::core::ast_builder::*;\n")
+                tables.write("    {\n")
+                tables.write("        use gluesql::core::ast_builder::*;\n")
                 tables.write(f'        let select_row = table("{struct_metadata.table_name}")\n')
-                tables.write(f"            .select()\n")
+                tables.write("            .select()\n")
                 tables.write(f'            .project("{columns}")\n')
-                tables.write(f"            .execute(connection)\n")
-                tables.write(f"            .await?;\n")
-                tables.write(f"        Ok(select_row.select()\n")
-                tables.write(f"            .unwrap()\n")
-                tables.write(f"            .map(Self::from_row)\n")
-                tables.write(f"            .collect::<Vec<_>>())\n")
-                tables.write(f"    }}\n")
+                tables.write("            .execute(connection)\n")
+                tables.write("            .await?;\n")
+                tables.write("        Ok(select_row.select()\n")
+                tables.write("            .unwrap()\n")
+                tables.write("            .map(Self::from_row)\n")
+                tables.write("            .collect::<Vec<_>>())\n")
+                tables.write("    }\n")
 
                 # We implement the `from_row` method for the struct. This method
                 # receives a row from the GlueSQL database, which is a `HashMap<&str, &&Value>`.
                 # The method returns the struct from the row.
                 tables.write(
-                    f"    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {{\n"
+                    "    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {\n"
                 )
                 tables.write("        Self {\n")
 
@@ -1555,7 +1559,7 @@ def write_web_common_structs(
                             f"                gluesql::prelude::Value::Uuid({attribute.name}) => Uuid::from_u128(*{attribute.name}),\n"
                         )
                         tables.write(
-                            f'                _ => unreachable!("Expected Uuid"),\n'
+                            '                _ => unreachable!("Expected Uuid"),\n'
                         )
                         tables.write("            },\n")
                     elif attribute.data_type == "Option<Uuid>":
@@ -1563,13 +1567,13 @@ def write_web_common_structs(
                             f'            {attribute.name}: match row.get("{attribute.name}").unwrap() {{\n'
                         )
                         tables.write(
-                            f"                gluesql::prelude::Value::Null => None,\n"
+                            "                gluesql::prelude::Value::Null => None,\n"
                         )
                         tables.write(
                             f"                gluesql::prelude::Value::Uuid({attribute.name}) => Some(Uuid::from_u128(*{attribute.name})),\n"
                         )
                         tables.write(
-                            f'                _ => unreachable!("Expected Uuid"),\n'
+                            '                _ => unreachable!("Expected Uuid"),\n'
                         )
                         tables.write("            },\n")
                     elif attribute.implements_clone():
@@ -1578,7 +1582,7 @@ def write_web_common_structs(
                                 f'            {attribute.name}: match row.get("{attribute.name}").unwrap() {{\n'
                             )
                             tables.write(
-                                f"                gluesql::prelude::Value::Null => None,\n"
+                                "                gluesql::prelude::Value::Null => None,\n"
                             )
                             tables.write(
                                 f"                gluesql::prelude::Value::{clonables[attribute.data_type]}({attribute.name}) => Some({attribute.name}.clone()),\n"
@@ -1625,10 +1629,10 @@ def write_web_common_structs(
 
     lower_enumeration = enumeration.lower()
 
-    tables.write(f"#[derive(")
+    tables.write("#[derive(")
     for derive in derives_for_enum + ["Copy", "Eq"]:
         tables.write(f"{derive}, ")
-    tables.write(f")]\n")
+    tables.write(")]\n")
     tables.write(f"pub enum {enumeration} {{\n")
     for struct in struct_metadatas:
         tables.write(f"    {struct.name},\n")
@@ -1655,10 +1659,10 @@ def write_web_common_structs(
     # Finally, we write an enum for the rows in the tables (or views)
 
     tables.write("\n")
-    tables.write(f"#[derive(")
+    tables.write("#[derive(")
     for derive in derives:
         tables.write(f"{derive}, ")
-    tables.write(f")]\n")
+    tables.write(")]\n")
     tables.write(f"pub enum {enumeration}Row {{\n")
     for struct in struct_metadatas:
         tables.write(f"    {struct.name}({struct.name}),\n")
@@ -1677,15 +1681,15 @@ def write_web_common_structs(
         tables.write(
             f"impl std::convert::TryFrom<{enumeration}Row> for {struct.name} {{\n"
         )
-        tables.write(f"    type Error = &'static str;\n")
+        tables.write("    type Error = &'static str;\n")
         tables.write(
             f"    fn try_from(item: {enumeration}Row) -> Result<Self, Self::Error> {{\n"
         )
-        tables.write(f"        match item {{\n")
+        tables.write("        match item {\n")
         tables.write(
             f"            {enumeration}Row::{struct.name}(item) => Ok(item),\n"
         )
-        tables.write(f'            _ => Err("Invalid conversion"),\n')
+        tables.write('            _ => Err("Invalid conversion"),\n')
         tables.write("        }\n")
         tables.write("    }\n")
         tables.write("}\n")
@@ -1733,10 +1737,10 @@ def write_web_common_structs(
         tables.write("\n")
 
         # We create the enumeration of all searchable table or view rows
-        tables.write(f"#[derive(")
+        tables.write("#[derive(")
         for derive in derives:
             tables.write(f"{derive}, ")
-        tables.write(f")]\n")
+        tables.write(")]\n")
         tables.write(f"pub enum Searcheable{enumeration}Row {{\n")
         for struct in struct_metadatas:
             if similarity_indices.has_table(struct.table_name):
@@ -1754,30 +1758,30 @@ def write_web_common_structs(
                 tables.write(
                     f"        Searcheable{enumeration}Row::{struct.name}(item)\n"
                 )
-                tables.write(f"    }}\n")
-                tables.write(f"}}\n")
+                tables.write("    }\n")
+                tables.write("}\n")
 
                 tables.write(
                     f"impl std::convert::TryFrom<Searcheable{enumeration}Row> for {struct.name} {{\n"
                 )
-                tables.write(f"    type Error = &'static str;\n")
+                tables.write("    type Error = &'static str;\n")
                 tables.write(
                     f"    fn try_from(item: Searcheable{enumeration}Row) -> Result<Self, Self::Error> {{\n"
                 )
-                tables.write(f"        match item {{\n")
+                tables.write("        match item {\n")
                 tables.write(
                     f"            Searcheable{enumeration}Row::{struct.name}(item) => Ok(item),\n"
                 )
-                tables.write(f'            _ => Err("Invalid conversion"),\n')
-                tables.write(f"        }}\n")
-                tables.write(f"    }}\n")
-                tables.write(f"}}\n")
+                tables.write('            _ => Err("Invalid conversion"),\n')
+                tables.write("        }\n")
+                tables.write("    }\n")
+                tables.write("}\n")
 
         # We create the enumeration of all searchable tables or views
-        tables.write(f"#[derive(")
+        tables.write("#[derive(")
         for derive in derives + ["Copy", "Eq"]:
             tables.write(f"{derive}, ")
-        tables.write(f")]\n")
+        tables.write(")]\n")
         tables.write(f"pub enum Searcheable{enumeration} {{\n")
         for struct in struct_metadatas:
             if similarity_indices.has_table(struct.table_name):
@@ -1787,32 +1791,32 @@ def write_web_common_structs(
         # We implement the search method for the SearchableTable or SearchableView
         # that returns a new Search task for the table or view.
         tables.write(f"impl Searcheable{enumeration} {{\n")
-        tables.write(f"    /// Search the table or view by the query.\n")
-        tables.write(f"    ///\n")
-        tables.write(f"    /// # Arguments\n")
-        tables.write(f"    /// * `query` - The query to search.\n")
+        tables.write("    /// Search the table or view by the query.\n")
+        tables.write("    ///\n")
+        tables.write("    /// # Arguments\n")
+        tables.write("    /// * `query` - The query to search.\n")
         tables.write(
-            f"    /// * `number_of_results` - The number of results to return.\n"
+            "    /// * `number_of_results` - The number of results to return.\n"
         )
         tables.write(
-            f"    pub fn search(&self, query: String, number_of_results: usize) -> Select {{\n"
+            "    pub fn search(&self, query: String, number_of_results: usize) -> Select {\n"
         )
-        tables.write(f"        match self {{\n")
+        tables.write("        match self {\n")
         for struct in struct_metadatas:
             if similarity_indices.has_table(struct.table_name):
                 tables.write(
                     f"            Searcheable{enumeration}::{struct.name} => Select::search(Searcheable{enumeration}::{struct.name}, query, number_of_results),\n"
                 )
-        tables.write(f"        }}\n")
-        tables.write(f"    }}\n")
-        tables.write(f"}}\n")
+        tables.write("        }\n")
+        tables.write("    }\n")
+        tables.write("}\n")
 
         # We create a Trait that we implement for all {enumeration}Rows which returns
         # statically the name of the table or view associated with the row.
         tables.write(f"pub trait Searcheable{enumeration}Name {{\n")
-        tables.write(f"    /// Returns the variant of the table or view.\n")
+        tables.write("    /// Returns the variant of the table or view.\n")
         tables.write(f"    fn parent_enum() -> Searcheable{enumeration};\n")
-        tables.write(f"}}\n")
+        tables.write("}\n")
 
         for struct in struct_metadatas:
             if similarity_indices.has_table(struct.table_name):
@@ -1821,24 +1825,24 @@ def write_web_common_structs(
                 )
                 tables.write(f"    fn parent_enum() -> Searcheable{enumeration} {{\n")
                 tables.write(f"        Searcheable{enumeration}::{struct.name}\n")
-                tables.write(f"    }}\n")
-                tables.write(f"}}\n")
+                tables.write("    }\n")
+                tables.write("}\n")
 
         # We create the Trait Search{enumeration} for all structs that implement
         # the Searchable{enumeration}Name trait. This trait contains the search method
         # that returns a new Select task for the table or view.
         tables.write(f"pub trait Search{enumeration} {{\n")
-        tables.write(f"    /// Search the table or view by the query.\n")
-        tables.write(f"    ///\n")
-        tables.write(f"    /// # Arguments\n")
-        tables.write(f"    /// * `query` - The query to search.\n")
+        tables.write("    /// Search the table or view by the query.\n")
+        tables.write("    ///\n")
+        tables.write("    /// # Arguments\n")
+        tables.write("    /// * `query` - The query to search.\n")
         tables.write(
-            f"    /// * `number_of_results` - The number of results to return.\n"
+            "    /// * `number_of_results` - The number of results to return.\n"
         )
         tables.write(
-            f"    fn search(query: String, number_of_results: usize) -> Select;\n"
+            "    fn search(query: String, number_of_results: usize) -> Select;\n"
         )
-        tables.write(f"}}\n")
+        tables.write("}\n")
 
         # We implement the Search{enumeration} trait as a blanket implementation
         # for all structs that implement the Searchable{enumeration}Name trait.
@@ -1846,11 +1850,11 @@ def write_web_common_structs(
             f"impl<T> Search{enumeration} for T where T: Searcheable{enumeration}Name {{\n"
         )
         tables.write(
-            f"    fn search(query: String, number_of_results: usize) -> Select {{\n"
+            "    fn search(query: String, number_of_results: usize) -> Select {\n"
         )
-        tables.write(f"        Self::parent_enum().search(query, number_of_results)\n")
-        tables.write(f"    }}\n")
-        tables.write(f"}}\n")
+        tables.write("        Self::parent_enum().search(query, number_of_results)\n")
+        tables.write("    }\n")
+        tables.write("}\n")
 
     tables.close()
 
@@ -1870,7 +1874,7 @@ def get_view_names() -> List[str]:
     for directory in os.listdir("migrations"):
         if not os.path.isdir(f"migrations/{directory}"):
             continue
-        with open(f"migrations/{directory}/up.sql", "r") as file:
+        with open(f"migrations/{directory}/up.sql", "r", encoding="utf8") as file:
             content = file.read()
         for line in content.split("\n"):
             if "CREATE VIEW" in line:
@@ -1879,7 +1883,8 @@ def get_view_names() -> List[str]:
     return view_names
 
 
-def get_views(cursor):
+def get_views(cursor) -> List[str]:
+    """Return list with the view names"""
     cursor.execute(
         "SELECT table_name FROM information_schema.views WHERE table_schema = 'public';"
     )
@@ -1887,7 +1892,14 @@ def get_views(cursor):
     return views
 
 
-def get_view_columns(cursor, view_name):
+def get_view_columns(cursor, view_name: str):
+    """Returns the columns of a given view
+    
+    Parameters
+    ------------
+    view_name: str
+        The name of the view for which to retrieve the columns
+    """
     cursor.execute(
         f"SELECT column_name, data_type FROM information_schema.columns WHERE table_name = '{view_name}' AND table_schema = 'public';"
     )
@@ -1910,7 +1922,7 @@ def map_postgres_to_rust_type(pg_type):
     raise NotImplementedError(f'Postgres type "{pg_type}" is not supported.')
 
 
-def generate_diesel_schema(view_name, columns):
+def generate_diesel_schema(view_name: str, columns: List[str]):
     schema_code = "diesel::table! {\n"
     schema_code += f"    {view_name} (id) {{\n"
     for column in columns:
@@ -1939,7 +1951,7 @@ def generate_view_schema():
     views = get_views(cursor)
 
     # We open the file to write the schema
-    schema_file = open("src/views/schema.rs", "w")
+    schema_file = open("src/views/schema.rs", "w", encoding="utf8")
 
     # Generating Diesel schema for each view
     for view in views:
@@ -1963,7 +1975,7 @@ def check_schema_completion():
     of the view names are present in the schema file.
     """
     view_names = get_view_names()
-    with open("src/views/schema.rs", "r") as file:
+    with open("src/views/schema.rs", "r", encoding="utf8") as file:
         content = file.read()
     for view_name in view_names:
         if view_name not in content:
@@ -1999,7 +2011,7 @@ def generate_view_structs():
     }
     ```
     """
-    with open("src/views/schema.rs", "r") as file:
+    with open("src/views/schema.rs", "r", encoding="utf8") as file:
         schema = file.read()
 
     data_types = {
@@ -2032,7 +2044,7 @@ def generate_view_structs():
         "QueryableByName",
     ]
 
-    views = open("src/views/views.rs", "w")
+    views = open("src/views/views.rs", "w", encoding="utf8")
 
     for import_statement in imports:
         views.write(f"{import_statement}\n")
@@ -2130,7 +2142,7 @@ def generate_nested_structs(
     similarity_indices: PGIndices = find_pg_trgm_indices()
 
     # We open the file to write the nested structs
-    tables = open(path, "w")
+    tables = open(path, "w", encoding="utf8")
 
     # Preliminarly, we write a docstring at the very head
     # of this submodule to explain what it does and warn the
@@ -2291,18 +2303,18 @@ def generate_nested_structs(
 
         tables.write(
             f"impl Nested{struct_name} {{\n"
-            f"    /// Get the nested struct from the provided primary key.\n"
-            f"    ///\n"
-            f"    /// # Arguments\n"
-            f"    /// * `id` - The primary key of the row.\n"
-            f"    /// * `connection` - The database connection.\n"
-            f"    pub fn get(\n"
+            "    /// Get the nested struct from the provided primary key.\n"
+            "    ///\n"
+            "    /// # Arguments\n"
+            "    /// * `id` - The primary key of the row.\n"
+            "    /// * `connection` - The database connection.\n"
+            "    pub fn get(\n"
             f"        id: {rust_primary_key_type},\n"
-            f"        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
-            f"    ) -> Result<Self, diesel::result::Error>\n"
-            f"    {{\n"
+            "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
+            "    ) -> Result<Self, diesel::result::Error>\n"
+            "    {\n"
             f"        let flat_struct = {struct_name}::get(id, connection)?;\n"
-            f"        Ok(Self {{\n"
+            "        Ok(Self {\n"
         )
         for attribute in new_struct_metadata.attributes:
             if attribute.optional:
@@ -2314,9 +2326,9 @@ def generate_nested_structs(
                     f"            {attribute.name}: {attribute.data_type}::get(flat_struct.{attribute.original_name}, connection)?,\n"
                 )
         tables.write(
-            f"        }})\n"
-            f"    }}\n"
-            f"}}\n"
+            "        })\n"
+            "    }\n"
+            "}\n"
         )
         
         # If there is an index on the table, we implement the search method that
@@ -2326,26 +2338,26 @@ def generate_nested_structs(
         if similarity_indices.has_table(table_name):
             tables.write(
                 f"impl Nested{struct_name} {{\n"
-                f"    /// Search the table by the query.\n"
-                f"    ///\n"
-                f"    /// # Arguments\n"
-                f"    /// * `query` - The string to search for.\n"
-                f"    /// * `limit` - The maximum number of results, by default `10`.\n"
-                f"    /// * `threshold` - The similarity threshold, by default `0.6`.\n"
-                f"    pub fn search(\n"
-                f"        query: &str,\n"
-                f"        limit: Option<i32>,\n"
-                f"        threshold: Option<f64>,\n"
-                f"        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
-                f"    ) -> Result<Vec<Self>, diesel::result::Error> {{\n"
+                "    /// Search the table by the query.\n"
+                "    ///\n"
+                "    /// # Arguments\n"
+                "    /// * `query` - The string to search for.\n"
+                "    /// * `limit` - The maximum number of results, by default `10`.\n"
+                "    /// * `threshold` - The similarity threshold, by default `0.6`.\n"
+                "    pub fn search(\n"
+                "        query: &str,\n"
+                "        limit: Option<i32>,\n"
+                "        threshold: Option<f64>,\n"
+                "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
+                "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
                 f"        let flat_structs = {struct_name}::search(query, limit, threshold, connection)?;\n"
-                f"        let mut nested_structs = Vec::new();\n"
-                f"        for flat_struct in flat_structs {{\n"
-                f"            nested_structs.push(Self::get(flat_struct.id, connection)?);\n"
-                f"        }}\n"
-                f"        Ok(nested_structs)\n"
-                f"    }}\n"
-                f"}}\n"
+                "        let mut nested_structs = Vec::new();\n"
+                "        for flat_struct in flat_structs {\n"
+                "            nested_structs.push(Self::get(flat_struct.id, connection)?);\n"
+                "        }\n"
+                "        Ok(nested_structs)\n"
+                "    }\n"
+                "}\n"
             )
         
         # We implement the bidirectional From methods for the nested struct
@@ -2354,7 +2366,7 @@ def generate_nested_structs(
         tables.write(
             f"impl From<web_common::database::nested_models::Nested{struct_name}> for Nested{struct_name} {{\n"
             f"    fn from(item: web_common::database::nested_models::Nested{struct_name}) -> Self {{\n"
-            f"        Self {{\n"
+            "        Self {\n"
         )
         for attribute in new_struct_metadata.attributes:
             if attribute.optional:
@@ -2366,15 +2378,15 @@ def generate_nested_structs(
                     f"            {attribute.name}: item.{attribute.name}.into(),\n"
                 )
         tables.write(
-            f"        }}\n"
-            f"    }}\n"
-            f"}}\n"
+            "        }\n"
+            "    }\n"
+            "}\n"
         )       
 
         tables.write(
             f"impl From<Nested{struct_name}> for web_common::database::nested_models::Nested{struct_name} {{\n"
             f"    fn from(item: Nested{struct_name}) -> Self {{\n"
-            f"        Self {{\n"
+            "        Self {\n"
         )
         for attribute in new_struct_metadata.attributes:
             if attribute.optional:
@@ -2386,9 +2398,9 @@ def generate_nested_structs(
                     f"            {attribute.name}: item.{attribute.name}.into(),\n"
                 )
         tables.write(
-            f"        }}\n"
-            f"    }}\n"
-            f"}}\n"
+            "        }\n"
+            "    }\n"
+            "}\n"
         )
 
         new_struct_metadatas.append(new_struct_metadata)
@@ -2404,7 +2416,7 @@ def write_web_common_nested_structs(
     """Writes the nested structs to the web_common crate."""
 
     # We open the file to write the nested structs
-    tables = open(f"../web_common/src/database/{path}", "w")
+    tables = open(f"../web_common/src/database/{path}", "w", encoding="utf8")
 
     # Preliminarly, we write a docstring at the very head
     # of this submodule to explain what it does and warn the
@@ -2430,21 +2442,12 @@ def write_web_common_nested_structs(
         tables.write(f"{import_statement}\n")
 
     for struct_metadata in nested_structs:
-        struct_name = struct_metadata.struct_name
-        table_name = struct_metadata.table_name
-        attributes = struct_metadata.attributes
-
         tables.write(
-            f"#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]\n"
+            "#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]\n"
         )
-        tables.write(f"pub struct {struct_name} {{\n")
-        for attribute in attributes:
-            attribute_type = attribute.data_type
-            optional = attribute.optional
-
-            if optional:
-                attribute_type = f"Option<{attribute_type}>"
-            tables.write(f"    pub {attribute.name}: {attribute_type},\n")
+        tables.write(f"pub struct {struct_metadata.name} {{\n")
+        for attribute in struct_metadata.attributes:
+            tables.write(f"    pub {attribute.name}: {attribute.format_attribute_type()},\n")
         tables.write("}\n\n")
 
     tables.close()
@@ -2466,7 +2469,7 @@ def main():
         raise Exception("The diesel_ext command failed.")
 
     # Read the generated file
-    with open("src/models.rs", "r") as file:
+    with open("src/models.rs", "r", encoding="utf8") as file:
         content = file.read()
 
     # Imports to always add to the file
@@ -2571,7 +2574,7 @@ def main():
     content = new_content
 
     # Write the file back
-    with open("src/models.rs", "w") as file:
+    with open("src/models.rs", "w", encoding="utf8") as file:
         file.write(content)
 
 
@@ -2608,7 +2611,7 @@ if __name__ == "__main__":
                 if not twin_found:
                     raise Exception(
                         f"Directory {directory} does not contain either a `down.sql` or an `up.sql` file "
-                        f"and there is no twin directory with a different code."
+                        "and there is no twin directory with a different code."
                     )
 
     densify_directory_counter()
