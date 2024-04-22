@@ -1,7 +1,7 @@
 -- Your SQL goes here
 CREATE TABLE IF NOT EXISTS taxa (
     -- The unique identifier for the taxon
-    id SERIAL PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
     -- The scientific name of the taxon
     name TEXT NOT NULL,
     -- The NCBI Taxon ID is a unique identifier for a taxon in the NCBI Taxonomy database

@@ -54,7 +54,7 @@ pub struct NestedItemCategoryUnit {
 pub struct NestedItemContinuousQuantity {
     pub inner: ItemContinuousQuantity,
     pub item: NestedItem,
-    pub unit: Unit,
+    pub unit: ContinuousUnit,
     pub sensor: Option<NestedItem>,
     pub measured_by: Option<User>,
 }
