@@ -79,7 +79,7 @@ impl ContainerHorizontalRule {
     pub fn get(
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         container_horizontal_rules::dsl::container_horizontal_rules
             .filter(container_horizontal_rules::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -148,7 +148,7 @@ impl ContainerVerticalRule {
     pub fn get(
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         container_vertical_rules::dsl::container_vertical_rules
             .filter(container_vertical_rules::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -187,7 +187,7 @@ impl ContinuousUnit {
     pub fn get(
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         continuous_units::dsl::continuous_units
             .filter(continuous_units::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -226,7 +226,7 @@ impl DiscreteUnit {
     pub fn get(
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         discrete_units::dsl::discrete_units
             .filter(discrete_units::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -271,7 +271,7 @@ impl DocumentFormat {
     pub fn get(
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         document_formats::dsl::document_formats
             .filter(document_formats::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -322,7 +322,7 @@ impl Document {
     pub fn get(
         id: uuid::Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         documents::dsl::documents
             .filter(documents::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -370,7 +370,7 @@ impl ItemCategory {
     pub fn get(
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         item_categories::dsl::item_categories
             .filter(item_categories::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -418,7 +418,7 @@ impl ItemCategoryRelationship {
     pub fn get(
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         item_category_relationships::dsl::item_category_relationships
             .filter(item_category_relationships::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -463,7 +463,7 @@ impl ItemCategoryUnit {
     pub fn get(
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         item_category_units::dsl::item_category_units
             .filter(item_category_units::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -520,7 +520,7 @@ impl ItemContinuousQuantity {
     pub fn get(
         id: uuid::Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         item_continuous_quantities::dsl::item_continuous_quantities
             .filter(item_continuous_quantities::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -574,7 +574,7 @@ impl ItemDiscreteQuantity {
     pub fn get(
         id: uuid::Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         item_discrete_quantities::dsl::item_discrete_quantities
             .filter(item_discrete_quantities::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -625,7 +625,7 @@ impl ItemLocation {
     pub fn get(
         id: uuid::Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         item_locations::dsl::item_locations
             .filter(item_locations::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -670,7 +670,7 @@ impl ItemUnit {
     pub fn get(
         id: uuid::Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         item_units::dsl::item_units
             .filter(item_units::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -712,7 +712,7 @@ impl Item {
     pub fn get(
         id: uuid::Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         items::dsl::items
             .filter(items::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -784,7 +784,7 @@ impl Location {
     pub fn get(
         id: uuid::Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         locations::dsl::locations
             .filter(locations::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -841,7 +841,7 @@ impl LoginProvider {
     pub fn get(
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         login_providers::dsl::login_providers
             .filter(login_providers::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -892,7 +892,7 @@ impl ManufacturedItemCategory {
     pub fn get(
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         manufactured_item_categories::dsl::manufactured_item_categories
             .filter(manufactured_item_categories::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -943,7 +943,7 @@ impl Notification {
     pub fn get(
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         notifications::dsl::notifications
             .filter(notifications::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -988,7 +988,7 @@ impl Organization {
     pub fn get(
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         organizations::dsl::organizations
             .filter(organizations::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -1027,7 +1027,7 @@ impl PrimaryUserEmail {
     pub fn get(
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         primary_user_emails::dsl::primary_user_emails
             .filter(primary_user_emails::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -1081,7 +1081,7 @@ impl ProcedureContinuousRequirement {
     pub fn get(
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         procedure_continuous_requirements::dsl::procedure_continuous_requirements
             .filter(procedure_continuous_requirements::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -1135,7 +1135,7 @@ impl ProcedureDiscreteRequirement {
     pub fn get(
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         procedure_discrete_requirements::dsl::procedure_discrete_requirements
             .filter(procedure_discrete_requirements::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -1183,7 +1183,7 @@ impl Procedure {
     pub fn get(
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         procedures::dsl::procedures
             .filter(procedures::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -1237,7 +1237,7 @@ impl ProjectRequirement {
     pub fn get(
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         project_requirements::dsl::project_requirements
             .filter(project_requirements::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -1288,7 +1288,7 @@ impl ProjectState {
     pub fn get(
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         project_states::dsl::project_states
             .filter(project_states::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -1387,7 +1387,7 @@ impl Project {
     pub fn get(
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         projects::dsl::projects
             .filter(projects::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -1456,7 +1456,7 @@ impl Role {
     pub fn get(
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         roles::dsl::roles
             .filter(roles::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -1504,7 +1504,7 @@ impl SampleTaxa {
     pub fn get(
         id: uuid::Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         sample_taxa::dsl::sample_taxa
             .filter(sample_taxa::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -1552,7 +1552,7 @@ impl SampledIndividualTaxa {
     pub fn get(
         id: uuid::Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         sampled_individual_taxa::dsl::sampled_individual_taxa
             .filter(sampled_individual_taxa::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -1591,7 +1591,7 @@ impl SampledIndividual {
     pub fn get(
         id: uuid::Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -1636,7 +1636,7 @@ impl Sample {
     pub fn get(
         id: uuid::Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         samples::dsl::samples
             .filter(samples::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -1678,7 +1678,7 @@ impl Spectra {
     pub fn get(
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         spectra::dsl::spectra
             .filter(spectra::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -1723,7 +1723,7 @@ impl SpectraCollection {
     pub fn get(
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         spectra_collection::dsl::spectra_collection
             .filter(spectra_collection::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -1768,7 +1768,7 @@ impl Taxa {
     pub fn get(
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         taxa::dsl::taxa
             .filter(taxa::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -1837,7 +1837,7 @@ impl Team {
     pub fn get(
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         teams::dsl::teams
             .filter(teams::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -1885,7 +1885,7 @@ impl Unit {
     pub fn get(
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         units::dsl::units
             .filter(units::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -1933,7 +1933,7 @@ impl UserEmail {
     pub fn get(
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         user_emails::dsl::user_emails
             .filter(user_emails::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -1987,7 +1987,7 @@ impl User {
     pub fn get(
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {{
         users::dsl::users
             .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -2025,322 +2025,322 @@ impl User {
 
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq)]
 pub enum TableRow {
-    ContainerHorizontalRule(ContainerHorizontalRule),
-    ContainerVerticalRule(ContainerVerticalRule),
-    ContinuousUnit(ContinuousUnit),
-    DiscreteUnit(DiscreteUnit),
-    DocumentFormat(DocumentFormat),
-    Document(Document),
-    ItemCategory(ItemCategory),
-    ItemCategoryRelationship(ItemCategoryRelationship),
-    ItemCategoryUnit(ItemCategoryUnit),
-    ItemContinuousQuantity(ItemContinuousQuantity),
-    ItemDiscreteQuantity(ItemDiscreteQuantity),
-    ItemLocation(ItemLocation),
-    ItemUnit(ItemUnit),
-    Item(Item),
-    Location(Location),
-    LoginProvider(LoginProvider),
-    ManufacturedItemCategory(ManufacturedItemCategory),
-    Notification(Notification),
-    Organization(Organization),
-    PrimaryUserEmail(PrimaryUserEmail),
-    ProcedureContinuousRequirement(ProcedureContinuousRequirement),
-    ProcedureDiscreteRequirement(ProcedureDiscreteRequirement),
-    Procedure(Procedure),
-    ProjectRequirement(ProjectRequirement),
-    ProjectState(ProjectState),
-    Project(Project),
-    Role(Role),
-    SampleTaxa(SampleTaxa),
-    SampledIndividualTaxa(SampledIndividualTaxa),
-    SampledIndividual(SampledIndividual),
-    Sample(Sample),
-    Spectra(Spectra),
-    SpectraCollection(SpectraCollection),
-    Taxa(Taxa),
-    Team(Team),
-    Unit(Unit),
-    UserEmail(UserEmail),
-    User(User),
+    None(None),
+    None(None),
+    None(None),
+    None(None),
+    None(None),
+    None(None),
+    None(None),
+    None(None),
+    None(None),
+    None(None),
+    None(None),
+    None(None),
+    None(None),
+    None(None),
+    None(None),
+    None(None),
+    None(None),
+    None(None),
+    None(None),
+    None(None),
+    None(None),
+    None(None),
+    None(None),
+    None(None),
+    None(None),
+    None(None),
+    None(None),
+    None(None),
+    None(None),
+    None(None),
+    None(None),
+    None(None),
+    None(None),
+    None(None),
+    None(None),
+    None(None),
+    None(None),
+    None(None),
 }
 
 impl From<web_common::database::tables::TableRow> for TableRow {
     fn from(item: web_common::database::tables::TableRow) -> Self {
         match item {
-            web_common::database::tables::TableRow::ContainerHorizontalRule(item) => TableRow::ContainerHorizontalRule(item.into()),
-            web_common::database::tables::TableRow::ContainerVerticalRule(item) => TableRow::ContainerVerticalRule(item.into()),
-            web_common::database::tables::TableRow::ContinuousUnit(item) => TableRow::ContinuousUnit(item.into()),
-            web_common::database::tables::TableRow::DiscreteUnit(item) => TableRow::DiscreteUnit(item.into()),
-            web_common::database::tables::TableRow::DocumentFormat(item) => TableRow::DocumentFormat(item.into()),
-            web_common::database::tables::TableRow::Document(item) => TableRow::Document(item.into()),
-            web_common::database::tables::TableRow::ItemCategory(item) => TableRow::ItemCategory(item.into()),
-            web_common::database::tables::TableRow::ItemCategoryRelationship(item) => TableRow::ItemCategoryRelationship(item.into()),
-            web_common::database::tables::TableRow::ItemCategoryUnit(item) => TableRow::ItemCategoryUnit(item.into()),
-            web_common::database::tables::TableRow::ItemContinuousQuantity(item) => TableRow::ItemContinuousQuantity(item.into()),
-            web_common::database::tables::TableRow::ItemDiscreteQuantity(item) => TableRow::ItemDiscreteQuantity(item.into()),
-            web_common::database::tables::TableRow::ItemLocation(item) => TableRow::ItemLocation(item.into()),
-            web_common::database::tables::TableRow::ItemUnit(item) => TableRow::ItemUnit(item.into()),
-            web_common::database::tables::TableRow::Item(item) => TableRow::Item(item.into()),
-            web_common::database::tables::TableRow::Location(item) => TableRow::Location(item.into()),
-            web_common::database::tables::TableRow::LoginProvider(item) => TableRow::LoginProvider(item.into()),
-            web_common::database::tables::TableRow::ManufacturedItemCategory(item) => TableRow::ManufacturedItemCategory(item.into()),
-            web_common::database::tables::TableRow::Notification(item) => TableRow::Notification(item.into()),
-            web_common::database::tables::TableRow::Organization(item) => TableRow::Organization(item.into()),
-            web_common::database::tables::TableRow::PrimaryUserEmail(item) => TableRow::PrimaryUserEmail(item.into()),
-            web_common::database::tables::TableRow::ProcedureContinuousRequirement(item) => TableRow::ProcedureContinuousRequirement(item.into()),
-            web_common::database::tables::TableRow::ProcedureDiscreteRequirement(item) => TableRow::ProcedureDiscreteRequirement(item.into()),
-            web_common::database::tables::TableRow::Procedure(item) => TableRow::Procedure(item.into()),
-            web_common::database::tables::TableRow::ProjectRequirement(item) => TableRow::ProjectRequirement(item.into()),
-            web_common::database::tables::TableRow::ProjectState(item) => TableRow::ProjectState(item.into()),
-            web_common::database::tables::TableRow::Project(item) => TableRow::Project(item.into()),
-            web_common::database::tables::TableRow::Role(item) => TableRow::Role(item.into()),
-            web_common::database::tables::TableRow::SampleTaxa(item) => TableRow::SampleTaxa(item.into()),
-            web_common::database::tables::TableRow::SampledIndividualTaxa(item) => TableRow::SampledIndividualTaxa(item.into()),
-            web_common::database::tables::TableRow::SampledIndividual(item) => TableRow::SampledIndividual(item.into()),
-            web_common::database::tables::TableRow::Sample(item) => TableRow::Sample(item.into()),
-            web_common::database::tables::TableRow::Spectra(item) => TableRow::Spectra(item.into()),
-            web_common::database::tables::TableRow::SpectraCollection(item) => TableRow::SpectraCollection(item.into()),
-            web_common::database::tables::TableRow::Taxa(item) => TableRow::Taxa(item.into()),
-            web_common::database::tables::TableRow::Team(item) => TableRow::Team(item.into()),
-            web_common::database::tables::TableRow::Unit(item) => TableRow::Unit(item.into()),
-            web_common::database::tables::TableRow::UserEmail(item) => TableRow::UserEmail(item.into()),
-            web_common::database::tables::TableRow::User(item) => TableRow::User(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
+            web_common::database::tables::TableRow::None(item) => TableRow::None(item.into()),
         }
     }
 }
 impl From<TableRow> for web_common::database::tables::TableRow {
     fn from(item: TableRow) -> Self {
         match item {
-            TableRow::ContainerHorizontalRule(item) => web_common::database::tables::TableRow::ContainerHorizontalRule(item.into()),
-            TableRow::ContainerVerticalRule(item) => web_common::database::tables::TableRow::ContainerVerticalRule(item.into()),
-            TableRow::ContinuousUnit(item) => web_common::database::tables::TableRow::ContinuousUnit(item.into()),
-            TableRow::DiscreteUnit(item) => web_common::database::tables::TableRow::DiscreteUnit(item.into()),
-            TableRow::DocumentFormat(item) => web_common::database::tables::TableRow::DocumentFormat(item.into()),
-            TableRow::Document(item) => web_common::database::tables::TableRow::Document(item.into()),
-            TableRow::ItemCategory(item) => web_common::database::tables::TableRow::ItemCategory(item.into()),
-            TableRow::ItemCategoryRelationship(item) => web_common::database::tables::TableRow::ItemCategoryRelationship(item.into()),
-            TableRow::ItemCategoryUnit(item) => web_common::database::tables::TableRow::ItemCategoryUnit(item.into()),
-            TableRow::ItemContinuousQuantity(item) => web_common::database::tables::TableRow::ItemContinuousQuantity(item.into()),
-            TableRow::ItemDiscreteQuantity(item) => web_common::database::tables::TableRow::ItemDiscreteQuantity(item.into()),
-            TableRow::ItemLocation(item) => web_common::database::tables::TableRow::ItemLocation(item.into()),
-            TableRow::ItemUnit(item) => web_common::database::tables::TableRow::ItemUnit(item.into()),
-            TableRow::Item(item) => web_common::database::tables::TableRow::Item(item.into()),
-            TableRow::Location(item) => web_common::database::tables::TableRow::Location(item.into()),
-            TableRow::LoginProvider(item) => web_common::database::tables::TableRow::LoginProvider(item.into()),
-            TableRow::ManufacturedItemCategory(item) => web_common::database::tables::TableRow::ManufacturedItemCategory(item.into()),
-            TableRow::Notification(item) => web_common::database::tables::TableRow::Notification(item.into()),
-            TableRow::Organization(item) => web_common::database::tables::TableRow::Organization(item.into()),
-            TableRow::PrimaryUserEmail(item) => web_common::database::tables::TableRow::PrimaryUserEmail(item.into()),
-            TableRow::ProcedureContinuousRequirement(item) => web_common::database::tables::TableRow::ProcedureContinuousRequirement(item.into()),
-            TableRow::ProcedureDiscreteRequirement(item) => web_common::database::tables::TableRow::ProcedureDiscreteRequirement(item.into()),
-            TableRow::Procedure(item) => web_common::database::tables::TableRow::Procedure(item.into()),
-            TableRow::ProjectRequirement(item) => web_common::database::tables::TableRow::ProjectRequirement(item.into()),
-            TableRow::ProjectState(item) => web_common::database::tables::TableRow::ProjectState(item.into()),
-            TableRow::Project(item) => web_common::database::tables::TableRow::Project(item.into()),
-            TableRow::Role(item) => web_common::database::tables::TableRow::Role(item.into()),
-            TableRow::SampleTaxa(item) => web_common::database::tables::TableRow::SampleTaxa(item.into()),
-            TableRow::SampledIndividualTaxa(item) => web_common::database::tables::TableRow::SampledIndividualTaxa(item.into()),
-            TableRow::SampledIndividual(item) => web_common::database::tables::TableRow::SampledIndividual(item.into()),
-            TableRow::Sample(item) => web_common::database::tables::TableRow::Sample(item.into()),
-            TableRow::Spectra(item) => web_common::database::tables::TableRow::Spectra(item.into()),
-            TableRow::SpectraCollection(item) => web_common::database::tables::TableRow::SpectraCollection(item.into()),
-            TableRow::Taxa(item) => web_common::database::tables::TableRow::Taxa(item.into()),
-            TableRow::Team(item) => web_common::database::tables::TableRow::Team(item.into()),
-            TableRow::Unit(item) => web_common::database::tables::TableRow::Unit(item.into()),
-            TableRow::UserEmail(item) => web_common::database::tables::TableRow::UserEmail(item.into()),
-            TableRow::User(item) => web_common::database::tables::TableRow::User(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
+            TableRow::None(item) => web_common::database::tables::TableRow::None(item.into()),
         }
     }
 }
-impl From<ContainerHorizontalRule> for TableRow {
-    fn from(item: ContainerHorizontalRule) -> Self {
-        TableRow::ContainerHorizontalRule(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
-impl From<ContainerVerticalRule> for TableRow {
-    fn from(item: ContainerVerticalRule) -> Self {
-        TableRow::ContainerVerticalRule(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
-impl From<ContinuousUnit> for TableRow {
-    fn from(item: ContinuousUnit) -> Self {
-        TableRow::ContinuousUnit(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
-impl From<DiscreteUnit> for TableRow {
-    fn from(item: DiscreteUnit) -> Self {
-        TableRow::DiscreteUnit(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
-impl From<DocumentFormat> for TableRow {
-    fn from(item: DocumentFormat) -> Self {
-        TableRow::DocumentFormat(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
-impl From<Document> for TableRow {
-    fn from(item: Document) -> Self {
-        TableRow::Document(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
-impl From<ItemCategory> for TableRow {
-    fn from(item: ItemCategory) -> Self {
-        TableRow::ItemCategory(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
-impl From<ItemCategoryRelationship> for TableRow {
-    fn from(item: ItemCategoryRelationship) -> Self {
-        TableRow::ItemCategoryRelationship(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
-impl From<ItemCategoryUnit> for TableRow {
-    fn from(item: ItemCategoryUnit) -> Self {
-        TableRow::ItemCategoryUnit(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
-impl From<ItemContinuousQuantity> for TableRow {
-    fn from(item: ItemContinuousQuantity) -> Self {
-        TableRow::ItemContinuousQuantity(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
-impl From<ItemDiscreteQuantity> for TableRow {
-    fn from(item: ItemDiscreteQuantity) -> Self {
-        TableRow::ItemDiscreteQuantity(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
-impl From<ItemLocation> for TableRow {
-    fn from(item: ItemLocation) -> Self {
-        TableRow::ItemLocation(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
-impl From<ItemUnit> for TableRow {
-    fn from(item: ItemUnit) -> Self {
-        TableRow::ItemUnit(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
-impl From<Item> for TableRow {
-    fn from(item: Item) -> Self {
-        TableRow::Item(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
-impl From<Location> for TableRow {
-    fn from(item: Location) -> Self {
-        TableRow::Location(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
-impl From<LoginProvider> for TableRow {
-    fn from(item: LoginProvider) -> Self {
-        TableRow::LoginProvider(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
-impl From<ManufacturedItemCategory> for TableRow {
-    fn from(item: ManufacturedItemCategory) -> Self {
-        TableRow::ManufacturedItemCategory(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
-impl From<Notification> for TableRow {
-    fn from(item: Notification) -> Self {
-        TableRow::Notification(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
-impl From<Organization> for TableRow {
-    fn from(item: Organization) -> Self {
-        TableRow::Organization(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
-impl From<PrimaryUserEmail> for TableRow {
-    fn from(item: PrimaryUserEmail) -> Self {
-        TableRow::PrimaryUserEmail(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
-impl From<ProcedureContinuousRequirement> for TableRow {
-    fn from(item: ProcedureContinuousRequirement) -> Self {
-        TableRow::ProcedureContinuousRequirement(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
-impl From<ProcedureDiscreteRequirement> for TableRow {
-    fn from(item: ProcedureDiscreteRequirement) -> Self {
-        TableRow::ProcedureDiscreteRequirement(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
-impl From<Procedure> for TableRow {
-    fn from(item: Procedure) -> Self {
-        TableRow::Procedure(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
-impl From<ProjectRequirement> for TableRow {
-    fn from(item: ProjectRequirement) -> Self {
-        TableRow::ProjectRequirement(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
-impl From<ProjectState> for TableRow {
-    fn from(item: ProjectState) -> Self {
-        TableRow::ProjectState(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
-impl From<Project> for TableRow {
-    fn from(item: Project) -> Self {
-        TableRow::Project(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
-impl From<Role> for TableRow {
-    fn from(item: Role) -> Self {
-        TableRow::Role(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
-impl From<SampleTaxa> for TableRow {
-    fn from(item: SampleTaxa) -> Self {
-        TableRow::SampleTaxa(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
-impl From<SampledIndividualTaxa> for TableRow {
-    fn from(item: SampledIndividualTaxa) -> Self {
-        TableRow::SampledIndividualTaxa(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
-impl From<SampledIndividual> for TableRow {
-    fn from(item: SampledIndividual) -> Self {
-        TableRow::SampledIndividual(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
-impl From<Sample> for TableRow {
-    fn from(item: Sample) -> Self {
-        TableRow::Sample(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
-impl From<Spectra> for TableRow {
-    fn from(item: Spectra) -> Self {
-        TableRow::Spectra(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
-impl From<SpectraCollection> for TableRow {
-    fn from(item: SpectraCollection) -> Self {
-        TableRow::SpectraCollection(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
-impl From<Taxa> for TableRow {
-    fn from(item: Taxa) -> Self {
-        TableRow::Taxa(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
-impl From<Team> for TableRow {
-    fn from(item: Team) -> Self {
-        TableRow::Team(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
-impl From<Unit> for TableRow {
-    fn from(item: Unit) -> Self {
-        TableRow::Unit(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
-impl From<UserEmail> for TableRow {
-    fn from(item: UserEmail) -> Self {
-        TableRow::UserEmail(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
-impl From<User> for TableRow {
-    fn from(item: User) -> Self {
-        TableRow::User(item)
+impl From<None> for TableRow {
+    fn from(item: None) -> Self {
+        TableRow::None(item)
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq)]
@@ -2478,7 +2478,7 @@ impl Table {
     }
 }
 impl std::fmt::Display for Table {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {{
         write!(f, "{}", self.name())
     }
 }
@@ -2617,10 +2617,10 @@ impl From<Table> for web_common::database::tables::Table {
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Copy, Eq, )]
 pub enum SearcheableTable {
-    ProjectState,
-    Project,
-    Taxa,
-    User,
+    None,
+    None,
+    None,
+    None,
 }
 
 impl SearcheableTable {
@@ -2638,8 +2638,8 @@ impl SearcheableTable {
         limit: Option<i32>,
         threshold: Option<f64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<SearcheableTableRow>, diesel::result::Error> {
-        Ok(match self {
+    ) -> Result<Vec<Searcheable{capitalized_table_type}Row>, diesel::result::Error> {{
+        Ok(match self {{
             SearcheableTable::ProjectState => ProjectState::search(query, limit, threshold, connection)?.into_iter().map(SearcheableTableRow::from).collect::<Vec<SearcheableTableRow>>(),
             SearcheableTable::Project => Project::search(query, limit, threshold, connection)?.into_iter().map(SearcheableTableRow::from).collect::<Vec<SearcheableTableRow>>(),
             SearcheableTable::Taxa => Taxa::search(query, limit, threshold, connection)?.into_iter().map(SearcheableTableRow::from).collect::<Vec<SearcheableTableRow>>(),

@@ -2,8 +2,8 @@ use serde::Deserialize;
 use serde::Serialize;
 use uuid::Uuid;
 use chrono::NaiveDateTime;
-use super::selects::Select;
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
+use chrono::Utc;
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ContainerHorizontalRule {
     pub id: i32,
@@ -11,12 +11,12 @@ pub struct ContainerHorizontalRule {
     pub name: String,
     pub item_type_id: i32,
     pub other_item_type_id: i32,
-    pub minimum_temperature: Option<i32>,
-    pub maximum_temperature: Option<i32>,
-    pub minimum_humidity: Option<i32>,
-    pub maximum_humidity: Option<i32>,
-    pub minimum_pressure: Option<i32>,
-    pub maximum_pressure: Option<i32>,
+    pub minimum_temperature: i32,
+    pub maximum_temperature: i32,
+    pub minimum_humidity: i32,
+    pub maximum_humidity: i32,
+    pub minimum_pressure: i32,
+    pub maximum_pressure: i32,
 }
 #[cfg(feature = "frontend")]
 impl ContainerHorizontalRule {
@@ -60,7 +60,7 @@ impl ContainerHorizontalRule {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table container_horizontal_rules
+    /// The number of rows inserted in table ContainerHorizontalRule
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -116,7 +116,7 @@ impl ContainerHorizontalRule {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: i32,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -291,7 +291,7 @@ impl ContainerHorizontalRule {
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ContainerVerticalRule {
     pub id: i32,
@@ -299,12 +299,12 @@ pub struct ContainerVerticalRule {
     pub name: String,
     pub container_item_type_id: i32,
     pub contained_item_type_id: i32,
-    pub minimum_temperature: Option<i32>,
-    pub maximum_temperature: Option<i32>,
-    pub minimum_humidity: Option<i32>,
-    pub maximum_humidity: Option<i32>,
-    pub minimum_pressure: Option<i32>,
-    pub maximum_pressure: Option<i32>,
+    pub minimum_temperature: i32,
+    pub maximum_temperature: i32,
+    pub minimum_humidity: i32,
+    pub maximum_humidity: i32,
+    pub minimum_pressure: i32,
+    pub maximum_pressure: i32,
 }
 #[cfg(feature = "frontend")]
 impl ContainerVerticalRule {
@@ -348,7 +348,7 @@ impl ContainerVerticalRule {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table container_vertical_rules
+    /// The number of rows inserted in table ContainerVerticalRule
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -404,7 +404,7 @@ impl ContainerVerticalRule {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: i32,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -579,7 +579,7 @@ impl ContainerVerticalRule {
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ContinuousUnit {
     pub id: i32,
@@ -598,7 +598,7 @@ impl ContinuousUnit {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table continuous_units
+    /// The number of rows inserted in table ContinuousUnit
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -654,7 +654,7 @@ impl ContinuousUnit {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: i32,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -760,7 +760,7 @@ impl ContinuousUnit {
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct DiscreteUnit {
     pub id: i32,
@@ -779,7 +779,7 @@ impl DiscreteUnit {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table discrete_units
+    /// The number of rows inserted in table DiscreteUnit
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -835,7 +835,7 @@ impl DiscreteUnit {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: i32,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -941,7 +941,7 @@ impl DiscreteUnit {
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct DocumentFormat {
     pub id: i32,
@@ -964,7 +964,7 @@ impl DocumentFormat {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table document_formats
+    /// The number of rows inserted in table DocumentFormat
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -1020,7 +1020,7 @@ impl DocumentFormat {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: i32,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -1136,7 +1136,7 @@ impl DocumentFormat {
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Document {
     pub id: Uuid,
@@ -1163,7 +1163,7 @@ impl Document {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table documents
+    /// The number of rows inserted in table Document
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -1219,7 +1219,7 @@ impl Document {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: uuid::Uuid,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -1345,7 +1345,7 @@ impl Document {
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ItemCategory {
     pub id: i32,
@@ -1370,7 +1370,7 @@ impl ItemCategory {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table item_categories
+    /// The number of rows inserted in table ItemCategory
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -1426,7 +1426,7 @@ impl ItemCategory {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: i32,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -1547,7 +1547,7 @@ impl ItemCategory {
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ItemCategoryRelationship {
     pub id: i32,
@@ -1572,7 +1572,7 @@ impl ItemCategoryRelationship {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table item_category_relationships
+    /// The number of rows inserted in table ItemCategoryRelationship
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -1628,7 +1628,7 @@ impl ItemCategoryRelationship {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: i32,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -1749,7 +1749,7 @@ impl ItemCategoryRelationship {
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ItemCategoryUnit {
     pub id: i32,
@@ -1772,7 +1772,7 @@ impl ItemCategoryUnit {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table item_category_units
+    /// The number of rows inserted in table ItemCategoryUnit
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -1828,7 +1828,7 @@ impl ItemCategoryUnit {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: i32,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -1944,16 +1944,16 @@ impl ItemCategoryUnit {
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ItemContinuousQuantity {
     pub id: Uuid,
     pub item_id: Uuid,
     pub amount: i32,
     pub unit_id: i32,
-    pub sensor_id: Option<Uuid>,
+    pub sensor_id: Uuid,
     pub measured_at: NaiveDateTime,
-    pub measured_by: Option<i32>,
+    pub measured_by: i32,
 }
 #[cfg(feature = "frontend")]
 impl ItemContinuousQuantity {
@@ -1981,7 +1981,7 @@ impl ItemContinuousQuantity {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table item_continuous_quantities
+    /// The number of rows inserted in table ItemContinuousQuantity
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -2037,7 +2037,7 @@ impl ItemContinuousQuantity {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: uuid::Uuid,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -2164,8 +2164,7 @@ impl ItemContinuousQuantity {
                 _ => unreachable!("Expected I32")
             },
             sensor_id: match row.get("sensor_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(sensor_id) => Some(Uuid::from_u128(*sensor_id)),
+                gluesql::prelude::Value::Uuid(sensor_id) => Uuid::from_u128(*sensor_id),
                 _ => unreachable!("Expected Uuid"),
             },
             measured_at: match row.get("measured_at").unwrap() {
@@ -2180,7 +2179,7 @@ impl ItemContinuousQuantity {
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ItemDiscreteQuantity {
     pub id: Uuid,
@@ -2188,7 +2187,7 @@ pub struct ItemDiscreteQuantity {
     pub quantity: i32,
     pub unit_id: i32,
     pub measured_at: NaiveDateTime,
-    pub measured_by: Option<i32>,
+    pub measured_by: i32,
 }
 #[cfg(feature = "frontend")]
 impl ItemDiscreteQuantity {
@@ -2212,7 +2211,7 @@ impl ItemDiscreteQuantity {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table item_discrete_quantities
+    /// The number of rows inserted in table ItemDiscreteQuantity
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -2268,7 +2267,7 @@ impl ItemDiscreteQuantity {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: uuid::Uuid,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -2403,14 +2402,14 @@ impl ItemDiscreteQuantity {
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ItemLocation {
     pub id: Uuid,
-    pub item_id: Option<Uuid>,
-    pub located_by: Option<i32>,
+    pub item_id: Uuid,
+    pub located_by: i32,
     pub located_at: NaiveDateTime,
-    pub location_id: Option<Uuid>,
+    pub location_id: Uuid,
 }
 #[cfg(feature = "frontend")]
 impl ItemLocation {
@@ -2439,7 +2438,7 @@ impl ItemLocation {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table item_locations
+    /// The number of rows inserted in table ItemLocation
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -2495,7 +2494,7 @@ impl ItemLocation {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: uuid::Uuid,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -2610,8 +2609,7 @@ impl ItemLocation {
                 _ => unreachable!("Expected Uuid"),
             },
             item_id: match row.get("item_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(item_id) => Some(Uuid::from_u128(*item_id)),
+                gluesql::prelude::Value::Uuid(item_id) => Uuid::from_u128(*item_id),
                 _ => unreachable!("Expected Uuid"),
             },
             located_by: match row.get("located_by").unwrap() {
@@ -2624,14 +2622,13 @@ impl ItemLocation {
                 _ => unreachable!("Expected Timestamp")
             },
             location_id: match row.get("location_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(location_id) => Some(Uuid::from_u128(*location_id)),
+                gluesql::prelude::Value::Uuid(location_id) => Uuid::from_u128(*location_id),
                 _ => unreachable!("Expected Uuid"),
             },
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ItemUnit {
     pub id: Uuid,
@@ -2654,7 +2651,7 @@ impl ItemUnit {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table item_units
+    /// The number of rows inserted in table ItemUnit
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -2710,7 +2707,7 @@ impl ItemUnit {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: uuid::Uuid,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -2826,11 +2823,11 @@ impl ItemUnit {
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Item {
     pub id: Uuid,
-    pub parent_id: Option<Uuid>,
+    pub parent_id: Uuid,
 }
 #[cfg(feature = "frontend")]
 impl Item {
@@ -2850,7 +2847,7 @@ impl Item {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table items
+    /// The number of rows inserted in table Item
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -2906,7 +2903,7 @@ impl Item {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: uuid::Uuid,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -3014,28 +3011,27 @@ impl Item {
                 _ => unreachable!("Expected Uuid"),
             },
             parent_id: match row.get("parent_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(parent_id) => Some(Uuid::from_u128(*parent_id)),
+                gluesql::prelude::Value::Uuid(parent_id) => Uuid::from_u128(*parent_id),
                 _ => unreachable!("Expected Uuid"),
             },
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Location {
     pub id: Uuid,
-    pub latitude_degrees: Option<i32>,
-    pub latitude_minutes: Option<i32>,
-    pub latitude_seconds: Option<i32>,
-    pub longitude_degrees: Option<i32>,
-    pub longitude_minutes: Option<i32>,
-    pub longitude_seconds: Option<i32>,
-    pub altitude: Option<i32>,
-    pub address: Option<String>,
-    pub geolocalization_device_id: Option<Uuid>,
-    pub altitude_device_id: Option<Uuid>,
-    pub parent_location_id: Option<Uuid>,
+    pub latitude_degrees: i32,
+    pub latitude_minutes: i32,
+    pub latitude_seconds: i32,
+    pub longitude_degrees: i32,
+    pub longitude_minutes: i32,
+    pub longitude_seconds: i32,
+    pub altitude: i32,
+    pub address: String,
+    pub geolocalization_device_id: Uuid,
+    pub altitude_device_id: Uuid,
+    pub parent_location_id: Uuid,
 }
 #[cfg(feature = "frontend")]
 impl Location {
@@ -3095,7 +3091,7 @@ impl Location {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table locations
+    /// The number of rows inserted in table Location
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -3151,7 +3147,7 @@ impl Location {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: uuid::Uuid,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -3329,24 +3325,21 @@ impl Location {
                 _ => unreachable!("Expected Str")
             },
             geolocalization_device_id: match row.get("geolocalization_device_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(geolocalization_device_id) => Some(Uuid::from_u128(*geolocalization_device_id)),
+                gluesql::prelude::Value::Uuid(geolocalization_device_id) => Uuid::from_u128(*geolocalization_device_id),
                 _ => unreachable!("Expected Uuid"),
             },
             altitude_device_id: match row.get("altitude_device_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(altitude_device_id) => Some(Uuid::from_u128(*altitude_device_id)),
+                gluesql::prelude::Value::Uuid(altitude_device_id) => Uuid::from_u128(*altitude_device_id),
                 _ => unreachable!("Expected Uuid"),
             },
             parent_location_id: match row.get("parent_location_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(parent_location_id) => Some(Uuid::from_u128(*parent_location_id)),
+                gluesql::prelude::Value::Uuid(parent_location_id) => Uuid::from_u128(*parent_location_id),
                 _ => unreachable!("Expected Uuid"),
             },
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct LoginProvider {
     pub id: i32,
@@ -3377,7 +3370,7 @@ impl LoginProvider {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table login_providers
+    /// The number of rows inserted in table LoginProvider
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -3433,7 +3426,7 @@ impl LoginProvider {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: i32,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -3569,7 +3562,7 @@ impl LoginProvider {
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ManufacturedItemCategory {
     pub id: i32,
@@ -3596,7 +3589,7 @@ impl ManufacturedItemCategory {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table manufactured_item_categories
+    /// The number of rows inserted in table ManufacturedItemCategory
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -3652,7 +3645,7 @@ impl ManufacturedItemCategory {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: i32,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -3778,7 +3771,7 @@ impl ManufacturedItemCategory {
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Notification {
     pub id: i32,
@@ -3805,7 +3798,7 @@ impl Notification {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table notifications
+    /// The number of rows inserted in table Notification
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -3861,7 +3854,7 @@ impl Notification {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: i32,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -3987,11 +3980,11 @@ impl Notification {
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Organization {
     pub id: i32,
-    pub parent_organization_id: Option<i32>,
+    pub parent_organization_id: i32,
     pub name: String,
 }
 #[cfg(feature = "frontend")]
@@ -4013,7 +4006,7 @@ impl Organization {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table organizations
+    /// The number of rows inserted in table Organization
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -4069,7 +4062,7 @@ impl Organization {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: i32,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -4189,7 +4182,7 @@ impl Organization {
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct PrimaryUserEmail {
     pub id: i32,
@@ -4208,7 +4201,7 @@ impl PrimaryUserEmail {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table primary_user_emails
+    /// The number of rows inserted in table PrimaryUserEmail
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -4264,7 +4257,7 @@ impl PrimaryUserEmail {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: i32,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -4370,7 +4363,7 @@ impl PrimaryUserEmail {
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ProcedureContinuousRequirement {
     pub id: i32,
@@ -4378,7 +4371,7 @@ pub struct ProcedureContinuousRequirement {
     pub procedure_id: i32,
     pub item_category_id: i32,
     pub quantity: f64,
-    pub unit_id: Option<i32>,
+    pub unit_id: i32,
 }
 #[cfg(feature = "frontend")]
 impl ProcedureContinuousRequirement {
@@ -4402,7 +4395,7 @@ impl ProcedureContinuousRequirement {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table procedure_continuous_requirements
+    /// The number of rows inserted in table ProcedureContinuousRequirement
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -4458,7 +4451,7 @@ impl ProcedureContinuousRequirement {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: i32,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -4593,7 +4586,7 @@ impl ProcedureContinuousRequirement {
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ProcedureDiscreteRequirement {
     pub id: i32,
@@ -4601,7 +4594,7 @@ pub struct ProcedureDiscreteRequirement {
     pub procedure_id: i32,
     pub item_category_id: i32,
     pub quantity: i32,
-    pub unit_id: Option<i32>,
+    pub unit_id: i32,
 }
 #[cfg(feature = "frontend")]
 impl ProcedureDiscreteRequirement {
@@ -4625,7 +4618,7 @@ impl ProcedureDiscreteRequirement {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table procedure_discrete_requirements
+    /// The number of rows inserted in table ProcedureDiscreteRequirement
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -4681,7 +4674,7 @@ impl ProcedureDiscreteRequirement {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: i32,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -4816,13 +4809,13 @@ impl ProcedureDiscreteRequirement {
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Procedure {
     pub id: i32,
     pub name: String,
-    pub description: Option<String>,
-    pub created_by: Option<i32>,
+    pub description: String,
+    pub created_by: i32,
 }
 #[cfg(feature = "frontend")]
 impl Procedure {
@@ -4847,7 +4840,7 @@ impl Procedure {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table procedures
+    /// The number of rows inserted in table Procedure
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -4903,7 +4896,7 @@ impl Procedure {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: i32,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -5031,7 +5024,7 @@ impl Procedure {
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ProjectRequirement {
     pub id: i32,
@@ -5039,7 +5032,7 @@ pub struct ProjectRequirement {
     pub project_id: i32,
     pub item_category_id: i32,
     pub quantity: i32,
-    pub unit_id: Option<i32>,
+    pub unit_id: i32,
 }
 #[cfg(feature = "frontend")]
 impl ProjectRequirement {
@@ -5063,7 +5056,7 @@ impl ProjectRequirement {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table project_requirements
+    /// The number of rows inserted in table ProjectRequirement
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -5119,7 +5112,7 @@ impl ProjectRequirement {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: i32,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -5254,7 +5247,7 @@ impl ProjectRequirement {
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ProjectState {
     pub id: i32,
@@ -5281,7 +5274,7 @@ impl ProjectState {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table project_states
+    /// The number of rows inserted in table ProjectState
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -5337,7 +5330,7 @@ impl ProjectState {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: i32,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -5463,7 +5456,7 @@ impl ProjectState {
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Project {
     pub id: i32,
@@ -5471,13 +5464,13 @@ pub struct Project {
     pub description: String,
     pub public: bool,
     pub state_id: i32,
-    pub parent_project_id: Option<i32>,
-    pub budget: Option<i64>,
-    pub expenses: Option<i64>,
+    pub parent_project_id: i32,
+    pub budget: i64,
+    pub expenses: i64,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
-    pub expected_end_date: Option<NaiveDateTime>,
-    pub end_date: Option<NaiveDateTime>,
+    pub expected_end_date: NaiveDateTime,
+    pub end_date: NaiveDateTime,
 }
 #[cfg(feature = "frontend")]
 impl Project {
@@ -5519,7 +5512,7 @@ impl Project {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table projects
+    /// The number of rows inserted in table Project
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -5575,7 +5568,7 @@ impl Project {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: i32,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -5752,7 +5745,7 @@ impl Project {
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Role {
     pub id: i32,
@@ -5773,7 +5766,7 @@ impl Role {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table roles
+    /// The number of rows inserted in table Role
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -5829,7 +5822,7 @@ impl Role {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: i32,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -5940,7 +5933,7 @@ impl Role {
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SampleTaxa {
     pub id: Uuid,
@@ -5965,7 +5958,7 @@ impl SampleTaxa {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table sample_taxa
+    /// The number of rows inserted in table SampleTaxa
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -6021,7 +6014,7 @@ impl SampleTaxa {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: uuid::Uuid,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -6142,7 +6135,7 @@ impl SampleTaxa {
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SampledIndividualTaxa {
     pub id: Uuid,
@@ -6167,7 +6160,7 @@ impl SampledIndividualTaxa {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table sampled_individual_taxa
+    /// The number of rows inserted in table SampledIndividualTaxa
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -6223,7 +6216,7 @@ impl SampledIndividualTaxa {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: uuid::Uuid,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -6344,7 +6337,7 @@ impl SampledIndividualTaxa {
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SampledIndividual {
     pub id: Uuid,
@@ -6363,7 +6356,7 @@ impl SampledIndividual {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table sampled_individuals
+    /// The number of rows inserted in table SampledIndividual
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -6419,7 +6412,7 @@ impl SampledIndividual {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: uuid::Uuid,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -6525,12 +6518,12 @@ impl SampledIndividual {
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Sample {
     pub id: Uuid,
-    pub created_by: Option<i32>,
-    pub derived_from: Option<Uuid>,
+    pub created_by: i32,
+    pub derived_from: Uuid,
 }
 #[cfg(feature = "frontend")]
 impl Sample {
@@ -6554,7 +6547,7 @@ impl Sample {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table samples
+    /// The number of rows inserted in table Sample
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -6610,7 +6603,7 @@ impl Sample {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: uuid::Uuid,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -6726,14 +6719,13 @@ impl Sample {
                 _ => unreachable!("Expected I32")
             },
             derived_from: match row.get("derived_from").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(derived_from) => Some(Uuid::from_u128(*derived_from)),
+                gluesql::prelude::Value::Uuid(derived_from) => Uuid::from_u128(*derived_from),
                 _ => unreachable!("Expected Uuid"),
             },
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Spectra {
     pub id: i32,
@@ -6754,7 +6746,7 @@ impl Spectra {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table spectra
+    /// The number of rows inserted in table Spectra
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -6810,7 +6802,7 @@ impl Spectra {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: i32,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -6921,7 +6913,7 @@ impl Spectra {
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SpectraCollection {
     pub id: i32,
@@ -6944,7 +6936,7 @@ impl SpectraCollection {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table spectra_collection
+    /// The number of rows inserted in table SpectraCollection
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -7000,7 +6992,7 @@ impl SpectraCollection {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: i32,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -7116,12 +7108,12 @@ impl SpectraCollection {
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Taxa {
     pub id: i32,
     pub name: String,
-    pub ncbi_taxon_id: Option<i32>,
+    pub ncbi_taxon_id: i32,
 }
 #[cfg(feature = "frontend")]
 impl Taxa {
@@ -7142,7 +7134,7 @@ impl Taxa {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table taxa
+    /// The number of rows inserted in table Taxa
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -7198,7 +7190,7 @@ impl Taxa {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: i32,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -7318,11 +7310,11 @@ impl Taxa {
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Team {
     pub id: i32,
-    pub parent_team_id: Option<i32>,
+    pub parent_team_id: i32,
 }
 #[cfg(feature = "frontend")]
 impl Team {
@@ -7342,7 +7334,7 @@ impl Team {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table teams
+    /// The number of rows inserted in table Team
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -7398,7 +7390,7 @@ impl Team {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: i32,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -7513,7 +7505,7 @@ impl Team {
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Unit {
     pub id: i32,
@@ -7538,7 +7530,7 @@ impl Unit {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table units
+    /// The number of rows inserted in table Unit
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -7594,7 +7586,7 @@ impl Unit {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: i32,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -7715,7 +7707,7 @@ impl Unit {
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct UserEmail {
     pub id: i32,
@@ -7740,7 +7732,7 @@ impl UserEmail {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table user_emails
+    /// The number of rows inserted in table UserEmail
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -7796,7 +7788,7 @@ impl UserEmail {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: i32,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -7917,12 +7909,12 @@ impl UserEmail {
         }
     }
 }
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, )]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct User {
     pub id: i32,
     pub first_name: String,
-    pub middle_name: Option<String>,
+    pub middle_name: String,
     pub last_name: String,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
@@ -7949,7 +7941,7 @@ impl User {
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table users
+    /// The number of rows inserted in table User
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -8005,7 +7997,7 @@ impl User {
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: i32,
+        {primary_key_name}: {rust_primary_key_type},
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,

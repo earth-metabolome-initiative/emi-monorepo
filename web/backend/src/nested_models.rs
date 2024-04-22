@@ -7,12 +7,12 @@ use serde::Serialize;
 use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::PooledConnection;
 use crate::models::*;
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedContainerHorizontalRule {
     pub inner: ContainerHorizontalRule,
     pub created_by: User,
-    pub item_type: NestedItemCategory,
-    pub other_item_type: NestedItemCategory,
+    pub item_type: i32,
+    pub other_item_type: i32,
 }
 
 impl NestedContainerHorizontalRule {
@@ -55,12 +55,12 @@ impl From<NestedContainerHorizontalRule> for web_common::database::nested_models
         }
     }
 }
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedContainerVerticalRule {
     pub inner: ContainerVerticalRule,
     pub created_by: User,
-    pub container_item_type: NestedItemCategory,
-    pub contained_item_type: NestedItemCategory,
+    pub container_item_type: i32,
+    pub contained_item_type: i32,
 }
 
 impl NestedContainerVerticalRule {
@@ -103,7 +103,7 @@ impl From<NestedContainerVerticalRule> for web_common::database::nested_models::
         }
     }
 }
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedDocument {
     pub inner: Document,
     pub author: User,
@@ -147,7 +147,7 @@ impl From<NestedDocument> for web_common::database::nested_models::NestedDocumen
         }
     }
 }
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedItemCategory {
     pub inner: ItemCategory,
     pub created_by: User,
@@ -187,11 +187,11 @@ impl From<NestedItemCategory> for web_common::database::nested_models::NestedIte
         }
     }
 }
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedItemCategoryRelationship {
     pub inner: ItemCategoryRelationship,
-    pub parent: NestedItemCategory,
-    pub child: NestedItemCategory,
+    pub parent: i32,
+    pub child: i32,
     pub added_by: User,
 }
 
@@ -235,10 +235,10 @@ impl From<NestedItemCategoryRelationship> for web_common::database::nested_model
         }
     }
 }
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedItemCategoryUnit {
     pub inner: ItemCategoryUnit,
-    pub item_category: NestedItemCategory,
+    pub item_category: i32,
     pub unit: Unit,
 }
 
@@ -279,12 +279,12 @@ impl From<NestedItemCategoryUnit> for web_common::database::nested_models::Neste
         }
     }
 }
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedItemContinuousQuantity {
     pub inner: ItemContinuousQuantity,
-    pub item: NestedItem,
+    pub item: Uuid,
     pub unit: Unit,
-    pub sensor: NestedItem,
+    pub sensor: Option<Uuid>,
     pub measured_by: User,
 }
 
@@ -331,10 +331,10 @@ impl From<NestedItemContinuousQuantity> for web_common::database::nested_models:
         }
     }
 }
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedItemDiscreteQuantity {
     pub inner: ItemDiscreteQuantity,
-    pub item: NestedItem,
+    pub item: Uuid,
     pub unit: Unit,
     pub measured_by: User,
 }
@@ -379,12 +379,12 @@ impl From<NestedItemDiscreteQuantity> for web_common::database::nested_models::N
         }
     }
 }
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedItemLocation {
     pub inner: ItemLocation,
-    pub item: NestedItem,
+    pub item: Option<Uuid>,
     pub located_by: User,
-    pub location: NestedLocation,
+    pub location: Option<Uuid>,
 }
 
 impl NestedItemLocation {
@@ -427,10 +427,10 @@ impl From<NestedItemLocation> for web_common::database::nested_models::NestedIte
         }
     }
 }
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedItemUnit {
     pub inner: ItemUnit,
-    pub item: NestedItem,
+    pub item: Uuid,
     pub unit: Unit,
 }
 
@@ -471,10 +471,10 @@ impl From<NestedItemUnit> for web_common::database::nested_models::NestedItemUni
         }
     }
 }
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedItem {
     pub inner: Item,
-    pub parent: Uuid,
+    pub parent: Option<Uuid>,
 }
 
 impl NestedItem {
@@ -511,12 +511,12 @@ impl From<NestedItem> for web_common::database::nested_models::NestedItem {
         }
     }
 }
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedLocation {
     pub inner: Location,
-    pub geolocalization_device: NestedItem,
-    pub altitude_device: NestedItem,
-    pub parent_location: Uuid,
+    pub geolocalization_device: Option<Uuid>,
+    pub altitude_device: Option<Uuid>,
+    pub parent_location: Option<Uuid>,
 }
 
 impl NestedLocation {
@@ -559,10 +559,10 @@ impl From<NestedLocation> for web_common::database::nested_models::NestedLocatio
         }
     }
 }
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedManufacturedItemCategory {
     pub inner: ManufacturedItemCategory,
-    pub manifacturer: NestedOrganization,
+    pub manifacturer: i32,
 }
 
 impl NestedManufacturedItemCategory {
@@ -599,7 +599,7 @@ impl From<NestedManufacturedItemCategory> for web_common::database::nested_model
         }
     }
 }
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedNotification {
     pub inner: Notification,
     pub user: User,
@@ -639,10 +639,10 @@ impl From<NestedNotification> for web_common::database::nested_models::NestedNot
         }
     }
 }
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedOrganization {
     pub inner: Organization,
-    pub parent_organization: i32,
+    pub parent_organization: Option<i32>,
 }
 
 impl NestedOrganization {
@@ -679,12 +679,12 @@ impl From<NestedOrganization> for web_common::database::nested_models::NestedOrg
         }
     }
 }
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedProcedureContinuousRequirement {
     pub inner: ProcedureContinuousRequirement,
     pub created_by: User,
-    pub procedure: NestedProcedure,
-    pub item_category: NestedItemCategory,
+    pub procedure: i32,
+    pub item_category: i32,
     pub unit: Unit,
 }
 
@@ -731,12 +731,12 @@ impl From<NestedProcedureContinuousRequirement> for web_common::database::nested
         }
     }
 }
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedProcedureDiscreteRequirement {
     pub inner: ProcedureDiscreteRequirement,
     pub created_by: User,
-    pub procedure: NestedProcedure,
-    pub item_category: NestedItemCategory,
+    pub procedure: i32,
+    pub item_category: i32,
     pub unit: Unit,
 }
 
@@ -783,7 +783,7 @@ impl From<NestedProcedureDiscreteRequirement> for web_common::database::nested_m
         }
     }
 }
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedProcedure {
     pub inner: Procedure,
     pub created_by: User,
@@ -823,12 +823,12 @@ impl From<NestedProcedure> for web_common::database::nested_models::NestedProced
         }
     }
 }
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedProjectRequirement {
     pub inner: ProjectRequirement,
     pub created_by: User,
-    pub project: NestedProject,
-    pub item_category: NestedItemCategory,
+    pub project: i32,
+    pub item_category: i32,
     pub unit: Unit,
 }
 
@@ -875,11 +875,11 @@ impl From<NestedProjectRequirement> for web_common::database::nested_models::Nes
         }
     }
 }
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedProject {
     pub inner: Project,
     pub state: ProjectState,
-    pub parent_project: i32,
+    pub parent_project: Option<i32>,
     pub created_by: User,
 }
 
@@ -944,11 +944,11 @@ impl From<NestedProject> for web_common::database::nested_models::NestedProject 
         }
     }
 }
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedSampleTaxa {
     pub inner: SampleTaxa,
     pub created_by: User,
-    pub sample: NestedSample,
+    pub sample: Uuid,
     pub taxon: Taxa,
 }
 
@@ -992,7 +992,7 @@ impl From<NestedSampleTaxa> for web_common::database::nested_models::NestedSampl
         }
     }
 }
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedSampledIndividualTaxa {
     pub inner: SampledIndividualTaxa,
     pub created_by: User,
@@ -1040,11 +1040,11 @@ impl From<NestedSampledIndividualTaxa> for web_common::database::nested_models::
         }
     }
 }
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedSample {
     pub inner: Sample,
     pub created_by: User,
-    pub derived_from: Uuid,
+    pub derived_from: Option<Uuid>,
 }
 
 impl NestedSample {
@@ -1084,10 +1084,10 @@ impl From<NestedSample> for web_common::database::nested_models::NestedSample {
         }
     }
 }
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedSpectra {
     pub inner: Spectra,
-    pub spectra_collection: NestedSpectraCollection,
+    pub spectra_collection: i32,
 }
 
 impl NestedSpectra {
@@ -1124,10 +1124,10 @@ impl From<NestedSpectra> for web_common::database::nested_models::NestedSpectra 
         }
     }
 }
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedSpectraCollection {
     pub inner: SpectraCollection,
-    pub sample: NestedSample,
+    pub sample: Uuid,
     pub created_by: User,
 }
 
@@ -1168,10 +1168,10 @@ impl From<NestedSpectraCollection> for web_common::database::nested_models::Nest
         }
     }
 }
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedTeam {
     pub inner: Team,
-    pub parent_team: i32,
+    pub parent_team: Option<i32>,
 }
 
 impl NestedTeam {
@@ -1208,7 +1208,7 @@ impl From<NestedTeam> for web_common::database::nested_models::NestedTeam {
         }
     }
 }
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedUserEmail {
     pub inner: UserEmail,
     pub user: User,

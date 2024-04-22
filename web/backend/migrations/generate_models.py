@@ -139,7 +139,7 @@ class AttributeMetadata:
 class StructMetadata:
 
     def __init__(self, struct_name: str, table_name: str):
-        self.struct_name = struct_name
+        self.name = struct_name
         self.table_name = table_name
         self.attributes: List[AttributeMetadata] = []
         self._derives: List[str] = []
@@ -1053,7 +1053,7 @@ def write_web_common_structs(
         models = file.read()
 
     for import_statement in imports:
-        struct_imported = import_statement.rsplit(":", maxsplit=1).strip(";")
+        struct_imported = import_statement.rsplit(":", maxsplit=1)[0].strip(";")
         if struct_imported not in models:
             continue
         tables.write(f"{import_statement}\n")
@@ -1081,8 +1081,6 @@ def write_web_common_structs(
         # in the line.
         if "struct" in line:
             struct_name = line.split(" ")[2]
-            struct_metadata["table_name"] = last_table_name
-            struct_metadata["struct_name"] = struct_name
 
             struct_metadata = StructMetadata(
                 table_name=last_table_name,
@@ -1192,7 +1190,7 @@ def write_web_common_structs(
                 for attribute in struct_metadata.attributes:
 
                     if attribute.optional:
-                        if attribute.name in types_and_methods:
+                        if attribute.data_type in types_and_methods:
                             tables.write(
                                 f"            match self.{attribute.name} {{\n"
                             )
@@ -1423,7 +1421,7 @@ def write_web_common_structs(
                             f"The struct {struct_metadata.name} contains an {attribute.data_type}."
                         )
 
-                if struct_metadata.optional:
+                if struct_metadata.contains_optional_fields():
                     tables.write(";\n")
 
                 # After all of the non-optional fields, we handle the optional fields.
@@ -1447,7 +1445,7 @@ def write_web_common_structs(
                             f"The struct {attribute.name} contains an {attribute.data_type}. "
                         )
 
-                if struct_metadata.optional:
+                if struct_metadata.contains_optional_fields():
                     tables.write("            update_row.execute(connection)\n")
                 else:
                     tables.write("            .execute(connection)\n")
@@ -2212,7 +2210,7 @@ def generate_nested_structs(
                     f"It has the following attributes: {struct.attributes}"
                 )
 
-        nested_struct_name = f"Nested{struct.struct_name}"
+        nested_struct_name = f"Nested{struct.name}"
         new_struct_metadata = StructMetadata(nested_struct_name, struct.table_name)
 
         # We write the Nested{struct_name} struct
