@@ -61,7 +61,7 @@ where
     ) -> Result<futures::channel::mpsc::Sender<FM>, String> {
         let endpoint = web_common::api::ws::FULL_ENDPOINT;
 
-        let websocket = WebSocket::open(&format!("wss://emi.local{}", endpoint))
+        let websocket = WebSocket::open(&format!("wss://{}{}", include_str!("../../.domain"), endpoint))
             .map_err(|err| format!("Error opening websocket connection: {:?}", err))?;
 
         match websocket.state() {
