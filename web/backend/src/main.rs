@@ -98,21 +98,23 @@ async fn main() -> std::io::Result<()> {
     )
     .unwrap();
 
+    let domain = std::env::var("DOMAIN").expect("DOMAIN is not available.");
+
     // load TLS keys
     // to create a self-signed temporary cert for testing:
     // `openssl req -x509 -newkey rsa:4096 -nodes -keyout key.pem -out cert.pem -days 365 -subj '/CN=localhost'`
     let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls()).unwrap();
     builder
-        .set_private_key_file("/app/nginx/emi.local-key.pem", SslFiletype::PEM)
+        .set_private_key_file(format!("/app/nginx/{domain}-key.pem"), SslFiletype::PEM)
         .unwrap();
     builder
-        .set_certificate_chain_file("/app/nginx/emi.local.pem")
+        .set_certificate_chain_file(format!("/app/nginx/{domain}.pem"))
         .unwrap();
 
     // Start http server
     HttpServer::new(move || {
         let cors = Cors::default()
-            .allowed_origin("https://emi.local")
+            .allowed_origin(&format!("https://{domain}"))
             .allowed_methods(vec!["GET", "POST", "PATCH", "DELETE"])
             .allowed_headers(vec![
                 header::CONTENT_TYPE,

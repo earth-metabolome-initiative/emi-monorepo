@@ -5,7 +5,7 @@ Among the first things to do is to add the test domain to the hosts file.
 This is done by adding the following line to the file `/etc/hosts`:
 
 ```bash
-sudo sh -c 'echo "127.0.0.1\temi.local" >> /etc/hosts'
+sudo sh -c 'echo "127.0.0.1\t${DOMAIN}" >> /etc/hosts'
 ```
 
 Afterwards, you may need to flush the DNS cache:
