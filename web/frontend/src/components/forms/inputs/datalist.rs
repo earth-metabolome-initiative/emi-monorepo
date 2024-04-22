@@ -9,7 +9,7 @@ use gloo::timers::callback::Timeout;
 use wasm_bindgen::JsCast;
 use web_common::api::ws::messages::*;
 use web_common::database::SearchTable;
-use web_common::database::SearcheableTableRow;
+use web_common::database::SearchableTableRow;
 
 use yew::prelude::*;
 use yew_agent::prelude::WorkerBridgeHandle;
@@ -95,8 +95,8 @@ where
         + Clone
         + PartialEq
         + SearchTable
-        + Into<SearcheableTableRow>
-        + TryFrom<SearcheableTableRow, Error = &'static str>
+        + Into<SearchableTableRow>
+        + TryFrom<SearchableTableRow, Error = &'static str>
         + RowToBadge,
 {
     type Message = DatalistMessage<Data>;

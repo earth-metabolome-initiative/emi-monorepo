@@ -1,6 +1,5 @@
 //! Submodule providing select queries, such as `Id` and `Search` queries.
 
-use super::SearcheableTable;
 use serde::{Deserialize, Serialize};
 use crate::api::ws::messages::FrontendMessage;
 use crate::database::Operation;
@@ -9,7 +8,11 @@ use crate::database::Task;
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub enum Select {
     Id(super::Table, uuid::Uuid),
-    SearchTable(SearcheableTable, String, usize),
+    SearchTable {
+        table: super::Table,
+        query: String,
+        number_of_results: u32,
+    },
 }
 
 impl Select {
@@ -24,8 +27,12 @@ impl Select {
     /// * `table` - The table to select from.
     /// * `query` - The query to search for.
     /// * `number_of_results` - The number of results to return.
-    pub fn search(table: SearcheableTable, query: String, number_of_results: usize) -> Self {
-        Self::SearchTable(table, query, number_of_results)
+    pub fn search(table: super::Table, query: String, number_of_results: u32) -> Self {
+        Self::SearchTable {
+            table: table.into(),
+            query,
+            number_of_results,
+        }
     }
 }
 

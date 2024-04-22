@@ -217,7 +217,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                     query,
                                     number_of_results,
                                 ) => {
-                                    let backend_variant: crate::models::SearcheableTable =
+                                    let backend_variant: crate::models::SearchableTable =
                                         (*table).into();
                                     ctx.address().do_send(BackendMessage::SearchTable(
                                         task.id(),

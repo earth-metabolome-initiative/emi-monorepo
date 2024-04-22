@@ -2344,51 +2344,51 @@ impl From<User> for TableRow {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq)]
-pub enum SearcheableTableRow {
+pub enum SearchableTableRow {
     ProjectState(ProjectState),
     Project(Project),
     Taxa(Taxa),
     User(User),
 }
 
-impl From<web_common::database::tables::SearcheableTableRow> for SearcheableTableRow {
-    fn from(item: web_common::database::tables::SearcheableTableRow) -> Self {
+impl From<web_common::database::tables::SearchableTableRow> for SearchableTableRow {
+    fn from(item: web_common::database::tables::SearchableTableRow) -> Self {
         match item {
-            web_common::database::tables::SearcheableTableRow::ProjectState(item) => SearcheableTableRow::ProjectState(item.into()),
-            web_common::database::tables::SearcheableTableRow::Project(item) => SearcheableTableRow::Project(item.into()),
-            web_common::database::tables::SearcheableTableRow::Taxa(item) => SearcheableTableRow::Taxa(item.into()),
-            web_common::database::tables::SearcheableTableRow::User(item) => SearcheableTableRow::User(item.into()),
+            web_common::database::tables::SearchableTableRow::ProjectState(item) => SearchableTableRow::ProjectState(item.into()),
+            web_common::database::tables::SearchableTableRow::Project(item) => SearchableTableRow::Project(item.into()),
+            web_common::database::tables::SearchableTableRow::Taxa(item) => SearchableTableRow::Taxa(item.into()),
+            web_common::database::tables::SearchableTableRow::User(item) => SearchableTableRow::User(item.into()),
         }
     }
 }
-impl From<SearcheableTableRow> for web_common::database::tables::SearcheableTableRow {
-    fn from(item: SearcheableTableRow) -> Self {
+impl From<SearchableTableRow> for web_common::database::tables::SearchableTableRow {
+    fn from(item: SearchableTableRow) -> Self {
         match item {
-            SearcheableTableRow::ProjectState(item) => web_common::database::tables::SearcheableTableRow::ProjectState(item.into()),
-            SearcheableTableRow::Project(item) => web_common::database::tables::SearcheableTableRow::Project(item.into()),
-            SearcheableTableRow::Taxa(item) => web_common::database::tables::SearcheableTableRow::Taxa(item.into()),
-            SearcheableTableRow::User(item) => web_common::database::tables::SearcheableTableRow::User(item.into()),
+            SearchableTableRow::ProjectState(item) => web_common::database::tables::SearchableTableRow::ProjectState(item.into()),
+            SearchableTableRow::Project(item) => web_common::database::tables::SearchableTableRow::Project(item.into()),
+            SearchableTableRow::Taxa(item) => web_common::database::tables::SearchableTableRow::Taxa(item.into()),
+            SearchableTableRow::User(item) => web_common::database::tables::SearchableTableRow::User(item.into()),
         }
     }
 }
-impl From<ProjectState> for SearcheableTableRow {
+impl From<ProjectState> for SearchableTableRow {
     fn from(item: ProjectState) -> Self {
-        SearcheableTableRow::ProjectState(item)
+        SearchableTableRow::ProjectState(item)
     }
 }
-impl From<Project> for SearcheableTableRow {
+impl From<Project> for SearchableTableRow {
     fn from(item: Project) -> Self {
-        SearcheableTableRow::Project(item)
+        SearchableTableRow::Project(item)
     }
 }
-impl From<Taxa> for SearcheableTableRow {
+impl From<Taxa> for SearchableTableRow {
     fn from(item: Taxa) -> Self {
-        SearcheableTableRow::Taxa(item)
+        SearchableTableRow::Taxa(item)
     }
 }
-impl From<User> for SearcheableTableRow {
+impl From<User> for SearchableTableRow {
     fn from(item: User) -> Self {
-        SearcheableTableRow::User(item)
+        SearchableTableRow::User(item)
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Copy, Eq, )]
@@ -2616,14 +2616,14 @@ impl From<Table> for web_common::database::tables::Table {
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Copy, Eq, )]
-pub enum SearcheableTable {
+pub enum SearchableTable {
     ProjectState,
     Project,
     Taxa,
     User,
 }
 
-impl SearcheableTable {
+impl SearchableTable {
     /// Search for the struct by a given string.
     ///
     /// # Arguments
@@ -2638,43 +2638,43 @@ impl SearcheableTable {
         limit: Option<i32>,
         threshold: Option<f64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<SearcheableTableRow>, diesel::result::Error> {
+    ) -> Result<Vec<SearchableTableRow>, diesel::result::Error> {
         Ok(match self {
-            SearcheableTable::ProjectState => ProjectState::search(query, limit, threshold, connection)?.into_iter().map(SearcheableTableRow::from).collect::<Vec<SearcheableTableRow>>(),
-            SearcheableTable::Project => Project::search(query, limit, threshold, connection)?.into_iter().map(SearcheableTableRow::from).collect::<Vec<SearcheableTableRow>>(),
-            SearcheableTable::Taxa => Taxa::search(query, limit, threshold, connection)?.into_iter().map(SearcheableTableRow::from).collect::<Vec<SearcheableTableRow>>(),
-            SearcheableTable::User => User::search(query, limit, threshold, connection)?.into_iter().map(SearcheableTableRow::from).collect::<Vec<SearcheableTableRow>>(),
+            SearchableTable::ProjectState => ProjectState::search(query, limit, threshold, connection)?.into_iter().map(SearchableTableRow::from).collect::<Vec<SearchableTableRow>>(),
+            SearchableTable::Project => Project::search(query, limit, threshold, connection)?.into_iter().map(SearchableTableRow::from).collect::<Vec<SearchableTableRow>>(),
+            SearchableTable::Taxa => Taxa::search(query, limit, threshold, connection)?.into_iter().map(SearchableTableRow::from).collect::<Vec<SearchableTableRow>>(),
+            SearchableTable::User => User::search(query, limit, threshold, connection)?.into_iter().map(SearchableTableRow::from).collect::<Vec<SearchableTableRow>>(),
         })
     }
 }
-impl From<&str> for SearcheableTable {
+impl From<&str> for SearchableTable {
     fn from(item: &str) -> Self {
         match item {
-            "project_states" => SearcheableTable::ProjectState,
-            "projects" => SearcheableTable::Project,
-            "taxa" => SearcheableTable::Taxa,
-            "users" => SearcheableTable::User,
+            "project_states" => SearchableTable::ProjectState,
+            "projects" => SearchableTable::Project,
+            "taxa" => SearchableTable::Taxa,
+            "users" => SearchableTable::User,
             _ => panic!("Unknown tables name"),
         }
     }
 }
-impl From<SearcheableTable> for web_common::database::tables::SearcheableTable {
-    fn from(item: SearcheableTable) -> Self {
+impl From<SearchableTable> for web_common::database::tables::SearchableTable {
+    fn from(item: SearchableTable) -> Self {
         match item {
-            SearcheableTable::ProjectState => web_common::database::tables::SearcheableTable::ProjectState,
-            SearcheableTable::Project => web_common::database::tables::SearcheableTable::Project,
-            SearcheableTable::Taxa => web_common::database::tables::SearcheableTable::Taxa,
-            SearcheableTable::User => web_common::database::tables::SearcheableTable::User,
+            SearchableTable::ProjectState => web_common::database::tables::SearchableTable::ProjectState,
+            SearchableTable::Project => web_common::database::tables::SearchableTable::Project,
+            SearchableTable::Taxa => web_common::database::tables::SearchableTable::Taxa,
+            SearchableTable::User => web_common::database::tables::SearchableTable::User,
         }
     }
 }
-impl From<web_common::database::tables::SearcheableTable> for SearcheableTable {
-    fn from(item: web_common::database::tables::SearcheableTable) -> Self {
+impl From<web_common::database::tables::SearchableTable> for SearchableTable {
+    fn from(item: web_common::database::tables::SearchableTable) -> Self {
         match item {
-            web_common::database::tables::SearcheableTable::ProjectState => SearcheableTable::ProjectState,
-            web_common::database::tables::SearcheableTable::Project => SearcheableTable::Project,
-            web_common::database::tables::SearcheableTable::Taxa => SearcheableTable::Taxa,
-            web_common::database::tables::SearcheableTable::User => SearcheableTable::User,
+            web_common::database::tables::SearchableTable::ProjectState => SearchableTable::ProjectState,
+            web_common::database::tables::SearchableTable::Project => SearchableTable::Project,
+            web_common::database::tables::SearchableTable::Taxa => SearchableTable::Taxa,
+            web_common::database::tables::SearchableTable::User => SearchableTable::User,
         }
     }
 }

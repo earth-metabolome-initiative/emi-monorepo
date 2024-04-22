@@ -8902,78 +8902,78 @@ impl TableRow {
 }
 
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, )]
-pub enum SearcheableTableRow {
+pub enum SearchableTableRow {
     ProjectState(ProjectState),
     Project(Project),
     Taxa(Taxa),
     User(User),
 }
 
-impl From<ProjectState> for SearcheableTableRow {
+impl From<ProjectState> for SearchableTableRow {
     fn from(item: ProjectState) -> Self {
-        SearcheableTableRow::ProjectState(item)
+        SearchableTableRow::ProjectState(item)
     }
 }
-impl std::convert::TryFrom<SearcheableTableRow> for ProjectState {
+impl std::convert::TryFrom<SearchableTableRow> for ProjectState {
     type Error = &'static str;
-    fn try_from(item: SearcheableTableRow) -> Result<Self, Self::Error> {
+    fn try_from(item: SearchableTableRow) -> Result<Self, Self::Error> {
         match item {
-            SearcheableTableRow::ProjectState(item) => Ok(item),
+            SearchableTableRow::ProjectState(item) => Ok(item),
             _ => Err("Invalid conversion"),
         }
     }
 }
-impl From<Project> for SearcheableTableRow {
+impl From<Project> for SearchableTableRow {
     fn from(item: Project) -> Self {
-        SearcheableTableRow::Project(item)
+        SearchableTableRow::Project(item)
     }
 }
-impl std::convert::TryFrom<SearcheableTableRow> for Project {
+impl std::convert::TryFrom<SearchableTableRow> for Project {
     type Error = &'static str;
-    fn try_from(item: SearcheableTableRow) -> Result<Self, Self::Error> {
+    fn try_from(item: SearchableTableRow) -> Result<Self, Self::Error> {
         match item {
-            SearcheableTableRow::Project(item) => Ok(item),
+            SearchableTableRow::Project(item) => Ok(item),
             _ => Err("Invalid conversion"),
         }
     }
 }
-impl From<Taxa> for SearcheableTableRow {
+impl From<Taxa> for SearchableTableRow {
     fn from(item: Taxa) -> Self {
-        SearcheableTableRow::Taxa(item)
+        SearchableTableRow::Taxa(item)
     }
 }
-impl std::convert::TryFrom<SearcheableTableRow> for Taxa {
+impl std::convert::TryFrom<SearchableTableRow> for Taxa {
     type Error = &'static str;
-    fn try_from(item: SearcheableTableRow) -> Result<Self, Self::Error> {
+    fn try_from(item: SearchableTableRow) -> Result<Self, Self::Error> {
         match item {
-            SearcheableTableRow::Taxa(item) => Ok(item),
+            SearchableTableRow::Taxa(item) => Ok(item),
             _ => Err("Invalid conversion"),
         }
     }
 }
-impl From<User> for SearcheableTableRow {
+impl From<User> for SearchableTableRow {
     fn from(item: User) -> Self {
-        SearcheableTableRow::User(item)
+        SearchableTableRow::User(item)
     }
 }
-impl std::convert::TryFrom<SearcheableTableRow> for User {
+impl std::convert::TryFrom<SearchableTableRow> for User {
     type Error = &'static str;
-    fn try_from(item: SearcheableTableRow) -> Result<Self, Self::Error> {
+    fn try_from(item: SearchableTableRow) -> Result<Self, Self::Error> {
         match item {
-            SearcheableTableRow::User(item) => Ok(item),
+            SearchableTableRow::User(item) => Ok(item),
             _ => Err("Invalid conversion"),
         }
     }
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Copy, Eq, )]
-pub enum SearcheableTable {
+pub enum SearchableTable {
     ProjectState,
     Project,
     Taxa,
     User,
 }
 
-impl SearcheableTable {
+impl SearchableTable {
     /// Search the table or view by the query.
     ///
     /// # Arguments
@@ -8981,35 +8981,35 @@ impl SearcheableTable {
     /// * `number_of_results` - The number of results to return.
     pub fn search(&self, query: String, number_of_results: usize) -> super::selects::Select {
         match self {
-            SearcheableTable::ProjectState => super::selects::Select::search(SearcheableTable::ProjectState, query, number_of_results),
-            SearcheableTable::Project => super::selects::Select::search(SearcheableTable::Project, query, number_of_results),
-            SearcheableTable::Taxa => super::selects::Select::search(SearcheableTable::Taxa, query, number_of_results),
-            SearcheableTable::User => super::selects::Select::search(SearcheableTable::User, query, number_of_results),
+            SearchableTable::ProjectState => super::selects::Select::search(SearchableTable::ProjectState, query, number_of_results),
+            SearchableTable::Project => super::selects::Select::search(SearchableTable::Project, query, number_of_results),
+            SearchableTable::Taxa => super::selects::Select::search(SearchableTable::Taxa, query, number_of_results),
+            SearchableTable::User => super::selects::Select::search(SearchableTable::User, query, number_of_results),
         }
     }
 }
-pub trait SearcheableTableName {
+pub trait SearchableTableName {
     /// Returns the variant of the table or view.
-    fn parent_enum() -> SearcheableTable;
+    fn parent_enum() -> SearchableTable;
 }
-impl SearcheableTableName for ProjectState {
-    fn parent_enum() -> SearcheableTable {
-        SearcheableTable::ProjectState
+impl SearchableTableName for ProjectState {
+    fn parent_enum() -> SearchableTable {
+        SearchableTable::ProjectState
     }
 }
-impl SearcheableTableName for Project {
-    fn parent_enum() -> SearcheableTable {
-        SearcheableTable::Project
+impl SearchableTableName for Project {
+    fn parent_enum() -> SearchableTable {
+        SearchableTable::Project
     }
 }
-impl SearcheableTableName for Taxa {
-    fn parent_enum() -> SearcheableTable {
-        SearcheableTable::Taxa
+impl SearchableTableName for Taxa {
+    fn parent_enum() -> SearchableTable {
+        SearchableTable::Taxa
     }
 }
-impl SearcheableTableName for User {
-    fn parent_enum() -> SearcheableTable {
-        SearcheableTable::User
+impl SearchableTableName for User {
+    fn parent_enum() -> SearchableTable {
+        SearchableTable::User
     }
 }
 pub trait SearchTable {
@@ -9020,7 +9020,7 @@ pub trait SearchTable {
     /// * `number_of_results` - The number of results to return.
     fn search(query: String, number_of_results: usize) -> super::selects::Select;
 }
-impl<T> SearchTable for T where T: SearcheableTableName {
+impl<T> SearchTable for T where T: SearchableTableName {
     fn search(query: String, number_of_results: usize) -> super::selects::Select {
         Self::parent_enum().search(query, number_of_results)
     }

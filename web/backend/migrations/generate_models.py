@@ -131,9 +131,11 @@ class AttributeMetadata:
         raise ValueError("The data type must be either a string or a StructMetadata.")
 
     def implements_eq(self) -> bool:
-        return self._data_type not in ["f32", "f64"] or isinstance(
-            self._data_type, StructMetadata
-        ) and self._data_type.can_implement_eq()
+        return (
+            self._data_type not in ["f32", "f64"]
+            or isinstance(self._data_type, StructMetadata)
+            and self._data_type.can_implement_eq()
+        )
 
     def __eq__(self, other: "AttributeMetadata") -> bool:
         return (
@@ -857,56 +859,6 @@ def write_from_impls(
         new_content += "    }\n"
         new_content += "}\n"
 
-    # We write the enumeration of the Searchable tables or views rows
-    # which are the tables or views that implement the `pg_trgm` index.
-
-    has_any_searchables = any(
-        similarity_indices.has_table(struct.table_name) for struct in struct_metadatas
-    )
-
-    if has_any_searchables:
-        new_content += table_deribes
-        new_content += f"pub enum Searcheable{capitalized_table_type}Row {{\n"
-        for struct in struct_metadatas:
-            if similarity_indices.has_table(struct.table_name):
-                new_content += f"    {struct.name}({struct.name}),\n"
-        new_content += "}\n\n"
-
-        # We implement the bidierectional From for the SearcheableTableRow or SearcheableViewRow
-        # of their respective structs in the `web_common` crate.
-        new_content += f"impl From<web_common::database::{table_type}::Searcheable{capitalized_table_type}Row> for Searcheable{capitalized_table_type}Row {{\n"
-        new_content += f"    fn from(item: web_common::database::{table_type}::Searcheable{capitalized_table_type}Row) -> Self {{\n"
-        new_content += "        match item {\n"
-        for struct in struct_metadatas:
-            if similarity_indices.has_table(struct.table_name):
-                new_content += f"            web_common::database::{table_type}::Searcheable{capitalized_table_type}Row::{struct.name}(item) => Searcheable{capitalized_table_type}Row::{struct.name}(item.into()),\n"
-        new_content += "        }\n"
-        new_content += "    }\n"
-        new_content += "}\n"
-
-        new_content += f"impl From<Searcheable{capitalized_table_type}Row> for web_common::database::{table_type}::Searcheable{capitalized_table_type}Row {{\n"
-        new_content += (
-            f"    fn from(item: Searcheable{capitalized_table_type}Row) -> Self {{\n"
-        )
-        new_content += "        match item {\n"
-        for struct in struct_metadatas:
-            if similarity_indices.has_table(struct.table_name):
-                new_content += f"            Searcheable{capitalized_table_type}Row::{struct.name}(item) => web_common::database::{table_type}::Searcheable{capitalized_table_type}Row::{struct.name}(item.into()),\n"
-        new_content += "        }\n"
-        new_content += "    }\n"
-        new_content += "}\n"
-
-        # For each of the searchable structs, we implement the From method so that it is possible to easily convert
-        # any of the Row structs into the SearchableViewRow or SearchableTableRow structs.
-
-        for struct in struct_metadatas:
-            if similarity_indices.has_table(struct.table_name):
-                new_content += f"impl From<{struct.name}> for Searcheable{capitalized_table_type}Row {{\n"
-                new_content += f"    fn from(item: {struct.name}) -> Self {{\n"
-                new_content += f"        Searcheable{capitalized_table_type}Row::{struct.name}(item)\n"
-                new_content += "    }\n"
-                new_content += "}\n"
-
     # Now we write the enum for the table or view names, analogous to the `Table` or `View`
     # enumeration in the `web_common` crate. We implement also the bidirectional From method
     # for the enumeration and the table or view name. Furthermore, we implement the Display
@@ -984,90 +936,6 @@ def write_from_impls(
     new_content += "    }\n"
     new_content += "}\n"
 
-    # Finally, we create the SearcheableTable or SearcheableView enumeration to cover all of the
-    # tables or views that implement the `pg_trgm` index. We implement the `search` method for the
-    # enumeration, which receives the query string, the limit, the threshold, and the connection to
-    # the database. The method returns a vector of the respective TableRow or ViewRow. We also implement
-    # the bidirectional From for the SearcheableTable or SearcheableView and their corresponding version
-    # present in the web_common crate.
-
-    has_any_searchables = any(
-        similarity_indices.has_table(struct.table_name) for struct in struct_metadatas
-    )
-
-    if has_any_searchables:
-        new_content += "#[derive("
-        for derive in derives:
-            new_content += f"{derive}, "
-        new_content += ")]\n"
-
-        new_content += f"pub enum Searcheable{capitalized_table_type} {{\n"
-        for struct in struct_metadatas:
-            if similarity_indices.has_table(struct.table_name):
-                new_content += f"    {struct.name},\n"
-        new_content += "}\n\n"
-
-        new_content += f"impl Searcheable{capitalized_table_type} {{\n"
-        new_content += "    /// Search for the struct by a given string.\n"
-        new_content += "    ///\n"
-        new_content += "    /// # Arguments\n"
-        new_content += "    /// * `query` - The string to search for.\n"
-        new_content += (
-            "    /// * `limit` - The maximum number of results, by default `10`.\n"
-        )
-        new_content += (
-            "    /// * `threshold` - The similarity threshold, by default `0.6`.\n"
-        )
-        new_content += "    /// * `connection` - The connection to the database.\n"
-        new_content += "    ///\n"
-        new_content += "    pub fn search(\n"
-        new_content += "        &self,\n"
-        new_content += "        query: &str,\n"
-        new_content += "        limit: Option<i32>,\n"
-        new_content += "        threshold: Option<f64>,\n"
-        new_content += "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
-        new_content += f"    ) -> Result<Vec<Searcheable{capitalized_table_type}Row>, diesel::result::Error> {{\n"
-        new_content += "        Ok(match self {\n"
-        for struct in struct_metadatas:
-            if similarity_indices.has_table(struct.table_name):
-                new_content += f"            Searcheable{capitalized_table_type}::{struct.name} => {struct.name}::search(query, limit, threshold, connection)?.into_iter().map(Searcheable{capitalized_table_type}Row::from).collect::<Vec<Searcheable{capitalized_table_type}Row>>(),\n"
-        new_content += "        })\n"
-        new_content += "    }\n"
-        new_content += "}\n"
-
-        new_content += f"impl From<&str> for Searcheable{capitalized_table_type} {{\n"
-        new_content += "    fn from(item: &str) -> Self {\n"
-        new_content += "        match item {\n"
-        for struct in struct_metadatas:
-            if similarity_indices.has_table(struct.table_name):
-                new_content += f'            "{struct.table_name}" => Searcheable{capitalized_table_type}::{struct.name},\n'
-        new_content += f'            _ => panic!("Unknown {table_type} name"),\n'
-        new_content += "        }\n"
-        new_content += "    }\n"
-        new_content += "}\n"
-
-        new_content += f"impl From<Searcheable{capitalized_table_type}> for web_common::database::{table_type}::Searcheable{capitalized_table_type} {{\n"
-        new_content += (
-            f"    fn from(item: Searcheable{capitalized_table_type}) -> Self {{\n"
-        )
-        new_content += "        match item {\n"
-        for struct in struct_metadatas:
-            if similarity_indices.has_table(struct.table_name):
-                new_content += f"            Searcheable{capitalized_table_type}::{struct.name} => web_common::database::{table_type}::Searcheable{capitalized_table_type}::{struct.name},\n"
-        new_content += "        }\n"
-        new_content += "    }\n"
-        new_content += "}\n"
-
-        new_content += f"impl From<web_common::database::{table_type}::Searcheable{capitalized_table_type}> for Searcheable{capitalized_table_type} {{\n"
-        new_content += f"    fn from(item: web_common::database::{table_type}::Searcheable{capitalized_table_type}) -> Self {{\n"
-        new_content += "        match item {\n"
-        for struct in struct_metadatas:
-            if similarity_indices.has_table(struct.table_name):
-                new_content += f"            web_common::database::{table_type}::Searcheable{capitalized_table_type}::{struct.name} => Searcheable{capitalized_table_type}::{struct.name},\n"
-        new_content += "        }\n"
-        new_content += "    }\n"
-        new_content += "}\n"
-
     with open(path, "w", encoding="utf8") as file:
         file.write(new_content)
 
@@ -1144,7 +1012,9 @@ def write_web_common_structs(
             struct_name = line.split(" ")[2]
 
             struct_metadata = StructMetadata(
-                table_name=last_table_name, struct_name=struct_name
+                table_name=last_table_name,
+                struct_name=struct_name,
+                is_table=enumeration == "Table",
             )
 
             inside_struct = True
@@ -1686,252 +1556,6 @@ def write_web_common_structs(
                 # And finally we close the struct implementation
                 tables.write("}\n")
 
-    # We create the Table enumeration, containing all
-    # the table names. We also implement the `table_name`
-    # method for the enumeration, returning the table name
-    # for each of the structs.
-    tables.write("\n")
-
-    derives_for_enum = [
-        "Deserialize",
-        "Serialize",
-        "Clone",
-        "Debug",
-        "PartialEq",
-    ]
-
-    lower_enumeration = enumeration.lower()
-
-    tables.write("#[derive(")
-    for derive in derives_for_enum + ["Copy", "Eq"]:
-        tables.write(f"{derive}, ")
-    tables.write(")]\n")
-    tables.write(f"pub enum {enumeration} {{\n")
-    for struct in struct_metadatas:
-        tables.write(f"    {struct.name},\n")
-    tables.write("}\n\n")
-
-    tables.write(f"impl {enumeration} {{\n")
-    tables.write("    pub fn name(&self) -> &'static str {\n")
-    tables.write("        match self {\n")
-    for struct in struct_metadatas:
-        tables.write(
-            f'            {enumeration}::{struct.name} => "{struct.table_name}",\n'
-        )
-    tables.write("        }\n")
-    tables.write("    }\n")
-    tables.write("}\n")
-
-    # We implement Display for the enumeration
-    tables.write(f"impl std::fmt::Display for {enumeration} {{\n")
-    tables.write(
-        "    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {\n"
-    )
-    tables.write('        write!(f, "{}", self.name())\n')
-    tables.write("    }\n")
-    tables.write("}\n")
-
-    # Finally, we write an enum for the rows in the tables (or views)
-
-    tables.write("\n")
-    tables.write("#[derive(")
-    for derive in derives:
-        tables.write(f"{derive}, ")
-    tables.write(")]\n")
-    tables.write(f"pub enum {enumeration}Row {{\n")
-    for struct in struct_metadatas:
-        tables.write(f"    {struct.name}({struct.name}),\n")
-    tables.write("}\n\n")
-
-    # For each of the structs, we implement the From trait for the Row enumeration
-    # and, since we cannot be sure that the struct is always the same as the table name,
-    # we also implement the TryFrom<{enumeration}Row> trait for the struct.
-    for struct in struct_metadatas:
-        tables.write(f"impl From<{struct.name}> for {enumeration}Row {{\n")
-        tables.write(f"    fn from(item: {struct.name}) -> Self {{\n")
-        tables.write(f"        {enumeration}Row::{struct.name}(item)\n")
-        tables.write("    }\n")
-        tables.write("}\n")
-
-        tables.write(
-            f"impl std::convert::TryFrom<{enumeration}Row> for {struct.name} {{\n"
-        )
-        tables.write("    type Error = &'static str;\n")
-        tables.write(
-            f"    fn try_from(item: {enumeration}Row) -> Result<Self, Self::Error> {{\n"
-        )
-        tables.write("        match item {\n")
-        tables.write(
-            f"            {enumeration}Row::{struct.name}(item) => Ok(item),\n"
-        )
-        tables.write('            _ => Err("Invalid conversion"),\n')
-        tables.write("        }\n")
-        tables.write("    }\n")
-        tables.write("}\n")
-
-    # We also implement the From<&str> trait for the enumeration
-    tables.write(f"impl From<&str> for {enumeration} {{\n")
-    tables.write("    fn from(item: &str) -> Self {\n")
-    tables.write("        match item {\n")
-    for struct in struct_metadatas:
-        tables.write(
-            f'            "{struct.table_name}" => {enumeration}::{struct.name},\n'
-        )
-    tables.write('            _ => panic!("Unknown table name"),\n')
-    tables.write("        }\n")
-    tables.write("    }\n")
-    tables.write("}\n")
-
-    tables.write(f"impl {enumeration}Row {{\n")
-    tables.write(
-        f"    pub fn {lower_enumeration}(&self) -> &'static {enumeration} {{\n"
-    )
-    tables.write("        match self {\n")
-    for struct in struct_metadatas:
-        tables.write(
-            f"            {enumeration}Row::{struct.name}(_) => &{enumeration}::{struct.name},\n"
-        )
-    tables.write("        }\n")
-    tables.write("    }\n")
-    tables.write("\n")
-    tables.write(f"    pub fn {lower_enumeration}_name(&self) -> &'static str {{\n")
-    tables.write(f"        self.{lower_enumeration}().name()\n")
-    tables.write("    }\n")
-    tables.write("}\n")
-
-    # We implement the web_common version of the SearchableTable or SearchableView
-    # enumeration. This enumeration contains all the tables or views that implement
-    # the `pg_trgm` index. The bidirectional conversion between the SearchableTable
-    # or SearchableView and their backend version that actually provides the Diesel
-    # methods are solely available in the backend.
-
-    has_any_searchables = any(
-        similarity_indices.has_table(struct.table_name) for struct in struct_metadatas
-    )
-
-    if has_any_searchables:
-        tables.write("\n")
-
-        # We create the enumeration of all searchable table or view rows
-        tables.write("#[derive(")
-        for derive in derives:
-            tables.write(f"{derive}, ")
-        tables.write(")]\n")
-        tables.write(f"pub enum Searcheable{enumeration}Row {{\n")
-        for struct in struct_metadatas:
-            if similarity_indices.has_table(struct.table_name):
-                tables.write(f"    {struct.name}({struct.name}),\n")
-        tables.write("}\n\n")
-
-        # We create the From trait to convert a searchable row to a row.
-        # and the try_from trait to convert a row to a searchable row.
-        for struct in struct_metadatas:
-            if similarity_indices.has_table(struct.table_name):
-                tables.write(
-                    f"impl From<{struct.name}> for Searcheable{enumeration}Row {{\n"
-                )
-                tables.write(f"    fn from(item: {struct.name}) -> Self {{\n")
-                tables.write(
-                    f"        Searcheable{enumeration}Row::{struct.name}(item)\n"
-                )
-                tables.write("    }\n")
-                tables.write("}\n")
-
-                tables.write(
-                    f"impl std::convert::TryFrom<Searcheable{enumeration}Row> for {struct.name} {{\n"
-                )
-                tables.write("    type Error = &'static str;\n")
-                tables.write(
-                    f"    fn try_from(item: Searcheable{enumeration}Row) -> Result<Self, Self::Error> {{\n"
-                )
-                tables.write("        match item {\n")
-                tables.write(
-                    f"            Searcheable{enumeration}Row::{struct.name}(item) => Ok(item),\n"
-                )
-                tables.write('            _ => Err("Invalid conversion"),\n')
-                tables.write("        }\n")
-                tables.write("    }\n")
-                tables.write("}\n")
-
-        # We create the enumeration of all searchable tables or views
-        tables.write("#[derive(")
-        for derive in derives + ["Copy", "Eq"]:
-            tables.write(f"{derive}, ")
-        tables.write(")]\n")
-        tables.write(f"pub enum Searcheable{enumeration} {{\n")
-        for struct in struct_metadatas:
-            if similarity_indices.has_table(struct.table_name):
-                tables.write(f"    {struct.name},\n")
-        tables.write("}\n\n")
-
-        # We implement the search method for the SearchableTable or SearchableView
-        # that returns a new Search task for the table or view.
-        tables.write(f"impl Searcheable{enumeration} {{\n")
-        tables.write("    /// Search the table or view by the query.\n")
-        tables.write("    ///\n")
-        tables.write("    /// # Arguments\n")
-        tables.write("    /// * `query` - The query to search.\n")
-        tables.write(
-            "    /// * `number_of_results` - The number of results to return.\n"
-        )
-        tables.write(
-            "    pub fn search(&self, query: String, number_of_results: usize) -> super::selects::Select {\n"
-        )
-        tables.write("        match self {\n")
-        for struct in struct_metadatas:
-            if similarity_indices.has_table(struct.table_name):
-                tables.write(
-                    f"            Searcheable{enumeration}::{struct.name} => super::selects::Select::search(Searcheable{enumeration}::{struct.name}, query, number_of_results),\n"
-                )
-        tables.write("        }\n")
-        tables.write("    }\n")
-        tables.write("}\n")
-
-        # We create a Trait that we implement for all {enumeration}Rows which returns
-        # statically the name of the table or view associated with the row.
-        tables.write(f"pub trait Searcheable{enumeration}Name {{\n")
-        tables.write("    /// Returns the variant of the table or view.\n")
-        tables.write(f"    fn parent_enum() -> Searcheable{enumeration};\n")
-        tables.write("}\n")
-
-        for struct in struct_metadatas:
-            if similarity_indices.has_table(struct.table_name):
-                tables.write(
-                    f"impl Searcheable{enumeration}Name for {struct.name} {{\n"
-                )
-                tables.write(f"    fn parent_enum() -> Searcheable{enumeration} {{\n")
-                tables.write(f"        Searcheable{enumeration}::{struct.name}\n")
-                tables.write("    }\n")
-                tables.write("}\n")
-
-        # We create the Trait Search{enumeration} for all structs that implement
-        # the Searchable{enumeration}Name trait. This trait contains the search method
-        # that returns a new Select task for the table or view.
-        tables.write(f"pub trait Search{enumeration} {{\n")
-        tables.write("    /// Search the table or view by the query.\n")
-        tables.write("    ///\n")
-        tables.write("    /// # Arguments\n")
-        tables.write("    /// * `query` - The query to search.\n")
-        tables.write(
-            "    /// * `number_of_results` - The number of results to return.\n"
-        )
-        tables.write(
-            "    fn search(query: String, number_of_results: usize) -> super::selects::Select;\n"
-        )
-        tables.write("}\n")
-
-        # We implement the Search{enumeration} trait as a blanket implementation
-        # for all structs that implement the Searchable{enumeration}Name trait.
-        tables.write(
-            f"impl<T> Search{enumeration} for T where T: Searcheable{enumeration}Name {{\n"
-        )
-        tables.write(
-            "    fn search(query: String, number_of_results: usize) -> super::selects::Select {\n"
-        )
-        tables.write("        Self::parent_enum().search(query, number_of_results)\n")
-        tables.write("    }\n")
-        tables.write("}\n")
-
     tables.close()
 
     return struct_metadatas
@@ -2289,7 +1913,9 @@ def generate_nested_structs(
                 )
 
         nested_struct_name = f"Nested{struct.name}"
-        new_struct_metadata = StructMetadata(nested_struct_name, struct.table_name)
+        new_struct_metadata = StructMetadata(
+            nested_struct_name, struct.table_name, is_table=struct.is_table()
+        )
 
         # We write the Nested{struct_name} struct
         tables.write("#[derive(")
@@ -2316,9 +1942,7 @@ def generate_nested_structs(
                         struct.table_name, attribute.name
                     )
                     normalized_attribute_name = attribute.name
-                    foreign_struct = get_struct_by_table_name(
-                        foreign_key_table_name
-                    )
+                    foreign_struct = get_struct_by_table_name(foreign_key_table_name)
                 if normalized_attribute_name.endswith("_id"):
                     normalized_attribute_name = normalized_attribute_name[:-3]
                 if (
@@ -2380,8 +2004,9 @@ def generate_nested_structs(
             "        Ok(Self {\n"
         )
         for attribute in new_struct_metadata.attributes:
-            if attribute.data_type() == new_struct_metadata.name or struct.has_attribute(
-                attribute
+            if (
+                attribute.data_type() == new_struct_metadata.name
+                or struct.has_attribute(attribute)
             ):
                 tables.write(
                     f"            {attribute.name}: flat_struct.{attribute.name},\n"
@@ -2502,10 +2127,119 @@ def write_web_common_nested_structs(path: str, nested_structs: List[StructMetada
         tables.write("#[derive(" + ", ".join(struct_metadata.derives()) + ")]\n")
         tables.write(f"pub struct {struct_metadata.name} {{\n")
         for attribute in struct_metadata.attributes:
-            tables.write(
-                f"    pub {attribute.name}: {attribute.format_data_type()},\n"
-            )
-        tables.write("}\n\n")
+            tables.write(f"    pub {attribute.name}: {attribute.format_data_type()},\n")
+        tables.write("}\n")
+
+    tables.close()
+
+
+def write_table_names_enumeration(struct_metadatas: List[StructMetadata]):
+    imports = [
+        "use serde::Deserialize;",
+        "use serde::Serialize;",
+    ]
+
+    # The derives to apply to the structs in the `src/database/tables.rs` document
+    derives = ["Deserialize", "Serialize", "Clone", "Debug", "PartialEq", "Eq", "Copy"]
+
+    # We check that we are currently executing in the `backend` crate
+    # so to make sure that the relative path to the `web_common` crate
+    # is correct.
+    if not os.getcwd().endswith("backend"):
+        raise Exception("This script must be executed in the `backend` crate.")
+
+    tables = open(f"../web_common/src/database/table_names.rs", "w", encoding="utf8")
+
+    # Preliminarly, we write a docstring at the very head
+    # of this submodule to explain what it does and warn the
+    # reader not to write anything in this file as it is
+    # automatically generated.
+
+    tables.write(
+        "//! This module contains the table names enumeration.\n"
+        "//!\n"
+        "//! This module is automatically generated. Do not write anything here.\n\n"
+    )
+
+    for import_statement in imports:
+        tables.write(f"{import_statement}\n")
+
+    unique_table_names = {
+        struct_metadata.table_name for struct_metadata in struct_metadatas
+    }
+
+    tables.write("#[derive(" + ", ".join(derives) + ")]\n")
+    tables.write("pub enum Table {\n")
+    for table_name in unique_table_names:
+        tables.write(f"    {table_name.capitalize()},\n")
+    tables.write("}\n\n")
+
+    # We implement the `AsRef` trait for the `Table` enum
+    # to convert it into &str.
+    tables.write("impl AsRef<str> for Table {\n")
+    tables.write("    fn as_ref(&self) -> &str {\n")
+    tables.write("        match self {\n")
+    for table_name in unique_table_names:
+        tables.write(
+            f'            Table::{table_name.capitalize()} => "{table_name}",\n'
+        )
+    tables.write("        }\n")
+    tables.write("    }\n")
+    tables.write("}\n")
+
+    # We implement display
+
+    tables.write("impl std::fmt::Display for Table {\n")
+    tables.write(
+        "    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {\n"
+    )
+    tables.write('        write!(f, "{}", self.as_ref())\n')
+    tables.write("    }\n")
+    tables.write("}\n")
+
+    tables.close()
+
+def write_web_common_search_trait_implementations(
+    struct_metadatas: List[StructMetadata]
+):
+    # We check that we are currently executing in the `backend` crate
+    # so to make sure that the relative path to the `web_common` crate
+    # is correct.
+    if not os.getcwd().endswith("backend"):
+        raise Exception("This script must be executed in the `backend` crate.")
+
+    tables = open(f"../web_common/src/database/search_tables.rs", "w", encoding="utf8")
+    table_metadatas = find_foreign_keys()
+
+    # Preliminarly, we write a docstring at the very head
+    # of this submodule to explain what it does and warn the
+    # reader not to write anything in this file as it is
+    # automatically generated.
+
+    tables.write(
+        "//! This module contains the table names enumeration.\n"
+        "//!\n"
+        "//! This module is automatically generated. Do not write anything here.\n\n"
+    )
+
+    # First, we create the Searchable trait that will be implemented by all the structs
+    # that are searchable.
+
+    tables.write("pub trait Searchable {\n")
+    tables.write("    fn search(query: &str, limit: Option<i32>) -> super::Select;\n")
+    tables.write("}\n")
+
+    for struct in struct_metadatas:
+        if table_metadatas.has_table(struct.table_name):
+            tables.write(f"impl Searchable for {struct.name} {{\n")
+            tables.write("    fn search(query: &str, limit: i32) -> super::Select {\n")
+            tables.write(f"        Select::search(\n")
+            tables.write(f'             {struct.table_name.capitalize()},\n')
+            tables.write("              query,\n")
+            tables.write("              limit,\n")
+            tables.write("        )\n")
+            tables.write("    }\n")
+            tables.write("}\n")
 
     tables.close()
 
@@ -2704,7 +2438,13 @@ if __name__ == "__main__":
     write_from_impls("src/models.rs", "tables", table_structs)
     write_from_impls("src/views/views.rs", "views", view_structs)
 
+    write_table_names_enumeration(table_structs + view_structs)
+
     nested_structs: List[StructMetadata] = generate_nested_structs(
         "src/nested_models.rs", table_structs + view_structs
     )
     write_web_common_nested_structs("nested_models.rs", nested_structs)
+
+    write_web_common_search_trait_implementations(
+        nested_structs + table_structs + view_structs
+    )
