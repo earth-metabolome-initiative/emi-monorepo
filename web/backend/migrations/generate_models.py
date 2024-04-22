@@ -108,11 +108,39 @@ class AttributeMetadata:
         self.data_type = data_type
         self.optional = optional
 
+    def format_attribute_type(self) -> str:
+        if self.optional:
+            return f"Option<{self.data_type}>"
+        return self.data_type
+
+    def implements_eq(self) -> bool:
+        return self.data_type not in ["f32", "f64"]
+
+    def implements_clone(self) -> bool:
+        return self.data_type in [
+            "bool",
+            "i8",
+            "i16",
+            "i32",
+            "i64",
+            "i128",
+            "u8",
+            "u16",
+            "u32",
+            "u64",
+            "u128",
+            "f32",
+            "f64",
+            "String",
+            "NaiveDateTime",
+        ]
+
+
 class StructMetadata:
 
-    def __init__(self, struct_name: str, primary_table_name: str):
+    def __init__(self, struct_name: str, table_name: str):
         self.struct_name = struct_name
-        self.primary_table_name = primary_table_name
+        self.table_name = table_name
         self.attributes: List[AttributeMetadata] = []
         self.derives: List[str] = []
 
@@ -121,6 +149,33 @@ class StructMetadata:
 
     def add_derive(self, derive: str):
         self.derives.append(derive)
+
+    def contains_optional_fields(self) -> bool:
+        return any(
+            attribute.optional
+            for attribute in self.attributes
+        )
+
+    def contains_only_optional_fields(self) -> bool:
+        return all(
+            attribute.optional
+            for attribute in self.attributes
+        )
+
+    def derives(self) -> List[str]:
+        derives = self.derives.copy()
+        if self.can_implement_eq() and "Eq" not in self.derives:
+            derives.append("Eq")
+        if self.can_implement_clone() and "Clone" not in self.derives:
+            derives.append("Clone")
+        
+        return derives
+
+    def can_implement_clone(self) -> bool:
+        return all(attribute.implements_clone() for attribute in self.attributes)
+
+    def can_implement_eq(self) -> bool:
+        return all(attribute.implements_eq() for attribute in self.attributes)
 
 
 def get_cursor():
@@ -474,7 +529,7 @@ def find_foreign_keys() -> TableMetadata:
 
 
 def write_from_impls(
-    path: str, table_type: str, table_structs: Dict[str, Dict[str, str]]
+    path: str, table_type: str, struct_metadatas: List[StructMetadata]
 ):
     """Write the `From` implementations for the structs in the `src/models.rs` file."""
 
@@ -950,7 +1005,7 @@ def write_web_common_structs(
     path: str,
     target: str,
     enumeration: str
-) -> Dict[str, Dict[str, str]]:
+) -> List[StructMetadata]:
     """Write the structs in the target file in the `web_common` crate.
 
     Parameters
@@ -1003,7 +1058,7 @@ def write_web_common_structs(
 
     # A dictionary to store the table names and their
     # respective structs.
-    table_names = {}
+    struct_metadatas: List[StructMetadata] = []
     last_table_name = None
     struct_has_just_finished = False
 
@@ -1021,16 +1076,14 @@ def write_web_common_structs(
         # by checking if the `struct` keyword is present
         # in the line.
         if "struct" in line:
-            struct_metadata = {
-                "table_name": None,
-                "struct_name": None,
-                "contains_options": False,
-                "contains_no_eq": False,
-                "attributes": [],
-            }
             struct_name = line.split(" ")[2]
             struct_metadata["table_name"] = last_table_name
             struct_metadata["struct_name"] = struct_name
+
+            struct_metadata = StructMetadata(
+                table_name=last_table_name,
+                struct_name=struct_name
+            )
 
             inside_struct = True
 
@@ -1040,17 +1093,18 @@ def write_web_common_structs(
             if "pub" in line and ":" in line:
                 field_name = line.strip().split(" ")[1].strip(":")
                 field_type = line.split(":")[1].strip(", ")
-                struct_metadata["attributes"].append(
-                    {
-                        "field_name": field_name,
-                        "field_type": field_type,
-                    }
+                option = False
+                if field_type.startswith("Option<"):
+                    option = True
+                    field_type = field_type[7:-1]
+                struct_metadata.add_attribute(
+                    AttributeMetadata(
+                        original_name=field_name,
+                        name=field_name,
+                        data_type=field_type,
+                        optional=option
+                    )
                 )
-                if "Option" in field_type:
-                    struct_metadata["contains_options"] = True
-                for no_eq_type in no_eq:
-                    if no_eq_type in field_type:
-                        struct_metadata["contains_no_eq"] = True
 
             # We determine whether the struct has ended
             # by checking if the `}` keyword is present
@@ -1063,11 +1117,11 @@ def write_web_common_structs(
             struct_has_just_finished = False
             # If the struct has finished, we can now begin with the
             # implementations for this struct.
-            tables.write(f"#[derive(")
             for derive in derives:
-                tables.write(f"{derive}, ")
-            if not struct_metadata["contains_no_eq"]:
-                tables.write(f"Eq, ")
+                struct_metadata.add_derive(derive)
+
+            tables.write(f"#[derive(")
+            tables.write(", ".join(struct_metadata.derives()))
             tables.write(f")]\n")
             # We also write conditional derives for the frontend feature
             # that ask for the `frontend` feature to be enabled and derive
@@ -1076,14 +1130,14 @@ def write_web_common_structs(
                 f'#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]\n'
             )
 
-            tables.write(f"pub struct {struct_name} {{\n")
-            for attribute in struct_metadata["attributes"]:
+            tables.write(f"pub struct {struct_metadata.name} {{\n")
+            for attribute in struct_metadata.attributes:
                 tables.write(
-                    f"    pub {attribute['field_name']}: {attribute['field_type']},\n"
+                    f"    pub {attribute.name}: {attribute.data_type},\n"
                 )
             tables.write("}\n")
 
-            table_names[struct_name] = struct_metadata.copy()
+            struct_metadatas.append(struct_metadata)
 
             if enumeration == "Table":
                 # This variant of the struct implementation is only
@@ -1092,15 +1146,13 @@ def write_web_common_structs(
                 # of GlueSQL. Fortunately, it does not force us like Diesel
                 # to create yet again another duplicate of the struct.
                 tables.write(f'#[cfg(feature = "frontend")]\n')
-                tables.write(f"impl {struct_name} {{\n")
+                tables.write(f"impl {struct_metadata.name} {{\n")
                 columns = ", ".join(
                     [
-                        attribute["field_name"]
-                        for attribute in struct_metadata["attributes"]
+                        attribute.name
+                        for attribute in struct_metadata.attributes
                     ]
                 )
-                table_name = struct_metadata["table_name"]
-                struct_name = struct_metadata["struct_name"]
 
                 # As first thing, we implement the `into_row` method for the struct. This method
                 # converts the struct into a vector of `gluesql::core::ast_builder::ExprList`
@@ -1133,18 +1185,15 @@ def write_web_common_structs(
                 )
 
                 tables.write(f"        vec![\n")
-                for attribute in struct_metadata["attributes"]:
-                    attribute_type = attribute["field_type"]
-                    attribute_name = attribute["field_name"]
+                for attribute in struct_metadata.attributes:
 
-                    if attribute_type.startswith("Option<"):
-                        inner_attribute_name = attribute_type[7:-1]
-                        if inner_attribute_name in types_and_methods:
+                    if attribute.optional:
+                        if attribute.name in types_and_methods:
                             tables.write(
-                                f"            match self.{attribute_name} {{\n"
+                                f"            match self.{attribute.name} {{\n"
                             )
                             tables.write(
-                                f"                Some({attribute_name}) => {types_and_methods[inner_attribute_name].format(attribute_name)},\n"
+                                f"                Some({attribute.name}) => {types_and_methods[attribute.data_type].format(attribute.name)},\n"
                             )
                             tables.write(
                                 f"                None => gluesql::core::ast_builder::null(),\n"
@@ -1152,16 +1201,16 @@ def write_web_common_structs(
                             tables.write("            },\n")
                         else:
                             raise NotImplementedError(
-                                f"The type {inner_attribute_name} is not supported. "
-                                f"The struct {struct_name} contains an {attribute_type}. "
+                                f"The type {attribute.data_type} is not supported. "
+                                f"The struct {struct_metadata.name} contains an {attribute.data_type}. "
                             )
-                    elif attribute_type in types_and_methods:
+                    elif attribute.data_type in types_and_methods:
                         tables.write(
-                            f"            {types_and_methods[attribute_type].format('self.{}'.format(attribute_name))},\n"
+                            f"            {types_and_methods[attribute.data_type].format('self.{}'.format(attribute.name))},\n"
                         )
                     else:
                         raise NotImplementedError(
-                            f"The type {attribute_type} is not supported."
+                            f"The type {attribute.data_type} is not supported."
                         )
 
                 tables.write(f"        ]\n")
@@ -1171,7 +1220,7 @@ def write_web_common_structs(
                 # We implement the `insert` method for the struct. This method
                 # receives a connection to the GlueSQL database and inserts the
                 # struct into the database.
-                tables.write(f"    /// Insert the {struct_name} into the database.\n")
+                tables.write(f"    /// Insert the {struct_metadata.name} into the database.\n")
                 tables.write(f"    ///\n")
                 tables.write(f"    /// # Arguments\n")
                 tables.write(
@@ -1180,7 +1229,7 @@ def write_web_common_structs(
                 tables.write(f"    ///\n")
                 tables.write(f"    /// # Returns\n")
                 tables.write(
-                    f"    /// The number of rows inserted in table {table_name}\n"
+                    f"    /// The number of rows inserted in table {struct_metadata.name}\n"
                 )
                 tables.write(f"    pub async fn insert<C>(\n")
                 tables.write(f"        self,\n")
@@ -1192,7 +1241,7 @@ def write_web_common_structs(
                 tables.write(f"    {{\n")
                 tables.write(f"        use gluesql::core::ast_builder::*;\n")
                 # We use the AST builder as much as possible so to avoid SQL injection attacks.
-                tables.write(f'        table("{table_name}")\n')
+                tables.write(f'        table("{struct_metadata.table_name}")\n')
                 tables.write(f"            .insert()\n")
                 tables.write(f'            .columns("{columns}")\n')
                 tables.write(f"            .values(vec![self.into_row()])\n")
@@ -1212,16 +1261,16 @@ def write_web_common_structs(
                 # receives the ID of the struct and a connection to the GlueSQL
                 # database. The method returns the struct from the database.
                 tables.write(
-                    f"    /// Get {struct_name} from the database by its ID.\n"
+                    f"    /// Get {struct_metadata.name} from the database by its ID.\n"
                 )
                 tables.write(f"    ///\n")
                 tables.write(f"    /// # Arguments\n")
                 primary_key_name, primary_key_type = table_metadatas.get_primary_key_name_and_type(
-                    table_name
+                    struct_metadata.table_name
                 )
                 rust_primary_key_type = sql_type_to_rust_type(primary_key_type)
 
-                tables.write(f"    /// * `{primary_key_name}` - The ID of {struct_name} to get.\n")
+                tables.write(f"    /// * `{primary_key_name}` - The ID of {struct_metadata.name} to get.\n")
                 tables.write(
                     f"    /// * `connection` - The connection to the database.\n"
                 )
@@ -1238,7 +1287,7 @@ def write_web_common_structs(
                 tables.write(f"    {{\n")
                 tables.write(f"        use gluesql::core::ast_builder::*;\n")
                 # We use the AST builder as much as possible so to avoid SQL injection attacks.
-                tables.write(f'        let select_row = table("{table_name}")\n')
+                tables.write(f'        let select_row = table("{struct_metadata.table_name}")\n')
                 tables.write(f"            .select()\n")
                 tables.write(f'            .filter(col("id").eq({primary_key_name}.to_string()))\n')
                 tables.write(f'            .project("{columns}")\n')
@@ -1254,7 +1303,7 @@ def write_web_common_structs(
 
                 # We implement the `delete` method for the struct. This method deletes
                 # the struct from the GlueSQL database.
-                tables.write(f"    /// Delete {struct_name} from the database.\n")
+                tables.write(f"    /// Delete {struct_metadata.name} from the database.\n")
                 tables.write(f"    ///\n")
                 tables.write(f"    /// # Arguments\n")
                 tables.write(f"    /// * `{primary_key_name}` - The ID of the struct to delete.\n")
@@ -1274,7 +1323,7 @@ def write_web_common_structs(
                 tables.write(f"    {{\n")
                 tables.write(f"        use gluesql::core::ast_builder::*;\n")
                 # We use the AST builder as much as possible so to avoid SQL injection attacks.
-                tables.write(f'        table("{table_name}")\n')
+                tables.write(f'        table("{struct_metadata.table_name}")\n')
                 tables.write(f"            .delete()\n")
                 tables.write(f'            .filter(col("id").eq(id.to_string()))\n')
                 tables.write(f"            .execute(connection)\n")
@@ -1292,7 +1341,7 @@ def write_web_common_structs(
                 # We implement the `delete` method for the struct. This method deletes
                 # the current instance of the struct from the GlueSQL database.
                 tables.write(
-                    f"    /// Delete the current instance of {struct_name} from the database.\n"
+                    f"    /// Delete the current instance of {struct_metadata.name} from the database.\n"
                 )
                 tables.write(f"    ///\n")
                 tables.write(f"    /// # Arguments\n")
@@ -1338,75 +1387,61 @@ def write_web_common_structs(
                 # We use the AST builder as much as possible so to avoid SQL injection attacks.
 
                 # First, we determine whether the current struct has at least an optional field.
-                has_optional_fields = False
 
-                for attribute in struct_metadata["attributes"]:
-                    attribute_name = attribute["field_name"]
-                    attribute_type = attribute["field_type"]
-                    if attribute_type.startswith("Option<"):
-                        has_optional_fields = True
-                        break
-
-                if has_optional_fields:
+                if struct_metadata.contains_optional_fields():
                     tables.write(
-                        f'        let mut update_row = table("{table_name}")\n'
+                        f'        let mut update_row = table("{struct_metadata.table_name}")\n'
                     )
                 else:
-                    tables.write(f'        table("{table_name}")\n')
+                    tables.write(f'        table("{struct_metadata.table_name}")\n')
                 tables.write(f"            .update()")
 
-                at_least_one_attribute = False
+                if struct_metadata.contains_only_optional_fields():
+                    raise NotImplementedError(
+                        f"The struct {struct_metadata.name} does not contain any non-optional attributes. "
+                        "It is not well defined how to update a struct without any attributes."
+                    )
 
-                for attribute in struct_metadata["attributes"]:
-                    attribute_name = attribute["field_name"]
-                    attribute_type = attribute["field_type"]
-                    if attribute_type.startswith("Option<"):
+                for attribute in struct_metadata.attributes:
+                    if attribute.optional:
                         # We handle this in the next loop
                         continue
-                    elif attribute_type in update_types_and_methods:
-                        at_least_one_attribute = True
-                        conversion = update_types_and_methods[attribute_type].format(
-                            "self.{}".format(attribute_name)
+                    if attribute.data_type in update_types_and_methods:
+                        conversion = update_types_and_methods[attribute.data_type].format(
+                            "self.{}".format(attribute.name)
                         )
                         tables.write(
-                            f'        \n.set("{attribute_name}", {conversion})'
+                            f'        \n.set("{attribute.name}", {conversion})'
                         )
                     else:
                         raise NotImplementedError(
-                            f"The type {attribute_type} is not supported."
-                            f"The struct {struct_name} contains an {attribute_type}."
+                            f"The type {attribute.data_type} is not supported."
+                            f"The struct {struct_metadata.name} contains an {attribute.data_type}."
                         )
 
-                if not at_least_one_attribute:
-                    raise NotImplementedError(
-                        f"The struct {struct_name} does not contain any attributes. "
-                        "It is not well defined how to update a struct without any attributes."
-                    )
                 if has_optional_fields:
                     tables.write(";\n")
 
                 # After all of the non-optional fields, we handle the optional fields.
-                for attribute in struct_metadata["attributes"]:
-                    attribute_name = attribute["field_name"]
-                    attribute_type = attribute["field_type"]
-                    if attribute_type.startswith("Option<"):
-                        inner_attribute_name = attribute_type[7:-1]
-                        conversion = update_types_and_methods[
-                            inner_attribute_name
-                        ].format("self.{}".format(attribute_name))
-                        if inner_attribute_name in update_types_and_methods:
-                            tables.write(
-                                f"        if let Some({attribute_name}) = self.{attribute_name} {{\n"
-                            )
-                            tables.write(
-                                f'            update_row = update_row.set("{attribute_name}", {update_types_and_methods[inner_attribute_name].format(attribute_name)});\n'
-                            )
-                            tables.write("        }\n")
-                        else:
-                            raise NotImplementedError(
-                                f"The type {inner_attribute_name} is not supported. "
-                                f"The struct {struct_name} contains an {attribute_type}. "
-                            )
+                for attribute in struct_metadata.attributes:
+                    if not attribute.optional:
+                        continue
+                    conversion = update_types_and_methods[
+                        attribute.data_type
+                    ].format("self.{}".format(attribute.name))
+                    if attribute.data_type in update_types_and_methods:
+                        tables.write(
+                            f"        if let Some({attribute.name}) = self.{attribute.name} {{\n"
+                        )
+                        tables.write(
+                            f'            update_row = update_row.set("{attribute.name}", {update_types_and_methods[attribute.data_type].format(attribute.name)});\n'
+                        )
+                        tables.write("        }\n")
+                    else:
+                        raise NotImplementedError(
+                            f"The type {attribute.data_type} is not supported. "
+                            f"The struct {attribute.name} contains an {attribute.data_type}. "
+                        )
 
                 if has_optional_fields:
                     tables.write(f"            update_row.execute(connection)\n")
@@ -1457,7 +1492,7 @@ def write_web_common_structs(
 
                 # We implement the `all` method for the struct. This method returns all of the
                 # structs in the GlueSQL database.
-                tables.write(f"    /// Get all {struct_name} from the database.\n")
+                tables.write(f"    /// Get all {struct_metadata.name} from the database.\n")
                 tables.write(f"    ///\n")
                 tables.write(f"    /// # Arguments\n")
                 tables.write(
@@ -1474,7 +1509,7 @@ def write_web_common_structs(
                 )
                 tables.write(f"    {{\n")
                 tables.write(f"        use gluesql::core::ast_builder::*;\n")
-                tables.write(f'        let select_row = table("{table_name}")\n')
+                tables.write(f'        let select_row = table("{struct_metadata.table_name}")\n')
                 tables.write(f"            .select()\n")
                 tables.write(f'            .project("{columns}")\n')
                 tables.write(f"            .execute(connection)\n")
@@ -1511,69 +1546,62 @@ def write_web_common_structs(
                     "NaiveDateTime": "Timestamp",
                 }
 
-                for attribute in struct_metadata["attributes"]:
-                    attribute_type = attribute["field_type"]
-                    attribute_name = attribute["field_name"]
-                    if attribute_type == "Uuid":
+                for attribute in struct_metadata.attributes:
+                    if attribute.data_type == "Uuid":
                         tables.write(
-                            f'            {attribute_name}: match row.get("{attribute_name}").unwrap() {{\n'
+                            f'            {attribute.name}: match row.get("{attribute.name}").unwrap() {{\n'
                         )
                         tables.write(
-                            f"                gluesql::prelude::Value::Uuid({attribute_name}) => Uuid::from_u128(*{attribute_name}),\n"
+                            f"                gluesql::prelude::Value::Uuid({attribute.name}) => Uuid::from_u128(*{attribute.name}),\n"
                         )
                         tables.write(
                             f'                _ => unreachable!("Expected Uuid"),\n'
                         )
                         tables.write("            },\n")
-                    elif attribute_type == "Option<Uuid>":
+                    elif attribute.data_type == "Option<Uuid>":
                         tables.write(
-                            f'            {attribute_name}: match row.get("{attribute_name}").unwrap() {{\n'
+                            f'            {attribute.name}: match row.get("{attribute.name}").unwrap() {{\n'
                         )
                         tables.write(
                             f"                gluesql::prelude::Value::Null => None,\n"
                         )
                         tables.write(
-                            f"                gluesql::prelude::Value::Uuid({attribute_name}) => Some(Uuid::from_u128(*{attribute_name})),\n"
+                            f"                gluesql::prelude::Value::Uuid({attribute.name}) => Some(Uuid::from_u128(*{attribute.name})),\n"
                         )
                         tables.write(
                             f'                _ => unreachable!("Expected Uuid"),\n'
                         )
                         tables.write("            },\n")
-                    elif (
-                        attribute_type in clonables
-                        or attribute_type.startswith("Option<")
-                        and attribute_type[7:-1] in clonables
-                    ):
-                        if attribute_type.startswith("Option<"):
-                            attribute_type = attribute_type[7:-1]
+                    elif attribute.implements_clone():
+                        if attribute.optional:
                             tables.write(
-                                f'            {attribute_name}: match row.get("{attribute_name}").unwrap() {{\n'
+                                f'            {attribute.name}: match row.get("{attribute.name}").unwrap() {{\n'
                             )
                             tables.write(
                                 f"                gluesql::prelude::Value::Null => None,\n"
                             )
                             tables.write(
-                                f"                gluesql::prelude::Value::{clonables[attribute_type]}({attribute_name}) => Some({attribute_name}.clone()),\n"
+                                f"                gluesql::prelude::Value::{clonables[attribute.data_type]}({attribute.name}) => Some({attribute.name}.clone()),\n"
                             )
                             tables.write(
-                                f'                _ => unreachable!("Expected {clonables[attribute_type]}")\n'
+                                f'                _ => unreachable!("Expected {clonables[attribute.data_type]}")\n'
                             )
                             tables.write("            },\n")
                         else:
                             tables.write(
-                                f'            {attribute_name}: match row.get("{attribute_name}").unwrap() {{\n'
+                                f'            {attribute.name}: match row.get("{attribute.name}").unwrap() {{\n'
                             )
                             tables.write(
-                                f"                gluesql::prelude::Value::{clonables[attribute_type]}({attribute_name}) => {attribute_name}.clone(),\n"
+                                f"                gluesql::prelude::Value::{clonables[attribute.data_type]}({attribute.name}) => {attribute.name}.clone(),\n"
                             )
                             tables.write(
-                                f'                _ => unreachable!("Expected {clonables[attribute_type]}")\n'
+                                f'                _ => unreachable!("Expected {clonables[attribute.data_type]}")\n'
                             )
                             tables.write("            },\n")
                     else:
                         raise NotImplementedError(
-                            f"Found an unsupported attribute type for the struct {struct_name}: {attribute_type} "
-                            f"for the attribute {attribute_name}."
+                            f"Found an unsupported attribute type for the struct {struct_name}: {attribute.data_type} "
+                            f"for the attribute {attribute.name}."
                         )
                 tables.write("        }\n")
                 tables.write("    }\n")
@@ -1602,16 +1630,15 @@ def write_web_common_structs(
         tables.write(f"{derive}, ")
     tables.write(f")]\n")
     tables.write(f"pub enum {enumeration} {{\n")
-    for struct_name in table_names.keys():
-        tables.write(f"    {struct_name},\n")
+    for struct in struct_metadatas:
+        tables.write(f"    {struct.name},\n")
     tables.write("}\n\n")
 
     tables.write(f"impl {enumeration} {{\n")
     tables.write("    pub fn name(&self) -> &'static str {\n")
     tables.write("        match self {\n")
-    for struct_name, table_data in table_names.items():
-        table_name = table_data["table_name"]
-        tables.write(f'            {enumeration}::{struct_name} => "{table_name}",\n')
+    for struct in struct_metadatas:
+        tables.write(f'            {enumeration}::{struct.name} => "{struct.table_name}",\n')
     tables.write("        }\n")
     tables.write("    }\n")
     tables.write("}\n")
@@ -1633,22 +1660,22 @@ def write_web_common_structs(
         tables.write(f"{derive}, ")
     tables.write(f")]\n")
     tables.write(f"pub enum {enumeration}Row {{\n")
-    for struct_name in table_names.keys():
-        tables.write(f"    {struct_name}({struct_name}),\n")
+    for struct in struct_metadatas:
+        tables.write(f"    {struct.name}({struct.name}),\n")
     tables.write("}\n\n")
 
     # For each of the structs, we implement the From trait for the Row enumeration
     # and, since we cannot be sure that the struct is always the same as the table name,
     # we also implement the TryFrom<{enumeration}Row> trait for the struct.
-    for struct_name in table_names.keys():
-        tables.write(f"impl From<{struct_name}> for {enumeration}Row {{\n")
-        tables.write(f"    fn from(item: {struct_name}) -> Self {{\n")
-        tables.write(f"        {enumeration}Row::{struct_name}(item)\n")
+    for struct in struct_metadatas:
+        tables.write(f"impl From<{struct.name}> for {enumeration}Row {{\n")
+        tables.write(f"    fn from(item: {struct.name}) -> Self {{\n")
+        tables.write(f"        {enumeration}Row::{struct.name}(item)\n")
         tables.write("    }\n")
         tables.write("}\n")
 
         tables.write(
-            f"impl std::convert::TryFrom<{enumeration}Row> for {struct_name} {{\n"
+            f"impl std::convert::TryFrom<{enumeration}Row> for {struct.name} {{\n"
         )
         tables.write(f"    type Error = &'static str;\n")
         tables.write(
@@ -1656,7 +1683,7 @@ def write_web_common_structs(
         )
         tables.write(f"        match item {{\n")
         tables.write(
-            f"            {enumeration}Row::{struct_name}(item) => Ok(item),\n"
+            f"            {enumeration}Row::{struct.name}(item) => Ok(item),\n"
         )
         tables.write(f'            _ => Err("Invalid conversion"),\n')
         tables.write("        }\n")
@@ -1667,9 +1694,8 @@ def write_web_common_structs(
     tables.write(f"impl From<&str> for {enumeration} {{\n")
     tables.write("    fn from(item: &str) -> Self {\n")
     tables.write("        match item {\n")
-    for struct_name, table_data in table_names.items():
-        table_name = table_data["table_name"]
-        tables.write(f'            "{table_name}" => {enumeration}::{struct_name},\n')
+    for struct in struct_metadatas:
+        tables.write(f'            "{struct.table_name}" => {enumeration}::{struct.name},\n')
     tables.write('            _ => panic!("Unknown table name"),\n')
     tables.write("        }\n")
     tables.write("    }\n")
@@ -1680,9 +1706,9 @@ def write_web_common_structs(
         f"    pub fn {lower_enumeration}(&self) -> &'static {enumeration} {{\n"
     )
     tables.write("        match self {\n")
-    for struct_name in table_names.keys():
+    for struct in struct_metadatas:
         tables.write(
-            f"            {enumeration}Row::{struct_name}(_) => &{enumeration}::{struct_name},\n"
+            f"            {enumeration}Row::{struct.name}(_) => &{enumeration}::{struct.name},\n"
         )
     tables.write("        }\n")
     tables.write("    }\n")
@@ -1699,8 +1725,8 @@ def write_web_common_structs(
     # methods are solely available in the backend.
 
     has_any_searchables = any(
-        similarity_indices.has_table(table_data["table_name"])
-        for table_data in table_names.values()
+        similarity_indices.has_table(struct.table_name)
+        for struct in struct_metadatas
     )
 
     if has_any_searchables:
@@ -1712,27 +1738,27 @@ def write_web_common_structs(
             tables.write(f"{derive}, ")
         tables.write(f")]\n")
         tables.write(f"pub enum Searcheable{enumeration}Row {{\n")
-        for struct_name in table_names.keys():
-            if similarity_indices.has_table(table_names[struct_name]["table_name"]):
-                tables.write(f"    {struct_name}({struct_name}),\n")
+        for struct in struct_metadatas:
+            if similarity_indices.has_table(struct.table_name):
+                tables.write(f"    {struct.name}({struct.name}),\n")
         tables.write("}\n\n")
 
         # We create the From trait to convert a searchable row to a row.
         # and the try_from trait to convert a row to a searchable row.
-        for struct_name in table_names.keys():
-            if similarity_indices.has_table(table_names[struct_name]["table_name"]):
+        for struct in struct_metadatas:
+            if similarity_indices.has_table(struct.table_name):
                 tables.write(
-                    f"impl From<{struct_name}> for Searcheable{enumeration}Row {{\n"
+                    f"impl From<{struct.name}> for Searcheable{enumeration}Row {{\n"
                 )
-                tables.write(f"    fn from(item: {struct_name}) -> Self {{\n")
+                tables.write(f"    fn from(item: {struct.name}) -> Self {{\n")
                 tables.write(
-                    f"        Searcheable{enumeration}Row::{struct_name}(item)\n"
+                    f"        Searcheable{enumeration}Row::{struct.name}(item)\n"
                 )
                 tables.write(f"    }}\n")
                 tables.write(f"}}\n")
 
                 tables.write(
-                    f"impl std::convert::TryFrom<Searcheable{enumeration}Row> for {struct_name} {{\n"
+                    f"impl std::convert::TryFrom<Searcheable{enumeration}Row> for {struct.name} {{\n"
                 )
                 tables.write(f"    type Error = &'static str;\n")
                 tables.write(
@@ -1740,7 +1766,7 @@ def write_web_common_structs(
                 )
                 tables.write(f"        match item {{\n")
                 tables.write(
-                    f"            Searcheable{enumeration}Row::{struct_name}(item) => Ok(item),\n"
+                    f"            Searcheable{enumeration}Row::{struct.name}(item) => Ok(item),\n"
                 )
                 tables.write(f'            _ => Err("Invalid conversion"),\n')
                 tables.write(f"        }}\n")
@@ -1753,9 +1779,9 @@ def write_web_common_structs(
             tables.write(f"{derive}, ")
         tables.write(f")]\n")
         tables.write(f"pub enum Searcheable{enumeration} {{\n")
-        for struct_name in table_names.keys():
-            if similarity_indices.has_table(table_names[struct_name]["table_name"]):
-                tables.write(f"    {struct_name},\n")
+        for struct in struct_metadatas:
+            if similarity_indices.has_table(struct.table_name):
+                tables.write(f"    {struct.name},\n")
         tables.write("}\n\n")
 
         # We implement the search method for the SearchableTable or SearchableView
@@ -1772,10 +1798,10 @@ def write_web_common_structs(
             f"    pub fn search(&self, query: String, number_of_results: usize) -> Select {{\n"
         )
         tables.write(f"        match self {{\n")
-        for struct_name in table_names.keys():
-            if similarity_indices.has_table(table_names[struct_name]["table_name"]):
+        for struct in struct_metadatas:
+            if similarity_indices.has_table(struct.table_name):
                 tables.write(
-                    f"            Searcheable{enumeration}::{struct_name} => Select::search(Searcheable{enumeration}::{struct_name}, query, number_of_results),\n"
+                    f"            Searcheable{enumeration}::{struct.name} => Select::search(Searcheable{enumeration}::{struct.name}, query, number_of_results),\n"
                 )
         tables.write(f"        }}\n")
         tables.write(f"    }}\n")
@@ -1788,13 +1814,13 @@ def write_web_common_structs(
         tables.write(f"    fn parent_enum() -> Searcheable{enumeration};\n")
         tables.write(f"}}\n")
 
-        for struct_name in table_names.keys():
-            if similarity_indices.has_table(table_names[struct_name]["table_name"]):
+        for struct in struct_metadatas:
+            if similarity_indices.has_table(struct.table_name):
                 tables.write(
-                    f"impl Searcheable{enumeration}Name for {struct_name} {{\n"
+                    f"impl Searcheable{enumeration}Name for {struct.name} {{\n"
                 )
                 tables.write(f"    fn parent_enum() -> Searcheable{enumeration} {{\n")
-                tables.write(f"        Searcheable{enumeration}::{struct_name}\n")
+                tables.write(f"        Searcheable{enumeration}::{struct.name}\n")
                 tables.write(f"    }}\n")
                 tables.write(f"}}\n")
 
@@ -1828,7 +1854,7 @@ def write_web_common_structs(
 
     tables.close()
 
-    return table_names
+    return struct_metadatas
 
 
 def get_view_names() -> List[str]:
@@ -2405,7 +2431,7 @@ def write_web_common_nested_structs(
 
     for struct_metadata in nested_structs:
         struct_name = struct_metadata.struct_name
-        table_name = struct_metadata.primary_table_name
+        table_name = struct_metadata.table_name
         attributes = struct_metadata.attributes
 
         tables.write(
@@ -2605,10 +2631,10 @@ if __name__ == "__main__":
     generate_view_schema()
     check_schema_completion()
     generate_view_structs()
-    table_structs: Dict[str, Dict[str, str]] = write_web_common_structs(
+    table_structs: List[StructMetadata] = write_web_common_structs(
         "src/models.rs", "tables", "Table"
     )
-    view_structs: Dict[str, Dict[str, str]] = write_web_common_structs(
+    view_structs: List[StructMetadata] = write_web_common_structs(
         "src/views/views.rs", "views", "View"
     )
     write_from_impls("src/models.rs", "tables", table_structs)
