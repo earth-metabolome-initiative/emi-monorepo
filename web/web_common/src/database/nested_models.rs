@@ -22,14 +22,14 @@ pub struct NestedContainerVerticalRule {
     pub contained_item_type: NestedItemCategory,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedDocument {
     pub inner: Document,
     pub author: User,
     pub format: DocumentFormat,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedItemCategory {
     pub inner: ItemCategory,
     pub created_by: User,
@@ -82,7 +82,7 @@ pub struct NestedItemUnit {
     pub unit: Unit,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedItem {
     pub inner: Item,
     pub parent_id: Option<Uuid>,
@@ -102,13 +102,13 @@ pub struct NestedManufacturedItemCategory {
     pub manifacturer: NestedOrganization,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedNotification {
     pub inner: Notification,
     pub user: User,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedOrganization {
     pub inner: Organization,
     pub parent_organization_id: Option<i32>,
@@ -132,7 +132,7 @@ pub struct NestedProcedureDiscreteRequirement {
     pub unit: Option<Unit>,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedProcedure {
     pub inner: Procedure,
     pub created_by: Option<User>,
@@ -147,7 +147,7 @@ pub struct NestedProjectRequirement {
     pub unit: Option<Unit>,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedProject {
     pub inner: Project,
     pub state: ProjectState,
@@ -163,7 +163,7 @@ pub struct NestedSampleTaxa {
     pub taxon: Taxa,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedSampledIndividualTaxa {
     pub inner: SampledIndividualTaxa,
     pub created_by: User,
@@ -171,7 +171,7 @@ pub struct NestedSampledIndividualTaxa {
     pub taxon: Taxa,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedSample {
     pub inner: Sample,
     pub created_by: Option<User>,
@@ -191,13 +191,13 @@ pub struct NestedSpectraCollection {
     pub created_by: User,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedTeam {
     pub inner: Team,
     pub parent_team_id: Option<i32>,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedUserEmail {
     pub inner: UserEmail,
     pub user: User,

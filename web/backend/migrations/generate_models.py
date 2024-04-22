@@ -56,7 +56,7 @@ will make use of the full path to the struct in the `web_common` crate so to avo
 
 """
 
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Union
 import psycopg2
 import compress_json
 import os
@@ -103,45 +103,69 @@ class PGIndices:
 
 class AttributeMetadata:
 
-    def __init__(self, original_name: str, name: str, data_type: str, optional: bool):
+    def __init__(
+        self,
+        original_name: str,
+        name: str,
+        data_type: Union[str, "StructMetadata"],
+        optional: bool,
+    ):
         self.original_name = original_name
         self.name = name
-        self.data_type = data_type
+        self._data_type = data_type
         self.optional = optional
 
-    def format_attribute_type(self) -> str:
+    def format_data_type(self) -> str:
+        data_type = self.data_type()
+
         if self.optional:
-            return f"Option<{self.data_type}>"
-        return self.data_type
+            return f"Option<{data_type}>"
+        return data_type
+
+    def data_type(self) -> str:
+        if isinstance(self._data_type, StructMetadata):
+            return self._data_type.name
+        elif isinstance(self._data_type, str):
+            return self._data_type
+
+        raise ValueError("The data type must be either a string or a StructMetadata.")
 
     def implements_eq(self) -> bool:
-        return self.data_type not in ["f32", "f64"]
+        return self._data_type not in ["f32", "f64"] or isinstance(
+            self._data_type, StructMetadata
+        ) and self._data_type.can_implement_eq()
 
     def __eq__(self, other: "AttributeMetadata") -> bool:
         return (
             self.name == other.name
-            and self.data_type == other.data_type
+            and self._data_type == other._data_type
             and self.optional == other.optional
         )
 
     def implements_clone(self) -> bool:
-        return self.data_type in [
-            "bool",
-            "i8",
-            "i16",
-            "i32",
-            "i64",
-            "i128",
-            "u8",
-            "u16",
-            "u32",
-            "u64",
-            "u128",
-            "f32",
-            "f64",
-            "String",
-            "NaiveDateTime",
-        ]
+        return (
+            self._data_type
+            in [
+                "bool",
+                "i8",
+                "i16",
+                "i32",
+                "i64",
+                "i128",
+                "u8",
+                "u16",
+                "u32",
+                "u64",
+                "u128",
+                "f32",
+                "f64",
+                "Uuid",
+                "String",
+                "NaiveDateTime",
+            ]
+            or isinstance(self._data_type, StructMetadata)
+            and self._data_type.can_implement_clone()
+        )
 
 
 class StructMetadata:
@@ -182,10 +206,9 @@ class StructMetadata:
     def has_attribute(self, attribute: AttributeMetadata) -> bool:
         """Returns the type of the attribute"""
         return any(
-            attribute == existing_attribute
-            for existing_attribute in self.attributes
+            attribute == existing_attribute for existing_attribute in self.attributes
         )
-        
+
 
 def get_cursor():
     """Get the cursor to the database."""
@@ -1172,7 +1195,7 @@ def write_web_common_structs(
             tables.write(f"pub struct {struct_metadata.name} {{\n")
             for attribute in struct_metadata.attributes:
                 tables.write(
-                    f"    pub {attribute.name}: {attribute.format_attribute_type()},\n"
+                    f"    pub {attribute.name}: {attribute.format_data_type()},\n"
                 )
             tables.write("}\n")
 
@@ -1224,12 +1247,12 @@ def write_web_common_structs(
                 for attribute in struct_metadata.attributes:
 
                     if attribute.optional:
-                        if attribute.data_type in types_and_methods:
+                        if attribute.data_type() in types_and_methods:
                             tables.write(
                                 f"            match self.{attribute.name} {{\n"
                             )
                             tables.write(
-                                f"                Some({attribute.name}) => {types_and_methods[attribute.data_type].format(attribute.name)},\n"
+                                f"                Some({attribute.name}) => {types_and_methods[attribute.data_type()].format(attribute.name)},\n"
                             )
                             tables.write(
                                 "                None => gluesql::core::ast_builder::null(),\n"
@@ -1237,16 +1260,16 @@ def write_web_common_structs(
                             tables.write("            },\n")
                         else:
                             raise NotImplementedError(
-                                f"The type {attribute.data_type} is not supported. "
-                                f"The struct {struct_metadata.name} contains an {attribute.data_type}. "
+                                f"The type {attribute.data_type()} is not supported. "
+                                f"The struct {struct_metadata.name} contains an {attribute.data_type()}. "
                             )
-                    elif attribute.data_type in types_and_methods:
+                    elif attribute.data_type() in types_and_methods:
                         tables.write(
-                            f"            {types_and_methods[attribute.data_type].format(f'self.{attribute.name}')},\n"
+                            f"            {types_and_methods[attribute.data_type()].format(f'self.{attribute.name}')},\n"
                         )
                     else:
                         raise NotImplementedError(
-                            f"The type {attribute.data_type} is not supported."
+                            f"The type {attribute.data_type()} is not supported."
                         )
 
                 tables.write("        ]\n")
@@ -1456,17 +1479,17 @@ def write_web_common_structs(
                     if attribute.optional:
                         # We handle this in the next loop
                         continue
-                    if attribute.data_type in update_types_and_methods:
+                    if attribute.data_type() in update_types_and_methods:
                         conversion = update_types_and_methods[
-                            attribute.data_type
+                            attribute.data_type()
                         ].format(f"self.{attribute.name}")
                         tables.write(
                             f'        \n.set("{attribute.name}", {conversion})'
                         )
                     else:
                         raise NotImplementedError(
-                            f"The type {attribute.data_type} is not supported."
-                            f"The struct {struct_metadata.name} contains an {attribute.data_type}."
+                            f"The type {attribute.data_type()} is not supported."
+                            f"The struct {struct_metadata.name} contains an {attribute.data_type()}."
                         )
 
                 if struct_metadata.contains_optional_fields():
@@ -1476,21 +1499,21 @@ def write_web_common_structs(
                 for attribute in struct_metadata.attributes:
                     if not attribute.optional:
                         continue
-                    conversion = update_types_and_methods[attribute.data_type].format(
+                    conversion = update_types_and_methods[attribute.data_type()].format(
                         f"self.{attribute.name}"
                     )
-                    if attribute.data_type in update_types_and_methods:
+                    if attribute.data_type() in update_types_and_methods:
                         tables.write(
                             f"        if let Some({attribute.name}) = self.{attribute.name} {{\n"
                         )
                         tables.write(
-                            f'            update_row = update_row.set("{attribute.name}", {update_types_and_methods[attribute.data_type].format(attribute.name)});\n'
+                            f'            update_row = update_row.set("{attribute.name}", {update_types_and_methods[attribute.data_type()].format(attribute.name)});\n'
                         )
                         tables.write("        }\n")
                     else:
                         raise NotImplementedError(
-                            f"The type {attribute.data_type} is not supported. "
-                            f"The struct {attribute.name} contains an {attribute.data_type}. "
+                            f"The type {attribute.data_type()} is not supported. "
+                            f"The struct {attribute.name} contains an {attribute.data_type()}. "
                         )
 
                 if struct_metadata.contains_optional_fields():
@@ -1601,7 +1624,7 @@ def write_web_common_structs(
                 }
 
                 for attribute in struct_metadata.attributes:
-                    if attribute.format_attribute_type() == "Uuid":
+                    if attribute.format_data_type() == "Uuid":
                         tables.write(
                             f'            {attribute.name}: match row.get("{attribute.name}").unwrap() {{\n'
                         )
@@ -1612,7 +1635,7 @@ def write_web_common_structs(
                             '                _ => unreachable!("Expected Uuid"),\n'
                         )
                         tables.write("            },\n")
-                    elif attribute.format_attribute_type() == "Option<Uuid>":
+                    elif attribute.format_data_type() == "Option<Uuid>":
                         tables.write(
                             f'            {attribute.name}: match row.get("{attribute.name}").unwrap() {{\n'
                         )
@@ -1635,10 +1658,10 @@ def write_web_common_structs(
                                 "                gluesql::prelude::Value::Null => None,\n"
                             )
                             tables.write(
-                                f"                gluesql::prelude::Value::{clonables[attribute.data_type]}({attribute.name}) => Some({attribute.name}.clone()),\n"
+                                f"                gluesql::prelude::Value::{clonables[attribute.data_type()]}({attribute.name}) => Some({attribute.name}.clone()),\n"
                             )
                             tables.write(
-                                f'                _ => unreachable!("Expected {clonables[attribute.data_type]}")\n'
+                                f'                _ => unreachable!("Expected {clonables[attribute.data_type()]}")\n'
                             )
                             tables.write("            },\n")
                         else:
@@ -1646,15 +1669,15 @@ def write_web_common_structs(
                                 f'            {attribute.name}: match row.get("{attribute.name}").unwrap() {{\n'
                             )
                             tables.write(
-                                f"                gluesql::prelude::Value::{clonables[attribute.data_type]}({attribute.name}) => {attribute.name}.clone(),\n"
+                                f"                gluesql::prelude::Value::{clonables[attribute.data_type()]}({attribute.name}) => {attribute.name}.clone(),\n"
                             )
                             tables.write(
-                                f'                _ => unreachable!("Expected {clonables[attribute.data_type]}")\n'
+                                f'                _ => unreachable!("Expected {clonables[attribute.data_type()]}")\n'
                             )
                             tables.write("            },\n")
                     else:
                         raise NotImplementedError(
-                            f"Found an unsupported attribute type for the struct {struct_name}: {attribute.data_type} "
+                            f"Found an unsupported attribute type for the struct {struct_name}: {attribute.data_type()} "
                             f"for the attribute {attribute.name}."
                         )
                 tables.write("        }\n")
@@ -2217,10 +2240,10 @@ def generate_nested_structs(
     for import_statement in imports:
         tables.write(f"{import_statement}\n")
 
-    def get_struct_name_by_table_name(table_name: str) -> str:
+    def get_struct_by_table_name(table_name: str) -> StructMetadata:
         for struct in struct_metadatas:
             if struct.table_name == table_name:
-                return struct.name
+                return struct
         raise ValueError(f"Table name {table_name} not found in the struct metadata.")
 
     new_struct_metadatas = []
@@ -2286,14 +2309,14 @@ def generate_nested_structs(
             # method of the `tables_metadata` object.
             if attribute.name in foreign_keys:
                 if attribute.name == primary_key_attribute:
-                    foreign_struct_name = struct.name
+                    foreign_struct = struct
                     normalized_attribute_name = "inner"
                 else:
                     foreign_key_table_name = tables_metadata.get_foreign_key_table_name(
                         struct.table_name, attribute.name
                     )
                     normalized_attribute_name = attribute.name
-                    foreign_struct_name = get_struct_name_by_table_name(
+                    foreign_struct = get_struct_by_table_name(
                         foreign_key_table_name
                     )
                 if normalized_attribute_name.endswith("_id"):
@@ -2308,33 +2331,33 @@ def generate_nested_structs(
                     # we cannot use it save risking the struct be extremely nested.
                     # Think for instance a leaf taxon struct containing its parent taxon
                     # and the parent taxon containing its parent taxon and so on.
-                    if struct.name == foreign_struct_name:
+                    if struct.name == foreign_struct.name:
                         new_attribute = AttributeMetadata(
                             original_name=attribute.name,
                             name=attribute.name,
-                            data_type=attribute.data_type,
+                            data_type=attribute.data_type(),
                             optional=attribute.optional,
                         )
                     else:
                         new_attribute = AttributeMetadata(
                             original_name=attribute.name,
                             name=normalized_attribute_name,
-                            data_type=f"Nested{foreign_struct_name}",
+                            data_type=f"Nested{foreign_struct.name}",
                             optional=attribute.optional,
                         )
                     tables.write(
-                        f"    pub {new_attribute.name}: {new_attribute.format_attribute_type()},\n"
+                        f"    pub {new_attribute.name}: {new_attribute.format_data_type()},\n"
                     )
                     new_struct_metadata.add_attribute(new_attribute)
                 else:
                     new_attribute = AttributeMetadata(
                         original_name=attribute.name,
                         name=normalized_attribute_name,
-                        data_type=foreign_struct_name,
+                        data_type=foreign_struct,
                         optional=attribute.optional,
                     )
                     tables.write(
-                        f"    pub {new_attribute.name}: {new_attribute.format_attribute_type()},\n"
+                        f"    pub {new_attribute.name}: {new_attribute.format_data_type()},\n"
                     )
                     new_struct_metadata.add_attribute(new_attribute)
             else:
@@ -2357,18 +2380,20 @@ def generate_nested_structs(
             "        Ok(Self {\n"
         )
         for attribute in new_struct_metadata.attributes:
-            if attribute.data_type == new_struct_metadata.name or struct.has_attribute(attribute):
+            if attribute.data_type() == new_struct_metadata.name or struct.has_attribute(
+                attribute
+            ):
                 tables.write(
                     f"            {attribute.name}: flat_struct.{attribute.name},\n"
                 )
                 continue
             if attribute.optional:
                 tables.write(
-                    f"            {attribute.name}: flat_struct.{attribute.original_name}.map(|flat_struct| {attribute.data_type}::get(flat_struct, connection)).transpose()?,\n"
+                    f"            {attribute.name}: flat_struct.{attribute.original_name}.map(|flat_struct| {attribute.data_type()}::get(flat_struct, connection)).transpose()?,\n"
                 )
             else:
                 tables.write(
-                    f"            {attribute.name}: {attribute.data_type}::get(flat_struct.{attribute.original_name}, connection)?,\n"
+                    f"            {attribute.name}: {attribute.data_type()}::get(flat_struct.{attribute.original_name}, connection)?,\n"
                 )
         tables.write("        })\n" "    }\n" "}\n")
 
@@ -2478,7 +2503,7 @@ def write_web_common_nested_structs(path: str, nested_structs: List[StructMetada
         tables.write(f"pub struct {struct_metadata.name} {{\n")
         for attribute in struct_metadata.attributes:
             tables.write(
-                f"    pub {attribute.name}: {attribute.format_attribute_type()},\n"
+                f"    pub {attribute.name}: {attribute.format_data_type()},\n"
             )
         tables.write("}\n\n")
 
