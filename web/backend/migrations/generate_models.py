@@ -102,11 +102,11 @@ class PGIndices:
 
 class AttributeMetadata:
 
-    def __init__(self, attribute_name: str, data_type: str, optional: bool, boxed: bool):
-        self.attribute_name = attribute_name
+    def __init__(self, original_name: str, name: str, data_type: str, optional: bool):
+        self.original_name = original_name
+        self.name = name
         self.data_type = data_type
         self.optional = optional
-        self.boxed = boxed
 
 class StructMetadata:
 
@@ -122,8 +122,6 @@ class StructMetadata:
     def add_derive(self, derive: str):
         self.derives.append(derive)
 
-    def contains_boxed_fields(self) -> bool:
-        return any(attribute.boxed for attribute in self.attributes)
 
 def get_cursor():
     """Get the cursor to the database."""
@@ -2203,7 +2201,6 @@ def generate_nested_structs(
             tables.write(", Eq")
             new_struct_metadata.add_derive("Eq")
         tables.write(")]\n")
-        new_struct_attributes = []
 
         tables.write(f"pub struct {nested_struct_name} {{\n")
         for attribute in struct_attributes:
@@ -2231,45 +2228,33 @@ def generate_nested_structs(
                     table_name, attribute_name
                 ):  
                     new_attribute_type = f"Nested{foreign_struct_name}"
-                    boxed = False
+                    # If the nested version of the foreign struct is already present,
+                    # we cannot use it save risking the struct be extremely nested.
+                    # Think for instance a leaf taxon struct containing its parent taxon
+                    # and the parent taxon containing its parent taxon and so on.
                     if struct_name == foreign_struct_name:
-                        new_attribute_type = f"Box<{new_attribute_type}>"
-                        boxed = True
-                    if optional:
-                        new_attribute_type = f"Option<{new_attribute_type}>"
-                        optional = True
+                        new_attribute_type = attribute_type
                     tables.write(
                         f"    pub {normalized_attribute_name}: {new_attribute_type},\n"
                     )
-                    new_struct_attributes.append(
-                        (normalized_attribute_name, attribute_name, f"Nested{foreign_struct_name}", boxed, optional)
-                    )
                     new_struct_metadata.add_attribute(
                         AttributeMetadata(
-                            attribute_name=normalized_attribute_name,
-                            data_type=f"Nested{foreign_struct_name}",
+                            original_name=attribute_name,
+                            name=normalized_attribute_name,
+                            data_type=new_attribute_type,
                             optional=optional,
-                            boxed=boxed,
                         )
                     )
                 else:
-                    new_attribute_type = foreign_struct_name
-                    boxed = False
-                    if optional:
-                        new_attribute_type = f"Option<{new_attribute_type}>"
-                        optional = True
                     tables.write(
-                        f"    pub {normalized_attribute_name}: {new_attribute_type},\n"
-                    )
-                    new_struct_attributes.append(
-                        (normalized_attribute_name, attribute_name, foreign_struct_name, boxed, optional)
+                        f"    pub {normalized_attribute_name}: {foreign_struct_name},\n"
                     )
                     new_struct_metadata.add_attribute(
                         AttributeMetadata(
-                            attribute_name=normalized_attribute_name,
+                            original_name=attribute_name,
+                            name=normalized_attribute_name,
                             data_type=foreign_struct_name,
                             optional=optional,
-                            boxed=boxed,
                         )
                     )
             else:
@@ -2291,21 +2276,15 @@ def generate_nested_structs(
             f"        let flat_struct = {struct_name}::get(id, connection)?;\n"
             f"        Ok(Self {{\n"
         )
-        for attribute_name, original_attribute_name, attribute_type, boxed, optional in new_struct_attributes:
-            if optional:
+        for attribute in new_struct_metadata.attributes:
+            if attribute.optional:
                 tables.write(
-                    f"            {attribute_name}: flat_struct.{original_attribute_name}.map(|flat_struct| {attribute_type}::get(flat_struct, connection)).transpose()?"
+                    f"            {attribute.name}: flat_struct.{attribute.original_name}.map(|flat_struct| {attribute.data_type}::get(flat_struct, connection)).transpose()?,\n"
                 )
-                if boxed:
-                    tables.write(".map(Box::new)")
-                tables.write(",\n")
             else:
                 tables.write(
-                    f"            {attribute_name}: {attribute_type}::get(flat_struct.{original_attribute_name}, connection)?"
+                    f"            {attribute.name}: {attribute.data_type}::get(flat_struct.{attribute.original_name}, connection)?,\n"
                 )
-                if boxed:
-                    tables.write(".map(Box::new)")
-                tables.write(",\n")
         tables.write(
             f"        }})\n"
             f"    }}\n"
@@ -2349,90 +2328,40 @@ def generate_nested_structs(
             f"    fn from(item: web_common::database::nested_models::Nested{struct_name}) -> Self {{\n"
             f"        Self {{\n"
         )
-        for attribute_name, original_attribute_name, attribute_type, boxed, optional in new_struct_attributes:
-            if optional:
+        for attribute in new_struct_metadata.attributes:
+            if attribute.optional:
                 tables.write(
-                    f"            {attribute_name}: item.{attribute_name}.map(|item| item.into())"
+                    f"            {attribute.name}: item.{attribute.name}.map(|item| item.into()),\n"
                 )
-                tables.write(",\n")
             else:
                 tables.write(
-                    f"            {attribute_name}: item.{attribute_name}.into(),\n"
+                    f"            {attribute.name}: item.{attribute.name}.into(),\n"
                 )
         tables.write(
             f"        }}\n"
             f"    }}\n"
             f"}}\n"
-        )
-
-        # If this struct contains boxed fields, we implement the From trait
-        # for the boxed versions of the nested structs.
-        if new_struct_metadata.contains_boxed_fields():
-            tables.write(
-                f"impl From<Box<web_common::database::nested_models::Nested{struct_name}>> for Box<Nested{struct_name}> {{\n"
-                f"    fn from(item: Box<web_common::database::nested_models::Nested{struct_name}>) -> Self {{\n"
-                f"        Box::new(Nested{struct_name} {{\n"
-            )
-            for attribute_name, original_attribute_name, attribute_type, boxed, optional in new_struct_attributes:
-                if optional:
-                    tables.write(
-                        f"            {attribute_name}: item.{attribute_name}.map(|item| item.into())"
-                    )
-                    tables.write(",\n")
-                else:
-                    tables.write(
-                        f"            {attribute_name}: item.{attribute_name}.into(),\n"
-                    )
-            tables.write(
-                f"        }})\n"
-                f"    }}\n"
-                f"}}\n"
-            )            
+        )       
 
         tables.write(
             f"impl From<Nested{struct_name}> for web_common::database::nested_models::Nested{struct_name} {{\n"
             f"    fn from(item: Nested{struct_name}) -> Self {{\n"
             f"        Self {{\n"
         )
-        for attribute_name, original_attribute_name, attribute_type, boxed, optional in new_struct_attributes:
-            if optional:
+        for attribute in new_struct_metadata.attributes:
+            if attribute.optional:
                 tables.write(
-                    f"            {attribute_name}: item.{attribute_name}.map(|item| item.into())"
+                    f"            {attribute.name}: item.{attribute.name}.map(|item| item.into()),\n"
                 )
-                tables.write(",\n")
             else:
                 tables.write(
-                    f"            {attribute_name}: item.{attribute_name}.into(),\n"
+                    f"            {attribute.name}: item.{attribute.name}.into(),\n"
                 )
         tables.write(
             f"        }}\n"
             f"    }}\n"
             f"}}\n"
         )
-
-        # If this struct contains boxed fields, we implement the From trait
-        # for the boxed versions of the nested structs.
-        if new_struct_metadata.contains_boxed_fields():
-            tables.write(
-                f"impl From<Box<Nested{struct_name}>> for Box<web_common::database::nested_models::Nested{struct_name}> {{\n"
-                f"    fn from(item: Box<Nested{struct_name}>) -> Self {{\n"
-                f"        Box::new(web_common::database::nested_models::Nested{struct_name} {{\n"
-            )
-            for attribute_name, original_attribute_name, attribute_type, boxed, optional in new_struct_attributes:
-                if optional:
-                    tables.write(
-                        f"            {attribute_name}: item.{attribute_name}.map(|item| item.into())"
-                    )
-                    tables.write(",\n")
-                else:
-                    tables.write(
-                        f"            {attribute_name}: item.{attribute_name}.into(),\n"
-                    )
-            tables.write(
-                f"        }})\n"
-                f"    }}\n"
-                f"}}\n"
-            )
 
         new_struct_metadatas.append(new_struct_metadata)
 
@@ -2482,16 +2411,12 @@ def write_web_common_nested_structs(
         )
         tables.write(f"pub struct {struct_name} {{\n")
         for attribute in attributes:
-            attribute_name = attribute.attribute_name
             attribute_type = attribute.data_type
             optional = attribute.optional
-            boxed = attribute.boxed
-            if boxed:
-                attribute_type = f"Box<{attribute_type}>"
 
             if optional:
                 attribute_type = f"Option<{attribute_type}>"
-            tables.write(f"    pub {attribute_name}: {attribute_type},\n")
+            tables.write(f"    pub {attribute.name}: {attribute_type},\n")
         tables.write("}\n\n")
 
     tables.close()
@@ -2689,4 +2614,4 @@ if __name__ == "__main__":
 
     table_nested_structs: List[StructMetadata]  = generate_nested_structs("src/nested_models.rs", "tables", table_structs)
     view_nested_structs: List[StructMetadata] = generate_nested_structs("src/views/nested_views.rs", "views", view_structs, table_structs)
-    write_web_common_nested_structs("nested_models.rs", table_nested_structs)
+    write_web_common_nested_structs("nested_models.rs", table_nested_structs + view_nested_structs)

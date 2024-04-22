@@ -284,8 +284,8 @@ pub struct NestedItemContinuousQuantity {
     pub inner: ItemContinuousQuantity,
     pub item: NestedItem,
     pub unit: Unit,
-    pub sensor: Option<NestedItem>,
-    pub measured_by: Option<User>,
+    pub sensor: NestedItem,
+    pub measured_by: User,
 }
 
 impl NestedItemContinuousQuantity {
@@ -336,7 +336,7 @@ pub struct NestedItemDiscreteQuantity {
     pub inner: ItemDiscreteQuantity,
     pub item: NestedItem,
     pub unit: Unit,
-    pub measured_by: Option<User>,
+    pub measured_by: User,
 }
 
 impl NestedItemDiscreteQuantity {
@@ -382,9 +382,9 @@ impl From<NestedItemDiscreteQuantity> for web_common::database::nested_models::N
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct NestedItemLocation {
     pub inner: ItemLocation,
-    pub item: Option<NestedItem>,
-    pub located_by: Option<User>,
-    pub location: Option<NestedLocation>,
+    pub item: NestedItem,
+    pub located_by: User,
+    pub location: NestedLocation,
 }
 
 impl NestedItemLocation {
@@ -474,7 +474,7 @@ impl From<NestedItemUnit> for web_common::database::nested_models::NestedItemUni
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct NestedItem {
     pub inner: Item,
-    pub parent: Option<Box<NestedItem>>,
+    pub parent: Option<Uuid>,
 }
 
 impl NestedItem {
@@ -491,7 +491,7 @@ impl NestedItem {
         let flat_struct = Item::get(id, connection)?;
         Ok(Self {
             inner: Item::get(flat_struct.id, connection)?,
-            parent: flat_struct.parent_id.map(|flat_struct| NestedItem::get(flat_struct, connection)).transpose()?.map(Box::new),
+            parent: flat_struct.parent_id.map(|flat_struct| Option<Uuid>::get(flat_struct, connection)).transpose()?,
         })
     }
 }
@@ -503,14 +503,6 @@ impl From<web_common::database::nested_models::NestedItem> for NestedItem {
         }
     }
 }
-impl From<Box<web_common::database::nested_models::NestedItem>> for Box<NestedItem> {
-    fn from(item: Box<web_common::database::nested_models::NestedItem>) -> Self {
-        Box::new(NestedItem {
-            inner: item.inner.into(),
-            parent: item.parent.map(|item| item.into()),
-        })
-    }
-}
 impl From<NestedItem> for web_common::database::nested_models::NestedItem {
     fn from(item: NestedItem) -> Self {
         Self {
@@ -519,20 +511,12 @@ impl From<NestedItem> for web_common::database::nested_models::NestedItem {
         }
     }
 }
-impl From<Box<NestedItem>> for Box<web_common::database::nested_models::NestedItem> {
-    fn from(item: Box<NestedItem>) -> Self {
-        Box::new(web_common::database::nested_models::NestedItem {
-            inner: item.inner.into(),
-            parent: item.parent.map(|item| item.into()),
-        })
-    }
-}
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct NestedLocation {
     pub inner: Location,
-    pub geolocalization_device: Option<NestedItem>,
-    pub altitude_device: Option<NestedItem>,
-    pub parent_location: Option<Box<NestedLocation>>,
+    pub geolocalization_device: NestedItem,
+    pub altitude_device: NestedItem,
+    pub parent_location: Option<Uuid>,
 }
 
 impl NestedLocation {
@@ -551,7 +535,7 @@ impl NestedLocation {
             inner: Location::get(flat_struct.id, connection)?,
             geolocalization_device: flat_struct.geolocalization_device_id.map(|flat_struct| NestedItem::get(flat_struct, connection)).transpose()?,
             altitude_device: flat_struct.altitude_device_id.map(|flat_struct| NestedItem::get(flat_struct, connection)).transpose()?,
-            parent_location: flat_struct.parent_location_id.map(|flat_struct| NestedLocation::get(flat_struct, connection)).transpose()?.map(Box::new),
+            parent_location: flat_struct.parent_location_id.map(|flat_struct| Option<Uuid>::get(flat_struct, connection)).transpose()?,
         })
     }
 }
@@ -565,16 +549,6 @@ impl From<web_common::database::nested_models::NestedLocation> for NestedLocatio
         }
     }
 }
-impl From<Box<web_common::database::nested_models::NestedLocation>> for Box<NestedLocation> {
-    fn from(item: Box<web_common::database::nested_models::NestedLocation>) -> Self {
-        Box::new(NestedLocation {
-            inner: item.inner.into(),
-            geolocalization_device: item.geolocalization_device.map(|item| item.into()),
-            altitude_device: item.altitude_device.map(|item| item.into()),
-            parent_location: item.parent_location.map(|item| item.into()),
-        })
-    }
-}
 impl From<NestedLocation> for web_common::database::nested_models::NestedLocation {
     fn from(item: NestedLocation) -> Self {
         Self {
@@ -583,16 +557,6 @@ impl From<NestedLocation> for web_common::database::nested_models::NestedLocatio
             altitude_device: item.altitude_device.map(|item| item.into()),
             parent_location: item.parent_location.map(|item| item.into()),
         }
-    }
-}
-impl From<Box<NestedLocation>> for Box<web_common::database::nested_models::NestedLocation> {
-    fn from(item: Box<NestedLocation>) -> Self {
-        Box::new(web_common::database::nested_models::NestedLocation {
-            inner: item.inner.into(),
-            geolocalization_device: item.geolocalization_device.map(|item| item.into()),
-            altitude_device: item.altitude_device.map(|item| item.into()),
-            parent_location: item.parent_location.map(|item| item.into()),
-        })
     }
 }
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -678,7 +642,7 @@ impl From<NestedNotification> for web_common::database::nested_models::NestedNot
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct NestedOrganization {
     pub inner: Organization,
-    pub parent_organization: Option<Box<NestedOrganization>>,
+    pub parent_organization: Option<i32>,
 }
 
 impl NestedOrganization {
@@ -695,7 +659,7 @@ impl NestedOrganization {
         let flat_struct = Organization::get(id, connection)?;
         Ok(Self {
             inner: Organization::get(flat_struct.id, connection)?,
-            parent_organization: flat_struct.parent_organization_id.map(|flat_struct| NestedOrganization::get(flat_struct, connection)).transpose()?.map(Box::new),
+            parent_organization: flat_struct.parent_organization_id.map(|flat_struct| Option<i32>::get(flat_struct, connection)).transpose()?,
         })
     }
 }
@@ -707,14 +671,6 @@ impl From<web_common::database::nested_models::NestedOrganization> for NestedOrg
         }
     }
 }
-impl From<Box<web_common::database::nested_models::NestedOrganization>> for Box<NestedOrganization> {
-    fn from(item: Box<web_common::database::nested_models::NestedOrganization>) -> Self {
-        Box::new(NestedOrganization {
-            inner: item.inner.into(),
-            parent_organization: item.parent_organization.map(|item| item.into()),
-        })
-    }
-}
 impl From<NestedOrganization> for web_common::database::nested_models::NestedOrganization {
     fn from(item: NestedOrganization) -> Self {
         Self {
@@ -723,21 +679,13 @@ impl From<NestedOrganization> for web_common::database::nested_models::NestedOrg
         }
     }
 }
-impl From<Box<NestedOrganization>> for Box<web_common::database::nested_models::NestedOrganization> {
-    fn from(item: Box<NestedOrganization>) -> Self {
-        Box::new(web_common::database::nested_models::NestedOrganization {
-            inner: item.inner.into(),
-            parent_organization: item.parent_organization.map(|item| item.into()),
-        })
-    }
-}
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct NestedProcedureContinuousRequirement {
     pub inner: ProcedureContinuousRequirement,
     pub created_by: User,
     pub procedure: NestedProcedure,
     pub item_category: NestedItemCategory,
-    pub unit: Option<Unit>,
+    pub unit: Unit,
 }
 
 impl NestedProcedureContinuousRequirement {
@@ -789,7 +737,7 @@ pub struct NestedProcedureDiscreteRequirement {
     pub created_by: User,
     pub procedure: NestedProcedure,
     pub item_category: NestedItemCategory,
-    pub unit: Option<Unit>,
+    pub unit: Unit,
 }
 
 impl NestedProcedureDiscreteRequirement {
@@ -838,7 +786,7 @@ impl From<NestedProcedureDiscreteRequirement> for web_common::database::nested_m
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct NestedProcedure {
     pub inner: Procedure,
-    pub created_by: Option<User>,
+    pub created_by: User,
 }
 
 impl NestedProcedure {
@@ -881,7 +829,7 @@ pub struct NestedProjectRequirement {
     pub created_by: User,
     pub project: NestedProject,
     pub item_category: NestedItemCategory,
-    pub unit: Option<Unit>,
+    pub unit: Unit,
 }
 
 impl NestedProjectRequirement {
@@ -931,7 +879,7 @@ impl From<NestedProjectRequirement> for web_common::database::nested_models::Nes
 pub struct NestedProject {
     pub inner: Project,
     pub state: ProjectState,
-    pub parent_project: Option<Box<NestedProject>>,
+    pub parent_project: Option<i32>,
     pub created_by: User,
 }
 
@@ -950,7 +898,7 @@ impl NestedProject {
         Ok(Self {
             inner: Project::get(flat_struct.id, connection)?,
             state: ProjectState::get(flat_struct.state_id, connection)?,
-            parent_project: flat_struct.parent_project_id.map(|flat_struct| NestedProject::get(flat_struct, connection)).transpose()?.map(Box::new),
+            parent_project: flat_struct.parent_project_id.map(|flat_struct| Option<i32>::get(flat_struct, connection)).transpose()?,
             created_by: User::get(flat_struct.created_by, connection)?,
         })
     }
@@ -986,16 +934,6 @@ impl From<web_common::database::nested_models::NestedProject> for NestedProject 
         }
     }
 }
-impl From<Box<web_common::database::nested_models::NestedProject>> for Box<NestedProject> {
-    fn from(item: Box<web_common::database::nested_models::NestedProject>) -> Self {
-        Box::new(NestedProject {
-            inner: item.inner.into(),
-            state: item.state.into(),
-            parent_project: item.parent_project.map(|item| item.into()),
-            created_by: item.created_by.into(),
-        })
-    }
-}
 impl From<NestedProject> for web_common::database::nested_models::NestedProject {
     fn from(item: NestedProject) -> Self {
         Self {
@@ -1004,16 +942,6 @@ impl From<NestedProject> for web_common::database::nested_models::NestedProject 
             parent_project: item.parent_project.map(|item| item.into()),
             created_by: item.created_by.into(),
         }
-    }
-}
-impl From<Box<NestedProject>> for Box<web_common::database::nested_models::NestedProject> {
-    fn from(item: Box<NestedProject>) -> Self {
-        Box::new(web_common::database::nested_models::NestedProject {
-            inner: item.inner.into(),
-            state: item.state.into(),
-            parent_project: item.parent_project.map(|item| item.into()),
-            created_by: item.created_by.into(),
-        })
     }
 }
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -1115,8 +1043,8 @@ impl From<NestedSampledIndividualTaxa> for web_common::database::nested_models::
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct NestedSample {
     pub inner: Sample,
-    pub created_by: Option<User>,
-    pub derived_from: Option<Box<NestedSample>>,
+    pub created_by: User,
+    pub derived_from: Option<Uuid>,
 }
 
 impl NestedSample {
@@ -1134,7 +1062,7 @@ impl NestedSample {
         Ok(Self {
             inner: Sample::get(flat_struct.id, connection)?,
             created_by: flat_struct.created_by.map(|flat_struct| User::get(flat_struct, connection)).transpose()?,
-            derived_from: flat_struct.derived_from.map(|flat_struct| NestedSample::get(flat_struct, connection)).transpose()?.map(Box::new),
+            derived_from: flat_struct.derived_from.map(|flat_struct| Option<Uuid>::get(flat_struct, connection)).transpose()?,
         })
     }
 }
@@ -1147,15 +1075,6 @@ impl From<web_common::database::nested_models::NestedSample> for NestedSample {
         }
     }
 }
-impl From<Box<web_common::database::nested_models::NestedSample>> for Box<NestedSample> {
-    fn from(item: Box<web_common::database::nested_models::NestedSample>) -> Self {
-        Box::new(NestedSample {
-            inner: item.inner.into(),
-            created_by: item.created_by.map(|item| item.into()),
-            derived_from: item.derived_from.map(|item| item.into()),
-        })
-    }
-}
 impl From<NestedSample> for web_common::database::nested_models::NestedSample {
     fn from(item: NestedSample) -> Self {
         Self {
@@ -1163,15 +1082,6 @@ impl From<NestedSample> for web_common::database::nested_models::NestedSample {
             created_by: item.created_by.map(|item| item.into()),
             derived_from: item.derived_from.map(|item| item.into()),
         }
-    }
-}
-impl From<Box<NestedSample>> for Box<web_common::database::nested_models::NestedSample> {
-    fn from(item: Box<NestedSample>) -> Self {
-        Box::new(web_common::database::nested_models::NestedSample {
-            inner: item.inner.into(),
-            created_by: item.created_by.map(|item| item.into()),
-            derived_from: item.derived_from.map(|item| item.into()),
-        })
     }
 }
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -1261,7 +1171,7 @@ impl From<NestedSpectraCollection> for web_common::database::nested_models::Nest
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct NestedTeam {
     pub inner: Team,
-    pub parent_team: Option<Box<NestedTeam>>,
+    pub parent_team: Option<i32>,
 }
 
 impl NestedTeam {
@@ -1278,7 +1188,7 @@ impl NestedTeam {
         let flat_struct = Team::get(id, connection)?;
         Ok(Self {
             inner: Team::get(flat_struct.id, connection)?,
-            parent_team: flat_struct.parent_team_id.map(|flat_struct| NestedTeam::get(flat_struct, connection)).transpose()?.map(Box::new),
+            parent_team: flat_struct.parent_team_id.map(|flat_struct| Option<i32>::get(flat_struct, connection)).transpose()?,
         })
     }
 }
@@ -1290,28 +1200,12 @@ impl From<web_common::database::nested_models::NestedTeam> for NestedTeam {
         }
     }
 }
-impl From<Box<web_common::database::nested_models::NestedTeam>> for Box<NestedTeam> {
-    fn from(item: Box<web_common::database::nested_models::NestedTeam>) -> Self {
-        Box::new(NestedTeam {
-            inner: item.inner.into(),
-            parent_team: item.parent_team.map(|item| item.into()),
-        })
-    }
-}
 impl From<NestedTeam> for web_common::database::nested_models::NestedTeam {
     fn from(item: NestedTeam) -> Self {
         Self {
             inner: item.inner.into(),
             parent_team: item.parent_team.map(|item| item.into()),
         }
-    }
-}
-impl From<Box<NestedTeam>> for Box<web_common::database::nested_models::NestedTeam> {
-    fn from(item: Box<NestedTeam>) -> Self {
-        Box::new(web_common::database::nested_models::NestedTeam {
-            inner: item.inner.into(),
-            parent_team: item.parent_team.map(|item| item.into()),
-        })
     }
 }
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
