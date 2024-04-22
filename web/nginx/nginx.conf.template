@@ -26,8 +26,8 @@ http {
         listen ${NGINX_HTTPS_PORT} ssl;
         server_name ${DOMAIN};
 
-        ssl_certificate /app/emi.local.pem;
-        ssl_certificate_key /app/emi.local-key.pem;
+        ssl_certificate /app/${DOMAIN}.pem;
+        ssl_certificate_key /app/${DOMAIN}-key.pem;
 
         # Set HTTP Strict Transport Security (HSTS) header
         add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; Secure" always;

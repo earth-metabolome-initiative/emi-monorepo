@@ -39,6 +39,8 @@ mkcert -install
 
 Now, we can create the certificates for the platform:
 
+(else if your bash doesnt takes the $DOMAIN variable just set it manually !)
+
 ```bash
 mkcert -cert-file nginx/${DOMAIN}.pem -key-file nginx/${DOMAIN}-key.pem ${DOMAIN}
 ```
