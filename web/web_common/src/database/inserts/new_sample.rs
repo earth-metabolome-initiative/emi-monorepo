@@ -1,5 +1,5 @@
 use crate::{custom_validators::*, database::SampleState};
-use crate::database::Insert;
+use crate::database::{Insert, SamplingProcedure, User};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
@@ -12,7 +12,9 @@ pub struct NewSample {
     #[validate]
     pub description: NotEmpty,
     pub public: bool,
-    pub sample_state: SampleState
+    pub sample_state: SampleState,
+    pub collector: User,
+    pub sampling_procedure: SamplingProcedure
     // pub parent_sample_id: Option<Uuid>,
 }
 
@@ -21,13 +23,17 @@ impl NewSample {
         name: String,
         description: String,
         public: bool,
-        sample_state: SampleState
+        sample_state: SampleState,
+        collector: User,
+        sampling_procedure: SamplingProcedure
     ) -> Result<Self, Vec<String>> {
         let new_sample = Self {
             name: NewSampleName::try_from(name)?,
             description: NotEmpty::try_from(description)?,
             public,
-            sample_state
+            sample_state,
+            collector,
+            sampling_procedure
         };
 
         Ok(new_sample)

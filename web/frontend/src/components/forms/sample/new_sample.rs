@@ -21,7 +21,8 @@ pub struct NewSampleBuilder {
     pub public: bool,
     pub parent_project: Option<NestedProject>,
     pub sample_state: Option<SampleState>,
-    pub user: Option<User>,
+    pub collector: Option<User>,
+    pub sampling_procedure: Option<SamplingProcedure>
 }
 
 impl FormBuilder for NewSampleBuilder {
@@ -49,7 +50,8 @@ impl FormBuilder for NewSampleBuilder {
             description: self.description.clone(),
             public: self.public,
             sample_state: self.sample_state.clone().unwrap(),
-            user: self.user.clone().unwrap(),
+            collector: self.collector.clone().unwrap(),
+            sampling_procedure: self.sampling_procedure.clone().unwrap()
         }
     }
 }
@@ -60,6 +62,8 @@ pub enum NewSampleBuilderActions {
     SetPublic(bool),
     SetParentProject(Option<NestedProject>),
     SetSampleState(Option<SampleState>),
+    SetCollector(User),
+    SetSamplingProcedure(SamplingProcedure)
 }
 
 impl Reducer<NewSampleBuilder> for NewSampleBuilderActions {
@@ -80,6 +84,12 @@ impl Reducer<NewSampleBuilder> for NewSampleBuilderActions {
             }
             NewSampleBuilderActions::SetSampleState(sample_state) => {
                 state_mut.sample_state = sample_state;
+            }
+            NewSampleBuilderActions::SetCollector(collector) => {
+                state_mut.collector = Some(collector);
+            }
+            NewSampleBuilderActions::SetSamplingProcedure(sampling_procedure) => {
+                state_mut.sampling_procedure = Some(sampling_procedure);
             }
         }
         state
@@ -124,6 +134,9 @@ pub fn complete_profile_form() -> Html {
     let set_sample_state = dispatch.apply_callback(|mut sample_states: Vec<SampleState>| {
         NewSampleBuilderActions::SetSampleState(sample_states.pop())
     });
+    let set_collector = dispatch.apply_callback(|mut users: Vec<User>| {
+        NewSampleBuilderActions::SetCollector(users.pop().unwrap())
+    });
 
     html! {
         <BasicForm<NewSample> builder={store.deref().clone()}>
@@ -132,6 +145,7 @@ pub fn complete_profile_form() -> Html {
             <Checkbox label="Public" builder={set_public} value={store.public} />
             <Datalist<web_common::database::NestedProject> builder={set_parent_project} value={store.parent_project.clone().map_or_else(|| Vec::new(), |value| vec![value])} label="Project" />
             <Datalist<web_common::database::SampleState> builder={set_sample_state} value={store.sample_state.clone().map_or_else(|| Vec::new(), |value| vec![value])} label="Sample State" />
+            <Datalist<web_common::database::User> builder={set_collector} value={store.collector.clone().map_or_else(|| Vec::new(), |value| vec![value])} label="Collector" />
         </BasicForm<NewSample>>
     }
 }

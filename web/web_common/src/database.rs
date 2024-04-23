@@ -18,6 +18,7 @@ pub use notification_message::NotificationMessage;
 pub mod to_strings;
 pub mod nested_models;
 pub use nested_models::*;
+pub mod nested_models_impls;
 pub mod markers;
 pub use markers::*;
 pub mod table_names;
