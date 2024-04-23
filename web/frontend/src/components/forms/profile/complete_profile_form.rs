@@ -1,41 +1,130 @@
 //! Component for the form requiring user name and surname.
 
+use std::rc::Rc;
+
 use crate::components::forms::*;
 use crate::stores::user_state::UserState;
+use serde::{Deserialize, Serialize};
 use wasm_bindgen::JsCast;
 use web_common::api::form_traits::TryFromCallback;
-use web_common::custom_validators::image;
+use web_common::custom_validators::{image, Image};
 use web_common::database::updates::update_profile::{ProfileImage, ValidatedNameField};
 use web_common::database::updates::CompleteProfile;
 use web_common::file_formats::GenericFileFormat;
 use web_sys::FormData;
+use std::ops::Deref;
 use yew::prelude::*;
 use yewdux::prelude::*;
 
+#[derive(Debug, PartialEq, Clone, Default, Store, Serialize, Deserialize)]
+#[store(storage = "session")]
+pub struct CompleteProfileBuilder {
+    pub first_name: Option<String>,
+    pub middle_name: Option<String>,
+    pub last_name: Option<String>,
+    pub picture: Option<Image>,
+}
 
-// impl FormResult for CompleteProfile {
-//     const METHOD: crate::api::form_traits::FormMethod = crate::api::form_traits::FormMethod::PUT;
+pub enum CompleteProfileBuilderMessage {
+    SetFirstName(String),
+    SetMiddleName(String),
+    SetLastName(String),
+    SetPicture(Image),
+}
 
-//     fn title() -> &'static str {
-//         "Complete Profile"
-//     }
+impl FormBuilder for CompleteProfileBuilder {
+    type Data = CompleteProfile;
+    type Actions = CompleteProfileBuilderMessage;
 
-//     fn task_target() -> &'static str {
-//         "Profile"
-//     }
+    fn form_level_errors(&self) -> Vec<String> {
+        vec![]
+    }
 
-//     fn description() -> &'static str {
-//         concat!(
-//             "Hello and welcome to the Earth Metabolome Initiative! ",
-//             "As a new user, we need you to complete your profile. ",
-//             "Please provide your given name and profile piture."
-//         )
-//     }
+    fn buildable(&self) -> Result<(), web_common::api::ApiError> {
+        if self.first_name.is_none() {
+            return Err(web_common::api::ApiError::BadRequest(vec![
+                "First name is required.".to_string(),
+            ]));
+        }
+        if self.last_name.is_none() {
+            return Err(web_common::api::ApiError::BadRequest(vec![
+                "Last name is required.".to_string(),
+            ]));
+        }
+        if self.picture.is_none() {
+            return Err(web_common::api::ApiError::BadRequest(vec![
+                "Profile picture is required.".to_string(),
+            ]));
+        }
 
-//     fn requires_authentication() -> bool {
-//         true
-//     }
-// }
+        CompleteProfile::new(
+            self.first_name.clone().unwrap(),
+            self.middle_name.clone(),
+            self.last_name.clone().unwrap(),
+            self.picture.clone().unwrap(),
+        )
+        .map(|_| ())
+        .map_err(|errors| web_common::api::ApiError::BadRequest(errors))
+    }
+
+    fn build(&self) -> Self::Data {
+        CompleteProfile::new(
+            self.first_name.clone().unwrap(),
+            self.middle_name.clone(),
+            self.last_name.clone().unwrap(),
+            self.picture.clone().unwrap(),
+        )
+        .unwrap()
+    }
+}
+
+impl Reducer<CompleteProfileBuilder> for CompleteProfileBuilderMessage {
+    fn apply(self, mut state: std::rc::Rc<CompleteProfileBuilder>) -> std::rc::Rc<CompleteProfileBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            CompleteProfileBuilderMessage::SetFirstName(first_name) => {
+                state_mut.first_name = Some(first_name);
+            }
+            CompleteProfileBuilderMessage::SetMiddleName(middle_name) => {
+                state_mut.middle_name = Some(middle_name);
+            }
+            CompleteProfileBuilderMessage::SetLastName(last_name) => {
+                state_mut.last_name = Some(last_name);
+            }
+            CompleteProfileBuilderMessage::SetPicture(picture) => {
+                state_mut.picture = Some(picture);
+            }
+        }
+
+        state
+    }
+}
+
+impl FormBuildable for CompleteProfile {
+    type Builder = CompleteProfileBuilder;
+    const METHOD: web_common::api::form_traits::FormMethod =
+        web_common::api::form_traits::FormMethod::PUT;
+
+    fn title() -> &'static str {
+        "Complete Profile"
+    }
+
+    fn description() -> &'static str {
+        concat!(
+            "Hello and welcome to the Earth Metabolome Initiative! ",
+            "As a new user, we need you to complete your profile. ",
+            "Please provide your given name and profile picture."
+        )
+    }
+
+    fn requires_authentication() -> bool {
+        true
+    }
+
+    fn task_target() -> &'static str {
+        "Profile"
+    }
+}
 
 // impl TryFromCallback<FormData> for FormWrapper<CompleteProfile> {
 //     fn try_from_callback<C>(data: FormData, callback: C) -> Result<(), Vec<String>>
@@ -95,28 +184,37 @@ use yewdux::prelude::*;
 
 #[function_component(CompleteProfileForm)]
 pub fn complete_profile_form() -> Html {
-    let (user_state, _dispatch) = use_store::<UserState>();
+    // The use_reducer hook takes an initialization function which will be called only once.
+    let (store, dispatch) = use_store::<CompleteProfileBuilder>();
 
-    if user_state.has_no_access_token() {
-        unreachable!("This component should only be rendered when the user is logged in.");
-    }
+    let set_first_name = dispatch.apply_callback(|first_name: ValidatedNameField| {
+        CompleteProfileBuilderMessage::SetFirstName(first_name.to_string())
+    });
 
-    if user_state.has_user() {
-        unreachable!("This component should only be rendered when the user has no profile.");
-    }
+    let set_middle_name = dispatch.apply_callback(|middle_name: ValidatedNameField| {
+        CompleteProfileBuilderMessage::SetMiddleName(middle_name.to_string())
+    });
+
+    let set_last_name = dispatch.apply_callback(|last_name: ValidatedNameField| {
+        CompleteProfileBuilderMessage::SetLastName(last_name.to_string())
+    });
+
+    let set_picture = dispatch.apply_callback(|picture| {
+        CompleteProfileBuilderMessage::SetPicture(picture)
+    });
 
     html! {
-    // <BasicForm<CompleteProfile>>
-    //     <FileInput<ProfileImage>
-    //         label="Profile picture"
-    //         maximal_size={5*1024_u64.pow(2)}
-    //         allowed_formats={vec![GenericFileFormat::Image]}
-    //     />
-    //     <ul class="name-wrapper input-group">
-    //         <li><BasicInput<ValidatedNameField> show_label={false} label="First name" input_type={InputType::Text} /></li>
-    //         <li><BasicInput<ValidatedNameField> show_label={false} label="Middle name" optional={true} input_type={InputType::Text} /></li>
-    //         <li><BasicInput<ValidatedNameField> show_label={false} label="Last name" input_type={InputType::Text} /></li>
-    //     </ul>
-    // </BasicForm<CompleteProfile>>
+    <BasicForm<CompleteProfile>  builder={store.deref().clone()}>
+        <FileInput<ProfileImage>
+            label="Profile picture"
+            maximal_size={5*1024_u64.pow(2)}
+            allowed_formats={vec![GenericFileFormat::Image]}
+        />
+        <ul class="name-wrapper input-group">
+            <li><BasicInput<ValidatedNameField> builder={set_first_name} show_label={false} label="First name" input_type={InputType::Text} /></li>
+            <li><BasicInput<ValidatedNameField> builder={set_middle_name} show_label={false} label="Middle name" optional={true} input_type={InputType::Text} /></li>
+            <li><BasicInput<ValidatedNameField> builder={set_last_name} show_label={false} label="Last name" input_type={InputType::Text} /></li>
+        </ul>
+    </BasicForm<CompleteProfile>>
     }
 }

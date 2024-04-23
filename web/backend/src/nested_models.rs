@@ -6,8 +6,8 @@ use serde::Deserialize;
 use serde::Serialize;
 use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::PooledConnection;
-use uuid::Uuid;
 use crate::models::*;
+use crate::views::views::*;
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedContainerHorizontalRule {
     pub inner: ContainerHorizontalRule,
@@ -1958,6 +1958,60 @@ impl From<NestedUserEmail> for web_common::database::nested_models::NestedUserEm
             inner: item.inner.into(),
             user: item.user.into(),
             login_provider: item.login_provider.into(),
+        }
+    }
+}
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+pub struct NestedPublicUser {
+    pub inner: PublicUser,
+}
+
+impl NestedPublicUser {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = PublicUser::all(connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self {
+                inner: flat_struct,
+            });
+        }
+        Ok(nested_structs)
+    }
+}
+impl NestedPublicUser {
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `id` - The primary key of the row.
+    /// * `connection` - The database connection.
+    pub fn get(
+        id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+        let flat_struct = PublicUser::get(id, connection)?;
+        Ok(Self {
+            inner: PublicUser::get(flat_struct.id, connection)?,
+        })
+    }
+}
+impl From<web_common::database::nested_models::NestedPublicUser> for NestedPublicUser {
+    fn from(item: web_common::database::nested_models::NestedPublicUser) -> Self {
+        Self {
+            inner: item.inner.into(),
+        }
+    }
+}
+impl From<NestedPublicUser> for web_common::database::nested_models::NestedPublicUser {
+    fn from(item: NestedPublicUser) -> Self {
+        Self {
+            inner: item.inner.into(),
         }
     }
 }

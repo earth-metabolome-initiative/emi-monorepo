@@ -2,7 +2,6 @@ use serde::Deserialize;
 use serde::Serialize;
 use uuid::Uuid;
 use chrono::NaiveDateTime;
-use chrono::Utc;
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ContainerHorizontalRule {

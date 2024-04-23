@@ -114,12 +114,9 @@ class AttributeMetadata:
         self.name = name
         self._data_type = data_type
         self.optional = optional
-    
+
     def is_undefined_nested_dependencies(self) -> bool:
-        return (
-            not self.has_struct_data_type()
-            and self.data_type().startswith("Nested")
-        )
+        return not self.has_struct_data_type() and self.data_type().startswith("Nested")
 
     def has_struct_data_type(self) -> bool:
         return isinstance(self._data_type, StructMetadata)
@@ -189,16 +186,22 @@ class StructMetadata:
 
     def has_undefined_nested_dependencies(self) -> bool:
         """Returns whether the struct has undefined nested dependencies.
-        
+
         Implementative details
         -----------------------
         This method checks if any of the attributes of the struct
-        is not a struct and starts with the word `Nested`. 
+        is not a struct and starts with the word `Nested`.
         """
         return any(
             attribute.is_undefined_nested_dependencies()
             for attribute in self.attributes
         )
+
+    def get_attribute_by_name(self, attribute_name: str) -> Optional[AttributeMetadata]:
+        for attribute in self.attributes:
+            if attribute.name == attribute_name:
+                return attribute
+        return None
 
     def capitalized_table_name(self) -> str:
         return "".join(word.capitalize() for word in self.table_name.split("_"))
@@ -721,47 +724,60 @@ def write_from_impls(
 
                 # For all tables we implement a `all` method that retrieves all of
                 # the rows in the table structured as a vector of the struct.
-                
+
                 new_content += "    /// Get all of the structs from the database.\n"
                 new_content += "    ///\n"
                 new_content += "    /// # Arguments\n"
-                new_content += "    /// * `connection` - The connection to the database.\n"
+                new_content += (
+                    "    /// * `connection` - The connection to the database.\n"
+                )
                 new_content += "    ///\n"
                 new_content += f"    pub fn all(\n"
                 new_content += "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
                 new_content += "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
-                new_content += f"        {struct.table_name}::dsl::{struct.table_name}\n"
+                if table_type == "tables":
+                    new_content += f"        use crate::schema::{struct.table_name};\n"
+                else:
+                    new_content += f"        use crate::views::schema::{struct.table_name};\n"
+                new_content += (
+                    f"        {struct.table_name}::dsl::{struct.table_name}\n"
+                )
                 new_content += "            .load::<Self>(connection)\n"
                 new_content += "    }\n"
 
-
                 if table_metadatas.has_primary_key(struct.table_name):
-
-                    primary_key_name, primary_key_type = (
-                        table_metadatas.get_primary_key_name_and_type(struct.table_name)
+                    primary_key_name, _ = table_metadatas.get_primary_key_name_and_type(
+                        struct.table_name
                     )
-                    rust_primary_key_type = sql_type_to_rust_type(primary_key_type)
+                    primary_key = struct.get_attribute_by_name(primary_key_name)
+                elif table_metadatas.is_view(struct.table_name):
+                    primary_key = struct.get_attribute_by_name("id")
 
+                if primary_key is not None:
                     new_content += (
                         "    /// Get the struct from the database by its ID.\n"
                     )
                     new_content += "    ///\n"
                     new_content += "    /// # Arguments\n"
-                    new_content += f"    /// * `{primary_key_name}` - The ID of the struct to get.\n"
+                    new_content += f"    /// * `{primary_key.name}` - The ID of the struct to get.\n"
                     new_content += (
                         "    /// * `connection` - The connection to the database.\n"
                     )
                     new_content += "    ///\n"
                     new_content += "    pub fn get(\n"
                     new_content += (
-                        f"        {primary_key_name}: {rust_primary_key_type},\n"
+                        f"        {primary_key.name}: {primary_key.data_type()},\n"
                     )
                     new_content += "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
                     new_content += "    ) -> Result<Self, diesel::result::Error> {\n"
+                    if table_type == "tables":
+                        new_content += f"        use crate::schema::{struct.table_name};\n"
+                    else:
+                        new_content += f"        use crate::views::schema::{struct.table_name};\n"
                     new_content += (
-                        f"        {struct.table_name}::dsl::{struct.table_name}\n"
+                            f"        {struct.table_name}::dsl::{struct.table_name}\n"
                     )
-                    new_content += f"            .filter({struct.table_name}::dsl::id.eq({primary_key_name}))\n"
+                    new_content += f"            .filter({struct.table_name}::dsl::{primary_key.name}.eq({primary_key.name}))\n"
                     new_content += "            .first::<Self>(connection)\n"
                     new_content += "    }\n"
 
@@ -881,7 +897,6 @@ def write_web_common_structs(
         "use serde::Serialize;",
         "use uuid::Uuid;",
         "use chrono::NaiveDateTime;",
-        "use chrono::Utc;",
     ]
 
     table_metadatas = find_foreign_keys()
@@ -924,7 +939,7 @@ def write_web_common_structs(
         # We find the table name by searching lines like
         # #[diesel(table_name = item_continuous_quantities)]
         if "table_name =" in line:
-            last_table_name = line.split("=")[1].strip(" )]")
+            last_table_name = line.split("=")[1].strip(" )]").split(":")[-1]
 
         # We determine whether a new struct has started
         # by checking if the `struct` keyword is present
@@ -1651,13 +1666,11 @@ def generate_view_structs():
         "use diesel::r2d2::PooledConnection;",
         "use diesel::r2d2::ConnectionManager;",
         "use diesel::prelude::*;",
-        "use crate::views::schema::*;",
     ]
 
     derives = [
         "Deserialize",
         "Serialize",
-        "Clone",
         "Debug",
         "PartialEq",
         "Queryable",
@@ -1669,14 +1682,9 @@ def generate_view_structs():
     for import_statement in imports:
         views.write(f"{import_statement}\n")
 
+    view_structs = []
     last_line_was_table = False
-    view_name = None
-    # A dictionary to store the view attributes and
-    # their respective types.
-    attributes = {}
     brackets_count = 0
-
-    view_names = []
 
     for line in schema.split("\n"):
         if "{" in line:
@@ -1686,7 +1694,13 @@ def generate_view_structs():
 
         if last_line_was_table:
             view_name = line.split("(")[0].strip(" ")
-            view_names.append(view_name)
+            view_struct = StructMetadata(
+                struct_name="".join(
+                    [part.capitalize() for part in view_name.split("_")]
+                ),
+                table_name=view_name,
+            )
+            view_structs.append(view_struct)
 
         if "diesel::table! {" in line:
             last_line_was_table = True
@@ -1696,31 +1710,34 @@ def generate_view_structs():
 
         if "->" in line:
             (attribute, data_type) = line.strip(" ,").split(" -> ")
-            attributes[attribute] = data_type
+            # CURRENTLY NOT SUPPORT NULLABLE! TODO!
+            view_struct.add_attribute(
+                AttributeMetadata(
+                    original_name=attribute,
+                    name=attribute,
+                    data_type=data_types[data_type],
+                    optional="Nullable" in data_type,
+                )
+            )
 
         # If we have found the end of the struct, we write the struct
         # to the file.
         if brackets_count == 0 and view_name is not None:
             # First, we generate the derives.
-            views.write("#[derive(")
             for derive in derives:
-                views.write(f"{derive}, ")
+                view_struct.add_derive(derive)
+            views.write("#[derive(")
+            views.write(", ".join(view_struct.derives()))
             views.write(")]\n")
 
             # Then, we write the table_name attribute to link
             # the struct to the view.
-            views.write(f"#[diesel(table_name = {view_name})]\n")
-
-            # We convert the view name, which is in snake case, to
-            # the struct name, which is in camel case.
-            view_name_parts = view_name.split("_")
-            view_name_parts = [part.capitalize() for part in view_name_parts]
-            view_struct = "".join(view_name_parts)
+            views.write(f"#[diesel(table_name = crate::views::schema::{view_struct.table_name})]\n")
 
             # We write the struct definition
-            views.write(f"pub struct {view_struct} {{\n")
-            for attribute, data_type in attributes.items():
-                views.write(f"    pub {attribute}: {data_types[data_type]},\n")
+            views.write(f"pub struct {view_struct.name} {{\n")
+            for attribute in view_struct.attributes:
+                views.write(f"    pub {attribute.name}: {attribute.data_type()},\n")
             views.write("}\n\n")
 
         if brackets_count == 0:
@@ -1728,10 +1745,10 @@ def generate_view_structs():
             view_name = None
 
     view_names_from_sql = get_view_names()
-    for view_name in view_names_from_sql:
+    for view_struct in view_structs:
         assert (
-            view_name in view_names
-        ), f'View "{view_name}" is not present in the "schema.rs" file.'
+            view_struct.table_name in view_names_from_sql
+        ), f'View "{view_struct.table_name}" is not present in the "schema.rs" file.'
 
     views.close()
 
@@ -1777,8 +1794,8 @@ def generate_nested_structs(
         "use serde::Serialize;",
         "use diesel::r2d2::ConnectionManager;",
         "use diesel::r2d2::PooledConnection;",
-        "use uuid::Uuid;",
         "use crate::models::*;",
+        "use crate::views::views::*;",
     ]
 
     for import_statement in imports:
@@ -1796,7 +1813,9 @@ def generate_nested_structs(
     # if the struct contains a reference to another struct.
     for struct in struct_metadatas:
         # If the struct does not have any foreign keys, we skip it
-        if not tables_metadata.has_foreign_keys(struct.table_name):
+        if not tables_metadata.has_foreign_keys(
+            struct.table_name
+        ) and not tables_metadata.is_view(struct.table_name):
             continue
 
         foreign_keys = tables_metadata.get_foreign_keys(struct.table_name)
@@ -1815,15 +1834,13 @@ def generate_nested_structs(
             if all(fk == primary_key_attribute for fk in foreign_keys):
                 continue
 
-            if primary_key_attribute not in foreign_keys:
-                foreign_keys.append(primary_key_attribute)
         else:
             # If the table does not have a primary key, as may happen in the context
             # of a view, we use the attribyte `id` as the primary key.
             for attribute in struct.attributes:
-                if attribute["field_name"] == "id":
+                if attribute.name == "id":
                     primary_key_attribute = "id"
-                    primary_key_type = attribute["field_type"]
+                    primary_key_type = attribute.data_type()
                     rust_primary_key_type = primary_key_type
                     break
             if primary_key_attribute is None:
@@ -1831,6 +1848,9 @@ def generate_nested_structs(
                     f"Table {struct.table_name} does not have a primary key nor an `id` attribute. "
                     f"It has the following attributes: {struct.attributes}"
                 )
+
+        if primary_key_attribute not in foreign_keys:
+            foreign_keys.append(primary_key_attribute)
 
         nested_struct_name = f"Nested{struct.name}"
         new_struct_metadata = StructMetadata(nested_struct_name, struct.table_name)
@@ -1861,13 +1881,15 @@ def generate_nested_structs(
                     )
                     normalized_attribute_name = attribute.name
                     foreign_struct = get_struct_by_table_name(foreign_key_table_name)
+
                 if normalized_attribute_name.endswith("_id"):
                     normalized_attribute_name = normalized_attribute_name[:-3]
-                if (
-                    attribute.name != primary_key_attribute
-                    and tables_metadata.foreign_key_table_has_foreign_keys(
+                if attribute.name != primary_key_attribute and (
+                    tables_metadata.foreign_key_table_has_foreign_keys(
                         struct.table_name, attribute.name
                     )
+                    or tables_metadata.is_view(struct.table_name)
+                    and primary_key_attribute == "id"
                 ):
                     # If the nested version of the foreign struct is already present,
                     # we cannot use it save risking the struct be extremely nested.
@@ -1943,14 +1965,18 @@ def generate_nested_structs(
         if any(
             attribute.name == primary_key_attribute for attribute in struct.attributes
         ):
-            tables.write(
-                f"                inner: flat_struct,\n"
-            )
-            
-        tables.write("            });\n" "        }\n" "        Ok(nested_structs)\n" "    }\n" "}\n")
+            tables.write(f"                inner: flat_struct,\n")
 
         tables.write(
-            f"impl Nested{struct.name} {{\n"
+            "            });\n"
+            "        }\n"
+            "        Ok(nested_structs)\n"
+            "    }\n"
+            "}\n"
+        )
+
+        tables.write(
+            f"impl {new_struct_metadata.name} {{\n"
             "    /// Get the nested struct from the provided primary key.\n"
             "    ///\n"
             "    /// # Arguments\n"
@@ -2117,7 +2143,7 @@ def write_web_common_nested_structs(path: str, nested_structs: List[StructMetada
         "use serde::Deserialize;",
         "use serde::Serialize;",
         "use super::tables::*;",
-        "use uuid::Uuid;",
+        "use super::views::*;",
     ]
 
     for import_statement in imports:

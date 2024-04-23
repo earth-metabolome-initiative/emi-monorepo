@@ -78,6 +78,7 @@ impl ContainerHorizontalRule {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::container_horizontal_rules;
         container_horizontal_rules::dsl::container_horizontal_rules
             .load::<Self>(connection)
     }
@@ -91,6 +92,7 @@ impl ContainerHorizontalRule {
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::container_horizontal_rules;
         container_horizontal_rules::dsl::container_horizontal_rules
             .filter(container_horizontal_rules::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -158,6 +160,7 @@ impl ContainerVerticalRule {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::container_vertical_rules;
         container_vertical_rules::dsl::container_vertical_rules
             .load::<Self>(connection)
     }
@@ -171,6 +174,7 @@ impl ContainerVerticalRule {
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::container_vertical_rules;
         container_vertical_rules::dsl::container_vertical_rules
             .filter(container_vertical_rules::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -208,6 +212,7 @@ impl ContinuousUnit {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::continuous_units;
         continuous_units::dsl::continuous_units
             .load::<Self>(connection)
     }
@@ -221,6 +226,7 @@ impl ContinuousUnit {
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::continuous_units;
         continuous_units::dsl::continuous_units
             .filter(continuous_units::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -267,6 +273,7 @@ impl DerivedSample {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::derived_samples;
         derived_samples::dsl::derived_samples
             .load::<Self>(connection)
     }
@@ -280,6 +287,7 @@ impl DerivedSample {
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::derived_samples;
         derived_samples::dsl::derived_samples
             .filter(derived_samples::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -317,6 +325,7 @@ impl DiscreteUnit {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::discrete_units;
         discrete_units::dsl::discrete_units
             .load::<Self>(connection)
     }
@@ -330,6 +339,7 @@ impl DiscreteUnit {
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::discrete_units;
         discrete_units::dsl::discrete_units
             .filter(discrete_units::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -373,6 +383,7 @@ impl DocumentFormat {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::document_formats;
         document_formats::dsl::document_formats
             .load::<Self>(connection)
     }
@@ -386,6 +397,7 @@ impl DocumentFormat {
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::document_formats;
         document_formats::dsl::document_formats
             .filter(document_formats::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -435,6 +447,7 @@ impl Document {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::documents;
         documents::dsl::documents
             .load::<Self>(connection)
     }
@@ -445,9 +458,10 @@ impl Document {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: uuid::Uuid,
+        id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::documents;
         documents::dsl::documents
             .filter(documents::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -494,6 +508,7 @@ impl ItemCategory {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::item_categories;
         item_categories::dsl::item_categories
             .load::<Self>(connection)
     }
@@ -507,6 +522,7 @@ impl ItemCategory {
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::item_categories;
         item_categories::dsl::item_categories
             .filter(item_categories::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -553,6 +569,7 @@ impl ItemCategoryRelationship {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::item_category_relationships;
         item_category_relationships::dsl::item_category_relationships
             .load::<Self>(connection)
     }
@@ -566,6 +583,7 @@ impl ItemCategoryRelationship {
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::item_category_relationships;
         item_category_relationships::dsl::item_category_relationships
             .filter(item_category_relationships::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -609,6 +627,7 @@ impl ItemCategoryUnit {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::item_category_units;
         item_category_units::dsl::item_category_units
             .load::<Self>(connection)
     }
@@ -622,6 +641,7 @@ impl ItemCategoryUnit {
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::item_category_units;
         item_category_units::dsl::item_category_units
             .filter(item_category_units::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -677,6 +697,7 @@ impl ItemContinuousQuantity {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::item_continuous_quantities;
         item_continuous_quantities::dsl::item_continuous_quantities
             .load::<Self>(connection)
     }
@@ -687,9 +708,10 @@ impl ItemContinuousQuantity {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: uuid::Uuid,
+        id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::item_continuous_quantities;
         item_continuous_quantities::dsl::item_continuous_quantities
             .filter(item_continuous_quantities::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -742,6 +764,7 @@ impl ItemDiscreteQuantity {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::item_discrete_quantities;
         item_discrete_quantities::dsl::item_discrete_quantities
             .load::<Self>(connection)
     }
@@ -752,9 +775,10 @@ impl ItemDiscreteQuantity {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: uuid::Uuid,
+        id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::item_discrete_quantities;
         item_discrete_quantities::dsl::item_discrete_quantities
             .filter(item_discrete_quantities::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -804,6 +828,7 @@ impl ItemLocation {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::item_locations;
         item_locations::dsl::item_locations
             .load::<Self>(connection)
     }
@@ -814,9 +839,10 @@ impl ItemLocation {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: uuid::Uuid,
+        id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::item_locations;
         item_locations::dsl::item_locations
             .filter(item_locations::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -860,6 +886,7 @@ impl ItemUnit {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::item_units;
         item_units::dsl::item_units
             .load::<Self>(connection)
     }
@@ -870,9 +897,10 @@ impl ItemUnit {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: uuid::Uuid,
+        id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::item_units;
         item_units::dsl::item_units
             .filter(item_units::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -913,6 +941,7 @@ impl Item {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::items;
         items::dsl::items
             .load::<Self>(connection)
     }
@@ -923,9 +952,10 @@ impl Item {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: uuid::Uuid,
+        id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::items;
         items::dsl::items
             .filter(items::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -996,6 +1026,7 @@ impl Location {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::locations;
         locations::dsl::locations
             .load::<Self>(connection)
     }
@@ -1006,9 +1037,10 @@ impl Location {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: uuid::Uuid,
+        id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::locations;
         locations::dsl::locations
             .filter(locations::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -1064,6 +1096,7 @@ impl LoginProvider {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::login_providers;
         login_providers::dsl::login_providers
             .load::<Self>(connection)
     }
@@ -1077,6 +1110,7 @@ impl LoginProvider {
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::login_providers;
         login_providers::dsl::login_providers
             .filter(login_providers::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -1126,6 +1160,7 @@ impl ManufacturedItemCategory {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::manufactured_item_categories;
         manufactured_item_categories::dsl::manufactured_item_categories
             .load::<Self>(connection)
     }
@@ -1139,6 +1174,7 @@ impl ManufacturedItemCategory {
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::manufactured_item_categories;
         manufactured_item_categories::dsl::manufactured_item_categories
             .filter(manufactured_item_categories::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -1188,6 +1224,7 @@ impl Notification {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::notifications;
         notifications::dsl::notifications
             .load::<Self>(connection)
     }
@@ -1201,6 +1238,7 @@ impl Notification {
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::notifications;
         notifications::dsl::notifications
             .filter(notifications::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -1244,6 +1282,7 @@ impl Organization {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::organizations;
         organizations::dsl::organizations
             .load::<Self>(connection)
     }
@@ -1257,6 +1296,7 @@ impl Organization {
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::organizations;
         organizations::dsl::organizations
             .filter(organizations::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -1294,6 +1334,7 @@ impl PrimaryUserEmail {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::primary_user_emails;
         primary_user_emails::dsl::primary_user_emails
             .load::<Self>(connection)
     }
@@ -1307,6 +1348,7 @@ impl PrimaryUserEmail {
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::primary_user_emails;
         primary_user_emails::dsl::primary_user_emails
             .filter(primary_user_emails::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -1359,6 +1401,7 @@ impl ProcedureContinuousRequirement {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::procedure_continuous_requirements;
         procedure_continuous_requirements::dsl::procedure_continuous_requirements
             .load::<Self>(connection)
     }
@@ -1372,6 +1415,7 @@ impl ProcedureContinuousRequirement {
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::procedure_continuous_requirements;
         procedure_continuous_requirements::dsl::procedure_continuous_requirements
             .filter(procedure_continuous_requirements::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -1424,6 +1468,7 @@ impl ProcedureDiscreteRequirement {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::procedure_discrete_requirements;
         procedure_discrete_requirements::dsl::procedure_discrete_requirements
             .load::<Self>(connection)
     }
@@ -1437,6 +1482,7 @@ impl ProcedureDiscreteRequirement {
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::procedure_discrete_requirements;
         procedure_discrete_requirements::dsl::procedure_discrete_requirements
             .filter(procedure_discrete_requirements::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -1483,6 +1529,7 @@ impl Procedure {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::procedures;
         procedures::dsl::procedures
             .load::<Self>(connection)
     }
@@ -1496,6 +1543,7 @@ impl Procedure {
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::procedures;
         procedures::dsl::procedures
             .filter(procedures::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -1548,6 +1596,7 @@ impl ProjectRequirement {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::project_requirements;
         project_requirements::dsl::project_requirements
             .load::<Self>(connection)
     }
@@ -1561,6 +1610,7 @@ impl ProjectRequirement {
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::project_requirements;
         project_requirements::dsl::project_requirements
             .filter(project_requirements::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -1610,6 +1660,7 @@ impl ProjectState {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::project_states;
         project_states::dsl::project_states
             .load::<Self>(connection)
     }
@@ -1623,6 +1674,7 @@ impl ProjectState {
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::project_states;
         project_states::dsl::project_states
             .filter(project_states::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -1720,6 +1772,7 @@ impl Project {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::projects;
         projects::dsl::projects
             .load::<Self>(connection)
     }
@@ -1733,6 +1786,7 @@ impl Project {
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::projects;
         projects::dsl::projects
             .filter(projects::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -1800,6 +1854,7 @@ impl Role {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::roles;
         roles::dsl::roles
             .load::<Self>(connection)
     }
@@ -1813,6 +1868,7 @@ impl Role {
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::roles;
         roles::dsl::roles
             .filter(roles::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -1862,6 +1918,7 @@ impl SampleState {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::sample_states;
         sample_states::dsl::sample_states
             .load::<Self>(connection)
     }
@@ -1875,6 +1932,7 @@ impl SampleState {
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::sample_states;
         sample_states::dsl::sample_states
             .filter(sample_states::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -1948,6 +2006,7 @@ impl SampleTaxa {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::sample_taxa;
         sample_taxa::dsl::sample_taxa
             .load::<Self>(connection)
     }
@@ -1958,9 +2017,10 @@ impl SampleTaxa {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: uuid::Uuid,
+        id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::sample_taxa;
         sample_taxa::dsl::sample_taxa
             .filter(sample_taxa::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -2007,6 +2067,7 @@ impl SampledIndividualTaxa {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::sampled_individual_taxa;
         sampled_individual_taxa::dsl::sampled_individual_taxa
             .load::<Self>(connection)
     }
@@ -2017,9 +2078,10 @@ impl SampledIndividualTaxa {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: uuid::Uuid,
+        id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::sampled_individual_taxa;
         sampled_individual_taxa::dsl::sampled_individual_taxa
             .filter(sampled_individual_taxa::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -2057,6 +2119,7 @@ impl SampledIndividual {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::sampled_individuals;
         sampled_individuals::dsl::sampled_individuals
             .load::<Self>(connection)
     }
@@ -2067,9 +2130,10 @@ impl SampledIndividual {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: uuid::Uuid,
+        id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::sampled_individuals;
         sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -2119,6 +2183,7 @@ impl Sample {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::samples;
         samples::dsl::samples
             .load::<Self>(connection)
     }
@@ -2129,9 +2194,10 @@ impl Sample {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: uuid::Uuid,
+        id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::samples;
         samples::dsl::samples
             .filter(samples::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -2178,6 +2244,7 @@ impl SamplingProcedure {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::sampling_procedures;
         sampling_procedures::dsl::sampling_procedures
             .load::<Self>(connection)
     }
@@ -2188,9 +2255,10 @@ impl SamplingProcedure {
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-        id: uuid::Uuid,
+        id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::sampling_procedures;
         sampling_procedures::dsl::sampling_procedures
             .filter(sampling_procedures::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -2258,6 +2326,7 @@ impl Spectra {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::spectra;
         spectra::dsl::spectra
             .load::<Self>(connection)
     }
@@ -2271,6 +2340,7 @@ impl Spectra {
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::spectra;
         spectra::dsl::spectra
             .filter(spectra::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -2314,6 +2384,7 @@ impl SpectraCollection {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::spectra_collection;
         spectra_collection::dsl::spectra_collection
             .load::<Self>(connection)
     }
@@ -2327,6 +2398,7 @@ impl SpectraCollection {
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::spectra_collection;
         spectra_collection::dsl::spectra_collection
             .filter(spectra_collection::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -2370,6 +2442,7 @@ impl Taxa {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::taxa;
         taxa::dsl::taxa
             .load::<Self>(connection)
     }
@@ -2383,6 +2456,7 @@ impl Taxa {
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::taxa;
         taxa::dsl::taxa
             .filter(taxa::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -2450,6 +2524,7 @@ impl Team {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::teams;
         teams::dsl::teams
             .load::<Self>(connection)
     }
@@ -2463,6 +2538,7 @@ impl Team {
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::teams;
         teams::dsl::teams
             .filter(teams::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -2509,6 +2585,7 @@ impl Unit {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::units;
         units::dsl::units
             .load::<Self>(connection)
     }
@@ -2522,6 +2599,7 @@ impl Unit {
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::units;
         units::dsl::units
             .filter(units::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -2568,6 +2646,7 @@ impl UserEmail {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::user_emails;
         user_emails::dsl::user_emails
             .load::<Self>(connection)
     }
@@ -2581,6 +2660,7 @@ impl UserEmail {
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::user_emails;
         user_emails::dsl::user_emails
             .filter(user_emails::dsl::id.eq(id))
             .first::<Self>(connection)
@@ -2633,6 +2713,7 @@ impl User {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::users;
         users::dsl::users
             .load::<Self>(connection)
     }
@@ -2646,6 +2727,7 @@ impl User {
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::users;
         users::dsl::users
             .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)

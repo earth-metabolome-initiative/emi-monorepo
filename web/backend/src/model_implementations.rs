@@ -1,7 +1,6 @@
 use diesel::connection::SimpleConnection;
 use crate::models::*;
 use crate::nested_models::NestedDocument;
-use crate::schema::*;
 use crate::DieselConn;
 use diesel::prelude::*;
 use diesel::r2d2::ConnectionManager;
@@ -36,6 +35,7 @@ impl Document {
         path: &str,
         conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>,
     ) -> Result<Document, diesel::result::Error> {
+        use crate::schema::documents;
         documents::dsl::documents
             .filter(documents::dsl::path.eq(path))
             .first::<Document>(conn)
@@ -55,7 +55,7 @@ impl NestedDocument {
 }
 
 #[derive(Queryable, Insertable, Debug)]
-#[diesel(table_name = user_emails)]
+#[diesel(table_name = crate::schema::user_emails)]
 pub(crate) struct NewUserEmail<'a> {
     email: &'a str,
     user_id: i32,
@@ -92,7 +92,7 @@ impl<'a> NewUserEmail<'a> {
 }
 
 #[derive(Queryable, Insertable, Debug)]
-#[diesel(table_name = primary_user_emails)]
+#[diesel(table_name = crate::schema::primary_user_emails)]
 pub(crate) struct NewPrimaryUserEmail {
     id: i32,
 }
@@ -137,7 +137,7 @@ impl LoginProvider {
 }
 
 #[derive(Queryable, Insertable, Debug, Default)]
-#[diesel(table_name = users)]
+#[diesel(table_name = crate::schema::users)]
 pub(crate) struct NewUser {
     first_name: Option<String>,
     middle_name: Option<String>,
@@ -298,6 +298,7 @@ impl Document {
         conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>,
     ) -> Result<Document, diesel::result::Error> {
         conn.transaction::<_, diesel::result::Error, _>(|conn| {
+            use crate::schema::documents;
             diesel::insert_into(documents::table)
                 .values(&self)
                 .get_result::<Document>(conn)

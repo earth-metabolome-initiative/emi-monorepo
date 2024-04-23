@@ -5,7 +5,7 @@
 use serde::Deserialize;
 use serde::Serialize;
 use super::tables::*;
-use uuid::Uuid;
+use super::views::*;
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedContainerHorizontalRule {
     pub inner: ContainerHorizontalRule,
@@ -190,4 +190,8 @@ pub struct NestedUserEmail {
     pub inner: UserEmail,
     pub user: User,
     pub login_provider: LoginProvider,
+}
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+pub struct NestedPublicUser {
+    pub inner: PublicUser,
 }

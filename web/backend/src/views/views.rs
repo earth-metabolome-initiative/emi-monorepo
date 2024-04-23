@@ -7,9 +7,8 @@ use chrono::NaiveDateTime;
 use diesel::r2d2::PooledConnection;
 use diesel::r2d2::ConnectionManager;
 use diesel::prelude::*;
-use crate::views::schema::*;
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Queryable, QueryableByName, )]
-#[diesel(table_name = public_user)]
+#[derive(Deserialize, Serialize, Debug, PartialEq, Queryable, QueryableByName, Eq, Clone)]
+#[diesel(table_name = crate::views::schema::public_user)]
 pub struct PublicUser {
     pub id: i32,
     pub first_name: String,
@@ -54,8 +53,24 @@ impl PublicUser {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::views::schema::public_user;
         public_user::dsl::public_user
             .load::<Self>(connection)
+    }
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn get(
+        id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::views::schema::public_user;
+        public_user::dsl::public_user
+            .filter(public_user::dsl::id.eq(id))
+            .first::<Self>(connection)
     }
 }
 
