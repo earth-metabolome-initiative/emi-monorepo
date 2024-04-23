@@ -239,6 +239,25 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                                         .collect()
                                                 })
                                             }
+                                            web_common::database::Table::ProjectStates => {
+                                                crate::models::ProjectState::search(
+                                                    &query,
+                                                    Some(*number_of_results as i32),
+                                                    Some(0.1),
+                                                    &mut self.diesel_connection,
+                                                )
+                                                .map_err(web_common::api::ApiError::from)
+                                                .and_then(|projects| {
+                                                    projects
+                                                        .iter()
+                                                        .map(|project| {
+                                                            bincode::serialize(project).map_err(
+                                                                web_common::api::ApiError::from,
+                                                            )
+                                                        })
+                                                        .collect()
+                                                })
+                                            }
                                             _ => {
                                                 unimplemented!("Table not implemented: {:?}", table)
                                             }
