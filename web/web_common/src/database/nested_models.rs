@@ -152,8 +152,9 @@ pub struct NestedSampledIndividualTaxa {
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct NestedSample {
     pub inner: Sample,
-    pub created_by: Option<User>,
-    pub derived_from: Option<Uuid>,
+    pub created_by: User,
+    pub state: SampleState,
+    pub derived_from: Option<Sample>,
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct NestedSpectra {

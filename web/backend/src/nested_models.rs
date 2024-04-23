@@ -1495,8 +1495,9 @@ impl From<NestedSampledIndividualTaxa> for web_common::database::nested_models::
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedSample {
     pub inner: Sample,
-    pub created_by: Option<User>,
-    pub derived_from: Option<Uuid>,
+    pub created_by: User,
+    pub state: SampleState,
+    pub derived_from: Option<Sample>,
 }
 
 impl NestedSample {
@@ -1511,8 +1512,9 @@ impl NestedSample {
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {
-                created_by: flat_struct.created_by.map(|flat_struct| User::get(flat_struct, connection)).transpose()?,
-            derived_from: flat_struct.derived_from,
+                created_by: User::get(flat_struct.created_by, connection)?,
+                state: SampleState::get(flat_struct.state, connection)?,
+                derived_from: flat_struct.derived_from.map(|flat_struct| Sample::get(flat_struct, connection)).transpose()?,
                 inner: flat_struct,
             });
         }
@@ -1533,8 +1535,9 @@ impl NestedSample {
         let flat_struct = Sample::get(id, connection)?;
         Ok(Self {
             inner: Sample::get(flat_struct.id, connection)?,
-            created_by: flat_struct.created_by.map(|flat_struct| User::get(flat_struct, connection)).transpose()?,
-            derived_from: flat_struct.derived_from,
+            created_by: User::get(flat_struct.created_by, connection)?,
+            state: SampleState::get(flat_struct.state, connection)?,
+            derived_from: flat_struct.derived_from.map(|flat_struct| Sample::get(flat_struct, connection)).transpose()?,
         })
     }
 }
