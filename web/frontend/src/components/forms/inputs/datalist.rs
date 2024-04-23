@@ -6,11 +6,11 @@ use super::InputErrors;
 use crate::components::database::row_to_badge::RowToBadge;
 use crate::workers::WebsocketWorker;
 use gloo::timers::callback::Timeout;
+use serde::de::DeserializeOwned;
 use wasm_bindgen::JsCast;
 use web_common::api::ws::messages::*;
-use web_common::database::SearchTable;
-use web_common::database::SearchableTableRow;
 
+use web_common::database::Searchable;
 use yew::prelude::*;
 use yew_agent::prelude::WorkerBridgeHandle;
 use yew_agent::scope_ext::AgentScopeExt;
@@ -33,7 +33,7 @@ where
     #[prop_or(1)]
     pub number_of_choices: usize,
     #[prop_or(10)]
-    pub number_of_candidates: usize,
+    pub number_of_candidates: u32,
 }
 
 impl<Data> DatalistProp<Data>
@@ -81,7 +81,7 @@ pub enum DatalistMessage<Data> {
     UpdateCurrentValue(String),
     SearchCandidatesTimeout,
     SearchCandidates,
-    UpdateCandidated(Vec<Data>),
+    UpdateCandidates(Vec<Data>),
     SelectCandidate(usize),
     DeleteSelection(usize),
     StartDeleteSelectionTimeout(usize),
@@ -94,9 +94,8 @@ where
     Data: 'static
         + Clone
         + PartialEq
-        + SearchTable
-        + Into<SearchableTableRow>
-        + TryFrom<SearchableTableRow, Error = &'static str>
+        + DeserializeOwned
+        + Searchable
         + RowToBadge,
 {
     type Message = DatalistMessage<Data>;
@@ -130,10 +129,10 @@ where
                     self.number_of_search_queries -= 1;
                     match results {
                         Ok(results) => {
-                            ctx.link().send_message(DatalistMessage::UpdateCandidated(results
-                                .into_iter()
+                            ctx.link().send_message(DatalistMessage::UpdateCandidates(results
+                                .iter()
                                 .map(|row| {
-                                    Data::try_from(row).expect("Failed to convert row to data")
+                                    bincode::deserialize(row).expect("Failed to convert row to data")
                                 })
                                 .collect()));
 
@@ -147,7 +146,7 @@ where
                 }
                 _ => false,
             },
-            DatalistMessage::UpdateCandidated(candidates) => {
+            DatalistMessage::UpdateCandidates(candidates) => {
                 if candidates.is_empty() {
                     self.errors.insert("No candidates found".to_string());
                 } else {
@@ -231,13 +230,13 @@ where
                 // less than the maximum number of candidates, we do not want to
                 // pester the server with another request, as the list will not change.
                 if !self.candidates.is_empty()
-                    && self.candidates.len() <= ctx.props().number_of_candidates
+                    && self.candidates.len() <= ctx.props().number_of_candidates as usize
                 {
                     return false;
                 }
                 let query = self.current_value.clone().unwrap_or_else(|| "".to_string());
                 self.websocket
-                    .send(Data::search(query, ctx.props().number_of_candidates).into());
+                    .send(Data::search_task(query, ctx.props().number_of_candidates).into());
                 self.number_of_search_queries += 1;
                 false
             }

@@ -178,6 +178,15 @@ class StructMetadata:
         self.attributes: List[AttributeMetadata] = []
         self._derives: List[str] = []
 
+    def capitalized_table_name(self) -> str:
+        return "".join(word.capitalize() for word in self.table_name.split("_"))
+
+    def is_nested(self) -> bool:
+        return any(
+            isinstance(attribute._data_type, StructMetadata)
+            for attribute in self.attributes
+        )
+
     def add_attribute(self, attribute_metadata: AttributeMetadata):
         self.attributes.append(attribute_metadata)
 
@@ -209,6 +218,12 @@ class StructMetadata:
         """Returns the type of the attribute"""
         return any(
             attribute == existing_attribute for existing_attribute in self.attributes
+        )
+
+    def is_nested(self) -> bool:
+        return any(
+            isinstance(attribute._data_type, StructMetadata)
+            for attribute in self.attributes
         )
 
 
@@ -804,138 +819,6 @@ def write_from_impls(
             field_name = line.strip().split(" ")[1].strip(":")
             struct_field_names.append(field_name)
 
-    # Finally, we create an enumeration for the tables (or views)
-    # depending on the table type. The enumeration, being for the
-    # Rows of the tables, will be called `TableRow` or `ViewRow`.
-    # This enumeration implements the get method for each of the variants,
-    # receiving the ID of the row, the connection to the database, and
-    # the identifier of either the Table or View, which is defined in the
-    # `Table` or `View` enumeration in web_common. To avoid potential collisions,
-    # we use the extended import path to web_common. Furthermore, we implement
-    # the bidirectional From for the TableRow or ViewRow of their respective
-    # structs in the `web_common` crate.
-
-    if table_type == "tables":
-        capitalized_table_type = "Table"
-    elif table_type == "views":
-        capitalized_table_type = "View"
-
-    table_deribes = "#[derive(Deserialize, Serialize, Clone, Debug, PartialEq)]\n"
-
-    # We start by writing the enumeration
-    new_content += table_deribes
-    new_content += f"pub enum {capitalized_table_type}Row {{\n"
-    for struct in struct_metadatas:
-        new_content += f"    {struct.name}({struct.name}),\n"
-    new_content += "}\n\n"
-
-    # Next up, we implement the bidirectional From for the TableRow or ViewRow
-    # of their respective structs in the `web_common` crate.
-    new_content += f"impl From<web_common::database::{table_type}::{capitalized_table_type}Row> for {capitalized_table_type}Row {{\n"
-    new_content += f"    fn from(item: web_common::database::{table_type}::{capitalized_table_type}Row) -> Self {{\n"
-    new_content += "        match item {\n"
-    for struct in struct_metadatas:
-        new_content += f"            web_common::database::{table_type}::{capitalized_table_type}Row::{struct.name}(item) => {capitalized_table_type}Row::{struct.name}(item.into()),\n"
-    new_content += "        }\n"
-    new_content += "    }\n"
-    new_content += "}\n"
-
-    new_content += f"impl From<{capitalized_table_type}Row> for web_common::database::{table_type}::{capitalized_table_type}Row {{\n"
-    new_content += f"    fn from(item: {capitalized_table_type}Row) -> Self {{\n"
-    new_content += "        match item {\n"
-    for struct in struct_metadatas:
-        new_content += f"            {capitalized_table_type}Row::{struct.name}(item) => web_common::database::{table_type}::{capitalized_table_type}Row::{struct.name}(item.into()),\n"
-    new_content += "        }\n"
-    new_content += "    }\n"
-    new_content += "}\n"
-
-    # For each of the structs, we implement the From method so that it is possible to easily convert
-    # any of the Row structs into the ViewRow or TableRow structs.
-
-    for struct in struct_metadatas:
-        new_content += f"impl From<{struct.name}> for {capitalized_table_type}Row {{\n"
-        new_content += f"    fn from(item: {struct.name}) -> Self {{\n"
-        new_content += f"        {capitalized_table_type}Row::{struct.name}(item)\n"
-        new_content += "    }\n"
-        new_content += "}\n"
-
-    # Now we write the enum for the table or view names, analogous to the `Table` or `View`
-    # enumeration in the `web_common` crate. We implement also the bidirectional From method
-    # for the enumeration and the table or view name. Furthermore, we implement the Display
-    # trait for the enumeration, returning the table or view name for each of the variants.
-    # We implement the `get` method for the enumeration, which receives the ID of the row, and the
-    # connection to the database. Since we already have the `&self` reference to which variant
-    # the enumeration is, we can use the `match` statement to call the `get` method for the respective
-    # struct without needing to provide the table or view name.
-
-    derives = [
-        "Deserialize",
-        "Serialize",
-        "Clone",
-        "Debug",
-        "PartialEq",
-        "Copy",
-        "Eq",
-    ]
-
-    new_content += "#[derive("
-    for derive in derives:
-        new_content += f"{derive}, "
-    new_content += ")]\n"
-
-    new_content += f"pub enum {capitalized_table_type} {{\n"
-    for struct in struct_metadatas:
-        new_content += f"    {struct.name},\n"
-    new_content += "}\n\n"
-
-    new_content += f"impl {capitalized_table_type} {{\n"
-    new_content += "    pub fn name(&self) -> &'static str {\n"
-    new_content += "        match self {\n"
-    for struct in struct_metadatas:
-        new_content += f'            {capitalized_table_type}::{struct.name} => "{struct.table_name}",\n'
-    new_content += "        }\n"
-    new_content += "    }\n"
-
-    new_content += "}\n"
-
-    new_content += f"impl std::fmt::Display for {capitalized_table_type} {{\n"
-    new_content += (
-        "    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {\n"
-    )
-    new_content += '        write!(f, "{}", self.name())\n'
-    new_content += "    }\n"
-    new_content += "}\n"
-
-    new_content += f"impl From<&str> for {capitalized_table_type} {{\n"
-    new_content += "    fn from(item: &str) -> Self {\n"
-    new_content += "        match item {\n"
-    for struct in struct_metadatas:
-        new_content += f'            "{struct.table_name}" => {capitalized_table_type}::{struct.name},\n'
-    new_content += f'            _ => panic!("Unknown {table_type} name"),\n'
-    new_content += "        }\n"
-    new_content += "    }\n"
-    new_content += "}\n"
-
-    # We implement the bidirectional From statement for the Table or View
-    # enumerations with their correspective from the web_common crate.
-    new_content += f"impl From<web_common::database::{table_type}::{capitalized_table_type}> for {capitalized_table_type} {{\n"
-    new_content += f"    fn from(item: web_common::database::{table_type}::{capitalized_table_type}) -> Self {{\n"
-    new_content += "        match item {\n"
-    for struct in struct_metadatas:
-        new_content += f"            web_common::database::{table_type}::{capitalized_table_type}::{struct.name} => {capitalized_table_type}::{struct.name},\n"
-    new_content += "        }\n"
-    new_content += "    }\n"
-    new_content += "}\n"
-
-    new_content += f"impl From<{capitalized_table_type}> for web_common::database::{table_type}::{capitalized_table_type} {{\n"
-    new_content += f"    fn from(item: {capitalized_table_type}) -> Self {{\n"
-    new_content += "        match item {\n"
-    for struct in struct_metadatas:
-        new_content += f"            {capitalized_table_type}::{struct.name} => web_common::database::{table_type}::{capitalized_table_type}::{struct.name},\n"
-    new_content += "        }\n"
-    new_content += "    }\n"
-    new_content += "}\n"
-
     with open(path, "w", encoding="utf8") as file:
         file.write(new_content)
 
@@ -1014,7 +897,6 @@ def write_web_common_structs(
             struct_metadata = StructMetadata(
                 table_name=last_table_name,
                 struct_name=struct_name,
-                is_table=enumeration == "Table",
             )
 
             inside_struct = True
@@ -1913,9 +1795,7 @@ def generate_nested_structs(
                 )
 
         nested_struct_name = f"Nested{struct.name}"
-        new_struct_metadata = StructMetadata(
-            nested_struct_name, struct.table_name, is_table=struct.is_table()
-        )
+        new_struct_metadata = StructMetadata(nested_struct_name, struct.table_name)
 
         # We write the Nested{struct_name} struct
         tables.write("#[derive(")
@@ -2165,13 +2045,14 @@ def write_table_names_enumeration(struct_metadatas: List[StructMetadata]):
         tables.write(f"{import_statement}\n")
 
     unique_table_names = {
-        struct_metadata.table_name for struct_metadata in struct_metadatas
+        (struct_metadata.table_name, struct_metadata.capitalized_table_name())
+        for struct_metadata in struct_metadatas
     }
 
     tables.write("#[derive(" + ", ".join(derives) + ")]\n")
     tables.write("pub enum Table {\n")
-    for table_name in unique_table_names:
-        tables.write(f"    {table_name.capitalize()},\n")
+    for _, table_name in unique_table_names:
+        tables.write(f"    {table_name},\n")
     tables.write("}\n\n")
 
     # We implement the `AsRef` trait for the `Table` enum
@@ -2179,9 +2060,9 @@ def write_table_names_enumeration(struct_metadatas: List[StructMetadata]):
     tables.write("impl AsRef<str> for Table {\n")
     tables.write("    fn as_ref(&self) -> &str {\n")
     tables.write("        match self {\n")
-    for table_name in unique_table_names:
+    for table_name, capitalized_table_name in unique_table_names:
         tables.write(
-            f'            Table::{table_name.capitalize()} => "{table_name}",\n'
+            f'            Table::{capitalized_table_name} => "{table_name}",\n'
         )
     tables.write("        }\n")
     tables.write("    }\n")
@@ -2199,8 +2080,9 @@ def write_table_names_enumeration(struct_metadatas: List[StructMetadata]):
 
     tables.close()
 
+
 def write_web_common_search_trait_implementations(
-    struct_metadatas: List[StructMetadata]
+    struct_metadatas: List[StructMetadata],
 ):
     # We check that we are currently executing in the `backend` crate
     # so to make sure that the relative path to the `web_common` crate
@@ -2209,7 +2091,11 @@ def write_web_common_search_trait_implementations(
         raise Exception("This script must be executed in the `backend` crate.")
 
     tables = open(f"../web_common/src/database/search_tables.rs", "w", encoding="utf8")
-    table_metadatas = find_foreign_keys()
+    similarity_indices: PGIndices = find_pg_trgm_indices()
+
+    imports = [
+        "use crate::database::*;",
+    ]
 
     # Preliminarly, we write a docstring at the very head
     # of this submodule to explain what it does and warn the
@@ -2222,19 +2108,24 @@ def write_web_common_search_trait_implementations(
         "//! This module is automatically generated. Do not write anything here.\n\n"
     )
 
+    for import_statement in imports:
+        tables.write(f"{import_statement}\n")
+
     # First, we create the Searchable trait that will be implemented by all the structs
     # that are searchable.
 
     tables.write("pub trait Searchable {\n")
-    tables.write("    fn search(query: &str, limit: Option<i32>) -> super::Select;\n")
+    tables.write("    fn search_task(query: String, limit: u32) -> super::Select;\n")
     tables.write("}\n")
 
     for struct in struct_metadatas:
-        if table_metadatas.has_table(struct.table_name):
+        if similarity_indices.has_table(struct.table_name):
             tables.write(f"impl Searchable for {struct.name} {{\n")
-            tables.write("    fn search(query: &str, limit: i32) -> super::Select {\n")
-            tables.write(f"        Select::search(\n")
-            tables.write(f'             {struct.table_name.capitalize()},\n')
+            tables.write(
+                "    fn search_task(query: String, limit: u32) -> super::Select {\n"
+            )
+            tables.write(f"        super::Select::search(\n")
+            tables.write(f"             Table::{struct.capitalized_table_name()},\n")
             tables.write("              query,\n")
             tables.write("              limit,\n")
             tables.write("        )\n")

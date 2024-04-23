@@ -212,25 +212,36 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                 }
                             },
                             web_common::database::Operation::Select(select) => match select {
-                                web_common::database::selects::Select::SearchTable(
+                                web_common::database::selects::Select::SearchTable {
                                     table,
                                     query,
                                     number_of_results,
-                                ) => {
-                                    let backend_variant: crate::models::SearchableTable =
-                                        (*table).into();
+                                } => {
                                     ctx.address().do_send(BackendMessage::SearchTable(
                                         task.id(),
-                                        match backend_variant.search(
-                                            query,
-                                            Some(*number_of_results as i32),
-                                            Some(0.0),
-                                            &mut self.diesel_connection,
-                                        ) {
-                                            Ok(rows) => {
-                                                Ok(rows.into_iter().map(Into::into).collect())
+                                        match table {
+                                            web_common::database::Table::Projects => {
+                                                crate::nested_models::NestedProject::search(
+                                                    &query,
+                                                    Some(*number_of_results as i32),
+                                                    Some(0.1),
+                                                    &mut self.diesel_connection,
+                                                )
+                                                .map_err(web_common::api::ApiError::from)
+                                                .and_then(|projects| {
+                                                    projects
+                                                        .iter()
+                                                        .map(|project| {
+                                                            bincode::serialize(project).map_err(
+                                                                web_common::api::ApiError::from,
+                                                            )
+                                                        })
+                                                        .collect()
+                                                })
                                             }
-                                            Err(err) => Err(err.into()),
+                                            _ => {
+                                                unimplemented!("Table not implemented: {:?}", table)
+                                            }
                                         },
                                     ));
                                 }

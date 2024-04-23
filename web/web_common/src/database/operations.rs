@@ -5,9 +5,8 @@ use uuid::Uuid;
 use super::inserts::Insert;
 use super::roles::Role;
 use super::selects::Select;
-use super::tables::Table;
+use super::Table;
 use super::updates::Update;
-use super::views::View;
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
 pub enum Authorization {
@@ -22,14 +21,6 @@ impl Authorization {
 
     pub fn logged_user() -> Self {
         Self::LoggedUser
-    }
-}
-
-impl View {
-    pub fn roles(&self) -> Vec<Role> {
-        match self {
-            View::PublicUser => vec![Role::Anonymous],
-        }
     }
 }
 

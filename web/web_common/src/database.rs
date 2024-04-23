@@ -2,6 +2,7 @@
 pub mod inserts;
 pub mod roles;
 pub mod selects;
+pub use selects::*;
 pub mod tables;
 pub mod updates;
 pub mod views;
@@ -19,3 +20,7 @@ pub mod nested_models;
 pub use nested_models::*;
 pub mod markers;
 pub use markers::*;
+pub mod table_names;
+pub use table_names::*;
+pub mod search_tables;
+pub use search_tables::*;

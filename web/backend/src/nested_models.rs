@@ -284,7 +284,7 @@ impl From<NestedItemCategoryUnit> for web_common::database::nested_models::Neste
 pub struct NestedItemContinuousQuantity {
     pub inner: ItemContinuousQuantity,
     pub item: NestedItem,
-    pub unit: ContinuousUnit,
+    pub unit: Unit,
     pub sensor: Option<NestedItem>,
     pub measured_by: Option<User>,
 }
@@ -304,7 +304,7 @@ impl NestedItemContinuousQuantity {
         Ok(Self {
             inner: ItemContinuousQuantity::get(flat_struct.id, connection)?,
             item: NestedItem::get(flat_struct.item_id, connection)?,
-            unit: ContinuousUnit::get(flat_struct.unit_id, connection)?,
+            unit: Unit::get(flat_struct.unit_id, connection)?,
             sensor: flat_struct.sensor_id.map(|flat_struct| NestedItem::get(flat_struct, connection)).transpose()?,
             measured_by: flat_struct.measured_by.map(|flat_struct| User::get(flat_struct, connection)).transpose()?,
         })

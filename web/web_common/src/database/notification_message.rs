@@ -3,14 +3,12 @@
 use crate::database::Notification;
 use serde::{Deserialize, Serialize};
 
-use super::ViewRow;
-
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 /// Struct representing a notification message.
 pub struct NotificationMessage {
     operation: SQLOperation,
     notification: Notification,
-    view_row: Option<ViewRow>,
+    // view_row: Option<ViewRow>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
@@ -28,12 +26,12 @@ impl NotificationMessage {
     pub fn new(
         operation: SQLOperation,
         notification: Notification,
-        view_row: Option<ViewRow>,
+        // view_row: Option<ViewRow>,
     ) -> Self {
         Self {
             operation,
             notification,
-            view_row,
+            // view_row,
         }
     }
 }
