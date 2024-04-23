@@ -137,6 +137,9 @@ pub fn complete_profile_form() -> Html {
     let set_collector = dispatch.apply_callback(|mut users: Vec<User>| {
         NewSampleBuilderActions::SetCollector(users.pop().unwrap())
     });
+    let set_sampling_procedure = dispatch.apply_callback(|mut sampling_procedures: Vec<SamplingProcedure>| {
+        NewSampleBuilderActions::SetSamplingProcedure(sampling_procedures.pop().unwrap())
+    });
 
     html! {
         <BasicForm<NewSample> builder={store.deref().clone()}>
@@ -146,6 +149,7 @@ pub fn complete_profile_form() -> Html {
             <Datalist<web_common::database::NestedProject> builder={set_parent_project} value={store.parent_project.clone().map_or_else(|| Vec::new(), |value| vec![value])} label="Project" />
             <Datalist<web_common::database::SampleState> builder={set_sample_state} value={store.sample_state.clone().map_or_else(|| Vec::new(), |value| vec![value])} label="Sample State" />
             <Datalist<web_common::database::User> builder={set_collector} value={store.collector.clone().map_or_else(|| Vec::new(), |value| vec![value])} label="Collector" />
+            <Datalist<web_common::database::SamplingProcedure> builder={set_sampling_procedure} value={store.sampling_procedure.clone().map_or_else(|| Vec::new(), |value| vec![value])} label="Sampling Procedure" />
         </BasicForm<NewSample>>
     }
 }

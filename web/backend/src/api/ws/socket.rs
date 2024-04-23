@@ -303,6 +303,25 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                                         .collect()
                                                 })
                                             }
+                                            web_common::database::Table::SamplingProcedures => {
+                                                crate::models::SamplingProcedure::search(
+                                                    &query,
+                                                    Some(*number_of_results as i32),
+                                                    Some(0.1),
+                                                    &mut self.diesel_connection,
+                                                )
+                                                .map_err(web_common::api::ApiError::from)
+                                                .and_then(|sampling_procedure| {
+                                                    sampling_procedure
+                                                        .iter()
+                                                        .map(|sampling_procedure| {
+                                                            bincode::serialize(sampling_procedure).map_err(
+                                                                web_common::api::ApiError::from,
+                                                            )
+                                                        })
+                                                        .collect()
+                                                })
+                                            }
                                             _ => {
                                                 unimplemented!("Table not implemented: {:?}", table)
                                             }
