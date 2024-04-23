@@ -1855,7 +1855,7 @@ def generate_nested_structs(
                         new_attribute = AttributeMetadata(
                             original_name=attribute.name,
                             name=normalized_attribute_name,
-                            data_type=foreign_struct.name,
+                            data_type=foreign_struct,
                             optional=attribute.optional,
                         )
                     else:
@@ -2063,6 +2063,11 @@ def write_web_common_nested_structs(path: str, nested_structs: List[StructMetada
         tables.write(f"{import_statement}\n")
 
     for struct_metadata in nested_structs:
+        if not struct_metadata.can_implement_clone():
+            print(f"# {struct_metadata.name}")
+            for attribute in struct_metadata.attributes:
+                print(f"* {attribute.name} {attribute.implements_clone()}")
+
         tables.write("#[derive(" + ", ".join(struct_metadata.derives()) + ")]\n")
         tables.write(f"pub struct {struct_metadata.name} {{\n")
         for attribute in struct_metadata.attributes:
