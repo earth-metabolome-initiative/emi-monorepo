@@ -46,6 +46,17 @@ impl From<web_common::database::views::PublicUser> for PublicUser {
 }
 
 impl PublicUser {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        public_user::dsl::public_user
+            .load::<Self>(connection)
+    }
 }
 
 

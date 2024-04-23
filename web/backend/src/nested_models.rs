@@ -17,6 +17,27 @@ pub struct NestedContainerHorizontalRule {
 }
 
 impl NestedContainerHorizontalRule {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = ContainerHorizontalRule::all(connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self {
+                created_by: User::get(flat_struct.created_by, connection)?,
+                item_type: NestedItemCategory::get(flat_struct.item_type_id, connection)?,
+                other_item_type: NestedItemCategory::get(flat_struct.other_item_type_id, connection)?,
+                inner: flat_struct,
+            });
+        }
+        Ok(nested_structs)
+    }
+}
+impl NestedContainerHorizontalRule {
     /// Get the nested struct from the provided primary key.
     ///
     /// # Arguments
@@ -65,6 +86,27 @@ pub struct NestedContainerVerticalRule {
 }
 
 impl NestedContainerVerticalRule {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = ContainerVerticalRule::all(connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self {
+                created_by: User::get(flat_struct.created_by, connection)?,
+                container_item_type: NestedItemCategory::get(flat_struct.container_item_type_id, connection)?,
+                contained_item_type: NestedItemCategory::get(flat_struct.contained_item_type_id, connection)?,
+                inner: flat_struct,
+            });
+        }
+        Ok(nested_structs)
+    }
+}
+impl NestedContainerVerticalRule {
     /// Get the nested struct from the provided primary key.
     ///
     /// # Arguments
@@ -112,6 +154,26 @@ pub struct NestedDocument {
 }
 
 impl NestedDocument {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = Document::all(connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self {
+                author: User::get(flat_struct.author_id, connection)?,
+                format: DocumentFormat::get(flat_struct.format_id, connection)?,
+                inner: flat_struct,
+            });
+        }
+        Ok(nested_structs)
+    }
+}
+impl NestedDocument {
     /// Get the nested struct from the provided primary key.
     ///
     /// # Arguments
@@ -155,6 +217,25 @@ pub struct NestedItemCategory {
 }
 
 impl NestedItemCategory {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = ItemCategory::all(connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self {
+                created_by: User::get(flat_struct.created_by, connection)?,
+                inner: flat_struct,
+            });
+        }
+        Ok(nested_structs)
+    }
+}
+impl NestedItemCategory {
     /// Get the nested struct from the provided primary key.
     ///
     /// # Arguments
@@ -196,6 +277,27 @@ pub struct NestedItemCategoryRelationship {
     pub added_by: User,
 }
 
+impl NestedItemCategoryRelationship {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = ItemCategoryRelationship::all(connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self {
+                parent: NestedItemCategory::get(flat_struct.parent_id, connection)?,
+                child: NestedItemCategory::get(flat_struct.child_id, connection)?,
+                added_by: User::get(flat_struct.added_by, connection)?,
+                inner: flat_struct,
+            });
+        }
+        Ok(nested_structs)
+    }
+}
 impl NestedItemCategoryRelationship {
     /// Get the nested struct from the provided primary key.
     ///
@@ -244,6 +346,26 @@ pub struct NestedItemCategoryUnit {
 }
 
 impl NestedItemCategoryUnit {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = ItemCategoryUnit::all(connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self {
+                item_category: NestedItemCategory::get(flat_struct.item_category_id, connection)?,
+                unit: Unit::get(flat_struct.unit_id, connection)?,
+                inner: flat_struct,
+            });
+        }
+        Ok(nested_structs)
+    }
+}
+impl NestedItemCategoryUnit {
     /// Get the nested struct from the provided primary key.
     ///
     /// # Arguments
@@ -289,6 +411,28 @@ pub struct NestedItemContinuousQuantity {
     pub measured_by: Option<User>,
 }
 
+impl NestedItemContinuousQuantity {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = ItemContinuousQuantity::all(connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self {
+                item: NestedItem::get(flat_struct.item_id, connection)?,
+                unit: Unit::get(flat_struct.unit_id, connection)?,
+                sensor: flat_struct.sensor_id.map(|flat_struct| NestedItem::get(flat_struct, connection)).transpose()?,
+                measured_by: flat_struct.measured_by.map(|flat_struct| User::get(flat_struct, connection)).transpose()?,
+                inner: flat_struct,
+            });
+        }
+        Ok(nested_structs)
+    }
+}
 impl NestedItemContinuousQuantity {
     /// Get the nested struct from the provided primary key.
     ///
@@ -341,6 +485,27 @@ pub struct NestedItemDiscreteQuantity {
 }
 
 impl NestedItemDiscreteQuantity {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = ItemDiscreteQuantity::all(connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self {
+                item: NestedItem::get(flat_struct.item_id, connection)?,
+                unit: Unit::get(flat_struct.unit_id, connection)?,
+                measured_by: flat_struct.measured_by.map(|flat_struct| User::get(flat_struct, connection)).transpose()?,
+                inner: flat_struct,
+            });
+        }
+        Ok(nested_structs)
+    }
+}
+impl NestedItemDiscreteQuantity {
     /// Get the nested struct from the provided primary key.
     ///
     /// # Arguments
@@ -389,6 +554,27 @@ pub struct NestedItemLocation {
 }
 
 impl NestedItemLocation {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = ItemLocation::all(connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self {
+                item: flat_struct.item_id.map(|flat_struct| NestedItem::get(flat_struct, connection)).transpose()?,
+                located_by: flat_struct.located_by.map(|flat_struct| User::get(flat_struct, connection)).transpose()?,
+                location: flat_struct.location_id.map(|flat_struct| NestedLocation::get(flat_struct, connection)).transpose()?,
+                inner: flat_struct,
+            });
+        }
+        Ok(nested_structs)
+    }
+}
+impl NestedItemLocation {
     /// Get the nested struct from the provided primary key.
     ///
     /// # Arguments
@@ -436,6 +622,26 @@ pub struct NestedItemUnit {
 }
 
 impl NestedItemUnit {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = ItemUnit::all(connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self {
+                item: NestedItem::get(flat_struct.item_id, connection)?,
+                unit: Unit::get(flat_struct.unit_id, connection)?,
+                inner: flat_struct,
+            });
+        }
+        Ok(nested_structs)
+    }
+}
+impl NestedItemUnit {
     /// Get the nested struct from the provided primary key.
     ///
     /// # Arguments
@@ -479,6 +685,25 @@ pub struct NestedItem {
 }
 
 impl NestedItem {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = Item::all(connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self {
+            parent_id: flat_struct.parent_id,
+                inner: flat_struct,
+            });
+        }
+        Ok(nested_structs)
+    }
+}
+impl NestedItem {
     /// Get the nested struct from the provided primary key.
     ///
     /// # Arguments
@@ -520,6 +745,27 @@ pub struct NestedLocation {
     pub parent_location_id: Option<Uuid>,
 }
 
+impl NestedLocation {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = Location::all(connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self {
+                geolocalization_device: flat_struct.geolocalization_device_id.map(|flat_struct| NestedItem::get(flat_struct, connection)).transpose()?,
+                altitude_device: flat_struct.altitude_device_id.map(|flat_struct| NestedItem::get(flat_struct, connection)).transpose()?,
+            parent_location_id: flat_struct.parent_location_id,
+                inner: flat_struct,
+            });
+        }
+        Ok(nested_structs)
+    }
+}
 impl NestedLocation {
     /// Get the nested struct from the provided primary key.
     ///
@@ -567,6 +813,25 @@ pub struct NestedManufacturedItemCategory {
 }
 
 impl NestedManufacturedItemCategory {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = ManufacturedItemCategory::all(connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self {
+                manifacturer: NestedOrganization::get(flat_struct.manifacturer_id, connection)?,
+                inner: flat_struct,
+            });
+        }
+        Ok(nested_structs)
+    }
+}
+impl NestedManufacturedItemCategory {
     /// Get the nested struct from the provided primary key.
     ///
     /// # Arguments
@@ -607,6 +872,25 @@ pub struct NestedNotification {
 }
 
 impl NestedNotification {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = Notification::all(connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self {
+                user: User::get(flat_struct.user_id, connection)?,
+                inner: flat_struct,
+            });
+        }
+        Ok(nested_structs)
+    }
+}
+impl NestedNotification {
     /// Get the nested struct from the provided primary key.
     ///
     /// # Arguments
@@ -646,6 +930,25 @@ pub struct NestedOrganization {
     pub parent_organization_id: Option<i32>,
 }
 
+impl NestedOrganization {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = Organization::all(connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self {
+            parent_organization_id: flat_struct.parent_organization_id,
+                inner: flat_struct,
+            });
+        }
+        Ok(nested_structs)
+    }
+}
 impl NestedOrganization {
     /// Get the nested struct from the provided primary key.
     ///
@@ -689,6 +992,28 @@ pub struct NestedProcedureContinuousRequirement {
     pub unit: Option<Unit>,
 }
 
+impl NestedProcedureContinuousRequirement {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = ProcedureContinuousRequirement::all(connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self {
+                created_by: User::get(flat_struct.created_by, connection)?,
+                procedure: NestedProcedure::get(flat_struct.procedure_id, connection)?,
+                item_category: NestedItemCategory::get(flat_struct.item_category_id, connection)?,
+                unit: flat_struct.unit_id.map(|flat_struct| Unit::get(flat_struct, connection)).transpose()?,
+                inner: flat_struct,
+            });
+        }
+        Ok(nested_structs)
+    }
+}
 impl NestedProcedureContinuousRequirement {
     /// Get the nested struct from the provided primary key.
     ///
@@ -742,6 +1067,28 @@ pub struct NestedProcedureDiscreteRequirement {
 }
 
 impl NestedProcedureDiscreteRequirement {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = ProcedureDiscreteRequirement::all(connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self {
+                created_by: User::get(flat_struct.created_by, connection)?,
+                procedure: NestedProcedure::get(flat_struct.procedure_id, connection)?,
+                item_category: NestedItemCategory::get(flat_struct.item_category_id, connection)?,
+                unit: flat_struct.unit_id.map(|flat_struct| Unit::get(flat_struct, connection)).transpose()?,
+                inner: flat_struct,
+            });
+        }
+        Ok(nested_structs)
+    }
+}
+impl NestedProcedureDiscreteRequirement {
     /// Get the nested struct from the provided primary key.
     ///
     /// # Arguments
@@ -791,6 +1138,25 @@ pub struct NestedProcedure {
 }
 
 impl NestedProcedure {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = Procedure::all(connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self {
+                created_by: flat_struct.created_by.map(|flat_struct| User::get(flat_struct, connection)).transpose()?,
+                inner: flat_struct,
+            });
+        }
+        Ok(nested_structs)
+    }
+}
+impl NestedProcedure {
     /// Get the nested struct from the provided primary key.
     ///
     /// # Arguments
@@ -833,6 +1199,28 @@ pub struct NestedProjectRequirement {
     pub unit: Option<Unit>,
 }
 
+impl NestedProjectRequirement {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = ProjectRequirement::all(connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self {
+                created_by: User::get(flat_struct.created_by, connection)?,
+                project: NestedProject::get(flat_struct.project_id, connection)?,
+                item_category: NestedItemCategory::get(flat_struct.item_category_id, connection)?,
+                unit: flat_struct.unit_id.map(|flat_struct| Unit::get(flat_struct, connection)).transpose()?,
+                inner: flat_struct,
+            });
+        }
+        Ok(nested_structs)
+    }
+}
 impl NestedProjectRequirement {
     /// Get the nested struct from the provided primary key.
     ///
@@ -884,6 +1272,27 @@ pub struct NestedProject {
     pub created_by: User,
 }
 
+impl NestedProject {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = Project::all(connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self {
+                state: ProjectState::get(flat_struct.state_id, connection)?,
+            parent_project_id: flat_struct.parent_project_id,
+                created_by: User::get(flat_struct.created_by, connection)?,
+                inner: flat_struct,
+            });
+        }
+        Ok(nested_structs)
+    }
+}
 impl NestedProject {
     /// Get the nested struct from the provided primary key.
     ///
@@ -954,6 +1363,27 @@ pub struct NestedSampleTaxa {
 }
 
 impl NestedSampleTaxa {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = SampleTaxa::all(connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self {
+                created_by: User::get(flat_struct.created_by, connection)?,
+                sample: NestedSample::get(flat_struct.sample_id, connection)?,
+                taxon: Taxa::get(flat_struct.taxon_id, connection)?,
+                inner: flat_struct,
+            });
+        }
+        Ok(nested_structs)
+    }
+}
+impl NestedSampleTaxa {
     /// Get the nested struct from the provided primary key.
     ///
     /// # Arguments
@@ -1002,6 +1432,27 @@ pub struct NestedSampledIndividualTaxa {
 }
 
 impl NestedSampledIndividualTaxa {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = SampledIndividualTaxa::all(connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self {
+                created_by: User::get(flat_struct.created_by, connection)?,
+                sampled_individual: SampledIndividual::get(flat_struct.sampled_individual_id, connection)?,
+                taxon: Taxa::get(flat_struct.taxon_id, connection)?,
+                inner: flat_struct,
+            });
+        }
+        Ok(nested_structs)
+    }
+}
+impl NestedSampledIndividualTaxa {
     /// Get the nested struct from the provided primary key.
     ///
     /// # Arguments
@@ -1049,6 +1500,26 @@ pub struct NestedSample {
 }
 
 impl NestedSample {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = Sample::all(connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self {
+                created_by: flat_struct.created_by.map(|flat_struct| User::get(flat_struct, connection)).transpose()?,
+            derived_from: flat_struct.derived_from,
+                inner: flat_struct,
+            });
+        }
+        Ok(nested_structs)
+    }
+}
+impl NestedSample {
     /// Get the nested struct from the provided primary key.
     ///
     /// # Arguments
@@ -1092,6 +1563,25 @@ pub struct NestedSpectra {
 }
 
 impl NestedSpectra {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = Spectra::all(connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self {
+                spectra_collection: NestedSpectraCollection::get(flat_struct.spectra_collection_id, connection)?,
+                inner: flat_struct,
+            });
+        }
+        Ok(nested_structs)
+    }
+}
+impl NestedSpectra {
     /// Get the nested struct from the provided primary key.
     ///
     /// # Arguments
@@ -1132,6 +1622,26 @@ pub struct NestedSpectraCollection {
     pub created_by: User,
 }
 
+impl NestedSpectraCollection {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = SpectraCollection::all(connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self {
+                sample: NestedSample::get(flat_struct.sample_id, connection)?,
+                created_by: User::get(flat_struct.created_by, connection)?,
+                inner: flat_struct,
+            });
+        }
+        Ok(nested_structs)
+    }
+}
 impl NestedSpectraCollection {
     /// Get the nested struct from the provided primary key.
     ///
@@ -1176,6 +1686,25 @@ pub struct NestedTeam {
 }
 
 impl NestedTeam {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = Team::all(connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self {
+            parent_team_id: flat_struct.parent_team_id,
+                inner: flat_struct,
+            });
+        }
+        Ok(nested_structs)
+    }
+}
+impl NestedTeam {
     /// Get the nested struct from the provided primary key.
     ///
     /// # Arguments
@@ -1216,6 +1745,26 @@ pub struct NestedUserEmail {
     pub login_provider: LoginProvider,
 }
 
+impl NestedUserEmail {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = UserEmail::all(connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self {
+                user: User::get(flat_struct.user_id, connection)?,
+                login_provider: LoginProvider::get(flat_struct.login_provider_id, connection)?,
+                inner: flat_struct,
+            });
+        }
+        Ok(nested_structs)
+    }
+}
 impl NestedUserEmail {
     /// Get the nested struct from the provided primary key.
     ///

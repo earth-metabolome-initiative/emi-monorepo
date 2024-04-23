@@ -70,6 +70,17 @@ impl From<web_common::database::tables::ContainerHorizontalRule> for ContainerHo
 }
 
 impl ContainerHorizontalRule {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        container_horizontal_rules::dsl::container_horizontal_rules
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -139,6 +150,17 @@ impl From<web_common::database::tables::ContainerVerticalRule> for ContainerVert
 }
 
 impl ContainerVerticalRule {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        container_vertical_rules::dsl::container_vertical_rules
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -178,6 +200,17 @@ impl From<web_common::database::tables::ContinuousUnit> for ContinuousUnit {
 }
 
 impl ContinuousUnit {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        continuous_units::dsl::continuous_units
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -217,6 +250,17 @@ impl From<web_common::database::tables::DiscreteUnit> for DiscreteUnit {
 }
 
 impl DiscreteUnit {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        discrete_units::dsl::discrete_units
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -262,6 +306,17 @@ impl From<web_common::database::tables::DocumentFormat> for DocumentFormat {
 }
 
 impl DocumentFormat {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        document_formats::dsl::document_formats
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -313,6 +368,17 @@ impl From<web_common::database::tables::Document> for Document {
 }
 
 impl Document {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        documents::dsl::documents
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -361,6 +427,17 @@ impl From<web_common::database::tables::ItemCategory> for ItemCategory {
 }
 
 impl ItemCategory {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        item_categories::dsl::item_categories
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -409,6 +486,17 @@ impl From<web_common::database::tables::ItemCategoryRelationship> for ItemCatego
 }
 
 impl ItemCategoryRelationship {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        item_category_relationships::dsl::item_category_relationships
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -454,6 +542,17 @@ impl From<web_common::database::tables::ItemCategoryUnit> for ItemCategoryUnit {
 }
 
 impl ItemCategoryUnit {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        item_category_units::dsl::item_category_units
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -511,6 +610,17 @@ impl From<web_common::database::tables::ItemContinuousQuantity> for ItemContinuo
 }
 
 impl ItemContinuousQuantity {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        item_continuous_quantities::dsl::item_continuous_quantities
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -565,6 +675,17 @@ impl From<web_common::database::tables::ItemDiscreteQuantity> for ItemDiscreteQu
 }
 
 impl ItemDiscreteQuantity {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        item_discrete_quantities::dsl::item_discrete_quantities
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -616,6 +737,17 @@ impl From<web_common::database::tables::ItemLocation> for ItemLocation {
 }
 
 impl ItemLocation {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        item_locations::dsl::item_locations
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -661,6 +793,17 @@ impl From<web_common::database::tables::ItemUnit> for ItemUnit {
 }
 
 impl ItemUnit {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        item_units::dsl::item_units
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -703,6 +846,17 @@ impl From<web_common::database::tables::Item> for Item {
 }
 
 impl Item {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        items::dsl::items
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -775,6 +929,17 @@ impl From<web_common::database::tables::Location> for Location {
 }
 
 impl Location {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        locations::dsl::locations
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -832,6 +997,17 @@ impl From<web_common::database::tables::LoginProvider> for LoginProvider {
 }
 
 impl LoginProvider {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        login_providers::dsl::login_providers
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -883,6 +1059,17 @@ impl From<web_common::database::tables::ManufacturedItemCategory> for Manufactur
 }
 
 impl ManufacturedItemCategory {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        manufactured_item_categories::dsl::manufactured_item_categories
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -934,6 +1121,17 @@ impl From<web_common::database::tables::Notification> for Notification {
 }
 
 impl Notification {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        notifications::dsl::notifications
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -979,6 +1177,17 @@ impl From<web_common::database::tables::Organization> for Organization {
 }
 
 impl Organization {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        organizations::dsl::organizations
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -1018,6 +1227,17 @@ impl From<web_common::database::tables::PrimaryUserEmail> for PrimaryUserEmail {
 }
 
 impl PrimaryUserEmail {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        primary_user_emails::dsl::primary_user_emails
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -1072,6 +1292,17 @@ impl From<web_common::database::tables::ProcedureContinuousRequirement> for Proc
 }
 
 impl ProcedureContinuousRequirement {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        procedure_continuous_requirements::dsl::procedure_continuous_requirements
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -1126,6 +1357,17 @@ impl From<web_common::database::tables::ProcedureDiscreteRequirement> for Proced
 }
 
 impl ProcedureDiscreteRequirement {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        procedure_discrete_requirements::dsl::procedure_discrete_requirements
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -1174,6 +1416,17 @@ impl From<web_common::database::tables::Procedure> for Procedure {
 }
 
 impl Procedure {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        procedures::dsl::procedures
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -1228,6 +1481,17 @@ impl From<web_common::database::tables::ProjectRequirement> for ProjectRequireme
 }
 
 impl ProjectRequirement {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        project_requirements::dsl::project_requirements
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -1279,6 +1543,17 @@ impl From<web_common::database::tables::ProjectState> for ProjectState {
 }
 
 impl ProjectState {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        project_states::dsl::project_states
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -1378,6 +1653,17 @@ impl From<web_common::database::tables::Project> for Project {
 }
 
 impl Project {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        projects::dsl::projects
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -1447,6 +1733,17 @@ impl From<web_common::database::tables::Role> for Role {
 }
 
 impl Role {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        roles::dsl::roles
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -1495,6 +1792,17 @@ impl From<web_common::database::tables::SampleTaxa> for SampleTaxa {
 }
 
 impl SampleTaxa {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        sample_taxa::dsl::sample_taxa
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -1543,6 +1851,17 @@ impl From<web_common::database::tables::SampledIndividualTaxa> for SampledIndivi
 }
 
 impl SampledIndividualTaxa {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        sampled_individual_taxa::dsl::sampled_individual_taxa
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -1582,6 +1901,17 @@ impl From<web_common::database::tables::SampledIndividual> for SampledIndividual
 }
 
 impl SampledIndividual {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        sampled_individuals::dsl::sampled_individuals
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -1627,6 +1957,17 @@ impl From<web_common::database::tables::Sample> for Sample {
 }
 
 impl Sample {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        samples::dsl::samples
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -1669,6 +2010,17 @@ impl From<web_common::database::tables::Spectra> for Spectra {
 }
 
 impl Spectra {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        spectra::dsl::spectra
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -1714,6 +2066,17 @@ impl From<web_common::database::tables::SpectraCollection> for SpectraCollection
 }
 
 impl SpectraCollection {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        spectra_collection::dsl::spectra_collection
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -1759,6 +2122,17 @@ impl From<web_common::database::tables::Taxa> for Taxa {
 }
 
 impl Taxa {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        taxa::dsl::taxa
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -1828,6 +2202,17 @@ impl From<web_common::database::tables::Team> for Team {
 }
 
 impl Team {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        teams::dsl::teams
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -1876,6 +2261,17 @@ impl From<web_common::database::tables::Unit> for Unit {
 }
 
 impl Unit {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        units::dsl::units
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -1924,6 +2320,17 @@ impl From<web_common::database::tables::UserEmail> for UserEmail {
 }
 
 impl UserEmail {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        user_emails::dsl::user_emails
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -1978,6 +2385,17 @@ impl From<web_common::database::tables::User> for User {
 }
 
 impl User {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        users::dsl::users
+            .load::<Self>(connection)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments

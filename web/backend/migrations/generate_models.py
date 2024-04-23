@@ -697,6 +697,22 @@ def write_from_impls(
                 struct = get_struct_metadata(struct_name)
                 new_content += f"impl {struct.name} {{\n"
 
+                # For all tables we implement a `all` method that retrieves all of
+                # the rows in the table structured as a vector of the struct.
+                
+                new_content += "    /// Get all of the structs from the database.\n"
+                new_content += "    ///\n"
+                new_content += "    /// # Arguments\n"
+                new_content += "    /// * `connection` - The connection to the database.\n"
+                new_content += "    ///\n"
+                new_content += f"    pub fn all(\n"
+                new_content += "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+                new_content += "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
+                new_content += f"        {struct.table_name}::dsl::{struct.table_name}\n"
+                new_content += "            .load::<Self>(connection)\n"
+                new_content += "    }\n"
+
+
                 if table_metadatas.has_primary_key(struct.table_name):
 
                     primary_key_name, primary_key_type = (
@@ -1867,6 +1883,49 @@ def generate_nested_structs(
             else:
                 continue
         tables.write("}\n\n")
+
+        # We implement the all for the nested structs
+        tables.write(
+            f"impl {nested_struct_name} {{\n"
+            "    /// Get all the nested structs from the database.\n"
+            "    ///\n"
+            "    /// # Arguments\n"
+            "    /// * `connection` - The database connection.\n"
+            "    pub fn all(\n"
+            "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
+            "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
+            f"        let flat_structs = {struct.name}::all(connection)?;\n"
+            "        let mut nested_structs = Vec::new();\n"
+            "        for flat_struct in flat_structs {\n"
+            "            nested_structs.push(Self {\n"
+        )
+        for attribute in new_struct_metadata.attributes:
+            if attribute.data_type() == struct.name:
+                continue
+            if (
+                attribute.data_type() == new_struct_metadata.name
+                or struct.has_attribute(attribute)
+            ):
+                tables.write(
+                    f"            {attribute.name}: flat_struct.{attribute.name},\n"
+                )
+                continue
+            if attribute.optional:
+                tables.write(
+                    f"                {attribute.name}: flat_struct.{attribute.original_name}.map(|flat_struct| {attribute.data_type()}::get(flat_struct, connection)).transpose()?,\n"
+                )
+            else:
+                tables.write(
+                    f"                {attribute.name}: {attribute.data_type()}::get(flat_struct.{attribute.original_name}, connection)?,\n"
+                )
+        if any(
+            attribute.name == primary_key_attribute for attribute in struct.attributes
+        ):
+            tables.write(
+                f"                inner: flat_struct,\n"
+            )
+            
+        tables.write("            });\n" "        }\n" "        Ok(nested_structs)\n" "    }\n" "}\n")
 
         tables.write(
             f"impl Nested{struct.name} {{\n"
