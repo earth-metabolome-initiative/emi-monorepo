@@ -147,6 +147,75 @@ impl From<NestedContainerVerticalRule> for web_common::database::nested_models::
     }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+pub struct NestedDerivedSample {
+    pub inner: DerivedSample,
+    pub created_by: User,
+    pub parent_sample: NestedSample,
+    pub child_sample: NestedSample,
+}
+
+impl NestedDerivedSample {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = DerivedSample::all(connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self {
+                created_by: User::get(flat_struct.created_by, connection)?,
+                parent_sample: NestedSample::get(flat_struct.parent_sample_id, connection)?,
+                child_sample: NestedSample::get(flat_struct.child_sample_id, connection)?,
+                inner: flat_struct,
+            });
+        }
+        Ok(nested_structs)
+    }
+}
+impl NestedDerivedSample {
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `id` - The primary key of the row.
+    /// * `connection` - The database connection.
+    pub fn get(
+        id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+        let flat_struct = DerivedSample::get(id, connection)?;
+        Ok(Self {
+            inner: DerivedSample::get(flat_struct.id, connection)?,
+            created_by: User::get(flat_struct.created_by, connection)?,
+            parent_sample: NestedSample::get(flat_struct.parent_sample_id, connection)?,
+            child_sample: NestedSample::get(flat_struct.child_sample_id, connection)?,
+        })
+    }
+}
+impl From<web_common::database::nested_models::NestedDerivedSample> for NestedDerivedSample {
+    fn from(item: web_common::database::nested_models::NestedDerivedSample) -> Self {
+        Self {
+            inner: item.inner.into(),
+            created_by: item.created_by.into(),
+            parent_sample: item.parent_sample.into(),
+            child_sample: item.child_sample.into(),
+        }
+    }
+}
+impl From<NestedDerivedSample> for web_common::database::nested_models::NestedDerivedSample {
+    fn from(item: NestedDerivedSample) -> Self {
+        Self {
+            inner: item.inner.into(),
+            created_by: item.created_by.into(),
+            parent_sample: item.parent_sample.into(),
+            child_sample: item.child_sample.into(),
+        }
+    }
+}
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedDocument {
     pub inner: Document,
     pub author: User,
@@ -1495,9 +1564,10 @@ impl From<NestedSampledIndividualTaxa> for web_common::database::nested_models::
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedSample {
     pub inner: Sample,
-    pub created_by: User,
+    pub inserted_by: User,
+    pub sampled_by: User,
+    pub procedure: NestedSamplingProcedure,
     pub state: SampleState,
-    pub derived_from: Option<Sample>,
 }
 
 impl NestedSample {
@@ -1512,9 +1582,10 @@ impl NestedSample {
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {
-                created_by: User::get(flat_struct.created_by, connection)?,
+                inserted_by: User::get(flat_struct.inserted_by, connection)?,
+                sampled_by: User::get(flat_struct.sampled_by, connection)?,
+                procedure: NestedSamplingProcedure::get(flat_struct.procedure_id, connection)?,
                 state: SampleState::get(flat_struct.state, connection)?,
-                derived_from: flat_struct.derived_from.map(|flat_struct| Sample::get(flat_struct, connection)).transpose()?,
                 inner: flat_struct,
             });
         }
@@ -1535,9 +1606,10 @@ impl NestedSample {
         let flat_struct = Sample::get(id, connection)?;
         Ok(Self {
             inner: Sample::get(flat_struct.id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
+            inserted_by: User::get(flat_struct.inserted_by, connection)?,
+            sampled_by: User::get(flat_struct.sampled_by, connection)?,
+            procedure: NestedSamplingProcedure::get(flat_struct.procedure_id, connection)?,
             state: SampleState::get(flat_struct.state, connection)?,
-            derived_from: flat_struct.derived_from.map(|flat_struct| Sample::get(flat_struct, connection)).transpose()?,
         })
     }
 }
@@ -1545,9 +1617,10 @@ impl From<web_common::database::nested_models::NestedSample> for NestedSample {
     fn from(item: web_common::database::nested_models::NestedSample) -> Self {
         Self {
             inner: item.inner.into(),
-            created_by: item.created_by.into(),
+            inserted_by: item.inserted_by.into(),
+            sampled_by: item.sampled_by.into(),
+            procedure: item.procedure.into(),
             state: item.state.into(),
-            derived_from: item.derived_from.map(|item| item.into()),
         }
     }
 }
@@ -1555,9 +1628,90 @@ impl From<NestedSample> for web_common::database::nested_models::NestedSample {
     fn from(item: NestedSample) -> Self {
         Self {
             inner: item.inner.into(),
-            created_by: item.created_by.into(),
+            inserted_by: item.inserted_by.into(),
+            sampled_by: item.sampled_by.into(),
+            procedure: item.procedure.into(),
             state: item.state.into(),
-            derived_from: item.derived_from.map(|item| item.into()),
+        }
+    }
+}
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+pub struct NestedSamplingProcedure {
+    pub inner: SamplingProcedure,
+    pub created_by: Option<User>,
+}
+
+impl NestedSamplingProcedure {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = SamplingProcedure::all(connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self {
+                created_by: flat_struct.created_by.map(|flat_struct| User::get(flat_struct, connection)).transpose()?,
+                inner: flat_struct,
+            });
+        }
+        Ok(nested_structs)
+    }
+}
+impl NestedSamplingProcedure {
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `id` - The primary key of the row.
+    /// * `connection` - The database connection.
+    pub fn get(
+        id: uuid::Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+        let flat_struct = SamplingProcedure::get(id, connection)?;
+        Ok(Self {
+            inner: SamplingProcedure::get(flat_struct.id, connection)?,
+            created_by: flat_struct.created_by.map(|flat_struct| User::get(flat_struct, connection)).transpose()?,
+        })
+    }
+}
+impl NestedSamplingProcedure {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `threshold` - The similarity threshold, by default `0.6`.
+    pub fn search(
+        query: &str,
+        limit: Option<i32>,
+        threshold: Option<f64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = SamplingProcedure::search(query, limit, threshold, connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self::get(flat_struct.id, connection)?);
+        }
+        Ok(nested_structs)
+    }
+}
+impl From<web_common::database::nested_models::NestedSamplingProcedure> for NestedSamplingProcedure {
+    fn from(item: web_common::database::nested_models::NestedSamplingProcedure) -> Self {
+        Self {
+            inner: item.inner.into(),
+            created_by: item.created_by.map(|item| item.into()),
+        }
+    }
+}
+impl From<NestedSamplingProcedure> for web_common::database::nested_models::NestedSamplingProcedure {
+    fn from(item: NestedSamplingProcedure) -> Self {
+        Self {
+            inner: item.inner.into(),
+            created_by: item.created_by.map(|item| item.into()),
         }
     }
 }

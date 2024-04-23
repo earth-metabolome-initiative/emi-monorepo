@@ -39,6 +39,15 @@ diesel::table! {
 }
 
 diesel::table! {
+    derived_samples (id) {
+        id -> Int4,
+        created_by -> Int4,
+        parent_sample_id -> Uuid,
+        child_sample_id -> Uuid,
+    }
+}
+
+diesel::table! {
     discrete_units (id) {
         id -> Int4,
     }
@@ -324,9 +333,19 @@ diesel::table! {
 diesel::table! {
     samples (id) {
         id -> Uuid,
-        created_by -> Int4,
+        inserted_by -> Int4,
+        sampled_by -> Int4,
+        procedure_id -> Uuid,
         state -> Int4,
-        derived_from -> Nullable<Uuid>,
+    }
+}
+
+diesel::table! {
+    sampling_procedures (id) {
+        id -> Uuid,
+        name -> Text,
+        description -> Nullable<Text>,
+        created_by -> Nullable<Int4>,
     }
 }
 
@@ -393,6 +412,7 @@ diesel::table! {
 diesel::joinable!(container_horizontal_rules -> users (created_by));
 diesel::joinable!(container_vertical_rules -> users (created_by));
 diesel::joinable!(continuous_units -> units (id));
+diesel::joinable!(derived_samples -> users (created_by));
 diesel::joinable!(discrete_units -> units (id));
 diesel::joinable!(documents -> document_formats (format_id));
 diesel::joinable!(documents -> users (author_id));
@@ -440,7 +460,8 @@ diesel::joinable!(sampled_individual_taxa -> taxa (taxon_id));
 diesel::joinable!(sampled_individual_taxa -> users (created_by));
 diesel::joinable!(sampled_individuals -> items (id));
 diesel::joinable!(samples -> sample_states (state));
-diesel::joinable!(samples -> users (created_by));
+diesel::joinable!(samples -> sampling_procedures (procedure_id));
+diesel::joinable!(sampling_procedures -> users (created_by));
 diesel::joinable!(spectra -> spectra_collection (spectra_collection_id));
 diesel::joinable!(spectra_collection -> samples (sample_id));
 diesel::joinable!(spectra_collection -> users (created_by));
@@ -451,6 +472,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     container_horizontal_rules,
     container_vertical_rules,
     continuous_units,
+    derived_samples,
     discrete_units,
     document_formats,
     documents,
@@ -480,6 +502,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     sampled_individual_taxa,
     sampled_individuals,
     samples,
+    sampling_procedures,
     spectra,
     spectra_collection,
     taxa,

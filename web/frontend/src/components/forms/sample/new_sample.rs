@@ -21,6 +21,7 @@ pub struct NewSampleBuilder {
     pub public: bool,
     pub parent_project: Option<NestedProject>,
     pub sample_state: Option<SampleState>,
+    pub user: Option<User>,
 }
 
 impl FormBuilder for NewSampleBuilder {
@@ -32,7 +33,7 @@ impl FormBuilder for NewSampleBuilder {
         self.description.validate()?;
         if self.sample_state.is_none() {
             return Err(web_common::api::ApiError::BadRequest(vec![
-                "Project state is required.".to_string(),
+                "Sample state is required.".to_string(),
             ]));
         }
         Ok(())
@@ -48,6 +49,7 @@ impl FormBuilder for NewSampleBuilder {
             description: self.description.clone(),
             public: self.public,
             sample_state: self.sample_state.clone().unwrap(),
+            user: self.user.clone().unwrap(),
         }
     }
 }

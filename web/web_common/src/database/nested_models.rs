@@ -21,6 +21,13 @@ pub struct NestedContainerVerticalRule {
     pub contained_item_type: NestedItemCategory,
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+pub struct NestedDerivedSample {
+    pub inner: DerivedSample,
+    pub created_by: User,
+    pub parent_sample: NestedSample,
+    pub child_sample: NestedSample,
+}
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedDocument {
     pub inner: Document,
     pub author: User,
@@ -152,9 +159,15 @@ pub struct NestedSampledIndividualTaxa {
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedSample {
     pub inner: Sample,
-    pub created_by: User,
+    pub inserted_by: User,
+    pub sampled_by: User,
+    pub procedure: NestedSamplingProcedure,
     pub state: SampleState,
-    pub derived_from: Option<Sample>,
+}
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+pub struct NestedSamplingProcedure {
+    pub inner: SamplingProcedure,
+    pub created_by: Option<User>,
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedSpectra {

@@ -228,6 +228,65 @@ impl ContinuousUnit {
 }
 
 #[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[diesel(table_name = derived_samples)]
+pub struct DerivedSample {
+    pub id: i32,
+    pub created_by: i32,
+    pub parent_sample_id: Uuid,
+    pub child_sample_id: Uuid,
+}
+
+impl From<DerivedSample> for web_common::database::tables::DerivedSample {
+    fn from(item: DerivedSample) -> Self {
+        Self {
+            id: item.id,
+            created_by: item.created_by,
+            parent_sample_id: item.parent_sample_id,
+            child_sample_id: item.child_sample_id,
+        }
+    }
+}
+
+impl From<web_common::database::tables::DerivedSample> for DerivedSample {
+    fn from(item: web_common::database::tables::DerivedSample) -> Self {
+        Self {
+            id: item.id,
+            created_by: item.created_by,
+            parent_sample_id: item.parent_sample_id,
+            child_sample_id: item.child_sample_id,
+        }
+    }
+}
+
+impl DerivedSample {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        derived_samples::dsl::derived_samples
+            .load::<Self>(connection)
+    }
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn get(
+        id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        derived_samples::dsl::derived_samples
+            .filter(derived_samples::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+}
+
+#[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = discrete_units)]
 pub struct DiscreteUnit {
     pub id: i32,
@@ -2021,18 +2080,20 @@ impl SampledIndividual {
 #[diesel(table_name = samples)]
 pub struct Sample {
     pub id: Uuid,
-    pub created_by: i32,
+    pub inserted_by: i32,
+    pub sampled_by: i32,
+    pub procedure_id: Uuid,
     pub state: i32,
-    pub derived_from: Option<Uuid>,
 }
 
 impl From<Sample> for web_common::database::tables::Sample {
     fn from(item: Sample) -> Self {
         Self {
             id: item.id,
-            created_by: item.created_by,
+            inserted_by: item.inserted_by,
+            sampled_by: item.sampled_by,
+            procedure_id: item.procedure_id,
             state: item.state,
-            derived_from: item.derived_from,
         }
     }
 }
@@ -2041,9 +2102,10 @@ impl From<web_common::database::tables::Sample> for Sample {
     fn from(item: web_common::database::tables::Sample) -> Self {
         Self {
             id: item.id,
-            created_by: item.created_by,
+            inserted_by: item.inserted_by,
+            sampled_by: item.sampled_by,
+            procedure_id: item.procedure_id,
             state: item.state,
-            derived_from: item.derived_from,
         }
     }
 }
@@ -2074,6 +2136,92 @@ impl Sample {
             .filter(samples::dsl::id.eq(id))
             .first::<Self>(connection)
     }
+}
+
+#[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[diesel(table_name = sampling_procedures)]
+pub struct SamplingProcedure {
+    pub id: Uuid,
+    pub name: String,
+    pub description: Option<String>,
+    pub created_by: Option<i32>,
+}
+
+impl From<SamplingProcedure> for web_common::database::tables::SamplingProcedure {
+    fn from(item: SamplingProcedure) -> Self {
+        Self {
+            id: item.id,
+            name: item.name,
+            description: item.description,
+            created_by: item.created_by,
+        }
+    }
+}
+
+impl From<web_common::database::tables::SamplingProcedure> for SamplingProcedure {
+    fn from(item: web_common::database::tables::SamplingProcedure) -> Self {
+        Self {
+            id: item.id,
+            name: item.name,
+            description: item.description,
+            created_by: item.created_by,
+        }
+    }
+}
+
+impl SamplingProcedure {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        sampling_procedures::dsl::sampling_procedures
+            .load::<Self>(connection)
+    }
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn get(
+        id: uuid::Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        sampling_procedures::dsl::sampling_procedures
+            .filter(sampling_procedures::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+    /// Search for the struct by a given string.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `threshold` - The similarity threshold, by default `0.6`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn search(
+        query: &str,
+        limit: Option<i32>,
+        threshold: Option<f64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::sampling_procedures;
+        let limit = limit.unwrap_or(10);
+        let threshold = threshold.unwrap_or(0.6);
+        let similarity_query = concat!(
+            "SELECT id, name, description, created_by FROM sampling_procedures ",
+            "ORDER BY similarity(name, $1) + similarity(description, $1) DESC LIMIT $3;"
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Float8, _>(threshold)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
 }
 
 #[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
