@@ -98,7 +98,7 @@ impl FormBuildable for NewProject {
     }
 
     fn description() -> &'static str {
-        concat!("Crate a new project.\n",)
+        concat!("Create a new project.\n",)
     }
 
     fn requires_authentication() -> bool {
@@ -106,33 +106,6 @@ impl FormBuildable for NewProject {
     }
 }
 
-// impl TryFromCallback<FormData> for FormWrapper<NewProject> {
-//     fn try_from_callback<C>(data: FormData, callback: C) -> Result<(), Vec<String>>
-//     where
-//         C: FnOnce(Result<Self, Vec<String>>) + 'static,
-//     {
-//         let project_name = data.get("name").as_string().ok_or_else(|| {
-//             vec!["The new project name field is missing or not a string.".to_string()]
-//         })?;
-
-//         let description = data.get("description").as_string().ok_or_else(|| {
-//             vec!["The new project description field is missing or not a string.".to_string()]
-//         })?;
-
-//         let public = data
-//             .get("public")
-//             .as_string()
-//             .unwrap_or_else(|| "off".to_string());
-
-//         let public: bool = InputBool::try_from(public.to_string())?.into();
-
-//         let new_project = NewProject::new(project_name, description, public)?;
-
-//         callback(Ok(FormWrapper::from(new_project)));
-
-//         Ok(())
-//     }
-// }
 
 #[function_component(NewProjectForm)]
 pub fn complete_profile_form() -> Html {
