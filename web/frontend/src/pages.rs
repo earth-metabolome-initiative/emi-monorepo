@@ -1,6 +1,7 @@
 pub mod home;
 pub mod login;
 pub mod new_project;
+pub mod new_sample;
 pub mod not_found;
 pub mod profile;
 pub mod server_error;
@@ -12,3 +13,4 @@ pub use new_sample::NewSamplePage;
 pub use not_found::NotFound;
 pub use profile::Profile;
 pub use server_error::ServerErrorPage;
+  

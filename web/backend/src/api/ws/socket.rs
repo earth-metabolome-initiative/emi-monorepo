@@ -21,6 +21,7 @@ use web_common::api::ws::messages::{BackendMessage, FrontendMessage};
 use web_common::database::NotificationMessage;
 
 use super::projects::ProjectMessage;
+use super::samples::SampleMessage;
 
 pub struct WebSocket {
     notifications_handler: Option<SpawnHandle>,
@@ -201,11 +202,9 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                         task.id(),
                                         new_project.clone(),
                                     ));
-                                }
-                            },
-                            web_common::database::Operation::Insert(insert) => match insert {
+                                },
                                 web_common::database::Insert::Sample(new_sample) => {
-                                    ctx.address().do_send(ProjectMessage::NewSample(
+                                    ctx.address().do_send(SampleMessage::NewSample(
                                         task.id(),
                                         new_sample.clone(),
                                     ));
@@ -255,11 +254,30 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                                     &mut self.diesel_connection,
                                                 )
                                                 .map_err(web_common::api::ApiError::from)
-                                                .and_then(|projects| {
-                                                    projects
+                                                .and_then(|project_states| {
+                                                    project_states
                                                         .iter()
-                                                        .map(|project| {
-                                                            bincode::serialize(project).map_err(
+                                                        .map(|project_state| {
+                                                            bincode::serialize(project_state).map_err(
+                                                                web_common::api::ApiError::from,
+                                                            )
+                                                        })
+                                                        .collect()
+                                                })
+                                            }
+                                            web_common::database::Table::SampleStates => {
+                                                crate::models::SampleState::search(
+                                                    &query,
+                                                    Some(*number_of_results as i32),
+                                                    Some(0.1),
+                                                    &mut self.diesel_connection,
+                                                )
+                                                .map_err(web_common::api::ApiError::from)
+                                                .and_then(|sample_states| {
+                                                    sample_states
+                                                        .iter()
+                                                        .map(|sample_state| {
+                                                            bincode::serialize(sample_state).map_err(
                                                                 web_common::api::ApiError::from,
                                                             )
                                                         })

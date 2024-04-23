@@ -1496,7 +1496,7 @@ impl From<NestedSampledIndividualTaxa> for web_common::database::nested_models::
 pub struct NestedSample {
     pub inner: Sample,
     pub created_by: Option<User>,
-    pub derived_from: Option<Sample>,
+    pub derived_from: Option<Uuid>,
 }
 
 impl NestedSample {
@@ -1512,7 +1512,7 @@ impl NestedSample {
         for flat_struct in flat_structs {
             nested_structs.push(Self {
                 created_by: flat_struct.created_by.map(|flat_struct| User::get(flat_struct, connection)).transpose()?,
-                derived_from: flat_struct.derived_from.map(|flat_struct| Sample::get(flat_struct, connection)).transpose()?,
+            derived_from: flat_struct.derived_from,
                 inner: flat_struct,
             });
         }
@@ -1534,7 +1534,7 @@ impl NestedSample {
         Ok(Self {
             inner: Sample::get(flat_struct.id, connection)?,
             created_by: flat_struct.created_by.map(|flat_struct| User::get(flat_struct, connection)).transpose()?,
-            derived_from: flat_struct.derived_from.map(|flat_struct| Sample::get(flat_struct, connection)).transpose()?,
+            derived_from: flat_struct.derived_from,
         })
     }
 }
@@ -1542,7 +1542,8 @@ impl From<web_common::database::nested_models::NestedSample> for NestedSample {
     fn from(item: web_common::database::nested_models::NestedSample) -> Self {
         Self {
             inner: item.inner.into(),
-            created_by: item.created_by.map(|item| item.into()),
+            created_by: item.created_by.into(),
+            state: item.state.into(),
             derived_from: item.derived_from.map(|item| item.into()),
         }
     }
@@ -1551,7 +1552,8 @@ impl From<NestedSample> for web_common::database::nested_models::NestedSample {
     fn from(item: NestedSample) -> Self {
         Self {
             inner: item.inner.into(),
-            created_by: item.created_by.map(|item| item.into()),
+            created_by: item.created_by.into(),
+            state: item.state.into(),
             derived_from: item.derived_from.map(|item| item.into()),
         }
     }

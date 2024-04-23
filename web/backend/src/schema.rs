@@ -288,6 +288,16 @@ diesel::table! {
 }
 
 diesel::table! {
+    sample_states (id) {
+        id -> Int4,
+        name -> Text,
+        description -> Text,
+        font_awesome_icon -> Text,
+        icon_color -> Text,
+    }
+}
+
+diesel::table! {
     sample_taxa (id) {
         id -> Uuid,
         created_by -> Int4,
@@ -314,7 +324,8 @@ diesel::table! {
 diesel::table! {
     samples (id) {
         id -> Uuid,
-        created_by -> Nullable<Int4>,
+        created_by -> Int4,
+        state -> Int4,
         derived_from -> Nullable<Uuid>,
     }
 }
@@ -428,6 +439,7 @@ diesel::joinable!(sampled_individual_taxa -> sampled_individuals (sampled_indivi
 diesel::joinable!(sampled_individual_taxa -> taxa (taxon_id));
 diesel::joinable!(sampled_individual_taxa -> users (created_by));
 diesel::joinable!(sampled_individuals -> items (id));
+diesel::joinable!(samples -> sample_states (state));
 diesel::joinable!(samples -> users (created_by));
 diesel::joinable!(spectra -> spectra_collection (spectra_collection_id));
 diesel::joinable!(spectra_collection -> samples (sample_id));
@@ -463,6 +475,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     project_states,
     projects,
     roles,
+    sample_states,
     sample_taxa,
     sampled_individual_taxa,
     sampled_individuals,

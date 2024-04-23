@@ -1,6 +1,6 @@
 //! Page of the user profile, allowing the user to edit their profile.
 
-use crate::components::forms::project::NewSampleForm;
+use crate::components::forms::sample::NewSampleForm;
 use crate::components::forms::BasicForm;
 use crate::router::AppRoute;
 use crate::stores::user_state::UserState;

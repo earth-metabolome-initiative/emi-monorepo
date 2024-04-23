@@ -7,6 +7,7 @@ pub mod socket;
 use crate::api::oauth::refresh::refresh_access_token;
 use actix_web_actors::ws::WsResponseBuilder;
 pub mod projects;
+pub mod samples;
 pub mod users;
 
 pub fn configure(cfg: &mut web::ServiceConfig) {

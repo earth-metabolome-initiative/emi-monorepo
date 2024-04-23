@@ -33,6 +33,15 @@ impl Searchable for Project {
         )
     }
 }
+impl Searchable for SampleState {
+    fn search_task(query: String, limit: u32) -> super::Select {
+        super::Select::search(
+             Table::SampleStates,
+              query,
+              limit,
+        )
+    }
+}
 impl Searchable for Taxa {
     fn search_task(query: String, limit: u32) -> super::Select {
         super::Select::search(

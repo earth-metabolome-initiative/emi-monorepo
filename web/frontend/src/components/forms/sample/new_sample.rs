@@ -19,7 +19,7 @@ pub struct NewSampleBuilder {
     pub name: NewSampleName,
     pub description: NotEmpty,
     pub public: bool,
-    pub parent_sample: Option<NestedSample>,
+    pub parent_project: Option<NestedProject>,
     pub sample_state: Option<SampleState>,
 }
 
@@ -56,7 +56,7 @@ pub enum NewSampleBuilderActions {
     SetName(NewSampleName),
     SetDescription(NotEmpty),
     SetPublic(bool),
-    SetParentProject(Option<NestedSample>),
+    SetParentProject(Option<NestedProject>),
     SetSampleState(Option<SampleState>),
 }
 
@@ -73,8 +73,8 @@ impl Reducer<NewSampleBuilder> for NewSampleBuilderActions {
             NewSampleBuilderActions::SetPublic(public) => {
                 state_mut.public = public;
             }
-            NewSampleBuilderActions::SetParentProject(parent_sample) => {
-                state_mut.parent_sample = parent_sample;
+            NewSampleBuilderActions::SetParentProject(parent_project) => {
+                state_mut.parent_project = parent_project;
             }
             NewSampleBuilderActions::SetSampleState(sample_state) => {
                 state_mut.sample_state = sample_state;
@@ -90,15 +90,15 @@ impl FormBuildable for NewSample {
     const METHOD: FormMethod = FormMethod::POST;
 
     fn title() -> &'static str {
-        "New Project"
+        "New Sample"
     }
 
     fn task_target() -> &'static str {
-        "Project"
+        "Sample"
     }
 
     fn description() -> &'static str {
-        concat!("Create a new project.\n",)
+        concat!("Create a new sample.\n",)
     }
 
     fn requires_authentication() -> bool {
@@ -116,8 +116,8 @@ pub fn complete_profile_form() -> Html {
     let set_description = dispatch
         .apply_callback(|description| NewSampleBuilderActions::SetDescription(description));
     let set_public = dispatch.apply_callback(|public| NewSampleBuilderActions::SetPublic(public));
-    let set_parent_sample = dispatch.apply_callback(|mut samples: Vec<NestedSample>| {
-        NewSampleBuilderActions::SetParentProject(samples.pop())
+    let set_parent_project = dispatch.apply_callback(|mut projects: Vec<NestedProject>| {
+        NewSampleBuilderActions::SetParentProject(projects.pop())
     });
     let set_sample_state = dispatch.apply_callback(|mut sample_states: Vec<SampleState>| {
         NewSampleBuilderActions::SetSampleState(sample_states.pop())
@@ -128,8 +128,8 @@ pub fn complete_profile_form() -> Html {
             <BasicInput<NewSampleName> label="Name" builder={set_name} value={store.name.clone()} input_type={InputType::Text} />
             <BasicInput<NotEmpty> label="Description" builder={set_description} value={store.description.clone()} input_type={InputType::Textarea} />
             <Checkbox label="Public" builder={set_public} value={store.public} />
-            // <Datalist<Editable<web_common::database::NestedSample>> builder={set_parent_sample} value={store.parent_sample.clone().map_or_else(|| Vec::new(), |value| vec![value])} label="Project" />
-            <Datalist<web_common::database::SampleState> builder={set_sample_state} value={store.sample_state.clone().map_or_else(|| Vec::new(), |value| vec![value])} label="Project State" />
+            <Datalist<web_common::database::NestedProject> builder={set_parent_project} value={store.parent_project.clone().map_or_else(|| Vec::new(), |value| vec![value])} label="Project" />
+            <Datalist<web_common::database::SampleState> builder={set_sample_state} value={store.sample_state.clone().map_or_else(|| Vec::new(), |value| vec![value])} label="Sample State" />
         </BasicForm<NewSample>>
     }
 }
