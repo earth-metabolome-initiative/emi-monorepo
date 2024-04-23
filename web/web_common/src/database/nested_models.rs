@@ -72,17 +72,17 @@ pub struct NestedItemUnit {
     pub item: NestedItem,
     pub unit: Unit,
 }
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct NestedItem {
     pub inner: Item,
-    pub parent_id: Option<Uuid>,
+    pub parent: Option<Item>,
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct NestedLocation {
     pub inner: Location,
     pub geolocalization_device: Option<NestedItem>,
     pub altitude_device: Option<NestedItem>,
-    pub parent_location_id: Option<Uuid>,
+    pub parent_location: Option<Location>,
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct NestedManufacturedItemCategory {
@@ -94,10 +94,10 @@ pub struct NestedNotification {
     pub inner: Notification,
     pub user: User,
 }
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct NestedOrganization {
     pub inner: Organization,
-    pub parent_organization_id: Option<i32>,
+    pub parent_organization: Option<Organization>,
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct NestedProcedureContinuousRequirement {
@@ -128,11 +128,11 @@ pub struct NestedProjectRequirement {
     pub item_category: NestedItemCategory,
     pub unit: Option<Unit>,
 }
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct NestedProject {
     pub inner: Project,
     pub state: ProjectState,
-    pub parent_project_id: Option<i32>,
+    pub parent_project: Option<Project>,
     pub created_by: User,
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
@@ -149,11 +149,11 @@ pub struct NestedSampledIndividualTaxa {
     pub sampled_individual: SampledIndividual,
     pub taxon: Taxa,
 }
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct NestedSample {
     pub inner: Sample,
     pub created_by: Option<User>,
-    pub derived_from: Option<Uuid>,
+    pub derived_from: Option<Sample>,
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct NestedSpectra {
@@ -166,10 +166,10 @@ pub struct NestedSpectraCollection {
     pub sample: NestedSample,
     pub created_by: User,
 }
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct NestedTeam {
     pub inner: Team,
-    pub parent_team_id: Option<i32>,
+    pub parent_team: Option<Team>,
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedUserEmail {

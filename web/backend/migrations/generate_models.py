@@ -1854,8 +1854,8 @@ def generate_nested_structs(
                     if struct.name == foreign_struct.name:
                         new_attribute = AttributeMetadata(
                             original_name=attribute.name,
-                            name=attribute.name,
-                            data_type=attribute.data_type(),
+                            name=normalized_attribute_name,
+                            data_type=foreign_struct.name,
                             optional=attribute.optional,
                         )
                     else:
@@ -1900,7 +1900,7 @@ def generate_nested_structs(
             "            nested_structs.push(Self {\n"
         )
         for attribute in new_struct_metadata.attributes:
-            if attribute.data_type() == struct.name:
+            if attribute.name == "inner":
                 continue
             if (
                 attribute.data_type() == new_struct_metadata.name
