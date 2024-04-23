@@ -203,6 +203,14 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                     ));
                                 }
                             },
+                            web_common::database::Operation::Insert(insert) => match insert {
+                                web_common::database::Insert::Sample(new_sample) => {
+                                    ctx.address().do_send(ProjectMessage::NewSample(
+                                        task.id(),
+                                        new_sample.clone(),
+                                    ));
+                                }
+                            },
                             web_common::database::Operation::Update(update) => match update {
                                 web_common::database::Update::CompleteProfile(profile) => {
                                     ctx.address().do_send(UserMessage::CompleteProfile(

@@ -1,11 +1,14 @@
 pub mod new_project;
+pub mod new_sample;
 use crate::database::Authorization;
 pub use new_project::NewProject;
+pub use new_sample::NewSample;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
 pub enum Insert {
     Project(new_project::NewProject),
+    Sample(new_sample::NewSample)
 }
 
 impl Insert {

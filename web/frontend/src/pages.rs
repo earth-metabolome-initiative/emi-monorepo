@@ -8,6 +8,7 @@ pub mod server_error;
 pub use home::Home;
 pub use login::Login;
 pub use new_project::NewProjectPage;
+pub use new_sample::NewSamplePage;
 pub use not_found::NotFound;
 pub use profile::Profile;
 pub use server_error::ServerErrorPage;

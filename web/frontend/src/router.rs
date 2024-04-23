@@ -12,6 +12,8 @@ pub enum AppRoute {
     Profile,
     #[at("/project/new")]
     NewProject,
+    #[at("/sample/new")]
+    NewSample,
     #[at("/")]
     Home,
     #[not_found]
@@ -26,6 +28,7 @@ pub fn switch(switch: AppRoute) -> Html {
         AppRoute::Login => html! {<Login />},
         AppRoute::Profile => html! {<Profile />},
         AppRoute::NewProject => html! {<NewProjectPage />},
+        AppRoute::NewSample => html! {<NewSamplePage />},
         AppRoute::NotFound => html! {<NotFound />},
         AppRoute::ServerError => html! {<ServerErrorPage />},
         AppRoute::Home => html! {<Home />},
