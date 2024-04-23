@@ -114,6 +114,15 @@ class AttributeMetadata:
         self.name = name
         self._data_type = data_type
         self.optional = optional
+    
+    def is_undefined_nested_dependencies(self) -> bool:
+        return (
+            not self.has_struct_data_type()
+            and self.data_type().startswith("Nested")
+        )
+
+    def has_struct_data_type(self) -> bool:
+        return isinstance(self._data_type, StructMetadata)
 
     def format_data_type(self) -> str:
         data_type = self.data_type()
@@ -177,6 +186,19 @@ class StructMetadata:
         self.table_name = table_name
         self.attributes: List[AttributeMetadata] = []
         self._derives: List[str] = []
+
+    def has_undefined_nested_dependencies(self) -> bool:
+        """Returns whether the struct has undefined nested dependencies.
+        
+        Implementative details
+        -----------------------
+        This method checks if any of the attributes of the struct
+        is not a struct and starts with the word `Nested`. 
+        """
+        return any(
+            attribute.is_undefined_nested_dependencies()
+            for attribute in self.attributes
+        )
 
     def capitalized_table_name(self) -> str:
         return "".join(word.capitalize() for word in self.table_name.split("_"))
@@ -2029,6 +2051,45 @@ def generate_nested_structs(
 
     tables.close()
 
+    # We replace until convergence the data type of the structs with the structs themselves.
+    # This is necessary as the nested structs may contain references to other structs, which
+    # in turn may contain references to other structs and so on.
+
+    changed = True
+
+    while changed:
+        changed = False
+        updated_struct_metadatas = []
+        for new_struct in new_struct_metadatas:
+            if not new_struct.has_undefined_nested_dependencies():
+                updated_struct_metadatas.append(new_struct)
+                continue
+            new_attributes = []
+            converged = True
+            for attribute in new_struct.attributes:
+                if attribute.is_undefined_nested_dependencies():
+                    for struct in new_struct_metadatas + struct_metadatas:
+                        if struct.name == attribute.data_type():
+                            if struct.has_undefined_nested_dependencies():
+                                converged = False
+                                continue
+                            new_attributes.append(
+                                AttributeMetadata(
+                                    original_name=attribute.original_name,
+                                    name=attribute.name,
+                                    data_type=struct,
+                                    optional=attribute.optional,
+                                )
+                            )
+                            changed = True
+                            break
+                else:
+                    new_attributes.append(attribute)
+            if converged:
+                new_struct.attributes = new_attributes
+            updated_struct_metadatas.append(new_struct)
+        new_struct_metadatas = updated_struct_metadatas
+
     return new_struct_metadatas
 
 
@@ -2385,25 +2446,35 @@ if __name__ == "__main__":
         shutil.rmtree("migrations/__pycache__")
 
     main()
+    print("Generated models.")
     generate_view_schema()
+    print("Generated view schema.")
     check_schema_completion()
+    print("Checked schema completion.")
     generate_view_structs()
+    print("Generated view structs.")
     table_structs: List[StructMetadata] = write_web_common_structs(
         "src/models.rs", "tables", "Table"
     )
     view_structs: List[StructMetadata] = write_web_common_structs(
         "src/views/views.rs", "views", "View"
     )
+    print("Generated web common structs.")
     write_from_impls("src/models.rs", "tables", table_structs)
     write_from_impls("src/views/views.rs", "views", view_structs)
+    print("Generated From implementations for backend.")
 
     write_table_names_enumeration(table_structs + view_structs)
+    print("Generated table names enumeration for web_common.")
 
     nested_structs: List[StructMetadata] = generate_nested_structs(
         "src/nested_models.rs", table_structs + view_structs
     )
+    print("Generated nested structs for backend.")
     write_web_common_nested_structs("nested_models.rs", nested_structs)
+    print("Generated nested structs for web_common.")
 
     write_web_common_search_trait_implementations(
         nested_structs + table_structs + view_structs
     )
+    print("Generated search trait implementations for web_common.")
