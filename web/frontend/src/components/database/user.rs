@@ -1,10 +1,10 @@
 /// impl row to badge for project state
 /// add function components
 use crate::{components::database::row_to_badge::RowToBadge, traits::FormatMatch};
-use web_common::database::User;
+use web_common::database::NestedPublicUser;
 use yew::prelude::*;
 
-impl RowToBadge for User {
+impl RowToBadge for NestedPublicUser {
     fn to_datalist_badge(&self, query: &str) -> Html {
         html! {
             <div>
@@ -24,7 +24,6 @@ impl RowToBadge for User {
             </p>
         }
     }
-    
 
     fn matches(&self, query: &str) -> bool {
         self.full_name() == query

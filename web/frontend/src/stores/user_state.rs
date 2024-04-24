@@ -53,6 +53,16 @@ impl UserState {
     pub fn user(&self) -> Option<&NestedPublicUser> {
         self.user.as_ref()
     }
+
+    pub fn complete_profile(&self) -> Option<&NestedPublicUser> {
+        self.user.as_ref().and_then(|user| {
+            if user.has_complete_profile() {
+                Some(user)
+            } else {
+                None
+            }
+        })
+    }
 }
 
 pub fn logout(

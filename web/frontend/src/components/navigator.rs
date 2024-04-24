@@ -60,6 +60,10 @@ impl Navigator {
         self.user_state.user()
     }
 
+    fn complete_profile(&self) -> Option<&NestedPublicUser> {
+        self.user_state.complete_profile()
+    }
+
     fn has_access_token(&self) -> bool {
         self.user_state.has_access_token()
     }
@@ -226,7 +230,7 @@ impl Component for Navigator {
                     </h1>
                     <SearchBar />
                     if self.has_access_token() {
-                        if let Some(user) = self.user() {
+                        if let Some(user) = self.complete_profile() {
                             <div class="user">
                                 if let Some(thumbnail) = &user.thumbnail {
                                     <img src={thumbnail.inner.path.clone()} alt={format!("{}'s avatar", user.inner.full_name())} />

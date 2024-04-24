@@ -42,6 +42,16 @@ impl Document {
     }
 }
 
+impl NestedDocument {
+    pub fn from_path(
+        path: &str,
+        conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        let document = Document::from_path(path, conn)?;
+        Ok(Self::get(document.id, conn)?)
+    }
+}
+
 
 impl NestedDocument {
     pub fn internal_path(&self) -> String {

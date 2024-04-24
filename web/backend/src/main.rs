@@ -2,6 +2,7 @@
 extern crate diesel;
 
 use actix_web::{get, web, App, HttpServer, Responder};
+use backend::models::Document;
 use diesel::prelude::*;
 use diesel::r2d2::{self, ConnectionManager};
 
@@ -25,7 +26,7 @@ async fn index() -> impl Responder {
 ///
 /// # Implementative details
 /// If the path happens to not exist, the server will return a 404 error.
-async fn static_files(req: HttpRequest) -> impl Responder {
+async fn frontend_static_files(req: HttpRequest) -> impl Responder {
     let path: PathBuf = req.match_info().query("filename").parse().unwrap();
     match NamedFile::open(format!("/app/frontend/dist/{}", path.display())) {
         Ok(file) => file,
@@ -135,7 +136,7 @@ async fn main() -> std::io::Result<()> {
             .route("/", web::get().to(index))
             .route("/login", web::get().to(index))
             .route("/profile", web::get().to(index))
-            .service(static_files)
+            .service(frontend_static_files)
             // enable logger
             .wrap(Logger::default())
             // We add support for CORS requests
