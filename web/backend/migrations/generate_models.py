@@ -56,17 +56,19 @@ will make use of the full path to the struct in the `web_common` crate so to avo
 
 """
 
-from typing import List, Tuple, Optional, Union
-import psycopg2
-import compress_json
 import os
 import re
-import pandas as pd
 import shutil
-from tqdm.auto import tqdm
+from typing import List, Optional, Tuple, Union
+
+import compress_json
+import pandas as pd
+import psycopg2
 from densify_directory_counter import densify_directory_counter
 from dotenv import load_dotenv
 from retrieve_ncbi_taxon import retrieve_ncbi_taxon
+from tqdm.auto import tqdm
+
 
 def struct_name_from_table_name(table_name: str) -> str:
     """Convert the table name to the struct name."""
@@ -120,7 +122,7 @@ class PGIndices:
             for column in view_columns:
                 if column.alias_name == "id":
                     return self.get_table(column.table_name)
-        
+
         for index in self.indices:
             if index.table_name == table_name:
                 return index
@@ -339,8 +341,15 @@ def sql_type_to_rust_type(sql_type: str) -> str:
 
 
 class ViewColumn:
-    
-    def __init__(self, column_name: str, data_type: str, alias_name: str, table_name: str, nullable: bool):
+
+    def __init__(
+        self,
+        column_name: str,
+        data_type: str,
+        alias_name: str,
+        table_name: str,
+        nullable: bool,
+    ):
         self.column_name = column_name
         self.data_type = data_type
         self.alias_name = alias_name
@@ -471,46 +480,66 @@ class TableMetadata:
                     original_table_name = original_table_name.strip()
                 else:
                     continue
-                
+
                 remapped = False
 
-                if not self.is_table(original_table_name) and not self.is_view(original_table_name):
+                if not self.is_table(original_table_name) and not self.is_view(
+                    original_table_name
+                ):
                     remapped_table_name = table_name_mappings.get(original_table_name)
                     remapped = True
                     if remapped_table_name is None:
-                        raise ValueError(f"The table {original_table_name} does not exist.")
+                        raise ValueError(
+                            f"The table {original_table_name} does not exist."
+                        )
                     original_table_name = remapped_table_name
 
-                extracted_columns.append(ViewColumn(
-                    column_name=original_column_name.strip(),
-                    data_type=self.get_column_data_type(original_table_name, original_column_name.strip()),
-                    alias_name=alias_column_name.strip(),
-                    table_name=original_table_name.strip(),
-                    nullable=remapped or self.is_nullable(original_table_name, original_column_name.strip())
-                ))
+                extracted_columns.append(
+                    ViewColumn(
+                        column_name=original_column_name.strip(),
+                        data_type=self.get_column_data_type(
+                            original_table_name, original_column_name.strip()
+                        ),
+                        alias_name=alias_column_name.strip(),
+                        table_name=original_table_name.strip(),
+                        nullable=remapped
+                        or self.is_nullable(
+                            original_table_name, original_column_name.strip()
+                        ),
+                    )
+                )
             else:
                 if "." in column:
                     original_table_name, original_column_name = column.split(".")
                     original_table_name = original_table_name.strip()
                 else:
                     continue
-                
+
                 remapped = False
 
-                if not self.is_table(original_table_name) and not self.is_view(original_table_name):
+                if not self.is_table(original_table_name) and not self.is_view(
+                    original_table_name
+                ):
                     remapped_table_name = table_name_mappings.get(original_table_name)
                     remapped = True
                     if remapped_table_name is None:
-                        raise ValueError(f"The table {original_table_name} does not exist.")
+                        raise ValueError(
+                            f"The table {original_table_name} does not exist."
+                        )
                     original_table_name = remapped_table_name
 
                 extracted_columns.append(
                     ViewColumn(
                         column_name=original_column_name.strip(),
-                        data_type=self.get_column_data_type(original_table_name, original_column_name.strip()),
+                        data_type=self.get_column_data_type(
+                            original_table_name, original_column_name.strip()
+                        ),
                         alias_name=original_column_name.strip(),
                         table_name=original_table_name.strip(),
-                        nullable=remapped or self.is_nullable(original_table_name, original_column_name.strip())
+                        nullable=remapped
+                        or self.is_nullable(
+                            original_table_name, original_column_name.strip()
+                        ),
                     )
                 )
 
@@ -559,7 +588,9 @@ class TableMetadata:
         if self.is_view(table_name):
             foreign_keys = []
             for column in self.extract_view_columns(table_name):
-                if column.column_name in self.get_foreign_keys(column.table_name) or self.is_primary_key(column.table_name, column.column_name):
+                if column.column_name in self.get_foreign_keys(
+                    column.table_name
+                ) or self.is_primary_key(column.table_name, column.column_name):
                     foreign_keys.append(column.alias_name)
             return foreign_keys
 
@@ -707,7 +738,7 @@ class TableMetadata:
             for view_column in self.extract_view_columns(table_name):
                 if view_column.alias_name == column_name:
                     return view_column.nullable
-        
+
         _conn, cursor = get_cursor()
 
         cursor.execute(
@@ -727,7 +758,6 @@ class TableMetadata:
         cursor.close()
 
         return is_nullable == "YES"
-
 
     def get_primary_key_name_and_type(
         self, table_name: str
@@ -787,11 +817,8 @@ class TableMetadata:
     def get_columns(self, table_name: str) -> List[str]:
         """Returns the columns of the table."""
         if self.is_view(table_name):
-            return [
-                column[1]
-                for column in self.extract_view_columns(table_name)
-            ]
-        
+            return [column[1] for column in self.extract_view_columns(table_name)]
+
         _conn, cursor = get_cursor()
         cursor.execute(
             f"""
@@ -1042,10 +1069,12 @@ def write_from_impls(
                     # Since the `sql_query` function needs to run a raw SQL query, we need to
                     # sanitize the input to avoid SQL injection attacks.
 
-                    joined_field_names = ", ".join([
-                        f"{struct.table_name}.{attribute.name}"
-                        for attribute in struct.attributes
-                    ])
+                    joined_field_names = ", ".join(
+                        [
+                            f"{struct.table_name}.{attribute.name}"
+                            for attribute in struct.attributes
+                        ]
+                    )
 
                     # Since the similarity function only takes two arguments, we need to combine
                     # the scores of all of the columns. We do this by summing the scores of each
@@ -1060,11 +1089,9 @@ def write_from_impls(
                         new_content += f'            "WITH selected_ids AS (",\n'
                         new_content += f'            "SELECT {similarity_index.table_name}.id FROM {similarity_index.table_name} ",\n'
                         new_content += f'            "ORDER BY {similarity_function} DESC LIMIT $3",\n'
-                        new_content += "         \")\",\n"
+                        new_content += '         ")",\n'
                         new_content += f'            "SELECT {joined_field_names} FROM {struct.table_name} ",\n'
-                        new_content += (
-                            f'            "JOIN selected_ids ON selected_ids.id = {struct.table_name}.id"\n'
-                        )
+                        new_content += f'            "JOIN selected_ids ON selected_ids.id = {struct.table_name}.id"\n'
                         new_content += "        );\n"
                     else:
                         new_content += "        let similarity_query = concat!(\n"
@@ -1773,13 +1800,9 @@ def generate_diesel_schema(view_name: str, columns: List[ViewColumn]) -> str:
     schema_code += f"    {view_name} (id) {{\n"
     for column in columns:
         if column.nullable:
-            schema_code += (
-                f"        {column.alias_name} -> diesel::sql_types::Nullable<{map_postgres_to_rust_type(column.data_type)}>,\n"
-            )
+            schema_code += f"        {column.alias_name} -> diesel::sql_types::Nullable<{map_postgres_to_rust_type(column.data_type)}>,\n"
         else:
-            schema_code += (
-                f"        {column.alias_name} -> {map_postgres_to_rust_type(column.data_type)},\n"
-            )
+            schema_code += f"        {column.alias_name} -> {map_postgres_to_rust_type(column.data_type)},\n"
     schema_code += "    }\n"
     schema_code += "}\n"
     return schema_code
@@ -1939,7 +1962,7 @@ def generate_view_structs():
                     original_name=attribute,
                     name=attribute,
                     data_type=data_types[data_type],
-                    optional=optional
+                    optional=optional,
                 )
             )
 
@@ -1962,7 +1985,9 @@ def generate_view_structs():
             # We write the struct definition
             views.write(f"pub struct {view_struct.name} {{\n")
             for attribute in view_struct.attributes:
-                views.write(f"    pub {attribute.name}: {attribute.format_data_type()},\n")
+                views.write(
+                    f"    pub {attribute.name}: {attribute.format_data_type()},\n"
+                )
             views.write("}\n\n")
 
         if brackets_count == 0:
@@ -2036,11 +2061,7 @@ def generate_nested_structs(
 
     # For each of the struct, we generated the Nested{struct_name} version
     # if the struct contains a reference to another struct.
-    for struct in tqdm(
-        struct_metadatas,
-        desc="Generating nested structs",
-        leave=False
-    ):
+    for struct in tqdm(struct_metadatas, desc="Generating nested structs", leave=False):
         # If the struct does not have any foreign keys, we skip it
         if not tables_metadata.has_foreign_keys(
             struct.table_name

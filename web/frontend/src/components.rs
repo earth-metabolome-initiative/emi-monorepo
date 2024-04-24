@@ -1,4 +1,5 @@
 pub mod app;
+pub mod database;
 pub mod error_page;
 pub mod footer;
 pub mod forms;
@@ -9,7 +10,6 @@ mod logout;
 pub mod navigator;
 mod search_bar;
 pub mod sidebar;
-pub mod database;
 
 pub use app::App;
 pub use error_page::ErrorPage;

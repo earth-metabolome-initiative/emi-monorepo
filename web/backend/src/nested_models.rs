@@ -1428,7 +1428,7 @@ pub struct NestedSampleTaxa {
     pub inner: SampleTaxa,
     pub created_by: User,
     pub sample: NestedSample,
-    pub taxon: Taxa,
+    pub taxon: NestedTaxa,
 }
 
 impl NestedSampleTaxa {
@@ -1445,7 +1445,7 @@ impl NestedSampleTaxa {
             nested_structs.push(Self {
                 created_by: User::get(flat_struct.created_by, connection)?,
                 sample: NestedSample::get(flat_struct.sample_id, connection)?,
-                taxon: Taxa::get(flat_struct.taxon_id, connection)?,
+                taxon: NestedTaxa::get(flat_struct.taxon_id, connection)?,
                 inner: flat_struct,
             });
         }
@@ -1468,7 +1468,7 @@ impl NestedSampleTaxa {
             inner: SampleTaxa::get(flat_struct.id, connection)?,
             created_by: User::get(flat_struct.created_by, connection)?,
             sample: NestedSample::get(flat_struct.sample_id, connection)?,
-            taxon: Taxa::get(flat_struct.taxon_id, connection)?,
+            taxon: NestedTaxa::get(flat_struct.taxon_id, connection)?,
         })
     }
 }
@@ -1497,7 +1497,7 @@ pub struct NestedSampledIndividualTaxa {
     pub inner: SampledIndividualTaxa,
     pub created_by: User,
     pub sampled_individual: SampledIndividual,
-    pub taxon: Taxa,
+    pub taxon: NestedTaxa,
 }
 
 impl NestedSampledIndividualTaxa {
@@ -1514,7 +1514,7 @@ impl NestedSampledIndividualTaxa {
             nested_structs.push(Self {
                 created_by: User::get(flat_struct.created_by, connection)?,
                 sampled_individual: SampledIndividual::get(flat_struct.sampled_individual_id, connection)?,
-                taxon: Taxa::get(flat_struct.taxon_id, connection)?,
+                taxon: NestedTaxa::get(flat_struct.taxon_id, connection)?,
                 inner: flat_struct,
             });
         }
@@ -1537,7 +1537,7 @@ impl NestedSampledIndividualTaxa {
             inner: SampledIndividualTaxa::get(flat_struct.id, connection)?,
             created_by: User::get(flat_struct.created_by, connection)?,
             sampled_individual: SampledIndividual::get(flat_struct.sampled_individual_id, connection)?,
-            taxon: Taxa::get(flat_struct.taxon_id, connection)?,
+            taxon: NestedTaxa::get(flat_struct.taxon_id, connection)?,
         })
     }
 }
@@ -1835,6 +1835,101 @@ impl From<NestedSpectraCollection> for web_common::database::nested_models::Nest
             inner: item.inner.into(),
             sample: item.sample.into(),
             created_by: item.created_by.into(),
+        }
+    }
+}
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+pub struct NestedTaxa {
+    pub inner: Taxa,
+    pub domain: Option<OrganismDomain>,
+    pub kingdom: Option<Kingdom>,
+    pub phylum: Option<Phylum>,
+    pub class: Option<Classe>,
+}
+
+impl NestedTaxa {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = Taxa::all(connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self {
+                domain: flat_struct.domain_id.map(|flat_struct| OrganismDomain::get(flat_struct, connection)).transpose()?,
+                kingdom: flat_struct.kingdom_id.map(|flat_struct| Kingdom::get(flat_struct, connection)).transpose()?,
+                phylum: flat_struct.phylum_id.map(|flat_struct| Phylum::get(flat_struct, connection)).transpose()?,
+                class: flat_struct.class_id.map(|flat_struct| Classe::get(flat_struct, connection)).transpose()?,
+                inner: flat_struct,
+            });
+        }
+        Ok(nested_structs)
+    }
+}
+impl NestedTaxa {
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `id` - The primary key of the row.
+    /// * `connection` - The database connection.
+    pub fn get(
+        id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+        let flat_struct = Taxa::get(id, connection)?;
+        Ok(Self {
+            inner: Taxa::get(flat_struct.id, connection)?,
+            domain: flat_struct.domain_id.map(|flat_struct| OrganismDomain::get(flat_struct, connection)).transpose()?,
+            kingdom: flat_struct.kingdom_id.map(|flat_struct| Kingdom::get(flat_struct, connection)).transpose()?,
+            phylum: flat_struct.phylum_id.map(|flat_struct| Phylum::get(flat_struct, connection)).transpose()?,
+            class: flat_struct.class_id.map(|flat_struct| Classe::get(flat_struct, connection)).transpose()?,
+        })
+    }
+}
+impl NestedTaxa {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `threshold` - The similarity threshold, by default `0.6`.
+    pub fn search(
+        query: &str,
+        limit: Option<i32>,
+        threshold: Option<f64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = Taxa::search(query, limit, threshold, connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self::get(flat_struct.id, connection)?);
+        }
+        Ok(nested_structs)
+    }
+}
+impl From<web_common::database::nested_models::NestedTaxa> for NestedTaxa {
+    fn from(item: web_common::database::nested_models::NestedTaxa) -> Self {
+        Self {
+            inner: item.inner.into(),
+            domain: item.domain.map(|item| item.into()),
+            kingdom: item.kingdom.map(|item| item.into()),
+            phylum: item.phylum.map(|item| item.into()),
+            class: item.class.map(|item| item.into()),
+        }
+    }
+}
+impl From<NestedTaxa> for web_common::database::nested_models::NestedTaxa {
+    fn from(item: NestedTaxa) -> Self {
+        Self {
+            inner: item.inner.into(),
+            domain: item.domain.map(|item| item.into()),
+            kingdom: item.kingdom.map(|item| item.into()),
+            phylum: item.phylum.map(|item| item.into()),
+            class: item.class.map(|item| item.into()),
         }
     }
 }

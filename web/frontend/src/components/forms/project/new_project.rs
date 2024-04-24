@@ -106,7 +106,6 @@ impl FormBuildable for NewProject {
     }
 }
 
-
 #[function_component(NewProjectForm)]
 pub fn complete_profile_form() -> Html {
     // The use_reducer hook takes an initialization function which will be called only once.

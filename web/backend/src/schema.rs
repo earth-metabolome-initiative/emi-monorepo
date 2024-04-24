@@ -1,6 +1,13 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
+    classes (id) {
+        id -> Int4,
+        name -> Text,
+    }
+}
+
+diesel::table! {
     container_horizontal_rules (id) {
         id -> Int4,
         created_by -> Int4,
@@ -149,6 +156,16 @@ diesel::table! {
 }
 
 diesel::table! {
+    kingdoms (id) {
+        id -> Int4,
+        name -> Text,
+        description -> Text,
+        font_awesome_icon -> Text,
+        icon_color -> Text,
+    }
+}
+
+diesel::table! {
     locations (id) {
         id -> Uuid,
         latitude_degrees -> Nullable<Int4>,
@@ -207,9 +224,26 @@ diesel::table! {
 }
 
 diesel::table! {
+    organism_domains (id) {
+        id -> Int4,
+        name -> Text,
+        description -> Text,
+        font_awesome_icon -> Text,
+        icon_color -> Text,
+    }
+}
+
+diesel::table! {
     organizations (id) {
         id -> Int4,
         parent_organization_id -> Nullable<Int4>,
+        name -> Text,
+    }
+}
+
+diesel::table! {
+    phylums (id) {
+        id -> Int4,
         name -> Text,
     }
 }
@@ -369,6 +403,10 @@ diesel::table! {
         id -> Int4,
         name -> Text,
         ncbi_taxon_id -> Nullable<Int4>,
+        domain_id -> Nullable<Int4>,
+        kingdom_id -> Nullable<Int4>,
+        phylum_id -> Nullable<Int4>,
+        class_id -> Nullable<Int4>,
     }
 }
 
@@ -465,10 +503,15 @@ diesel::joinable!(sampling_procedures -> users (created_by));
 diesel::joinable!(spectra -> spectra_collection (spectra_collection_id));
 diesel::joinable!(spectra_collection -> samples (sample_id));
 diesel::joinable!(spectra_collection -> users (created_by));
+diesel::joinable!(taxa -> classes (class_id));
+diesel::joinable!(taxa -> kingdoms (kingdom_id));
+diesel::joinable!(taxa -> organism_domains (domain_id));
+diesel::joinable!(taxa -> phylums (phylum_id));
 diesel::joinable!(user_emails -> login_providers (login_provider_id));
 diesel::joinable!(user_emails -> users (user_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
+    classes,
     container_horizontal_rules,
     container_vertical_rules,
     continuous_units,
@@ -484,11 +527,14 @@ diesel::allow_tables_to_appear_in_same_query!(
     item_locations,
     item_units,
     items,
+    kingdoms,
     locations,
     login_providers,
     manufactured_item_categories,
     notifications,
+    organism_domains,
     organizations,
+    phylums,
     primary_user_emails,
     procedure_continuous_requirements,
     procedure_discrete_requirements,

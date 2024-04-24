@@ -147,14 +147,14 @@ pub struct NestedSampleTaxa {
     pub inner: SampleTaxa,
     pub created_by: User,
     pub sample: NestedSample,
-    pub taxon: Taxa,
+    pub taxon: NestedTaxa,
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedSampledIndividualTaxa {
     pub inner: SampledIndividualTaxa,
     pub created_by: User,
     pub sampled_individual: SampledIndividual,
-    pub taxon: Taxa,
+    pub taxon: NestedTaxa,
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedSample {
@@ -179,6 +179,14 @@ pub struct NestedSpectraCollection {
     pub inner: SpectraCollection,
     pub sample: NestedSample,
     pub created_by: User,
+}
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+pub struct NestedTaxa {
+    pub inner: Taxa,
+    pub domain: Option<OrganismDomain>,
+    pub kingdom: Option<Kingdom>,
+    pub phylum: Option<Phylum>,
+    pub class: Option<Classe>,
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedTeam {

@@ -1,0 +1,10 @@
+name,description,font_awesome_icon,icon_color
+Archaeplastida,"Major group of eukaryotes",fa-leaf,teal
+Biota incertae sedis,"Group of organisms with uncertain taxonomic classification.",fa-question-circle,grey
+Chloroplastida,"Kingdom of photosynthetic eukaryotic organisms.",fa-seedling,green
+Chromista,"Eukaryotic kingdom of algae.",fa-water,primary
+Fungi,"Biological kingdom, separate from plants and animals.",fa-mushroom,brown
+Metazoa,"Kingdom of multicellular eukaryotic organisms.",fa-paw,orange
+Protista,"Eukaryotic organisms that are not animals, plants or fungi.",fa-microscope,blue
+Protozoa,"Kingdom of unicellular eukaryotic organisms.",fa-bacteria,pink
+Unaccepted,"Organisms whose classification is not accepted within a particular taxonomic framework.",fa-ban,error

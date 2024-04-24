@@ -24,10 +24,55 @@ impl Searchable for NestedSamplingProcedure {
         )
     }
 }
+impl Searchable for NestedTaxa {
+    fn search_task(query: String, limit: u32) -> super::Select {
+        super::Select::search(
+             Table::Taxa,
+              query,
+              limit,
+        )
+    }
+}
 impl Searchable for NestedPublicUser {
     fn search_task(query: String, limit: u32) -> super::Select {
         super::Select::search(
              Table::PublicUsers,
+              query,
+              limit,
+        )
+    }
+}
+impl Searchable for Classe {
+    fn search_task(query: String, limit: u32) -> super::Select {
+        super::Select::search(
+             Table::Classes,
+              query,
+              limit,
+        )
+    }
+}
+impl Searchable for Kingdom {
+    fn search_task(query: String, limit: u32) -> super::Select {
+        super::Select::search(
+             Table::Kingdoms,
+              query,
+              limit,
+        )
+    }
+}
+impl Searchable for OrganismDomain {
+    fn search_task(query: String, limit: u32) -> super::Select {
+        super::Select::search(
+             Table::OrganismDomains,
+              query,
+              limit,
+        )
+    }
+}
+impl Searchable for Phylum {
+    fn search_task(query: String, limit: u32) -> super::Select {
+        super::Select::search(
+             Table::Phylums,
               query,
               limit,
         )

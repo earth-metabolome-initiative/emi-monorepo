@@ -18,6 +18,87 @@ use diesel::Queryable;
 use chrono::NaiveDateTime;
 use uuid::Uuid;
 #[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[diesel(table_name = classes)]
+pub struct Classe {
+    pub id: i32,
+    pub name: String,
+}
+
+impl From<Classe> for web_common::database::tables::Classe {
+    fn from(item: Classe) -> Self {
+        Self {
+            id: item.id,
+            name: item.name,
+        }
+    }
+}
+
+impl From<web_common::database::tables::Classe> for Classe {
+    fn from(item: web_common::database::tables::Classe) -> Self {
+        Self {
+            id: item.id,
+            name: item.name,
+        }
+    }
+}
+
+impl Classe {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::classes;
+        classes::dsl::classes
+            .load::<Self>(connection)
+    }
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn get(
+        id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::classes;
+        classes::dsl::classes
+            .filter(classes::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+    /// Search for the struct by a given string.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `threshold` - The similarity threshold, by default `0.6`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn search(
+        query: &str,
+        limit: Option<i32>,
+        threshold: Option<f64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        let threshold = threshold.unwrap_or(0.3);
+        let similarity_query = concat!(
+            "SELECT classes.id, classes.name FROM classes ",
+            "ORDER BY similarity(classes.name, $1) DESC LIMIT $3;"
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Float8, _>(threshold)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+}
+
+#[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = container_horizontal_rules)]
 pub struct ContainerHorizontalRule {
     pub id: i32,
@@ -963,6 +1044,96 @@ impl Item {
 }
 
 #[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[diesel(table_name = kingdoms)]
+pub struct Kingdom {
+    pub id: i32,
+    pub name: String,
+    pub description: String,
+    pub font_awesome_icon: String,
+    pub icon_color: String,
+}
+
+impl From<Kingdom> for web_common::database::tables::Kingdom {
+    fn from(item: Kingdom) -> Self {
+        Self {
+            id: item.id,
+            name: item.name,
+            description: item.description,
+            font_awesome_icon: item.font_awesome_icon,
+            icon_color: item.icon_color,
+        }
+    }
+}
+
+impl From<web_common::database::tables::Kingdom> for Kingdom {
+    fn from(item: web_common::database::tables::Kingdom) -> Self {
+        Self {
+            id: item.id,
+            name: item.name,
+            description: item.description,
+            font_awesome_icon: item.font_awesome_icon,
+            icon_color: item.icon_color,
+        }
+    }
+}
+
+impl Kingdom {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::kingdoms;
+        kingdoms::dsl::kingdoms
+            .load::<Self>(connection)
+    }
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn get(
+        id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::kingdoms;
+        kingdoms::dsl::kingdoms
+            .filter(kingdoms::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+    /// Search for the struct by a given string.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `threshold` - The similarity threshold, by default `0.6`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn search(
+        query: &str,
+        limit: Option<i32>,
+        threshold: Option<f64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        let threshold = threshold.unwrap_or(0.3);
+        let similarity_query = concat!(
+            "SELECT kingdoms.id, kingdoms.name, kingdoms.description, kingdoms.font_awesome_icon, kingdoms.icon_color FROM kingdoms ",
+            "ORDER BY similarity(kingdoms.name, $1) + similarity(kingdoms.description, $1) DESC LIMIT $3;"
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Float8, _>(threshold)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+}
+
+#[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = locations)]
 pub struct Location {
     pub id: Uuid,
@@ -1246,6 +1417,96 @@ impl Notification {
 }
 
 #[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[diesel(table_name = organism_domains)]
+pub struct OrganismDomain {
+    pub id: i32,
+    pub name: String,
+    pub description: String,
+    pub font_awesome_icon: String,
+    pub icon_color: String,
+}
+
+impl From<OrganismDomain> for web_common::database::tables::OrganismDomain {
+    fn from(item: OrganismDomain) -> Self {
+        Self {
+            id: item.id,
+            name: item.name,
+            description: item.description,
+            font_awesome_icon: item.font_awesome_icon,
+            icon_color: item.icon_color,
+        }
+    }
+}
+
+impl From<web_common::database::tables::OrganismDomain> for OrganismDomain {
+    fn from(item: web_common::database::tables::OrganismDomain) -> Self {
+        Self {
+            id: item.id,
+            name: item.name,
+            description: item.description,
+            font_awesome_icon: item.font_awesome_icon,
+            icon_color: item.icon_color,
+        }
+    }
+}
+
+impl OrganismDomain {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::organism_domains;
+        organism_domains::dsl::organism_domains
+            .load::<Self>(connection)
+    }
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn get(
+        id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::organism_domains;
+        organism_domains::dsl::organism_domains
+            .filter(organism_domains::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+    /// Search for the struct by a given string.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `threshold` - The similarity threshold, by default `0.6`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn search(
+        query: &str,
+        limit: Option<i32>,
+        threshold: Option<f64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        let threshold = threshold.unwrap_or(0.3);
+        let similarity_query = concat!(
+            "SELECT organism_domains.id, organism_domains.name, organism_domains.description, organism_domains.font_awesome_icon, organism_domains.icon_color FROM organism_domains ",
+            "ORDER BY similarity(organism_domains.name, $1) + similarity(organism_domains.description, $1) DESC LIMIT $3;"
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Float8, _>(threshold)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+}
+
+#[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
 #[diesel(table_name = organizations)]
 pub struct Organization {
     pub id: i32,
@@ -1301,6 +1562,87 @@ impl Organization {
             .filter(organizations::dsl::id.eq(id))
             .first::<Self>(connection)
     }
+}
+
+#[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
+#[diesel(table_name = phylums)]
+pub struct Phylum {
+    pub id: i32,
+    pub name: String,
+}
+
+impl From<Phylum> for web_common::database::tables::Phylum {
+    fn from(item: Phylum) -> Self {
+        Self {
+            id: item.id,
+            name: item.name,
+        }
+    }
+}
+
+impl From<web_common::database::tables::Phylum> for Phylum {
+    fn from(item: web_common::database::tables::Phylum) -> Self {
+        Self {
+            id: item.id,
+            name: item.name,
+        }
+    }
+}
+
+impl Phylum {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::phylums;
+        phylums::dsl::phylums
+            .load::<Self>(connection)
+    }
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn get(
+        id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::phylums;
+        phylums::dsl::phylums
+            .filter(phylums::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+    /// Search for the struct by a given string.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `threshold` - The similarity threshold, by default `0.6`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn search(
+        query: &str,
+        limit: Option<i32>,
+        threshold: Option<f64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        let threshold = threshold.unwrap_or(0.3);
+        let similarity_query = concat!(
+            "SELECT phylums.id, phylums.name FROM phylums ",
+            "ORDER BY similarity(phylums.name, $1) DESC LIMIT $3;"
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Float8, _>(threshold)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
 }
 
 #[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
@@ -2407,6 +2749,10 @@ pub struct Taxa {
     pub id: i32,
     pub name: String,
     pub ncbi_taxon_id: Option<i32>,
+    pub domain_id: Option<i32>,
+    pub kingdom_id: Option<i32>,
+    pub phylum_id: Option<i32>,
+    pub class_id: Option<i32>,
 }
 
 impl From<Taxa> for web_common::database::tables::Taxa {
@@ -2415,6 +2761,10 @@ impl From<Taxa> for web_common::database::tables::Taxa {
             id: item.id,
             name: item.name,
             ncbi_taxon_id: item.ncbi_taxon_id,
+            domain_id: item.domain_id,
+            kingdom_id: item.kingdom_id,
+            phylum_id: item.phylum_id,
+            class_id: item.class_id,
         }
     }
 }
@@ -2425,6 +2775,10 @@ impl From<web_common::database::tables::Taxa> for Taxa {
             id: item.id,
             name: item.name,
             ncbi_taxon_id: item.ncbi_taxon_id,
+            domain_id: item.domain_id,
+            kingdom_id: item.kingdom_id,
+            phylum_id: item.phylum_id,
+            class_id: item.class_id,
         }
     }
 }
@@ -2474,7 +2828,7 @@ impl Taxa {
         let limit = limit.unwrap_or(10);
         let threshold = threshold.unwrap_or(0.3);
         let similarity_query = concat!(
-            "SELECT taxa.id, taxa.name, taxa.ncbi_taxon_id FROM taxa ",
+            "SELECT taxa.id, taxa.name, taxa.ncbi_taxon_id, taxa.domain_id, taxa.kingdom_id, taxa.phylum_id, taxa.class_id FROM taxa ",
             "ORDER BY similarity(taxa.name, $1) DESC LIMIT $3;"
         );
         diesel::sql_query(similarity_query)
