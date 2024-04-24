@@ -247,6 +247,13 @@ form.standard-form {
                     }
 
                     p {
+                        img {
+                            width: 2em;
+                            height: 2em;
+                            border-radius: 100%;
+                            margin-right: 0.5em;
+                        }
+
                         i {
                             margin-right: 0.5em;
                         }
@@ -414,6 +421,13 @@ form.standard-form {
                     }
 
                     i {
+                        margin-right: 0.5em;
+                    }
+
+                    img {
+                        width: 1.6em;
+                        height: 1.6em;
+                        border-radius: 100%;
                         margin-right: 0.5em;
                     }
                 }
