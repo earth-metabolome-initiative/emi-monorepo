@@ -300,8 +300,8 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                                 )
                                                 .bincode_serialize()
                                             }
-                                            web_common::database::Table::Users => {
-                                                crate::models::User::search(
+                                            web_common::database::Table::PublicUsers => {
+                                                crate::nested_models::NestedPublicUser::search(
                                                     &query,
                                                     Some(*number_of_results as i32),
                                                     Some(0.1),

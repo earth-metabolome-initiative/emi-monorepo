@@ -96,13 +96,11 @@ impl PublicUser {
         let threshold = threshold.unwrap_or(0.3);
         let similarity_query = concat!(
             "WITH selected_ids AS (",
-            "SELECT id FROM users ",
-            "WHERE ",
-            "(similarity(first_name, $1) + similarity(middle_name, $1) + similarity(last_name, $1)) > $2 ",
-            "ORDER BY similarity(first_name, $1) + similarity(middle_name, $1) + similarity(last_name, $1) DESC LIMIT $3",
+            "SELECT users.id FROM users ",
+            "ORDER BY similarity(users.first_name, $1) + similarity(users.middle_name, $1) + similarity(users.last_name, $1) DESC LIMIT $3",
          ")",
-            "SELECT id, first_name, middle_name, last_name, created_at, updated_at, thumbnail_id, picture_id FROM public_users ",
-            "JOIN selected_ids ON selected_ids.id = id"
+            "SELECT public_users.id, public_users.first_name, public_users.middle_name, public_users.last_name, public_users.created_at, public_users.updated_at, public_users.thumbnail_id, public_users.picture_id FROM public_users ",
+            "JOIN selected_ids ON selected_ids.id = public_users.id"
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)

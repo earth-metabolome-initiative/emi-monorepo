@@ -1696,10 +1696,8 @@ impl ProjectState {
         let limit = limit.unwrap_or(10);
         let threshold = threshold.unwrap_or(0.3);
         let similarity_query = concat!(
-            "SELECT id, name, description, font_awesome_icon, icon_color FROM project_states ",
-            "WHERE ",
-            "(similarity(name, $1) + similarity(description, $1)) > $2 ",
-            "ORDER BY similarity(name, $1) + similarity(description, $1) DESC LIMIT $3;"
+            "SELECT project_states.id, project_states.name, project_states.description, project_states.font_awesome_icon, project_states.icon_color FROM project_states ",
+            "ORDER BY similarity(project_states.name, $1) + similarity(project_states.description, $1) DESC LIMIT $3;"
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -1809,10 +1807,8 @@ impl Project {
         let limit = limit.unwrap_or(10);
         let threshold = threshold.unwrap_or(0.3);
         let similarity_query = concat!(
-            "SELECT id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, expected_end_date, end_date FROM projects ",
-            "WHERE ",
-            "(similarity(name, $1) + similarity(description, $1)) > $2 ",
-            "ORDER BY similarity(name, $1) + similarity(description, $1) DESC LIMIT $3;"
+            "SELECT projects.id, projects.name, projects.description, projects.public, projects.state_id, projects.parent_project_id, projects.budget, projects.expenses, projects.created_by, projects.created_at, projects.expected_end_date, projects.end_date FROM projects ",
+            "ORDER BY similarity(projects.name, $1) + similarity(projects.description, $1) DESC LIMIT $3;"
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -1956,10 +1952,8 @@ impl SampleState {
         let limit = limit.unwrap_or(10);
         let threshold = threshold.unwrap_or(0.3);
         let similarity_query = concat!(
-            "SELECT id, name, description, font_awesome_icon, icon_color FROM sample_states ",
-            "WHERE ",
-            "(similarity(name, $1) + similarity(description, $1)) > $2 ",
-            "ORDER BY similarity(name, $1) + similarity(description, $1) DESC LIMIT $3;"
+            "SELECT sample_states.id, sample_states.name, sample_states.description, sample_states.font_awesome_icon, sample_states.icon_color FROM sample_states ",
+            "ORDER BY similarity(sample_states.name, $1) + similarity(sample_states.description, $1) DESC LIMIT $3;"
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -2283,10 +2277,8 @@ impl SamplingProcedure {
         let limit = limit.unwrap_or(10);
         let threshold = threshold.unwrap_or(0.3);
         let similarity_query = concat!(
-            "SELECT id, name, description, created_by FROM sampling_procedures ",
-            "WHERE ",
-            "(similarity(name, $1) + similarity(description, $1)) > $2 ",
-            "ORDER BY similarity(name, $1) + similarity(description, $1) DESC LIMIT $3;"
+            "SELECT sampling_procedures.id, sampling_procedures.name, sampling_procedures.description, sampling_procedures.created_by FROM sampling_procedures ",
+            "ORDER BY similarity(sampling_procedures.name, $1) + similarity(sampling_procedures.description, $1) DESC LIMIT $3;"
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -2482,10 +2474,8 @@ impl Taxa {
         let limit = limit.unwrap_or(10);
         let threshold = threshold.unwrap_or(0.3);
         let similarity_query = concat!(
-            "SELECT id, name, ncbi_taxon_id FROM taxa ",
-            "WHERE ",
-            "(similarity(name, $1)) > $2 ",
-            "ORDER BY similarity(name, $1) DESC LIMIT $3;"
+            "SELECT taxa.id, taxa.name, taxa.ncbi_taxon_id FROM taxa ",
+            "ORDER BY similarity(taxa.name, $1) DESC LIMIT $3;"
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -2754,10 +2744,8 @@ impl User {
         let limit = limit.unwrap_or(10);
         let threshold = threshold.unwrap_or(0.3);
         let similarity_query = concat!(
-            "SELECT id, first_name, middle_name, last_name, created_at, updated_at FROM users ",
-            "WHERE ",
-            "(similarity(first_name, $1) + similarity(middle_name, $1) + similarity(last_name, $1)) > $2 ",
-            "ORDER BY similarity(first_name, $1) + similarity(middle_name, $1) + similarity(last_name, $1) DESC LIMIT $3;"
+            "SELECT users.id, users.first_name, users.middle_name, users.last_name, users.created_at, users.updated_at FROM users ",
+            "ORDER BY similarity(users.first_name, $1) + similarity(users.middle_name, $1) + similarity(users.last_name, $1) DESC LIMIT $3;"
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)

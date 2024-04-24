@@ -1040,34 +1040,33 @@ def write_from_impls(
                     # Since the `sql_query` function needs to run a raw SQL query, we need to
                     # sanitize the input to avoid SQL injection attacks.
 
-                    joined_field_names = ", ".join(struct_field_names)
+                    joined_field_names = ", ".join([
+                        f"{struct.table_name}.{attribute.name}"
+                        for attribute in struct.attributes
+                    ])
 
                     # Since the similarity function only takes two arguments, we need to combine
                     # the scores of all of the columns. We do this by summing the scores of each
                     # column:
                     similarity_function = " + ".join(
-                        f"similarity({column}, $1)"
+                        f"similarity({similarity_index.table_name}.{column}, $1)"
                         for column in similarity_index.columns
                     )
 
                     if table_type == "views":
                         new_content += "        let similarity_query = concat!(\n"
                         new_content += f'            "WITH selected_ids AS (",\n'
-                        new_content += f'            "SELECT id FROM {similarity_index.table_name} ",\n'
-                        new_content += '            "WHERE ",\n'
-                        new_content += f'            "({similarity_function}) > $2 ",\n'
+                        new_content += f'            "SELECT {similarity_index.table_name}.id FROM {similarity_index.table_name} ",\n'
                         new_content += f'            "ORDER BY {similarity_function} DESC LIMIT $3",\n'
                         new_content += "         \")\",\n"
                         new_content += f'            "SELECT {joined_field_names} FROM {struct.table_name} ",\n'
                         new_content += (
-                            '            "JOIN selected_ids ON selected_ids.id = id"\n'
+                            f'            "JOIN selected_ids ON selected_ids.id = {struct.table_name}.id"\n'
                         )
                         new_content += "        );\n"
                     else:
                         new_content += "        let similarity_query = concat!(\n"
                         new_content += f'            "SELECT {joined_field_names} FROM {struct.table_name} ",\n'
-                        new_content += '            "WHERE ",\n'
-                        new_content += f'            "({similarity_function}) > $2 ",\n'
                         new_content += f'            "ORDER BY {similarity_function} DESC LIMIT $3;"\n'
                         new_content += "        );\n"
 
