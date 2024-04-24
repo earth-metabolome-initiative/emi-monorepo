@@ -475,10 +475,11 @@ class TableMetadata:
                 remapped = False
 
                 if not self.is_table(original_table_name) and not self.is_view(original_table_name):
-                    original_table_name = table_name_mappings.get(original_table_name)
+                    remapped_table_name = table_name_mappings.get(original_table_name)
                     remapped = True
-                    if original_table_name is None:
+                    if remapped_table_name is None:
                         raise ValueError(f"The table {original_table_name} does not exist.")
+                    original_table_name = remapped_table_name
 
                 extracted_columns.append(ViewColumn(
                     column_name=original_column_name.strip(),
@@ -497,10 +498,11 @@ class TableMetadata:
                 remapped = False
 
                 if not self.is_table(original_table_name) and not self.is_view(original_table_name):
-                    original_table_name = table_name_mappings.get(original_table_name)
+                    remapped_table_name = table_name_mappings.get(original_table_name)
                     remapped = True
-                    if original_table_name is None:
+                    if remapped_table_name is None:
                         raise ValueError(f"The table {original_table_name} does not exist.")
+                    original_table_name = remapped_table_name
 
                 extracted_columns.append(
                     ViewColumn(
