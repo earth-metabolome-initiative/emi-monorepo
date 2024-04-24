@@ -22,7 +22,8 @@ pub struct NewSampleBuilder {
     pub parent_project: Option<NestedProject>,
     pub sample_state: Option<SampleState>,
     pub collector: Option<User>,
-    pub sampling_procedure: Option<SamplingProcedure>
+    pub sampling_procedure: Option<SamplingProcedure>,
+    pub taxa: Vec<Taxa>,
 }
 
 impl FormBuilder for NewSampleBuilder {
@@ -51,7 +52,9 @@ impl FormBuilder for NewSampleBuilder {
             public: self.public,
             sample_state: self.sample_state.clone().unwrap(),
             collector: self.collector.clone().unwrap(),
-            sampling_procedure: self.sampling_procedure.clone().unwrap()
+            sampling_procedure: self.sampling_procedure.clone().unwrap(),
+            taxa: self.taxa.clone(),
+
         }
     }
 }
@@ -62,8 +65,9 @@ pub enum NewSampleBuilderActions {
     SetPublic(bool),
     SetParentProject(Option<NestedProject>),
     SetSampleState(Option<SampleState>),
-    SetCollector(User),
-    SetSamplingProcedure(SamplingProcedure)
+    SetCollector(Option<User>),
+    SetSamplingProcedure(Option<SamplingProcedure>),
+    SetTaxa(Vec<Taxa>),
 }
 
 impl Reducer<NewSampleBuilder> for NewSampleBuilderActions {
@@ -86,10 +90,13 @@ impl Reducer<NewSampleBuilder> for NewSampleBuilderActions {
                 state_mut.sample_state = sample_state;
             }
             NewSampleBuilderActions::SetCollector(collector) => {
-                state_mut.collector = Some(collector);
+                state_mut.collector = collector;
             }
             NewSampleBuilderActions::SetSamplingProcedure(sampling_procedure) => {
-                state_mut.sampling_procedure = Some(sampling_procedure);
+                state_mut.sampling_procedure = sampling_procedure;
+            }
+            NewSampleBuilderActions::SetTaxa(taxa) => {
+                state_mut.taxa = taxa;
             }
         }
         state
@@ -135,21 +142,23 @@ pub fn complete_profile_form() -> Html {
         NewSampleBuilderActions::SetSampleState(sample_states.pop())
     });
     let set_collector = dispatch.apply_callback(|mut users: Vec<User>| {
-        NewSampleBuilderActions::SetCollector(users.pop().unwrap())
+        NewSampleBuilderActions::SetCollector(users.pop())
     });
     let set_sampling_procedure = dispatch.apply_callback(|mut sampling_procedures: Vec<SamplingProcedure>| {
-        NewSampleBuilderActions::SetSamplingProcedure(sampling_procedures.pop().unwrap())
+        NewSampleBuilderActions::SetSamplingProcedure(sampling_procedures.pop())
     });
+    let set_taxa = dispatch.apply_callback(|taxa: Vec<Taxa>| NewSampleBuilderActions::SetTaxa(taxa));
 
     html! {
         <BasicForm<NewSample> builder={store.deref().clone()}>
             <BasicInput<NewSampleName> label="Name" builder={set_name} value={store.name.clone()} input_type={InputType::Text} />
             <BasicInput<NotEmpty> label="Description" builder={set_description} value={store.description.clone()} input_type={InputType::Textarea} />
             <Checkbox label="Public" builder={set_public} value={store.public} />
-            <Datalist<web_common::database::NestedProject> builder={set_parent_project} value={store.parent_project.clone().map_or_else(|| Vec::new(), |value| vec![value])} label="Project" />
+            <Datalist<web_common::database::NestedProject> builder={set_parent_project} optional = {true} value={store.parent_project.clone().map_or_else(|| Vec::new(), |value| vec![value])} label="Project" />
             <Datalist<web_common::database::SampleState> builder={set_sample_state} value={store.sample_state.clone().map_or_else(|| Vec::new(), |value| vec![value])} label="Sample State" />
             <Datalist<web_common::database::User> builder={set_collector} value={store.collector.clone().map_or_else(|| Vec::new(), |value| vec![value])} label="Collector" />
             <Datalist<web_common::database::SamplingProcedure> builder={set_sampling_procedure} value={store.sampling_procedure.clone().map_or_else(|| Vec::new(), |value| vec![value])} label="Sampling Procedure" />
+            <Datalist<web_common::database::Taxa> builder={set_taxa} optional = {true} number_of_choices = {5} value={store.taxa.clone()} label="Taxa" />
         </BasicForm<NewSample>>
     }
 }

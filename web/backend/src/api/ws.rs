@@ -9,6 +9,7 @@ use actix_web_actors::ws::WsResponseBuilder;
 pub mod projects;
 pub mod samples;
 pub mod users;
+pub mod taxa;
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(start_websocket);

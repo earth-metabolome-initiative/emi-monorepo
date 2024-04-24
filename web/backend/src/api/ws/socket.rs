@@ -264,6 +264,15 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                                 )
                                                 .bincode_serialize()
                                             }
+                                            web_common::database::Table::Taxa => {
+                                                crate::models::Taxa::search(
+                                                    &query,
+                                                    Some(*number_of_results as i32),
+                                                    Some(0.1),
+                                                    &mut self.diesel_connection,
+                                                )
+                                                .bincode_serialize()
+                                            }
                                             web_common::database::Table::SamplingProcedures => {
                                                 crate::models::SamplingProcedure::search(
                                                     &query,
