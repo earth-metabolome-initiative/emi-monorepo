@@ -22,7 +22,7 @@ pub enum FrontendMessage {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum BackendMessage {
     Close(Option<CloseReason>),
-    RefreshToken(AccessToken),
+    RefreshToken((NestedPublicUser, AccessToken)),
     Notification(NotificationMessage),
     SearchTable(uuid::Uuid, Result<Vec<Vec<u8>>, ApiError>),
     TaskResult(Uuid, Result<(), ApiError>),

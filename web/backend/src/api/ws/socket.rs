@@ -1,8 +1,11 @@
 //! Submodule defining the websocket actor and its message handling.
 
+use std::mem::swap;
+
 use crate::api::ws::users::UserMessage;
 use crate::models::Notification;
 use crate::models::User;
+use crate::nested_models::NestedPublicUser;
 use crate::traits::bincode_serialize::BincodeSerialize;
 use crate::DBPool;
 use crate::DieselConn;
@@ -12,6 +15,7 @@ use actix::Message;
 use actix::SpawnHandle;
 use actix::WrapFuture;
 use actix::{Actor, StreamHandler};
+use actix_web::web::Bytes;
 use actix_web_actors::ws;
 use serde::Deserialize;
 use serde::Serialize;
@@ -31,6 +35,7 @@ pub struct WebSocket {
     pub(crate) diesel_connection: DieselConn,
     redis: redis::Client,
     sqlx: SQLxPool<Postgres>,
+    continuation_bytes: Vec<u8>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -48,7 +53,16 @@ impl WebSocket {
             diesel,
             redis,
             sqlx,
+            continuation_bytes: Vec::new(),
         }
+    }
+
+    fn user(&self) -> Option<&User> {
+        self.user.as_ref().map(|(user, _)| user)
+    }
+
+    fn access_token(&self) -> Option<&AccessToken> {
+        self.user.as_ref().map(|(_, access_token)| access_token)
     }
 
     pub fn authenticated(
@@ -66,6 +80,7 @@ impl WebSocket {
             diesel,
             redis,
             sqlx,
+            continuation_bytes: Vec::new(),
         }
     }
 
@@ -148,9 +163,18 @@ impl Actor for WebSocket {
         // self.listen_for_notifications(ctx);
         if self.is_authenticated() {
             log::info!("Sending refresh token message");
-            ctx.address().do_send(BackendMessage::RefreshToken(
-                self.user.as_ref().unwrap().1.clone(),
-            ));
+            match NestedPublicUser::get(self.user().unwrap().id, &mut self.diesel_connection) {
+                Ok(user) => {
+                    ctx.address().do_send(BackendMessage::RefreshToken((
+                        user.into(),
+                        self.access_token().unwrap().clone(),
+                    )));
+                }
+                Err(err) => {
+                    log::error!("Error getting user: {:?}", err);
+                    ctx.close(Some(ws::CloseCode::Error.into()));
+                }
+            }
         }
     }
 }
@@ -186,6 +210,27 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
     fn handle(&mut self, msg: Result<ws::Message, ws::ProtocolError>, ctx: &mut Self::Context) {
         match msg {
             Ok(msg) => {
+                if let ws::Message::Continuation(item) = msg {
+                    match item {
+                        actix_http::ws::Item::FirstBinary(bytes)
+                        | actix_http::ws::Item::FirstText(bytes) => {
+                            self.continuation_bytes = bytes.to_vec();
+                        }
+                        actix_http::ws::Item::Continue(bytes) => {
+                            self.continuation_bytes.extend_from_slice(bytes.as_ref());
+                        }
+                        actix_http::ws::Item::Last(bytes) => {
+                            self.continuation_bytes.extend_from_slice(bytes.as_ref());
+                            let mut continuation_bytes = Vec::new();
+                            swap(&mut self.continuation_bytes, &mut continuation_bytes);
+                            let complete_message: Result<ws::Message, ws::ProtocolError> =
+                                Ok(ws::Message::Binary(Bytes::from(continuation_bytes)));
+                            self.continuation_bytes.clear();
+                            self.handle(complete_message, ctx);
+                        }
+                    }
+                    return;
+                }
                 let frontend_message: FrontendMessage = msg.into();
                 match frontend_message {
                     FrontendMessage::Close(_code) => {
@@ -203,7 +248,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                         task.id(),
                                         new_project.clone(),
                                     ));
-                                },
+                                }
                                 web_common::database::Insert::Sample(new_sample) => {
                                     ctx.address().do_send(SampleMessage::NewSample(
                                         task.id(),
@@ -235,7 +280,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                                     Some(0.1),
                                                     &mut self.diesel_connection,
                                                 )
-                                                .bincode_serialize()  
+                                                .bincode_serialize()
                                             }
                                             web_common::database::Table::ProjectStates => {
                                                 crate::models::ProjectState::search(

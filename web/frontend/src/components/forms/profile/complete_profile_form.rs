@@ -3,16 +3,12 @@
 use std::rc::Rc;
 
 use crate::components::forms::*;
-use crate::stores::user_state::UserState;
 use serde::{Deserialize, Serialize};
-use wasm_bindgen::JsCast;
-use web_common::api::form_traits::TryFromCallback;
-use web_common::custom_validators::{image, Image};
+use std::ops::Deref;
+use web_common::custom_validators::Image;
 use web_common::database::updates::update_profile::{ProfileImage, ValidatedNameField};
 use web_common::database::updates::CompleteProfile;
 use web_common::file_formats::GenericFileFormat;
-use web_sys::FormData;
-use std::ops::Deref;
 use yew::prelude::*;
 use yewdux::prelude::*;
 
@@ -29,7 +25,7 @@ pub enum CompleteProfileBuilderMessage {
     SetFirstName(String),
     SetMiddleName(String),
     SetLastName(String),
-    SetPicture(Image),
+    SetPicture(Option<Image>),
 }
 
 impl FormBuilder for CompleteProfileBuilder {
@@ -79,7 +75,10 @@ impl FormBuilder for CompleteProfileBuilder {
 }
 
 impl Reducer<CompleteProfileBuilder> for CompleteProfileBuilderMessage {
-    fn apply(self, mut state: std::rc::Rc<CompleteProfileBuilder>) -> std::rc::Rc<CompleteProfileBuilder> {
+    fn apply(
+        self,
+        mut state: std::rc::Rc<CompleteProfileBuilder>,
+    ) -> std::rc::Rc<CompleteProfileBuilder> {
         let state_mut = Rc::make_mut(&mut state);
         match self {
             CompleteProfileBuilderMessage::SetFirstName(first_name) => {
@@ -92,7 +91,7 @@ impl Reducer<CompleteProfileBuilder> for CompleteProfileBuilderMessage {
                 state_mut.last_name = Some(last_name);
             }
             CompleteProfileBuilderMessage::SetPicture(picture) => {
-                state_mut.picture = Some(picture);
+                state_mut.picture = picture;
             }
         }
 
@@ -199,14 +198,15 @@ pub fn complete_profile_form() -> Html {
         CompleteProfileBuilderMessage::SetLastName(last_name.to_string())
     });
 
-    let set_picture = dispatch.apply_callback(|picture| {
-        CompleteProfileBuilderMessage::SetPicture(picture)
+    let set_picture = dispatch.apply_callback(|mut picture: Vec<ProfileImage>| {
+        CompleteProfileBuilderMessage::SetPicture(picture.pop().map(|image| image.into()))
     });
 
     html! {
     <BasicForm<CompleteProfile>  builder={store.deref().clone()}>
         <FileInput<ProfileImage>
             label="Profile picture"
+            builder={set_picture}
             maximal_size={5*1024_u64.pow(2)}
             allowed_formats={vec![GenericFileFormat::Image]}
         />

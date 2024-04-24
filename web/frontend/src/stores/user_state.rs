@@ -3,7 +3,7 @@ use crate::cookies::is_logged_in;
 use crate::router::AppRoute;
 use log::info;
 use serde::{Deserialize, Serialize};
-use web_common::{api::oauth::jwt_cookies::AccessToken, database::PublicUser};
+use web_common::{api::oauth::jwt_cookies::AccessToken, database::NestedPublicUser};
 use yew_router::prelude::*;
 use yewdux::prelude::*;
 
@@ -11,7 +11,7 @@ use yewdux::prelude::*;
 /// The following macro will make sure that the store is saved across sessions.
 #[store(storage = "session", storage_tab_sync)]
 pub struct UserState {
-    user: Option<PublicUser>,
+    user: Option<NestedPublicUser>,
     access_token: Option<AccessToken>,
 }
 
@@ -37,7 +37,7 @@ impl UserState {
     }
 
     /// Set the user to the provided value and returns whether any changes were made.
-    pub fn set_user(&mut self, user: PublicUser) -> bool {
+    pub fn set_user(&mut self, user: NestedPublicUser) -> bool {
         if self.user.as_ref() != Some(&user) {
             self.user = Some(user);
             true
@@ -50,7 +50,7 @@ impl UserState {
         self.access_token.as_ref()
     }
 
-    pub fn user(&self) -> Option<&PublicUser> {
+    pub fn user(&self) -> Option<&NestedPublicUser> {
         self.user.as_ref()
     }
 }

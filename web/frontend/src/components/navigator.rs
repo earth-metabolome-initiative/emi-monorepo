@@ -27,7 +27,7 @@ use gloo::timers::callback::Interval;
 use gluesql::core::executor::Payload;
 use web_common::api::ws::messages::*;
 use web_common::api::ApiError;
-use web_common::database::PublicUser;
+use web_common::database::NestedPublicUser;
 use yew::prelude::*;
 use yew_agent::scope_ext::AgentScopeExt;
 use yew_router::prelude::*;
@@ -56,7 +56,7 @@ impl Navigator {
         self.app_state.sidebar_open()
     }
 
-    fn user(&self) -> Option<&PublicUser> {
+    fn user(&self) -> Option<&NestedPublicUser> {
         self.user_state.user()
     }
 
@@ -164,10 +164,11 @@ impl Component for Navigator {
                 }
                 task_submitted
             }
-            NavigatorMessage::Backend(BackendMessage::RefreshToken(refresh_token)) => {
+            NavigatorMessage::Backend(BackendMessage::RefreshToken((user, refresh_token))) => {
                 log::info!("Received new access token");
                 self.user_dispatch.reduce_mut(|state| {
                     state.set_access_token(refresh_token);
+                    state.set_user(user);
                 });
                 false
             }
@@ -227,8 +228,10 @@ impl Component for Navigator {
                     if self.has_access_token() {
                         if let Some(user) = self.user() {
                             <div class="user">
-                                <img src={user.thumbnail_path()} alt={format!("{}'s avatar", user.full_name())} />
-                                <span>{user.full_name()}</span>
+                                if let Some(thumbnail) = &user.thumbnail {
+                                    <img src={thumbnail.inner.path.clone()} alt={format!("{}'s avatar", user.inner.full_name())} />
+                                }
+                                <span>{user.inner.full_name()}</span>
                                 // {if store.is_offline() {
                                 //     html! {
                                 //         <span class="badge offline">{"Offline"}</span>

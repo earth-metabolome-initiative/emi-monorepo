@@ -49,7 +49,7 @@ impl NestedDocument {
             "{}/{}.{}",
             std::env::var("DOCUMENTS_DIRECTORY").unwrap(),
             self.inner.id,
-            self.format.mime_type
+            self.format.extension
         )
     }
 }
@@ -199,9 +199,15 @@ impl User {
             // We attempt to save the profile picture and thumbnail
             let profile_picture_path =
                 NestedDocument::get( profile_picture_document.id, conn,)?.internal_path();
-            profile_picture.save_with_format(profile_picture_path, ImageFormat::Png)?;
+            profile_picture.save_with_format(&profile_picture_path, ImageFormat::Png).map_err(|err| {
+                log::error!("Failed to save profile picture: {}, {}", err, profile_picture_path);
+                err
+            })?;
             let thumbnail_path = NestedDocument::get(thumbnail_document.id, conn)?.internal_path();
-            thumbnail.save_with_format(thumbnail_path, ImageFormat::Png)?;
+            thumbnail.save_with_format(&thumbnail_path, ImageFormat::Png).map_err(|err| {
+                log::error!("Failed to save thumbnail: {}, {}", err, thumbnail_path);
+                err
+            })?;
             Ok(())
         })
     }

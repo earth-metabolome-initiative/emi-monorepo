@@ -12,12 +12,12 @@ use diesel::prelude::*;
 pub struct PublicUser {
     pub id: i32,
     pub first_name: String,
-    pub middle_name: String,
+    pub middle_name: Option<String>,
     pub last_name: String,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
-    pub thumbnail_id: Uuid,
-    pub picture_id: Uuid,
+    pub thumbnail_id: Option<Uuid>,
+    pub picture_id: Option<Uuid>,
 }
 
 impl From<PublicUser> for web_common::database::views::PublicUser {

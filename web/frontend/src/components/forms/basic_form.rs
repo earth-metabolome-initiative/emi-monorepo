@@ -222,12 +222,12 @@ where
             })
         };
 
+        let submit_button_disabled = ctx.props().builder.buildable().is_err();
+        
         let classes = format!(
             "standard-form{}",
             if self.errors.is_empty() { " error" } else { "" }
         );
-
-        let submit_button_disabled = ctx.props().builder.buildable().is_err();
 
         let button_classes = if submit_button_disabled {
             ""

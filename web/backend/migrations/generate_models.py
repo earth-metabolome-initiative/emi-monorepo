@@ -103,8 +103,8 @@ class PGIndices:
             )
             # We seek an "id" column in the view columns
             for column in view_columns:
-                if column[1] == "id":
-                    return self.has_table(column[2])
+                if column.alias_name == "id":
+                    return self.has_table(column.table_name)
 
         for index in self.indices:
             if index.table_name == table_name:
@@ -118,8 +118,8 @@ class PGIndices:
             )
             # We seek an "id" column in the view columns
             for column in view_columns:
-                if column[1] == "id":
-                    return self.get_table(column[2])
+                if column.alias_name == "id":
+                    return self.get_table(column.table_name)
         
         for index in self.indices:
             if index.table_name == table_name:
@@ -338,13 +338,29 @@ def sql_type_to_rust_type(sql_type: str) -> str:
     raise NotImplementedError(f"The SQL type {sql_type} is not supported.")
 
 
+class ViewColumn:
+    
+    def __init__(self, column_name: str, data_type: str, alias_name: str, table_name: str, nullable: bool):
+        self.column_name = column_name
+        self.data_type = data_type
+        self.alias_name = alias_name
+        self.table_name = table_name
+        self.nullable = nullable
+
+
 class TableMetadata:
 
     def __init__(self, table_metadata: pd.DataFrame):
         self.table_metadata = table_metadata
+        self._view_names: List[str] = []
+        self._table_names: List[str] = []
 
     def is_table(self, table_name: str) -> bool:
         """Returns whether the table is a table."""
+        if table_name in self._view_names:
+            return False
+        if table_name in self._table_names:
+            return True
         conn, cursor = get_cursor()
         cursor.execute(
             f"""
@@ -360,10 +376,18 @@ class TableMetadata:
         is_table = cursor.fetchone() is not None
         cursor.close()
         conn.close()
+
+        if is_table:
+            self._table_names.append(table_name)
+
         return is_table
 
     def is_view(self, table_name: str) -> bool:
         """Returns whether the table is a view."""
+        if table_name in self._view_names:
+            return True
+        if table_name in self._table_names:
+            return False
         conn, cursor = get_cursor()
         cursor.execute(
             f"""
@@ -379,9 +403,13 @@ class TableMetadata:
         is_view = cursor.fetchone() is not None
         cursor.close()
         conn.close()
+
+        if is_view:
+            self._view_names.append(table_name)
+
         return is_view
 
-    def extract_view_columns(self, view_name: str) -> List[Tuple[str, str, str]]:
+    def extract_view_columns(self, view_name: str) -> List[ViewColumn]:
         """Returns list of columns, their alias and the original table name from a provided view name.
 
         # Example
@@ -432,7 +460,7 @@ class TableMetadata:
             "profile_picture_documents": "documents",
         }
 
-        extracted_columns = []
+        extracted_columns: List[ViewColumn] = []
         for column in columns:
             if " AS " in column:
                 original_column_name, alias_column_name = column.split(" AS ")
@@ -444,18 +472,21 @@ class TableMetadata:
                 else:
                     continue
                 
-                original_table_name = table_name_mappings.get(original_table_name, original_table_name)
+                remapped = False
 
                 if not self.is_table(original_table_name) and not self.is_view(original_table_name):
-                    raise ValueError(f"The table {original_table_name} does not exist.")
+                    original_table_name = table_name_mappings.get(original_table_name)
+                    remapped = True
+                    if original_table_name is None:
+                        raise ValueError(f"The table {original_table_name} does not exist.")
 
-                extracted_columns.append(
-                    (
-                        original_column_name.strip(),
-                        alias_column_name.strip(),
-                        original_table_name.strip(),
-                    )
-                )
+                extracted_columns.append(ViewColumn(
+                    column_name=original_column_name.strip(),
+                    data_type=self.get_column_data_type(original_table_name, original_column_name.strip()),
+                    alias_name=alias_column_name.strip(),
+                    table_name=original_table_name.strip(),
+                    nullable=remapped or self.is_nullable(original_table_name, original_column_name.strip())
+                ))
             else:
                 if "." in column:
                     original_table_name, original_column_name = column.split(".")
@@ -463,16 +494,21 @@ class TableMetadata:
                 else:
                     continue
                 
-                original_table_name = table_name_mappings.get(original_table_name, original_table_name)
+                remapped = False
 
                 if not self.is_table(original_table_name) and not self.is_view(original_table_name):
-                    raise ValueError(f"The table {original_table_name} does not exist.")
+                    original_table_name = table_name_mappings.get(original_table_name)
+                    remapped = True
+                    if original_table_name is None:
+                        raise ValueError(f"The table {original_table_name} does not exist.")
 
                 extracted_columns.append(
-                    (
-                        original_column_name.strip(),
-                        original_column_name.strip(),
-                        original_table_name.strip(),
+                    ViewColumn(
+                        column_name=original_column_name.strip(),
+                        data_type=self.get_column_data_type(original_table_name, original_column_name.strip()),
+                        alias_name=original_column_name.strip(),
+                        table_name=original_table_name.strip(),
+                        nullable=remapped or self.is_nullable(original_table_name, original_column_name.strip())
                     )
                 )
 
@@ -494,12 +530,8 @@ class TableMetadata:
         value, then the table has foreign keys.
         """
         if self.is_view(table_name):
-            for (
-                original_column_name,
-                _alias_column_name,
-                original_table_name,
-            ) in self.extract_view_columns(table_name):
-                if original_column_name in self.get_foreign_keys(original_table_name):
+            for column in self.extract_view_columns(table_name):
+                if column.column_name in self.get_foreign_keys(column.table_name):
                     return True
             return False
 
@@ -524,13 +556,9 @@ class TableMetadata:
         """
         if self.is_view(table_name):
             foreign_keys = []
-            for (
-                original_column_name,
-                alias_column_name,
-                original_table_name,
-            ) in self.extract_view_columns(table_name):
-                if original_column_name in self.get_foreign_keys(original_table_name) or self.is_primary_key(original_table_name, original_column_name):
-                    foreign_keys.append(alias_column_name)
+            for column in self.extract_view_columns(table_name):
+                if column.column_name in self.get_foreign_keys(column.table_name) or self.is_primary_key(column.table_name, column.column_name):
+                    foreign_keys.append(column.alias_name)
             return foreign_keys
 
         table_columns = self.table_metadata[
@@ -557,14 +585,10 @@ class TableMetadata:
         name. This value is the table that the foreign key references.
         """
         if self.is_view(table_name):
-            for (
-                original_column_name,
-                alias_column_name,
-                original_table_name,
-            ) in self.extract_view_columns(table_name):
-                if alias_column_name == column_name:
+            for column in self.extract_view_columns(table_name):
+                if column.alias_name == column_name:
                     return self.get_foreign_key_table_name(
-                        original_table_name, original_column_name
+                        column.table_name, column.column_name
                     )
             raise ValueError(
                 f"The column {column_name} does not exist in the view {table_name}."
@@ -632,6 +656,77 @@ class TableMetadata:
         primary_key_name, _ = self.get_primary_key_name_and_type(table_name)
         return primary_key_name == candidate_key
 
+    def get_column_data_type(self, table_name: str, column_name: str) -> str:
+        """Returns the data type of the column.
+
+        Parameters
+        ----------
+        table_name : str
+            The name of the table.
+        column_name : str
+            The name of the column.
+        """
+        if self.is_view(table_name):
+            for view_column in self.extract_view_columns(table_name):
+                if view_column.alias_name == column_name:
+                    return view_column.data_type
+
+        _conn, cursor = get_cursor()
+
+        cursor.execute(
+            f"""
+            SELECT
+                data_type
+            FROM
+                information_schema.columns
+            WHERE
+                table_name = '{table_name}'
+                AND column_name = '{column_name}';
+            """
+        )
+
+        data_type = cursor.fetchone()[0]
+
+        cursor.close()
+
+        return data_type
+
+    def is_nullable(self, table_name: str, column_name: str) -> bool:
+        """Returns whether the column is nullable.
+
+        Parameters
+        ----------
+        table_name : str
+            The name of the table.
+        column_name : str
+            The name of the column.
+        """
+        if self.is_view(table_name):
+            for view_column in self.extract_view_columns(table_name):
+                if view_column.alias_name == column_name:
+                    return view_column.nullable
+        
+        _conn, cursor = get_cursor()
+
+        cursor.execute(
+            f"""
+            SELECT
+                is_nullable
+            FROM
+                information_schema.columns
+            WHERE
+                table_name = '{table_name}'
+                AND column_name = '{column_name}';
+            """
+        )
+
+        is_nullable = cursor.fetchone()[0]
+
+        cursor.close()
+
+        return is_nullable == "YES"
+
+
     def get_primary_key_name_and_type(
         self, table_name: str
     ) -> Optional[Tuple[str, str]]:
@@ -654,8 +749,8 @@ class TableMetadata:
             # we return the primary key of the associated table.
             view_columns = self.extract_view_columns(table_name)
             for column in view_columns:
-                if column[1] == "id":
-                    return self.get_primary_key_name_and_type(column[2])
+                if column.alias_name == "id":
+                    return self.get_primary_key_name_and_type(column.table_name)
             return None
         _conn, cursor = get_cursor()
 
@@ -1657,21 +1752,6 @@ def get_views(cursor) -> List[str]:
     return views
 
 
-def get_view_columns(cursor, view_name: str):
-    """Returns the columns of a given view
-
-    Parameters
-    ------------
-    view_name: str
-        The name of the view for which to retrieve the columns
-    """
-    cursor.execute(
-        f"SELECT column_name, data_type FROM information_schema.columns WHERE table_name = '{view_name}' AND table_schema = 'public';"
-    )
-    columns = cursor.fetchall()
-    return columns
-
-
 def map_postgres_to_rust_type(pg_type):
     pg_to_rust_types = {
         "uuid": "diesel::sql_types::Uuid",
@@ -1687,13 +1767,18 @@ def map_postgres_to_rust_type(pg_type):
     raise NotImplementedError(f'Postgres type "{pg_type}" is not supported.')
 
 
-def generate_diesel_schema(view_name: str, columns: List[str]):
+def generate_diesel_schema(view_name: str, columns: List[ViewColumn]) -> str:
     schema_code = "diesel::table! {\n"
     schema_code += f"    {view_name} (id) {{\n"
     for column in columns:
-        schema_code += (
-            f"        {column[0]} -> {map_postgres_to_rust_type(column[1])},\n"
-        )
+        if column.nullable:
+            schema_code += (
+                f"        {column.alias_name} -> diesel::sql_types::Nullable<{map_postgres_to_rust_type(column.data_type)}>,\n"
+            )
+        else:
+            schema_code += (
+                f"        {column.alias_name} -> {map_postgres_to_rust_type(column.data_type)},\n"
+            )
     schema_code += "    }\n"
     schema_code += "}\n"
     return schema_code
@@ -1714,6 +1799,7 @@ def generate_view_schema():
 
     # Getting the list of views
     views = get_views(cursor)
+    table_metadata = find_foreign_keys()
 
     # We open the file to write the schema
     schema_file = open("src/views/schema.rs", "w", encoding="utf8")
@@ -1721,7 +1807,7 @@ def generate_view_schema():
     # Generating Diesel schema for each view
     for view in views:
         view_name = view[0]
-        columns = get_view_columns(cursor, view_name)
+        columns = table_metadata.extract_view_columns(view_name)
         schema_code = generate_diesel_schema(view_name, columns)
         schema_file.write(schema_code + "\n")
 
@@ -1843,13 +1929,16 @@ def generate_view_structs():
 
         if "->" in line:
             (attribute, data_type) = line.strip(" ,").split(" -> ")
-            # CURRENTLY NOT SUPPORT NULLABLE! TODO!
+            optional = False
+            if "Nullable<" in data_type:
+                optional = True
+                data_type = data_type.split("Nullable<", maxsplit=1)[1].strip(">")
             view_struct.add_attribute(
                 AttributeMetadata(
                     original_name=attribute,
                     name=attribute,
                     data_type=data_types[data_type],
-                    optional="Nullable" in data_type,
+                    optional=optional
                 )
             )
 
@@ -1872,7 +1961,7 @@ def generate_view_structs():
             # We write the struct definition
             views.write(f"pub struct {view_struct.name} {{\n")
             for attribute in view_struct.attributes:
-                views.write(f"    pub {attribute.name}: {attribute.data_type()},\n")
+                views.write(f"    pub {attribute.name}: {attribute.format_data_type()},\n")
             views.write("}\n\n")
 
         if brackets_count == 0:

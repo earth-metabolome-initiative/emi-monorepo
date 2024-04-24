@@ -32,8 +32,12 @@ pub fn human_readable_size(size: u64) -> String {
 }
 
 #[derive(Clone, PartialEq, Properties)]
-pub struct FileInputProp {
+pub struct FileInputProp<Data>
+where
+    Data: 'static + Clone + PartialEq,
+{
     pub label: String,
+    pub builder: Callback<Vec<Data>>,
     #[prop_or(false)]
     pub optional: bool,
     #[prop_or(false)]
@@ -46,7 +50,10 @@ pub struct FileInputProp {
     pub maximal_size: Option<u64>,
 }
 
-impl FileInputProp {
+impl<Data> FileInputProp<Data>
+where
+    Data: 'static + Clone + PartialEq,
+{
     pub fn label(&self) -> String {
         self.label.clone()
     }
@@ -81,18 +88,18 @@ pub struct FileInput<Data> {
     is_valid: Option<bool>,
     validation_timeout: Option<Timeout>,
     files: Vec<web_sys::File>,
+    parsed_files: Vec<Data>,
     show_drop_area: bool,
     show_drop_area_timeout: Option<Timeout>,
     hide_drop_area_timeout: Option<Timeout>,
     dragging: bool,
-    _phantom: std::marker::PhantomData<Data>,
 }
 
-pub enum FileInputMessage {
+pub enum FileInputMessage<Data> {
     Backend(BackendMessage),
     RemoveError(String),
     RemoveErrors,
-    Validate(Result<web_sys::File, Vec<String>>),
+    Validate(Result<(web_sys::File, Data), Vec<String>>),
     Files(web_sys::FileList),
     FilesRemoved(usize),
     SetTimeoutDropAreaVisibility(bool),
@@ -102,10 +109,10 @@ pub enum FileInputMessage {
 
 impl<Data> Component for FileInput<Data>
 where
-    Data: 'static + Clone + Validate + TryFromCallback<web_sys::File>,
+    Data: 'static + Clone + Validate + TryFromCallback<web_sys::File> + PartialEq,
 {
-    type Message = FileInputMessage;
-    type Properties = FileInputProp;
+    type Message = FileInputMessage<Data>;
+    type Properties = FileInputProp<Data>;
 
     fn create(ctx: &Context<Self>) -> Self {
         let document = web_sys::window().unwrap().document().unwrap();
@@ -151,11 +158,11 @@ where
             is_valid: None,
             validation_timeout: None,
             files: Vec::new(),
+            parsed_files: Vec::new(),
             show_drop_area: ctx.props().urls.is_empty(),
             show_drop_area_timeout: None,
             hide_drop_area_timeout: None,
             dragging: false,
-            _phantom: std::marker::PhantomData,
         }
     }
 
@@ -260,7 +267,7 @@ where
                     }) {
                         let link = ctx.link().clone();
                         if let Err(error) = Data::try_from_callback(file.clone(), move |result| {
-                            link.send_message(FileInputMessage::Validate(result.map(|_| file)));
+                            link.send_message(FileInputMessage::Validate(result.map(|data| (file, data))));
                         }) {
                             ctx.link()
                                 .send_message(FileInputMessage::Validate(Err(error)));
@@ -280,9 +287,11 @@ where
                 }
 
                 match data {
-                    Ok(file) => {
+                    Ok((file, data)) => {
                         self.files.push(file);
+                        self.parsed_files.push(data);
                         self.is_valid = Some(true);
+                        ctx.props().builder.emit(self.parsed_files.clone());
                     }
                     Err(errors) => {
                         for error in errors {
