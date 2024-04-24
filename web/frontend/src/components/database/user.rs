@@ -9,7 +9,9 @@ impl RowToBadge for NestedPublicUser {
         html! {
             <div>
                 <p>
-                    // <i class={format!("{} {}", self.font_awesome_icon, self.icon_color)}></i>
+                    if let Some(thumbnail) = &self.thumbnail {
+                        <img src={thumbnail.inner.path.clone()} alt={format!("{}'s avatar", self.inner.full_name())} />
+                    }
                     <span>{self.full_name().format_match(query)}</span>
                 </p>
             </div>
@@ -19,7 +21,9 @@ impl RowToBadge for NestedPublicUser {
     fn to_selected_datalist_badge(&self) -> Html {
         html! {
             <p>
-                // <i class={format!("{} {}", self.font_awesome_icon, self.icon_color)}></i>
+                if let Some(thumbnail) = &self.thumbnail {
+                    <img src={thumbnail.inner.path.clone()} alt={format!("{}'s avatar", self.inner.full_name())} />
+                }
                 <span>{&self.full_name()}</span>
             </p>
         }
