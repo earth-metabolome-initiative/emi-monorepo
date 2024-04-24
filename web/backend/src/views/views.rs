@@ -8,7 +8,7 @@ use diesel::r2d2::PooledConnection;
 use diesel::r2d2::ConnectionManager;
 use diesel::prelude::*;
 #[derive(Deserialize, Serialize, Debug, PartialEq, Queryable, QueryableByName, Eq, Clone)]
-#[diesel(table_name = crate::views::schema::public_user)]
+#[diesel(table_name = crate::views::schema::public_users)]
 pub struct PublicUser {
     pub id: i32,
     pub first_name: String,
@@ -16,6 +16,8 @@ pub struct PublicUser {
     pub last_name: String,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
+    pub thumbnail_id: Uuid,
+    pub picture_id: Uuid,
 }
 
 impl From<PublicUser> for web_common::database::views::PublicUser {
@@ -27,6 +29,8 @@ impl From<PublicUser> for web_common::database::views::PublicUser {
             last_name: item.last_name,
             created_at: item.created_at,
             updated_at: item.updated_at,
+            thumbnail_id: item.thumbnail_id,
+            picture_id: item.picture_id,
         }
     }
 }
@@ -40,6 +44,8 @@ impl From<web_common::database::views::PublicUser> for PublicUser {
             last_name: item.last_name,
             created_at: item.created_at,
             updated_at: item.updated_at,
+            thumbnail_id: item.thumbnail_id,
+            picture_id: item.picture_id,
         }
     }
 }
@@ -53,8 +59,8 @@ impl PublicUser {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::views::schema::public_user;
-        public_user::dsl::public_user
+        use crate::views::schema::public_users;
+        public_users::dsl::public_users
             .load::<Self>(connection)
     }
     /// Get the struct from the database by its ID.
@@ -67,11 +73,43 @@ impl PublicUser {
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
-        use crate::views::schema::public_user;
-        public_user::dsl::public_user
-            .filter(public_user::dsl::id.eq(id))
+        use crate::views::schema::public_users;
+        public_users::dsl::public_users
+            .filter(public_users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
+    /// Search for the struct by a given string.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `threshold` - The similarity threshold, by default `0.6`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn search(
+        query: &str,
+        limit: Option<i32>,
+        threshold: Option<f64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        let threshold = threshold.unwrap_or(0.3);
+        let similarity_query = concat!(
+            "WITH selected_ids AS (",
+            "SELECT id FROM users ",
+            "WHERE ",
+            "(similarity(first_name, $1) + similarity(middle_name, $1) + similarity(last_name, $1)) > $2 ",
+            "ORDER BY similarity(first_name, $1) + similarity(middle_name, $1) + similarity(last_name, $1) DESC LIMIT $3",
+         ")",
+            "SELECT id, first_name, middle_name, last_name, created_at, updated_at, thumbnail_id, picture_id FROM public_users ",
+            "JOIN selected_ids ON selected_ids.id = id"
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Float8, _>(threshold)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
 }
 
 

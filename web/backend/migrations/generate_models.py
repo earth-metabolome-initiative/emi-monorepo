@@ -63,9 +63,16 @@ import os
 import re
 import pandas as pd
 import shutil
+from tqdm.auto import tqdm
 from densify_directory_counter import densify_directory_counter
 from dotenv import load_dotenv
 from retrieve_ncbi_taxon import retrieve_ncbi_taxon
+
+def struct_name_from_table_name(table_name: str) -> str:
+    """Convert the table name to the struct name."""
+    if table_name.endswith("s"):
+        table_name = table_name[:-1]
+    return "".join(word.capitalize() for word in table_name.split("_"))
 
 
 class PGIndex:
@@ -87,14 +94,33 @@ class PGIndices:
 
     def __init__(self, indices: List[PGIndex]):
         self.indices = indices
+        self.foreign_keys_information = find_foreign_keys()
 
     def has_table(self, table_name: str) -> bool:
+        if self.foreign_keys_information.is_view(table_name):
+            view_columns = self.foreign_keys_information.extract_view_columns(
+                table_name
+            )
+            # We seek an "id" column in the view columns
+            for column in view_columns:
+                if column[1] == "id":
+                    return self.has_table(column[2])
+
         for index in self.indices:
             if index.table_name == table_name:
                 return True
         return False
 
     def get_table(self, table_name: str) -> PGIndex:
+        if self.foreign_keys_information.is_view(table_name):
+            view_columns = self.foreign_keys_information.extract_view_columns(
+                table_name
+            )
+            # We seek an "id" column in the view columns
+            for column in view_columns:
+                if column[1] == "id":
+                    return self.get_table(column[2])
+        
         for index in self.indices:
             if index.table_name == table_name:
                 return index
@@ -317,6 +343,25 @@ class TableMetadata:
     def __init__(self, table_metadata: pd.DataFrame):
         self.table_metadata = table_metadata
 
+    def is_table(self, table_name: str) -> bool:
+        """Returns whether the table is a table."""
+        conn, cursor = get_cursor()
+        cursor.execute(
+            f"""
+            SELECT
+                table_name
+            FROM
+                information_schema.tables
+            WHERE
+                table_name = '{table_name}'
+                AND table_type = 'BASE TABLE';
+            """
+        )
+        is_table = cursor.fetchone() is not None
+        cursor.close()
+        conn.close()
+        return is_table
+
     def is_view(self, table_name: str) -> bool:
         """Returns whether the table is a view."""
         conn, cursor = get_cursor()
@@ -381,6 +426,12 @@ class TableMetadata:
         columns = re.findall(r"SELECT (.*?) FROM", view_definition)[0]
         columns = columns.split(", ")
 
+        # For each column, we need to identify the original table name.
+        table_name_mappings = {
+            "thumbnail_documents": "documents",
+            "profile_picture_documents": "documents",
+        }
+
         extracted_columns = []
         for column in columns:
             if " AS " in column:
@@ -389,8 +440,15 @@ class TableMetadata:
                     original_table_name, original_column_name = (
                         original_column_name.split(".")
                     )
+                    original_table_name = original_table_name.strip()
                 else:
                     continue
+                
+                original_table_name = table_name_mappings.get(original_table_name, original_table_name)
+
+                if not self.is_table(original_table_name) and not self.is_view(original_table_name):
+                    raise ValueError(f"The table {original_table_name} does not exist.")
+
                 extracted_columns.append(
                     (
                         original_column_name.strip(),
@@ -401,8 +459,15 @@ class TableMetadata:
             else:
                 if "." in column:
                     original_table_name, original_column_name = column.split(".")
+                    original_table_name = original_table_name.strip()
                 else:
                     continue
+                
+                original_table_name = table_name_mappings.get(original_table_name, original_table_name)
+
+                if not self.is_table(original_table_name) and not self.is_view(original_table_name):
+                    raise ValueError(f"The table {original_table_name} does not exist.")
+
                 extracted_columns.append(
                     (
                         original_column_name.strip(),
@@ -464,7 +529,7 @@ class TableMetadata:
                 alias_column_name,
                 original_table_name,
             ) in self.extract_view_columns(table_name):
-                if original_column_name in self.get_foreign_keys(original_table_name):
+                if original_column_name in self.get_foreign_keys(original_table_name) or self.is_primary_key(original_table_name, original_column_name):
                     foreign_keys.append(alias_column_name)
             return foreign_keys
 
@@ -504,6 +569,10 @@ class TableMetadata:
             raise ValueError(
                 f"The column {column_name} does not exist in the view {table_name}."
             )
+
+        if self.is_primary_key(table_name, column_name):
+            return table_name
+
         table_columns = self.table_metadata[
             (self.table_metadata["referencing_table"] == table_name)
             & (self.table_metadata["referencing_column"] == column_name)
@@ -545,6 +614,24 @@ class TableMetadata:
         """
         return self.get_primary_key_name_and_type(table_name) is not None
 
+    def is_primary_key(self, table_name: str, candidate_key: str) -> bool:
+        """Returns whether the candidate key is the primary key of the table.
+
+        Parameters
+        ----------
+        table_name : str
+            The name of the table.
+        candidate_key : str
+            The candidate key.
+
+        Implementation details
+        ----------------------
+        This method returns whether the candidate key is the primary key
+        of the table metadata associated with the table name.
+        """
+        primary_key_name, _ = self.get_primary_key_name_and_type(table_name)
+        return primary_key_name == candidate_key
+
     def get_primary_key_name_and_type(
         self, table_name: str
     ) -> Optional[Tuple[str, str]]:
@@ -563,6 +650,12 @@ class TableMetadata:
         of the table.
         """
         if self.is_view(table_name):
+            # We check if the view has an "id" column and if it does,
+            # we return the primary key of the associated table.
+            view_columns = self.extract_view_columns(table_name)
+            for column in view_columns:
+                if column[1] == "id":
+                    return self.get_primary_key_name_and_type(column[2])
             return None
         _conn, cursor = get_cursor()
 
@@ -593,6 +686,31 @@ class TableMetadata:
         cursor.close()
 
         return primary_key
+
+    def get_columns(self, table_name: str) -> List[str]:
+        """Returns the columns of the table."""
+        if self.is_view(table_name):
+            return [
+                column[1]
+                for column in self.extract_view_columns(table_name)
+            ]
+        
+        _conn, cursor = get_cursor()
+        cursor.execute(
+            f"""
+            SELECT
+                column_name
+            FROM
+                information_schema.columns
+            WHERE
+                table_name = '{table_name}';
+            """
+        )
+
+        columns = cursor.fetchall()
+        cursor.close()
+
+        return [column[0] for column in columns]
 
 
 def find_foreign_keys() -> TableMetadata:
@@ -637,6 +755,9 @@ def write_from_impls(
     path: str, table_type: str, struct_metadatas: List[StructMetadata]
 ):
     """Write the `From` implementations for the structs in the `src/models.rs` file."""
+
+    if len(struct_metadatas) == 0:
+        return
 
     if table_type not in ["tables", "views"]:
         raise ValueError("The table type must be either 'tables' or 'views'.")
@@ -738,7 +859,9 @@ def write_from_impls(
                 if table_type == "tables":
                     new_content += f"        use crate::schema::{struct.table_name};\n"
                 else:
-                    new_content += f"        use crate::views::schema::{struct.table_name};\n"
+                    new_content += (
+                        f"        use crate::views::schema::{struct.table_name};\n"
+                    )
                 new_content += (
                     f"        {struct.table_name}::dsl::{struct.table_name}\n"
                 )
@@ -771,11 +894,15 @@ def write_from_impls(
                     new_content += "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
                     new_content += "    ) -> Result<Self, diesel::result::Error> {\n"
                     if table_type == "tables":
-                        new_content += f"        use crate::schema::{struct.table_name};\n"
+                        new_content += (
+                            f"        use crate::schema::{struct.table_name};\n"
+                        )
                     else:
-                        new_content += f"        use crate::views::schema::{struct.table_name};\n"
+                        new_content += (
+                            f"        use crate::views::schema::{struct.table_name};\n"
+                        )
                     new_content += (
-                            f"        {struct.table_name}::dsl::{struct.table_name}\n"
+                        f"        {struct.table_name}::dsl::{struct.table_name}\n"
                     )
                     new_content += f"            .filter({struct.table_name}::dsl::{primary_key.name}.eq({primary_key.name}))\n"
                     new_content += "            .first::<Self>(connection)\n"
@@ -787,8 +914,9 @@ def write_from_impls(
                 # parameter to limit the number of results and a threshold
                 # parameter to set the similarity threshold.
                 if similarity_indices.has_table(struct.table_name):
-                    index = similarity_indices.get_table(struct.table_name)
-                    index_columns = index.columns
+                    similarity_index: PGIndex = similarity_indices.get_table(
+                        struct.table_name
+                    )
                     new_content += "    /// Search for the struct by a given string.\n"
                     new_content += "    ///\n"
                     new_content += "    /// # Arguments\n"
@@ -808,21 +936,8 @@ def write_from_impls(
                         "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
                     )
 
-                    if table_type == "tables":
-                        new_content += (
-                            f"        use crate::schema::{struct.table_name};\n"
-                        )
-                    elif table_type == "views":
-                        new_content += (
-                            f"        use crate::views::schema::{struct.table_name};\n"
-                        )
-                    else:
-                        raise NotImplementedError(
-                            "The table type must be either 'tables' or 'views'."
-                        )
-
                     new_content += "        let limit = limit.unwrap_or(10);\n"
-                    new_content += "        let threshold = threshold.unwrap_or(0.6);\n"
+                    new_content += "        let threshold = threshold.unwrap_or(0.3);\n"
 
                     # Since Diesel does not support the `similarity` Postgres function natively
                     # as part of the DSL query builder, we are forced to build the query manually
@@ -836,15 +951,30 @@ def write_from_impls(
                     # the scores of all of the columns. We do this by summing the scores of each
                     # column:
                     similarity_function = " + ".join(
-                        f"similarity({column}, $1)" for column in index_columns
+                        f"similarity({column}, $1)"
+                        for column in similarity_index.columns
                     )
 
-                    new_content += "        let similarity_query = concat!(\n"
-                    new_content += f'            "SELECT {joined_field_names} FROM {struct.table_name} ",\n'
-                    new_content += (
-                        f'            "ORDER BY {similarity_function} DESC LIMIT $3;"\n'
-                    )
-                    new_content += "        );\n"
+                    if table_type == "views":
+                        new_content += "        let similarity_query = concat!(\n"
+                        new_content += f'            "WITH selected_ids AS (",\n'
+                        new_content += f'            "SELECT id FROM {similarity_index.table_name} ",\n'
+                        new_content += '            "WHERE ",\n'
+                        new_content += f'            "({similarity_function}) > $2 ",\n'
+                        new_content += f'            "ORDER BY {similarity_function} DESC LIMIT $3",\n'
+                        new_content += "         \")\",\n"
+                        new_content += f'            "SELECT {joined_field_names} FROM {struct.table_name} ",\n'
+                        new_content += (
+                            '            "JOIN selected_ids ON selected_ids.id = id"\n'
+                        )
+                        new_content += "        );\n"
+                    else:
+                        new_content += "        let similarity_query = concat!(\n"
+                        new_content += f'            "SELECT {joined_field_names} FROM {struct.table_name} ",\n'
+                        new_content += '            "WHERE ",\n'
+                        new_content += f'            "({similarity_function}) > $2 ",\n'
+                        new_content += f'            "ORDER BY {similarity_function} DESC LIMIT $3;"\n'
+                        new_content += "        );\n"
 
                     new_content += "        diesel::sql_query(similarity_query)\n"
                     new_content += (
@@ -1512,8 +1642,8 @@ def get_view_names() -> List[str]:
         with open(f"migrations/{directory}/up.sql", "r", encoding="utf8") as file:
             content = file.read()
         for line in content.split("\n"):
-            if "CREATE VIEW" in line:
-                view_name = line.split(" ")[2]
+            if "CREATE VIEW" in line or "CREATE MATERIALIZED VIEW" in line:
+                view_name = line.rsplit(" ", maxsplit=2)[1]
                 view_names.append(view_name)
     return view_names
 
@@ -1646,8 +1776,15 @@ def generate_view_structs():
     }
     ```
     """
+
     with open("src/views/schema.rs", "r", encoding="utf8") as file:
         schema = file.read()
+
+    views = open("src/views/views.rs", "w", encoding="utf8")
+
+    if len(schema) == 0:
+        views.close()
+        return
 
     data_types = {
         "diesel::sql_types::Uuid": "Uuid",
@@ -1677,8 +1814,6 @@ def generate_view_structs():
         "QueryableByName",
     ]
 
-    views = open("src/views/views.rs", "w", encoding="utf8")
-
     for import_statement in imports:
         views.write(f"{import_statement}\n")
 
@@ -1695,9 +1830,7 @@ def generate_view_structs():
         if last_line_was_table:
             view_name = line.split("(")[0].strip(" ")
             view_struct = StructMetadata(
-                struct_name="".join(
-                    [part.capitalize() for part in view_name.split("_")]
-                ),
+                struct_name=struct_name_from_table_name(view_name),
                 table_name=view_name,
             )
             view_structs.append(view_struct)
@@ -1732,7 +1865,9 @@ def generate_view_structs():
 
             # Then, we write the table_name attribute to link
             # the struct to the view.
-            views.write(f"#[diesel(table_name = crate::views::schema::{view_struct.table_name})]\n")
+            views.write(
+                f"#[diesel(table_name = crate::views::schema::{view_struct.table_name})]\n"
+            )
 
             # We write the struct definition
             views.write(f"pub struct {view_struct.name} {{\n")
@@ -1811,7 +1946,11 @@ def generate_nested_structs(
 
     # For each of the struct, we generated the Nested{struct_name} version
     # if the struct contains a reference to another struct.
-    for struct in struct_metadatas:
+    for struct in tqdm(
+        struct_metadatas,
+        desc="Generating nested structs",
+        leave=False
+    ):
         # If the struct does not have any foreign keys, we skip it
         if not tables_metadata.has_foreign_keys(
             struct.table_name

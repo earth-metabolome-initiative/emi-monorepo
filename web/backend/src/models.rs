@@ -1693,11 +1693,12 @@ impl ProjectState {
         threshold: Option<f64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::project_states;
         let limit = limit.unwrap_or(10);
-        let threshold = threshold.unwrap_or(0.6);
+        let threshold = threshold.unwrap_or(0.3);
         let similarity_query = concat!(
             "SELECT id, name, description, font_awesome_icon, icon_color FROM project_states ",
+            "WHERE ",
+            "(similarity(name, $1) + similarity(description, $1)) > $2 ",
             "ORDER BY similarity(name, $1) + similarity(description, $1) DESC LIMIT $3;"
         );
         diesel::sql_query(similarity_query)
@@ -1805,11 +1806,12 @@ impl Project {
         threshold: Option<f64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::projects;
         let limit = limit.unwrap_or(10);
-        let threshold = threshold.unwrap_or(0.6);
+        let threshold = threshold.unwrap_or(0.3);
         let similarity_query = concat!(
             "SELECT id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, expected_end_date, end_date FROM projects ",
+            "WHERE ",
+            "(similarity(name, $1) + similarity(description, $1)) > $2 ",
             "ORDER BY similarity(name, $1) + similarity(description, $1) DESC LIMIT $3;"
         );
         diesel::sql_query(similarity_query)
@@ -1951,11 +1953,12 @@ impl SampleState {
         threshold: Option<f64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::sample_states;
         let limit = limit.unwrap_or(10);
-        let threshold = threshold.unwrap_or(0.6);
+        let threshold = threshold.unwrap_or(0.3);
         let similarity_query = concat!(
             "SELECT id, name, description, font_awesome_icon, icon_color FROM sample_states ",
+            "WHERE ",
+            "(similarity(name, $1) + similarity(description, $1)) > $2 ",
             "ORDER BY similarity(name, $1) + similarity(description, $1) DESC LIMIT $3;"
         );
         diesel::sql_query(similarity_query)
@@ -2277,11 +2280,12 @@ impl SamplingProcedure {
         threshold: Option<f64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::sampling_procedures;
         let limit = limit.unwrap_or(10);
-        let threshold = threshold.unwrap_or(0.6);
+        let threshold = threshold.unwrap_or(0.3);
         let similarity_query = concat!(
             "SELECT id, name, description, created_by FROM sampling_procedures ",
+            "WHERE ",
+            "(similarity(name, $1) + similarity(description, $1)) > $2 ",
             "ORDER BY similarity(name, $1) + similarity(description, $1) DESC LIMIT $3;"
         );
         diesel::sql_query(similarity_query)
@@ -2475,11 +2479,12 @@ impl Taxa {
         threshold: Option<f64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::taxa;
         let limit = limit.unwrap_or(10);
-        let threshold = threshold.unwrap_or(0.6);
+        let threshold = threshold.unwrap_or(0.3);
         let similarity_query = concat!(
             "SELECT id, name, ncbi_taxon_id FROM taxa ",
+            "WHERE ",
+            "(similarity(name, $1)) > $2 ",
             "ORDER BY similarity(name, $1) DESC LIMIT $3;"
         );
         diesel::sql_query(similarity_query)
@@ -2746,11 +2751,12 @@ impl User {
         threshold: Option<f64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::users;
         let limit = limit.unwrap_or(10);
-        let threshold = threshold.unwrap_or(0.6);
+        let threshold = threshold.unwrap_or(0.3);
         let similarity_query = concat!(
             "SELECT id, first_name, middle_name, last_name, created_at, updated_at FROM users ",
+            "WHERE ",
+            "(similarity(first_name, $1) + similarity(middle_name, $1) + similarity(last_name, $1)) > $2 ",
             "ORDER BY similarity(first_name, $1) + similarity(middle_name, $1) + similarity(last_name, $1) DESC LIMIT $3;"
         );
         diesel::sql_query(similarity_query)

@@ -1964,6 +1964,8 @@ impl From<NestedUserEmail> for web_common::database::nested_models::NestedUserEm
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedPublicUser {
     pub inner: PublicUser,
+    pub thumbnail: NestedDocument,
+    pub picture: NestedDocument,
 }
 
 impl NestedPublicUser {
@@ -1978,6 +1980,8 @@ impl NestedPublicUser {
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {
+                thumbnail: NestedDocument::get(flat_struct.thumbnail_id, connection)?,
+                picture: NestedDocument::get(flat_struct.picture_id, connection)?,
                 inner: flat_struct,
             });
         }
@@ -1998,13 +2002,38 @@ impl NestedPublicUser {
         let flat_struct = PublicUser::get(id, connection)?;
         Ok(Self {
             inner: PublicUser::get(flat_struct.id, connection)?,
+            thumbnail: NestedDocument::get(flat_struct.thumbnail_id, connection)?,
+            picture: NestedDocument::get(flat_struct.picture_id, connection)?,
         })
+    }
+}
+impl NestedPublicUser {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `threshold` - The similarity threshold, by default `0.6`.
+    pub fn search(
+        query: &str,
+        limit: Option<i32>,
+        threshold: Option<f64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = PublicUser::search(query, limit, threshold, connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self::get(flat_struct.id, connection)?);
+        }
+        Ok(nested_structs)
     }
 }
 impl From<web_common::database::nested_models::NestedPublicUser> for NestedPublicUser {
     fn from(item: web_common::database::nested_models::NestedPublicUser) -> Self {
         Self {
             inner: item.inner.into(),
+            thumbnail: item.thumbnail.into(),
+            picture: item.picture.into(),
         }
     }
 }
@@ -2012,6 +2041,8 @@ impl From<NestedPublicUser> for web_common::database::nested_models::NestedPubli
     fn from(item: NestedPublicUser) -> Self {
         Self {
             inner: item.inner.into(),
+            thumbnail: item.thumbnail.into(),
+            picture: item.picture.into(),
         }
     }
 }

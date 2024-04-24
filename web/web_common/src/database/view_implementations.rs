@@ -1,5 +1,3 @@
-use uuid::Uuid;
-
 use crate::custom_validators::ImageSize;
 
 use super::PublicUser;
@@ -9,7 +7,10 @@ impl PublicUser {
         format!("{} {}", self.first_name, self.last_name)
     }
 
-    pub fn profile_picture_path<I>(id: I, image_size: &ImageSize) -> String where I: ToString{
+    pub fn profile_picture_path<I>(id: I, image_size: &ImageSize) -> String
+    where
+        I: ToString,
+    {
         format!(
             "{}/{}/{}.png",
             crate::api::documents::profile::picture::FULL_ENDPOINT,

@@ -194,4 +194,6 @@ pub struct NestedUserEmail {
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedPublicUser {
     pub inner: PublicUser,
+    pub thumbnail: NestedDocument,
+    pub picture: NestedDocument,
 }

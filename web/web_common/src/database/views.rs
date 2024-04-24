@@ -11,4 +11,6 @@ pub struct PublicUser {
     pub last_name: String,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
+    pub thumbnail_id: Uuid,
+    pub picture_id: Uuid,
 }
