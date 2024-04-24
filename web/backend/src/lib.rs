@@ -5,6 +5,7 @@ pub mod nested_models;
 pub mod schema;
 pub mod transactions;
 pub mod views;
+pub mod traits;
 
 use diesel::prelude::*;
 use diesel::r2d2::{self, ConnectionManager, Pool};

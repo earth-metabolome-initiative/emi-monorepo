@@ -3,6 +3,7 @@
 use crate::api::ws::users::UserMessage;
 use crate::models::Notification;
 use crate::models::User;
+use crate::traits::bincode_serialize::BincodeSerialize;
 use crate::DBPool;
 use crate::DieselConn;
 use actix::ActorContext;
@@ -234,17 +235,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                                     Some(0.1),
                                                     &mut self.diesel_connection,
                                                 )
-                                                .map_err(web_common::api::ApiError::from)
-                                                .and_then(|projects| {
-                                                    projects
-                                                        .iter()
-                                                        .map(|project| {
-                                                            bincode::serialize(project).map_err(
-                                                                web_common::api::ApiError::from,
-                                                            )
-                                                        })
-                                                        .collect()
-                                                })
+                                                .bincode_serialize()  
                                             }
                                             web_common::database::Table::ProjectStates => {
                                                 crate::models::ProjectState::search(
@@ -253,17 +244,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                                     Some(0.1),
                                                     &mut self.diesel_connection,
                                                 )
-                                                .map_err(web_common::api::ApiError::from)
-                                                .and_then(|project_states| {
-                                                    project_states
-                                                        .iter()
-                                                        .map(|project_state| {
-                                                            bincode::serialize(project_state).map_err(
-                                                                web_common::api::ApiError::from,
-                                                            )
-                                                        })
-                                                        .collect()
-                                                })
+                                                .bincode_serialize()
                                             }
                                             web_common::database::Table::SampleStates => {
                                                 crate::models::SampleState::search(
@@ -272,17 +253,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                                     Some(0.1),
                                                     &mut self.diesel_connection,
                                                 )
-                                                .map_err(web_common::api::ApiError::from)
-                                                .and_then(|sample_states| {
-                                                    sample_states
-                                                        .iter()
-                                                        .map(|sample_state| {
-                                                            bincode::serialize(sample_state).map_err(
-                                                                web_common::api::ApiError::from,
-                                                            )
-                                                        })
-                                                        .collect()
-                                                })
+                                                .bincode_serialize()
                                             }
                                             web_common::database::Table::Users => {
                                                 crate::models::User::search(
@@ -291,17 +262,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                                     Some(0.1),
                                                     &mut self.diesel_connection,
                                                 )
-                                                .map_err(web_common::api::ApiError::from)
-                                                .and_then(|user| {
-                                                    user
-                                                        .iter()
-                                                        .map(|user| {
-                                                            bincode::serialize(user).map_err(
-                                                                web_common::api::ApiError::from,
-                                                            )
-                                                        })
-                                                        .collect()
-                                                })
+                                                .bincode_serialize()
                                             }
                                             web_common::database::Table::SamplingProcedures => {
                                                 crate::models::SamplingProcedure::search(
@@ -310,17 +271,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                                     Some(0.1),
                                                     &mut self.diesel_connection,
                                                 )
-                                                .map_err(web_common::api::ApiError::from)
-                                                .and_then(|sampling_procedure| {
-                                                    sampling_procedure
-                                                        .iter()
-                                                        .map(|sampling_procedure| {
-                                                            bincode::serialize(sampling_procedure).map_err(
-                                                                web_common::api::ApiError::from,
-                                                            )
-                                                        })
-                                                        .collect()
-                                                })
+                                                .bincode_serialize()
                                             }
                                             _ => {
                                                 unimplemented!("Table not implemented: {:?}", table)
