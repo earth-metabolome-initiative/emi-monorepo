@@ -18,14 +18,14 @@ use diesel::Queryable;
 use chrono::NaiveDateTime;
 use uuid::Uuid;
 #[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
-#[diesel(table_name = classes)]
-pub struct Classe {
+#[diesel(table_name = class_ranks)]
+pub struct ClassRank {
     pub id: i32,
     pub name: String,
 }
 
-impl From<Classe> for web_common::database::tables::Classe {
-    fn from(item: Classe) -> Self {
+impl From<ClassRank> for web_common::database::tables::ClassRank {
+    fn from(item: ClassRank) -> Self {
         Self {
             id: item.id,
             name: item.name,
@@ -33,8 +33,8 @@ impl From<Classe> for web_common::database::tables::Classe {
     }
 }
 
-impl From<web_common::database::tables::Classe> for Classe {
-    fn from(item: web_common::database::tables::Classe) -> Self {
+impl From<web_common::database::tables::ClassRank> for ClassRank {
+    fn from(item: web_common::database::tables::ClassRank) -> Self {
         Self {
             id: item.id,
             name: item.name,
@@ -42,7 +42,7 @@ impl From<web_common::database::tables::Classe> for Classe {
     }
 }
 
-impl Classe {
+impl ClassRank {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
@@ -51,8 +51,8 @@ impl Classe {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::classes;
-        classes::dsl::classes
+        use crate::schema::class_ranks;
+        class_ranks::dsl::class_ranks
             .load::<Self>(connection)
     }
     /// Get the struct from the database by its ID.
@@ -65,9 +65,9 @@ impl Classe {
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::classes;
-        classes::dsl::classes
-            .filter(classes::dsl::id.eq(id))
+        use crate::schema::class_ranks;
+        class_ranks::dsl::class_ranks
+            .filter(class_ranks::dsl::id.eq(id))
             .first::<Self>(connection)
     }
     /// Search for the struct by a given string.
@@ -87,8 +87,8 @@ impl Classe {
         let limit = limit.unwrap_or(10);
         let threshold = threshold.unwrap_or(0.3);
         let similarity_query = concat!(
-            "SELECT classes.id, classes.name FROM classes ",
-            "ORDER BY similarity(classes.name, $1) DESC LIMIT $3;"
+            "SELECT class_ranks.id, class_ranks.name FROM class_ranks ",
+            "ORDER BY similarity(class_ranks.name, $1) DESC LIMIT $3;"
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -178,6 +178,21 @@ impl ContainerHorizontalRule {
             .filter(container_horizontal_rules::dsl::id.eq(id))
             .first::<Self>(connection)
     }
+    /// Get the struct from the database by its name.
+    ///
+    /// # Arguments
+    /// * `name` - The name of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_name(
+        name: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::container_horizontal_rules;
+        container_horizontal_rules::dsl::container_horizontal_rules
+            .filter(container_horizontal_rules::dsl::name.eq(name))
+            .first::<Self>(connection)
+    }
 }
 
 #[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
@@ -258,6 +273,21 @@ impl ContainerVerticalRule {
         use crate::schema::container_vertical_rules;
         container_vertical_rules::dsl::container_vertical_rules
             .filter(container_vertical_rules::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+    /// Get the struct from the database by its name.
+    ///
+    /// # Arguments
+    /// * `name` - The name of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_name(
+        name: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::container_vertical_rules;
+        container_vertical_rules::dsl::container_vertical_rules
+            .filter(container_vertical_rules::dsl::name.eq(name))
             .first::<Self>(connection)
     }
 }
@@ -483,6 +513,21 @@ impl DocumentFormat {
             .filter(document_formats::dsl::id.eq(id))
             .first::<Self>(connection)
     }
+    /// Get the struct from the database by its extension.
+    ///
+    /// # Arguments
+    /// * `extension` - The extension of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_extension(
+        extension: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::document_formats;
+        document_formats::dsl::document_formats
+            .filter(document_formats::dsl::extension.eq(extension))
+            .first::<Self>(connection)
+    }
 }
 
 #[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
@@ -547,6 +592,21 @@ impl Document {
             .filter(documents::dsl::id.eq(id))
             .first::<Self>(connection)
     }
+    /// Get the struct from the database by its path.
+    ///
+    /// # Arguments
+    /// * `path` - The path of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_path(
+        path: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::documents;
+        documents::dsl::documents
+            .filter(documents::dsl::path.eq(path))
+            .first::<Self>(connection)
+    }
 }
 
 #[derive(QueryableByName, Insertable, Eq, Deserialize, Serialize, PartialEq, Clone, Selectable, Queryable, Debug)]
@@ -606,6 +666,21 @@ impl ItemCategory {
         use crate::schema::item_categories;
         item_categories::dsl::item_categories
             .filter(item_categories::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+    /// Get the struct from the database by its name.
+    ///
+    /// # Arguments
+    /// * `name` - The name of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_name(
+        name: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::item_categories;
+        item_categories::dsl::item_categories
+            .filter(item_categories::dsl::name.eq(name))
             .first::<Self>(connection)
     }
 }
@@ -2132,6 +2207,21 @@ impl Project {
             .filter(projects::dsl::id.eq(id))
             .first::<Self>(connection)
     }
+    /// Get the struct from the database by its name.
+    ///
+    /// # Arguments
+    /// * `name` - The name of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_name(
+        name: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::projects;
+        projects::dsl::projects
+            .filter(projects::dsl::name.eq(name))
+            .first::<Self>(connection)
+    }
     /// Search for the struct by a given string.
     ///
     /// # Arguments
@@ -2211,6 +2301,21 @@ impl Role {
         use crate::schema::roles;
         roles::dsl::roles
             .filter(roles::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+    /// Get the struct from the database by its name.
+    ///
+    /// # Arguments
+    /// * `name` - The name of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_name(
+        name: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::roles;
+        roles::dsl::roles
+            .filter(roles::dsl::name.eq(name))
             .first::<Self>(connection)
     }
 }

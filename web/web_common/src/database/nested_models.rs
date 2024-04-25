@@ -846,7 +846,7 @@ pub struct NestedTaxa {
     pub domain: Option<OrganismDomain>,
     pub kingdom: Option<Kingdom>,
     pub phylum: Option<Phylum>,
-    pub class: Option<Classe>,
+    pub class: Option<ClassRank>,
 }
 #[cfg(feature = "frontend")]
 impl NestedTaxa {
@@ -867,7 +867,7 @@ impl NestedTaxa {
             domain: if let Some(domain_id) = flat_struct.domain_id { OrganismDomain::get(domain_id, connection).await? } else { return Ok(None) },
             kingdom: if let Some(kingdom_id) = flat_struct.kingdom_id { Kingdom::get(kingdom_id, connection).await? } else { return Ok(None) },
             phylum: if let Some(phylum_id) = flat_struct.phylum_id { Phylum::get(phylum_id, connection).await? } else { return Ok(None) },
-            class: if let Some(class_id) = flat_struct.class_id { Classe::get(class_id, connection).await? } else { return Ok(None) },
+            class: if let Some(class_id) = flat_struct.class_id { ClassRank::get(class_id, connection).await? } else { return Ok(None) },
         }))
        } else {
            Ok(None)

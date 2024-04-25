@@ -2,7 +2,6 @@
 extern crate diesel;
 
 use actix_web::{get, web, App, HttpServer, Responder};
-use backend::models::Document;
 use diesel::prelude::*;
 use diesel::r2d2::{self, ConnectionManager};
 

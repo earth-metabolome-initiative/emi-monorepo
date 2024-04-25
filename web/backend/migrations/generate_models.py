@@ -827,6 +827,57 @@ class TableMetadata:
         return primary_key
 
     @cache
+    def get_unique_constraint_columns(self, table_name: str) -> Union[List[str], List[ViewColumn]]:
+        """Returns the columns of the unique constraint."""
+        if self.is_view(table_name):
+            # In a view, we return as set of unique columns the columns
+            # that appear in the view and are unique in the table of
+            # reference of the view, i.e. the one associated to the ID
+            # column of the view.
+            view_columns = self.extract_view_columns(table_name)
+            base_table_name = None
+            for column in view_columns:
+                if column.alias_name == "id":
+                    base_table_name = column.table_name
+                    break
+            if base_table_name is None:
+                raise ValueError(
+                    f"The view {table_name} does not have an ID column."
+                )
+            base_unique_columns = self.get_unique_constraint_columns(base_table_name)
+
+            view_unique_columns: List[ViewColumn] = []
+            for column in view_columns:
+                if column.column_name in base_unique_columns:
+                    view_unique_columns.append(ViewColumn(
+                        column_name=column.column_name,
+                        data_type=column.data_type,
+                        alias_name=column.alias_name,
+                        table_name=column.table_name,
+                        nullable=column.nullable
+                    ))
+
+            return view_unique_columns
+
+        _conn, cursor = get_cursor()
+        cursor.execute(
+            f"""
+            SELECT min(column_name)
+            FROM information_schema.table_constraints AS c
+            JOIN information_schema.constraint_column_usage AS cc
+                USING (table_schema, table_name, constraint_name)
+            WHERE c.constraint_type = 'UNIQUE' AND c.table_name = '{table_name}'
+            GROUP BY table_schema, table_name
+            HAVING count(*) = 1;
+            """
+        )
+
+        columns = cursor.fetchall()
+        cursor.close()
+
+        return [column[0] for column in columns]
+
+    @cache
     def get_columns(self, table_name: str) -> List[str]:
         """Returns the columns of the table."""
         if self.is_view(table_name):
@@ -1044,6 +1095,73 @@ def write_from_impls(
                     new_content += f"            .filter({struct.table_name}::dsl::{primary_key.name}.eq({primary_key.name}))\n"
                     new_content += "            .first::<Self>(connection)\n"
                     new_content += "    }\n"
+
+                # For each of the columns in the struct that are required to be UNIQUE
+                # in the SQL, as defined by the get_unique_constraint_columns method, we
+                # implement methods of the form `from_{column_name}` that retrieves the
+                # struct by the unique column. In the case of a view, we first retrieve
+                # the associated base table and secondarily we execute with a get the
+                # struct by the id column from the obtained base table.
+                for unique_column in table_metadatas.get_unique_constraint_columns(struct.table_name):
+                    if table_type == "views":
+                        # In the case of view, we do not receive simple string as unique column
+                        # but instances of ViewColumn.
+                        attribute = struct.get_attribute_by_name(unique_column.alias_name)
+                        attribute_data_type = attribute.data_type()
+                        if attribute_data_type == "String":
+                            attribute_data_type = "&str"
+
+                        struct_name = struct_name_from_table_name(unique_column.table_name)
+
+                        new_content += (
+                            f"    /// Get the struct from the database by its {unique_column.alias_name}.\n"
+                        )
+                        new_content += "    ///\n"
+                        new_content += "    /// # Arguments\n"
+                        new_content += f"    /// * `{unique_column.alias_name}` - The {unique_column.alias_name} of the struct to get.\n"
+                        new_content += (
+                            "    /// * `connection` - The connection to the database.\n"
+                        )
+                        new_content += "    ///\n"
+                        new_content += f"    pub fn from_{unique_column.alias_name}(\n"
+                        new_content += f"        {unique_column.alias_name}: {attribute_data_type},\n"
+                        new_content += "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+                        new_content += "    ) -> Result<Self, diesel::result::Error> {\n"
+                        new_content += (
+                            f"        {struct_name}::from_{unique_column.column_name}({unique_column.alias_name}, connection)\n"
+                            f"            .map(|entry| {struct.name}::get(entry.{primary_key.name}, connection))\n"
+                        )
+                        new_content += "    }\n"
+
+                    else:
+                        attribute = struct.get_attribute_by_name(unique_column)
+                        attribute_data_type = attribute.data_type()
+                        if attribute_data_type == "String":
+                            attribute_data_type = "&str"
+                        new_content += (
+                            f"    /// Get the struct from the database by its {unique_column}.\n"
+                        )
+                        new_content += "    ///\n"
+                        new_content += "    /// # Arguments\n"
+                        new_content += f"    /// * `{unique_column}` - The {unique_column} of the struct to get.\n"
+                        new_content += (
+                            "    /// * `connection` - The connection to the database.\n"
+                        )
+                        new_content += "    ///\n"
+                        new_content += f"    pub fn from_{unique_column}(\n"
+                        new_content += f"        {unique_column}: {attribute_data_type},\n"
+                        new_content += "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+                        new_content += "    ) -> Result<Self, diesel::result::Error> {\n"
+                        new_content += (
+                            f"        use crate::schema::{struct.table_name};\n"
+                        )
+                        new_content += (
+                            f"        {struct.table_name}::dsl::{struct.table_name}\n"
+                        )
+                        new_content += f"            .filter({struct.table_name}::dsl::{unique_column}.eq({unique_column}))\n"
+                        new_content += "            .first::<Self>(connection)\n"
+                        new_content += "    }\n"
+
 
                 # If this table implements the `pg_trgm` index, we also
                 # provide the `search` method to search for the struct
@@ -2270,6 +2388,61 @@ def generate_nested_structs(
                     f"            {attribute.name}: {attribute.data_type()}::get(flat_struct.{attribute.original_name}, connection)?,\n"
                 )
         tables.write("        })\n" "    }\n" "}\n")
+
+        # For each of the columns in the struct that have a UNIQUE constraint,
+        # we implement the methods `from_{column_name}` by employing the method
+        # of the same name available for the main struct associated to this struct
+        for unique_column in tables_metadata.get_unique_constraint_columns(struct.table_name):
+            if isinstance(unique_column, ViewColumn):
+                unique_column = unique_column.alias_name
+            
+            attribute = struct.get_attribute_by_name(unique_column)
+            attribute_data_type = attribute.data_type()
+            if attribute_data_type == "String":
+                attribute_data_type = "&str"
+
+            tables.write(
+                f"impl {nested_struct_name} {{\n"
+                f"    /// Get the nested struct from the provided {unique_column}.\n"
+                "    ///\n"
+                f"    /// # Arguments\n"
+                f"    /// * `{attribute.name}` - The {attribute.name} of the row.\n"
+                "    /// * `connection` - The database connection.\n"
+                f"    pub fn from_{attribute.name}(\n"
+                f"        {attribute.name}: {attribute_data_type},\n"
+                "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
+                "    ) -> Result<Self, diesel::result::Error>\n"
+                "    {\n"
+                f"        let flat_struct = {struct.name}::from_{attribute.name}({attribute.name}, connection)?;\n"
+                "        Ok(Self {\n"
+            )
+            for attribute in new_struct_metadata.attributes:
+                if attribute.name == "inner":
+                    continue
+                if (
+                    attribute.data_type() == new_struct_metadata.name
+                    or struct.has_attribute(attribute)
+                ):
+                    tables.write(
+                        f"            {attribute.name}: flat_struct.{attribute.name},\n"
+                    )
+                    continue
+                if attribute.optional:
+                    tables.write(
+                        f"            {attribute.name}: flat_struct.{attribute.original_name}.map(|flat_struct| {attribute.data_type()}::get(flat_struct, connection)).transpose()?,\n"
+                    )
+                else:
+                    tables.write(
+                        f"            {attribute.name}: {attribute.data_type()}::get(flat_struct.{attribute.original_name}, connection)?,\n"
+                    )
+            # We handle the inner attribute
+            if any(
+                attribute.name == primary_key_attribute
+                for attribute in struct.attributes
+            ):
+                tables.write(f"            inner: flat_struct,\n")
+            tables.write("        })\n" "    }\n" "}\n")
+
 
         # If there is an index on the table, we implement the search method that
         # calls search on the flat version of the struct and then iterates on the

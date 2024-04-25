@@ -57,6 +57,26 @@ impl NestedContainerHorizontalRule {
         })
     }
 }
+impl NestedContainerHorizontalRule {
+    /// Get the nested struct from the provided name.
+    ///
+    /// # Arguments
+    /// * `name` - The name of the row.
+    /// * `connection` - The database connection.
+    pub fn from_name(
+        name: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+        let flat_struct = ContainerHorizontalRule::from_name(name, connection)?;
+        Ok(Self {
+            created_by: User::get(flat_struct.created_by, connection)?,
+            item_type: NestedItemCategory::get(flat_struct.item_type_id, connection)?,
+            other_item_type: NestedItemCategory::get(flat_struct.other_item_type_id, connection)?,
+            inner: flat_struct,
+        })
+    }
+}
 impl From<web_common::database::nested_models::NestedContainerHorizontalRule> for NestedContainerHorizontalRule {
     fn from(item: web_common::database::nested_models::NestedContainerHorizontalRule) -> Self {
         Self {
@@ -123,6 +143,26 @@ impl NestedContainerVerticalRule {
             created_by: User::get(flat_struct.created_by, connection)?,
             container_item_type: NestedItemCategory::get(flat_struct.container_item_type_id, connection)?,
             contained_item_type: NestedItemCategory::get(flat_struct.contained_item_type_id, connection)?,
+        })
+    }
+}
+impl NestedContainerVerticalRule {
+    /// Get the nested struct from the provided name.
+    ///
+    /// # Arguments
+    /// * `name` - The name of the row.
+    /// * `connection` - The database connection.
+    pub fn from_name(
+        name: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+        let flat_struct = ContainerVerticalRule::from_name(name, connection)?;
+        Ok(Self {
+            created_by: User::get(flat_struct.created_by, connection)?,
+            container_item_type: NestedItemCategory::get(flat_struct.container_item_type_id, connection)?,
+            contained_item_type: NestedItemCategory::get(flat_struct.contained_item_type_id, connection)?,
+            inner: flat_struct,
         })
     }
 }
@@ -261,6 +301,25 @@ impl NestedDocument {
         })
     }
 }
+impl NestedDocument {
+    /// Get the nested struct from the provided path.
+    ///
+    /// # Arguments
+    /// * `path` - The path of the row.
+    /// * `connection` - The database connection.
+    pub fn from_path(
+        path: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+        let flat_struct = Document::from_path(path, connection)?;
+        Ok(Self {
+            author: User::get(flat_struct.author_id, connection)?,
+            format: DocumentFormat::get(flat_struct.format_id, connection)?,
+            inner: flat_struct,
+        })
+    }
+}
 impl From<web_common::database::nested_models::NestedDocument> for NestedDocument {
     fn from(item: web_common::database::nested_models::NestedDocument) -> Self {
         Self {
@@ -319,6 +378,24 @@ impl NestedItemCategory {
         Ok(Self {
             inner: ItemCategory::get(flat_struct.id, connection)?,
             created_by: User::get(flat_struct.created_by, connection)?,
+        })
+    }
+}
+impl NestedItemCategory {
+    /// Get the nested struct from the provided name.
+    ///
+    /// # Arguments
+    /// * `name` - The name of the row.
+    /// * `connection` - The database connection.
+    pub fn from_name(
+        name: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+        let flat_struct = ItemCategory::from_name(name, connection)?;
+        Ok(Self {
+            created_by: User::get(flat_struct.created_by, connection)?,
+            inner: flat_struct,
         })
     }
 }
@@ -1383,6 +1460,26 @@ impl NestedProject {
     }
 }
 impl NestedProject {
+    /// Get the nested struct from the provided name.
+    ///
+    /// # Arguments
+    /// * `name` - The name of the row.
+    /// * `connection` - The database connection.
+    pub fn from_name(
+        name: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+        let flat_struct = Project::from_name(name, connection)?;
+        Ok(Self {
+            state: ProjectState::get(flat_struct.state_id, connection)?,
+            parent_project: flat_struct.parent_project_id.map(|flat_struct| Project::get(flat_struct, connection)).transpose()?,
+            created_by: User::get(flat_struct.created_by, connection)?,
+            inner: flat_struct,
+        })
+    }
+}
+impl NestedProject {
     /// Search the table by the query.
     ///
     /// # Arguments
@@ -1844,7 +1941,7 @@ pub struct NestedTaxa {
     pub domain: Option<OrganismDomain>,
     pub kingdom: Option<Kingdom>,
     pub phylum: Option<Phylum>,
-    pub class: Option<Classe>,
+    pub class: Option<ClassRank>,
 }
 
 impl NestedTaxa {
@@ -1862,7 +1959,7 @@ impl NestedTaxa {
                 domain: flat_struct.domain_id.map(|flat_struct| OrganismDomain::get(flat_struct, connection)).transpose()?,
                 kingdom: flat_struct.kingdom_id.map(|flat_struct| Kingdom::get(flat_struct, connection)).transpose()?,
                 phylum: flat_struct.phylum_id.map(|flat_struct| Phylum::get(flat_struct, connection)).transpose()?,
-                class: flat_struct.class_id.map(|flat_struct| Classe::get(flat_struct, connection)).transpose()?,
+                class: flat_struct.class_id.map(|flat_struct| ClassRank::get(flat_struct, connection)).transpose()?,
                 inner: flat_struct,
             });
         }
@@ -1886,7 +1983,7 @@ impl NestedTaxa {
             domain: flat_struct.domain_id.map(|flat_struct| OrganismDomain::get(flat_struct, connection)).transpose()?,
             kingdom: flat_struct.kingdom_id.map(|flat_struct| Kingdom::get(flat_struct, connection)).transpose()?,
             phylum: flat_struct.phylum_id.map(|flat_struct| Phylum::get(flat_struct, connection)).transpose()?,
-            class: flat_struct.class_id.map(|flat_struct| Classe::get(flat_struct, connection)).transpose()?,
+            class: flat_struct.class_id.map(|flat_struct| ClassRank::get(flat_struct, connection)).transpose()?,
         })
     }
 }

@@ -4,12 +4,12 @@ use uuid::Uuid;
 use chrono::NaiveDateTime;
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
-pub struct Classe {
+pub struct ClassRank {
     pub id: i32,
     pub name: String,
 }
 #[cfg(feature = "frontend")]
-impl Classe {
+impl ClassRank {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
             gluesql::core::ast_builder::num(self.id),
@@ -17,13 +17,13 @@ impl Classe {
         ]
     }
 
-    /// Insert the Classe into the database.
+    /// Insert the ClassRank into the database.
     ///
     /// # Arguments
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table Classe
+    /// The number of rows inserted in table ClassRank
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -31,7 +31,7 @@ impl Classe {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
-        table("classes")
+        table("class_ranks")
             .insert()
             .columns("id, name")
             .values(vec![self.into_row()])
@@ -43,10 +43,10 @@ impl Classe {
              })
     }
 
-    /// Get Classe from the database by its ID.
+    /// Get ClassRank from the database by its ID.
     ///
     /// # Arguments
-    /// * `id` - The ID of Classe to get.
+    /// * `id` - The ID of ClassRank to get.
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
@@ -56,7 +56,7 @@ impl Classe {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
-        let select_row = table("classes")
+        let select_row = table("class_ranks")
             .select()
             .filter(col("id").eq(id.to_string()))
             .project("id, name")
@@ -70,7 +70,7 @@ impl Classe {
             .pop())
     }
 
-    /// Delete Classe from the database.
+    /// Delete ClassRank from the database.
     ///
     /// # Arguments
     /// * `id` - The ID of the struct to delete.
@@ -85,7 +85,7 @@ impl Classe {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
-        table("classes")
+        table("class_ranks")
             .delete()
             .filter(col("id").eq(id.to_string()))
             .execute(connection)
@@ -96,7 +96,7 @@ impl Classe {
              })
     }
 
-    /// Delete the current instance of Classe from the database.
+    /// Delete the current instance of ClassRank from the database.
     ///
     /// # Arguments
     /// * `connection` - The connection to the database.
@@ -125,7 +125,7 @@ impl Classe {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
-        table("classes")
+        table("class_ranks")
             .update()        
 .set("id", gluesql::core::ast_builder::num(self.id))        
 .set("name", gluesql::core::ast_builder::text(self.name))            .execute(connection)
@@ -156,7 +156,7 @@ impl Classe {
             Ok(number_of_rows)
         }
     }
-    /// Get all Classe from the database.
+    /// Get all ClassRank from the database.
     ///
     /// # Arguments
     /// * `connection` - The connection to the database.
@@ -167,7 +167,7 @@ impl Classe {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
-        let select_row = table("classes")
+        let select_row = table("class_ranks")
             .select()
             .project("id, name")
             .execute(connection)

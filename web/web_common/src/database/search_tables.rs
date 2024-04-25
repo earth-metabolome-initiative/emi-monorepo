@@ -42,10 +42,10 @@ impl Searchable for NestedPublicUser {
         )
     }
 }
-impl Searchable for Classe {
+impl Searchable for ClassRank {
     fn search_task(query: String, limit: u32) -> super::Select {
         super::Select::search(
-             Table::Classes,
+             Table::ClassRanks,
               query,
               limit,
         )

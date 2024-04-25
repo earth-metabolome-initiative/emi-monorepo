@@ -1,7 +1,7 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
-    classes (id) {
+    class_ranks (id) {
         id -> Int4,
         name -> Text,
     }
@@ -503,7 +503,7 @@ diesel::joinable!(sampling_procedures -> users (created_by));
 diesel::joinable!(spectra -> spectra_collection (spectra_collection_id));
 diesel::joinable!(spectra_collection -> samples (sample_id));
 diesel::joinable!(spectra_collection -> users (created_by));
-diesel::joinable!(taxa -> classes (class_id));
+diesel::joinable!(taxa -> class_ranks (class_id));
 diesel::joinable!(taxa -> kingdoms (kingdom_id));
 diesel::joinable!(taxa -> organism_domains (domain_id));
 diesel::joinable!(taxa -> phylums (phylum_id));
@@ -511,7 +511,7 @@ diesel::joinable!(user_emails -> login_providers (login_provider_id));
 diesel::joinable!(user_emails -> users (user_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
-    classes,
+    class_ranks,
     container_horizontal_rules,
     container_vertical_rules,
     continuous_units,

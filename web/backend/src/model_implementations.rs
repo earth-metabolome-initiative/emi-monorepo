@@ -1,7 +1,7 @@
-use diesel::connection::SimpleConnection;
 use crate::models::*;
 use crate::nested_models::NestedDocument;
 use crate::DieselConn;
+use diesel::connection::SimpleConnection;
 use diesel::prelude::*;
 use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::Pool;
@@ -15,43 +15,6 @@ use web_common::api::ApiError;
 use web_common::custom_validators::Image;
 use web_common::custom_validators::ImageSize;
 use web_common::database::updates::CompleteProfile;
-
-impl DocumentFormat {
-    pub fn from_extension(
-        extension: &str,
-        conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>,
-    ) -> Result<DocumentFormat, diesel::result::Error> {
-        use crate::schema::document_formats;
-        // The extension of the format is stored as the name of the describable.
-        document_formats::dsl::document_formats
-            .filter(document_formats::dsl::extension.eq(extension))
-            .select(DocumentFormat::as_select())
-            .first::<DocumentFormat>(conn)
-    }
-}
-
-impl Document {
-    pub fn from_path(
-        path: &str,
-        conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>,
-    ) -> Result<Document, diesel::result::Error> {
-        use crate::schema::documents;
-        documents::dsl::documents
-            .filter(documents::dsl::path.eq(path))
-            .first::<Document>(conn)
-    }
-}
-
-impl NestedDocument {
-    pub fn from_path(
-        path: &str,
-        conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
-        let document = Document::from_path(path, conn)?;
-        Ok(Self::get(document.id, conn)?)
-    }
-}
-
 
 impl NestedDocument {
     pub fn internal_path(&self) -> String {
@@ -89,7 +52,9 @@ impl<'a> NewUserEmail<'a> {
         conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>,
     ) -> Result<UserEmail, diesel::result::Error> {
         use crate::schema::user_emails;
-        let result = diesel::insert_into(user_emails::dsl::user_emails).values(self).execute(conn);
+        let result = diesel::insert_into(user_emails::dsl::user_emails)
+            .values(self)
+            .execute(conn);
         match result {
             Ok(_) => user_emails::dsl::user_emails
                 .filter(user_emails::dsl::email.eq(&self.email))
@@ -197,7 +162,8 @@ impl User {
                 self.standard_profile_picture_path(),
                 png_format.id,
                 profile_picture.as_bytes().len() as i32,
-            ).insert(conn)?;
+            )
+            .insert(conn)?;
             // Similarly, we create the document for the thumbnail.
             let thumbnail_document = Document::new(
                 None,
@@ -205,19 +171,28 @@ impl User {
                 self.thumbnail_path(),
                 png_format.id,
                 thumbnail.as_bytes().len() as i32,
-            ).insert(conn)?;
+            )
+            .insert(conn)?;
             // We attempt to save the profile picture and thumbnail
             let profile_picture_path =
-                NestedDocument::get( profile_picture_document.id, conn,)?.internal_path();
-            profile_picture.save_with_format(&profile_picture_path, ImageFormat::Png).map_err(|err| {
-                log::error!("Failed to save profile picture: {}, {}", err, profile_picture_path);
-                err
-            })?;
+                NestedDocument::get(profile_picture_document.id, conn)?.internal_path();
+            profile_picture
+                .save_with_format(&profile_picture_path, ImageFormat::Png)
+                .map_err(|err| {
+                    log::error!(
+                        "Failed to save profile picture: {}, {}",
+                        err,
+                        profile_picture_path
+                    );
+                    err
+                })?;
             let thumbnail_path = NestedDocument::get(thumbnail_document.id, conn)?.internal_path();
-            thumbnail.save_with_format(&thumbnail_path, ImageFormat::Png).map_err(|err| {
-                log::error!("Failed to save thumbnail: {}, {}", err, thumbnail_path);
-                err
-            })?;
+            thumbnail
+                .save_with_format(&thumbnail_path, ImageFormat::Png)
+                .map_err(|err| {
+                    log::error!("Failed to save thumbnail: {}, {}", err, thumbnail_path);
+                    err
+                })?;
             Ok(())
         })
     }
@@ -290,15 +265,8 @@ impl LoginProvider {
     }
 }
 
-
 impl Document {
-    pub fn new(
-        id: Option<Uuid>,
-        author_id: i32,
-        path: String,
-        format_id: i32,
-        bytes: i32,
-    ) -> Self {
+    pub fn new(id: Option<Uuid>, author_id: i32, path: String, format_id: i32, bytes: i32) -> Self {
         Document {
             id: id.unwrap_or_else(Uuid::new_v4),
             author_id,
