@@ -1,0 +1,2 @@
+-- Down version of bio_kingdom_items_name_description_trgm_idx
+DROP INDEX IF EXISTS bio_kingdom_items_name_description_trgm_idx;
