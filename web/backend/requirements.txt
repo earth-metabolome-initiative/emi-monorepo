@@ -4,3 +4,4 @@ psycopg2
 downloaders
 pandas
 tqdm
+cache_decorator
