@@ -244,9 +244,26 @@ def retrieve_taxons() -> pd.DataFrame:
     print("Add wikidata identifier")
     df = add_wikidata_id(df)
 
+    # In order to avoid collision with SQL terminology, we rename the columns
+    # referring to ranks from {rank} to bio_{rank}
+    ranks = [
+        "kingdom",
+        "phylum",
+        "class",
+        "order",
+        "family",
+        "genus",
+        "domain",
+    ]
+
+    df = df.rename(columns={
+        rank: f"bio_{rank}"
+        for rank in ranks
+    })
+
     return df
 
 
 if __name__ == "__main__":
     df = retrieve_taxons()
-    df.to_csv("db_data/taxons.csv.gz", index=True, compression="gzip")
+    df.to_csv("db_data/bio_ott_taxons.csv.gz", index=True, compression="gzip")
