@@ -1,5 +1,5 @@
 use crate::{custom_validators::*, database::SampleState};
-use crate::database::{Insert, NestedPublicUser, SamplingProcedure, Taxa, User};
+use crate::database::{Insert, NestedBioOttTaxonItem, NestedPublicUser, SamplingProcedure, User};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
@@ -15,7 +15,7 @@ pub struct NewSample {
     pub sample_state: SampleState,
     pub collector: NestedPublicUser,
     pub sampling_procedure: SamplingProcedure,
-    pub taxa: Vec<Taxa>,
+    pub taxa: Vec<NestedBioOttTaxonItem>,
     // pub parent_sample_id: Option<Uuid>,
 }
 
@@ -27,7 +27,7 @@ impl NewSample {
         sample_state: SampleState,
         collector: NestedPublicUser,
         sampling_procedure: SamplingProcedure,
-        taxa: Vec<Taxa>
+        taxa: Vec<NestedBioOttTaxonItem>
     ) -> Result<Self, Vec<String>> {
         let new_sample = Self {
             name: NewSampleName::try_from(name)?,

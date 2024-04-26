@@ -9,7 +9,7 @@ use crate::database::Task;
 pub enum Select {
     Id(super::Table, uuid::Uuid),
     SearchTable {
-        table: String,
+        table_name: String,
         query: String,
         number_of_results: u32,
     },
@@ -29,7 +29,7 @@ impl Select {
     /// * `number_of_results` - The number of results to return.
     pub fn search(table: super::Table, query: String, number_of_results: u32) -> Self {
         Self::SearchTable {
-            table: table.into(),
+            table_name: table.into(),
             query,
             number_of_results,
         }

@@ -15,7 +15,6 @@ pub use operations::*;
 pub mod notification_message;
 pub mod view_implementations;
 pub use notification_message::NotificationMessage;
-pub mod to_strings;
 pub mod nested_models;
 pub use nested_models::*;
 pub mod nested_models_impls;
