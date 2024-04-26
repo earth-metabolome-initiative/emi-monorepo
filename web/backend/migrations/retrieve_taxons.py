@@ -76,7 +76,7 @@ def load_dataframe():
 
 
 def get_rank(df: pd.DataFrame, row: pd.Series, rank_name: str) -> str:
-    """Get the rank of a given row"""
+    """Get the rank of a given row."""
     if row["rank"] == rank_name:
         return row["name"]
 
@@ -166,6 +166,8 @@ def main() -> pd.DataFrame:
     df = enrich_ranks(df)
     print("Populating the font awesome icons")
     df = populate_font_awesome_icons(df)
+    # We sort the dataframe by index
+    df = df.sort_index()
     return df
 
 
