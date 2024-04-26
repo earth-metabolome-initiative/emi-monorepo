@@ -5,6 +5,7 @@ from tqdm.auto import tqdm
 from cache_decorator import Cache
 from pyinaturalist.docs.font_awesome_icons import EXTENDED_FONT_AWESOME_ICONS
 from io import StringIO
+import requests
 
 
 def download_taxon_document():
@@ -133,8 +134,10 @@ def populate_font_awesome_icons(df: pd.DataFrame):
     otol_to_inat = pd.read_csv("./migrations/otol_to_inat.csv").set_index("identifier")
 
     column_name = "font_awesome_icon"
+    color_column_name = "icon_color"
 
     df[column_name] = ""
+    df[color_column_name] = ""
 
     for inat_identifier in tqdm(
         EXTENDED_FONT_AWESOME_ICONS.keys(), desc="Populating icons",
@@ -147,12 +150,15 @@ def populate_font_awesome_icons(df: pd.DataFrame):
             continue
 
         if pd.notna(row.OTT_ID):
-            df.at[row.OTT_ID, column_name] = EXTENDED_FONT_AWESOME_ICONS[
+            icon = EXTENDED_FONT_AWESOME_ICONS[
                 inat_identifier
-            ].name
+            ]
+            df.at[row.OTT_ID, column_name] = icon.name
+            df.at[row.OTT_ID, color_column_name] = icon.color
 
     for index, row in tqdm(df.iterrows(), total=df.shape[0], desc=f"Parsing species", leave=False):
         propagate_down(df, row, column_name, unknown="fa-question-circle")
+        propagate_down(df, row, color_column_name, unknown="grey")
 
     return df
 
