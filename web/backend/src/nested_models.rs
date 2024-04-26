@@ -9,6 +9,262 @@ use diesel::r2d2::PooledConnection;
 use crate::models::*;
 use crate::views::views::*;
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+pub struct NestedBioOttRank {
+    pub inner: BioOttRank,
+    pub font_awesome_icon: Option<FontAwesomeIcon>,
+}
+
+impl NestedBioOttRank {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = BioOttRank::all(connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self {
+                font_awesome_icon: flat_struct.font_awesome_icon_id.map(|flat_struct| FontAwesomeIcon::get(flat_struct, connection)).transpose()?,
+                inner: flat_struct,
+            });
+        }
+        Ok(nested_structs)
+    }
+}
+impl NestedBioOttRank {
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `id` - The primary key of the row.
+    /// * `connection` - The database connection.
+    pub fn get(
+        id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+        let flat_struct = BioOttRank::get(id, connection)?;
+        Ok(Self {
+            inner: BioOttRank::get(flat_struct.id, connection)?,
+            font_awesome_icon: flat_struct.font_awesome_icon_id.map(|flat_struct| FontAwesomeIcon::get(flat_struct, connection)).transpose()?,
+        })
+    }
+}
+impl NestedBioOttRank {
+    /// Get the nested struct from the provided name.
+    ///
+    /// # Arguments
+    /// * `name` - The name of the row.
+    /// * `connection` - The database connection.
+    pub fn from_name(
+        name: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+        let flat_struct = BioOttRank::from_name(name, connection)?;
+        Ok(Self {
+            font_awesome_icon: flat_struct.font_awesome_icon_id.map(|flat_struct| FontAwesomeIcon::get(flat_struct, connection)).transpose()?,
+            inner: flat_struct,
+        })
+    }
+}
+impl NestedBioOttRank {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `threshold` - The similarity threshold, by default `0.6`.
+    pub fn search(
+        query: &str,
+        limit: Option<i32>,
+        threshold: Option<f64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = BioOttRank::search(query, limit, threshold, connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self::get(flat_struct.id, connection)?);
+        }
+        Ok(nested_structs)
+    }
+}
+impl From<web_common::database::nested_models::NestedBioOttRank> for NestedBioOttRank {
+    fn from(item: web_common::database::nested_models::NestedBioOttRank) -> Self {
+        Self {
+            inner: item.inner.into(),
+            font_awesome_icon: item.font_awesome_icon.map(|item| item.into()),
+        }
+    }
+}
+impl From<NestedBioOttRank> for web_common::database::nested_models::NestedBioOttRank {
+    fn from(item: NestedBioOttRank) -> Self {
+        Self {
+            inner: item.inner.into(),
+            font_awesome_icon: item.font_awesome_icon.map(|item| item.into()),
+        }
+    }
+}
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+pub struct NestedBioOttTaxonItem {
+    pub inner: BioOttTaxonItem,
+    pub ott_rank: Option<NestedBioOttRank>,
+    pub domain: Option<BioOttTaxonItem>,
+    pub kingdom: Option<BioOttTaxonItem>,
+    pub phylum: Option<BioOttTaxonItem>,
+    pub class: Option<BioOttTaxonItem>,
+    pub order: Option<BioOttTaxonItem>,
+    pub family: Option<BioOttTaxonItem>,
+    pub genus: Option<BioOttTaxonItem>,
+    pub parent: Option<BioOttTaxonItem>,
+    pub font_awesome_icon: Option<FontAwesomeIcon>,
+    pub color: Option<Color>,
+}
+
+impl NestedBioOttTaxonItem {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub fn all(
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = BioOttTaxonItem::all(connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self {
+                ott_rank: flat_struct.ott_rank_id.map(|flat_struct| NestedBioOttRank::get(flat_struct, connection)).transpose()?,
+                domain: flat_struct.domain_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
+                kingdom: flat_struct.kingdom_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
+                phylum: flat_struct.phylum_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
+                class: flat_struct.class_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
+                order: flat_struct.order_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
+                family: flat_struct.family_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
+                genus: flat_struct.genus_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
+                parent: flat_struct.parent_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
+                font_awesome_icon: flat_struct.font_awesome_icon_id.map(|flat_struct| FontAwesomeIcon::get(flat_struct, connection)).transpose()?,
+                color: flat_struct.color_id.map(|flat_struct| Color::get(flat_struct, connection)).transpose()?,
+                inner: flat_struct,
+            });
+        }
+        Ok(nested_structs)
+    }
+}
+impl NestedBioOttTaxonItem {
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `id` - The primary key of the row.
+    /// * `connection` - The database connection.
+    pub fn get(
+        id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+        let flat_struct = BioOttTaxonItem::get(id, connection)?;
+        Ok(Self {
+            inner: BioOttTaxonItem::get(flat_struct.id, connection)?,
+            ott_rank: flat_struct.ott_rank_id.map(|flat_struct| NestedBioOttRank::get(flat_struct, connection)).transpose()?,
+            domain: flat_struct.domain_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
+            kingdom: flat_struct.kingdom_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
+            phylum: flat_struct.phylum_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
+            class: flat_struct.class_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
+            order: flat_struct.order_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
+            family: flat_struct.family_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
+            genus: flat_struct.genus_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
+            parent: flat_struct.parent_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
+            font_awesome_icon: flat_struct.font_awesome_icon_id.map(|flat_struct| FontAwesomeIcon::get(flat_struct, connection)).transpose()?,
+            color: flat_struct.color_id.map(|flat_struct| Color::get(flat_struct, connection)).transpose()?,
+        })
+    }
+}
+impl NestedBioOttTaxonItem {
+    /// Get the nested struct from the provided ott_id.
+    ///
+    /// # Arguments
+    /// * `ott_id` - The ott_id of the row.
+    /// * `connection` - The database connection.
+    pub fn from_ott_id(
+        ott_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+        let flat_struct = BioOttTaxonItem::from_ott_id(ott_id, connection)?;
+        Ok(Self {
+            ott_rank: flat_struct.ott_rank_id.map(|flat_struct| NestedBioOttRank::get(flat_struct, connection)).transpose()?,
+            domain: flat_struct.domain_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
+            kingdom: flat_struct.kingdom_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
+            phylum: flat_struct.phylum_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
+            class: flat_struct.class_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
+            order: flat_struct.order_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
+            family: flat_struct.family_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
+            genus: flat_struct.genus_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
+            parent: flat_struct.parent_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
+            font_awesome_icon: flat_struct.font_awesome_icon_id.map(|flat_struct| FontAwesomeIcon::get(flat_struct, connection)).transpose()?,
+            color: flat_struct.color_id.map(|flat_struct| Color::get(flat_struct, connection)).transpose()?,
+            inner: flat_struct,
+        })
+    }
+}
+impl NestedBioOttTaxonItem {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `threshold` - The similarity threshold, by default `0.6`.
+    pub fn search(
+        query: &str,
+        limit: Option<i32>,
+        threshold: Option<f64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let flat_structs = BioOttTaxonItem::search(query, limit, threshold, connection)?;
+        let mut nested_structs = Vec::new();
+        for flat_struct in flat_structs {
+            nested_structs.push(Self::get(flat_struct.id, connection)?);
+        }
+        Ok(nested_structs)
+    }
+}
+impl From<web_common::database::nested_models::NestedBioOttTaxonItem> for NestedBioOttTaxonItem {
+    fn from(item: web_common::database::nested_models::NestedBioOttTaxonItem) -> Self {
+        Self {
+            inner: item.inner.into(),
+            ott_rank: item.ott_rank.map(|item| item.into()),
+            domain: item.domain.map(|item| item.into()),
+            kingdom: item.kingdom.map(|item| item.into()),
+            phylum: item.phylum.map(|item| item.into()),
+            class: item.class.map(|item| item.into()),
+            order: item.order.map(|item| item.into()),
+            family: item.family.map(|item| item.into()),
+            genus: item.genus.map(|item| item.into()),
+            parent: item.parent.map(|item| item.into()),
+            font_awesome_icon: item.font_awesome_icon.map(|item| item.into()),
+            color: item.color.map(|item| item.into()),
+        }
+    }
+}
+impl From<NestedBioOttTaxonItem> for web_common::database::nested_models::NestedBioOttTaxonItem {
+    fn from(item: NestedBioOttTaxonItem) -> Self {
+        Self {
+            inner: item.inner.into(),
+            ott_rank: item.ott_rank.map(|item| item.into()),
+            domain: item.domain.map(|item| item.into()),
+            kingdom: item.kingdom.map(|item| item.into()),
+            phylum: item.phylum.map(|item| item.into()),
+            class: item.class.map(|item| item.into()),
+            order: item.order.map(|item| item.into()),
+            family: item.family.map(|item| item.into()),
+            genus: item.genus.map(|item| item.into()),
+            parent: item.parent.map(|item| item.into()),
+            font_awesome_icon: item.font_awesome_icon.map(|item| item.into()),
+            color: item.color.map(|item| item.into()),
+        }
+    }
+}
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedContainerHorizontalRule {
     pub inner: ContainerHorizontalRule,
     pub created_by: User,
@@ -1521,14 +1777,14 @@ impl From<NestedProject> for web_common::database::nested_models::NestedProject 
     }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
-pub struct NestedSampleTaxa {
-    pub inner: SampleTaxa,
+pub struct NestedSampleBioOttTaxonItem {
+    pub inner: SampleBioOttTaxonItem,
     pub created_by: User,
     pub sample: NestedSample,
-    pub taxon: NestedTaxa,
+    pub taxon: NestedBioOttTaxonItem,
 }
 
-impl NestedSampleTaxa {
+impl NestedSampleBioOttTaxonItem {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
@@ -1536,20 +1792,20 @@ impl NestedSampleTaxa {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = SampleTaxa::all(connection)?;
+        let flat_structs = SampleBioOttTaxonItem::all(connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {
                 created_by: User::get(flat_struct.created_by, connection)?,
                 sample: NestedSample::get(flat_struct.sample_id, connection)?,
-                taxon: NestedTaxa::get(flat_struct.taxon_id, connection)?,
+                taxon: NestedBioOttTaxonItem::get(flat_struct.taxon_id, connection)?,
                 inner: flat_struct,
             });
         }
         Ok(nested_structs)
     }
 }
-impl NestedSampleTaxa {
+impl NestedSampleBioOttTaxonItem {
     /// Get the nested struct from the provided primary key.
     ///
     /// # Arguments
@@ -1560,17 +1816,17 @@ impl NestedSampleTaxa {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = SampleTaxa::get(id, connection)?;
+        let flat_struct = SampleBioOttTaxonItem::get(id, connection)?;
         Ok(Self {
-            inner: SampleTaxa::get(flat_struct.id, connection)?,
+            inner: SampleBioOttTaxonItem::get(flat_struct.id, connection)?,
             created_by: User::get(flat_struct.created_by, connection)?,
             sample: NestedSample::get(flat_struct.sample_id, connection)?,
-            taxon: NestedTaxa::get(flat_struct.taxon_id, connection)?,
+            taxon: NestedBioOttTaxonItem::get(flat_struct.taxon_id, connection)?,
         })
     }
 }
-impl From<web_common::database::nested_models::NestedSampleTaxa> for NestedSampleTaxa {
-    fn from(item: web_common::database::nested_models::NestedSampleTaxa) -> Self {
+impl From<web_common::database::nested_models::NestedSampleBioOttTaxonItem> for NestedSampleBioOttTaxonItem {
+    fn from(item: web_common::database::nested_models::NestedSampleBioOttTaxonItem) -> Self {
         Self {
             inner: item.inner.into(),
             created_by: item.created_by.into(),
@@ -1579,8 +1835,8 @@ impl From<web_common::database::nested_models::NestedSampleTaxa> for NestedSampl
         }
     }
 }
-impl From<NestedSampleTaxa> for web_common::database::nested_models::NestedSampleTaxa {
-    fn from(item: NestedSampleTaxa) -> Self {
+impl From<NestedSampleBioOttTaxonItem> for web_common::database::nested_models::NestedSampleBioOttTaxonItem {
+    fn from(item: NestedSampleBioOttTaxonItem) -> Self {
         Self {
             inner: item.inner.into(),
             created_by: item.created_by.into(),
@@ -1590,14 +1846,14 @@ impl From<NestedSampleTaxa> for web_common::database::nested_models::NestedSampl
     }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
-pub struct NestedSampledIndividualTaxa {
-    pub inner: SampledIndividualTaxa,
+pub struct NestedSampledIndividualBioOttTaxonItem {
+    pub inner: SampledIndividualBioOttTaxonItem,
     pub created_by: User,
     pub sampled_individual: SampledIndividual,
-    pub taxon: NestedTaxa,
+    pub taxon: NestedBioOttTaxonItem,
 }
 
-impl NestedSampledIndividualTaxa {
+impl NestedSampledIndividualBioOttTaxonItem {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
@@ -1605,20 +1861,20 @@ impl NestedSampledIndividualTaxa {
     pub fn all(
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = SampledIndividualTaxa::all(connection)?;
+        let flat_structs = SampledIndividualBioOttTaxonItem::all(connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {
                 created_by: User::get(flat_struct.created_by, connection)?,
                 sampled_individual: SampledIndividual::get(flat_struct.sampled_individual_id, connection)?,
-                taxon: NestedTaxa::get(flat_struct.taxon_id, connection)?,
+                taxon: NestedBioOttTaxonItem::get(flat_struct.taxon_id, connection)?,
                 inner: flat_struct,
             });
         }
         Ok(nested_structs)
     }
 }
-impl NestedSampledIndividualTaxa {
+impl NestedSampledIndividualBioOttTaxonItem {
     /// Get the nested struct from the provided primary key.
     ///
     /// # Arguments
@@ -1629,17 +1885,17 @@ impl NestedSampledIndividualTaxa {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = SampledIndividualTaxa::get(id, connection)?;
+        let flat_struct = SampledIndividualBioOttTaxonItem::get(id, connection)?;
         Ok(Self {
-            inner: SampledIndividualTaxa::get(flat_struct.id, connection)?,
+            inner: SampledIndividualBioOttTaxonItem::get(flat_struct.id, connection)?,
             created_by: User::get(flat_struct.created_by, connection)?,
             sampled_individual: SampledIndividual::get(flat_struct.sampled_individual_id, connection)?,
-            taxon: NestedTaxa::get(flat_struct.taxon_id, connection)?,
+            taxon: NestedBioOttTaxonItem::get(flat_struct.taxon_id, connection)?,
         })
     }
 }
-impl From<web_common::database::nested_models::NestedSampledIndividualTaxa> for NestedSampledIndividualTaxa {
-    fn from(item: web_common::database::nested_models::NestedSampledIndividualTaxa) -> Self {
+impl From<web_common::database::nested_models::NestedSampledIndividualBioOttTaxonItem> for NestedSampledIndividualBioOttTaxonItem {
+    fn from(item: web_common::database::nested_models::NestedSampledIndividualBioOttTaxonItem) -> Self {
         Self {
             inner: item.inner.into(),
             created_by: item.created_by.into(),
@@ -1648,8 +1904,8 @@ impl From<web_common::database::nested_models::NestedSampledIndividualTaxa> for 
         }
     }
 }
-impl From<NestedSampledIndividualTaxa> for web_common::database::nested_models::NestedSampledIndividualTaxa {
-    fn from(item: NestedSampledIndividualTaxa) -> Self {
+impl From<NestedSampledIndividualBioOttTaxonItem> for web_common::database::nested_models::NestedSampledIndividualBioOttTaxonItem {
+    fn from(item: NestedSampledIndividualBioOttTaxonItem) -> Self {
         Self {
             inner: item.inner.into(),
             created_by: item.created_by.into(),
@@ -1932,101 +2188,6 @@ impl From<NestedSpectraCollection> for web_common::database::nested_models::Nest
             inner: item.inner.into(),
             sample: item.sample.into(),
             created_by: item.created_by.into(),
-        }
-    }
-}
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
-pub struct NestedTaxa {
-    pub inner: Taxa,
-    pub domain: Option<OrganismDomain>,
-    pub kingdom: Option<Kingdom>,
-    pub phylum: Option<Phylum>,
-    pub class: Option<ClassRank>,
-}
-
-impl NestedTaxa {
-    /// Get all the nested structs from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The database connection.
-    pub fn all(
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = Taxa::all(connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self {
-                domain: flat_struct.domain_id.map(|flat_struct| OrganismDomain::get(flat_struct, connection)).transpose()?,
-                kingdom: flat_struct.kingdom_id.map(|flat_struct| Kingdom::get(flat_struct, connection)).transpose()?,
-                phylum: flat_struct.phylum_id.map(|flat_struct| Phylum::get(flat_struct, connection)).transpose()?,
-                class: flat_struct.class_id.map(|flat_struct| ClassRank::get(flat_struct, connection)).transpose()?,
-                inner: flat_struct,
-            });
-        }
-        Ok(nested_structs)
-    }
-}
-impl NestedTaxa {
-    /// Get the nested struct from the provided primary key.
-    ///
-    /// # Arguments
-    /// * `id` - The primary key of the row.
-    /// * `connection` - The database connection.
-    pub fn get(
-        id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-        let flat_struct = Taxa::get(id, connection)?;
-        Ok(Self {
-            inner: Taxa::get(flat_struct.id, connection)?,
-            domain: flat_struct.domain_id.map(|flat_struct| OrganismDomain::get(flat_struct, connection)).transpose()?,
-            kingdom: flat_struct.kingdom_id.map(|flat_struct| Kingdom::get(flat_struct, connection)).transpose()?,
-            phylum: flat_struct.phylum_id.map(|flat_struct| Phylum::get(flat_struct, connection)).transpose()?,
-            class: flat_struct.class_id.map(|flat_struct| ClassRank::get(flat_struct, connection)).transpose()?,
-        })
-    }
-}
-impl NestedTaxa {
-    /// Search the table by the query.
-    ///
-    /// # Arguments
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    /// * `threshold` - The similarity threshold, by default `0.6`.
-    pub fn search(
-        query: &str,
-        limit: Option<i32>,
-        threshold: Option<f64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = Taxa::search(query, limit, threshold, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self::get(flat_struct.id, connection)?);
-        }
-        Ok(nested_structs)
-    }
-}
-impl From<web_common::database::nested_models::NestedTaxa> for NestedTaxa {
-    fn from(item: web_common::database::nested_models::NestedTaxa) -> Self {
-        Self {
-            inner: item.inner.into(),
-            domain: item.domain.map(|item| item.into()),
-            kingdom: item.kingdom.map(|item| item.into()),
-            phylum: item.phylum.map(|item| item.into()),
-            class: item.class.map(|item| item.into()),
-        }
-    }
-}
-impl From<NestedTaxa> for web_common::database::nested_models::NestedTaxa {
-    fn from(item: NestedTaxa) -> Self {
-        Self {
-            inner: item.inner.into(),
-            domain: item.domain.map(|item| item.into()),
-            kingdom: item.kingdom.map(|item| item.into()),
-            phylum: item.phylum.map(|item| item.into()),
-            class: item.class.map(|item| item.into()),
         }
     }
 }

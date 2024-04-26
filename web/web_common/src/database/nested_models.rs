@@ -7,6 +7,82 @@ use serde::Serialize;
 use super::tables::*;
 use super::views::*;
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+pub struct NestedBioOttRank {
+    pub inner: BioOttRank,
+    pub font_awesome_icon: Option<FontAwesomeIcon>,
+}
+#[cfg(feature = "frontend")]
+impl NestedBioOttRank {
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `id` - The primary key of the row.
+    /// * `connection` - The database connection.
+    pub async fn get<C>(
+        id: i32,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+       if let Some(flat_struct) = BioOttRank::get(id, connection).await? {
+        Ok(Some(Self {
+            inner: if let Some(inner) = BioOttRank::get(flat_struct.id, connection).await? { inner } else {return Ok(None)},
+            font_awesome_icon: if let Some(font_awesome_icon_id) = flat_struct.font_awesome_icon_id { FontAwesomeIcon::get(font_awesome_icon_id, connection).await? } else { return Ok(None) },
+        }))
+       } else {
+           Ok(None)
+       }
+    }
+}
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+pub struct NestedBioOttTaxonItem {
+    pub inner: BioOttTaxonItem,
+    pub ott_rank: Option<NestedBioOttRank>,
+    pub domain: Option<BioOttTaxonItem>,
+    pub kingdom: Option<BioOttTaxonItem>,
+    pub phylum: Option<BioOttTaxonItem>,
+    pub class: Option<BioOttTaxonItem>,
+    pub order: Option<BioOttTaxonItem>,
+    pub family: Option<BioOttTaxonItem>,
+    pub genus: Option<BioOttTaxonItem>,
+    pub parent: Option<BioOttTaxonItem>,
+    pub font_awesome_icon: Option<FontAwesomeIcon>,
+    pub color: Option<Color>,
+}
+#[cfg(feature = "frontend")]
+impl NestedBioOttTaxonItem {
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `id` - The primary key of the row.
+    /// * `connection` - The database connection.
+    pub async fn get<C>(
+        id: i32,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+       if let Some(flat_struct) = BioOttTaxonItem::get(id, connection).await? {
+        Ok(Some(Self {
+            inner: if let Some(inner) = BioOttTaxonItem::get(flat_struct.id, connection).await? { inner } else {return Ok(None)},
+            ott_rank: if let Some(ott_rank_id) = flat_struct.ott_rank_id { NestedBioOttRank::get(ott_rank_id, connection).await? } else { return Ok(None) },
+            domain: if let Some(domain_id) = flat_struct.domain_id { BioOttTaxonItem::get(domain_id, connection).await? } else { return Ok(None) },
+            kingdom: if let Some(kingdom_id) = flat_struct.kingdom_id { BioOttTaxonItem::get(kingdom_id, connection).await? } else { return Ok(None) },
+            phylum: if let Some(phylum_id) = flat_struct.phylum_id { BioOttTaxonItem::get(phylum_id, connection).await? } else { return Ok(None) },
+            class: if let Some(class_id) = flat_struct.class_id { BioOttTaxonItem::get(class_id, connection).await? } else { return Ok(None) },
+            order: if let Some(order_id) = flat_struct.order_id { BioOttTaxonItem::get(order_id, connection).await? } else { return Ok(None) },
+            family: if let Some(family_id) = flat_struct.family_id { BioOttTaxonItem::get(family_id, connection).await? } else { return Ok(None) },
+            genus: if let Some(genus_id) = flat_struct.genus_id { BioOttTaxonItem::get(genus_id, connection).await? } else { return Ok(None) },
+            parent: if let Some(parent_id) = flat_struct.parent_id { BioOttTaxonItem::get(parent_id, connection).await? } else { return Ok(None) },
+            font_awesome_icon: if let Some(font_awesome_icon_id) = flat_struct.font_awesome_icon_id { FontAwesomeIcon::get(font_awesome_icon_id, connection).await? } else { return Ok(None) },
+            color: if let Some(color_id) = flat_struct.color_id { Color::get(color_id, connection).await? } else { return Ok(None) },
+        }))
+       } else {
+           Ok(None)
+       }
+    }
+}
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedContainerHorizontalRule {
     pub inner: ContainerHorizontalRule,
     pub created_by: User,
@@ -657,14 +733,14 @@ impl NestedProject {
     }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
-pub struct NestedSampleTaxa {
-    pub inner: SampleTaxa,
+pub struct NestedSampleBioOttTaxonItem {
+    pub inner: SampleBioOttTaxonItem,
     pub created_by: User,
     pub sample: NestedSample,
-    pub taxon: NestedTaxa,
+    pub taxon: NestedBioOttTaxonItem,
 }
 #[cfg(feature = "frontend")]
-impl NestedSampleTaxa {
+impl NestedSampleBioOttTaxonItem {
     /// Get the nested struct from the provided primary key.
     ///
     /// # Arguments
@@ -676,12 +752,12 @@ impl NestedSampleTaxa {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       if let Some(flat_struct) = SampleTaxa::get(id, connection).await? {
+       if let Some(flat_struct) = SampleBioOttTaxonItem::get(id, connection).await? {
         Ok(Some(Self {
-            inner: if let Some(inner) = SampleTaxa::get(flat_struct.id, connection).await? { inner } else {return Ok(None)},
+            inner: if let Some(inner) = SampleBioOttTaxonItem::get(flat_struct.id, connection).await? { inner } else {return Ok(None)},
             created_by: if let Some(created_by) = User::get(flat_struct.created_by, connection).await? { created_by } else {return Ok(None)},
             sample: if let Some(sample) = NestedSample::get(flat_struct.sample_id, connection).await? { sample } else {return Ok(None)},
-            taxon: if let Some(taxon) = NestedTaxa::get(flat_struct.taxon_id, connection).await? { taxon } else {return Ok(None)},
+            taxon: if let Some(taxon) = NestedBioOttTaxonItem::get(flat_struct.taxon_id, connection).await? { taxon } else {return Ok(None)},
         }))
        } else {
            Ok(None)
@@ -689,14 +765,14 @@ impl NestedSampleTaxa {
     }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
-pub struct NestedSampledIndividualTaxa {
-    pub inner: SampledIndividualTaxa,
+pub struct NestedSampledIndividualBioOttTaxonItem {
+    pub inner: SampledIndividualBioOttTaxonItem,
     pub created_by: User,
     pub sampled_individual: SampledIndividual,
-    pub taxon: NestedTaxa,
+    pub taxon: NestedBioOttTaxonItem,
 }
 #[cfg(feature = "frontend")]
-impl NestedSampledIndividualTaxa {
+impl NestedSampledIndividualBioOttTaxonItem {
     /// Get the nested struct from the provided primary key.
     ///
     /// # Arguments
@@ -708,12 +784,12 @@ impl NestedSampledIndividualTaxa {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       if let Some(flat_struct) = SampledIndividualTaxa::get(id, connection).await? {
+       if let Some(flat_struct) = SampledIndividualBioOttTaxonItem::get(id, connection).await? {
         Ok(Some(Self {
-            inner: if let Some(inner) = SampledIndividualTaxa::get(flat_struct.id, connection).await? { inner } else {return Ok(None)},
+            inner: if let Some(inner) = SampledIndividualBioOttTaxonItem::get(flat_struct.id, connection).await? { inner } else {return Ok(None)},
             created_by: if let Some(created_by) = User::get(flat_struct.created_by, connection).await? { created_by } else {return Ok(None)},
             sampled_individual: if let Some(sampled_individual) = SampledIndividual::get(flat_struct.sampled_individual_id, connection).await? { sampled_individual } else {return Ok(None)},
-            taxon: if let Some(taxon) = NestedTaxa::get(flat_struct.taxon_id, connection).await? { taxon } else {return Ok(None)},
+            taxon: if let Some(taxon) = NestedBioOttTaxonItem::get(flat_struct.taxon_id, connection).await? { taxon } else {return Ok(None)},
         }))
        } else {
            Ok(None)
@@ -834,40 +910,6 @@ impl NestedSpectraCollection {
             inner: if let Some(inner) = SpectraCollection::get(flat_struct.id, connection).await? { inner } else {return Ok(None)},
             sample: if let Some(sample) = NestedSample::get(flat_struct.sample_id, connection).await? { sample } else {return Ok(None)},
             created_by: if let Some(created_by) = User::get(flat_struct.created_by, connection).await? { created_by } else {return Ok(None)},
-        }))
-       } else {
-           Ok(None)
-       }
-    }
-}
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
-pub struct NestedTaxa {
-    pub inner: Taxa,
-    pub domain: Option<OrganismDomain>,
-    pub kingdom: Option<Kingdom>,
-    pub phylum: Option<Phylum>,
-    pub class: Option<ClassRank>,
-}
-#[cfg(feature = "frontend")]
-impl NestedTaxa {
-    /// Get the nested struct from the provided primary key.
-    ///
-    /// # Arguments
-    /// * `id` - The primary key of the row.
-    /// * `connection` - The database connection.
-    pub async fn get<C>(
-        id: i32,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Option<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-       if let Some(flat_struct) = Taxa::get(id, connection).await? {
-        Ok(Some(Self {
-            inner: if let Some(inner) = Taxa::get(flat_struct.id, connection).await? { inner } else {return Ok(None)},
-            domain: if let Some(domain_id) = flat_struct.domain_id { OrganismDomain::get(domain_id, connection).await? } else { return Ok(None) },
-            kingdom: if let Some(kingdom_id) = flat_struct.kingdom_id { Kingdom::get(kingdom_id, connection).await? } else { return Ok(None) },
-            phylum: if let Some(phylum_id) = flat_struct.phylum_id { Phylum::get(phylum_id, connection).await? } else { return Ok(None) },
-            class: if let Some(class_id) = flat_struct.class_id { ClassRank::get(class_id, connection).await? } else { return Ok(None) },
         }))
        } else {
            Ok(None)

@@ -6,6 +6,24 @@ use crate::database::*;
 pub trait Searchable {
     fn search_task(query: String, limit: u32) -> super::Select;
 }
+impl Searchable for NestedBioOttRank {
+    fn search_task(query: String, limit: u32) -> super::Select {
+        super::Select::search(
+             Table::BioOttRanks,
+              query,
+              limit,
+        )
+    }
+}
+impl Searchable for NestedBioOttTaxonItem {
+    fn search_task(query: String, limit: u32) -> super::Select {
+        super::Select::search(
+             Table::BioOttTaxonItems,
+              query,
+              limit,
+        )
+    }
+}
 impl Searchable for NestedProject {
     fn search_task(query: String, limit: u32) -> super::Select {
         super::Select::search(
@@ -24,15 +42,6 @@ impl Searchable for NestedSamplingProcedure {
         )
     }
 }
-impl Searchable for NestedTaxa {
-    fn search_task(query: String, limit: u32) -> super::Select {
-        super::Select::search(
-             Table::Taxa,
-              query,
-              limit,
-        )
-    }
-}
 impl Searchable for NestedPublicUser {
     fn search_task(query: String, limit: u32) -> super::Select {
         super::Select::search(
@@ -42,37 +51,37 @@ impl Searchable for NestedPublicUser {
         )
     }
 }
-impl Searchable for ClassRank {
+impl Searchable for BioOttRank {
     fn search_task(query: String, limit: u32) -> super::Select {
         super::Select::search(
-             Table::ClassRanks,
+             Table::BioOttRanks,
               query,
               limit,
         )
     }
 }
-impl Searchable for Kingdom {
+impl Searchable for BioOttTaxonItem {
     fn search_task(query: String, limit: u32) -> super::Select {
         super::Select::search(
-             Table::Kingdoms,
+             Table::BioOttTaxonItems,
               query,
               limit,
         )
     }
 }
-impl Searchable for OrganismDomain {
+impl Searchable for Color {
     fn search_task(query: String, limit: u32) -> super::Select {
         super::Select::search(
-             Table::OrganismDomains,
+             Table::Colors,
               query,
               limit,
         )
     }
 }
-impl Searchable for Phylum {
+impl Searchable for FontAwesomeIcon {
     fn search_task(query: String, limit: u32) -> super::Select {
         super::Select::search(
-             Table::Phylums,
+             Table::FontAwesomeIcons,
               query,
               limit,
         )
@@ -109,15 +118,6 @@ impl Searchable for SamplingProcedure {
     fn search_task(query: String, limit: u32) -> super::Select {
         super::Select::search(
              Table::SamplingProcedures,
-              query,
-              limit,
-        )
-    }
-}
-impl Searchable for Taxa {
-    fn search_task(query: String, limit: u32) -> super::Select {
-        super::Select::search(
-             Table::Taxa,
               query,
               limit,
         )

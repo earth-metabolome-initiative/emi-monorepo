@@ -1,9 +1,43 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
-    class_ranks (id) {
+    bio_ott_ranks (id) {
         id -> Int4,
         name -> Text,
+        font_awesome_icon_id -> Nullable<Int4>,
+    }
+}
+
+diesel::table! {
+    bio_ott_taxon_items (id) {
+        id -> Int4,
+        name -> Text,
+        description -> Nullable<Text>,
+        ott_id -> Int4,
+        ott_rank_id -> Nullable<Int4>,
+        wikidata_id -> Nullable<Int4>,
+        ncbi_id -> Nullable<Int4>,
+        gbif_id -> Nullable<Int4>,
+        irmng_id -> Nullable<Int4>,
+        worms_id -> Nullable<Int4>,
+        domain_id -> Nullable<Int4>,
+        kingdom_id -> Nullable<Int4>,
+        phylum_id -> Nullable<Int4>,
+        class_id -> Nullable<Int4>,
+        order_id -> Nullable<Int4>,
+        family_id -> Nullable<Int4>,
+        genus_id -> Nullable<Int4>,
+        parent_id -> Nullable<Int4>,
+        font_awesome_icon_id -> Nullable<Int4>,
+        color_id -> Nullable<Int4>,
+    }
+}
+
+diesel::table! {
+    colors (id) {
+        id -> Int4,
+        name -> Text,
+        hexadecimal_value -> Text,
     }
 }
 
@@ -82,6 +116,13 @@ diesel::table! {
 }
 
 diesel::table! {
+    font_awesome_icons (id) {
+        id -> Int4,
+        name -> Text,
+    }
+}
+
+diesel::table! {
     item_categories (id) {
         id -> Int4,
         name -> Text,
@@ -156,16 +197,6 @@ diesel::table! {
 }
 
 diesel::table! {
-    kingdoms (id) {
-        id -> Int4,
-        name -> Text,
-        description -> Text,
-        font_awesome_icon -> Text,
-        icon_color -> Text,
-    }
-}
-
-diesel::table! {
     locations (id) {
         id -> Uuid,
         latitude_degrees -> Nullable<Int4>,
@@ -224,26 +255,9 @@ diesel::table! {
 }
 
 diesel::table! {
-    organism_domains (id) {
-        id -> Int4,
-        name -> Text,
-        description -> Text,
-        font_awesome_icon -> Text,
-        icon_color -> Text,
-    }
-}
-
-diesel::table! {
     organizations (id) {
         id -> Int4,
         parent_organization_id -> Nullable<Int4>,
-        name -> Text,
-    }
-}
-
-diesel::table! {
-    phylums (id) {
-        id -> Int4,
         name -> Text,
     }
 }
@@ -331,6 +345,15 @@ diesel::table! {
 }
 
 diesel::table! {
+    sample_bio_ott_taxon_items (id) {
+        id -> Uuid,
+        created_by -> Int4,
+        sample_id -> Uuid,
+        taxon_id -> Int4,
+    }
+}
+
+diesel::table! {
     sample_states (id) {
         id -> Int4,
         name -> Text,
@@ -341,16 +364,7 @@ diesel::table! {
 }
 
 diesel::table! {
-    sample_taxa (id) {
-        id -> Uuid,
-        created_by -> Int4,
-        sample_id -> Uuid,
-        taxon_id -> Int4,
-    }
-}
-
-diesel::table! {
-    sampled_individual_taxa (id) {
+    sampled_individual_bio_ott_taxon_items (id) {
         id -> Uuid,
         created_by -> Int4,
         sampled_individual_id -> Uuid,
@@ -399,18 +413,6 @@ diesel::table! {
 }
 
 diesel::table! {
-    taxa (id) {
-        id -> Int4,
-        name -> Text,
-        ncbi_taxon_id -> Nullable<Int4>,
-        domain_id -> Nullable<Int4>,
-        kingdom_id -> Nullable<Int4>,
-        phylum_id -> Nullable<Int4>,
-        class_id -> Nullable<Int4>,
-    }
-}
-
-diesel::table! {
     teams (id) {
         id -> Int4,
         parent_team_id -> Nullable<Int4>,
@@ -447,6 +449,10 @@ diesel::table! {
     }
 }
 
+diesel::joinable!(bio_ott_ranks -> font_awesome_icons (font_awesome_icon_id));
+diesel::joinable!(bio_ott_taxon_items -> bio_ott_ranks (ott_rank_id));
+diesel::joinable!(bio_ott_taxon_items -> colors (color_id));
+diesel::joinable!(bio_ott_taxon_items -> font_awesome_icons (font_awesome_icon_id));
 diesel::joinable!(container_horizontal_rules -> users (created_by));
 diesel::joinable!(container_vertical_rules -> users (created_by));
 diesel::joinable!(continuous_units -> units (id));
@@ -490,12 +496,12 @@ diesel::joinable!(project_requirements -> units (unit_id));
 diesel::joinable!(project_requirements -> users (created_by));
 diesel::joinable!(projects -> project_states (state_id));
 diesel::joinable!(projects -> users (created_by));
-diesel::joinable!(sample_taxa -> samples (sample_id));
-diesel::joinable!(sample_taxa -> taxa (taxon_id));
-diesel::joinable!(sample_taxa -> users (created_by));
-diesel::joinable!(sampled_individual_taxa -> sampled_individuals (sampled_individual_id));
-diesel::joinable!(sampled_individual_taxa -> taxa (taxon_id));
-diesel::joinable!(sampled_individual_taxa -> users (created_by));
+diesel::joinable!(sample_bio_ott_taxon_items -> bio_ott_taxon_items (taxon_id));
+diesel::joinable!(sample_bio_ott_taxon_items -> samples (sample_id));
+diesel::joinable!(sample_bio_ott_taxon_items -> users (created_by));
+diesel::joinable!(sampled_individual_bio_ott_taxon_items -> bio_ott_taxon_items (taxon_id));
+diesel::joinable!(sampled_individual_bio_ott_taxon_items -> sampled_individuals (sampled_individual_id));
+diesel::joinable!(sampled_individual_bio_ott_taxon_items -> users (created_by));
 diesel::joinable!(sampled_individuals -> items (id));
 diesel::joinable!(samples -> sample_states (state));
 diesel::joinable!(samples -> sampling_procedures (procedure_id));
@@ -503,15 +509,13 @@ diesel::joinable!(sampling_procedures -> users (created_by));
 diesel::joinable!(spectra -> spectra_collection (spectra_collection_id));
 diesel::joinable!(spectra_collection -> samples (sample_id));
 diesel::joinable!(spectra_collection -> users (created_by));
-diesel::joinable!(taxa -> class_ranks (class_id));
-diesel::joinable!(taxa -> kingdoms (kingdom_id));
-diesel::joinable!(taxa -> organism_domains (domain_id));
-diesel::joinable!(taxa -> phylums (phylum_id));
 diesel::joinable!(user_emails -> login_providers (login_provider_id));
 diesel::joinable!(user_emails -> users (user_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
-    class_ranks,
+    bio_ott_ranks,
+    bio_ott_taxon_items,
+    colors,
     container_horizontal_rules,
     container_vertical_rules,
     continuous_units,
@@ -519,6 +523,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     discrete_units,
     document_formats,
     documents,
+    font_awesome_icons,
     item_categories,
     item_category_relationships,
     item_category_units,
@@ -527,14 +532,11 @@ diesel::allow_tables_to_appear_in_same_query!(
     item_locations,
     item_units,
     items,
-    kingdoms,
     locations,
     login_providers,
     manufactured_item_categories,
     notifications,
-    organism_domains,
     organizations,
-    phylums,
     primary_user_emails,
     procedure_continuous_requirements,
     procedure_discrete_requirements,
@@ -543,15 +545,14 @@ diesel::allow_tables_to_appear_in_same_query!(
     project_states,
     projects,
     roles,
+    sample_bio_ott_taxon_items,
     sample_states,
-    sample_taxa,
-    sampled_individual_taxa,
+    sampled_individual_bio_ott_taxon_items,
     sampled_individuals,
     samples,
     sampling_procedures,
     spectra,
     spectra_collection,
-    taxa,
     teams,
     units,
     user_emails,

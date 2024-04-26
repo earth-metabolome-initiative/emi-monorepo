@@ -4,26 +4,31 @@ use uuid::Uuid;
 use chrono::NaiveDateTime;
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
-pub struct ClassRank {
+pub struct BioOttRank {
     pub id: i32,
     pub name: String,
+    pub font_awesome_icon_id: Option<i32>,
 }
 #[cfg(feature = "frontend")]
-impl ClassRank {
+impl BioOttRank {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
             gluesql::core::ast_builder::num(self.id),
             gluesql::core::ast_builder::text(self.name),
+            match self.font_awesome_icon_id {
+                Some(font_awesome_icon_id) => gluesql::core::ast_builder::num(font_awesome_icon_id),
+                None => gluesql::core::ast_builder::null(),
+            },
         ]
     }
 
-    /// Insert the ClassRank into the database.
+    /// Insert the BioOttRank into the database.
     ///
     /// # Arguments
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table ClassRank
+    /// The number of rows inserted in table BioOttRank
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -31,9 +36,9 @@ impl ClassRank {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
-        table("class_ranks")
+        table("bio_ott_ranks")
             .insert()
-            .columns("id, name")
+            .columns("id, name, font_awesome_icon_id")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -43,10 +48,10 @@ impl ClassRank {
              })
     }
 
-    /// Get ClassRank from the database by its ID.
+    /// Get BioOttRank from the database by its ID.
     ///
     /// # Arguments
-    /// * `id` - The ID of ClassRank to get.
+    /// * `id` - The ID of BioOttRank to get.
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
@@ -56,10 +61,10 @@ impl ClassRank {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
-        let select_row = table("class_ranks")
+        let select_row = table("bio_ott_ranks")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, name")
+            .project("id, name, font_awesome_icon_id")
             .limit(1)
             .execute(connection)
             .await?;
@@ -70,7 +75,7 @@ impl ClassRank {
             .pop())
     }
 
-    /// Delete ClassRank from the database.
+    /// Delete BioOttRank from the database.
     ///
     /// # Arguments
     /// * `id` - The ID of the struct to delete.
@@ -85,7 +90,7 @@ impl ClassRank {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
-        table("class_ranks")
+        table("bio_ott_ranks")
             .delete()
             .filter(col("id").eq(id.to_string()))
             .execute(connection)
@@ -96,7 +101,7 @@ impl ClassRank {
              })
     }
 
-    /// Delete the current instance of ClassRank from the database.
+    /// Delete the current instance of BioOttRank from the database.
     ///
     /// # Arguments
     /// * `connection` - The connection to the database.
@@ -125,10 +130,14 @@ impl ClassRank {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
-        table("class_ranks")
+        let mut update_row = table("bio_ott_ranks")
             .update()        
 .set("id", gluesql::core::ast_builder::num(self.id))        
-.set("name", gluesql::core::ast_builder::text(self.name))            .execute(connection)
+.set("name", gluesql::core::ast_builder::text(self.name));
+        if let Some(font_awesome_icon_id) = self.font_awesome_icon_id {
+            update_row = update_row.set("font_awesome_icon_id", gluesql::core::ast_builder::num(font_awesome_icon_id));
+        }
+            update_row.execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -156,7 +165,7 @@ impl ClassRank {
             Ok(number_of_rows)
         }
     }
-    /// Get all ClassRank from the database.
+    /// Get all BioOttRank from the database.
     ///
     /// # Arguments
     /// * `connection` - The connection to the database.
@@ -167,9 +176,9 @@ impl ClassRank {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
-        let select_row = table("class_ranks")
+        let select_row = table("bio_ott_ranks")
             .select()
-            .project("id, name")
+            .project("id, name, font_awesome_icon_id")
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -185,6 +194,623 @@ impl ClassRank {
             },
             name: match row.get("name").unwrap() {
                 gluesql::prelude::Value::Str(name) => name.clone(),
+                _ => unreachable!("Expected Str")
+            },
+            font_awesome_icon_id: match row.get("font_awesome_icon_id").unwrap() {
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::I32(font_awesome_icon_id) => Some(font_awesome_icon_id.clone()),
+                _ => unreachable!("Expected I32")
+            },
+        }
+    }
+}
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
+pub struct BioOttTaxonItem {
+    pub id: i32,
+    pub name: String,
+    pub description: Option<String>,
+    pub ott_id: i32,
+    pub ott_rank_id: Option<i32>,
+    pub wikidata_id: Option<i32>,
+    pub ncbi_id: Option<i32>,
+    pub gbif_id: Option<i32>,
+    pub irmng_id: Option<i32>,
+    pub worms_id: Option<i32>,
+    pub domain_id: Option<i32>,
+    pub kingdom_id: Option<i32>,
+    pub phylum_id: Option<i32>,
+    pub class_id: Option<i32>,
+    pub order_id: Option<i32>,
+    pub family_id: Option<i32>,
+    pub genus_id: Option<i32>,
+    pub parent_id: Option<i32>,
+    pub font_awesome_icon_id: Option<i32>,
+    pub color_id: Option<i32>,
+}
+#[cfg(feature = "frontend")]
+impl BioOttTaxonItem {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::num(self.id),
+            gluesql::core::ast_builder::text(self.name),
+            match self.description {
+                Some(description) => gluesql::core::ast_builder::text(description),
+                None => gluesql::core::ast_builder::null(),
+            },
+            gluesql::core::ast_builder::num(self.ott_id),
+            match self.ott_rank_id {
+                Some(ott_rank_id) => gluesql::core::ast_builder::num(ott_rank_id),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.wikidata_id {
+                Some(wikidata_id) => gluesql::core::ast_builder::num(wikidata_id),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.ncbi_id {
+                Some(ncbi_id) => gluesql::core::ast_builder::num(ncbi_id),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.gbif_id {
+                Some(gbif_id) => gluesql::core::ast_builder::num(gbif_id),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.irmng_id {
+                Some(irmng_id) => gluesql::core::ast_builder::num(irmng_id),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.worms_id {
+                Some(worms_id) => gluesql::core::ast_builder::num(worms_id),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.domain_id {
+                Some(domain_id) => gluesql::core::ast_builder::num(domain_id),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.kingdom_id {
+                Some(kingdom_id) => gluesql::core::ast_builder::num(kingdom_id),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.phylum_id {
+                Some(phylum_id) => gluesql::core::ast_builder::num(phylum_id),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.class_id {
+                Some(class_id) => gluesql::core::ast_builder::num(class_id),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.order_id {
+                Some(order_id) => gluesql::core::ast_builder::num(order_id),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.family_id {
+                Some(family_id) => gluesql::core::ast_builder::num(family_id),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.genus_id {
+                Some(genus_id) => gluesql::core::ast_builder::num(genus_id),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.parent_id {
+                Some(parent_id) => gluesql::core::ast_builder::num(parent_id),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.font_awesome_icon_id {
+                Some(font_awesome_icon_id) => gluesql::core::ast_builder::num(font_awesome_icon_id),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.color_id {
+                Some(color_id) => gluesql::core::ast_builder::num(color_id),
+                None => gluesql::core::ast_builder::null(),
+            },
+        ]
+    }
+
+    /// Insert the BioOttTaxonItem into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows inserted in table BioOttTaxonItem
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("bio_ott_taxon_items")
+            .insert()
+            .columns("id, name, description, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, font_awesome_icon_id, color_id")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
+                 _ => unreachable!("Payload must be an Insert"),
+             })
+    }
+
+    /// Get BioOttTaxonItem from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of BioOttTaxonItem to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn get<C>(
+        id: i32,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("bio_ott_taxon_items")
+            .select()
+            .filter(col("id").eq(id.to_string()))
+            .project("id, name, description, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, font_awesome_icon_id, color_id")
+            .limit(1)
+            .execute(connection)
+            .await?;
+         Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>()
+            .pop())
+    }
+
+    /// Delete BioOttTaxonItem from the database.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete_from_id<C>(
+        id: i32,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("bio_ott_taxon_items")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
+                 _ => unreachable!("Payload must be a Delete"),
+             })
+    }
+
+    /// Delete the current instance of BioOttTaxonItem from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        Self::delete_from_id(self.id, connection).await
+    }
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("bio_ott_taxon_items")
+            .update()        
+.set("id", gluesql::core::ast_builder::num(self.id))        
+.set("name", gluesql::core::ast_builder::text(self.name))        
+.set("ott_id", gluesql::core::ast_builder::num(self.ott_id));
+        if let Some(description) = self.description {
+            update_row = update_row.set("description", gluesql::core::ast_builder::text(description));
+        }
+        if let Some(ott_rank_id) = self.ott_rank_id {
+            update_row = update_row.set("ott_rank_id", gluesql::core::ast_builder::num(ott_rank_id));
+        }
+        if let Some(wikidata_id) = self.wikidata_id {
+            update_row = update_row.set("wikidata_id", gluesql::core::ast_builder::num(wikidata_id));
+        }
+        if let Some(ncbi_id) = self.ncbi_id {
+            update_row = update_row.set("ncbi_id", gluesql::core::ast_builder::num(ncbi_id));
+        }
+        if let Some(gbif_id) = self.gbif_id {
+            update_row = update_row.set("gbif_id", gluesql::core::ast_builder::num(gbif_id));
+        }
+        if let Some(irmng_id) = self.irmng_id {
+            update_row = update_row.set("irmng_id", gluesql::core::ast_builder::num(irmng_id));
+        }
+        if let Some(worms_id) = self.worms_id {
+            update_row = update_row.set("worms_id", gluesql::core::ast_builder::num(worms_id));
+        }
+        if let Some(domain_id) = self.domain_id {
+            update_row = update_row.set("domain_id", gluesql::core::ast_builder::num(domain_id));
+        }
+        if let Some(kingdom_id) = self.kingdom_id {
+            update_row = update_row.set("kingdom_id", gluesql::core::ast_builder::num(kingdom_id));
+        }
+        if let Some(phylum_id) = self.phylum_id {
+            update_row = update_row.set("phylum_id", gluesql::core::ast_builder::num(phylum_id));
+        }
+        if let Some(class_id) = self.class_id {
+            update_row = update_row.set("class_id", gluesql::core::ast_builder::num(class_id));
+        }
+        if let Some(order_id) = self.order_id {
+            update_row = update_row.set("order_id", gluesql::core::ast_builder::num(order_id));
+        }
+        if let Some(family_id) = self.family_id {
+            update_row = update_row.set("family_id", gluesql::core::ast_builder::num(family_id));
+        }
+        if let Some(genus_id) = self.genus_id {
+            update_row = update_row.set("genus_id", gluesql::core::ast_builder::num(genus_id));
+        }
+        if let Some(parent_id) = self.parent_id {
+            update_row = update_row.set("parent_id", gluesql::core::ast_builder::num(parent_id));
+        }
+        if let Some(font_awesome_icon_id) = self.font_awesome_icon_id {
+            update_row = update_row.set("font_awesome_icon_id", gluesql::core::ast_builder::num(font_awesome_icon_id));
+        }
+        if let Some(color_id) = self.color_id {
+            update_row = update_row.set("color_id", gluesql::core::ast_builder::num(color_id));
+        }
+            update_row.execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+    /// Update the struct in the database if it exists, otherwise insert it.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated or inserted.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let number_of_rows = self.clone().update(connection).await?;
+        if number_of_rows == 0 {
+            self.insert(connection).await
+        } else {
+            Ok(number_of_rows)
+        }
+    }
+    /// Get all BioOttTaxonItem from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all<C>(
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("bio_ott_taxon_items")
+            .select()
+            .project("id, name, description, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, font_awesome_icon_id, color_id")
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
+        Self {
+            id: match row.get("id").unwrap() {
+                gluesql::prelude::Value::I32(id) => id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            name: match row.get("name").unwrap() {
+                gluesql::prelude::Value::Str(name) => name.clone(),
+                _ => unreachable!("Expected Str")
+            },
+            description: match row.get("description").unwrap() {
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::Str(description) => Some(description.clone()),
+                _ => unreachable!("Expected Str")
+            },
+            ott_id: match row.get("ott_id").unwrap() {
+                gluesql::prelude::Value::I32(ott_id) => ott_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            ott_rank_id: match row.get("ott_rank_id").unwrap() {
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::I32(ott_rank_id) => Some(ott_rank_id.clone()),
+                _ => unreachable!("Expected I32")
+            },
+            wikidata_id: match row.get("wikidata_id").unwrap() {
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::I32(wikidata_id) => Some(wikidata_id.clone()),
+                _ => unreachable!("Expected I32")
+            },
+            ncbi_id: match row.get("ncbi_id").unwrap() {
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::I32(ncbi_id) => Some(ncbi_id.clone()),
+                _ => unreachable!("Expected I32")
+            },
+            gbif_id: match row.get("gbif_id").unwrap() {
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::I32(gbif_id) => Some(gbif_id.clone()),
+                _ => unreachable!("Expected I32")
+            },
+            irmng_id: match row.get("irmng_id").unwrap() {
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::I32(irmng_id) => Some(irmng_id.clone()),
+                _ => unreachable!("Expected I32")
+            },
+            worms_id: match row.get("worms_id").unwrap() {
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::I32(worms_id) => Some(worms_id.clone()),
+                _ => unreachable!("Expected I32")
+            },
+            domain_id: match row.get("domain_id").unwrap() {
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::I32(domain_id) => Some(domain_id.clone()),
+                _ => unreachable!("Expected I32")
+            },
+            kingdom_id: match row.get("kingdom_id").unwrap() {
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::I32(kingdom_id) => Some(kingdom_id.clone()),
+                _ => unreachable!("Expected I32")
+            },
+            phylum_id: match row.get("phylum_id").unwrap() {
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::I32(phylum_id) => Some(phylum_id.clone()),
+                _ => unreachable!("Expected I32")
+            },
+            class_id: match row.get("class_id").unwrap() {
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::I32(class_id) => Some(class_id.clone()),
+                _ => unreachable!("Expected I32")
+            },
+            order_id: match row.get("order_id").unwrap() {
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::I32(order_id) => Some(order_id.clone()),
+                _ => unreachable!("Expected I32")
+            },
+            family_id: match row.get("family_id").unwrap() {
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::I32(family_id) => Some(family_id.clone()),
+                _ => unreachable!("Expected I32")
+            },
+            genus_id: match row.get("genus_id").unwrap() {
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::I32(genus_id) => Some(genus_id.clone()),
+                _ => unreachable!("Expected I32")
+            },
+            parent_id: match row.get("parent_id").unwrap() {
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::I32(parent_id) => Some(parent_id.clone()),
+                _ => unreachable!("Expected I32")
+            },
+            font_awesome_icon_id: match row.get("font_awesome_icon_id").unwrap() {
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::I32(font_awesome_icon_id) => Some(font_awesome_icon_id.clone()),
+                _ => unreachable!("Expected I32")
+            },
+            color_id: match row.get("color_id").unwrap() {
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::I32(color_id) => Some(color_id.clone()),
+                _ => unreachable!("Expected I32")
+            },
+        }
+    }
+}
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
+pub struct Color {
+    pub id: i32,
+    pub name: String,
+    pub hexadecimal_value: String,
+}
+#[cfg(feature = "frontend")]
+impl Color {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::num(self.id),
+            gluesql::core::ast_builder::text(self.name),
+            gluesql::core::ast_builder::text(self.hexadecimal_value),
+        ]
+    }
+
+    /// Insert the Color into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows inserted in table Color
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("colors")
+            .insert()
+            .columns("id, name, hexadecimal_value")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
+                 _ => unreachable!("Payload must be an Insert"),
+             })
+    }
+
+    /// Get Color from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of Color to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn get<C>(
+        id: i32,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("colors")
+            .select()
+            .filter(col("id").eq(id.to_string()))
+            .project("id, name, hexadecimal_value")
+            .limit(1)
+            .execute(connection)
+            .await?;
+         Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>()
+            .pop())
+    }
+
+    /// Delete Color from the database.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete_from_id<C>(
+        id: i32,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("colors")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
+                 _ => unreachable!("Payload must be a Delete"),
+             })
+    }
+
+    /// Delete the current instance of Color from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        Self::delete_from_id(self.id, connection).await
+    }
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("colors")
+            .update()        
+.set("id", gluesql::core::ast_builder::num(self.id))        
+.set("name", gluesql::core::ast_builder::text(self.name))        
+.set("hexadecimal_value", gluesql::core::ast_builder::text(self.hexadecimal_value))            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+    /// Update the struct in the database if it exists, otherwise insert it.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated or inserted.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let number_of_rows = self.clone().update(connection).await?;
+        if number_of_rows == 0 {
+            self.insert(connection).await
+        } else {
+            Ok(number_of_rows)
+        }
+    }
+    /// Get all Color from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all<C>(
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("colors")
+            .select()
+            .project("id, name, hexadecimal_value")
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
+        Self {
+            id: match row.get("id").unwrap() {
+                gluesql::prelude::Value::I32(id) => id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            name: match row.get("name").unwrap() {
+                gluesql::prelude::Value::Str(name) => name.clone(),
+                _ => unreachable!("Expected Str")
+            },
+            hexadecimal_value: match row.get("hexadecimal_value").unwrap() {
+                gluesql::prelude::Value::Str(hexadecimal_value) => hexadecimal_value.clone(),
                 _ => unreachable!("Expected Str")
             },
         }
@@ -1730,6 +2356,194 @@ impl Document {
             bytes: match row.get("bytes").unwrap() {
                 gluesql::prelude::Value::I32(bytes) => bytes.clone(),
                 _ => unreachable!("Expected I32")
+            },
+        }
+    }
+}
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
+pub struct FontAwesomeIcon {
+    pub id: i32,
+    pub name: String,
+}
+#[cfg(feature = "frontend")]
+impl FontAwesomeIcon {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::num(self.id),
+            gluesql::core::ast_builder::text(self.name),
+        ]
+    }
+
+    /// Insert the FontAwesomeIcon into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows inserted in table FontAwesomeIcon
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("font_awesome_icons")
+            .insert()
+            .columns("id, name")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
+                 _ => unreachable!("Payload must be an Insert"),
+             })
+    }
+
+    /// Get FontAwesomeIcon from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of FontAwesomeIcon to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn get<C>(
+        id: i32,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("font_awesome_icons")
+            .select()
+            .filter(col("id").eq(id.to_string()))
+            .project("id, name")
+            .limit(1)
+            .execute(connection)
+            .await?;
+         Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>()
+            .pop())
+    }
+
+    /// Delete FontAwesomeIcon from the database.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete_from_id<C>(
+        id: i32,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("font_awesome_icons")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
+                 _ => unreachable!("Payload must be a Delete"),
+             })
+    }
+
+    /// Delete the current instance of FontAwesomeIcon from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        Self::delete_from_id(self.id, connection).await
+    }
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("font_awesome_icons")
+            .update()        
+.set("id", gluesql::core::ast_builder::num(self.id))        
+.set("name", gluesql::core::ast_builder::text(self.name))            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+    /// Update the struct in the database if it exists, otherwise insert it.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated or inserted.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let number_of_rows = self.clone().update(connection).await?;
+        if number_of_rows == 0 {
+            self.insert(connection).await
+        } else {
+            Ok(number_of_rows)
+        }
+    }
+    /// Get all FontAwesomeIcon from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all<C>(
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("font_awesome_icons")
+            .select()
+            .project("id, name")
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
+        Self {
+            id: match row.get("id").unwrap() {
+                gluesql::prelude::Value::I32(id) => id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            name: match row.get("name").unwrap() {
+                gluesql::prelude::Value::Str(name) => name.clone(),
+                _ => unreachable!("Expected Str")
             },
         }
     }
@@ -3412,215 +4226,6 @@ impl Item {
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
-pub struct Kingdom {
-    pub id: i32,
-    pub name: String,
-    pub description: String,
-    pub font_awesome_icon: String,
-    pub icon_color: String,
-}
-#[cfg(feature = "frontend")]
-impl Kingdom {
-    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
-        vec![
-            gluesql::core::ast_builder::num(self.id),
-            gluesql::core::ast_builder::text(self.name),
-            gluesql::core::ast_builder::text(self.description),
-            gluesql::core::ast_builder::text(self.font_awesome_icon),
-            gluesql::core::ast_builder::text(self.icon_color),
-        ]
-    }
-
-    /// Insert the Kingdom into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows inserted in table Kingdom
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("kingdoms")
-            .insert()
-            .columns("id, name, description, font_awesome_icon, icon_color")
-            .values(vec![self.into_row()])
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
-                 _ => unreachable!("Payload must be an Insert"),
-             })
-    }
-
-    /// Get Kingdom from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of Kingdom to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn get<C>(
-        id: i32,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Option<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("kingdoms")
-            .select()
-            .filter(col("id").eq(id.to_string()))
-            .project("id, name, description, font_awesome_icon, icon_color")
-            .limit(1)
-            .execute(connection)
-            .await?;
-         Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>()
-            .pop())
-    }
-
-    /// Delete Kingdom from the database.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete_from_id<C>(
-        id: i32,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("kingdoms")
-            .delete()
-            .filter(col("id").eq(id.to_string()))
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
-                 _ => unreachable!("Payload must be a Delete"),
-             })
-    }
-
-    /// Delete the current instance of Kingdom from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        Self::delete_from_id(self.id, connection).await
-    }
-    /// Update the struct in the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated.
-    pub async fn update<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("kingdoms")
-            .update()        
-.set("id", gluesql::core::ast_builder::num(self.id))        
-.set("name", gluesql::core::ast_builder::text(self.name))        
-.set("description", gluesql::core::ast_builder::text(self.description))        
-.set("font_awesome_icon", gluesql::core::ast_builder::text(self.font_awesome_icon))        
-.set("icon_color", gluesql::core::ast_builder::text(self.icon_color))            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
-                 _ => unreachable!("Expected Payload::Update")
-})
-    }
-
-    /// Update the struct in the database if it exists, otherwise insert it.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated or inserted.
-    pub async fn update_or_insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        let number_of_rows = self.clone().update(connection).await?;
-        if number_of_rows == 0 {
-            self.insert(connection).await
-        } else {
-            Ok(number_of_rows)
-        }
-    }
-    /// Get all Kingdom from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn all<C>(
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("kingdoms")
-            .select()
-            .project("id, name, description, font_awesome_icon, icon_color")
-            .execute(connection)
-            .await?;
-        Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>())
-    }
-    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
-        Self {
-            id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::I32(id) => id.clone(),
-                _ => unreachable!("Expected I32")
-            },
-            name: match row.get("name").unwrap() {
-                gluesql::prelude::Value::Str(name) => name.clone(),
-                _ => unreachable!("Expected Str")
-            },
-            description: match row.get("description").unwrap() {
-                gluesql::prelude::Value::Str(description) => description.clone(),
-                _ => unreachable!("Expected Str")
-            },
-            font_awesome_icon: match row.get("font_awesome_icon").unwrap() {
-                gluesql::prelude::Value::Str(font_awesome_icon) => font_awesome_icon.clone(),
-                _ => unreachable!("Expected Str")
-            },
-            icon_color: match row.get("icon_color").unwrap() {
-                gluesql::prelude::Value::Str(icon_color) => icon_color.clone(),
-                _ => unreachable!("Expected Str")
-            },
-        }
-    }
-}
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Location {
     pub id: Uuid,
     pub latitude_degrees: Option<i32>,
@@ -4587,215 +5192,6 @@ impl Notification {
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
-pub struct OrganismDomain {
-    pub id: i32,
-    pub name: String,
-    pub description: String,
-    pub font_awesome_icon: String,
-    pub icon_color: String,
-}
-#[cfg(feature = "frontend")]
-impl OrganismDomain {
-    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
-        vec![
-            gluesql::core::ast_builder::num(self.id),
-            gluesql::core::ast_builder::text(self.name),
-            gluesql::core::ast_builder::text(self.description),
-            gluesql::core::ast_builder::text(self.font_awesome_icon),
-            gluesql::core::ast_builder::text(self.icon_color),
-        ]
-    }
-
-    /// Insert the OrganismDomain into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows inserted in table OrganismDomain
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("organism_domains")
-            .insert()
-            .columns("id, name, description, font_awesome_icon, icon_color")
-            .values(vec![self.into_row()])
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
-                 _ => unreachable!("Payload must be an Insert"),
-             })
-    }
-
-    /// Get OrganismDomain from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of OrganismDomain to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn get<C>(
-        id: i32,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Option<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("organism_domains")
-            .select()
-            .filter(col("id").eq(id.to_string()))
-            .project("id, name, description, font_awesome_icon, icon_color")
-            .limit(1)
-            .execute(connection)
-            .await?;
-         Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>()
-            .pop())
-    }
-
-    /// Delete OrganismDomain from the database.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete_from_id<C>(
-        id: i32,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("organism_domains")
-            .delete()
-            .filter(col("id").eq(id.to_string()))
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
-                 _ => unreachable!("Payload must be a Delete"),
-             })
-    }
-
-    /// Delete the current instance of OrganismDomain from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        Self::delete_from_id(self.id, connection).await
-    }
-    /// Update the struct in the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated.
-    pub async fn update<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("organism_domains")
-            .update()        
-.set("id", gluesql::core::ast_builder::num(self.id))        
-.set("name", gluesql::core::ast_builder::text(self.name))        
-.set("description", gluesql::core::ast_builder::text(self.description))        
-.set("font_awesome_icon", gluesql::core::ast_builder::text(self.font_awesome_icon))        
-.set("icon_color", gluesql::core::ast_builder::text(self.icon_color))            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
-                 _ => unreachable!("Expected Payload::Update")
-})
-    }
-
-    /// Update the struct in the database if it exists, otherwise insert it.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated or inserted.
-    pub async fn update_or_insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        let number_of_rows = self.clone().update(connection).await?;
-        if number_of_rows == 0 {
-            self.insert(connection).await
-        } else {
-            Ok(number_of_rows)
-        }
-    }
-    /// Get all OrganismDomain from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn all<C>(
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("organism_domains")
-            .select()
-            .project("id, name, description, font_awesome_icon, icon_color")
-            .execute(connection)
-            .await?;
-        Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>())
-    }
-    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
-        Self {
-            id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::I32(id) => id.clone(),
-                _ => unreachable!("Expected I32")
-            },
-            name: match row.get("name").unwrap() {
-                gluesql::prelude::Value::Str(name) => name.clone(),
-                _ => unreachable!("Expected Str")
-            },
-            description: match row.get("description").unwrap() {
-                gluesql::prelude::Value::Str(description) => description.clone(),
-                _ => unreachable!("Expected Str")
-            },
-            font_awesome_icon: match row.get("font_awesome_icon").unwrap() {
-                gluesql::prelude::Value::Str(font_awesome_icon) => font_awesome_icon.clone(),
-                _ => unreachable!("Expected Str")
-            },
-            icon_color: match row.get("icon_color").unwrap() {
-                gluesql::prelude::Value::Str(icon_color) => icon_color.clone(),
-                _ => unreachable!("Expected Str")
-            },
-        }
-    }
-}
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Organization {
     pub id: i32,
     pub parent_organization_id: Option<i32>,
@@ -4987,194 +5383,6 @@ impl Organization {
             parent_organization_id: match row.get("parent_organization_id").unwrap() {
                 gluesql::prelude::Value::Null => None,
                 gluesql::prelude::Value::I32(parent_organization_id) => Some(parent_organization_id.clone()),
-                _ => unreachable!("Expected I32")
-            },
-            name: match row.get("name").unwrap() {
-                gluesql::prelude::Value::Str(name) => name.clone(),
-                _ => unreachable!("Expected Str")
-            },
-        }
-    }
-}
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
-pub struct Phylum {
-    pub id: i32,
-    pub name: String,
-}
-#[cfg(feature = "frontend")]
-impl Phylum {
-    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
-        vec![
-            gluesql::core::ast_builder::num(self.id),
-            gluesql::core::ast_builder::text(self.name),
-        ]
-    }
-
-    /// Insert the Phylum into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows inserted in table Phylum
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("phylums")
-            .insert()
-            .columns("id, name")
-            .values(vec![self.into_row()])
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
-                 _ => unreachable!("Payload must be an Insert"),
-             })
-    }
-
-    /// Get Phylum from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of Phylum to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn get<C>(
-        id: i32,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Option<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("phylums")
-            .select()
-            .filter(col("id").eq(id.to_string()))
-            .project("id, name")
-            .limit(1)
-            .execute(connection)
-            .await?;
-         Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>()
-            .pop())
-    }
-
-    /// Delete Phylum from the database.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete_from_id<C>(
-        id: i32,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("phylums")
-            .delete()
-            .filter(col("id").eq(id.to_string()))
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
-                 _ => unreachable!("Payload must be a Delete"),
-             })
-    }
-
-    /// Delete the current instance of Phylum from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        Self::delete_from_id(self.id, connection).await
-    }
-    /// Update the struct in the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated.
-    pub async fn update<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("phylums")
-            .update()        
-.set("id", gluesql::core::ast_builder::num(self.id))        
-.set("name", gluesql::core::ast_builder::text(self.name))            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
-                 _ => unreachable!("Expected Payload::Update")
-})
-    }
-
-    /// Update the struct in the database if it exists, otherwise insert it.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated or inserted.
-    pub async fn update_or_insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        let number_of_rows = self.clone().update(connection).await?;
-        if number_of_rows == 0 {
-            self.insert(connection).await
-        } else {
-            Ok(number_of_rows)
-        }
-    }
-    /// Get all Phylum from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn all<C>(
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("phylums")
-            .select()
-            .project("id, name")
-            .execute(connection)
-            .await?;
-        Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>())
-    }
-    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
-        Self {
-            id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::I32(id) => id.clone(),
                 _ => unreachable!("Expected I32")
             },
             name: match row.get("name").unwrap() {
@@ -6937,6 +7145,208 @@ impl Role {
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
+pub struct SampleBioOttTaxonItem {
+    pub id: Uuid,
+    pub created_by: i32,
+    pub sample_id: Uuid,
+    pub taxon_id: i32,
+}
+#[cfg(feature = "frontend")]
+impl SampleBioOttTaxonItem {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::uuid(self.id.to_string()),
+            gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::uuid(self.sample_id.to_string()),
+            gluesql::core::ast_builder::num(self.taxon_id),
+        ]
+    }
+
+    /// Insert the SampleBioOttTaxonItem into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows inserted in table SampleBioOttTaxonItem
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("sample_bio_ott_taxon_items")
+            .insert()
+            .columns("id, created_by, sample_id, taxon_id")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
+                 _ => unreachable!("Payload must be an Insert"),
+             })
+    }
+
+    /// Get SampleBioOttTaxonItem from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of SampleBioOttTaxonItem to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn get<C>(
+        id: uuid::Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("sample_bio_ott_taxon_items")
+            .select()
+            .filter(col("id").eq(id.to_string()))
+            .project("id, created_by, sample_id, taxon_id")
+            .limit(1)
+            .execute(connection)
+            .await?;
+         Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>()
+            .pop())
+    }
+
+    /// Delete SampleBioOttTaxonItem from the database.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete_from_id<C>(
+        id: uuid::Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("sample_bio_ott_taxon_items")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
+                 _ => unreachable!("Payload must be a Delete"),
+             })
+    }
+
+    /// Delete the current instance of SampleBioOttTaxonItem from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        Self::delete_from_id(self.id, connection).await
+    }
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("sample_bio_ott_taxon_items")
+            .update()        
+.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("sample_id", gluesql::core::ast_builder::uuid(self.sample_id.to_string()))        
+.set("taxon_id", gluesql::core::ast_builder::num(self.taxon_id))            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+    /// Update the struct in the database if it exists, otherwise insert it.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated or inserted.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let number_of_rows = self.clone().update(connection).await?;
+        if number_of_rows == 0 {
+            self.insert(connection).await
+        } else {
+            Ok(number_of_rows)
+        }
+    }
+    /// Get all SampleBioOttTaxonItem from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all<C>(
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("sample_bio_ott_taxon_items")
+            .select()
+            .project("id, created_by, sample_id, taxon_id")
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
+        Self {
+            id: match row.get("id").unwrap() {
+                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
+                _ => unreachable!("Expected Uuid"),
+            },
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            sample_id: match row.get("sample_id").unwrap() {
+                gluesql::prelude::Value::Uuid(sample_id) => Uuid::from_u128(*sample_id),
+                _ => unreachable!("Expected Uuid"),
+            },
+            taxon_id: match row.get("taxon_id").unwrap() {
+                gluesql::prelude::Value::I32(taxon_id) => taxon_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+        }
+    }
+}
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SampleState {
     pub id: i32,
     pub name: String,
@@ -7146,216 +7556,14 @@ impl SampleState {
 }
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
-pub struct SampleTaxa {
-    pub id: Uuid,
-    pub created_by: i32,
-    pub sample_id: Uuid,
-    pub taxon_id: i32,
-}
-#[cfg(feature = "frontend")]
-impl SampleTaxa {
-    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
-        vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
-            gluesql::core::ast_builder::num(self.created_by),
-            gluesql::core::ast_builder::uuid(self.sample_id.to_string()),
-            gluesql::core::ast_builder::num(self.taxon_id),
-        ]
-    }
-
-    /// Insert the SampleTaxa into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows inserted in table SampleTaxa
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("sample_taxa")
-            .insert()
-            .columns("id, created_by, sample_id, taxon_id")
-            .values(vec![self.into_row()])
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
-                 _ => unreachable!("Payload must be an Insert"),
-             })
-    }
-
-    /// Get SampleTaxa from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of SampleTaxa to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn get<C>(
-        id: uuid::Uuid,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Option<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("sample_taxa")
-            .select()
-            .filter(col("id").eq(id.to_string()))
-            .project("id, created_by, sample_id, taxon_id")
-            .limit(1)
-            .execute(connection)
-            .await?;
-         Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>()
-            .pop())
-    }
-
-    /// Delete SampleTaxa from the database.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete_from_id<C>(
-        id: uuid::Uuid,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("sample_taxa")
-            .delete()
-            .filter(col("id").eq(id.to_string()))
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
-                 _ => unreachable!("Payload must be a Delete"),
-             })
-    }
-
-    /// Delete the current instance of SampleTaxa from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        Self::delete_from_id(self.id, connection).await
-    }
-    /// Update the struct in the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated.
-    pub async fn update<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("sample_taxa")
-            .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
-.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
-.set("sample_id", gluesql::core::ast_builder::uuid(self.sample_id.to_string()))        
-.set("taxon_id", gluesql::core::ast_builder::num(self.taxon_id))            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
-                 _ => unreachable!("Expected Payload::Update")
-})
-    }
-
-    /// Update the struct in the database if it exists, otherwise insert it.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated or inserted.
-    pub async fn update_or_insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        let number_of_rows = self.clone().update(connection).await?;
-        if number_of_rows == 0 {
-            self.insert(connection).await
-        } else {
-            Ok(number_of_rows)
-        }
-    }
-    /// Get all SampleTaxa from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn all<C>(
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("sample_taxa")
-            .select()
-            .project("id, created_by, sample_id, taxon_id")
-            .execute(connection)
-            .await?;
-        Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>())
-    }
-    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
-        Self {
-            id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
-            },
-            created_by: match row.get("created_by").unwrap() {
-                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
-                _ => unreachable!("Expected I32")
-            },
-            sample_id: match row.get("sample_id").unwrap() {
-                gluesql::prelude::Value::Uuid(sample_id) => Uuid::from_u128(*sample_id),
-                _ => unreachable!("Expected Uuid"),
-            },
-            taxon_id: match row.get("taxon_id").unwrap() {
-                gluesql::prelude::Value::I32(taxon_id) => taxon_id.clone(),
-                _ => unreachable!("Expected I32")
-            },
-        }
-    }
-}
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
-pub struct SampledIndividualTaxa {
+pub struct SampledIndividualBioOttTaxonItem {
     pub id: Uuid,
     pub created_by: i32,
     pub sampled_individual_id: Uuid,
     pub taxon_id: i32,
 }
 #[cfg(feature = "frontend")]
-impl SampledIndividualTaxa {
+impl SampledIndividualBioOttTaxonItem {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
             gluesql::core::ast_builder::uuid(self.id.to_string()),
@@ -7365,13 +7573,13 @@ impl SampledIndividualTaxa {
         ]
     }
 
-    /// Insert the SampledIndividualTaxa into the database.
+    /// Insert the SampledIndividualBioOttTaxonItem into the database.
     ///
     /// # Arguments
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
-    /// The number of rows inserted in table SampledIndividualTaxa
+    /// The number of rows inserted in table SampledIndividualBioOttTaxonItem
     pub async fn insert<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -7379,7 +7587,7 @@ impl SampledIndividualTaxa {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
-        table("sampled_individual_taxa")
+        table("sampled_individual_bio_ott_taxon_items")
             .insert()
             .columns("id, created_by, sampled_individual_id, taxon_id")
             .values(vec![self.into_row()])
@@ -7391,10 +7599,10 @@ impl SampledIndividualTaxa {
              })
     }
 
-    /// Get SampledIndividualTaxa from the database by its ID.
+    /// Get SampledIndividualBioOttTaxonItem from the database by its ID.
     ///
     /// # Arguments
-    /// * `id` - The ID of SampledIndividualTaxa to get.
+    /// * `id` - The ID of SampledIndividualBioOttTaxonItem to get.
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
@@ -7404,7 +7612,7 @@ impl SampledIndividualTaxa {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
-        let select_row = table("sampled_individual_taxa")
+        let select_row = table("sampled_individual_bio_ott_taxon_items")
             .select()
             .filter(col("id").eq(id.to_string()))
             .project("id, created_by, sampled_individual_id, taxon_id")
@@ -7418,7 +7626,7 @@ impl SampledIndividualTaxa {
             .pop())
     }
 
-    /// Delete SampledIndividualTaxa from the database.
+    /// Delete SampledIndividualBioOttTaxonItem from the database.
     ///
     /// # Arguments
     /// * `id` - The ID of the struct to delete.
@@ -7433,7 +7641,7 @@ impl SampledIndividualTaxa {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
-        table("sampled_individual_taxa")
+        table("sampled_individual_bio_ott_taxon_items")
             .delete()
             .filter(col("id").eq(id.to_string()))
             .execute(connection)
@@ -7444,7 +7652,7 @@ impl SampledIndividualTaxa {
              })
     }
 
-    /// Delete the current instance of SampledIndividualTaxa from the database.
+    /// Delete the current instance of SampledIndividualBioOttTaxonItem from the database.
     ///
     /// # Arguments
     /// * `connection` - The connection to the database.
@@ -7473,7 +7681,7 @@ impl SampledIndividualTaxa {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
-        table("sampled_individual_taxa")
+        table("sampled_individual_bio_ott_taxon_items")
             .update()        
 .set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
 .set("created_by", gluesql::core::ast_builder::num(self.created_by))        
@@ -7506,7 +7714,7 @@ impl SampledIndividualTaxa {
             Ok(number_of_rows)
         }
     }
-    /// Get all SampledIndividualTaxa from the database.
+    /// Get all SampledIndividualBioOttTaxonItem from the database.
     ///
     /// # Arguments
     /// * `connection` - The connection to the database.
@@ -7517,7 +7725,7 @@ impl SampledIndividualTaxa {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
-        let select_row = table("sampled_individual_taxa")
+        let select_row = table("sampled_individual_bio_ott_taxon_items")
             .select()
             .project("id, created_by, sampled_individual_id, taxon_id")
             .execute(connection)
@@ -8531,260 +8739,6 @@ impl SpectraCollection {
             },
             created_by: match row.get("created_by").unwrap() {
                 gluesql::prelude::Value::I32(created_by) => created_by.clone(),
-                _ => unreachable!("Expected I32")
-            },
-        }
-    }
-}
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
-pub struct Taxa {
-    pub id: i32,
-    pub name: String,
-    pub ncbi_taxon_id: Option<i32>,
-    pub domain_id: Option<i32>,
-    pub kingdom_id: Option<i32>,
-    pub phylum_id: Option<i32>,
-    pub class_id: Option<i32>,
-}
-#[cfg(feature = "frontend")]
-impl Taxa {
-    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
-        vec![
-            gluesql::core::ast_builder::num(self.id),
-            gluesql::core::ast_builder::text(self.name),
-            match self.ncbi_taxon_id {
-                Some(ncbi_taxon_id) => gluesql::core::ast_builder::num(ncbi_taxon_id),
-                None => gluesql::core::ast_builder::null(),
-            },
-            match self.domain_id {
-                Some(domain_id) => gluesql::core::ast_builder::num(domain_id),
-                None => gluesql::core::ast_builder::null(),
-            },
-            match self.kingdom_id {
-                Some(kingdom_id) => gluesql::core::ast_builder::num(kingdom_id),
-                None => gluesql::core::ast_builder::null(),
-            },
-            match self.phylum_id {
-                Some(phylum_id) => gluesql::core::ast_builder::num(phylum_id),
-                None => gluesql::core::ast_builder::null(),
-            },
-            match self.class_id {
-                Some(class_id) => gluesql::core::ast_builder::num(class_id),
-                None => gluesql::core::ast_builder::null(),
-            },
-        ]
-    }
-
-    /// Insert the Taxa into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows inserted in table Taxa
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("taxa")
-            .insert()
-            .columns("id, name, ncbi_taxon_id, domain_id, kingdom_id, phylum_id, class_id")
-            .values(vec![self.into_row()])
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
-                 _ => unreachable!("Payload must be an Insert"),
-             })
-    }
-
-    /// Get Taxa from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of Taxa to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn get<C>(
-        id: i32,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Option<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("taxa")
-            .select()
-            .filter(col("id").eq(id.to_string()))
-            .project("id, name, ncbi_taxon_id, domain_id, kingdom_id, phylum_id, class_id")
-            .limit(1)
-            .execute(connection)
-            .await?;
-         Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>()
-            .pop())
-    }
-
-    /// Delete Taxa from the database.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete_from_id<C>(
-        id: i32,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("taxa")
-            .delete()
-            .filter(col("id").eq(id.to_string()))
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
-                 _ => unreachable!("Payload must be a Delete"),
-             })
-    }
-
-    /// Delete the current instance of Taxa from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        Self::delete_from_id(self.id, connection).await
-    }
-    /// Update the struct in the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated.
-    pub async fn update<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let mut update_row = table("taxa")
-            .update()        
-.set("id", gluesql::core::ast_builder::num(self.id))        
-.set("name", gluesql::core::ast_builder::text(self.name));
-        if let Some(ncbi_taxon_id) = self.ncbi_taxon_id {
-            update_row = update_row.set("ncbi_taxon_id", gluesql::core::ast_builder::num(ncbi_taxon_id));
-        }
-        if let Some(domain_id) = self.domain_id {
-            update_row = update_row.set("domain_id", gluesql::core::ast_builder::num(domain_id));
-        }
-        if let Some(kingdom_id) = self.kingdom_id {
-            update_row = update_row.set("kingdom_id", gluesql::core::ast_builder::num(kingdom_id));
-        }
-        if let Some(phylum_id) = self.phylum_id {
-            update_row = update_row.set("phylum_id", gluesql::core::ast_builder::num(phylum_id));
-        }
-        if let Some(class_id) = self.class_id {
-            update_row = update_row.set("class_id", gluesql::core::ast_builder::num(class_id));
-        }
-            update_row.execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
-                 _ => unreachable!("Expected Payload::Update")
-})
-    }
-
-    /// Update the struct in the database if it exists, otherwise insert it.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated or inserted.
-    pub async fn update_or_insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        let number_of_rows = self.clone().update(connection).await?;
-        if number_of_rows == 0 {
-            self.insert(connection).await
-        } else {
-            Ok(number_of_rows)
-        }
-    }
-    /// Get all Taxa from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn all<C>(
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("taxa")
-            .select()
-            .project("id, name, ncbi_taxon_id, domain_id, kingdom_id, phylum_id, class_id")
-            .execute(connection)
-            .await?;
-        Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>())
-    }
-    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
-        Self {
-            id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::I32(id) => id.clone(),
-                _ => unreachable!("Expected I32")
-            },
-            name: match row.get("name").unwrap() {
-                gluesql::prelude::Value::Str(name) => name.clone(),
-                _ => unreachable!("Expected Str")
-            },
-            ncbi_taxon_id: match row.get("ncbi_taxon_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::I32(ncbi_taxon_id) => Some(ncbi_taxon_id.clone()),
-                _ => unreachable!("Expected I32")
-            },
-            domain_id: match row.get("domain_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::I32(domain_id) => Some(domain_id.clone()),
-                _ => unreachable!("Expected I32")
-            },
-            kingdom_id: match row.get("kingdom_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::I32(kingdom_id) => Some(kingdom_id.clone()),
-                _ => unreachable!("Expected I32")
-            },
-            phylum_id: match row.get("phylum_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::I32(phylum_id) => Some(phylum_id.clone()),
-                _ => unreachable!("Expected I32")
-            },
-            class_id: match row.get("class_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::I32(class_id) => Some(class_id.clone()),
                 _ => unreachable!("Expected I32")
             },
         }

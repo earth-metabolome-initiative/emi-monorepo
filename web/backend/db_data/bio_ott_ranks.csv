@@ -1,0 +1,42 @@
+name,font_awesome_icon
+no rank,fa-question-circle
+species,fa-leaf
+no rank - terminal,fa-question-circle
+genus,fa-leaf
+subspecies,fa-leaf
+species group,fa-leaf
+species subgroup,fa-leaf
+family,fa-people-roof
+subfamily,fa-people-roof
+tribe,fa-people-group
+class,fa-leaf
+order,fa-leaf
+phylum,fa-leaf
+subgenus,fa-leaf
+forma,fa-leaf
+varietas,fa-leaf
+superfamily,fa-people-roof
+subtribe,fa-people-group
+subsection,fa-leaf
+infraclass,fa-leaf
+suborder,fa-leaf
+subclass,fa-leaf
+superorder,fa-leaf
+infraorder,fa-leaf
+subphylum,fa-leaf
+superclass,fa-leaf
+parvorder,fa-leaf
+subcohort,fa-people-group
+section,fa-leaf
+infrakingdom,fa-crown
+variety,fa-leaf
+subkingdom,fa-crown
+domain,fa-chess-king
+kingdom,fa-crown
+infraphylum,fa-leaf
+supertribe,fa-people-group
+infraspecificname,fa-leaf
+subterclass,fa-leaf
+subdivision,fa-leaf
+cohort,fa-people-group
+superphylum,fa-leaf
