@@ -4,6 +4,7 @@ import pandas as pd
 from tqdm.auto import tqdm
 from cache_decorator import Cache
 from pyinaturalist.docs.font_awesome_icons import EXTENDED_FONT_AWESOME_ICONS
+from io import StringIO
 
 
 def download_taxon_document():
@@ -143,7 +144,7 @@ def populate_font_awesome_icons(df: pd.DataFrame):
         try:
             row = otol_to_inat.loc[inat_identifier]
         except KeyError:
-            pass
+            continue
 
         if pd.notna(row.OTT_ID):
             df.at[row.OTT_ID, column_name] = EXTENDED_FONT_AWESOME_ICONS[
@@ -152,6 +153,56 @@ def populate_font_awesome_icons(df: pd.DataFrame):
 
     for index, row in tqdm(df.iterrows(), total=df.shape[0], desc=f"Parsing species", leave=False):
         propagate_down(df, row, column_name, unknown="fa-question-circle")
+
+    return df
+
+@Cache
+def retrieve_wikidata_to_ott_mapping() -> pd.DataFrame:
+    """Retrieve the mapping between Wikidata and OTT
+    
+    Implementative details
+    ----------------------
+    This method executes a sparql query to retrieve the mapping between Wikidata and OTT.
+
+    Returns
+    -------
+    A dataframe with the following two columns:
+    * taxon: the Wikidata item
+    * ottid: the OTT identifier
+    """
+
+    query = """SELECT ?taxon ?ottid WHERE {
+    ?taxon wdt:P31 wd:Q16521 .
+    ?taxon wdt:P9157 ?ottid. 
+    hint:Prior hint:rangeSafe true.
+    }"""
+    out = requests.get(
+        "https://query.wikidata.org/sparql",
+        params={"query": query},
+        headers={
+            "Accept": "text/csv",
+            "Accept-Encoding": "gzip,deflate",
+            "User-Agent": "LOTUS project database dumper",
+        },
+        timeout=70,
+    ).text
+
+    df = pd.read_csv(StringIO(out))
+    # We convert the url to the identifier
+    df["taxon"] = df.taxon.str.rsplit("/", maxsplit=1).str[1]
+    # We remove the Q prefix
+    df["taxon"] = df.taxon.str.replace("Q", "").astype(int)
+
+    return df
+
+
+@Cache(use_approximated_hash=True)
+def add_wikidata_id(df: pd.DataFrame) -> pd.DataFrame:
+    """Add the wikidata id to the dataframe"""
+    wikidata_to_ott = retrieve_wikidata_to_ott_mapping()
+    wikidata_to_ott = wikidata_to_ott.set_index("ottid")
+
+    df["wikidata_id"] = wikidata_to_ott.loc[df.index, "taxon"]
 
     return df
 
@@ -166,8 +217,9 @@ def main() -> pd.DataFrame:
     df = enrich_ranks(df)
     print("Populating the font awesome icons")
     df = populate_font_awesome_icons(df)
-    # We sort the dataframe by index
-    df = df.sort_index()
+    print("Add wikidata identifier")
+    df = add_wikidata_id(df)
+    
     return df
 
 
