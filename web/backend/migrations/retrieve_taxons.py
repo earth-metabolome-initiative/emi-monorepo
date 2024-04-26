@@ -156,7 +156,7 @@ def populate_font_awesome_icons(df: pd.DataFrame):
 
     return df
 
-@Cache
+@Cache()
 def retrieve_wikidata_to_ott_mapping() -> pd.DataFrame:
     """Retrieve the mapping between Wikidata and OTT
     
