@@ -195,7 +195,7 @@ def retrieve_wikidata_to_ott_mapping() -> pd.DataFrame:
 
     df = pd.read_csv(StringIO(out))
     # We convert the url to the identifier
-    df["taxon"] = df.taxon.str.rsplit("/", maxsplit=1).str[1]
+    df["taxon"] = df.taxon.str.rsplit("/", n=1).str[1]
     # We remove the Q prefix
     df["taxon"] = df.taxon.str.replace("Q", "").astype(int)
 
