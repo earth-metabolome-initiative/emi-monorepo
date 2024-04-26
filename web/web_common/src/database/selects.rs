@@ -9,7 +9,7 @@ use crate::database::Task;
 pub enum Select {
     Id(super::Table, uuid::Uuid),
     SearchTable {
-        table: super::Table,
+        table: String,
         query: String,
         number_of_results: u32,
     },

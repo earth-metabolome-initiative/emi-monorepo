@@ -5,3 +5,4 @@ downloaders
 pandas
 tqdm
 cache_decorator
+git+https://github.com/LucaCappelletti94/pyinaturalist.git#egg=pyinaturalist

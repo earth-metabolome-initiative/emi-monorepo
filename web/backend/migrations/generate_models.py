@@ -2718,6 +2718,29 @@ def write_table_names_enumeration(struct_metadatas: List[StructMetadata]):
     tables.write("    }\n")
     tables.write("}\n")
 
+    # We implement the conversion From<Table> for String
+
+    tables.write("impl From<Table> for String {\n")
+    tables.write("    fn from(table: Table) -> Self {\n")
+    tables.write("        table.to_string()\n")
+    tables.write("    }\n")
+    tables.write("}\n")
+
+    # We implement the TryFrom trait from String to Table
+
+    tables.write("impl std::convert::TryFrom<&str> for Table {\n")
+    tables.write("    type Error = String;\n")
+    tables.write("    fn try_from(value: &str) -> Result<Self, Self::Error> {\n")
+    tables.write("        match value {\n")
+    for table_name, capitalized_table_name in unique_table_names:
+        tables.write(
+            f'            "{table_name}" => Ok(Table::{capitalized_table_name}),\n'
+        )
+    tables.write('            table_name => Err(format!("Unknown table name: {}", table_name)),\n')
+    tables.write("        }\n")
+    tables.write("    }\n")
+    tables.write("}\n")
+
     tables.close()
 
 
