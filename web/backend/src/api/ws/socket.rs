@@ -23,6 +23,7 @@ use sqlx::postgres::PgListener;
 use sqlx::{Pool as SQLxPool, Postgres};
 use web_common::api::oauth::jwt_cookies::AccessToken;
 use web_common::api::ws::messages::{BackendMessage, FrontendMessage};
+use web_common::api::ApiError;
 use web_common::database::NotificationMessage;
 
 use super::projects::ProjectMessage;
@@ -266,10 +267,20 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                             },
                             web_common::database::Operation::Select(select) => match select {
                                 web_common::database::selects::Select::SearchTable {
-                                    table,
+                                    table_name,
                                     query,
                                     number_of_results,
                                 } => {
+                                    let table: web_common::database::Table = match table_name.as_str().try_into() {
+                                        Ok(table) => table,
+                                        Err(err) => {
+                                            ctx.address().do_send(BackendMessage::TaskResult(
+                                                task.id(),
+                                                Err(ApiError::BadRequest(vec![err.to_string()]))
+                                            ));
+                                            return;
+                                        }
+                                    };
                                     ctx.address().do_send(BackendMessage::SearchTable(
                                         task.id(),
                                         match table {
@@ -309,8 +320,8 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                                 )
                                                 .bincode_serialize()
                                             }
-                                            web_common::database::Table::Taxa => {
-                                                crate::models::Taxa::search(
+                                            web_common::database::Table::BioOttTaxonItems => {
+                                                crate::nested_models::NestedBioOttTaxonItem::search(
                                                     &query,
                                                     Some(*number_of_results as i32),
                                                     Some(0.1),

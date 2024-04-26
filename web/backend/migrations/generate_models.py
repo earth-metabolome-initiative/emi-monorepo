@@ -66,7 +66,7 @@ import pandas as pd
 import psycopg2
 from densify_directory_counter import densify_directory_counter
 from dotenv import load_dotenv
-# from retrieve_ncbi_taxon import retrieve_ncbi_taxon
+from retrieve_taxons import retrieve_taxons
 from tqdm.auto import tqdm
 from functools import cache
 import glob
@@ -2973,6 +2973,8 @@ if __name__ == "__main__":
 
     if os.path.exists("migrations/__pycache__"):
         shutil.rmtree("migrations/__pycache__")
+
+    retrieve_taxons()
 
     main()
     print("Generated models.")
