@@ -28,8 +28,8 @@ diesel::table! {
         family_id -> Nullable<Int4>,
         genus_id -> Nullable<Int4>,
         parent_id -> Nullable<Int4>,
-        font_awesome_icon_id -> Nullable<Int4>,
-        color_id -> Nullable<Int4>,
+        font_awesome_icon_id -> Int4,
+        color_id -> Int4,
     }
 }
 

@@ -137,8 +137,8 @@ pub struct BioOttTaxonItem {
     pub family_id: Option<i32>,
     pub genus_id: Option<i32>,
     pub parent_id: Option<i32>,
-    pub font_awesome_icon_id: Option<i32>,
-    pub color_id: Option<i32>,
+    pub font_awesome_icon_id: i32,
+    pub color_id: i32,
 }
 
 impl From<BioOttTaxonItem> for web_common::database::tables::BioOttTaxonItem {

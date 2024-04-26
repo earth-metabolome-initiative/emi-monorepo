@@ -1,16 +1,17 @@
 /// impl row to badge for associated taxa
 /// add function components
 use crate::{components::database::row_to_badge::RowToBadge, traits::FormatMatch};
-use web_common::database::Taxa;
+use web_common::database::NestedBioOttTaxonItem;
 use yew::prelude::*;
 
-impl RowToBadge for Taxa {
+impl RowToBadge for NestedBioOttTaxonItem {
     fn to_datalist_badge(&self, query: &str) -> Html {
         html! {
             <div>
                 <p>
-                    // <i class={format!("{} {}", self.font_awesome_icon, self.icon_color)}></i>
-                    <span>{self.taxon_display().format_match(query)}</span>
+                    <i class={format!("{} {}", self.font_awesome_icon.name, self.color.name)}></i>
+                    <span>{self.name.format_match(query)}</span>
+                    <span>{}</span>
                 </p>
             </div>
         }
@@ -19,23 +20,22 @@ impl RowToBadge for Taxa {
     fn to_selected_datalist_badge(&self) -> Html {
         html! {
             <p>
-                // <i class={format!("{} {}", self.font_awesome_icon, self.icon_color)}></i>
-                <span>{&self.taxon_display()}</span>
+            <i class={format!("{} {}", self.font_awesome_icon.name, self.color.name)}></i>
+                <span>{&self.name}</span>
             </p>
         }
     }
-    
 
     fn matches(&self, query: &str) -> bool {
-        self.taxon_display() == query
+        self.name == query
     }
 
     fn similarity_score(&self, query: &str) -> isize {
-        self.taxon_display().similarity_score(query)
+        self.name.similarity_score(query)
     }
 
     fn primary_color_class(&self) -> &str {
-        "grey"
+        &self.color.name
     }
 
     fn description(&self) -> &str {

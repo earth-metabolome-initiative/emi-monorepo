@@ -46,8 +46,8 @@ pub struct NestedBioOttTaxonItem {
     pub family: Option<BioOttTaxonItem>,
     pub genus: Option<BioOttTaxonItem>,
     pub parent: Option<BioOttTaxonItem>,
-    pub font_awesome_icon: Option<FontAwesomeIcon>,
-    pub color: Option<Color>,
+    pub font_awesome_icon: FontAwesomeIcon,
+    pub color: Color,
 }
 #[cfg(feature = "frontend")]
 impl NestedBioOttTaxonItem {
@@ -74,8 +74,8 @@ impl NestedBioOttTaxonItem {
             family: if let Some(family_id) = flat_struct.family_id { BioOttTaxonItem::get(family_id, connection).await? } else { return Ok(None) },
             genus: if let Some(genus_id) = flat_struct.genus_id { BioOttTaxonItem::get(genus_id, connection).await? } else { return Ok(None) },
             parent: if let Some(parent_id) = flat_struct.parent_id { BioOttTaxonItem::get(parent_id, connection).await? } else { return Ok(None) },
-            font_awesome_icon: if let Some(font_awesome_icon_id) = flat_struct.font_awesome_icon_id { FontAwesomeIcon::get(font_awesome_icon_id, connection).await? } else { return Ok(None) },
-            color: if let Some(color_id) = flat_struct.color_id { Color::get(color_id, connection).await? } else { return Ok(None) },
+            font_awesome_icon: if let Some(font_awesome_icon) = FontAwesomeIcon::get(flat_struct.font_awesome_icon_id, connection).await? { font_awesome_icon } else {return Ok(None)},
+            color: if let Some(color) = Color::get(flat_struct.color_id, connection).await? { color } else {return Ok(None)},
         }))
        } else {
            Ok(None)

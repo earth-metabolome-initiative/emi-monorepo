@@ -118,8 +118,8 @@ pub struct NestedBioOttTaxonItem {
     pub family: Option<BioOttTaxonItem>,
     pub genus: Option<BioOttTaxonItem>,
     pub parent: Option<BioOttTaxonItem>,
-    pub font_awesome_icon: Option<FontAwesomeIcon>,
-    pub color: Option<Color>,
+    pub font_awesome_icon: FontAwesomeIcon,
+    pub color: Color,
 }
 
 impl NestedBioOttTaxonItem {
@@ -143,8 +143,8 @@ impl NestedBioOttTaxonItem {
                 family: flat_struct.family_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
                 genus: flat_struct.genus_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
                 parent: flat_struct.parent_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
-                font_awesome_icon: flat_struct.font_awesome_icon_id.map(|flat_struct| FontAwesomeIcon::get(flat_struct, connection)).transpose()?,
-                color: flat_struct.color_id.map(|flat_struct| Color::get(flat_struct, connection)).transpose()?,
+                font_awesome_icon: FontAwesomeIcon::get(flat_struct.font_awesome_icon_id, connection)?,
+                color: Color::get(flat_struct.color_id, connection)?,
                 inner: flat_struct,
             });
         }
@@ -174,8 +174,8 @@ impl NestedBioOttTaxonItem {
             family: flat_struct.family_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
             genus: flat_struct.genus_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
             parent: flat_struct.parent_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
-            font_awesome_icon: flat_struct.font_awesome_icon_id.map(|flat_struct| FontAwesomeIcon::get(flat_struct, connection)).transpose()?,
-            color: flat_struct.color_id.map(|flat_struct| Color::get(flat_struct, connection)).transpose()?,
+            font_awesome_icon: FontAwesomeIcon::get(flat_struct.font_awesome_icon_id, connection)?,
+            color: Color::get(flat_struct.color_id, connection)?,
         })
     }
 }
@@ -201,8 +201,8 @@ impl NestedBioOttTaxonItem {
             family: flat_struct.family_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
             genus: flat_struct.genus_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
             parent: flat_struct.parent_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
-            font_awesome_icon: flat_struct.font_awesome_icon_id.map(|flat_struct| FontAwesomeIcon::get(flat_struct, connection)).transpose()?,
-            color: flat_struct.color_id.map(|flat_struct| Color::get(flat_struct, connection)).transpose()?,
+            font_awesome_icon: FontAwesomeIcon::get(flat_struct.font_awesome_icon_id, connection)?,
+            color: Color::get(flat_struct.color_id, connection)?,
             inner: flat_struct,
         })
     }
@@ -241,8 +241,8 @@ impl From<web_common::database::nested_models::NestedBioOttTaxonItem> for Nested
             family: item.family.map(|item| item.into()),
             genus: item.genus.map(|item| item.into()),
             parent: item.parent.map(|item| item.into()),
-            font_awesome_icon: item.font_awesome_icon.map(|item| item.into()),
-            color: item.color.map(|item| item.into()),
+            font_awesome_icon: item.font_awesome_icon.into(),
+            color: item.color.into(),
         }
     }
 }
@@ -259,8 +259,8 @@ impl From<NestedBioOttTaxonItem> for web_common::database::nested_models::Nested
             family: item.family.map(|item| item.into()),
             genus: item.genus.map(|item| item.into()),
             parent: item.parent.map(|item| item.into()),
-            font_awesome_icon: item.font_awesome_icon.map(|item| item.into()),
-            color: item.color.map(|item| item.into()),
+            font_awesome_icon: item.font_awesome_icon.into(),
+            color: item.color.into(),
         }
     }
 }

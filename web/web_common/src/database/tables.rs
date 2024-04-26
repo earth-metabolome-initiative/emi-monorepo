@@ -225,8 +225,8 @@ pub struct BioOttTaxonItem {
     pub family_id: Option<i32>,
     pub genus_id: Option<i32>,
     pub parent_id: Option<i32>,
-    pub font_awesome_icon_id: Option<i32>,
-    pub color_id: Option<i32>,
+    pub font_awesome_icon_id: i32,
+    pub color_id: i32,
 }
 #[cfg(feature = "frontend")]
 impl BioOttTaxonItem {
@@ -295,14 +295,8 @@ impl BioOttTaxonItem {
                 Some(parent_id) => gluesql::core::ast_builder::num(parent_id),
                 None => gluesql::core::ast_builder::null(),
             },
-            match self.font_awesome_icon_id {
-                Some(font_awesome_icon_id) => gluesql::core::ast_builder::num(font_awesome_icon_id),
-                None => gluesql::core::ast_builder::null(),
-            },
-            match self.color_id {
-                Some(color_id) => gluesql::core::ast_builder::num(color_id),
-                None => gluesql::core::ast_builder::null(),
-            },
+            gluesql::core::ast_builder::num(self.font_awesome_icon_id),
+            gluesql::core::ast_builder::num(self.color_id),
         ]
     }
 
@@ -418,7 +412,9 @@ impl BioOttTaxonItem {
             .update()        
 .set("id", gluesql::core::ast_builder::num(self.id))        
 .set("name", gluesql::core::ast_builder::text(self.name))        
-.set("ott_id", gluesql::core::ast_builder::num(self.ott_id));
+.set("ott_id", gluesql::core::ast_builder::num(self.ott_id))        
+.set("font_awesome_icon_id", gluesql::core::ast_builder::num(self.font_awesome_icon_id))        
+.set("color_id", gluesql::core::ast_builder::num(self.color_id));
         if let Some(description) = self.description {
             update_row = update_row.set("description", gluesql::core::ast_builder::text(description));
         }
@@ -463,12 +459,6 @@ impl BioOttTaxonItem {
         }
         if let Some(parent_id) = self.parent_id {
             update_row = update_row.set("parent_id", gluesql::core::ast_builder::num(parent_id));
-        }
-        if let Some(font_awesome_icon_id) = self.font_awesome_icon_id {
-            update_row = update_row.set("font_awesome_icon_id", gluesql::core::ast_builder::num(font_awesome_icon_id));
-        }
-        if let Some(color_id) = self.color_id {
-            update_row = update_row.set("color_id", gluesql::core::ast_builder::num(color_id));
         }
             update_row.execute(connection)
             .await
@@ -609,13 +599,11 @@ impl BioOttTaxonItem {
                 _ => unreachable!("Expected I32")
             },
             font_awesome_icon_id: match row.get("font_awesome_icon_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::I32(font_awesome_icon_id) => Some(font_awesome_icon_id.clone()),
+                gluesql::prelude::Value::I32(font_awesome_icon_id) => font_awesome_icon_id.clone(),
                 _ => unreachable!("Expected I32")
             },
             color_id: match row.get("color_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::I32(color_id) => Some(color_id.clone()),
+                gluesql::prelude::Value::I32(color_id) => color_id.clone(),
                 _ => unreachable!("Expected I32")
             },
         }
