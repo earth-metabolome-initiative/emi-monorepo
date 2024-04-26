@@ -266,4 +266,6 @@ def retrieve_taxons() -> pd.DataFrame:
 
 if __name__ == "__main__":
     df = retrieve_taxons()
-    df.to_csv("db_data/bio_ott_taxons.csv.gz", index=True, compression="gzip")
+    path = "db_data/bio_ott_taxons.csv.gz"
+    print(f"Saving the dataframe to {path}")
+    df.to_csv(path, index=True, compression="gzip")
