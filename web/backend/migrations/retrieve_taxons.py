@@ -120,7 +120,7 @@ def enrich_ranks(df: pd.DataFrame):
     for rank in ranks:
         df[rank] = ""
 
-    for index, row in tqdm(df.iterrows(), total=df.shape[0], desc=f"Parsing species"):
+    for index, row in tqdm(df.iterrows(), total=df.shape[0], desc=f"Parsing species", leave=False):
         for rank in ranks:
             get_rank(df, row, rank)
     return df
@@ -129,14 +129,15 @@ def enrich_ranks(df: pd.DataFrame):
 @Cache(use_approximated_hash=True)
 def populate_font_awesome_icons(df: pd.DataFrame):
     """Populate the font awesome icons"""
-    otol_to_inat = pd.read_csv("otol_to_inat.csv").set_index("identifier")
+    otol_to_inat = pd.read_csv("./migrations/otol_to_inat.csv").set_index("identifier")
 
     column_name = "font_awesome_icon"
 
     df[column_name] = ""
 
     for inat_identifier in tqdm(
-        EXTENDED_FONT_AWESOME_ICONS.keys(), desc="Populating icons"
+        EXTENDED_FONT_AWESOME_ICONS.keys(), desc="Populating icons",
+        leave=False
     ):
         # We lookup the OTT_ID identifier
         try:
@@ -149,7 +150,7 @@ def populate_font_awesome_icons(df: pd.DataFrame):
                 inat_identifier
             ].name
 
-    for index, row in tqdm(df.iterrows(), total=df.shape[0], desc=f"Parsing species"):
+    for index, row in tqdm(df.iterrows(), total=df.shape[0], desc=f"Parsing species", leave=False):
         propagate_down(df, row, column_name, unknown="fa-question-circle")
 
     return df
@@ -157,9 +158,13 @@ def populate_font_awesome_icons(df: pd.DataFrame):
 @Cache(use_approximated_hash=True)
 def main() -> pd.DataFrame:
     """Main function"""
+    print("Downloading the taxonomy document")
     download_taxon_document()
+    print("Loading the taxonomy document")
     df = load_dataframe()
+    print("Enriching the ranks")
     df = enrich_ranks(df)
+    print("Populating the font awesome icons")
     df = populate_font_awesome_icons(df)
     return df
 
