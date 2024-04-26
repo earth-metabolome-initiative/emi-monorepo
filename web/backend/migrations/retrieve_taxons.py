@@ -207,7 +207,7 @@ def add_wikidata_id(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 @Cache(use_approximated_hash=True)
-def main() -> pd.DataFrame:
+def retrieve_taxons() -> pd.DataFrame:
     """Main function"""
     print("Downloading the taxonomy document")
     download_taxon_document()
@@ -224,5 +224,5 @@ def main() -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    df = main()
+    df = retrieve_taxons()
     df.to_csv("db_data/taxons.csv.gz", index=True, compression="gzip")
