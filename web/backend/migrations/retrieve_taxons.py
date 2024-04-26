@@ -208,7 +208,21 @@ def add_wikidata_id(df: pd.DataFrame) -> pd.DataFrame:
     wikidata_to_ott = retrieve_wikidata_to_ott_mapping()
     wikidata_to_ott = wikidata_to_ott.set_index("ottid")
 
-    df["wikidata_id"] = wikidata_to_ott.loc[df.index, "taxon"]
+    wikidata_ids = []
+
+    for ottid in tqdm(
+        df.index,
+        desc="Adding wikidata id",
+        leave=False
+    ):
+        try:
+            wikidata_ids.append(
+                wikidata_to_ott.loc[ottid].taxon
+            )
+        except KeyError:
+            wikidata_ids.append(None)
+     
+    df["wikidata_id"] = wikidata_ids
 
     return df
 
