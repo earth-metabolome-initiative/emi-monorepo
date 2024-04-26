@@ -2687,7 +2687,7 @@ def write_table_names_enumeration(struct_metadatas: List[StructMetadata]):
 
     unique_table_names = list(unique_table_names)
 
-    sorted(unique_table_names, key=lambda x: x[0])
+    unique_table_names = sorted(unique_table_names, key=lambda x: x[0])
 
     tables.write("#[derive(" + ", ".join(derives) + ")]\n")
     tables.write("pub enum Table {\n")
