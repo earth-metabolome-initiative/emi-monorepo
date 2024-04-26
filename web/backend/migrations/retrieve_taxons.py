@@ -219,9 +219,10 @@ def main() -> pd.DataFrame:
     df = populate_font_awesome_icons(df)
     print("Add wikidata identifier")
     df = add_wikidata_id(df)
-    
+
     return df
 
 
 if __name__ == "__main__":
-    main()
+    df = main()
+    df.to_csv("db_data/taxons.csv.gz", index=True, compression="gzip")
