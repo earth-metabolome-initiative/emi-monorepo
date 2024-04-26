@@ -1,5 +1,6 @@
 from downloaders import BaseDownloader
 from tqdm.auto import tqdm
+import numpy as np
 import pandas as pd
 from tqdm.auto import tqdm
 from cache_decorator import Cache
@@ -207,6 +208,10 @@ def add_wikidata_id(df: pd.DataFrame) -> pd.DataFrame:
     """Add the wikidata id to the dataframe"""
     wikidata_to_ott = retrieve_wikidata_to_ott_mapping()
     wikidata_to_ott = wikidata_to_ott.set_index("ottid")
+    wikidata_to_ott = wikidata_to_ott.sort_index()
+
+    wikidata_ottds: np.ndarray = wikidata_to_ott.index
+    wikidata_taxa: np.ndarray = wikidata_to_ott.taxon.values
 
     wikidata_ids = []
 
@@ -215,11 +220,10 @@ def add_wikidata_id(df: pd.DataFrame) -> pd.DataFrame:
         desc="Adding wikidata id",
         leave=False
     ):
-        try:
-            wikidata_ids.append(
-                wikidata_to_ott.loc[ottid].taxon
-            )
-        except KeyError:
+        index = np.searchsorted(wikidata_ottds, ottid)
+        if index < len(wikidata_ottds) and wikidata_ottds[index] == ottid:
+            wikidata_ids.append(wikidata_taxa[index])
+        else:
             wikidata_ids.append(None)
      
     df["wikidata_id"] = wikidata_ids
