@@ -244,6 +244,25 @@ def retrieve_taxons() -> pd.DataFrame:
     print("Add wikidata identifier")
     df = add_wikidata_id(df)
 
+    # We handle the corner case represented by the "Allocotidus"
+    # entry from the irmng dataset. For some reason, while it has
+    # always numerical ids, for this entry it has as value "Allocotidus"
+    # which is a string. We convert it to NaN.
+    df.loc[df.irmng == "Allocotidus", "irmng"] = np.nan
+
+    # We enforce the use of integers even when the column may
+    # contain NaN values by switching to object dtype and casting
+    # the column to int.
+    for column in [
+        "ncbi",
+        "gbif",
+        "irmng",
+        "worms",
+        "parent_uid",
+        "wikidata_id",
+    ]:
+        df[column] = df[column].astype("Int64")
+
     # In order to avoid collision with SQL terminology, we rename the columns
     # referring to ranks from {rank} to bio_{rank}
     ranks = [
