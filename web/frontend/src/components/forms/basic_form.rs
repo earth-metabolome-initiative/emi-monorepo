@@ -267,7 +267,6 @@ where
                     }}
                     <span>{format!("{} {}", Data::METHOD.to_crud(), Data::task_target())}</span>
                 </button>
-                <div>{format!("{:?}", ctx.props().builder.clone())}</div>
                 <div class="clear"></div>
             </form>
         }
