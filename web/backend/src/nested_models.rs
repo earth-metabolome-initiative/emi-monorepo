@@ -18,11 +18,13 @@ impl NestedBioOttRank {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
     /// * `connection` - The database connection.
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = BioOttRank::all(connection)?;
+        let flat_structs = BioOttRank::all(limit, connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {
@@ -126,11 +128,13 @@ impl NestedBioOttTaxonItem {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
     /// * `connection` - The database connection.
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = BioOttTaxonItem::all(connection)?;
+        let flat_structs = BioOttTaxonItem::all(limit, connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {
@@ -276,11 +280,13 @@ impl NestedContainerHorizontalRule {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
     /// * `connection` - The database connection.
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = ContainerHorizontalRule::all(connection)?;
+        let flat_structs = ContainerHorizontalRule::all(limit, connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {
@@ -365,11 +371,13 @@ impl NestedContainerVerticalRule {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
     /// * `connection` - The database connection.
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = ContainerVerticalRule::all(connection)?;
+        let flat_structs = ContainerVerticalRule::all(limit, connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {
@@ -454,11 +462,13 @@ impl NestedDerivedSample {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
     /// * `connection` - The database connection.
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = DerivedSample::all(connection)?;
+        let flat_structs = DerivedSample::all(limit, connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {
@@ -522,11 +532,13 @@ impl NestedDocument {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
     /// * `connection` - The database connection.
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = Document::all(connection)?;
+        let flat_structs = Document::all(limit, connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {
@@ -604,11 +616,13 @@ impl NestedItemCategory {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
     /// * `connection` - The database connection.
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = ItemCategory::all(connection)?;
+        let flat_structs = ItemCategory::all(limit, connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {
@@ -683,11 +697,13 @@ impl NestedItemCategoryRelationship {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
     /// * `connection` - The database connection.
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = ItemCategoryRelationship::all(connection)?;
+        let flat_structs = ItemCategoryRelationship::all(limit, connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {
@@ -751,11 +767,13 @@ impl NestedItemCategoryUnit {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
     /// * `connection` - The database connection.
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = ItemCategoryUnit::all(connection)?;
+        let flat_structs = ItemCategoryUnit::all(limit, connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {
@@ -817,11 +835,13 @@ impl NestedItemContinuousQuantity {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
     /// * `connection` - The database connection.
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = ItemContinuousQuantity::all(connection)?;
+        let flat_structs = ItemContinuousQuantity::all(limit, connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {
@@ -890,11 +910,13 @@ impl NestedItemDiscreteQuantity {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
     /// * `connection` - The database connection.
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = ItemDiscreteQuantity::all(connection)?;
+        let flat_structs = ItemDiscreteQuantity::all(limit, connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {
@@ -959,11 +981,13 @@ impl NestedItemLocation {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
     /// * `connection` - The database connection.
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = ItemLocation::all(connection)?;
+        let flat_structs = ItemLocation::all(limit, connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {
@@ -1027,11 +1051,13 @@ impl NestedItemUnit {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
     /// * `connection` - The database connection.
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = ItemUnit::all(connection)?;
+        let flat_structs = ItemUnit::all(limit, connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {
@@ -1090,11 +1116,13 @@ impl NestedItem {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
     /// * `connection` - The database connection.
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = Item::all(connection)?;
+        let flat_structs = Item::all(limit, connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {
@@ -1151,11 +1179,13 @@ impl NestedLocation {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
     /// * `connection` - The database connection.
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = Location::all(connection)?;
+        let flat_structs = Location::all(limit, connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {
@@ -1218,11 +1248,13 @@ impl NestedManufacturedItemCategory {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
     /// * `connection` - The database connection.
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = ManufacturedItemCategory::all(connection)?;
+        let flat_structs = ManufacturedItemCategory::all(limit, connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {
@@ -1277,11 +1309,13 @@ impl NestedNotification {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
     /// * `connection` - The database connection.
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = Notification::all(connection)?;
+        let flat_structs = Notification::all(limit, connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {
@@ -1336,11 +1370,13 @@ impl NestedOrganization {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
     /// * `connection` - The database connection.
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = Organization::all(connection)?;
+        let flat_structs = Organization::all(limit, connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {
@@ -1398,11 +1434,13 @@ impl NestedProcedureContinuousRequirement {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
     /// * `connection` - The database connection.
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = ProcedureContinuousRequirement::all(connection)?;
+        let flat_structs = ProcedureContinuousRequirement::all(limit, connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {
@@ -1472,11 +1510,13 @@ impl NestedProcedureDiscreteRequirement {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
     /// * `connection` - The database connection.
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = ProcedureDiscreteRequirement::all(connection)?;
+        let flat_structs = ProcedureDiscreteRequirement::all(limit, connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {
@@ -1543,11 +1583,13 @@ impl NestedProcedure {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
     /// * `connection` - The database connection.
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = Procedure::all(connection)?;
+        let flat_structs = Procedure::all(limit, connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {
@@ -1605,11 +1647,13 @@ impl NestedProjectRequirement {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
     /// * `connection` - The database connection.
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = ProjectRequirement::all(connection)?;
+        let flat_structs = ProjectRequirement::all(limit, connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {
@@ -1678,11 +1722,13 @@ impl NestedProject {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
     /// * `connection` - The database connection.
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = Project::all(connection)?;
+        let flat_structs = Project::all(limit, connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {
@@ -1788,11 +1834,13 @@ impl NestedSampleBioOttTaxonItem {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
     /// * `connection` - The database connection.
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = SampleBioOttTaxonItem::all(connection)?;
+        let flat_structs = SampleBioOttTaxonItem::all(limit, connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {
@@ -1857,11 +1905,13 @@ impl NestedSampledIndividualBioOttTaxonItem {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
     /// * `connection` - The database connection.
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = SampledIndividualBioOttTaxonItem::all(connection)?;
+        let flat_structs = SampledIndividualBioOttTaxonItem::all(limit, connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {
@@ -1927,11 +1977,13 @@ impl NestedSample {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
     /// * `connection` - The database connection.
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = Sample::all(connection)?;
+        let flat_structs = Sample::all(limit, connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {
@@ -1998,11 +2050,13 @@ impl NestedSamplingProcedure {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
     /// * `connection` - The database connection.
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = SamplingProcedure::all(connection)?;
+        let flat_structs = SamplingProcedure::all(limit, connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {
@@ -2078,11 +2132,13 @@ impl NestedSpectra {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
     /// * `connection` - The database connection.
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = Spectra::all(connection)?;
+        let flat_structs = Spectra::all(limit, connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {
@@ -2138,11 +2194,13 @@ impl NestedSpectraCollection {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
     /// * `connection` - The database connection.
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = SpectraCollection::all(connection)?;
+        let flat_structs = SpectraCollection::all(limit, connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {
@@ -2201,11 +2259,13 @@ impl NestedTeam {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
     /// * `connection` - The database connection.
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = Team::all(connection)?;
+        let flat_structs = Team::all(limit, connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {
@@ -2261,11 +2321,13 @@ impl NestedUserEmail {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
     /// * `connection` - The database connection.
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = UserEmail::all(connection)?;
+        let flat_structs = UserEmail::all(limit, connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {
@@ -2325,11 +2387,13 @@ impl NestedPublicUser {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
     /// * `connection` - The database connection.
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = PublicUser::all(connection)?;
+        let flat_structs = PublicUser::all(limit, connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {

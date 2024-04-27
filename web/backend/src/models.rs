@@ -49,14 +49,20 @@ impl BioOttRank {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::bio_ott_ranks;
-        bio_ott_ranks::dsl::bio_ott_ranks
-            .load::<Self>(connection)
+        let query = bio_ott_ranks::dsl::bio_ott_ranks;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -104,8 +110,12 @@ impl BioOttRank {
     ) -> Result<Vec<Self>, diesel::result::Error> {
         let limit = limit.unwrap_or(10);
         let threshold = threshold.unwrap_or(0.3);
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), connection);
+        }
         let similarity_query = concat!(
             "SELECT bio_ott_ranks.id, bio_ott_ranks.name, bio_ott_ranks.font_awesome_icon_id FROM bio_ott_ranks ",
+            "WHERE similarity(bio_ott_ranks.name, $1) > 0.0 ",
             "ORDER BY similarity(bio_ott_ranks.name, $1) DESC LIMIT $3;"
         );
         diesel::sql_query(similarity_query)
@@ -196,14 +206,20 @@ impl BioOttTaxonItem {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::bio_ott_taxon_items;
-        bio_ott_taxon_items::dsl::bio_ott_taxon_items
-            .load::<Self>(connection)
+        let query = bio_ott_taxon_items::dsl::bio_ott_taxon_items;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -251,8 +267,12 @@ impl BioOttTaxonItem {
     ) -> Result<Vec<Self>, diesel::result::Error> {
         let limit = limit.unwrap_or(10);
         let threshold = threshold.unwrap_or(0.3);
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), connection);
+        }
         let similarity_query = concat!(
             "SELECT bio_ott_taxon_items.id, bio_ott_taxon_items.name, bio_ott_taxon_items.ott_id, bio_ott_taxon_items.ott_rank_id, bio_ott_taxon_items.wikidata_id, bio_ott_taxon_items.ncbi_id, bio_ott_taxon_items.gbif_id, bio_ott_taxon_items.irmng_id, bio_ott_taxon_items.worms_id, bio_ott_taxon_items.domain_id, bio_ott_taxon_items.kingdom_id, bio_ott_taxon_items.phylum_id, bio_ott_taxon_items.class_id, bio_ott_taxon_items.order_id, bio_ott_taxon_items.family_id, bio_ott_taxon_items.genus_id, bio_ott_taxon_items.parent_id, bio_ott_taxon_items.font_awesome_icon_id, bio_ott_taxon_items.color_id FROM bio_ott_taxon_items ",
+            "WHERE similarity(bio_ott_taxon_items.name, $1) > 0.0 ",
             "ORDER BY similarity(bio_ott_taxon_items.name, $1) DESC LIMIT $3;"
         );
         diesel::sql_query(similarity_query)
@@ -295,14 +315,20 @@ impl Color {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::colors;
-        colors::dsl::colors
-            .load::<Self>(connection)
+        let query = colors::dsl::colors;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -335,8 +361,12 @@ impl Color {
     ) -> Result<Vec<Self>, diesel::result::Error> {
         let limit = limit.unwrap_or(10);
         let threshold = threshold.unwrap_or(0.3);
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), connection);
+        }
         let similarity_query = concat!(
             "SELECT colors.id, colors.name, colors.hexadecimal_value FROM colors ",
+            "WHERE similarity(colors.name, $1) > 0.0 ",
             "ORDER BY similarity(colors.name, $1) DESC LIMIT $3;"
         );
         diesel::sql_query(similarity_query)
@@ -403,14 +433,20 @@ impl ContainerHorizontalRule {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::container_horizontal_rules;
-        container_horizontal_rules::dsl::container_horizontal_rules
-            .load::<Self>(connection)
+        let query = container_horizontal_rules::dsl::container_horizontal_rules;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -500,14 +536,20 @@ impl ContainerVerticalRule {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::container_vertical_rules;
-        container_vertical_rules::dsl::container_vertical_rules
-            .load::<Self>(connection)
+        let query = container_vertical_rules::dsl::container_vertical_rules;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -567,14 +609,20 @@ impl ContinuousUnit {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::continuous_units;
-        continuous_units::dsl::continuous_units
-            .load::<Self>(connection)
+        let query = continuous_units::dsl::continuous_units;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -628,14 +676,20 @@ impl DerivedSample {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::derived_samples;
-        derived_samples::dsl::derived_samples
-            .load::<Self>(connection)
+        let query = derived_samples::dsl::derived_samples;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -680,14 +734,20 @@ impl DiscreteUnit {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::discrete_units;
-        discrete_units::dsl::discrete_units
-            .load::<Self>(connection)
+        let query = discrete_units::dsl::discrete_units;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -738,14 +798,20 @@ impl DocumentFormat {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::document_formats;
-        document_formats::dsl::document_formats
-            .load::<Self>(connection)
+        let query = document_formats::dsl::document_formats;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -817,14 +883,20 @@ impl Document {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::documents;
-        documents::dsl::documents
-            .load::<Self>(connection)
+        let query = documents::dsl::documents;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -887,14 +959,20 @@ impl FontAwesomeIcon {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::font_awesome_icons;
-        font_awesome_icons::dsl::font_awesome_icons
-            .load::<Self>(connection)
+        let query = font_awesome_icons::dsl::font_awesome_icons;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -942,8 +1020,12 @@ impl FontAwesomeIcon {
     ) -> Result<Vec<Self>, diesel::result::Error> {
         let limit = limit.unwrap_or(10);
         let threshold = threshold.unwrap_or(0.3);
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), connection);
+        }
         let similarity_query = concat!(
             "SELECT font_awesome_icons.id, font_awesome_icons.name FROM font_awesome_icons ",
+            "WHERE similarity(font_awesome_icons.name, $1) > 0.0 ",
             "ORDER BY similarity(font_awesome_icons.name, $1) DESC LIMIT $3;"
         );
         diesel::sql_query(similarity_query)
@@ -989,14 +1071,20 @@ impl ItemCategory {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::item_categories;
-        item_categories::dsl::item_categories
-            .load::<Self>(connection)
+        let query = item_categories::dsl::item_categories;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -1065,14 +1153,20 @@ impl ItemCategoryRelationship {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::item_category_relationships;
-        item_category_relationships::dsl::item_category_relationships
-            .load::<Self>(connection)
+        let query = item_category_relationships::dsl::item_category_relationships;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -1123,14 +1217,20 @@ impl ItemCategoryUnit {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::item_category_units;
-        item_category_units::dsl::item_category_units
-            .load::<Self>(connection)
+        let query = item_category_units::dsl::item_category_units;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -1193,14 +1293,20 @@ impl ItemContinuousQuantity {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::item_continuous_quantities;
-        item_continuous_quantities::dsl::item_continuous_quantities
-            .load::<Self>(connection)
+        let query = item_continuous_quantities::dsl::item_continuous_quantities;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -1260,14 +1366,20 @@ impl ItemDiscreteQuantity {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::item_discrete_quantities;
-        item_discrete_quantities::dsl::item_discrete_quantities
-            .load::<Self>(connection)
+        let query = item_discrete_quantities::dsl::item_discrete_quantities;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -1324,14 +1436,20 @@ impl ItemLocation {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::item_locations;
-        item_locations::dsl::item_locations
-            .load::<Self>(connection)
+        let query = item_locations::dsl::item_locations;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -1382,14 +1500,20 @@ impl ItemUnit {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::item_units;
-        item_units::dsl::item_units
-            .load::<Self>(connection)
+        let query = item_units::dsl::item_units;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -1437,14 +1561,20 @@ impl Item {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::items;
-        items::dsl::items
-            .load::<Self>(connection)
+        let query = items::dsl::items;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -1522,14 +1652,20 @@ impl Location {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::locations;
-        locations::dsl::locations
-            .load::<Self>(connection)
+        let query = locations::dsl::locations;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -1592,14 +1728,20 @@ impl LoginProvider {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::login_providers;
-        login_providers::dsl::login_providers
-            .load::<Self>(connection)
+        let query = login_providers::dsl::login_providers;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -1656,14 +1798,20 @@ impl ManufacturedItemCategory {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::manufactured_item_categories;
-        manufactured_item_categories::dsl::manufactured_item_categories
-            .load::<Self>(connection)
+        let query = manufactured_item_categories::dsl::manufactured_item_categories;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -1720,14 +1868,20 @@ impl Notification {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::notifications;
-        notifications::dsl::notifications
-            .load::<Self>(connection)
+        let query = notifications::dsl::notifications;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -1778,14 +1932,20 @@ impl Organization {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::organizations;
-        organizations::dsl::organizations
-            .load::<Self>(connection)
+        let query = organizations::dsl::organizations;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -1830,14 +1990,20 @@ impl PrimaryUserEmail {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::primary_user_emails;
-        primary_user_emails::dsl::primary_user_emails
-            .load::<Self>(connection)
+        let query = primary_user_emails::dsl::primary_user_emails;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -1897,14 +2063,20 @@ impl ProcedureContinuousRequirement {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::procedure_continuous_requirements;
-        procedure_continuous_requirements::dsl::procedure_continuous_requirements
-            .load::<Self>(connection)
+        let query = procedure_continuous_requirements::dsl::procedure_continuous_requirements;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -1964,14 +2136,20 @@ impl ProcedureDiscreteRequirement {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::procedure_discrete_requirements;
-        procedure_discrete_requirements::dsl::procedure_discrete_requirements
-            .load::<Self>(connection)
+        let query = procedure_discrete_requirements::dsl::procedure_discrete_requirements;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -2025,14 +2203,20 @@ impl Procedure {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::procedures;
-        procedures::dsl::procedures
-            .load::<Self>(connection)
+        let query = procedures::dsl::procedures;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -2092,14 +2276,20 @@ impl ProjectRequirement {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::project_requirements;
-        project_requirements::dsl::project_requirements
-            .load::<Self>(connection)
+        let query = project_requirements::dsl::project_requirements;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -2156,14 +2346,20 @@ impl ProjectState {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::project_states;
-        project_states::dsl::project_states
-            .load::<Self>(connection)
+        let query = project_states::dsl::project_states;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -2196,8 +2392,12 @@ impl ProjectState {
     ) -> Result<Vec<Self>, diesel::result::Error> {
         let limit = limit.unwrap_or(10);
         let threshold = threshold.unwrap_or(0.3);
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), connection);
+        }
         let similarity_query = concat!(
             "SELECT project_states.id, project_states.name, project_states.description, project_states.font_awesome_icon, project_states.icon_color FROM project_states ",
+            "WHERE similarity(project_states.name, $1) + similarity(project_states.description, $1) > 0.0 ",
             "ORDER BY similarity(project_states.name, $1) + similarity(project_states.description, $1) DESC LIMIT $3;"
         );
         diesel::sql_query(similarity_query)
@@ -2267,14 +2467,20 @@ impl Project {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::projects;
-        projects::dsl::projects
-            .load::<Self>(connection)
+        let query = projects::dsl::projects;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -2322,8 +2528,12 @@ impl Project {
     ) -> Result<Vec<Self>, diesel::result::Error> {
         let limit = limit.unwrap_or(10);
         let threshold = threshold.unwrap_or(0.3);
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), connection);
+        }
         let similarity_query = concat!(
             "SELECT projects.id, projects.name, projects.description, projects.public, projects.state_id, projects.parent_project_id, projects.budget, projects.expenses, projects.created_by, projects.created_at, projects.expected_end_date, projects.end_date FROM projects ",
+            "WHERE similarity(projects.name, $1) + similarity(projects.description, $1) > 0.0 ",
             "ORDER BY similarity(projects.name, $1) + similarity(projects.description, $1) DESC LIMIT $3;"
         );
         diesel::sql_query(similarity_query)
@@ -2363,14 +2573,20 @@ impl Role {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::roles;
-        roles::dsl::roles
-            .load::<Self>(connection)
+        let query = roles::dsl::roles;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -2439,14 +2655,20 @@ impl SampleBioOttTaxonItem {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::sample_bio_ott_taxon_items;
-        sample_bio_ott_taxon_items::dsl::sample_bio_ott_taxon_items
-            .load::<Self>(connection)
+        let query = sample_bio_ott_taxon_items::dsl::sample_bio_ott_taxon_items;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -2503,14 +2725,20 @@ impl SampleState {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::sample_states;
-        sample_states::dsl::sample_states
-            .load::<Self>(connection)
+        let query = sample_states::dsl::sample_states;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -2543,8 +2771,12 @@ impl SampleState {
     ) -> Result<Vec<Self>, diesel::result::Error> {
         let limit = limit.unwrap_or(10);
         let threshold = threshold.unwrap_or(0.3);
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), connection);
+        }
         let similarity_query = concat!(
             "SELECT sample_states.id, sample_states.name, sample_states.description, sample_states.font_awesome_icon, sample_states.icon_color FROM sample_states ",
+            "WHERE similarity(sample_states.name, $1) + similarity(sample_states.description, $1) > 0.0 ",
             "ORDER BY similarity(sample_states.name, $1) + similarity(sample_states.description, $1) DESC LIMIT $3;"
         );
         diesel::sql_query(similarity_query)
@@ -2590,14 +2822,20 @@ impl SampledIndividualBioOttTaxonItem {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::sampled_individual_bio_ott_taxon_items;
-        sampled_individual_bio_ott_taxon_items::dsl::sampled_individual_bio_ott_taxon_items
-            .load::<Self>(connection)
+        let query = sampled_individual_bio_ott_taxon_items::dsl::sampled_individual_bio_ott_taxon_items;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -2642,14 +2880,20 @@ impl SampledIndividual {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::sampled_individuals;
-        sampled_individuals::dsl::sampled_individuals
-            .load::<Self>(connection)
+        let query = sampled_individuals::dsl::sampled_individuals;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -2706,14 +2950,20 @@ impl Sample {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::samples;
-        samples::dsl::samples
-            .load::<Self>(connection)
+        let query = samples::dsl::samples;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -2767,14 +3017,20 @@ impl SamplingProcedure {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::sampling_procedures;
-        sampling_procedures::dsl::sampling_procedures
-            .load::<Self>(connection)
+        let query = sampling_procedures::dsl::sampling_procedures;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -2807,8 +3063,12 @@ impl SamplingProcedure {
     ) -> Result<Vec<Self>, diesel::result::Error> {
         let limit = limit.unwrap_or(10);
         let threshold = threshold.unwrap_or(0.3);
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), connection);
+        }
         let similarity_query = concat!(
             "SELECT sampling_procedures.id, sampling_procedures.name, sampling_procedures.description, sampling_procedures.created_by FROM sampling_procedures ",
+            "WHERE similarity(sampling_procedures.name, $1) + similarity(sampling_procedures.description, $1) > 0.0 ",
             "ORDER BY similarity(sampling_procedures.name, $1) + similarity(sampling_procedures.description, $1) DESC LIMIT $3;"
         );
         diesel::sql_query(similarity_query)
@@ -2848,14 +3108,20 @@ impl Spectra {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::spectra;
-        spectra::dsl::spectra
-            .load::<Self>(connection)
+        let query = spectra::dsl::spectra;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -2906,14 +3172,20 @@ impl SpectraCollection {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::spectra_collection;
-        spectra_collection::dsl::spectra_collection
-            .load::<Self>(connection)
+        let query = spectra_collection::dsl::spectra_collection;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -2961,14 +3233,20 @@ impl Team {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::teams;
-        teams::dsl::teams
-            .load::<Self>(connection)
+        let query = teams::dsl::teams;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -3022,14 +3300,20 @@ impl Unit {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::units;
-        units::dsl::units
-            .load::<Self>(connection)
+        let query = units::dsl::units;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -3083,14 +3367,20 @@ impl UserEmail {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::user_emails;
-        user_emails::dsl::user_emails
-            .load::<Self>(connection)
+        let query = user_emails::dsl::user_emails;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -3150,14 +3440,20 @@ impl User {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::users;
-        users::dsl::users
-            .load::<Self>(connection)
+        let query = users::dsl::users;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -3190,8 +3486,12 @@ impl User {
     ) -> Result<Vec<Self>, diesel::result::Error> {
         let limit = limit.unwrap_or(10);
         let threshold = threshold.unwrap_or(0.3);
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), connection);
+        }
         let similarity_query = concat!(
             "SELECT users.id, users.first_name, users.middle_name, users.last_name, users.created_at, users.updated_at FROM users ",
+            "WHERE similarity(users.first_name, $1) + similarity(users.middle_name, $1) + similarity(users.last_name, $1) > 0.0 ",
             "ORDER BY similarity(users.first_name, $1) + similarity(users.middle_name, $1) + similarity(users.last_name, $1) DESC LIMIT $3;"
         );
         diesel::sql_query(similarity_query)

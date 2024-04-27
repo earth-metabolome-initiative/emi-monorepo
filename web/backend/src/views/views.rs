@@ -54,14 +54,20 @@ impl PublicUser {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::views::schema::public_users;
-        public_users::dsl::public_users
-            .load::<Self>(connection)
+        let query = public_users::dsl::public_users;
+        if let Some(limit) = limit {
+            query.limit(limit).load::<Self>(connection)
+        } else {
+            query.load::<Self>(connection)
+        }
     }
     /// Get the struct from the database by its ID.
     ///
@@ -94,9 +100,13 @@ impl PublicUser {
     ) -> Result<Vec<Self>, diesel::result::Error> {
         let limit = limit.unwrap_or(10);
         let threshold = threshold.unwrap_or(0.3);
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), connection);
+        }
         let similarity_query = concat!(
             "WITH selected_ids AS (",
             "SELECT users.id FROM users ",
+            "WHERE similarity(users.first_name, $1) + similarity(users.middle_name, $1) + similarity(users.last_name, $1) > 0.0 ",
             "ORDER BY similarity(users.first_name, $1) + similarity(users.middle_name, $1) + similarity(users.last_name, $1) DESC LIMIT $3",
          ")",
             "SELECT public_users.id, public_users.first_name, public_users.middle_name, public_users.last_name, public_users.created_at, public_users.updated_at, public_users.thumbnail_id, public_users.picture_id FROM public_users ",

@@ -1038,10 +1038,12 @@ def write_from_impls(
                 new_content += "    ///\n"
                 new_content += "    /// # Arguments\n"
                 new_content += (
+                    "    /// * `limit` - The maximum number of structs to retrieve.\n"
                     "    /// * `connection` - The connection to the database.\n"
                 )
                 new_content += "    ///\n"
                 new_content += f"    pub fn all(\n"
+                new_content += "        limit: Option<i64>,\n"
                 new_content += "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
                 new_content += "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
                 if table_type == "tables":
@@ -1050,10 +1052,13 @@ def write_from_impls(
                     new_content += (
                         f"        use crate::views::schema::{struct.table_name};\n"
                     )
-                new_content += (
-                    f"        {struct.table_name}::dsl::{struct.table_name}\n"
-                )
-                new_content += "            .load::<Self>(connection)\n"
+                # If the limit is None, we do not apply any limit to the query.
+                new_content += f"        let query = {struct.table_name}::dsl::{struct.table_name};\n"
+                new_content += "        if let Some(limit) = limit {\n"
+                new_content += "            query.limit(limit).load::<Self>(connection)\n"
+                new_content += "        } else {\n"
+                new_content += "            query.load::<Self>(connection)\n"
+                new_content += "        }\n"
                 new_content += "    }\n"
 
                 if table_metadatas.has_primary_key(struct.table_name):
@@ -1194,6 +1199,13 @@ def write_from_impls(
                     new_content += "        let limit = limit.unwrap_or(10);\n"
                     new_content += "        let threshold = threshold.unwrap_or(0.3);\n"
 
+                    # If the query string is empty, we run an all query with the
+                    # limit parameter provided instead of a more complex similarity
+                    # search.
+                    new_content += "        if query.is_empty() {\n"
+                    new_content += "            return Self::all(Some(limit as i64), connection);\n"
+                    new_content += "        }\n"
+
                     # Since Diesel does not support the `similarity` Postgres function natively
                     # as part of the DSL query builder, we are forced to build the query manually
                     # in raw SQL. We use the `sql_query` function to execute the raw SQL query.
@@ -1219,6 +1231,7 @@ def write_from_impls(
                         new_content += "        let similarity_query = concat!(\n"
                         new_content += f'            "WITH selected_ids AS (",\n'
                         new_content += f'            "SELECT {similarity_index.table_name}.id FROM {similarity_index.table_name} ",\n'
+                        new_content += f'            "WHERE {similarity_function} > 0.0 ",\n'
                         new_content += f'            "ORDER BY {similarity_function} DESC LIMIT $3",\n'
                         new_content += '         ")",\n'
                         new_content += f'            "SELECT {joined_field_names} FROM {struct.table_name} ",\n'
@@ -1227,6 +1240,7 @@ def write_from_impls(
                     else:
                         new_content += "        let similarity_query = concat!(\n"
                         new_content += f'            "SELECT {joined_field_names} FROM {struct.table_name} ",\n'
+                        new_content += f'            "WHERE {similarity_function} > 0.0 ",\n'
                         new_content += f'            "ORDER BY {similarity_function} DESC LIMIT $3;"\n'
                         new_content += "        );\n"
 
@@ -2314,11 +2328,13 @@ def generate_nested_structs(
             "    /// Get all the nested structs from the database.\n"
             "    ///\n"
             "    /// # Arguments\n"
+            "    /// * `limit` - The maximum number of rows to return.\n"
             "    /// * `connection` - The database connection.\n"
             "    pub fn all(\n"
+            "        limit: Option<i64>,\n"
             "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
             "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
-            f"        let flat_structs = {struct.name}::all(connection)?;\n"
+            f"        let flat_structs = {struct.name}::all(limit, connection)?;\n"
             "        let mut nested_structs = Vec::new();\n"
             "        for flat_struct in flat_structs {\n"
             "            nested_structs.push(Self {\n"
