@@ -1,4 +1,3 @@
--- SQL defining the procedures table.
 CREATE TABLE bio_ott_taxon_items (
     id INTEGER PRIMARY KEY,
 
@@ -8,17 +7,14 @@ CREATE TABLE bio_ott_taxon_items (
     -- For example Aaleniella exists in both Mollusca and Arthropoda
     name TEXT NOT NULL,
 
-    -- a description of the item, this may not exist
-    description TEXT,
-
     -- the identifier of the taxon item
     ott_id INTEGER UNIQUE NOT NULL,
 
     -- the rank of the taxon item. This id is still an ott_id
-    ott_rank_id INTEGER REFERENCES bio_ott_ranks(id) ON DELETE CASCADE,
+    ott_rank_id INTEGER NOT NULL REFERENCES bio_ott_ranks(id) ON DELETE CASCADE,
 
     -- if available, the wikidata identifier of the taxon item
-    wikidata_id INTEGER, -- we need to check how to get this
+    wikidata_id INTEGER,
 
     -- if available, the ncbi identifier of the taxon item
     ncbi_id INTEGER,
@@ -46,8 +42,9 @@ CREATE TABLE bio_ott_taxon_items (
 
     genus_id INTEGER REFERENCES bio_ott_taxon_items(id) ON DELETE CASCADE,
 
-    -- the parent of the taxon item. This id is still an ott_id
-    parent_id INTEGER REFERENCES bio_ott_taxon_items(id) ON DELETE CASCADE,
+    -- the parent of the taxon item. This is a recursive relationship
+    -- where the root is the parent of itself.
+    parent_id INTEGER NOT NULL REFERENCES bio_ott_taxon_items(id) ON DELETE CASCADE,
 
     -- the font awesome icon of the taxon item
     font_awesome_icon_id INTEGER NOT NULL REFERENCES font_awesome_icons(id) ON DELETE CASCADE,

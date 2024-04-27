@@ -37,7 +37,7 @@ impl NestedBioOttRank {
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedBioOttTaxonItem {
     pub inner: BioOttTaxonItem,
-    pub ott_rank: Option<NestedBioOttRank>,
+    pub ott_rank: NestedBioOttRank,
     pub domain: Option<BioOttTaxonItem>,
     pub kingdom: Option<BioOttTaxonItem>,
     pub phylum: Option<BioOttTaxonItem>,
@@ -45,7 +45,7 @@ pub struct NestedBioOttTaxonItem {
     pub order: Option<BioOttTaxonItem>,
     pub family: Option<BioOttTaxonItem>,
     pub genus: Option<BioOttTaxonItem>,
-    pub parent: Option<BioOttTaxonItem>,
+    pub parent: BioOttTaxonItem,
     pub font_awesome_icon: FontAwesomeIcon,
     pub color: Color,
 }
@@ -65,7 +65,7 @@ impl NestedBioOttTaxonItem {
        if let Some(flat_struct) = BioOttTaxonItem::get(id, connection).await? {
         Ok(Some(Self {
             inner: if let Some(inner) = BioOttTaxonItem::get(flat_struct.id, connection).await? { inner } else {return Ok(None)},
-            ott_rank: if let Some(ott_rank_id) = flat_struct.ott_rank_id { NestedBioOttRank::get(ott_rank_id, connection).await? } else { return Ok(None) },
+            ott_rank: if let Some(ott_rank) = NestedBioOttRank::get(flat_struct.ott_rank_id, connection).await? { ott_rank } else {return Ok(None)},
             domain: if let Some(domain_id) = flat_struct.domain_id { BioOttTaxonItem::get(domain_id, connection).await? } else { return Ok(None) },
             kingdom: if let Some(kingdom_id) = flat_struct.kingdom_id { BioOttTaxonItem::get(kingdom_id, connection).await? } else { return Ok(None) },
             phylum: if let Some(phylum_id) = flat_struct.phylum_id { BioOttTaxonItem::get(phylum_id, connection).await? } else { return Ok(None) },
@@ -73,7 +73,7 @@ impl NestedBioOttTaxonItem {
             order: if let Some(order_id) = flat_struct.order_id { BioOttTaxonItem::get(order_id, connection).await? } else { return Ok(None) },
             family: if let Some(family_id) = flat_struct.family_id { BioOttTaxonItem::get(family_id, connection).await? } else { return Ok(None) },
             genus: if let Some(genus_id) = flat_struct.genus_id { BioOttTaxonItem::get(genus_id, connection).await? } else { return Ok(None) },
-            parent: if let Some(parent_id) = flat_struct.parent_id { BioOttTaxonItem::get(parent_id, connection).await? } else { return Ok(None) },
+            parent: if let Some(parent) = BioOttTaxonItem::get(flat_struct.parent_id, connection).await? { parent } else {return Ok(None)},
             font_awesome_icon: if let Some(font_awesome_icon) = FontAwesomeIcon::get(flat_struct.font_awesome_icon_id, connection).await? { font_awesome_icon } else {return Ok(None)},
             color: if let Some(color) = Color::get(flat_struct.color_id, connection).await? { color } else {return Ok(None)},
         }))

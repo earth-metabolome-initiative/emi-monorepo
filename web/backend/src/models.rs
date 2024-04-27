@@ -121,9 +121,8 @@ impl BioOttRank {
 pub struct BioOttTaxonItem {
     pub id: i32,
     pub name: String,
-    pub description: Option<String>,
     pub ott_id: i32,
-    pub ott_rank_id: Option<i32>,
+    pub ott_rank_id: i32,
     pub wikidata_id: Option<i32>,
     pub ncbi_id: Option<i32>,
     pub gbif_id: Option<i32>,
@@ -136,7 +135,7 @@ pub struct BioOttTaxonItem {
     pub order_id: Option<i32>,
     pub family_id: Option<i32>,
     pub genus_id: Option<i32>,
-    pub parent_id: Option<i32>,
+    pub parent_id: i32,
     pub font_awesome_icon_id: i32,
     pub color_id: i32,
 }
@@ -146,7 +145,6 @@ impl From<BioOttTaxonItem> for web_common::database::tables::BioOttTaxonItem {
         Self {
             id: item.id,
             name: item.name,
-            description: item.description,
             ott_id: item.ott_id,
             ott_rank_id: item.ott_rank_id,
             wikidata_id: item.wikidata_id,
@@ -173,7 +171,6 @@ impl From<web_common::database::tables::BioOttTaxonItem> for BioOttTaxonItem {
         Self {
             id: item.id,
             name: item.name,
-            description: item.description,
             ott_id: item.ott_id,
             ott_rank_id: item.ott_rank_id,
             wikidata_id: item.wikidata_id,
@@ -255,7 +252,7 @@ impl BioOttTaxonItem {
         let limit = limit.unwrap_or(10);
         let threshold = threshold.unwrap_or(0.3);
         let similarity_query = concat!(
-            "SELECT bio_ott_taxon_items.id, bio_ott_taxon_items.name, bio_ott_taxon_items.description, bio_ott_taxon_items.ott_id, bio_ott_taxon_items.ott_rank_id, bio_ott_taxon_items.wikidata_id, bio_ott_taxon_items.ncbi_id, bio_ott_taxon_items.gbif_id, bio_ott_taxon_items.irmng_id, bio_ott_taxon_items.worms_id, bio_ott_taxon_items.domain_id, bio_ott_taxon_items.kingdom_id, bio_ott_taxon_items.phylum_id, bio_ott_taxon_items.class_id, bio_ott_taxon_items.order_id, bio_ott_taxon_items.family_id, bio_ott_taxon_items.genus_id, bio_ott_taxon_items.parent_id, bio_ott_taxon_items.font_awesome_icon_id, bio_ott_taxon_items.color_id FROM bio_ott_taxon_items ",
+            "SELECT bio_ott_taxon_items.id, bio_ott_taxon_items.name, bio_ott_taxon_items.ott_id, bio_ott_taxon_items.ott_rank_id, bio_ott_taxon_items.wikidata_id, bio_ott_taxon_items.ncbi_id, bio_ott_taxon_items.gbif_id, bio_ott_taxon_items.irmng_id, bio_ott_taxon_items.worms_id, bio_ott_taxon_items.domain_id, bio_ott_taxon_items.kingdom_id, bio_ott_taxon_items.phylum_id, bio_ott_taxon_items.class_id, bio_ott_taxon_items.order_id, bio_ott_taxon_items.family_id, bio_ott_taxon_items.genus_id, bio_ott_taxon_items.parent_id, bio_ott_taxon_items.font_awesome_icon_id, bio_ott_taxon_items.color_id FROM bio_ott_taxon_items ",
             "ORDER BY similarity(bio_ott_taxon_items.name, $1) DESC LIMIT $3;"
         );
         diesel::sql_query(similarity_query)

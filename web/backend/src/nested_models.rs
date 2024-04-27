@@ -109,7 +109,7 @@ impl From<NestedBioOttRank> for web_common::database::nested_models::NestedBioOt
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedBioOttTaxonItem {
     pub inner: BioOttTaxonItem,
-    pub ott_rank: Option<NestedBioOttRank>,
+    pub ott_rank: NestedBioOttRank,
     pub domain: Option<BioOttTaxonItem>,
     pub kingdom: Option<BioOttTaxonItem>,
     pub phylum: Option<BioOttTaxonItem>,
@@ -117,7 +117,7 @@ pub struct NestedBioOttTaxonItem {
     pub order: Option<BioOttTaxonItem>,
     pub family: Option<BioOttTaxonItem>,
     pub genus: Option<BioOttTaxonItem>,
-    pub parent: Option<BioOttTaxonItem>,
+    pub parent: BioOttTaxonItem,
     pub font_awesome_icon: FontAwesomeIcon,
     pub color: Color,
 }
@@ -134,7 +134,7 @@ impl NestedBioOttTaxonItem {
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self {
-                ott_rank: flat_struct.ott_rank_id.map(|flat_struct| NestedBioOttRank::get(flat_struct, connection)).transpose()?,
+                ott_rank: NestedBioOttRank::get(flat_struct.ott_rank_id, connection)?,
                 domain: flat_struct.domain_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
                 kingdom: flat_struct.kingdom_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
                 phylum: flat_struct.phylum_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
@@ -142,7 +142,7 @@ impl NestedBioOttTaxonItem {
                 order: flat_struct.order_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
                 family: flat_struct.family_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
                 genus: flat_struct.genus_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
-                parent: flat_struct.parent_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
+                parent: BioOttTaxonItem::get(flat_struct.parent_id, connection)?,
                 font_awesome_icon: FontAwesomeIcon::get(flat_struct.font_awesome_icon_id, connection)?,
                 color: Color::get(flat_struct.color_id, connection)?,
                 inner: flat_struct,
@@ -165,7 +165,7 @@ impl NestedBioOttTaxonItem {
         let flat_struct = BioOttTaxonItem::get(id, connection)?;
         Ok(Self {
             inner: BioOttTaxonItem::get(flat_struct.id, connection)?,
-            ott_rank: flat_struct.ott_rank_id.map(|flat_struct| NestedBioOttRank::get(flat_struct, connection)).transpose()?,
+            ott_rank: NestedBioOttRank::get(flat_struct.ott_rank_id, connection)?,
             domain: flat_struct.domain_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
             kingdom: flat_struct.kingdom_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
             phylum: flat_struct.phylum_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
@@ -173,7 +173,7 @@ impl NestedBioOttTaxonItem {
             order: flat_struct.order_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
             family: flat_struct.family_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
             genus: flat_struct.genus_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
-            parent: flat_struct.parent_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
+            parent: BioOttTaxonItem::get(flat_struct.parent_id, connection)?,
             font_awesome_icon: FontAwesomeIcon::get(flat_struct.font_awesome_icon_id, connection)?,
             color: Color::get(flat_struct.color_id, connection)?,
         })
@@ -192,7 +192,7 @@ impl NestedBioOttTaxonItem {
     {
         let flat_struct = BioOttTaxonItem::from_ott_id(ott_id, connection)?;
         Ok(Self {
-            ott_rank: flat_struct.ott_rank_id.map(|flat_struct| NestedBioOttRank::get(flat_struct, connection)).transpose()?,
+            ott_rank: NestedBioOttRank::get(flat_struct.ott_rank_id, connection)?,
             domain: flat_struct.domain_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
             kingdom: flat_struct.kingdom_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
             phylum: flat_struct.phylum_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
@@ -200,7 +200,7 @@ impl NestedBioOttTaxonItem {
             order: flat_struct.order_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
             family: flat_struct.family_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
             genus: flat_struct.genus_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
-            parent: flat_struct.parent_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
+            parent: BioOttTaxonItem::get(flat_struct.parent_id, connection)?,
             font_awesome_icon: FontAwesomeIcon::get(flat_struct.font_awesome_icon_id, connection)?,
             color: Color::get(flat_struct.color_id, connection)?,
             inner: flat_struct,
@@ -232,7 +232,7 @@ impl From<web_common::database::nested_models::NestedBioOttTaxonItem> for Nested
     fn from(item: web_common::database::nested_models::NestedBioOttTaxonItem) -> Self {
         Self {
             inner: item.inner.into(),
-            ott_rank: item.ott_rank.map(|item| item.into()),
+            ott_rank: item.ott_rank.into(),
             domain: item.domain.map(|item| item.into()),
             kingdom: item.kingdom.map(|item| item.into()),
             phylum: item.phylum.map(|item| item.into()),
@@ -240,7 +240,7 @@ impl From<web_common::database::nested_models::NestedBioOttTaxonItem> for Nested
             order: item.order.map(|item| item.into()),
             family: item.family.map(|item| item.into()),
             genus: item.genus.map(|item| item.into()),
-            parent: item.parent.map(|item| item.into()),
+            parent: item.parent.into(),
             font_awesome_icon: item.font_awesome_icon.into(),
             color: item.color.into(),
         }
@@ -250,7 +250,7 @@ impl From<NestedBioOttTaxonItem> for web_common::database::nested_models::Nested
     fn from(item: NestedBioOttTaxonItem) -> Self {
         Self {
             inner: item.inner.into(),
-            ott_rank: item.ott_rank.map(|item| item.into()),
+            ott_rank: item.ott_rank.into(),
             domain: item.domain.map(|item| item.into()),
             kingdom: item.kingdom.map(|item| item.into()),
             phylum: item.phylum.map(|item| item.into()),
@@ -258,7 +258,7 @@ impl From<NestedBioOttTaxonItem> for web_common::database::nested_models::Nested
             order: item.order.map(|item| item.into()),
             family: item.family.map(|item| item.into()),
             genus: item.genus.map(|item| item.into()),
-            parent: item.parent.map(|item| item.into()),
+            parent: item.parent.into(),
             font_awesome_icon: item.font_awesome_icon.into(),
             color: item.color.into(),
         }

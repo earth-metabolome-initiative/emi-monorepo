@@ -209,9 +209,8 @@ impl BioOttRank {
 pub struct BioOttTaxonItem {
     pub id: i32,
     pub name: String,
-    pub description: Option<String>,
     pub ott_id: i32,
-    pub ott_rank_id: Option<i32>,
+    pub ott_rank_id: i32,
     pub wikidata_id: Option<i32>,
     pub ncbi_id: Option<i32>,
     pub gbif_id: Option<i32>,
@@ -224,7 +223,7 @@ pub struct BioOttTaxonItem {
     pub order_id: Option<i32>,
     pub family_id: Option<i32>,
     pub genus_id: Option<i32>,
-    pub parent_id: Option<i32>,
+    pub parent_id: i32,
     pub font_awesome_icon_id: i32,
     pub color_id: i32,
 }
@@ -234,15 +233,8 @@ impl BioOttTaxonItem {
         vec![
             gluesql::core::ast_builder::num(self.id),
             gluesql::core::ast_builder::text(self.name),
-            match self.description {
-                Some(description) => gluesql::core::ast_builder::text(description),
-                None => gluesql::core::ast_builder::null(),
-            },
             gluesql::core::ast_builder::num(self.ott_id),
-            match self.ott_rank_id {
-                Some(ott_rank_id) => gluesql::core::ast_builder::num(ott_rank_id),
-                None => gluesql::core::ast_builder::null(),
-            },
+            gluesql::core::ast_builder::num(self.ott_rank_id),
             match self.wikidata_id {
                 Some(wikidata_id) => gluesql::core::ast_builder::num(wikidata_id),
                 None => gluesql::core::ast_builder::null(),
@@ -291,10 +283,7 @@ impl BioOttTaxonItem {
                 Some(genus_id) => gluesql::core::ast_builder::num(genus_id),
                 None => gluesql::core::ast_builder::null(),
             },
-            match self.parent_id {
-                Some(parent_id) => gluesql::core::ast_builder::num(parent_id),
-                None => gluesql::core::ast_builder::null(),
-            },
+            gluesql::core::ast_builder::num(self.parent_id),
             gluesql::core::ast_builder::num(self.font_awesome_icon_id),
             gluesql::core::ast_builder::num(self.color_id),
         ]
@@ -316,7 +305,7 @@ impl BioOttTaxonItem {
         use gluesql::core::ast_builder::*;
         table("bio_ott_taxon_items")
             .insert()
-            .columns("id, name, description, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, font_awesome_icon_id, color_id")
+            .columns("id, name, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, font_awesome_icon_id, color_id")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -342,7 +331,7 @@ impl BioOttTaxonItem {
         let select_row = table("bio_ott_taxon_items")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, name, description, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, font_awesome_icon_id, color_id")
+            .project("id, name, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, font_awesome_icon_id, color_id")
             .limit(1)
             .execute(connection)
             .await?;
@@ -413,14 +402,10 @@ impl BioOttTaxonItem {
 .set("id", gluesql::core::ast_builder::num(self.id))        
 .set("name", gluesql::core::ast_builder::text(self.name))        
 .set("ott_id", gluesql::core::ast_builder::num(self.ott_id))        
+.set("ott_rank_id", gluesql::core::ast_builder::num(self.ott_rank_id))        
+.set("parent_id", gluesql::core::ast_builder::num(self.parent_id))        
 .set("font_awesome_icon_id", gluesql::core::ast_builder::num(self.font_awesome_icon_id))        
 .set("color_id", gluesql::core::ast_builder::num(self.color_id));
-        if let Some(description) = self.description {
-            update_row = update_row.set("description", gluesql::core::ast_builder::text(description));
-        }
-        if let Some(ott_rank_id) = self.ott_rank_id {
-            update_row = update_row.set("ott_rank_id", gluesql::core::ast_builder::num(ott_rank_id));
-        }
         if let Some(wikidata_id) = self.wikidata_id {
             update_row = update_row.set("wikidata_id", gluesql::core::ast_builder::num(wikidata_id));
         }
@@ -456,9 +441,6 @@ impl BioOttTaxonItem {
         }
         if let Some(genus_id) = self.genus_id {
             update_row = update_row.set("genus_id", gluesql::core::ast_builder::num(genus_id));
-        }
-        if let Some(parent_id) = self.parent_id {
-            update_row = update_row.set("parent_id", gluesql::core::ast_builder::num(parent_id));
         }
             update_row.execute(connection)
             .await
@@ -501,7 +483,7 @@ impl BioOttTaxonItem {
         use gluesql::core::ast_builder::*;
         let select_row = table("bio_ott_taxon_items")
             .select()
-            .project("id, name, description, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, font_awesome_icon_id, color_id")
+            .project("id, name, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, font_awesome_icon_id, color_id")
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -519,18 +501,12 @@ impl BioOttTaxonItem {
                 gluesql::prelude::Value::Str(name) => name.clone(),
                 _ => unreachable!("Expected Str")
             },
-            description: match row.get("description").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Str(description) => Some(description.clone()),
-                _ => unreachable!("Expected Str")
-            },
             ott_id: match row.get("ott_id").unwrap() {
                 gluesql::prelude::Value::I32(ott_id) => ott_id.clone(),
                 _ => unreachable!("Expected I32")
             },
             ott_rank_id: match row.get("ott_rank_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::I32(ott_rank_id) => Some(ott_rank_id.clone()),
+                gluesql::prelude::Value::I32(ott_rank_id) => ott_rank_id.clone(),
                 _ => unreachable!("Expected I32")
             },
             wikidata_id: match row.get("wikidata_id").unwrap() {
@@ -594,8 +570,7 @@ impl BioOttTaxonItem {
                 _ => unreachable!("Expected I32")
             },
             parent_id: match row.get("parent_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::I32(parent_id) => Some(parent_id.clone()),
+                gluesql::prelude::Value::I32(parent_id) => parent_id.clone(),
                 _ => unreachable!("Expected I32")
             },
             font_awesome_icon_id: match row.get("font_awesome_icon_id").unwrap() {

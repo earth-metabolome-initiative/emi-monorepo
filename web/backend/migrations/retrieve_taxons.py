@@ -1,3 +1,4 @@
+from typing import List, Tuple
 from downloaders import BaseDownloader
 from tqdm.auto import tqdm
 import numpy as np
@@ -78,41 +79,56 @@ def load_dataframe():
     return df.set_index("uid", drop=True)
 
 
-def get_rank(df: pd.DataFrame, row: pd.Series, rank_name: str) -> str:
+def get_rank(df: pd.DataFrame, row: pd.Series, rank_names: List[str]) -> List[int]:
     """Get the rank of a given row."""
-    if row["rank"] == rank_name:
-        return row["name"]
+    remaining_rank_names = []
+    remaining_rank_indices = []
+    results = [np.nan] * len(rank_names)
 
-    if row[rank_name] != "":
-        return row[rank_name]
+    for i, rank_name in enumerate(rank_names):
+        if row["rank"] == rank_name:
+            results[i] = row.name
+            continue
 
-    if pd.isna(row.parent_uid):
-        return "unknown"
+        if row[rank_name] != 0.0:
+            results[i] = row[rank_name]
+            continue
 
-    parent_row = df.loc[int(row.parent_uid)]
+        remaining_rank_names.append(rank_name)
+        remaining_rank_indices.append(i)
 
-    rank = get_rank(df, parent_row, rank_name)
-    df.at[row.name, rank_name] = rank
+    if len(remaining_rank_names) == 0 or row.parent_id == row.name:
+        return results
 
-    return rank
+    parent_row = df.iloc[row.parent_id]
+
+    ranks = get_rank(df, parent_row, remaining_rank_names)
+
+    for rank, rank_name, i in zip(ranks, remaining_rank_names, remaining_rank_indices):
+        df.at[row.name, rank_name] = rank
+        results[i] = rank
+
+    return results
 
 
 def propagate_down(
-    df: pd.DataFrame, row: pd.Series, column: str, unknown: str = "unknown"
-) -> str:
+    df: pd.DataFrame, row: pd.Series, columns: List[str], unknowns: List[int]
+) -> List[int]:
     """Propagate the value of a column down the tree"""
-    if row[column] != "":
-        return row[column]
+    if any(row[column] != df.shape[0] for column in columns):
+        return [row[column] for column in columns]
 
-    if pd.isna(row.parent_uid):
-        return "unknown"
+    if row.parent_id == row.name:
+        return unknowns
 
-    parent_row = df.loc[int(row.parent_uid)]
+    parent_row = df.iloc[row.parent_id]
 
-    rank = get_rank(df, parent_row, column)
-    df.at[row.name, column] = rank
+    ranks = propagate_down(df, parent_row, columns, unknowns)
 
-    return rank
+    for rank, column in zip(ranks, columns):
+        df.at[row.name, column] = rank
+
+    return ranks
 
 
 @Cache(use_approximated_hash=True)
@@ -121,11 +137,12 @@ def enrich_ranks(df: pd.DataFrame):
     ranks = ["kingdom", "phylum", "class", "order", "family", "genus", "domain"]
 
     for rank in ranks:
-        df[rank] = ""
+        df[rank] = 0.0
 
-    for index, row in tqdm(df.iterrows(), total=df.shape[0], desc=f"Parsing species", leave=False):
-        for rank in ranks:
-            get_rank(df, row, rank)
+    for index, row in tqdm(
+        df.iterrows(), total=df.shape[0], desc=f"Propagating ranks", leave=False
+    ):
+        get_rank(df, row, ranks)
     return df
 
 
@@ -134,15 +151,19 @@ def populate_font_awesome_icons(df: pd.DataFrame):
     """Populate the font awesome icons"""
     otol_to_inat = pd.read_csv("./migrations/otol_to_inat.csv").set_index("identifier")
 
-    column_name = "font_awesome_icon"
-    color_column_name = "icon_color"
+    colors = pd.read_csv("./db_data/colors.csv").set_index("name")
+    icons = pd.read_csv("./db_data/font_awesome_icons.csv").set_index("name")
 
-    df[column_name] = ""
-    df[color_column_name] = ""
+    column_name = "font_awesome_icon_id"
+    color_column_name = "color_id"
+
+    df[column_name] = df.shape[0]
+    df[color_column_name] = df.shape[0]
+
+    df.set_index("uid", inplace=True, drop=True)
 
     for inat_identifier in tqdm(
-        EXTENDED_FONT_AWESOME_ICONS.keys(), desc="Populating icons",
-        leave=False
+        EXTENDED_FONT_AWESOME_ICONS.keys(), desc="Populating icons", leave=False
     ):
         # We lookup the OTT_ID identifier
         try:
@@ -151,22 +172,26 @@ def populate_font_awesome_icons(df: pd.DataFrame):
             continue
 
         if pd.notna(row.OTT_ID):
-            icon = EXTENDED_FONT_AWESOME_ICONS[
-                inat_identifier
-            ]
-            df.at[row.OTT_ID, column_name] = icon.name
-            df.at[row.OTT_ID, color_column_name] = icon.color
+            icon = EXTENDED_FONT_AWESOME_ICONS[inat_identifier]
+            df.at[row.OTT_ID, column_name] = icons.index.get_loc(icon.name)
+            df.at[row.OTT_ID, color_column_name] = colors.index.get_loc(icon.color)
 
-    for index, row in tqdm(df.iterrows(), total=df.shape[0], desc=f"Parsing species", leave=False):
-        propagate_down(df, row, column_name, unknown="fa-question-circle")
-        propagate_down(df, row, color_column_name, unknown="grey")
+    df = df.reset_index()
+
+    unknowns = [icons.index.get_loc("fa-question-circle"), colors.index.get_loc("grey")]
+
+    for index, row in tqdm(
+        df.iterrows(), total=df.shape[0], desc=f"Propagating icons", leave=False
+    ):
+        propagate_down(df, row, [column_name, color_column_name], unknowns=unknowns)
 
     return df
+
 
 @Cache()
 def retrieve_wikidata_to_ott_mapping() -> pd.DataFrame:
     """Retrieve the mapping between Wikidata and OTT
-    
+
     Implementative details
     ----------------------
     This method executes a sparql query to retrieve the mapping between Wikidata and OTT.
@@ -206,29 +231,29 @@ def retrieve_wikidata_to_ott_mapping() -> pd.DataFrame:
 @Cache(use_approximated_hash=True)
 def add_wikidata_id(df: pd.DataFrame) -> pd.DataFrame:
     """Add the wikidata id to the dataframe"""
-    wikidata_to_ott = retrieve_wikidata_to_ott_mapping()
-    wikidata_to_ott = wikidata_to_ott.set_index("ottid")
+    wikidata_to_ott = retrieve_wikidata_to_ott_mapping().set_index("ottid")
     wikidata_to_ott = wikidata_to_ott.sort_index()
 
-    wikidata_ottds: np.ndarray = wikidata_to_ott.index
-    wikidata_taxa: np.ndarray = wikidata_to_ott.taxon.values
+    wikidata_ottds: np.ndarray = np.array(wikidata_to_ott.index)
+    wikidata_taxa: np.ndarray = np.array(wikidata_to_ott.taxon.values)
 
-    wikidata_ids = []
+    wikidata_ids = np.full(len(df.uid), np.nan)
+    uids = np.array(df.uid)
 
-    for ottid in tqdm(
-        df.index,
-        desc="Adding wikidata id",
-        leave=False
-    ):
-        index = np.searchsorted(wikidata_ottds, ottid)
-        if index < len(wikidata_ottds) and wikidata_ottds[index] == ottid:
-            wikidata_ids.append(wikidata_taxa[index])
-        else:
-            wikidata_ids.append(None)
-     
+    indices = np.searchsorted(wikidata_ottds, uids)
+    mask = indices >= len(wikidata_ottds)
+    indices[mask] = 0
+
+    mask = mask | (wikidata_ottds[indices] != uids)
+
+    indices[mask] = 0
+    wikidata_ids = wikidata_taxa[indices].astype(float)
+    wikidata_ids[mask] = np.nan
+
     df["wikidata_id"] = wikidata_ids
 
     return df
+
 
 @Cache(use_approximated_hash=True)
 def retrieve_taxons():
@@ -237,12 +262,32 @@ def retrieve_taxons():
     download_taxon_document()
     print("Loading the taxonomy document")
     df = load_dataframe()
+
+    # We impute the missing parent uid of the life entry with its own uid
+    df.loc[df.index == 805080, "parent_uid"] = 805080
+
+    # We replace the parent uid with the number of the row in the dataframe
+    # curresponding to the parent uid
+    df["parent_id"] = (
+        df["parent_uid"].map(lambda x: df.index.get_loc(x)).astype(np.int32)
+    )
+    df = df.drop(columns=["parent_uid"])
+    df = df.reset_index()
+
     print("Enriching the ranks")
     df = enrich_ranks(df)
-    print("Populating the font awesome icons")
-    df = populate_font_awesome_icons(df)
     print("Add wikidata identifier")
     df = add_wikidata_id(df)
+    print("Populating the font awesome icons")
+    df = populate_font_awesome_icons(df)
+
+    # We replace the rank column with the index curresponding to the
+    # line in the dataframe 'ranks' that contains the rank
+    ranks = pd.read_csv("./db_data/bio_ott_ranks.csv").set_index("name")
+    df["ott_rank_id"] = df["rank"].map(lambda x: ranks.index.get_loc(x))
+
+    # We drop the rank column
+    df = df.drop(columns=["rank"])
 
     # We handle the corner case represented by the "Allocotidus"
     # entry from the irmng dataset. For some reason, while it has
@@ -258,8 +303,15 @@ def retrieve_taxons():
         "gbif",
         "irmng",
         "worms",
-        "parent_uid",
+        "parent_id",
         "wikidata_id",
+        "kingdom",
+        "phylum",
+        "class",
+        "order",
+        "family",
+        "genus",
+        "domain",
     ]:
         df[column] = df[column].astype("Int64")
 
@@ -273,16 +325,20 @@ def retrieve_taxons():
         "family",
         "genus",
         "domain",
+        "worms",
+        "irmng",
+        "ncbi",
+        "gbif",
     ]
 
-    df = df.rename(columns={
-        rank: f"bio_{rank}"
-        for rank in ranks
-    })
+    df = df.rename(columns={rank: f"{rank}_id" for rank in ranks})
+
+    # We rename the 'uid' column to 'ott_id'
+    df = df.rename(columns={"uid": "ott_id"})
 
     path = "db_data/bio_ott_taxons.csv.gz"
     print(f"Saving the dataframe to {path}")
-    df.to_csv(path, index=True, compression="gzip")
+    df.to_csv(path, index=False, compression="gzip")
 
 
 if __name__ == "__main__":

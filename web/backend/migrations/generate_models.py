@@ -2974,7 +2974,8 @@ if __name__ == "__main__":
     if os.path.exists("migrations/__pycache__"):
         shutil.rmtree("migrations/__pycache__")
 
-    retrieve_taxons()
+    if not os.path.exists("./db_data/bio_ott_taxons.csv.gz"):
+        retrieve_taxons()
 
     main()
     print("Generated models.")

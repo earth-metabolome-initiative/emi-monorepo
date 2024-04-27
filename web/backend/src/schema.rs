@@ -12,9 +12,8 @@ diesel::table! {
     bio_ott_taxon_items (id) {
         id -> Int4,
         name -> Text,
-        description -> Nullable<Text>,
         ott_id -> Int4,
-        ott_rank_id -> Nullable<Int4>,
+        ott_rank_id -> Int4,
         wikidata_id -> Nullable<Int4>,
         ncbi_id -> Nullable<Int4>,
         gbif_id -> Nullable<Int4>,
@@ -27,7 +26,7 @@ diesel::table! {
         order_id -> Nullable<Int4>,
         family_id -> Nullable<Int4>,
         genus_id -> Nullable<Int4>,
-        parent_id -> Nullable<Int4>,
+        parent_id -> Int4,
         font_awesome_icon_id -> Int4,
         color_id -> Int4,
     }
