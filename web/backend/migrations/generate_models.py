@@ -72,7 +72,6 @@ from functools import cache
 import glob
 
 
-
 def struct_name_from_table_name(table_name: str) -> str:
     """Convert the table name to the struct name."""
     if table_name.endswith("s"):
@@ -82,18 +81,12 @@ def struct_name_from_table_name(table_name: str) -> str:
 
 class PGIndex:
 
-    def __init__(self, name: str, table_name: str, columns: List[str]):
+    def __init__(
+        self, name: str, table_name: str, arguments: str
+    ):
         self.name = name
         self.table_name = table_name
-        self.columns = columns
-
-    def human_readable_columns(self) -> str:
-        """Return the columns in a human-readable format."""
-        last_column = self.columns[-1]
-        if len(self.columns) == 1:
-            return last_column
-        return f"{', '.join(self.columns[:-1])} and {last_column}"
-
+        self.arguments = arguments
 
 class PGIndices:
 
@@ -302,16 +295,16 @@ def get_cursor():
 
     return conn, conn.cursor()
 
-
 def find_pg_trgm_indices() -> PGIndices:
     """Returns the list of indices that are of type `pg_trgm`."""
+    tables_metadata = find_foreign_keys()
     conn, cursor = get_cursor()
     cursor.execute(
         """
         SELECT
             indexname AS index_name,
             tablename AS table_name,
-            substring(indexdef from '\((.*)\)') AS columns_involved
+            substring(indexdef from '\((.*)\)') AS arguments
         FROM
             pg_indexes
         WHERE
@@ -323,10 +316,29 @@ def find_pg_trgm_indices() -> PGIndices:
     pg_indices = []
     for index in indices:
         sanitized_coumn_names = []
-        for column in index[2].split(", "):
-            sanitized_coumn_names.append(column.split(" ")[0])
+        table_name = index[1]
+        table_columns = tables_metadata.get_columns(table_name)
+        arguments = index[2]
 
-        pg_indices.append(PGIndex(index[0], index[1], sanitized_coumn_names))
+        # At this time, we only support indices with a single gin_trgm_ops.
+        # We check that in the definition of the index there appears
+        # only a single gin_trgm_ops call.
+        if arguments.count("gin_trgm_ops") != 1:
+            raise ValueError(
+                f"The index {index[0]} has more than one gin_trgm_ops call."
+            )
+
+        assert arguments.endswith(" gin_trgm_ops")
+
+        arguments = arguments.replace(" gin_trgm_ops", "")
+
+        pg_indices.append(
+            PGIndex(
+                name=index[0],
+                table_name=index[1],
+                arguments=arguments,
+            )
+        )
 
     cursor.close()
     conn.close()
@@ -827,7 +839,9 @@ class TableMetadata:
         return primary_key
 
     @cache
-    def get_unique_constraint_columns(self, table_name: str) -> Union[List[str], List[ViewColumn]]:
+    def get_unique_constraint_columns(
+        self, table_name: str
+    ) -> Union[List[str], List[ViewColumn]]:
         """Returns the columns of the unique constraint."""
         if self.is_view(table_name):
             # In a view, we return as set of unique columns the columns
@@ -841,21 +855,21 @@ class TableMetadata:
                     base_table_name = column.table_name
                     break
             if base_table_name is None:
-                raise ValueError(
-                    f"The view {table_name} does not have an ID column."
-                )
+                raise ValueError(f"The view {table_name} does not have an ID column.")
             base_unique_columns = self.get_unique_constraint_columns(base_table_name)
 
             view_unique_columns: List[ViewColumn] = []
             for column in view_columns:
                 if column.column_name in base_unique_columns:
-                    view_unique_columns.append(ViewColumn(
-                        column_name=column.column_name,
-                        data_type=column.data_type,
-                        alias_name=column.alias_name,
-                        table_name=column.table_name,
-                        nullable=column.nullable
-                    ))
+                    view_unique_columns.append(
+                        ViewColumn(
+                            column_name=column.column_name,
+                            data_type=column.data_type,
+                            alias_name=column.alias_name,
+                            table_name=column.table_name,
+                            nullable=column.nullable,
+                        )
+                    )
 
             return view_unique_columns
 
@@ -1055,7 +1069,9 @@ def write_from_impls(
                 # If the limit is None, we do not apply any limit to the query.
                 new_content += f"        let query = {struct.table_name}::dsl::{struct.table_name};\n"
                 new_content += "        if let Some(limit) = limit {\n"
-                new_content += "            query.limit(limit).load::<Self>(connection)\n"
+                new_content += (
+                    "            query.limit(limit).load::<Self>(connection)\n"
+                )
                 new_content += "        } else {\n"
                 new_content += "            query.load::<Self>(connection)\n"
                 new_content += "        }\n"
@@ -1107,20 +1123,24 @@ def write_from_impls(
                 # struct by the unique column. In the case of a view, we first retrieve
                 # the associated base table and secondarily we execute with a get the
                 # struct by the id column from the obtained base table.
-                for unique_column in table_metadatas.get_unique_constraint_columns(struct.table_name):
+                for unique_column in table_metadatas.get_unique_constraint_columns(
+                    struct.table_name
+                ):
                     if table_type == "views":
                         # In the case of view, we do not receive simple string as unique column
                         # but instances of ViewColumn.
-                        attribute = struct.get_attribute_by_name(unique_column.alias_name)
+                        attribute = struct.get_attribute_by_name(
+                            unique_column.alias_name
+                        )
                         attribute_data_type = attribute.data_type()
                         if attribute_data_type == "String":
                             attribute_data_type = "&str"
 
-                        struct_name = struct_name_from_table_name(unique_column.table_name)
-
-                        new_content += (
-                            f"    /// Get the struct from the database by its {unique_column.alias_name}.\n"
+                        struct_name = struct_name_from_table_name(
+                            unique_column.table_name
                         )
+
+                        new_content += f"    /// Get the struct from the database by its {unique_column.alias_name}.\n"
                         new_content += "    ///\n"
                         new_content += "    /// # Arguments\n"
                         new_content += f"    /// * `{unique_column.alias_name}` - The {unique_column.alias_name} of the struct to get.\n"
@@ -1131,7 +1151,9 @@ def write_from_impls(
                         new_content += f"    pub fn from_{unique_column.alias_name}(\n"
                         new_content += f"        {unique_column.alias_name}: {attribute_data_type},\n"
                         new_content += "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
-                        new_content += "    ) -> Result<Self, diesel::result::Error> {\n"
+                        new_content += (
+                            "    ) -> Result<Self, diesel::result::Error> {\n"
+                        )
                         new_content += (
                             f"        {struct_name}::from_{unique_column.column_name}({unique_column.alias_name}, connection)\n"
                             f"            .map(|entry| {struct.name}::get(entry.{primary_key.name}, connection))\n"
@@ -1143,9 +1165,7 @@ def write_from_impls(
                         attribute_data_type = attribute.data_type()
                         if attribute_data_type == "String":
                             attribute_data_type = "&str"
-                        new_content += (
-                            f"    /// Get the struct from the database by its {unique_column}.\n"
-                        )
+                        new_content += f"    /// Get the struct from the database by its {unique_column}.\n"
                         new_content += "    ///\n"
                         new_content += "    /// # Arguments\n"
                         new_content += f"    /// * `{unique_column}` - The {unique_column} of the struct to get.\n"
@@ -1154,9 +1174,13 @@ def write_from_impls(
                         )
                         new_content += "    ///\n"
                         new_content += f"    pub fn from_{unique_column}(\n"
-                        new_content += f"        {unique_column}: {attribute_data_type},\n"
+                        new_content += (
+                            f"        {unique_column}: {attribute_data_type},\n"
+                        )
                         new_content += "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
-                        new_content += "    ) -> Result<Self, diesel::result::Error> {\n"
+                        new_content += (
+                            "    ) -> Result<Self, diesel::result::Error> {\n"
+                        )
                         new_content += (
                             f"        use crate::schema::{struct.table_name};\n"
                         )
@@ -1167,12 +1191,10 @@ def write_from_impls(
                         new_content += "            .first::<Self>(connection)\n"
                         new_content += "    }\n"
 
-
                 # If this table implements the `pg_trgm` index, we also
                 # provide the `search` method to search for the struct
                 # by a given string. The method also receives a limit
-                # parameter to limit the number of results and a threshold
-                # parameter to set the similarity threshold.
+                # parameter to limit the number of results.
                 if similarity_indices.has_table(struct.table_name):
                     similarity_index: PGIndex = similarity_indices.get_table(
                         struct.table_name
@@ -1182,7 +1204,6 @@ def write_from_impls(
                     new_content += "    /// # Arguments\n"
                     new_content += "    /// * `query` - The string to search for.\n"
                     new_content += "    /// * `limit` - The maximum number of results, by default `10`.\n"
-                    new_content += "    /// * `threshold` - The similarity threshold, by default `0.6`.\n"
                     new_content += (
                         "    /// * `connection` - The connection to the database.\n"
                     )
@@ -1190,14 +1211,12 @@ def write_from_impls(
                     new_content += "    pub fn search(\n"
                     new_content += "        query: &str,\n"
                     new_content += "        limit: Option<i32>,\n"
-                    new_content += "        threshold: Option<f64>,\n"
                     new_content += "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
                     new_content += (
                         "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
                     )
 
                     new_content += "        let limit = limit.unwrap_or(10);\n"
-                    new_content += "        let threshold = threshold.unwrap_or(0.3);\n"
 
                     # If the query string is empty, we run an all query with the
                     # limit parameter provided instead of a more complex similarity
@@ -1206,33 +1225,16 @@ def write_from_impls(
                     new_content += "            return Self::all(Some(limit as i64), connection);\n"
                     new_content += "        }\n"
 
-                    # Since Diesel does not support the `similarity` Postgres function natively
-                    # as part of the DSL query builder, we are forced to build the query manually
-                    # in raw SQL. We use the `sql_query` function to execute the raw SQL query.
-                    # Since the `sql_query` function needs to run a raw SQL query, we need to
-                    # sanitize the input to avoid SQL injection attacks.
-
-                    joined_field_names = ", ".join(
-                        [
-                            f"{struct.table_name}.{attribute.name}"
-                            for attribute in struct.attributes
-                        ]
-                    )
-
-                    # Since the similarity function only takes two arguments, we need to combine
-                    # the scores of all of the columns. We do this by summing the scores of each
-                    # column:
-                    similarity_function = " + ".join(
-                        f"similarity({similarity_index.table_name}.{column}, $1)"
-                        for column in similarity_index.columns
-                    )
+                    joined_field_names = ", ".join(struct_field_names)
 
                     if table_type == "views":
                         new_content += "        let similarity_query = concat!(\n"
                         new_content += f'            "WITH selected_ids AS (",\n'
-                        new_content += f'            "SELECT {similarity_index.table_name}.id FROM {similarity_index.table_name} ",\n'
-                        new_content += f'            "WHERE {similarity_function} > 0.0 ",\n'
-                        new_content += f'            "ORDER BY {similarity_function} DESC LIMIT $3",\n'
+                        new_content += f'            "SELECT {similarity_index.table_name}.{primary_key.name} AS id FROM {similarity_index.table_name} ",\n'
+                        new_content += f'            "WHERE {similarity_index.arguments} % $1 ",\n'
+                        new_content += (
+                            f'            "ORDER BY {similarity_index.arguments} <-> $1 LIMIT $2",\n'
+                        )
                         new_content += '         ")",\n'
                         new_content += f'            "SELECT {joined_field_names} FROM {struct.table_name} ",\n'
                         new_content += f'            "JOIN selected_ids ON selected_ids.id = {struct.table_name}.id"\n'
@@ -1240,16 +1242,15 @@ def write_from_impls(
                     else:
                         new_content += "        let similarity_query = concat!(\n"
                         new_content += f'            "SELECT {joined_field_names} FROM {struct.table_name} ",\n'
-                        new_content += f'            "WHERE {similarity_function} > 0.0 ",\n'
-                        new_content += f'            "ORDER BY {similarity_function} DESC LIMIT $3;"\n'
+                        new_content += f'            "WHERE {similarity_index.arguments} % $1 ",\n'
+                        new_content += (
+                            f'            "ORDER BY {similarity_index.arguments} <-> $1 LIMIT $2;"\n'
+                        )
                         new_content += "        );\n"
 
                     new_content += "        diesel::sql_query(similarity_query)\n"
                     new_content += (
                         "            .bind::<diesel::sql_types::Text, _>(query)\n"
-                    )
-                    new_content += (
-                        "            .bind::<diesel::sql_types::Float8, _>(threshold)\n"
                     )
                     new_content += (
                         "            .bind::<diesel::sql_types::Integer, _>(limit)\n"
@@ -1450,9 +1451,7 @@ def write_web_common_structs(
 
                 if attribute.optional:
                     if attribute.data_type() in types_and_methods:
-                        tables.write(
-                            f"            match self.{attribute.name} {{\n"
-                        )
+                        tables.write(f"            match self.{attribute.name} {{\n")
                         tables.write(
                             f"                Some({attribute.name}) => {types_and_methods[attribute.data_type()].format(attribute.name)},\n"
                         )
@@ -1486,9 +1485,7 @@ def write_web_common_structs(
             )
             tables.write("    ///\n")
             tables.write("    /// # Arguments\n")
-            tables.write(
-                "    /// * `connection` - The connection to the database.\n"
-            )
+            tables.write("    /// * `connection` - The connection to the database.\n")
             tables.write("    ///\n")
             tables.write("    /// # Returns\n")
             tables.write(
@@ -1538,9 +1535,7 @@ def write_web_common_structs(
             tables.write(
                 f"    /// * `{primary_key_name}` - The ID of {struct_metadata.name} to get.\n"
             )
-            tables.write(
-                "    /// * `connection` - The connection to the database.\n"
-            )
+            tables.write("    /// * `connection` - The connection to the database.\n")
             tables.write("    ///\n")
             tables.write("    pub async fn get<C>(\n")
             tables.write(f"        {primary_key_name}: {rust_primary_key_type},\n")
@@ -1574,17 +1569,13 @@ def write_web_common_structs(
 
             # We implement the `delete` method for the struct. This method deletes
             # the struct from the GlueSQL database.
-            tables.write(
-                f"    /// Delete {struct_metadata.name} from the database.\n"
-            )
+            tables.write(f"    /// Delete {struct_metadata.name} from the database.\n")
             tables.write("    ///\n")
             tables.write("    /// # Arguments\n")
             tables.write(
                 f"    /// * `{primary_key_name}` - The ID of the struct to delete.\n"
             )
-            tables.write(
-                "    /// * `connection` - The connection to the database.\n"
-            )
+            tables.write("    /// * `connection` - The connection to the database.\n")
             tables.write("    ///\n")
             tables.write("    /// # Returns\n")
             tables.write("    /// The number of rows deleted.\n")
@@ -1620,9 +1611,7 @@ def write_web_common_structs(
             )
             tables.write("    ///\n")
             tables.write("    /// # Arguments\n")
-            tables.write(
-                "    /// * `connection` - The connection to the database.\n"
-            )
+            tables.write("    /// * `connection` - The connection to the database.\n")
             tables.write("    ///\n")
             tables.write("    /// # Returns\n")
             tables.write("    /// The number of rows deleted.\n")
@@ -1634,9 +1623,7 @@ def write_web_common_structs(
                 "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
             )
             tables.write("    {\n")
-            tables.write(
-                "        Self::delete_from_id(self.id, connection).await\n"
-            )
+            tables.write("        Self::delete_from_id(self.id, connection).await\n")
             tables.write("    }\n")
 
             # We implement the `update` method for the struct. This method updates
@@ -1644,9 +1631,7 @@ def write_web_common_structs(
             tables.write("    /// Update the struct in the database.\n")
             tables.write("    ///\n")
             tables.write("    /// # Arguments\n")
-            tables.write(
-                "    /// * `connection` - The connection to the database.\n"
-            )
+            tables.write("    /// * `connection` - The connection to the database.\n")
             tables.write("    ///\n")
             tables.write("    /// # Returns\n")
             tables.write("    /// The number of rows updated.\n")
@@ -1682,12 +1667,10 @@ def write_web_common_structs(
                     # We handle this in the next loop
                     continue
                 if attribute.data_type() in update_types_and_methods:
-                    conversion = update_types_and_methods[
-                        attribute.data_type()
-                    ].format(f"self.{attribute.name}")
-                    tables.write(
-                        f'        \n.set("{attribute.name}", {conversion})'
+                    conversion = update_types_and_methods[attribute.data_type()].format(
+                        f"self.{attribute.name}"
                     )
+                    tables.write(f'        \n.set("{attribute.name}", {conversion})')
                 else:
                     raise NotImplementedError(
                         f"The type {attribute.data_type()} is not supported."
@@ -1741,9 +1724,7 @@ def write_web_common_structs(
             )
             tables.write("    ///\n")
             tables.write("    /// # Arguments\n")
-            tables.write(
-                "    /// * `connection` - The connection to the database.\n"
-            )
+            tables.write("    /// * `connection` - The connection to the database.\n")
             tables.write("    ///\n")
             tables.write("    /// # Returns\n")
             tables.write("    /// The number of rows updated or inserted.\n")
@@ -1767,20 +1748,14 @@ def write_web_common_structs(
 
             # We implement the `all` method for the struct. This method returns all of the
             # structs in the GlueSQL database.
-            tables.write(
-                f"    /// Get all {struct_metadata.name} from the database.\n"
-            )
+            tables.write(f"    /// Get all {struct_metadata.name} from the database.\n")
             tables.write("    ///\n")
             tables.write("    /// # Arguments\n")
-            tables.write(
-                "    /// * `connection` - The connection to the database.\n"
-            )
+            tables.write("    /// * `connection` - The connection to the database.\n")
             tables.write("    ///\n")
             tables.write("    pub async fn all<C>(\n")
             tables.write("        connection: &mut gluesql::prelude::Glue<C>,\n")
-            tables.write(
-                "    ) -> Result<Vec<Self>, gluesql::prelude::Error> where\n"
-            )
+            tables.write("    ) -> Result<Vec<Self>, gluesql::prelude::Error> where\n")
             tables.write(
                 "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
             )
@@ -2408,10 +2383,12 @@ def generate_nested_structs(
         # For each of the columns in the struct that have a UNIQUE constraint,
         # we implement the methods `from_{column_name}` by employing the method
         # of the same name available for the main struct associated to this struct
-        for unique_column in tables_metadata.get_unique_constraint_columns(struct.table_name):
+        for unique_column in tables_metadata.get_unique_constraint_columns(
+            struct.table_name
+        ):
             if isinstance(unique_column, ViewColumn):
                 unique_column = unique_column.alias_name
-            
+
             attribute = struct.get_attribute_by_name(unique_column)
             attribute_data_type = attribute.data_type()
             if attribute_data_type == "String":
@@ -2459,7 +2436,6 @@ def generate_nested_structs(
                 tables.write(f"            inner: flat_struct,\n")
             tables.write("        })\n" "    }\n" "}\n")
 
-
         # If there is an index on the table, we implement the search method that
         # calls search on the flat version of the struct and then iterates on the
         # primary keys of the results and constructs the nested structs by calling
@@ -2472,14 +2448,12 @@ def generate_nested_structs(
                 "    /// # Arguments\n"
                 "    /// * `query` - The string to search for.\n"
                 "    /// * `limit` - The maximum number of results, by default `10`.\n"
-                "    /// * `threshold` - The similarity threshold, by default `0.6`.\n"
                 "    pub fn search(\n"
                 "        query: &str,\n"
                 "        limit: Option<i32>,\n"
-                "        threshold: Option<f64>,\n"
                 "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
                 "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
-                f"        let flat_structs = {struct.name}::search(query, limit, threshold, connection)?;\n"
+                f"        let flat_structs = {struct.name}::search(query, limit, connection)?;\n"
                 "        let mut nested_structs = Vec::new();\n"
                 "        for flat_struct in flat_structs {\n"
                 "            nested_structs.push(Self::get(flat_struct.id, connection)?);\n"
@@ -2618,16 +2592,14 @@ def write_web_common_nested_structs(path: str, nested_structs: List[StructMetada
         # `get` method for the Diesel-based approach of the backend.
 
         primary_key_name, primary_key_type = (
-            table_metadatas.get_primary_key_name_and_type(
-                struct_metadata.table_name
-            )
+            table_metadatas.get_primary_key_name_and_type(struct_metadata.table_name)
         )
 
         rust_primary_key_type = sql_type_to_rust_type(primary_key_type)
         flat_struct = struct_metadata.get_attribute_by_name("inner")._data_type
 
         tables.write(
-            f"#[cfg(feature = \"frontend\")]\n"
+            f'#[cfg(feature = "frontend")]\n'
             f"impl {struct_metadata.name} {{\n"
             "    /// Get the nested struct from the provided primary key.\n"
             "    ///\n"
@@ -2660,7 +2632,14 @@ def write_web_common_nested_structs(path: str, nested_structs: List[StructMetada
                 tables.write(
                     f"            {attribute.name}: if let Some({attribute.name}) = {attribute.data_type()}::get(flat_struct.{attribute.original_name}, connection).await? {{ {attribute.name} }} else {{return Ok(None)}},\n"
                 )
-        tables.write("        }))\n" "       } else {\n" "           Ok(None)\n" "       }\n" "    }\n" "}\n")
+        tables.write(
+            "        }))\n"
+            "       } else {\n"
+            "           Ok(None)\n"
+            "       }\n"
+            "    }\n"
+            "}\n"
+        )
 
     tables.close()
 
@@ -2752,7 +2731,9 @@ def write_table_names_enumeration(struct_metadatas: List[StructMetadata]):
         tables.write(
             f'            "{table_name}" => Ok(Table::{capitalized_table_name}),\n'
         )
-    tables.write('            table_name => Err(format!("Unknown table name: {}", table_name)),\n')
+    tables.write(
+        '            table_name => Err(format!("Unknown table name: {}", table_name)),\n'
+    )
     tables.write("        }\n")
     tables.write("    }\n")
     tables.write("}\n")

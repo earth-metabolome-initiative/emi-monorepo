@@ -89,32 +89,28 @@ impl PublicUser {
     /// # Arguments
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
-    /// * `threshold` - The similarity threshold, by default `0.6`.
     /// * `connection` - The connection to the database.
     ///
     pub fn search(
         query: &str,
         limit: Option<i32>,
-        threshold: Option<f64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         let limit = limit.unwrap_or(10);
-        let threshold = threshold.unwrap_or(0.3);
         if query.is_empty() {
             return Self::all(Some(limit as i64), connection);
         }
         let similarity_query = concat!(
             "WITH selected_ids AS (",
-            "SELECT users.id FROM users ",
-            "WHERE similarity(users.first_name, $1) + similarity(users.middle_name, $1) + similarity(users.last_name, $1) > 0.0 ",
-            "ORDER BY similarity(users.first_name, $1) + similarity(users.middle_name, $1) + similarity(users.last_name, $1) DESC LIMIT $3",
+            "SELECT users.id AS id FROM users ",
+            "WHERE f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text) % $1 ",
+            "ORDER BY f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text) <-> $1 LIMIT $2",
          ")",
-            "SELECT public_users.id, public_users.first_name, public_users.middle_name, public_users.last_name, public_users.created_at, public_users.updated_at, public_users.thumbnail_id, public_users.picture_id FROM public_users ",
+            "SELECT id, first_name, middle_name, last_name, created_at, updated_at, thumbnail_id, picture_id FROM public_users ",
             "JOIN selected_ids ON selected_ids.id = public_users.id"
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
-            .bind::<diesel::sql_types::Float8, _>(threshold)
             .bind::<diesel::sql_types::Integer, _>(limit)
             .load(connection)
 }

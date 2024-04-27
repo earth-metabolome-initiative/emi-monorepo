@@ -99,28 +99,24 @@ impl BioOttRank {
     /// # Arguments
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
-    /// * `threshold` - The similarity threshold, by default `0.6`.
     /// * `connection` - The connection to the database.
     ///
     pub fn search(
         query: &str,
         limit: Option<i32>,
-        threshold: Option<f64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         let limit = limit.unwrap_or(10);
-        let threshold = threshold.unwrap_or(0.3);
         if query.is_empty() {
             return Self::all(Some(limit as i64), connection);
         }
         let similarity_query = concat!(
-            "SELECT bio_ott_ranks.id, bio_ott_ranks.name, bio_ott_ranks.font_awesome_icon_id FROM bio_ott_ranks ",
-            "WHERE similarity(bio_ott_ranks.name, $1) > 0.0 ",
-            "ORDER BY similarity(bio_ott_ranks.name, $1) DESC LIMIT $3;"
+            "SELECT id, name, font_awesome_icon_id FROM bio_ott_ranks ",
+            "WHERE name % $1 ",
+            "ORDER BY name <-> $1 LIMIT $2;"
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
-            .bind::<diesel::sql_types::Float8, _>(threshold)
             .bind::<diesel::sql_types::Integer, _>(limit)
             .load(connection)
 }
@@ -256,28 +252,24 @@ impl BioOttTaxonItem {
     /// # Arguments
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
-    /// * `threshold` - The similarity threshold, by default `0.6`.
     /// * `connection` - The connection to the database.
     ///
     pub fn search(
         query: &str,
         limit: Option<i32>,
-        threshold: Option<f64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         let limit = limit.unwrap_or(10);
-        let threshold = threshold.unwrap_or(0.3);
         if query.is_empty() {
             return Self::all(Some(limit as i64), connection);
         }
         let similarity_query = concat!(
-            "SELECT bio_ott_taxon_items.id, bio_ott_taxon_items.name, bio_ott_taxon_items.ott_id, bio_ott_taxon_items.ott_rank_id, bio_ott_taxon_items.wikidata_id, bio_ott_taxon_items.ncbi_id, bio_ott_taxon_items.gbif_id, bio_ott_taxon_items.irmng_id, bio_ott_taxon_items.worms_id, bio_ott_taxon_items.domain_id, bio_ott_taxon_items.kingdom_id, bio_ott_taxon_items.phylum_id, bio_ott_taxon_items.class_id, bio_ott_taxon_items.order_id, bio_ott_taxon_items.family_id, bio_ott_taxon_items.genus_id, bio_ott_taxon_items.parent_id, bio_ott_taxon_items.font_awesome_icon_id, bio_ott_taxon_items.color_id FROM bio_ott_taxon_items ",
-            "WHERE similarity(bio_ott_taxon_items.name, $1) > 0.0 ",
-            "ORDER BY similarity(bio_ott_taxon_items.name, $1) DESC LIMIT $3;"
+            "SELECT id, name, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, font_awesome_icon_id, color_id FROM bio_ott_taxon_items ",
+            "WHERE name % $1 ",
+            "ORDER BY name <-> $1 LIMIT $2;"
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
-            .bind::<diesel::sql_types::Float8, _>(threshold)
             .bind::<diesel::sql_types::Integer, _>(limit)
             .load(connection)
 }
@@ -350,28 +342,24 @@ impl Color {
     /// # Arguments
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
-    /// * `threshold` - The similarity threshold, by default `0.6`.
     /// * `connection` - The connection to the database.
     ///
     pub fn search(
         query: &str,
         limit: Option<i32>,
-        threshold: Option<f64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         let limit = limit.unwrap_or(10);
-        let threshold = threshold.unwrap_or(0.3);
         if query.is_empty() {
             return Self::all(Some(limit as i64), connection);
         }
         let similarity_query = concat!(
-            "SELECT colors.id, colors.name, colors.hexadecimal_value FROM colors ",
-            "WHERE similarity(colors.name, $1) > 0.0 ",
-            "ORDER BY similarity(colors.name, $1) DESC LIMIT $3;"
+            "SELECT id, name, hexadecimal_value FROM colors ",
+            "WHERE name % $1 ",
+            "ORDER BY name <-> $1 LIMIT $2;"
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
-            .bind::<diesel::sql_types::Float8, _>(threshold)
             .bind::<diesel::sql_types::Integer, _>(limit)
             .load(connection)
 }
@@ -1009,28 +997,24 @@ impl FontAwesomeIcon {
     /// # Arguments
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
-    /// * `threshold` - The similarity threshold, by default `0.6`.
     /// * `connection` - The connection to the database.
     ///
     pub fn search(
         query: &str,
         limit: Option<i32>,
-        threshold: Option<f64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         let limit = limit.unwrap_or(10);
-        let threshold = threshold.unwrap_or(0.3);
         if query.is_empty() {
             return Self::all(Some(limit as i64), connection);
         }
         let similarity_query = concat!(
-            "SELECT font_awesome_icons.id, font_awesome_icons.name FROM font_awesome_icons ",
-            "WHERE similarity(font_awesome_icons.name, $1) > 0.0 ",
-            "ORDER BY similarity(font_awesome_icons.name, $1) DESC LIMIT $3;"
+            "SELECT id, name FROM font_awesome_icons ",
+            "WHERE name % $1 ",
+            "ORDER BY name <-> $1 LIMIT $2;"
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
-            .bind::<diesel::sql_types::Float8, _>(threshold)
             .bind::<diesel::sql_types::Integer, _>(limit)
             .load(connection)
 }
@@ -2381,28 +2365,24 @@ impl ProjectState {
     /// # Arguments
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
-    /// * `threshold` - The similarity threshold, by default `0.6`.
     /// * `connection` - The connection to the database.
     ///
     pub fn search(
         query: &str,
         limit: Option<i32>,
-        threshold: Option<f64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         let limit = limit.unwrap_or(10);
-        let threshold = threshold.unwrap_or(0.3);
         if query.is_empty() {
             return Self::all(Some(limit as i64), connection);
         }
         let similarity_query = concat!(
-            "SELECT project_states.id, project_states.name, project_states.description, project_states.font_awesome_icon, project_states.icon_color FROM project_states ",
-            "WHERE similarity(project_states.name, $1) + similarity(project_states.description, $1) > 0.0 ",
-            "ORDER BY similarity(project_states.name, $1) + similarity(project_states.description, $1) DESC LIMIT $3;"
+            "SELECT id, name, description, font_awesome_icon, icon_color FROM project_states ",
+            "WHERE f_concat_project_states_name_description(name, description) % $1 ",
+            "ORDER BY f_concat_project_states_name_description(name, description) <-> $1 LIMIT $2;"
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
-            .bind::<diesel::sql_types::Float8, _>(threshold)
             .bind::<diesel::sql_types::Integer, _>(limit)
             .load(connection)
 }
@@ -2517,28 +2497,24 @@ impl Project {
     /// # Arguments
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
-    /// * `threshold` - The similarity threshold, by default `0.6`.
     /// * `connection` - The connection to the database.
     ///
     pub fn search(
         query: &str,
         limit: Option<i32>,
-        threshold: Option<f64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         let limit = limit.unwrap_or(10);
-        let threshold = threshold.unwrap_or(0.3);
         if query.is_empty() {
             return Self::all(Some(limit as i64), connection);
         }
         let similarity_query = concat!(
-            "SELECT projects.id, projects.name, projects.description, projects.public, projects.state_id, projects.parent_project_id, projects.budget, projects.expenses, projects.created_by, projects.created_at, projects.expected_end_date, projects.end_date FROM projects ",
-            "WHERE similarity(projects.name, $1) + similarity(projects.description, $1) > 0.0 ",
-            "ORDER BY similarity(projects.name, $1) + similarity(projects.description, $1) DESC LIMIT $3;"
+            "SELECT id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, expected_end_date, end_date FROM projects ",
+            "WHERE f_concat_projects_name_description(name, description) % $1 ",
+            "ORDER BY f_concat_projects_name_description(name, description) <-> $1 LIMIT $2;"
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
-            .bind::<diesel::sql_types::Float8, _>(threshold)
             .bind::<diesel::sql_types::Integer, _>(limit)
             .load(connection)
 }
@@ -2760,28 +2736,24 @@ impl SampleState {
     /// # Arguments
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
-    /// * `threshold` - The similarity threshold, by default `0.6`.
     /// * `connection` - The connection to the database.
     ///
     pub fn search(
         query: &str,
         limit: Option<i32>,
-        threshold: Option<f64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         let limit = limit.unwrap_or(10);
-        let threshold = threshold.unwrap_or(0.3);
         if query.is_empty() {
             return Self::all(Some(limit as i64), connection);
         }
         let similarity_query = concat!(
-            "SELECT sample_states.id, sample_states.name, sample_states.description, sample_states.font_awesome_icon, sample_states.icon_color FROM sample_states ",
-            "WHERE similarity(sample_states.name, $1) + similarity(sample_states.description, $1) > 0.0 ",
-            "ORDER BY similarity(sample_states.name, $1) + similarity(sample_states.description, $1) DESC LIMIT $3;"
+            "SELECT id, name, description, font_awesome_icon, icon_color FROM sample_states ",
+            "WHERE f_concat_sample_states_name_description(name, description) % $1 ",
+            "ORDER BY f_concat_sample_states_name_description(name, description) <-> $1 LIMIT $2;"
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
-            .bind::<diesel::sql_types::Float8, _>(threshold)
             .bind::<diesel::sql_types::Integer, _>(limit)
             .load(connection)
 }
@@ -3052,28 +3024,24 @@ impl SamplingProcedure {
     /// # Arguments
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
-    /// * `threshold` - The similarity threshold, by default `0.6`.
     /// * `connection` - The connection to the database.
     ///
     pub fn search(
         query: &str,
         limit: Option<i32>,
-        threshold: Option<f64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         let limit = limit.unwrap_or(10);
-        let threshold = threshold.unwrap_or(0.3);
         if query.is_empty() {
             return Self::all(Some(limit as i64), connection);
         }
         let similarity_query = concat!(
-            "SELECT sampling_procedures.id, sampling_procedures.name, sampling_procedures.description, sampling_procedures.created_by FROM sampling_procedures ",
-            "WHERE similarity(sampling_procedures.name, $1) + similarity(sampling_procedures.description, $1) > 0.0 ",
-            "ORDER BY similarity(sampling_procedures.name, $1) + similarity(sampling_procedures.description, $1) DESC LIMIT $3;"
+            "SELECT id, name, description, created_by FROM sampling_procedures ",
+            "WHERE f_concat_sampling_procedures_name_description(name, description) % $1 ",
+            "ORDER BY f_concat_sampling_procedures_name_description(name, description) <-> $1 LIMIT $2;"
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
-            .bind::<diesel::sql_types::Float8, _>(threshold)
             .bind::<diesel::sql_types::Integer, _>(limit)
             .load(connection)
 }
@@ -3475,28 +3443,24 @@ impl User {
     /// # Arguments
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
-    /// * `threshold` - The similarity threshold, by default `0.6`.
     /// * `connection` - The connection to the database.
     ///
     pub fn search(
         query: &str,
         limit: Option<i32>,
-        threshold: Option<f64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         let limit = limit.unwrap_or(10);
-        let threshold = threshold.unwrap_or(0.3);
         if query.is_empty() {
             return Self::all(Some(limit as i64), connection);
         }
         let similarity_query = concat!(
-            "SELECT users.id, users.first_name, users.middle_name, users.last_name, users.created_at, users.updated_at FROM users ",
-            "WHERE similarity(users.first_name, $1) + similarity(users.middle_name, $1) + similarity(users.last_name, $1) > 0.0 ",
-            "ORDER BY similarity(users.first_name, $1) + similarity(users.middle_name, $1) + similarity(users.last_name, $1) DESC LIMIT $3;"
+            "SELECT id, first_name, middle_name, last_name, created_at, updated_at FROM users ",
+            "WHERE f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text) % $1 ",
+            "ORDER BY f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text) <-> $1 LIMIT $2;"
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
-            .bind::<diesel::sql_types::Float8, _>(threshold)
             .bind::<diesel::sql_types::Integer, _>(limit)
             .load(connection)
 }

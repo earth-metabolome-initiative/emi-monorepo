@@ -77,14 +77,12 @@ impl NestedBioOttRank {
     /// # Arguments
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
-    /// * `threshold` - The similarity threshold, by default `0.6`.
     pub fn search(
         query: &str,
         limit: Option<i32>,
-        threshold: Option<f64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = BioOttRank::search(query, limit, threshold, connection)?;
+        let flat_structs = BioOttRank::search(query, limit, connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self::get(flat_struct.id, connection)?);
@@ -217,14 +215,12 @@ impl NestedBioOttTaxonItem {
     /// # Arguments
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
-    /// * `threshold` - The similarity threshold, by default `0.6`.
     pub fn search(
         query: &str,
         limit: Option<i32>,
-        threshold: Option<f64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = BioOttTaxonItem::search(query, limit, threshold, connection)?;
+        let flat_structs = BioOttTaxonItem::search(query, limit, connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self::get(flat_struct.id, connection)?);
@@ -1787,14 +1783,12 @@ impl NestedProject {
     /// # Arguments
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
-    /// * `threshold` - The similarity threshold, by default `0.6`.
     pub fn search(
         query: &str,
         limit: Option<i32>,
-        threshold: Option<f64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = Project::search(query, limit, threshold, connection)?;
+        let flat_structs = Project::search(query, limit, connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self::get(flat_struct.id, connection)?);
@@ -2091,14 +2085,12 @@ impl NestedSamplingProcedure {
     /// # Arguments
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
-    /// * `threshold` - The similarity threshold, by default `0.6`.
     pub fn search(
         query: &str,
         limit: Option<i32>,
-        threshold: Option<f64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = SamplingProcedure::search(query, limit, threshold, connection)?;
+        let flat_structs = SamplingProcedure::search(query, limit, connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self::get(flat_struct.id, connection)?);
@@ -2430,14 +2422,12 @@ impl NestedPublicUser {
     /// # Arguments
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
-    /// * `threshold` - The similarity threshold, by default `0.6`.
     pub fn search(
         query: &str,
         limit: Option<i32>,
-        threshold: Option<f64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = PublicUser::search(query, limit, threshold, connection)?;
+        let flat_structs = PublicUser::search(query, limit, connection)?;
         let mut nested_structs = Vec::new();
         for flat_struct in flat_structs {
             nested_structs.push(Self::get(flat_struct.id, connection)?);

@@ -8,6 +8,7 @@ use crate::workers::WebsocketWorker;
 use gloo::timers::callback::Timeout;
 use serde::Serialize;
 use std::collections::HashSet;
+use std::fmt::Debug;
 use std::rc::Rc;
 use web_common::api::form_traits::FormMethod;
 use web_common::api::ws::messages::*;
@@ -20,7 +21,7 @@ use yew_router::prelude::use_navigator;
 use yewdux::prelude::*;
 
 /// Trait defining something that can be used to build something else by a form.
-pub trait FormBuilder: Clone + Store + PartialEq + Serialize {
+pub trait FormBuilder: Clone + Store + PartialEq + Serialize + Debug {
     type Data: FormBuildable<Builder = Self>;
     type Actions: Reducer<Self>;
 
@@ -266,6 +267,7 @@ where
                     }}
                     <span>{format!("{} {}", Data::METHOD.to_crud(), Data::task_target())}</span>
                 </button>
+                <div>{format!("{:?}", ctx.props().builder.clone())}</div>
                 <div class="clear"></div>
             </form>
         }
