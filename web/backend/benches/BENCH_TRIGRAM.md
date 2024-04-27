@@ -18,15 +18,15 @@ We have not yet measured the different memory usage of the data structures. We w
 
 | Lowercased | Data Structure           | Type       | Time 1      | Time 2      | Time 3      |
 |------------|--------------------------|------------|-------------|-------------|-------------|
-| Yes        | BiWebgraph               | Sequential | 4.7489 s    | 4.7495 s    | 4.7501 s    |
+| No         | BiWebgraph               | Sequential | 4.7489 s    | 4.7495 s    | 4.7501 s    |
 | No         | Bit Field Vector         | Sequential | 832.56 ms   | 832.71 ms   | 832.85 ms   |
 | Yes        | Postgres (% & <->)       | Sequential | 309.57 ms   | 309.60 ms   | 309.62 ms   |
-| Yes        | BiWebgraph               | Parallel   | 1.4514 s    | 1.4538 s    | 1.4564 s    |
+| No         | BiWebgraph               | Parallel   | 1.4514 s    | 1.4538 s    | 1.4564 s    |
 | No         | Bit Field Vector         | Parallel   | 286.36 ms   | 287.90 ms   | 289.43 ms   |
 | Yes        | BiWebgraph               | Sequential | 5.4268 s    | 5.4274 s    | 5.4279 s    |
-| No         | Bit Field Vector         | Sequential | 933.60 ms   | 933.96 ms   | 934.34 ms   |
+| Yes        | Bit Field Vector         | Sequential | 933.60 ms   | 933.96 ms   | 934.34 ms   |
 | Yes        | BiWebgraph               | Parallel   | 1.4600 s    | 1.4625 s    | 1.4651 s    |
-| No         | Bit Field Vector         | Parallel   | 279.95 ms   | 281.32 ms   | 282.69 ms   |
+| Yes        | Bit Field Vector         | Parallel   | 279.95 ms   | 281.32 ms   | 282.69 ms   |
 
 
 ## Benchmarks on NCBI taxonomy
