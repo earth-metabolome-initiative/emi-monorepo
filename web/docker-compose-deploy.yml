@@ -74,6 +74,7 @@ services:
       ACTIX_PORT: ${ACTIX_PORT}
       ACTIX_WORKER_THREADS: ${ACTIX_WORKER_THREADS}
       DOCUMENTS_DIRECTORY: ${DOCUMENTS_DIRECTORY}
+      DOMAIN: ${DOMAIN}
     volumes:
       - ./:/app
     ports:
@@ -90,12 +91,16 @@ services:
       dockerfile: DockerfileDeploy
       args:
         ACTIX_PORT: ${ACTIX_PORT}
+        NGINX_HTTP_PORT: ${NGINX_HTTP_PORT}
+        NGINX_HTTPS_PORT: ${NGINX_HTTPS_PORT}
         DOMAIN: ${DOMAIN}
         NGINX_WORKER_PROCESSES: ${NGINX_WORKER_PROCESSES}
     volumes:
       - ./nginx:/app
     environment:
       ACTIX_PORT: ${ACTIX_PORT}
+      NGINX_HTTP_PORT: ${NGINX_HTTP_PORT}
+      NGINX_HTTPS_PORT: ${NGINX_HTTPS_PORT}
       DOMAIN: ${DOMAIN}
       NGINX_WORKER_PROCESSES: ${NGINX_WORKER_PROCESSES}
     ports:

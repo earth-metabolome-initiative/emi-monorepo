@@ -9,9 +9,8 @@ impl RowToBadge for NestedBioOttTaxonItem {
         html! {
             <div>
                 <p>
-                    <i class={format!("{} {}", self.font_awesome_icon.name, self.color.name)}></i>
-                    <span>{self.name.format_match(query)}</span>
-                    <span>{}</span>
+                    <i class={format!("fa-solid {} {}", self.font_awesome_icon.name, self.color.name)}></i>
+                    <span>{self.inner.name.format_match(query)}</span>
                 </p>
             </div>
         }
@@ -20,18 +19,18 @@ impl RowToBadge for NestedBioOttTaxonItem {
     fn to_selected_datalist_badge(&self) -> Html {
         html! {
             <p>
-            <i class={format!("{} {}", self.font_awesome_icon.name, self.color.name)}></i>
-                <span>{&self.name}</span>
+            <i class={format!("fa-solid {} {}", self.font_awesome_icon.name, self.color.name)}></i>
+                <span>{&self.inner.name}</span>
             </p>
         }
     }
 
     fn matches(&self, query: &str) -> bool {
-        self.name == query
+        self.inner.name == query
     }
 
     fn similarity_score(&self, query: &str) -> isize {
-        self.name.similarity_score(query)
+        self.inner.name.similarity_score(query)
     }
 
     fn primary_color_class(&self) -> &str {

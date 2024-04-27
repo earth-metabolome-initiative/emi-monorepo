@@ -40,15 +40,15 @@ impl DBWorker {
 
             // Execute the initial SQL to create the tables
             // in the IndexedDB
-            database
-                .execute(
-                    [load_sql!(
-                        "../backend/migrations/00000000000031_create_taxa_table/up.sql"
-                    )]
-                    .join(";"),
-                )
-                .await
-                .unwrap();
+            // database
+            //     .execute(
+            //         [load_sql!(
+            //             "../backend/migrations/00000000000031_create_taxa_table/up.sql"
+            //         )]
+            //         .join(";"),
+            //     )
+            //     .await
+            //     .unwrap();
 
             // Then we start listening for queries
             while let Some(query) = receiver.next().await {

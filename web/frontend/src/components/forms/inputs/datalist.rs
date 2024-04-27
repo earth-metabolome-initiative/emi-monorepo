@@ -229,11 +229,11 @@ where
                 // If ths system has already returned a list of candidates that is
                 // less than the maximum number of candidates, we do not want to
                 // pester the server with another request, as the list will not change.
-                if !self.candidates.is_empty()
-                    && self.candidates.len() <= ctx.props().number_of_candidates as usize
-                {
-                    return false;
-                }
+                // if !self.candidates.is_empty()
+                //     && self.candidates.len() <= ctx.props().number_of_candidates as usize
+                // {
+                //     return false;
+                // }
                 let query = self.current_value.clone().unwrap_or_else(|| "".to_string());
                 self.websocket
                     .send(Data::search_task(query, ctx.props().number_of_candidates).into());

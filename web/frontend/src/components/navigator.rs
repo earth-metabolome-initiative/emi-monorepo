@@ -98,7 +98,6 @@ impl Component for Navigator {
             websocket: ctx.link().bridge_worker(Callback::from({
                 let link = ctx.link().clone();
                 move |message: BackendMessage| {
-                    log::info!("Received message from websocket: {:?}", message);
                     link.send_message(NavigatorMessage::Backend(message));
                 }
             })),

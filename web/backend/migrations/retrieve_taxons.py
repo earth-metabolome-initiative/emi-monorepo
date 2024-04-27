@@ -289,6 +289,24 @@ def retrieve_taxons():
     # We drop the rank column
     df = df.drop(columns=["rank"])
 
+    # Since in SQL the Serial ids do not start from zero but from one,
+    # and we populated the ids in the dataframe starting from zero, we
+    # need to add one to all the ids.
+    for column in [
+        "parent_id",
+        "color_id",
+        "ott_rank_id",
+        "font_awesome_icon_id",
+        "kingdom",
+        "phylum",
+        "class",
+        "order",
+        "family",
+        "genus",
+        "domain",
+    ]:
+        df[column] += 1
+
     # We handle the corner case represented by the "Allocotidus"
     # entry from the irmng dataset. For some reason, while it has
     # always numerical ids, for this entry it has as value "Allocotidus"

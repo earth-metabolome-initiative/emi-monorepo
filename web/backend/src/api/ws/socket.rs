@@ -184,7 +184,6 @@ impl actix::Handler<BackendMessage> for WebSocket {
     type Result = ();
 
     fn handle(&mut self, msg: BackendMessage, ctx: &mut Self::Context) {
-        log::info!("Sending message to frontend: {:?}", msg);
         ctx.binary(msg);
     }
 }

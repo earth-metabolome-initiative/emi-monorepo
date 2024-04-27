@@ -1,5 +1,5 @@
 use crate::{custom_validators::*, database::SampleState};
-use crate::database::{Insert, NestedBioOttTaxonItem, NestedPublicUser, SamplingProcedure, User};
+use crate::database::{Insert, NestedBioOttTaxonItem, NestedPublicUser, SamplingProcedure};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
