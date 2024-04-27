@@ -59,6 +59,7 @@ indicatif = "0.17.8"
 ngrammatic = {git ="https://github.com/LucaCappelletti94/ngrammatic.git" }
 paste = "1.0.14"
 criterion = { version = "0.5", features = ["html_reports"] }
+flate2 = "1.0.29"
 
 [[bench]]
 name = "bench_trigram"

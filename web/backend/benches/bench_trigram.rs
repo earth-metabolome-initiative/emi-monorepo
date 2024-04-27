@@ -2,7 +2,7 @@
 //! query on species names using either Diesel + PostgreSQL or alternatively Ngrammatics.
 #![feature(test)]
 extern crate test;
-use backend::models::Taxa;
+use backend::models::BioOttTaxonItem;
 use criterion::{criterion_group, criterion_main, Criterion};
 use diesel::{r2d2::ConnectionManager, PgConnection};
 use ngrammatic::prelude::*;
@@ -14,11 +14,11 @@ fn iter_taxons() -> impl Iterator<Item = String> {
     use std::fs::File;
     use std::io::{BufRead, BufReader};
 
-    let file = File::open("./db_data/taxons.tsv").unwrap();
-    let reader = BufReader::new(file);
+    let file = File::open("./db_data/bio_ott_taxons.csv.gz").unwrap();
+    let reader = BufReader::new(flate2::read::GzDecoder::new(file));
     reader
         .lines()
-        .map(|line| line.unwrap().split('\t').nth(1).unwrap().to_string())
+        .map(|line| line.unwrap().split(',').nth(1).unwrap().to_string())
 }
 
 fn build_vec() -> Vec<String> {
@@ -71,7 +71,7 @@ fn ngram_search<NG, B, G, R>(
     for<'a> <B as ngrammatic::Keys<NG>>::KeyRef<'a>: AsRef<R>,
 {
     let search_config = NgramSearchConfig::default()
-        .set_minimum_similarity_score(0.6)
+        .set_minimum_similarity_score(0.3)
         .unwrap()
         // The old approach by default returned 10 results, so
         // to better compare the two, we set the same limit here.
@@ -223,9 +223,9 @@ fn postgres_diesel(c: &mut Criterion) {
 
     c.bench_function("postgres_diesel", |b| {
         b.iter(|| {
-            let _ = Taxa::search("Acanthocephala", Some(10), Some(0.6), &mut connection);
-            let _ = Taxa::search("Doggus Lionenus", Some(10), Some(0.6), &mut connection);
-            let _ = Taxa::search("Felis Caninus", Some(10), Some(0.6), &mut connection);
+            let _ = BioOttTaxonItem::search("Acanthocephala", Some(10), &mut connection);
+            let _ = BioOttTaxonItem::search("Doggus Lionenus", Some(10), &mut connection);
+            let _ = BioOttTaxonItem::search("Felis Caninus", Some(10), &mut connection);
         });
     });
 }
