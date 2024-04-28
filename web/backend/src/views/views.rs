@@ -84,14 +84,14 @@ impl PublicUser {
             .filter(public_users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
-    /// Search for the struct by a given string.
+    /// Search for the struct by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn search(
+    pub fn similarity_search(
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -103,8 +103,68 @@ impl PublicUser {
         let similarity_query = concat!(
             "WITH selected_ids AS (",
             "SELECT users.id AS id FROM users ",
-            "WHERE f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text) % $1 ",
-            "ORDER BY f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text) <-> $1 LIMIT $2",
+            "WHERE $1 % f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text)  ",
+            "ORDER BY similarity($1, f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text)) LIMIT $2",
+         ")",
+            "SELECT id, first_name, middle_name, last_name, created_at, updated_at, thumbnail_id, picture_id FROM public_users ",
+            "JOIN selected_ids ON selected_ids.id = public_users.id"
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), connection);
+        }
+        let similarity_query = concat!(
+            "WITH selected_ids AS (",
+            "SELECT users.id AS id FROM users ",
+            "WHERE $1 <% f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text)  ",
+            "ORDER BY word_similarity($1, f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text)) LIMIT $2",
+         ")",
+            "SELECT id, first_name, middle_name, last_name, created_at, updated_at, thumbnail_id, picture_id FROM public_users ",
+            "JOIN selected_ids ON selected_ids.id = public_users.id"
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), connection);
+        }
+        let similarity_query = concat!(
+            "WITH selected_ids AS (",
+            "SELECT users.id AS id FROM users ",
+            "WHERE $1 <<% f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text)  ",
+            "ORDER BY strict_word_similarity($1, f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text)) LIMIT $2",
          ")",
             "SELECT id, first_name, middle_name, last_name, created_at, updated_at, thumbnail_id, picture_id FROM public_users ",
             "JOIN selected_ids ON selected_ids.id = public_users.id"

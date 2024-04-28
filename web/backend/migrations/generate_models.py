@@ -82,13 +82,26 @@ def struct_name_from_table_name(table_name: str) -> str:
 class PGIndex:
 
     def __init__(
-        self, name: str, table_name: str, arguments: str
+        self, name: str,
+        table_name: str,
+        arguments: str,
+        index_type: str
     ):
         self.name = name
         self.table_name = table_name
         self.arguments = arguments
+        self.index_type = index_type
+
+    def is_gin(self) -> bool:
+        return self.index_type == "gin_trgm_ops"
 
 class PGIndices:
+
+    SIMILARITY_METHODS = (
+        ("similarity", "%", "<->"),
+        ("word_similarity", "<%", "<<->"),
+        ("strict_word_similarity", "<<%", "<<<->"),
+    )
 
     def __init__(self, indices: List[PGIndex]):
         self.indices = indices
@@ -309,7 +322,10 @@ def find_pg_trgm_indices() -> PGIndices:
             pg_indexes
         WHERE
             indexdef ILIKE '%using gin%'
-            AND indexdef ILIKE '%gin_trgm_ops%';
+            AND indexdef ILIKE '%gin_trgm_ops%'
+            OR
+            indexdef ILIKE '%using gist%'
+            AND indexdef ILIKE '%gist_trgm_ops%';
         """
     )
     indices = cursor.fetchall()
@@ -320,23 +336,33 @@ def find_pg_trgm_indices() -> PGIndices:
         table_columns = tables_metadata.get_columns(table_name)
         arguments = index[2]
 
-        # At this time, we only support indices with a single gin_trgm_ops.
+        index_type = None
+        for possible_index_type in (
+            "gin_trgm_ops",
+            "gist_trgm_ops",
+        ):
+            if possible_index_type in arguments:
+                index_type = possible_index_type
+                break
+
+        # At this time, we only support indices with a single {index_type}.
         # We check that in the definition of the index there appears
-        # only a single gin_trgm_ops call.
-        if arguments.count("gin_trgm_ops") != 1:
+        # only a single {index_type} call.
+        if arguments.count(index_type) != 1:
             raise ValueError(
-                f"The index {index[0]} has more than one gin_trgm_ops call."
+                f"The index {index[0]} has more than one {index_type} call."
             )
 
-        assert arguments.endswith(" gin_trgm_ops")
+        assert arguments.endswith(f" {index_type}")
 
-        arguments = arguments.replace(" gin_trgm_ops", "")
+        arguments = arguments.replace(f" {index_type}", "")
 
         pg_indices.append(
             PGIndex(
                 name=index[0],
                 table_name=index[1],
                 arguments=arguments,
+                index_type=index_type,
             )
         )
 
@@ -1199,64 +1225,71 @@ def write_from_impls(
                     similarity_index: PGIndex = similarity_indices.get_table(
                         struct.table_name
                     )
-                    new_content += "    /// Search for the struct by a given string.\n"
-                    new_content += "    ///\n"
-                    new_content += "    /// # Arguments\n"
-                    new_content += "    /// * `query` - The string to search for.\n"
-                    new_content += "    /// * `limit` - The maximum number of results, by default `10`.\n"
-                    new_content += (
-                        "    /// * `connection` - The connection to the database.\n"
-                    )
-                    new_content += "    ///\n"
-                    new_content += "    pub fn search(\n"
-                    new_content += "        query: &str,\n"
-                    new_content += "        limit: Option<i32>,\n"
-                    new_content += "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
-                    new_content += (
-                        "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
-                    )
 
-                    new_content += "        let limit = limit.unwrap_or(10);\n"
+                    for method_name, similarity_operator, distance_operator in PGIndices.SIMILARITY_METHODS:
 
-                    # If the query string is empty, we run an all query with the
-                    # limit parameter provided instead of a more complex similarity
-                    # search.
-                    new_content += "        if query.is_empty() {\n"
-                    new_content += "            return Self::all(Some(limit as i64), connection);\n"
-                    new_content += "        }\n"
-
-                    joined_field_names = ", ".join(struct_field_names)
-
-                    if table_type == "views":
-                        new_content += "        let similarity_query = concat!(\n"
-                        new_content += f'            "WITH selected_ids AS (",\n'
-                        new_content += f'            "SELECT {similarity_index.table_name}.{primary_key.name} AS id FROM {similarity_index.table_name} ",\n'
-                        new_content += f'            "WHERE {similarity_index.arguments} % $1 ",\n'
+                        new_content += f"    /// Search for the struct by a given string by Postgres's `{method_name}`.\n"
+                        new_content += "    ///\n"
+                        new_content += "    /// # Arguments\n"
+                        new_content += "    /// * `query` - The string to search for.\n"
+                        new_content += "    /// * `limit` - The maximum number of results, by default `10`.\n"
+                        new_content += "    /// * `connection` - The connection to the database.\n"
+                        new_content += "    ///\n"
+                        new_content += f"    pub fn {method_name}_search(\n"
+                        new_content += "        query: &str,\n"
+                        new_content += "        limit: Option<i32>,\n"
+                        new_content += "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
                         new_content += (
-                            f'            "ORDER BY {similarity_index.arguments} <-> $1 LIMIT $2",\n'
+                            "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
                         )
-                        new_content += '         ")",\n'
-                        new_content += f'            "SELECT {joined_field_names} FROM {struct.table_name} ",\n'
-                        new_content += f'            "JOIN selected_ids ON selected_ids.id = {struct.table_name}.id"\n'
-                        new_content += "        );\n"
-                    else:
-                        new_content += "        let similarity_query = concat!(\n"
-                        new_content += f'            "SELECT {joined_field_names} FROM {struct.table_name} ",\n'
-                        new_content += f'            "WHERE {similarity_index.arguments} % $1 ",\n'
-                        new_content += (
-                            f'            "ORDER BY {similarity_index.arguments} <-> $1 LIMIT $2;"\n'
-                        )
-                        new_content += "        );\n"
 
-                    new_content += "        diesel::sql_query(similarity_query)\n"
-                    new_content += (
-                        "            .bind::<diesel::sql_types::Text, _>(query)\n"
-                    )
-                    new_content += (
-                        "            .bind::<diesel::sql_types::Integer, _>(limit)\n"
-                    )
-                    new_content += "            .load(connection)\n"
-                    new_content += "}\n"
+                        new_content += "        let limit = limit.unwrap_or(10);\n"
+
+                        # If the query string is empty, we run an all query with the
+                        # limit parameter provided instead of a more complex similarity
+                        # search.
+                        new_content += "        if query.is_empty() {\n"
+                        new_content += "            return Self::all(Some(limit as i64), connection);\n"
+                        new_content += "        }\n"
+
+                        joined_field_names = ", ".join(struct_field_names)
+
+                        if table_type == "views":
+                            new_content += "        let similarity_query = concat!(\n"
+                            new_content += f'            "WITH selected_ids AS (",\n'
+                            new_content += f'            "SELECT {similarity_index.table_name}.{primary_key.name} AS id FROM {similarity_index.table_name} ",\n'
+                            if similarity_index.is_gin():
+                                new_content += f'            "WHERE $1 {similarity_operator} {similarity_index.arguments}  ",\n'
+                                new_content += f'            "ORDER BY {method_name}($1, {similarity_index.arguments}) LIMIT $2",\n'
+                            else:
+                                new_content += (
+                                    f'            "ORDER BY $1 {distance_operator} {similarity_index.arguments} LIMIT $2",\n'
+                                )
+                            new_content += '         ")",\n'
+                            new_content += f'            "SELECT {joined_field_names} FROM {struct.table_name} ",\n'
+                            new_content += f'            "JOIN selected_ids ON selected_ids.id = {struct.table_name}.id"\n'
+                            new_content += "        );\n"
+                        else:
+                            new_content += "        let similarity_query = concat!(\n"
+                            new_content += f'            "SELECT {joined_field_names} FROM {struct.table_name} ",\n'
+                            if similarity_index.is_gin():
+                                new_content += f'            "WHERE $1 {similarity_operator} {similarity_index.arguments} ",\n'
+                                new_content += f'            "ORDER BY {method_name}($1, {similarity_index.arguments}) LIMIT $2",\n'
+                            else:
+                                new_content += (
+                                    f'            "ORDER BY $1 {distance_operator} {similarity_index.arguments} LIMIT $2;"\n'
+                                )
+                            new_content += "        );\n"
+
+                        new_content += "        diesel::sql_query(similarity_query)\n"
+                        new_content += (
+                            "            .bind::<diesel::sql_types::Text, _>(query)\n"
+                        )
+                        new_content += (
+                            "            .bind::<diesel::sql_types::Integer, _>(limit)\n"
+                        )
+                        new_content += "            .load(connection)\n"
+                        new_content += "}\n"
 
                 # Finally, we cluse the struct implementation.
                 new_content += "}\n"
@@ -2298,70 +2331,26 @@ def generate_nested_structs(
         tables.write("}\n\n")
 
         # We implement the all for the nested structs
+
+        # First, we implement a method that will be reused by several of the following methods,
+        # including the all, get and search ones: a method that given the flat struct and a connection
+        # to the database returns a result containing the nested struct.
         tables.write(
             f"impl {nested_struct_name} {{\n"
-            "    /// Get all the nested structs from the database.\n"
+            "    /// Convert the flat struct to the nested struct.\n"
             "    ///\n"
             "    /// # Arguments\n"
-            "    /// * `limit` - The maximum number of rows to return.\n"
+            "    /// * `flat_struct` - The flat struct.\n"
             "    /// * `connection` - The database connection.\n"
-            "    pub fn all(\n"
-            "        limit: Option<i64>,\n"
+            "    pub fn from_flat(\n"
+            f"        flat_struct: {struct.name},\n"
             "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
-            "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
-            f"        let flat_structs = {struct.name}::all(limit, connection)?;\n"
-            "        let mut nested_structs = Vec::new();\n"
-            "        for flat_struct in flat_structs {\n"
-            "            nested_structs.push(Self {\n"
+            "    ) -> Result<Self, diesel::result::Error> {\n"
+            "        Ok(Self {\n"
         )
         for attribute in new_struct_metadata.attributes:
             if attribute.name == "inner":
                 continue
-            if (
-                attribute.data_type() == new_struct_metadata.name
-                or struct.has_attribute(attribute)
-            ):
-                tables.write(
-                    f"            {attribute.name}: flat_struct.{attribute.name},\n"
-                )
-                continue
-            if attribute.optional:
-                tables.write(
-                    f"                {attribute.name}: flat_struct.{attribute.original_name}.map(|flat_struct| {attribute.data_type()}::get(flat_struct, connection)).transpose()?,\n"
-                )
-            else:
-                tables.write(
-                    f"                {attribute.name}: {attribute.data_type()}::get(flat_struct.{attribute.original_name}, connection)?,\n"
-                )
-        if any(
-            attribute.name == primary_key_attribute for attribute in struct.attributes
-        ):
-            tables.write(f"                inner: flat_struct,\n")
-
-        tables.write(
-            "            });\n"
-            "        }\n"
-            "        Ok(nested_structs)\n"
-            "    }\n"
-            "}\n"
-        )
-
-        tables.write(
-            f"impl {new_struct_metadata.name} {{\n"
-            "    /// Get the nested struct from the provided primary key.\n"
-            "    ///\n"
-            "    /// # Arguments\n"
-            f"    /// * `{primary_key_attribute}` - The primary key of the row.\n"
-            "    /// * `connection` - The database connection.\n"
-            "    pub fn get(\n"
-            f"        {primary_key_attribute}: {rust_primary_key_type},\n"
-            "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
-            "    ) -> Result<Self, diesel::result::Error>\n"
-            "    {\n"
-            f"        let flat_struct = {struct.name}::get({primary_key_attribute}, connection)?;\n"
-            "        Ok(Self {\n"
-        )
-        for attribute in new_struct_metadata.attributes:
             if (
                 attribute.data_type() == new_struct_metadata.name
                 or struct.has_attribute(attribute)
@@ -2378,7 +2367,46 @@ def generate_nested_structs(
                 tables.write(
                     f"            {attribute.name}: {attribute.data_type()}::get(flat_struct.{attribute.original_name}, connection)?,\n"
                 )
+        if any(
+            attribute.name == primary_key_attribute for attribute in struct.attributes
+        ):
+            tables.write(f"                inner: flat_struct,\n")
         tables.write("        })\n" "    }\n" "}\n")
+
+        # Then we implement the all query.
+
+        tables.write(
+            f"impl {nested_struct_name} {{\n"
+            "    /// Get all the nested structs from the database.\n"
+            "    ///\n"
+            "    /// # Arguments\n"
+            "    /// * `limit` - The maximum number of rows to return.\n"
+            "    /// * `connection` - The database connection.\n"
+            "    pub fn all(\n"
+            "        limit: Option<i64>,\n"
+            "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
+            "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
+            f"        {struct.name}::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()\n"
+            "    }\n"
+            "}\n"
+        )
+
+        tables.write(
+            f"impl {new_struct_metadata.name} {{\n"
+            "    /// Get the nested struct from the provided primary key.\n"
+            "    ///\n"
+            "    /// # Arguments\n"
+            f"    /// * `{primary_key_attribute}` - The primary key of the row.\n"
+            "    /// * `connection` - The database connection.\n"
+            "    pub fn get(\n"
+            f"        {primary_key_attribute}: {rust_primary_key_type},\n"
+            "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
+            "    ) -> Result<Self, diesel::result::Error>\n"
+            "    {\n"
+            f"       {struct.name}::get({primary_key_attribute}, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))\n"
+            "    }\n"
+            "}\n"
+        )
 
         # For each of the columns in the struct that have a UNIQUE constraint,
         # we implement the methods `from_{column_name}` by employing the method
@@ -2406,62 +2434,33 @@ def generate_nested_structs(
                 "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
                 "    ) -> Result<Self, diesel::result::Error>\n"
                 "    {\n"
-                f"        let flat_struct = {struct.name}::from_{attribute.name}({attribute.name}, connection)?;\n"
-                "        Ok(Self {\n"
+                f"        {struct.name}::from_{attribute.name}({attribute.name}, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))\n"
+                "    }\n"
+                "}\n"
             )
-            for attribute in new_struct_metadata.attributes:
-                if attribute.name == "inner":
-                    continue
-                if (
-                    attribute.data_type() == new_struct_metadata.name
-                    or struct.has_attribute(attribute)
-                ):
-                    tables.write(
-                        f"            {attribute.name}: flat_struct.{attribute.name},\n"
-                    )
-                    continue
-                if attribute.optional:
-                    tables.write(
-                        f"            {attribute.name}: flat_struct.{attribute.original_name}.map(|flat_struct| {attribute.data_type()}::get(flat_struct, connection)).transpose()?,\n"
-                    )
-                else:
-                    tables.write(
-                        f"            {attribute.name}: {attribute.data_type()}::get(flat_struct.{attribute.original_name}, connection)?,\n"
-                    )
-            # We handle the inner attribute
-            if any(
-                attribute.name == primary_key_attribute
-                for attribute in struct.attributes
-            ):
-                tables.write(f"            inner: flat_struct,\n")
-            tables.write("        })\n" "    }\n" "}\n")
 
         # If there is an index on the table, we implement the search method that
         # calls search on the flat version of the struct and then iterates on the
         # primary keys of the results and constructs the nested structs by calling
         # the `get` method several times.
         if similarity_indices.has_table(struct.table_name):
-            tables.write(
-                f"impl Nested{struct.name} {{\n"
-                "    /// Search the table by the query.\n"
-                "    ///\n"
-                "    /// # Arguments\n"
-                "    /// * `query` - The string to search for.\n"
-                "    /// * `limit` - The maximum number of results, by default `10`.\n"
-                "    pub fn search(\n"
-                "        query: &str,\n"
-                "        limit: Option<i32>,\n"
-                "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
-                "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
-                f"        let flat_structs = {struct.name}::search(query, limit, connection)?;\n"
-                "        let mut nested_structs = Vec::new();\n"
-                "        for flat_struct in flat_structs {\n"
-                "            nested_structs.push(Self::get(flat_struct.id, connection)?);\n"
-                "        }\n"
-                "        Ok(nested_structs)\n"
-                "    }\n"
-                "}\n"
-            )
+            for method_name, _, _ in PGIndices.SIMILARITY_METHODS:
+                tables.write(
+                    f"impl Nested{struct.name} {{\n"
+                    "    /// Search the table by the query.\n"
+                    "    ///\n"
+                    "    /// # Arguments\n"
+                    "    /// * `query` - The string to search for.\n"
+                    "    /// * `limit` - The maximum number of results, by default `10`.\n"
+                    f"    pub fn {method_name}_search(\n"
+                    "        query: &str,\n"
+                    "        limit: Option<i32>,\n"
+                    "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
+                    "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
+                    f"       {struct.name}::{method_name}_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()\n"
+                    "    }\n"
+                    "}\n"
+                )
 
         # We implement the bidirectional From methods for the nested struct
         # present in the web_common crate, which does not use Diesel or its

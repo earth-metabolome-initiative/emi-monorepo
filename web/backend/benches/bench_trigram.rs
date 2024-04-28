@@ -79,10 +79,10 @@ fn ngram_search<NG, B, G, R>(
 
     c.bench_function(
         &format!(
-            "ngram_search_{}_{}_{}",
+            "{}_{}_{}",
             // We print the name of the Graph data type used
-            std::any::type_name::<G>(),
-            std::any::type_name::<R>(),
+            std::any::type_name::<G>().split("::").last().unwrap(),
+            std::any::type_name::<R>().split("::").last().unwrap(),
             if parallel { "par" } else { "seq" }
         ),
         |b| {
@@ -197,43 +197,82 @@ fn ngrammatic_bitvec_trigram_par_search_lowercased(c: &mut Criterion) {
     );
 }
 
-fn postgres_diesel(c: &mut Criterion) {
+fn postgres_similarity(c: &mut Criterion) {
     dotenvy::dotenv().ok();
-    env_logger::init();
     let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
     // create db connection pool
     let manager: ConnectionManager<_> = ConnectionManager::<PgConnection>::new(&database_url);
-    let pool: r2d2::Pool<ConnectionManager<PgConnection>> = match r2d2::Pool::builder()
+    let pool: r2d2::Pool<ConnectionManager<PgConnection>> = r2d2::Pool::builder()
         // We set the maximum number of connections in the pool to 10
         .max_size(10)
-        .build(manager)
-    {
-        Ok(client) => {
-            log::info!("✅ Diesel connection to the database is successful!");
-            client
-        }
-        Err(e) => {
-            log::error!("🔥 Error connecting to the database with Diesel: {}", e);
-            std::process::exit(1);
-        }
-    };
+        .build(manager).unwrap();
 
     let mut connection = pool.get().unwrap();
 
-    c.bench_function("postgres_diesel", |b| {
+    c.bench_function("postgres_similarity", |b| {
         b.iter(|| {
-            let _ = BioOttTaxonItem::search("Acanthocephala", Some(10), &mut connection);
-            let _ = BioOttTaxonItem::search("Doggus Lionenus", Some(10), &mut connection);
-            let _ = BioOttTaxonItem::search("Felis Caninus", Some(10), &mut connection);
+            let _ = BioOttTaxonItem::similarity_search("Acanthocephala", Some(10), &mut connection);
+            let _ = BioOttTaxonItem::similarity_search("Doggus Lionenus", Some(10), &mut connection);
+            let _ = BioOttTaxonItem::similarity_search("Felis Caninus", Some(10), &mut connection);
+        });
+    });
+}
+
+fn postgres_word_similarity(c: &mut Criterion) {
+    dotenvy::dotenv().ok();
+    let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+
+    // create db connection pool
+    let manager: ConnectionManager<_> = ConnectionManager::<PgConnection>::new(&database_url);
+    let pool: r2d2::Pool<ConnectionManager<PgConnection>> = r2d2::Pool::builder()
+        // We set the maximum number of connections in the pool to 10
+        .max_size(10)
+        .build(manager).unwrap();
+
+    let mut connection = pool.get().unwrap();
+
+    c.bench_function("postgres_word_similarity", |b| {
+        b.iter(|| {
+            let _ = BioOttTaxonItem::word_similarity_search("Acanthocephala", Some(10), &mut connection);
+            let _ = BioOttTaxonItem::word_similarity_search("Doggus Lionenus", Some(10), &mut connection);
+            let _ = BioOttTaxonItem::word_similarity_search("Felis Caninus", Some(10), &mut connection);
+        });
+    });
+}
+
+fn postgres_strict_word_similarity(c: &mut Criterion) {
+    dotenvy::dotenv().ok();
+    let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+
+    // create db connection pool
+    let manager: ConnectionManager<_> = ConnectionManager::<PgConnection>::new(&database_url);
+    let pool: r2d2::Pool<ConnectionManager<PgConnection>> = r2d2::Pool::builder()
+        // We set the maximum number of connections in the pool to 10
+        .max_size(10)
+        .build(manager).unwrap();
+
+    let mut connection = pool.get().unwrap();
+
+    c.bench_function("postgres_strict_word_similarity", |b| {
+        b.iter(|| {
+            let _ = BioOttTaxonItem::strict_word_similarity_search("Acanthocephala", Some(10), &mut connection);
+            let _ = BioOttTaxonItem::strict_word_similarity_search("Doggus Lionenus", Some(10), &mut connection);
+            let _ = BioOttTaxonItem::strict_word_similarity_search("Felis Caninus", Some(10), &mut connection);
         });
     });
 }
 
 criterion_group!(
-    name = benches;
+    name = ngrammatic_benches;
     config = Criterion::default().measurement_time(std::time::Duration::from_secs(100));
-    targets = ngrammatic_webgraph_trigram_search, ngrammatic_bitvec_trigram_search, postgres_diesel, ngrammatic_webgraph_trigram_par_search, ngrammatic_bitvec_trigram_par_search, ngrammatic_webgraph_trigram_search_lowercased, ngrammatic_bitvec_trigram_search_lowercased, ngrammatic_webgraph_trigram_par_search_lowercased, ngrammatic_bitvec_trigram_par_search_lowercased
+    targets = ngrammatic_webgraph_trigram_search, ngrammatic_bitvec_trigram_search, ngrammatic_webgraph_trigram_par_search, ngrammatic_bitvec_trigram_par_search, ngrammatic_webgraph_trigram_search_lowercased, ngrammatic_bitvec_trigram_search_lowercased, ngrammatic_webgraph_trigram_par_search_lowercased, ngrammatic_bitvec_trigram_par_search_lowercased
 );
 
-criterion_main!(benches);
+criterion_group!(
+    name = postgres_benches;
+    config = Criterion::default().measurement_time(std::time::Duration::from_secs(100));
+    targets = postgres_similarity, postgres_word_similarity, postgres_strict_word_similarity
+);
+
+criterion_main!(postgres_benches);

@@ -94,14 +94,14 @@ impl BioOttRank {
             .filter(bio_ott_ranks::dsl::name.eq(name))
             .first::<Self>(connection)
     }
-    /// Search for the struct by a given string.
+    /// Search for the struct by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn search(
+    pub fn similarity_search(
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -112,8 +112,60 @@ impl BioOttRank {
         }
         let similarity_query = concat!(
             "SELECT id, name, font_awesome_icon_id FROM bio_ott_ranks ",
-            "WHERE name % $1 ",
-            "ORDER BY name <-> $1 LIMIT $2;"
+            "WHERE $1 % name ",
+            "ORDER BY similarity($1, name) LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, name, font_awesome_icon_id FROM bio_ott_ranks ",
+            "WHERE $1 <% name ",
+            "ORDER BY word_similarity($1, name) LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, name, font_awesome_icon_id FROM bio_ott_ranks ",
+            "WHERE $1 <<% name ",
+            "ORDER BY strict_word_similarity($1, name) LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -247,14 +299,14 @@ impl BioOttTaxonItem {
             .filter(bio_ott_taxon_items::dsl::ott_id.eq(ott_id))
             .first::<Self>(connection)
     }
-    /// Search for the struct by a given string.
+    /// Search for the struct by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn search(
+    pub fn similarity_search(
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -265,8 +317,60 @@ impl BioOttTaxonItem {
         }
         let similarity_query = concat!(
             "SELECT id, name, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, font_awesome_icon_id, color_id FROM bio_ott_taxon_items ",
-            "WHERE name % $1 ",
-            "ORDER BY name <-> $1 LIMIT $2;"
+            "WHERE $1 % name ",
+            "ORDER BY similarity($1, name) LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, name, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, font_awesome_icon_id, color_id FROM bio_ott_taxon_items ",
+            "WHERE $1 <% name ",
+            "ORDER BY word_similarity($1, name) LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, name, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, font_awesome_icon_id, color_id FROM bio_ott_taxon_items ",
+            "WHERE $1 <<% name ",
+            "ORDER BY strict_word_similarity($1, name) LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -337,14 +441,14 @@ impl Color {
             .filter(colors::dsl::id.eq(id))
             .first::<Self>(connection)
     }
-    /// Search for the struct by a given string.
+    /// Search for the struct by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn search(
+    pub fn similarity_search(
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -355,8 +459,60 @@ impl Color {
         }
         let similarity_query = concat!(
             "SELECT id, name, hexadecimal_value FROM colors ",
-            "WHERE name % $1 ",
-            "ORDER BY name <-> $1 LIMIT $2;"
+            "WHERE $1 % name ",
+            "ORDER BY similarity($1, name) LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, name, hexadecimal_value FROM colors ",
+            "WHERE $1 <% name ",
+            "ORDER BY word_similarity($1, name) LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, name, hexadecimal_value FROM colors ",
+            "WHERE $1 <<% name ",
+            "ORDER BY strict_word_similarity($1, name) LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -992,14 +1148,14 @@ impl FontAwesomeIcon {
             .filter(font_awesome_icons::dsl::name.eq(name))
             .first::<Self>(connection)
     }
-    /// Search for the struct by a given string.
+    /// Search for the struct by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn search(
+    pub fn similarity_search(
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -1010,8 +1166,60 @@ impl FontAwesomeIcon {
         }
         let similarity_query = concat!(
             "SELECT id, name FROM font_awesome_icons ",
-            "WHERE name % $1 ",
-            "ORDER BY name <-> $1 LIMIT $2;"
+            "WHERE $1 % name ",
+            "ORDER BY similarity($1, name) LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, name FROM font_awesome_icons ",
+            "WHERE $1 <% name ",
+            "ORDER BY word_similarity($1, name) LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, name FROM font_awesome_icons ",
+            "WHERE $1 <<% name ",
+            "ORDER BY strict_word_similarity($1, name) LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -2360,14 +2568,14 @@ impl ProjectState {
             .filter(project_states::dsl::id.eq(id))
             .first::<Self>(connection)
     }
-    /// Search for the struct by a given string.
+    /// Search for the struct by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn search(
+    pub fn similarity_search(
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -2378,8 +2586,60 @@ impl ProjectState {
         }
         let similarity_query = concat!(
             "SELECT id, name, description, font_awesome_icon, icon_color FROM project_states ",
-            "WHERE f_concat_project_states_name_description(name, description) % $1 ",
-            "ORDER BY f_concat_project_states_name_description(name, description) <-> $1 LIMIT $2;"
+            "WHERE $1 % f_concat_project_states_name_description(name, description) ",
+            "ORDER BY similarity($1, f_concat_project_states_name_description(name, description)) LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, name, description, font_awesome_icon, icon_color FROM project_states ",
+            "WHERE $1 <% f_concat_project_states_name_description(name, description) ",
+            "ORDER BY word_similarity($1, f_concat_project_states_name_description(name, description)) LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, name, description, font_awesome_icon, icon_color FROM project_states ",
+            "WHERE $1 <<% f_concat_project_states_name_description(name, description) ",
+            "ORDER BY strict_word_similarity($1, f_concat_project_states_name_description(name, description)) LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -2492,14 +2752,14 @@ impl Project {
             .filter(projects::dsl::name.eq(name))
             .first::<Self>(connection)
     }
-    /// Search for the struct by a given string.
+    /// Search for the struct by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn search(
+    pub fn similarity_search(
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -2510,8 +2770,60 @@ impl Project {
         }
         let similarity_query = concat!(
             "SELECT id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, expected_end_date, end_date FROM projects ",
-            "WHERE f_concat_projects_name_description(name, description) % $1 ",
-            "ORDER BY f_concat_projects_name_description(name, description) <-> $1 LIMIT $2;"
+            "WHERE $1 % f_concat_projects_name_description(name, description) ",
+            "ORDER BY similarity($1, f_concat_projects_name_description(name, description)) LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, expected_end_date, end_date FROM projects ",
+            "WHERE $1 <% f_concat_projects_name_description(name, description) ",
+            "ORDER BY word_similarity($1, f_concat_projects_name_description(name, description)) LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, expected_end_date, end_date FROM projects ",
+            "WHERE $1 <<% f_concat_projects_name_description(name, description) ",
+            "ORDER BY strict_word_similarity($1, f_concat_projects_name_description(name, description)) LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -2731,14 +3043,14 @@ impl SampleState {
             .filter(sample_states::dsl::id.eq(id))
             .first::<Self>(connection)
     }
-    /// Search for the struct by a given string.
+    /// Search for the struct by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn search(
+    pub fn similarity_search(
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -2749,8 +3061,60 @@ impl SampleState {
         }
         let similarity_query = concat!(
             "SELECT id, name, description, font_awesome_icon, icon_color FROM sample_states ",
-            "WHERE f_concat_sample_states_name_description(name, description) % $1 ",
-            "ORDER BY f_concat_sample_states_name_description(name, description) <-> $1 LIMIT $2;"
+            "WHERE $1 % f_concat_sample_states_name_description(name, description) ",
+            "ORDER BY similarity($1, f_concat_sample_states_name_description(name, description)) LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, name, description, font_awesome_icon, icon_color FROM sample_states ",
+            "WHERE $1 <% f_concat_sample_states_name_description(name, description) ",
+            "ORDER BY word_similarity($1, f_concat_sample_states_name_description(name, description)) LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, name, description, font_awesome_icon, icon_color FROM sample_states ",
+            "WHERE $1 <<% f_concat_sample_states_name_description(name, description) ",
+            "ORDER BY strict_word_similarity($1, f_concat_sample_states_name_description(name, description)) LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -3019,14 +3383,14 @@ impl SamplingProcedure {
             .filter(sampling_procedures::dsl::id.eq(id))
             .first::<Self>(connection)
     }
-    /// Search for the struct by a given string.
+    /// Search for the struct by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn search(
+    pub fn similarity_search(
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -3037,8 +3401,60 @@ impl SamplingProcedure {
         }
         let similarity_query = concat!(
             "SELECT id, name, description, created_by FROM sampling_procedures ",
-            "WHERE f_concat_sampling_procedures_name_description(name, description) % $1 ",
-            "ORDER BY f_concat_sampling_procedures_name_description(name, description) <-> $1 LIMIT $2;"
+            "WHERE $1 % f_concat_sampling_procedures_name_description(name, description) ",
+            "ORDER BY similarity($1, f_concat_sampling_procedures_name_description(name, description)) LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, name, description, created_by FROM sampling_procedures ",
+            "WHERE $1 <% f_concat_sampling_procedures_name_description(name, description) ",
+            "ORDER BY word_similarity($1, f_concat_sampling_procedures_name_description(name, description)) LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, name, description, created_by FROM sampling_procedures ",
+            "WHERE $1 <<% f_concat_sampling_procedures_name_description(name, description) ",
+            "ORDER BY strict_word_similarity($1, f_concat_sampling_procedures_name_description(name, description)) LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -3438,14 +3854,14 @@ impl User {
             .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
-    /// Search for the struct by a given string.
+    /// Search for the struct by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn search(
+    pub fn similarity_search(
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -3456,8 +3872,60 @@ impl User {
         }
         let similarity_query = concat!(
             "SELECT id, first_name, middle_name, last_name, created_at, updated_at FROM users ",
-            "WHERE f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text) % $1 ",
-            "ORDER BY f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text) <-> $1 LIMIT $2;"
+            "WHERE $1 % f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text) ",
+            "ORDER BY similarity($1, f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text)) LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, first_name, middle_name, last_name, created_at, updated_at FROM users ",
+            "WHERE $1 <% f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text) ",
+            "ORDER BY word_similarity($1, f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text)) LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, first_name, middle_name, last_name, created_at, updated_at FROM users ",
+            "WHERE $1 <<% f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text) ",
+            "ORDER BY strict_word_similarity($1, f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text)) LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)

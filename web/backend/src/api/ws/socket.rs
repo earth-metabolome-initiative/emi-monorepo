@@ -284,7 +284,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                         task.id(),
                                         match table {
                                             web_common::database::Table::Projects => {
-                                                crate::nested_models::NestedProject::search(
+                                                crate::nested_models::NestedProject::similarity_search(
                                                     &query,
                                                     Some(*number_of_results as i32),
                                                     &mut self.diesel_connection,
@@ -292,7 +292,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                                 .bincode_serialize()
                                             }
                                             web_common::database::Table::ProjectStates => {
-                                                crate::models::ProjectState::search(
+                                                crate::models::ProjectState::similarity_search(
                                                     &query,
                                                     Some(*number_of_results as i32),
                                                     &mut self.diesel_connection,
@@ -300,7 +300,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                                 .bincode_serialize()
                                             }
                                             web_common::database::Table::SampleStates => {
-                                                crate::models::SampleState::search(
+                                                crate::models::SampleState::similarity_search(
                                                     &query,
                                                     Some(*number_of_results as i32),
                                                     &mut self.diesel_connection,
@@ -308,7 +308,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                                 .bincode_serialize()
                                             }
                                             web_common::database::Table::PublicUsers => {
-                                                crate::nested_models::NestedPublicUser::search(
+                                                crate::nested_models::NestedPublicUser::similarity_search(
                                                     &query,
                                                     Some(*number_of_results as i32),
                                                     &mut self.diesel_connection,
@@ -316,7 +316,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                                 .bincode_serialize()
                                             }
                                             web_common::database::Table::BioOttTaxonItems => {
-                                                crate::nested_models::NestedBioOttTaxonItem::search(
+                                                crate::nested_models::NestedBioOttTaxonItem::strict_word_similarity_search(
                                                     &query,
                                                     Some(*number_of_results as i32),
                                                     &mut self.diesel_connection,
@@ -324,7 +324,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                                 .bincode_serialize()
                                             }
                                             web_common::database::Table::SamplingProcedures => {
-                                                crate::models::SamplingProcedure::search(
+                                                crate::models::SamplingProcedure::similarity_search(
                                                     &query,
                                                     Some(*number_of_results as i32),
                                                     &mut self.diesel_connection,

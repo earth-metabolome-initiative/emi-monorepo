@@ -15,6 +15,22 @@ pub struct NestedBioOttRank {
 }
 
 impl NestedBioOttRank {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: BioOttRank,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            font_awesome_icon: flat_struct.font_awesome_icon_id.map(|flat_struct| FontAwesomeIcon::get(flat_struct, connection)).transpose()?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedBioOttRank {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
@@ -24,15 +40,7 @@ impl NestedBioOttRank {
         limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = BioOttRank::all(limit, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self {
-                font_awesome_icon: flat_struct.font_awesome_icon_id.map(|flat_struct| FontAwesomeIcon::get(flat_struct, connection)).transpose()?,
-                inner: flat_struct,
-            });
-        }
-        Ok(nested_structs)
+        BioOttRank::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedBioOttRank {
@@ -46,11 +54,7 @@ impl NestedBioOttRank {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = BioOttRank::get(id, connection)?;
-        Ok(Self {
-            inner: BioOttRank::get(flat_struct.id, connection)?,
-            font_awesome_icon: flat_struct.font_awesome_icon_id.map(|flat_struct| FontAwesomeIcon::get(flat_struct, connection)).transpose()?,
-        })
+       BioOttRank::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl NestedBioOttRank {
@@ -64,11 +68,7 @@ impl NestedBioOttRank {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = BioOttRank::from_name(name, connection)?;
-        Ok(Self {
-            font_awesome_icon: flat_struct.font_awesome_icon_id.map(|flat_struct| FontAwesomeIcon::get(flat_struct, connection)).transpose()?,
-            inner: flat_struct,
-        })
+        BioOttRank::from_name(name, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl NestedBioOttRank {
@@ -77,17 +77,40 @@ impl NestedBioOttRank {
     /// # Arguments
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
-    pub fn search(
+    pub fn similarity_search(
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = BioOttRank::search(query, limit, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self::get(flat_struct.id, connection)?);
-        }
-        Ok(nested_structs)
+       BioOttRank::similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedBioOttRank {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       BioOttRank::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedBioOttRank {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn strict_word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       BioOttRank::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl From<web_common::database::nested_models::NestedBioOttRank> for NestedBioOttRank {
@@ -123,6 +146,32 @@ pub struct NestedBioOttTaxonItem {
 }
 
 impl NestedBioOttTaxonItem {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: BioOttTaxonItem,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            ott_rank: NestedBioOttRank::get(flat_struct.ott_rank_id, connection)?,
+            domain: flat_struct.domain_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
+            kingdom: flat_struct.kingdom_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
+            phylum: flat_struct.phylum_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
+            class: flat_struct.class_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
+            order: flat_struct.order_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
+            family: flat_struct.family_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
+            genus: flat_struct.genus_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
+            parent: BioOttTaxonItem::get(flat_struct.parent_id, connection)?,
+            font_awesome_icon: FontAwesomeIcon::get(flat_struct.font_awesome_icon_id, connection)?,
+            color: Color::get(flat_struct.color_id, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedBioOttTaxonItem {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
@@ -132,25 +181,7 @@ impl NestedBioOttTaxonItem {
         limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = BioOttTaxonItem::all(limit, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self {
-                ott_rank: NestedBioOttRank::get(flat_struct.ott_rank_id, connection)?,
-                domain: flat_struct.domain_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
-                kingdom: flat_struct.kingdom_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
-                phylum: flat_struct.phylum_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
-                class: flat_struct.class_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
-                order: flat_struct.order_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
-                family: flat_struct.family_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
-                genus: flat_struct.genus_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
-                parent: BioOttTaxonItem::get(flat_struct.parent_id, connection)?,
-                font_awesome_icon: FontAwesomeIcon::get(flat_struct.font_awesome_icon_id, connection)?,
-                color: Color::get(flat_struct.color_id, connection)?,
-                inner: flat_struct,
-            });
-        }
-        Ok(nested_structs)
+        BioOttTaxonItem::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedBioOttTaxonItem {
@@ -164,21 +195,7 @@ impl NestedBioOttTaxonItem {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = BioOttTaxonItem::get(id, connection)?;
-        Ok(Self {
-            inner: BioOttTaxonItem::get(flat_struct.id, connection)?,
-            ott_rank: NestedBioOttRank::get(flat_struct.ott_rank_id, connection)?,
-            domain: flat_struct.domain_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
-            kingdom: flat_struct.kingdom_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
-            phylum: flat_struct.phylum_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
-            class: flat_struct.class_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
-            order: flat_struct.order_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
-            family: flat_struct.family_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
-            genus: flat_struct.genus_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
-            parent: BioOttTaxonItem::get(flat_struct.parent_id, connection)?,
-            font_awesome_icon: FontAwesomeIcon::get(flat_struct.font_awesome_icon_id, connection)?,
-            color: Color::get(flat_struct.color_id, connection)?,
-        })
+       BioOttTaxonItem::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl NestedBioOttTaxonItem {
@@ -192,21 +209,7 @@ impl NestedBioOttTaxonItem {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = BioOttTaxonItem::from_ott_id(ott_id, connection)?;
-        Ok(Self {
-            ott_rank: NestedBioOttRank::get(flat_struct.ott_rank_id, connection)?,
-            domain: flat_struct.domain_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
-            kingdom: flat_struct.kingdom_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
-            phylum: flat_struct.phylum_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
-            class: flat_struct.class_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
-            order: flat_struct.order_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
-            family: flat_struct.family_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
-            genus: flat_struct.genus_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
-            parent: BioOttTaxonItem::get(flat_struct.parent_id, connection)?,
-            font_awesome_icon: FontAwesomeIcon::get(flat_struct.font_awesome_icon_id, connection)?,
-            color: Color::get(flat_struct.color_id, connection)?,
-            inner: flat_struct,
-        })
+        BioOttTaxonItem::from_ott_id(ott_id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl NestedBioOttTaxonItem {
@@ -215,17 +218,40 @@ impl NestedBioOttTaxonItem {
     /// # Arguments
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
-    pub fn search(
+    pub fn similarity_search(
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = BioOttTaxonItem::search(query, limit, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self::get(flat_struct.id, connection)?);
-        }
-        Ok(nested_structs)
+       BioOttTaxonItem::similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedBioOttTaxonItem {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       BioOttTaxonItem::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedBioOttTaxonItem {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn strict_word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       BioOttTaxonItem::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl From<web_common::database::nested_models::NestedBioOttTaxonItem> for NestedBioOttTaxonItem {
@@ -273,6 +299,24 @@ pub struct NestedContainerHorizontalRule {
 }
 
 impl NestedContainerHorizontalRule {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: ContainerHorizontalRule,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            created_by: User::get(flat_struct.created_by, connection)?,
+            item_type: NestedItemCategory::get(flat_struct.item_type_id, connection)?,
+            other_item_type: NestedItemCategory::get(flat_struct.other_item_type_id, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedContainerHorizontalRule {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
@@ -282,17 +326,7 @@ impl NestedContainerHorizontalRule {
         limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = ContainerHorizontalRule::all(limit, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self {
-                created_by: User::get(flat_struct.created_by, connection)?,
-                item_type: NestedItemCategory::get(flat_struct.item_type_id, connection)?,
-                other_item_type: NestedItemCategory::get(flat_struct.other_item_type_id, connection)?,
-                inner: flat_struct,
-            });
-        }
-        Ok(nested_structs)
+        ContainerHorizontalRule::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedContainerHorizontalRule {
@@ -306,13 +340,7 @@ impl NestedContainerHorizontalRule {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = ContainerHorizontalRule::get(id, connection)?;
-        Ok(Self {
-            inner: ContainerHorizontalRule::get(flat_struct.id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-            item_type: NestedItemCategory::get(flat_struct.item_type_id, connection)?,
-            other_item_type: NestedItemCategory::get(flat_struct.other_item_type_id, connection)?,
-        })
+       ContainerHorizontalRule::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl NestedContainerHorizontalRule {
@@ -326,13 +354,7 @@ impl NestedContainerHorizontalRule {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = ContainerHorizontalRule::from_name(name, connection)?;
-        Ok(Self {
-            created_by: User::get(flat_struct.created_by, connection)?,
-            item_type: NestedItemCategory::get(flat_struct.item_type_id, connection)?,
-            other_item_type: NestedItemCategory::get(flat_struct.other_item_type_id, connection)?,
-            inner: flat_struct,
-        })
+        ContainerHorizontalRule::from_name(name, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedContainerHorizontalRule> for NestedContainerHorizontalRule {
@@ -364,6 +386,24 @@ pub struct NestedContainerVerticalRule {
 }
 
 impl NestedContainerVerticalRule {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: ContainerVerticalRule,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            created_by: User::get(flat_struct.created_by, connection)?,
+            container_item_type: NestedItemCategory::get(flat_struct.container_item_type_id, connection)?,
+            contained_item_type: NestedItemCategory::get(flat_struct.contained_item_type_id, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedContainerVerticalRule {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
@@ -373,17 +413,7 @@ impl NestedContainerVerticalRule {
         limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = ContainerVerticalRule::all(limit, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self {
-                created_by: User::get(flat_struct.created_by, connection)?,
-                container_item_type: NestedItemCategory::get(flat_struct.container_item_type_id, connection)?,
-                contained_item_type: NestedItemCategory::get(flat_struct.contained_item_type_id, connection)?,
-                inner: flat_struct,
-            });
-        }
-        Ok(nested_structs)
+        ContainerVerticalRule::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedContainerVerticalRule {
@@ -397,13 +427,7 @@ impl NestedContainerVerticalRule {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = ContainerVerticalRule::get(id, connection)?;
-        Ok(Self {
-            inner: ContainerVerticalRule::get(flat_struct.id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-            container_item_type: NestedItemCategory::get(flat_struct.container_item_type_id, connection)?,
-            contained_item_type: NestedItemCategory::get(flat_struct.contained_item_type_id, connection)?,
-        })
+       ContainerVerticalRule::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl NestedContainerVerticalRule {
@@ -417,13 +441,7 @@ impl NestedContainerVerticalRule {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = ContainerVerticalRule::from_name(name, connection)?;
-        Ok(Self {
-            created_by: User::get(flat_struct.created_by, connection)?,
-            container_item_type: NestedItemCategory::get(flat_struct.container_item_type_id, connection)?,
-            contained_item_type: NestedItemCategory::get(flat_struct.contained_item_type_id, connection)?,
-            inner: flat_struct,
-        })
+        ContainerVerticalRule::from_name(name, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedContainerVerticalRule> for NestedContainerVerticalRule {
@@ -455,6 +473,24 @@ pub struct NestedDerivedSample {
 }
 
 impl NestedDerivedSample {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: DerivedSample,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            created_by: User::get(flat_struct.created_by, connection)?,
+            parent_sample: NestedSample::get(flat_struct.parent_sample_id, connection)?,
+            child_sample: NestedSample::get(flat_struct.child_sample_id, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedDerivedSample {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
@@ -464,17 +500,7 @@ impl NestedDerivedSample {
         limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = DerivedSample::all(limit, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self {
-                created_by: User::get(flat_struct.created_by, connection)?,
-                parent_sample: NestedSample::get(flat_struct.parent_sample_id, connection)?,
-                child_sample: NestedSample::get(flat_struct.child_sample_id, connection)?,
-                inner: flat_struct,
-            });
-        }
-        Ok(nested_structs)
+        DerivedSample::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedDerivedSample {
@@ -488,13 +514,7 @@ impl NestedDerivedSample {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = DerivedSample::get(id, connection)?;
-        Ok(Self {
-            inner: DerivedSample::get(flat_struct.id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-            parent_sample: NestedSample::get(flat_struct.parent_sample_id, connection)?,
-            child_sample: NestedSample::get(flat_struct.child_sample_id, connection)?,
-        })
+       DerivedSample::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedDerivedSample> for NestedDerivedSample {
@@ -525,6 +545,23 @@ pub struct NestedDocument {
 }
 
 impl NestedDocument {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: Document,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            author: User::get(flat_struct.author_id, connection)?,
+            format: DocumentFormat::get(flat_struct.format_id, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedDocument {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
@@ -534,16 +571,7 @@ impl NestedDocument {
         limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = Document::all(limit, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self {
-                author: User::get(flat_struct.author_id, connection)?,
-                format: DocumentFormat::get(flat_struct.format_id, connection)?,
-                inner: flat_struct,
-            });
-        }
-        Ok(nested_structs)
+        Document::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedDocument {
@@ -557,12 +585,7 @@ impl NestedDocument {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = Document::get(id, connection)?;
-        Ok(Self {
-            inner: Document::get(flat_struct.id, connection)?,
-            author: User::get(flat_struct.author_id, connection)?,
-            format: DocumentFormat::get(flat_struct.format_id, connection)?,
-        })
+       Document::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl NestedDocument {
@@ -576,12 +599,7 @@ impl NestedDocument {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = Document::from_path(path, connection)?;
-        Ok(Self {
-            author: User::get(flat_struct.author_id, connection)?,
-            format: DocumentFormat::get(flat_struct.format_id, connection)?,
-            inner: flat_struct,
-        })
+        Document::from_path(path, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedDocument> for NestedDocument {
@@ -609,6 +627,22 @@ pub struct NestedItemCategory {
 }
 
 impl NestedItemCategory {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: ItemCategory,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            created_by: User::get(flat_struct.created_by, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedItemCategory {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
@@ -618,15 +652,7 @@ impl NestedItemCategory {
         limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = ItemCategory::all(limit, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self {
-                created_by: User::get(flat_struct.created_by, connection)?,
-                inner: flat_struct,
-            });
-        }
-        Ok(nested_structs)
+        ItemCategory::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedItemCategory {
@@ -640,11 +666,7 @@ impl NestedItemCategory {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = ItemCategory::get(id, connection)?;
-        Ok(Self {
-            inner: ItemCategory::get(flat_struct.id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-        })
+       ItemCategory::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl NestedItemCategory {
@@ -658,11 +680,7 @@ impl NestedItemCategory {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = ItemCategory::from_name(name, connection)?;
-        Ok(Self {
-            created_by: User::get(flat_struct.created_by, connection)?,
-            inner: flat_struct,
-        })
+        ItemCategory::from_name(name, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedItemCategory> for NestedItemCategory {
@@ -690,6 +708,24 @@ pub struct NestedItemCategoryRelationship {
 }
 
 impl NestedItemCategoryRelationship {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: ItemCategoryRelationship,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            parent: NestedItemCategory::get(flat_struct.parent_id, connection)?,
+            child: NestedItemCategory::get(flat_struct.child_id, connection)?,
+            added_by: User::get(flat_struct.added_by, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedItemCategoryRelationship {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
@@ -699,17 +735,7 @@ impl NestedItemCategoryRelationship {
         limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = ItemCategoryRelationship::all(limit, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self {
-                parent: NestedItemCategory::get(flat_struct.parent_id, connection)?,
-                child: NestedItemCategory::get(flat_struct.child_id, connection)?,
-                added_by: User::get(flat_struct.added_by, connection)?,
-                inner: flat_struct,
-            });
-        }
-        Ok(nested_structs)
+        ItemCategoryRelationship::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedItemCategoryRelationship {
@@ -723,13 +749,7 @@ impl NestedItemCategoryRelationship {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = ItemCategoryRelationship::get(id, connection)?;
-        Ok(Self {
-            inner: ItemCategoryRelationship::get(flat_struct.id, connection)?,
-            parent: NestedItemCategory::get(flat_struct.parent_id, connection)?,
-            child: NestedItemCategory::get(flat_struct.child_id, connection)?,
-            added_by: User::get(flat_struct.added_by, connection)?,
-        })
+       ItemCategoryRelationship::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedItemCategoryRelationship> for NestedItemCategoryRelationship {
@@ -760,6 +780,23 @@ pub struct NestedItemCategoryUnit {
 }
 
 impl NestedItemCategoryUnit {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: ItemCategoryUnit,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            item_category: NestedItemCategory::get(flat_struct.item_category_id, connection)?,
+            unit: Unit::get(flat_struct.unit_id, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedItemCategoryUnit {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
@@ -769,16 +806,7 @@ impl NestedItemCategoryUnit {
         limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = ItemCategoryUnit::all(limit, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self {
-                item_category: NestedItemCategory::get(flat_struct.item_category_id, connection)?,
-                unit: Unit::get(flat_struct.unit_id, connection)?,
-                inner: flat_struct,
-            });
-        }
-        Ok(nested_structs)
+        ItemCategoryUnit::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedItemCategoryUnit {
@@ -792,12 +820,7 @@ impl NestedItemCategoryUnit {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = ItemCategoryUnit::get(id, connection)?;
-        Ok(Self {
-            inner: ItemCategoryUnit::get(flat_struct.id, connection)?,
-            item_category: NestedItemCategory::get(flat_struct.item_category_id, connection)?,
-            unit: Unit::get(flat_struct.unit_id, connection)?,
-        })
+       ItemCategoryUnit::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedItemCategoryUnit> for NestedItemCategoryUnit {
@@ -828,6 +851,25 @@ pub struct NestedItemContinuousQuantity {
 }
 
 impl NestedItemContinuousQuantity {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: ItemContinuousQuantity,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            item: NestedItem::get(flat_struct.item_id, connection)?,
+            unit: Unit::get(flat_struct.unit_id, connection)?,
+            sensor: flat_struct.sensor_id.map(|flat_struct| NestedItem::get(flat_struct, connection)).transpose()?,
+            measured_by: flat_struct.measured_by.map(|flat_struct| User::get(flat_struct, connection)).transpose()?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedItemContinuousQuantity {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
@@ -837,18 +879,7 @@ impl NestedItemContinuousQuantity {
         limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = ItemContinuousQuantity::all(limit, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self {
-                item: NestedItem::get(flat_struct.item_id, connection)?,
-                unit: Unit::get(flat_struct.unit_id, connection)?,
-                sensor: flat_struct.sensor_id.map(|flat_struct| NestedItem::get(flat_struct, connection)).transpose()?,
-                measured_by: flat_struct.measured_by.map(|flat_struct| User::get(flat_struct, connection)).transpose()?,
-                inner: flat_struct,
-            });
-        }
-        Ok(nested_structs)
+        ItemContinuousQuantity::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedItemContinuousQuantity {
@@ -862,14 +893,7 @@ impl NestedItemContinuousQuantity {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = ItemContinuousQuantity::get(id, connection)?;
-        Ok(Self {
-            inner: ItemContinuousQuantity::get(flat_struct.id, connection)?,
-            item: NestedItem::get(flat_struct.item_id, connection)?,
-            unit: Unit::get(flat_struct.unit_id, connection)?,
-            sensor: flat_struct.sensor_id.map(|flat_struct| NestedItem::get(flat_struct, connection)).transpose()?,
-            measured_by: flat_struct.measured_by.map(|flat_struct| User::get(flat_struct, connection)).transpose()?,
-        })
+       ItemContinuousQuantity::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedItemContinuousQuantity> for NestedItemContinuousQuantity {
@@ -903,6 +927,24 @@ pub struct NestedItemDiscreteQuantity {
 }
 
 impl NestedItemDiscreteQuantity {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: ItemDiscreteQuantity,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            item: NestedItem::get(flat_struct.item_id, connection)?,
+            unit: Unit::get(flat_struct.unit_id, connection)?,
+            measured_by: flat_struct.measured_by.map(|flat_struct| User::get(flat_struct, connection)).transpose()?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedItemDiscreteQuantity {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
@@ -912,17 +954,7 @@ impl NestedItemDiscreteQuantity {
         limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = ItemDiscreteQuantity::all(limit, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self {
-                item: NestedItem::get(flat_struct.item_id, connection)?,
-                unit: Unit::get(flat_struct.unit_id, connection)?,
-                measured_by: flat_struct.measured_by.map(|flat_struct| User::get(flat_struct, connection)).transpose()?,
-                inner: flat_struct,
-            });
-        }
-        Ok(nested_structs)
+        ItemDiscreteQuantity::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedItemDiscreteQuantity {
@@ -936,13 +968,7 @@ impl NestedItemDiscreteQuantity {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = ItemDiscreteQuantity::get(id, connection)?;
-        Ok(Self {
-            inner: ItemDiscreteQuantity::get(flat_struct.id, connection)?,
-            item: NestedItem::get(flat_struct.item_id, connection)?,
-            unit: Unit::get(flat_struct.unit_id, connection)?,
-            measured_by: flat_struct.measured_by.map(|flat_struct| User::get(flat_struct, connection)).transpose()?,
-        })
+       ItemDiscreteQuantity::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedItemDiscreteQuantity> for NestedItemDiscreteQuantity {
@@ -974,6 +1000,24 @@ pub struct NestedItemLocation {
 }
 
 impl NestedItemLocation {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: ItemLocation,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            item: flat_struct.item_id.map(|flat_struct| NestedItem::get(flat_struct, connection)).transpose()?,
+            located_by: flat_struct.located_by.map(|flat_struct| User::get(flat_struct, connection)).transpose()?,
+            location: flat_struct.location_id.map(|flat_struct| NestedLocation::get(flat_struct, connection)).transpose()?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedItemLocation {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
@@ -983,17 +1027,7 @@ impl NestedItemLocation {
         limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = ItemLocation::all(limit, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self {
-                item: flat_struct.item_id.map(|flat_struct| NestedItem::get(flat_struct, connection)).transpose()?,
-                located_by: flat_struct.located_by.map(|flat_struct| User::get(flat_struct, connection)).transpose()?,
-                location: flat_struct.location_id.map(|flat_struct| NestedLocation::get(flat_struct, connection)).transpose()?,
-                inner: flat_struct,
-            });
-        }
-        Ok(nested_structs)
+        ItemLocation::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedItemLocation {
@@ -1007,13 +1041,7 @@ impl NestedItemLocation {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = ItemLocation::get(id, connection)?;
-        Ok(Self {
-            inner: ItemLocation::get(flat_struct.id, connection)?,
-            item: flat_struct.item_id.map(|flat_struct| NestedItem::get(flat_struct, connection)).transpose()?,
-            located_by: flat_struct.located_by.map(|flat_struct| User::get(flat_struct, connection)).transpose()?,
-            location: flat_struct.location_id.map(|flat_struct| NestedLocation::get(flat_struct, connection)).transpose()?,
-        })
+       ItemLocation::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedItemLocation> for NestedItemLocation {
@@ -1044,6 +1072,23 @@ pub struct NestedItemUnit {
 }
 
 impl NestedItemUnit {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: ItemUnit,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            item: NestedItem::get(flat_struct.item_id, connection)?,
+            unit: Unit::get(flat_struct.unit_id, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedItemUnit {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
@@ -1053,16 +1098,7 @@ impl NestedItemUnit {
         limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = ItemUnit::all(limit, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self {
-                item: NestedItem::get(flat_struct.item_id, connection)?,
-                unit: Unit::get(flat_struct.unit_id, connection)?,
-                inner: flat_struct,
-            });
-        }
-        Ok(nested_structs)
+        ItemUnit::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedItemUnit {
@@ -1076,12 +1112,7 @@ impl NestedItemUnit {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = ItemUnit::get(id, connection)?;
-        Ok(Self {
-            inner: ItemUnit::get(flat_struct.id, connection)?,
-            item: NestedItem::get(flat_struct.item_id, connection)?,
-            unit: Unit::get(flat_struct.unit_id, connection)?,
-        })
+       ItemUnit::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedItemUnit> for NestedItemUnit {
@@ -1109,6 +1140,22 @@ pub struct NestedItem {
 }
 
 impl NestedItem {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: Item,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            parent: flat_struct.parent_id.map(|flat_struct| Item::get(flat_struct, connection)).transpose()?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedItem {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
@@ -1118,15 +1165,7 @@ impl NestedItem {
         limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = Item::all(limit, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self {
-                parent: flat_struct.parent_id.map(|flat_struct| Item::get(flat_struct, connection)).transpose()?,
-                inner: flat_struct,
-            });
-        }
-        Ok(nested_structs)
+        Item::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedItem {
@@ -1140,11 +1179,7 @@ impl NestedItem {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = Item::get(id, connection)?;
-        Ok(Self {
-            inner: Item::get(flat_struct.id, connection)?,
-            parent: flat_struct.parent_id.map(|flat_struct| Item::get(flat_struct, connection)).transpose()?,
-        })
+       Item::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedItem> for NestedItem {
@@ -1172,6 +1207,24 @@ pub struct NestedLocation {
 }
 
 impl NestedLocation {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: Location,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            geolocalization_device: flat_struct.geolocalization_device_id.map(|flat_struct| NestedItem::get(flat_struct, connection)).transpose()?,
+            altitude_device: flat_struct.altitude_device_id.map(|flat_struct| NestedItem::get(flat_struct, connection)).transpose()?,
+            parent_location: flat_struct.parent_location_id.map(|flat_struct| Location::get(flat_struct, connection)).transpose()?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedLocation {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
@@ -1181,17 +1234,7 @@ impl NestedLocation {
         limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = Location::all(limit, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self {
-                geolocalization_device: flat_struct.geolocalization_device_id.map(|flat_struct| NestedItem::get(flat_struct, connection)).transpose()?,
-                altitude_device: flat_struct.altitude_device_id.map(|flat_struct| NestedItem::get(flat_struct, connection)).transpose()?,
-                parent_location: flat_struct.parent_location_id.map(|flat_struct| Location::get(flat_struct, connection)).transpose()?,
-                inner: flat_struct,
-            });
-        }
-        Ok(nested_structs)
+        Location::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedLocation {
@@ -1205,13 +1248,7 @@ impl NestedLocation {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = Location::get(id, connection)?;
-        Ok(Self {
-            inner: Location::get(flat_struct.id, connection)?,
-            geolocalization_device: flat_struct.geolocalization_device_id.map(|flat_struct| NestedItem::get(flat_struct, connection)).transpose()?,
-            altitude_device: flat_struct.altitude_device_id.map(|flat_struct| NestedItem::get(flat_struct, connection)).transpose()?,
-            parent_location: flat_struct.parent_location_id.map(|flat_struct| Location::get(flat_struct, connection)).transpose()?,
-        })
+       Location::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedLocation> for NestedLocation {
@@ -1241,6 +1278,22 @@ pub struct NestedManufacturedItemCategory {
 }
 
 impl NestedManufacturedItemCategory {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: ManufacturedItemCategory,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            manifacturer: NestedOrganization::get(flat_struct.manifacturer_id, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedManufacturedItemCategory {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
@@ -1250,15 +1303,7 @@ impl NestedManufacturedItemCategory {
         limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = ManufacturedItemCategory::all(limit, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self {
-                manifacturer: NestedOrganization::get(flat_struct.manifacturer_id, connection)?,
-                inner: flat_struct,
-            });
-        }
-        Ok(nested_structs)
+        ManufacturedItemCategory::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedManufacturedItemCategory {
@@ -1272,11 +1317,7 @@ impl NestedManufacturedItemCategory {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = ManufacturedItemCategory::get(id, connection)?;
-        Ok(Self {
-            inner: ManufacturedItemCategory::get(flat_struct.id, connection)?,
-            manifacturer: NestedOrganization::get(flat_struct.manifacturer_id, connection)?,
-        })
+       ManufacturedItemCategory::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedManufacturedItemCategory> for NestedManufacturedItemCategory {
@@ -1302,6 +1343,22 @@ pub struct NestedNotification {
 }
 
 impl NestedNotification {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: Notification,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            user: User::get(flat_struct.user_id, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedNotification {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
@@ -1311,15 +1368,7 @@ impl NestedNotification {
         limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = Notification::all(limit, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self {
-                user: User::get(flat_struct.user_id, connection)?,
-                inner: flat_struct,
-            });
-        }
-        Ok(nested_structs)
+        Notification::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedNotification {
@@ -1333,11 +1382,7 @@ impl NestedNotification {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = Notification::get(id, connection)?;
-        Ok(Self {
-            inner: Notification::get(flat_struct.id, connection)?,
-            user: User::get(flat_struct.user_id, connection)?,
-        })
+       Notification::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedNotification> for NestedNotification {
@@ -1363,6 +1408,22 @@ pub struct NestedOrganization {
 }
 
 impl NestedOrganization {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: Organization,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            parent_organization: flat_struct.parent_organization_id.map(|flat_struct| Organization::get(flat_struct, connection)).transpose()?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedOrganization {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
@@ -1372,15 +1433,7 @@ impl NestedOrganization {
         limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = Organization::all(limit, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self {
-                parent_organization: flat_struct.parent_organization_id.map(|flat_struct| Organization::get(flat_struct, connection)).transpose()?,
-                inner: flat_struct,
-            });
-        }
-        Ok(nested_structs)
+        Organization::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedOrganization {
@@ -1394,11 +1447,7 @@ impl NestedOrganization {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = Organization::get(id, connection)?;
-        Ok(Self {
-            inner: Organization::get(flat_struct.id, connection)?,
-            parent_organization: flat_struct.parent_organization_id.map(|flat_struct| Organization::get(flat_struct, connection)).transpose()?,
-        })
+       Organization::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedOrganization> for NestedOrganization {
@@ -1427,6 +1476,25 @@ pub struct NestedProcedureContinuousRequirement {
 }
 
 impl NestedProcedureContinuousRequirement {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: ProcedureContinuousRequirement,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            created_by: User::get(flat_struct.created_by, connection)?,
+            procedure: NestedProcedure::get(flat_struct.procedure_id, connection)?,
+            item_category: NestedItemCategory::get(flat_struct.item_category_id, connection)?,
+            unit: flat_struct.unit_id.map(|flat_struct| Unit::get(flat_struct, connection)).transpose()?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedProcedureContinuousRequirement {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
@@ -1436,18 +1504,7 @@ impl NestedProcedureContinuousRequirement {
         limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = ProcedureContinuousRequirement::all(limit, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self {
-                created_by: User::get(flat_struct.created_by, connection)?,
-                procedure: NestedProcedure::get(flat_struct.procedure_id, connection)?,
-                item_category: NestedItemCategory::get(flat_struct.item_category_id, connection)?,
-                unit: flat_struct.unit_id.map(|flat_struct| Unit::get(flat_struct, connection)).transpose()?,
-                inner: flat_struct,
-            });
-        }
-        Ok(nested_structs)
+        ProcedureContinuousRequirement::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedProcedureContinuousRequirement {
@@ -1461,14 +1518,7 @@ impl NestedProcedureContinuousRequirement {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = ProcedureContinuousRequirement::get(id, connection)?;
-        Ok(Self {
-            inner: ProcedureContinuousRequirement::get(flat_struct.id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-            procedure: NestedProcedure::get(flat_struct.procedure_id, connection)?,
-            item_category: NestedItemCategory::get(flat_struct.item_category_id, connection)?,
-            unit: flat_struct.unit_id.map(|flat_struct| Unit::get(flat_struct, connection)).transpose()?,
-        })
+       ProcedureContinuousRequirement::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedProcedureContinuousRequirement> for NestedProcedureContinuousRequirement {
@@ -1503,6 +1553,25 @@ pub struct NestedProcedureDiscreteRequirement {
 }
 
 impl NestedProcedureDiscreteRequirement {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: ProcedureDiscreteRequirement,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            created_by: User::get(flat_struct.created_by, connection)?,
+            procedure: NestedProcedure::get(flat_struct.procedure_id, connection)?,
+            item_category: NestedItemCategory::get(flat_struct.item_category_id, connection)?,
+            unit: flat_struct.unit_id.map(|flat_struct| Unit::get(flat_struct, connection)).transpose()?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedProcedureDiscreteRequirement {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
@@ -1512,18 +1581,7 @@ impl NestedProcedureDiscreteRequirement {
         limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = ProcedureDiscreteRequirement::all(limit, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self {
-                created_by: User::get(flat_struct.created_by, connection)?,
-                procedure: NestedProcedure::get(flat_struct.procedure_id, connection)?,
-                item_category: NestedItemCategory::get(flat_struct.item_category_id, connection)?,
-                unit: flat_struct.unit_id.map(|flat_struct| Unit::get(flat_struct, connection)).transpose()?,
-                inner: flat_struct,
-            });
-        }
-        Ok(nested_structs)
+        ProcedureDiscreteRequirement::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedProcedureDiscreteRequirement {
@@ -1537,14 +1595,7 @@ impl NestedProcedureDiscreteRequirement {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = ProcedureDiscreteRequirement::get(id, connection)?;
-        Ok(Self {
-            inner: ProcedureDiscreteRequirement::get(flat_struct.id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-            procedure: NestedProcedure::get(flat_struct.procedure_id, connection)?,
-            item_category: NestedItemCategory::get(flat_struct.item_category_id, connection)?,
-            unit: flat_struct.unit_id.map(|flat_struct| Unit::get(flat_struct, connection)).transpose()?,
-        })
+       ProcedureDiscreteRequirement::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedProcedureDiscreteRequirement> for NestedProcedureDiscreteRequirement {
@@ -1576,6 +1627,22 @@ pub struct NestedProcedure {
 }
 
 impl NestedProcedure {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: Procedure,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            created_by: flat_struct.created_by.map(|flat_struct| User::get(flat_struct, connection)).transpose()?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedProcedure {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
@@ -1585,15 +1652,7 @@ impl NestedProcedure {
         limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = Procedure::all(limit, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self {
-                created_by: flat_struct.created_by.map(|flat_struct| User::get(flat_struct, connection)).transpose()?,
-                inner: flat_struct,
-            });
-        }
-        Ok(nested_structs)
+        Procedure::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedProcedure {
@@ -1607,11 +1666,7 @@ impl NestedProcedure {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = Procedure::get(id, connection)?;
-        Ok(Self {
-            inner: Procedure::get(flat_struct.id, connection)?,
-            created_by: flat_struct.created_by.map(|flat_struct| User::get(flat_struct, connection)).transpose()?,
-        })
+       Procedure::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedProcedure> for NestedProcedure {
@@ -1640,6 +1695,25 @@ pub struct NestedProjectRequirement {
 }
 
 impl NestedProjectRequirement {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: ProjectRequirement,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            created_by: User::get(flat_struct.created_by, connection)?,
+            project: NestedProject::get(flat_struct.project_id, connection)?,
+            item_category: NestedItemCategory::get(flat_struct.item_category_id, connection)?,
+            unit: flat_struct.unit_id.map(|flat_struct| Unit::get(flat_struct, connection)).transpose()?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedProjectRequirement {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
@@ -1649,18 +1723,7 @@ impl NestedProjectRequirement {
         limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = ProjectRequirement::all(limit, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self {
-                created_by: User::get(flat_struct.created_by, connection)?,
-                project: NestedProject::get(flat_struct.project_id, connection)?,
-                item_category: NestedItemCategory::get(flat_struct.item_category_id, connection)?,
-                unit: flat_struct.unit_id.map(|flat_struct| Unit::get(flat_struct, connection)).transpose()?,
-                inner: flat_struct,
-            });
-        }
-        Ok(nested_structs)
+        ProjectRequirement::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedProjectRequirement {
@@ -1674,14 +1737,7 @@ impl NestedProjectRequirement {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = ProjectRequirement::get(id, connection)?;
-        Ok(Self {
-            inner: ProjectRequirement::get(flat_struct.id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-            project: NestedProject::get(flat_struct.project_id, connection)?,
-            item_category: NestedItemCategory::get(flat_struct.item_category_id, connection)?,
-            unit: flat_struct.unit_id.map(|flat_struct| Unit::get(flat_struct, connection)).transpose()?,
-        })
+       ProjectRequirement::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedProjectRequirement> for NestedProjectRequirement {
@@ -1715,6 +1771,24 @@ pub struct NestedProject {
 }
 
 impl NestedProject {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: Project,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            state: ProjectState::get(flat_struct.state_id, connection)?,
+            parent_project: flat_struct.parent_project_id.map(|flat_struct| Project::get(flat_struct, connection)).transpose()?,
+            created_by: User::get(flat_struct.created_by, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedProject {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
@@ -1724,17 +1798,7 @@ impl NestedProject {
         limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = Project::all(limit, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self {
-                state: ProjectState::get(flat_struct.state_id, connection)?,
-                parent_project: flat_struct.parent_project_id.map(|flat_struct| Project::get(flat_struct, connection)).transpose()?,
-                created_by: User::get(flat_struct.created_by, connection)?,
-                inner: flat_struct,
-            });
-        }
-        Ok(nested_structs)
+        Project::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedProject {
@@ -1748,13 +1812,7 @@ impl NestedProject {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = Project::get(id, connection)?;
-        Ok(Self {
-            inner: Project::get(flat_struct.id, connection)?,
-            state: ProjectState::get(flat_struct.state_id, connection)?,
-            parent_project: flat_struct.parent_project_id.map(|flat_struct| Project::get(flat_struct, connection)).transpose()?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-        })
+       Project::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl NestedProject {
@@ -1768,13 +1826,7 @@ impl NestedProject {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = Project::from_name(name, connection)?;
-        Ok(Self {
-            state: ProjectState::get(flat_struct.state_id, connection)?,
-            parent_project: flat_struct.parent_project_id.map(|flat_struct| Project::get(flat_struct, connection)).transpose()?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-            inner: flat_struct,
-        })
+        Project::from_name(name, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl NestedProject {
@@ -1783,17 +1835,40 @@ impl NestedProject {
     /// # Arguments
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
-    pub fn search(
+    pub fn similarity_search(
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = Project::search(query, limit, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self::get(flat_struct.id, connection)?);
-        }
-        Ok(nested_structs)
+       Project::similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedProject {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       Project::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedProject {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn strict_word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       Project::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl From<web_common::database::nested_models::NestedProject> for NestedProject {
@@ -1825,6 +1900,24 @@ pub struct NestedSampleBioOttTaxonItem {
 }
 
 impl NestedSampleBioOttTaxonItem {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: SampleBioOttTaxonItem,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            created_by: User::get(flat_struct.created_by, connection)?,
+            sample: NestedSample::get(flat_struct.sample_id, connection)?,
+            taxon: NestedBioOttTaxonItem::get(flat_struct.taxon_id, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedSampleBioOttTaxonItem {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
@@ -1834,17 +1927,7 @@ impl NestedSampleBioOttTaxonItem {
         limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = SampleBioOttTaxonItem::all(limit, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self {
-                created_by: User::get(flat_struct.created_by, connection)?,
-                sample: NestedSample::get(flat_struct.sample_id, connection)?,
-                taxon: NestedBioOttTaxonItem::get(flat_struct.taxon_id, connection)?,
-                inner: flat_struct,
-            });
-        }
-        Ok(nested_structs)
+        SampleBioOttTaxonItem::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedSampleBioOttTaxonItem {
@@ -1858,13 +1941,7 @@ impl NestedSampleBioOttTaxonItem {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = SampleBioOttTaxonItem::get(id, connection)?;
-        Ok(Self {
-            inner: SampleBioOttTaxonItem::get(flat_struct.id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-            sample: NestedSample::get(flat_struct.sample_id, connection)?,
-            taxon: NestedBioOttTaxonItem::get(flat_struct.taxon_id, connection)?,
-        })
+       SampleBioOttTaxonItem::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedSampleBioOttTaxonItem> for NestedSampleBioOttTaxonItem {
@@ -1896,6 +1973,24 @@ pub struct NestedSampledIndividualBioOttTaxonItem {
 }
 
 impl NestedSampledIndividualBioOttTaxonItem {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: SampledIndividualBioOttTaxonItem,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            created_by: User::get(flat_struct.created_by, connection)?,
+            sampled_individual: SampledIndividual::get(flat_struct.sampled_individual_id, connection)?,
+            taxon: NestedBioOttTaxonItem::get(flat_struct.taxon_id, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedSampledIndividualBioOttTaxonItem {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
@@ -1905,17 +2000,7 @@ impl NestedSampledIndividualBioOttTaxonItem {
         limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = SampledIndividualBioOttTaxonItem::all(limit, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self {
-                created_by: User::get(flat_struct.created_by, connection)?,
-                sampled_individual: SampledIndividual::get(flat_struct.sampled_individual_id, connection)?,
-                taxon: NestedBioOttTaxonItem::get(flat_struct.taxon_id, connection)?,
-                inner: flat_struct,
-            });
-        }
-        Ok(nested_structs)
+        SampledIndividualBioOttTaxonItem::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedSampledIndividualBioOttTaxonItem {
@@ -1929,13 +2014,7 @@ impl NestedSampledIndividualBioOttTaxonItem {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = SampledIndividualBioOttTaxonItem::get(id, connection)?;
-        Ok(Self {
-            inner: SampledIndividualBioOttTaxonItem::get(flat_struct.id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-            sampled_individual: SampledIndividual::get(flat_struct.sampled_individual_id, connection)?,
-            taxon: NestedBioOttTaxonItem::get(flat_struct.taxon_id, connection)?,
-        })
+       SampledIndividualBioOttTaxonItem::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedSampledIndividualBioOttTaxonItem> for NestedSampledIndividualBioOttTaxonItem {
@@ -1968,6 +2047,25 @@ pub struct NestedSample {
 }
 
 impl NestedSample {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: Sample,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            inserted_by: User::get(flat_struct.inserted_by, connection)?,
+            sampled_by: User::get(flat_struct.sampled_by, connection)?,
+            procedure: NestedSamplingProcedure::get(flat_struct.procedure_id, connection)?,
+            state: SampleState::get(flat_struct.state, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedSample {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
@@ -1977,18 +2075,7 @@ impl NestedSample {
         limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = Sample::all(limit, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self {
-                inserted_by: User::get(flat_struct.inserted_by, connection)?,
-                sampled_by: User::get(flat_struct.sampled_by, connection)?,
-                procedure: NestedSamplingProcedure::get(flat_struct.procedure_id, connection)?,
-                state: SampleState::get(flat_struct.state, connection)?,
-                inner: flat_struct,
-            });
-        }
-        Ok(nested_structs)
+        Sample::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedSample {
@@ -2002,14 +2089,7 @@ impl NestedSample {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = Sample::get(id, connection)?;
-        Ok(Self {
-            inner: Sample::get(flat_struct.id, connection)?,
-            inserted_by: User::get(flat_struct.inserted_by, connection)?,
-            sampled_by: User::get(flat_struct.sampled_by, connection)?,
-            procedure: NestedSamplingProcedure::get(flat_struct.procedure_id, connection)?,
-            state: SampleState::get(flat_struct.state, connection)?,
-        })
+       Sample::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedSample> for NestedSample {
@@ -2041,6 +2121,22 @@ pub struct NestedSamplingProcedure {
 }
 
 impl NestedSamplingProcedure {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: SamplingProcedure,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            created_by: flat_struct.created_by.map(|flat_struct| User::get(flat_struct, connection)).transpose()?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedSamplingProcedure {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
@@ -2050,15 +2146,7 @@ impl NestedSamplingProcedure {
         limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = SamplingProcedure::all(limit, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self {
-                created_by: flat_struct.created_by.map(|flat_struct| User::get(flat_struct, connection)).transpose()?,
-                inner: flat_struct,
-            });
-        }
-        Ok(nested_structs)
+        SamplingProcedure::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedSamplingProcedure {
@@ -2072,11 +2160,7 @@ impl NestedSamplingProcedure {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = SamplingProcedure::get(id, connection)?;
-        Ok(Self {
-            inner: SamplingProcedure::get(flat_struct.id, connection)?,
-            created_by: flat_struct.created_by.map(|flat_struct| User::get(flat_struct, connection)).transpose()?,
-        })
+       SamplingProcedure::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl NestedSamplingProcedure {
@@ -2085,17 +2169,40 @@ impl NestedSamplingProcedure {
     /// # Arguments
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
-    pub fn search(
+    pub fn similarity_search(
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = SamplingProcedure::search(query, limit, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self::get(flat_struct.id, connection)?);
-        }
-        Ok(nested_structs)
+       SamplingProcedure::similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedSamplingProcedure {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       SamplingProcedure::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedSamplingProcedure {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn strict_word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       SamplingProcedure::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl From<web_common::database::nested_models::NestedSamplingProcedure> for NestedSamplingProcedure {
@@ -2121,6 +2228,22 @@ pub struct NestedSpectra {
 }
 
 impl NestedSpectra {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: Spectra,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            spectra_collection: NestedSpectraCollection::get(flat_struct.spectra_collection_id, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedSpectra {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
@@ -2130,15 +2253,7 @@ impl NestedSpectra {
         limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = Spectra::all(limit, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self {
-                spectra_collection: NestedSpectraCollection::get(flat_struct.spectra_collection_id, connection)?,
-                inner: flat_struct,
-            });
-        }
-        Ok(nested_structs)
+        Spectra::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedSpectra {
@@ -2152,11 +2267,7 @@ impl NestedSpectra {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = Spectra::get(id, connection)?;
-        Ok(Self {
-            inner: Spectra::get(flat_struct.id, connection)?,
-            spectra_collection: NestedSpectraCollection::get(flat_struct.spectra_collection_id, connection)?,
-        })
+       Spectra::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedSpectra> for NestedSpectra {
@@ -2183,6 +2294,23 @@ pub struct NestedSpectraCollection {
 }
 
 impl NestedSpectraCollection {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: SpectraCollection,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            sample: NestedSample::get(flat_struct.sample_id, connection)?,
+            created_by: User::get(flat_struct.created_by, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedSpectraCollection {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
@@ -2192,16 +2320,7 @@ impl NestedSpectraCollection {
         limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = SpectraCollection::all(limit, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self {
-                sample: NestedSample::get(flat_struct.sample_id, connection)?,
-                created_by: User::get(flat_struct.created_by, connection)?,
-                inner: flat_struct,
-            });
-        }
-        Ok(nested_structs)
+        SpectraCollection::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedSpectraCollection {
@@ -2215,12 +2334,7 @@ impl NestedSpectraCollection {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = SpectraCollection::get(id, connection)?;
-        Ok(Self {
-            inner: SpectraCollection::get(flat_struct.id, connection)?,
-            sample: NestedSample::get(flat_struct.sample_id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-        })
+       SpectraCollection::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedSpectraCollection> for NestedSpectraCollection {
@@ -2248,6 +2362,22 @@ pub struct NestedTeam {
 }
 
 impl NestedTeam {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: Team,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            parent_team: flat_struct.parent_team_id.map(|flat_struct| Team::get(flat_struct, connection)).transpose()?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedTeam {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
@@ -2257,15 +2387,7 @@ impl NestedTeam {
         limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = Team::all(limit, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self {
-                parent_team: flat_struct.parent_team_id.map(|flat_struct| Team::get(flat_struct, connection)).transpose()?,
-                inner: flat_struct,
-            });
-        }
-        Ok(nested_structs)
+        Team::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedTeam {
@@ -2279,11 +2401,7 @@ impl NestedTeam {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = Team::get(id, connection)?;
-        Ok(Self {
-            inner: Team::get(flat_struct.id, connection)?,
-            parent_team: flat_struct.parent_team_id.map(|flat_struct| Team::get(flat_struct, connection)).transpose()?,
-        })
+       Team::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedTeam> for NestedTeam {
@@ -2310,6 +2428,23 @@ pub struct NestedUserEmail {
 }
 
 impl NestedUserEmail {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: UserEmail,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            user: User::get(flat_struct.user_id, connection)?,
+            login_provider: LoginProvider::get(flat_struct.login_provider_id, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedUserEmail {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
@@ -2319,16 +2454,7 @@ impl NestedUserEmail {
         limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = UserEmail::all(limit, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self {
-                user: User::get(flat_struct.user_id, connection)?,
-                login_provider: LoginProvider::get(flat_struct.login_provider_id, connection)?,
-                inner: flat_struct,
-            });
-        }
-        Ok(nested_structs)
+        UserEmail::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedUserEmail {
@@ -2342,12 +2468,7 @@ impl NestedUserEmail {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = UserEmail::get(id, connection)?;
-        Ok(Self {
-            inner: UserEmail::get(flat_struct.id, connection)?,
-            user: User::get(flat_struct.user_id, connection)?,
-            login_provider: LoginProvider::get(flat_struct.login_provider_id, connection)?,
-        })
+       UserEmail::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedUserEmail> for NestedUserEmail {
@@ -2376,6 +2497,23 @@ pub struct NestedPublicUser {
 }
 
 impl NestedPublicUser {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: PublicUser,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            thumbnail: flat_struct.thumbnail_id.map(|flat_struct| NestedDocument::get(flat_struct, connection)).transpose()?,
+            picture: flat_struct.picture_id.map(|flat_struct| NestedDocument::get(flat_struct, connection)).transpose()?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedPublicUser {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
@@ -2385,16 +2523,7 @@ impl NestedPublicUser {
         limit: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = PublicUser::all(limit, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self {
-                thumbnail: flat_struct.thumbnail_id.map(|flat_struct| NestedDocument::get(flat_struct, connection)).transpose()?,
-                picture: flat_struct.picture_id.map(|flat_struct| NestedDocument::get(flat_struct, connection)).transpose()?,
-                inner: flat_struct,
-            });
-        }
-        Ok(nested_structs)
+        PublicUser::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedPublicUser {
@@ -2408,12 +2537,7 @@ impl NestedPublicUser {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        let flat_struct = PublicUser::get(id, connection)?;
-        Ok(Self {
-            inner: PublicUser::get(flat_struct.id, connection)?,
-            thumbnail: flat_struct.thumbnail_id.map(|flat_struct| NestedDocument::get(flat_struct, connection)).transpose()?,
-            picture: flat_struct.picture_id.map(|flat_struct| NestedDocument::get(flat_struct, connection)).transpose()?,
-        })
+       PublicUser::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl NestedPublicUser {
@@ -2422,17 +2546,40 @@ impl NestedPublicUser {
     /// # Arguments
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
-    pub fn search(
+    pub fn similarity_search(
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let flat_structs = PublicUser::search(query, limit, connection)?;
-        let mut nested_structs = Vec::new();
-        for flat_struct in flat_structs {
-            nested_structs.push(Self::get(flat_struct.id, connection)?);
-        }
-        Ok(nested_structs)
+       PublicUser::similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedPublicUser {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       PublicUser::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedPublicUser {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn strict_word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       PublicUser::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl From<web_common::database::nested_models::NestedPublicUser> for NestedPublicUser {
