@@ -31,7 +31,9 @@ where
     #[prop_or(false)]
     pub optional: bool,
     #[prop_or(1)]
-    pub number_of_choices: usize,
+    pub minimum_number_of_choices: usize,
+    #[prop_or(1)]
+    pub maximum_number_of_choices: usize,
     #[prop_or(10)]
     pub number_of_candidates: u32,
 }
@@ -252,11 +254,11 @@ where
             }
             DatalistMessage::SelectCandidate(index) => {
                 let candidate = self.candidates.get(index).unwrap();
-                if ctx.props().number_of_choices == 1 {
+                if ctx.props().maximum_number_of_choices == 1 {
                     self.selections.clear();
                 }
                 self.selections.push(candidate.clone());
-                if self.selections.len() == ctx.props().number_of_choices {
+                if self.selections.len() == ctx.props().maximum_number_of_choices {
                     ctx.props().builder.emit(self.selections.clone());
                     self.is_focused = false;
                 }
@@ -278,17 +280,7 @@ where
                 true
             }
             DatalistMessage::UpdateCurrentValue(value) => {
-                // We check if any of the candidates match the current value
-                // exactly. If so, we select that candidate.
-                if let Some(candidate_index) = self
-                    .candidates
-                    .iter()
-                    .position(|candidate| candidate.matches(&value))
-                {
-                    ctx.link().send_message(DatalistMessage::SelectCandidate(candidate_index));
-                } else {
-                    self.current_value = Some(value);
-                }
+                self.current_value = Some(value);
                 ctx.link()
                     .send_message(DatalistMessage::SearchCandidatesTimeout);
 
@@ -418,6 +410,8 @@ where
                         oninput={on_input}
                         onfocus={on_focus}
                         onblur={on_blur}
+                        autocomplete="off"
+                        spellcheck="false"
                         id={props.normalized_label()}
                         name={props.normalized_label()}
                     />
@@ -450,7 +444,7 @@ where
                         {
                             // If this entry needs more than one selection, we display
                             // the button to add more selections.
-                            if !self.is_focused && self.selections.len() < ctx.props().number_of_choices {
+                            if !self.is_focused && self.selections.len() < ctx.props().maximum_number_of_choices {
                                 let classes = format!("datalist-add{}", if self.selections_to_delete.len() == self.selections.len() {" deleting"} else {""});
                                 let on_click = {
                                     let link = ctx.link().clone();
@@ -476,13 +470,27 @@ where
                 } else {
                     html!{}
                 }}
+            </>
+        };
+
+        html! {
+            <div class={classes}>
+                {if props.show_label {
+                    html! {
+                        <div class="input-container">
+                            {input_field}
+                        </div>
+                    }
+                } else {
+                    input_field
+                }}
                 {if self.number_of_search_queries > 0{
                     // We display a loading spinner if the system is currently searching for candidates.
                     html! {
                         <div class="loading-spinner"></div>
                     }
                 } else {
-                    {if !self.is_focused || self.candidates.is_empty() || self.selections.len() == ctx.props().number_of_choices{
+                    {if !self.is_focused || self.candidates.is_empty() || self.selections.len() == ctx.props().maximum_number_of_choices{
                         html! {}
                     } else {
                         let mut total_candidate_score = 0.0;
@@ -523,21 +531,6 @@ where
                         }
                         }
                     }}
-                }}
-
-            </>
-        };
-
-        html! {
-            <div class={classes}>
-                {if props.show_label {
-                    html! {
-                        <div class="input-container">
-                            {input_field}
-                        </div>
-                    }
-                } else {
-                    input_field
                 }}
                 <InputErrors errors={self.errors.clone()} on_delete={on_delete} />
             </div>

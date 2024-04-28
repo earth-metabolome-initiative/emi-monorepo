@@ -158,7 +158,7 @@ pub fn complete_profile_form() -> Html {
             <Datalist<web_common::database::SampleState> builder={set_sample_state} value={store.sample_state.clone().map_or_else(|| Vec::new(), |value| vec![value])} label="Sample State" />
             <Datalist<web_common::database::NestedPublicUser> builder={set_collector} value={store.collector.clone().map_or_else(|| Vec::new(), |value| vec![value])} label="Collector" />
             <Datalist<web_common::database::SamplingProcedure> builder={set_sampling_procedure} value={store.sampling_procedure.clone().map_or_else(|| Vec::new(), |value| vec![value])} label="Sampling Procedure" />
-            <Datalist<web_common::database::NestedBioOttTaxonItem> builder={set_taxa} optional = {true} number_of_choices = {5} value={store.taxa.clone()} label="Taxa" />
+            <Datalist<web_common::database::NestedBioOttTaxonItem> builder={set_taxa} optional = {true} value={store.taxa.clone()} label="Taxa" />
         </BasicForm<NewSample>>
     }
 }

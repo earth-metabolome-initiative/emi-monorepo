@@ -609,7 +609,7 @@ form.standard-form {
             min-width: 100px;
         }
 
-        &.text .input-container {
+        &.text .input-container, &.datalist .input-container {
             display: grid;
             grid-template-columns: auto 1fr;
             align-items: center;
@@ -620,7 +620,6 @@ form.standard-form {
         }
 
         input[type="text"],
-        input[type="search"],
         input[type="search"],
         textarea,
         input[type="number"] {
