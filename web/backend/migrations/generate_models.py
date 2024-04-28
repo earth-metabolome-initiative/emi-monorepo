@@ -1260,7 +1260,7 @@ def write_from_impls(
                             new_content += f'            "SELECT {similarity_index.table_name}.{primary_key.name} AS id FROM {similarity_index.table_name} ",\n'
                             if similarity_index.is_gin():
                                 new_content += f'            "WHERE $1 {similarity_operator} {similarity_index.arguments}  ",\n'
-                                new_content += f'            "ORDER BY {method_name}($1, {similarity_index.arguments}) LIMIT $2",\n'
+                                new_content += f'            "ORDER BY {method_name}($1, {similarity_index.arguments}) DESC LIMIT $2",\n'
                             else:
                                 new_content += (
                                     f'            "ORDER BY $1 {distance_operator} {similarity_index.arguments} LIMIT $2",\n'
@@ -1274,7 +1274,7 @@ def write_from_impls(
                             new_content += f'            "SELECT {joined_field_names} FROM {struct.table_name} ",\n'
                             if similarity_index.is_gin():
                                 new_content += f'            "WHERE $1 {similarity_operator} {similarity_index.arguments} ",\n'
-                                new_content += f'            "ORDER BY {method_name}($1, {similarity_index.arguments}) LIMIT $2",\n'
+                                new_content += f'            "ORDER BY {method_name}($1, {similarity_index.arguments}) DESC LIMIT $2",\n'
                             else:
                                 new_content += (
                                     f'            "ORDER BY $1 {distance_operator} {similarity_index.arguments} LIMIT $2;"\n'

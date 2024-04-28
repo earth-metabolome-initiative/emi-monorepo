@@ -104,7 +104,7 @@ impl PublicUser {
             "WITH selected_ids AS (",
             "SELECT users.id AS id FROM users ",
             "WHERE $1 % f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text)  ",
-            "ORDER BY similarity($1, f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text)) LIMIT $2",
+            "ORDER BY similarity($1, f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text)) DESC LIMIT $2",
          ")",
             "SELECT id, first_name, middle_name, last_name, created_at, updated_at, thumbnail_id, picture_id FROM public_users ",
             "JOIN selected_ids ON selected_ids.id = public_users.id"
@@ -134,7 +134,7 @@ impl PublicUser {
             "WITH selected_ids AS (",
             "SELECT users.id AS id FROM users ",
             "WHERE $1 <% f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text)  ",
-            "ORDER BY word_similarity($1, f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text)) LIMIT $2",
+            "ORDER BY word_similarity($1, f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text)) DESC LIMIT $2",
          ")",
             "SELECT id, first_name, middle_name, last_name, created_at, updated_at, thumbnail_id, picture_id FROM public_users ",
             "JOIN selected_ids ON selected_ids.id = public_users.id"
@@ -164,7 +164,7 @@ impl PublicUser {
             "WITH selected_ids AS (",
             "SELECT users.id AS id FROM users ",
             "WHERE $1 <<% f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text)  ",
-            "ORDER BY strict_word_similarity($1, f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text)) LIMIT $2",
+            "ORDER BY strict_word_similarity($1, f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text)) DESC LIMIT $2",
          ")",
             "SELECT id, first_name, middle_name, last_name, created_at, updated_at, thumbnail_id, picture_id FROM public_users ",
             "JOIN selected_ids ON selected_ids.id = public_users.id"

@@ -113,7 +113,7 @@ impl BioOttRank {
         let similarity_query = concat!(
             "SELECT id, name, font_awesome_icon_id FROM bio_ott_ranks ",
             "WHERE $1 % name ",
-            "ORDER BY similarity($1, name) LIMIT $2",
+            "ORDER BY similarity($1, name) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -139,7 +139,7 @@ impl BioOttRank {
         let similarity_query = concat!(
             "SELECT id, name, font_awesome_icon_id FROM bio_ott_ranks ",
             "WHERE $1 <% name ",
-            "ORDER BY word_similarity($1, name) LIMIT $2",
+            "ORDER BY word_similarity($1, name) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -165,7 +165,7 @@ impl BioOttRank {
         let similarity_query = concat!(
             "SELECT id, name, font_awesome_icon_id FROM bio_ott_ranks ",
             "WHERE $1 <<% name ",
-            "ORDER BY strict_word_similarity($1, name) LIMIT $2",
+            "ORDER BY strict_word_similarity($1, name) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -318,7 +318,7 @@ impl BioOttTaxonItem {
         let similarity_query = concat!(
             "SELECT id, name, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, font_awesome_icon_id, color_id FROM bio_ott_taxon_items ",
             "WHERE $1 % name ",
-            "ORDER BY similarity($1, name) LIMIT $2",
+            "ORDER BY similarity($1, name) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -344,7 +344,7 @@ impl BioOttTaxonItem {
         let similarity_query = concat!(
             "SELECT id, name, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, font_awesome_icon_id, color_id FROM bio_ott_taxon_items ",
             "WHERE $1 <% name ",
-            "ORDER BY word_similarity($1, name) LIMIT $2",
+            "ORDER BY word_similarity($1, name) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -370,7 +370,7 @@ impl BioOttTaxonItem {
         let similarity_query = concat!(
             "SELECT id, name, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, font_awesome_icon_id, color_id FROM bio_ott_taxon_items ",
             "WHERE $1 <<% name ",
-            "ORDER BY strict_word_similarity($1, name) LIMIT $2",
+            "ORDER BY strict_word_similarity($1, name) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -460,7 +460,7 @@ impl Color {
         let similarity_query = concat!(
             "SELECT id, name, hexadecimal_value FROM colors ",
             "WHERE $1 % name ",
-            "ORDER BY similarity($1, name) LIMIT $2",
+            "ORDER BY similarity($1, name) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -486,7 +486,7 @@ impl Color {
         let similarity_query = concat!(
             "SELECT id, name, hexadecimal_value FROM colors ",
             "WHERE $1 <% name ",
-            "ORDER BY word_similarity($1, name) LIMIT $2",
+            "ORDER BY word_similarity($1, name) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -512,7 +512,7 @@ impl Color {
         let similarity_query = concat!(
             "SELECT id, name, hexadecimal_value FROM colors ",
             "WHERE $1 <<% name ",
-            "ORDER BY strict_word_similarity($1, name) LIMIT $2",
+            "ORDER BY strict_word_similarity($1, name) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -1167,7 +1167,7 @@ impl FontAwesomeIcon {
         let similarity_query = concat!(
             "SELECT id, name FROM font_awesome_icons ",
             "WHERE $1 % name ",
-            "ORDER BY similarity($1, name) LIMIT $2",
+            "ORDER BY similarity($1, name) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -1193,7 +1193,7 @@ impl FontAwesomeIcon {
         let similarity_query = concat!(
             "SELECT id, name FROM font_awesome_icons ",
             "WHERE $1 <% name ",
-            "ORDER BY word_similarity($1, name) LIMIT $2",
+            "ORDER BY word_similarity($1, name) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -1219,7 +1219,7 @@ impl FontAwesomeIcon {
         let similarity_query = concat!(
             "SELECT id, name FROM font_awesome_icons ",
             "WHERE $1 <<% name ",
-            "ORDER BY strict_word_similarity($1, name) LIMIT $2",
+            "ORDER BY strict_word_similarity($1, name) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -2587,7 +2587,7 @@ impl ProjectState {
         let similarity_query = concat!(
             "SELECT id, name, description, font_awesome_icon, icon_color FROM project_states ",
             "WHERE $1 % f_concat_project_states_name_description(name, description) ",
-            "ORDER BY similarity($1, f_concat_project_states_name_description(name, description)) LIMIT $2",
+            "ORDER BY similarity($1, f_concat_project_states_name_description(name, description)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -2613,7 +2613,7 @@ impl ProjectState {
         let similarity_query = concat!(
             "SELECT id, name, description, font_awesome_icon, icon_color FROM project_states ",
             "WHERE $1 <% f_concat_project_states_name_description(name, description) ",
-            "ORDER BY word_similarity($1, f_concat_project_states_name_description(name, description)) LIMIT $2",
+            "ORDER BY word_similarity($1, f_concat_project_states_name_description(name, description)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -2639,7 +2639,7 @@ impl ProjectState {
         let similarity_query = concat!(
             "SELECT id, name, description, font_awesome_icon, icon_color FROM project_states ",
             "WHERE $1 <<% f_concat_project_states_name_description(name, description) ",
-            "ORDER BY strict_word_similarity($1, f_concat_project_states_name_description(name, description)) LIMIT $2",
+            "ORDER BY strict_word_similarity($1, f_concat_project_states_name_description(name, description)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -2771,7 +2771,7 @@ impl Project {
         let similarity_query = concat!(
             "SELECT id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, expected_end_date, end_date FROM projects ",
             "WHERE $1 % f_concat_projects_name_description(name, description) ",
-            "ORDER BY similarity($1, f_concat_projects_name_description(name, description)) LIMIT $2",
+            "ORDER BY similarity($1, f_concat_projects_name_description(name, description)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -2797,7 +2797,7 @@ impl Project {
         let similarity_query = concat!(
             "SELECT id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, expected_end_date, end_date FROM projects ",
             "WHERE $1 <% f_concat_projects_name_description(name, description) ",
-            "ORDER BY word_similarity($1, f_concat_projects_name_description(name, description)) LIMIT $2",
+            "ORDER BY word_similarity($1, f_concat_projects_name_description(name, description)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -2823,7 +2823,7 @@ impl Project {
         let similarity_query = concat!(
             "SELECT id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, expected_end_date, end_date FROM projects ",
             "WHERE $1 <<% f_concat_projects_name_description(name, description) ",
-            "ORDER BY strict_word_similarity($1, f_concat_projects_name_description(name, description)) LIMIT $2",
+            "ORDER BY strict_word_similarity($1, f_concat_projects_name_description(name, description)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -3062,7 +3062,7 @@ impl SampleState {
         let similarity_query = concat!(
             "SELECT id, name, description, font_awesome_icon, icon_color FROM sample_states ",
             "WHERE $1 % f_concat_sample_states_name_description(name, description) ",
-            "ORDER BY similarity($1, f_concat_sample_states_name_description(name, description)) LIMIT $2",
+            "ORDER BY similarity($1, f_concat_sample_states_name_description(name, description)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -3088,7 +3088,7 @@ impl SampleState {
         let similarity_query = concat!(
             "SELECT id, name, description, font_awesome_icon, icon_color FROM sample_states ",
             "WHERE $1 <% f_concat_sample_states_name_description(name, description) ",
-            "ORDER BY word_similarity($1, f_concat_sample_states_name_description(name, description)) LIMIT $2",
+            "ORDER BY word_similarity($1, f_concat_sample_states_name_description(name, description)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -3114,7 +3114,7 @@ impl SampleState {
         let similarity_query = concat!(
             "SELECT id, name, description, font_awesome_icon, icon_color FROM sample_states ",
             "WHERE $1 <<% f_concat_sample_states_name_description(name, description) ",
-            "ORDER BY strict_word_similarity($1, f_concat_sample_states_name_description(name, description)) LIMIT $2",
+            "ORDER BY strict_word_similarity($1, f_concat_sample_states_name_description(name, description)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -3402,7 +3402,7 @@ impl SamplingProcedure {
         let similarity_query = concat!(
             "SELECT id, name, description, created_by FROM sampling_procedures ",
             "WHERE $1 % f_concat_sampling_procedures_name_description(name, description) ",
-            "ORDER BY similarity($1, f_concat_sampling_procedures_name_description(name, description)) LIMIT $2",
+            "ORDER BY similarity($1, f_concat_sampling_procedures_name_description(name, description)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -3428,7 +3428,7 @@ impl SamplingProcedure {
         let similarity_query = concat!(
             "SELECT id, name, description, created_by FROM sampling_procedures ",
             "WHERE $1 <% f_concat_sampling_procedures_name_description(name, description) ",
-            "ORDER BY word_similarity($1, f_concat_sampling_procedures_name_description(name, description)) LIMIT $2",
+            "ORDER BY word_similarity($1, f_concat_sampling_procedures_name_description(name, description)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -3454,7 +3454,7 @@ impl SamplingProcedure {
         let similarity_query = concat!(
             "SELECT id, name, description, created_by FROM sampling_procedures ",
             "WHERE $1 <<% f_concat_sampling_procedures_name_description(name, description) ",
-            "ORDER BY strict_word_similarity($1, f_concat_sampling_procedures_name_description(name, description)) LIMIT $2",
+            "ORDER BY strict_word_similarity($1, f_concat_sampling_procedures_name_description(name, description)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -3873,7 +3873,7 @@ impl User {
         let similarity_query = concat!(
             "SELECT id, first_name, middle_name, last_name, created_at, updated_at FROM users ",
             "WHERE $1 % f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text) ",
-            "ORDER BY similarity($1, f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text)) LIMIT $2",
+            "ORDER BY similarity($1, f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -3899,7 +3899,7 @@ impl User {
         let similarity_query = concat!(
             "SELECT id, first_name, middle_name, last_name, created_at, updated_at FROM users ",
             "WHERE $1 <% f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text) ",
-            "ORDER BY word_similarity($1, f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text)) LIMIT $2",
+            "ORDER BY word_similarity($1, f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -3925,7 +3925,7 @@ impl User {
         let similarity_query = concat!(
             "SELECT id, first_name, middle_name, last_name, created_at, updated_at FROM users ",
             "WHERE $1 <<% f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text) ",
-            "ORDER BY strict_word_similarity($1, f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text)) LIMIT $2",
+            "ORDER BY strict_word_similarity($1, f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
