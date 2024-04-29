@@ -2,7 +2,7 @@ use serde::Deserialize;
 use serde::Serialize;
 use uuid::Uuid;
 use chrono::NaiveDateTime;
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq)]
+#[derive(Deserialize, Serialize, Debug, PartialEq, Eq, Clone)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct PublicUser {
     pub id: i32,

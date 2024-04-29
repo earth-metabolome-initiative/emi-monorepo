@@ -247,24 +247,6 @@ impl User {
     }
 }
 
-impl LoginProvider {
-    /// Returns list of available login providers.
-    ///
-    /// # Arguments
-    /// * `pool` - The database connection pool.
-    pub fn get_all(
-        pool: &Pool<ConnectionManager<PgConnection>>,
-    ) -> Result<Vec<LoginProvider>, String> {
-        use crate::schema::login_providers::dsl::*;
-        let mut conn = pool.get().unwrap();
-        let providers = login_providers.load::<LoginProvider>(&mut conn);
-        match providers {
-            Ok(providers) => Ok(providers),
-            Err(_) => Err("Failed to retrieve login providers".to_string()),
-        }
-    }
-}
-
 impl Document {
     pub fn new(id: Option<Uuid>, author_id: i32, path: String, format_id: i32, bytes: i32) -> Self {
         Document {
@@ -274,18 +256,5 @@ impl Document {
             format_id,
             bytes,
         }
-    }
-
-    /// Insert the document into the database.
-    pub fn insert(
-        self,
-        conn: &mut PooledConnection<ConnectionManager<diesel::PgConnection>>,
-    ) -> Result<Document, diesel::result::Error> {
-        conn.transaction::<_, diesel::result::Error, _>(|conn| {
-            use crate::schema::documents;
-            diesel::insert_into(documents::table)
-                .values(&self)
-                .get_result::<Document>(conn)
-        })
     }
 }

@@ -104,7 +104,7 @@ impl Task {
             return true;
         }
         let elapsed = chrono::Utc::now() - self.start;
-        let retry_time = 2u32.pow(self.attempts as u32) * 5;
+        let retry_time = (2u32.pow(self.attempts as u32) * 20).max(60*10);
         elapsed.num_seconds() > retry_time as i64
     }
 

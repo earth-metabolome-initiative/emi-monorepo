@@ -199,6 +199,10 @@ impl Component for Navigator {
                 }
                 false
             }
+            NavigatorMessage::Backend(BackendMessage::Notification(notification)) => {
+                log::info!("Received notification: {:?}", notification);
+                false
+            }
             NavigatorMessage::Backend(_) => false,
             NavigatorMessage::ToggleSidebar => {
                 self.app_dispatch.reduce_mut(|state| {

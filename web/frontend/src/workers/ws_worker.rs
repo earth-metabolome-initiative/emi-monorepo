@@ -139,8 +139,9 @@ where
         match internal_message {
             InternalMessage::Backend(backend_message) => {
                 if let Some(task_id) = backend_message.id() {
+                    log::debug!("Task result: {:?}", backend_message);
                     if let Some(subscriber_id) = self.tasks.remove(&task_id) {
-                        scope.respond(subscriber_id, backend_message.clone());
+                        scope.respond(subscriber_id, backend_message);
                     }
                 } else {
                     for sub in &self.subscribers {

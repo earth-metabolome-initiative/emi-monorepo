@@ -25,9 +25,19 @@ use web_common::api::oauth::jwt_cookies::AccessToken;
 use web_common::api::ws::messages::{BackendMessage, FrontendMessage};
 use web_common::api::ApiError;
 use web_common::database::NotificationMessage;
+use web_common::database::Table;
 
 use super::projects::ProjectMessage;
 use super::samples::SampleMessage;
+
+#[derive(Debug, Deserialize, Serialize)]
+struct NotificationRecord {
+    /// The notification's metadata.
+    notification: Notification,
+    /// The unserialized record, which we cannot de-serialize
+    /// a priori before deserializing the notification above.
+    record: String
+}
 
 pub struct WebSocket {
     notifications_handler: Option<SpawnHandle>,
@@ -37,12 +47,6 @@ pub struct WebSocket {
     redis: redis::Client,
     sqlx: SQLxPool<Postgres>,
     continuation_bytes: Vec<u8>,
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-struct NotificationPayload {
-    operation: web_common::database::notification_message::SQLOperation,
-    notification: Notification,
 }
 
 impl WebSocket {
@@ -89,79 +93,83 @@ impl WebSocket {
         self.user.is_some()
     }
 
-    // fn listen_for_notifications(&mut self, ctx: &mut <WebSocket as Actor>::Context) {
-    //     // If the handler is stopped or was never started, start it.
-    //     if self.notifications_handler.is_none() {
-    //         if let Some((user, _)) = &self.user {
-    //             log::info!("Starting notifications handler for user {}", user.id);
-    //             let address = ctx.address().clone();
-    //             let channel_name = format!("user_{}", user.id);
-    //             let pool = self.sqlx.clone();
-    //             let mut diesel_connection = self.diesel.get().unwrap();
-    //             self.notifications_handler = Some(
-    //                 ctx.spawn(
-    //                     async move {
-    //                         // Initiate the logger.
-    //                         let mut listener = PgListener::connect_with(&pool).await.unwrap();
-    //                         match listener.listen_all([channel_name.as_str()]).await {
-    //                             Ok(_) => {}
-    //                             Err(err) => {
-    //                                 log::error!("Error listening for notifications: {:?}", err);
-    //                                 return;
-    //                             }
-    //                         }
-    //                         loop {
-    //                             while let Some(postgres_notification) =
-    //                                 listener.try_recv().await.unwrap()
-    //                             {
-    //                                 let notification_payload: String =
-    //                                     postgres_notification.payload().to_owned();
-    //                                 let payload: NotificationPayload =
-    //                                     serde_json::from_str(&notification_payload).unwrap();
+    fn listen_for_notifications(&mut self, ctx: &mut <WebSocket as Actor>::Context) {
+        // If the handler is stopped or was never started, start it.
+        if self.notifications_handler.is_none() {
+            if let Some((user, _)) = &self.user {
+                log::info!("Starting notifications handler for user {}", user.id);
+                let address = ctx.address().clone();
+                let channel_name = format!("user_{}", user.id);
+                let pool = self.sqlx.clone();
+                let mut diesel_connection = self.diesel.get().unwrap();
+                self.notifications_handler = Some(
+                    ctx.spawn(
+                        async move {
+                            // Initiate the logger.
+                            let mut listener = PgListener::connect_with(&pool).await.unwrap();
+                            match listener.listen_all([channel_name.as_str()]).await {
+                                Ok(_) => {}
+                                Err(err) => {
+                                    log::error!("Error listening for notifications: {:?}", err);
+                                    return;
+                                }
+                            }
+                            loop {
+                                while let Some(postgres_notification) =
+                                    listener.try_recv().await.unwrap()
+                                {
+                                    let notification_payload: String =
+                                        postgres_notification.payload().to_owned();
+                                    let payload: NotificationRecord =
+                                        serde_json::from_str(&notification_payload).unwrap();
 
-    //                                 let row_id = payload.notification.row_id.clone();
-    //                                 let view: crate::views::View =
-    //                                     payload.notification.table_name.as_str().into();
+                                    let table: Table = payload
+                                        .notification
+                                        .table_name
+                                        .as_str()
+                                        .try_into()
+                                        .unwrap();
 
-    //                                 let row = if let Some(id) = row_id {
-    //                                     match view.get(id, &mut diesel_connection) {
-    //                                         Ok(row) => Some(row.into()),
-    //                                         Err(err) => {
-    //                                             log::error!(
-    //                                                 "Error getting row from view {}: {:?}",
-    //                                                 view,
-    //                                                 err
-    //                                             );
-    //                                             return;
-    //                                         }
-    //                                     }
-    //                                 } else {
-    //                                     None
-    //                                 };
+                                    let serialized_record: Vec<u8> = match table {
+                                        Table::Users => {
+                                            let record: User =
+                                                serde_json::from_str(&payload.record)
+                                                    .expect("Error deserializing User");
+                                            bincode::serialize(
+                                                &NestedPublicUser::get(
+                                                    record.id,
+                                                    &mut diesel_connection,
+                                                )
+                                                .unwrap(),
+                                            ).unwrap()
+                                        }
+                                        _ => {
+                                            unimplemented!("Table not implemented: {:?}", table)
+                                        }
+                                    };
 
-    //                                 address.do_send(BackendMessage::Notification(
-    //                                     NotificationMessage::new(
-    //                                         payload.operation,
-    //                                         payload.notification.into(),
-    //                                         row,
-    //                                     ),
-    //                                 ));
-    //                             }
-    //                         }
-    //                     }
-    //                     .into_actor(self),
-    //                 ),
-    //             );
-    //         }
-    //     }
-    // }
+                                    address.do_send(BackendMessage::Notification(
+                                        NotificationMessage::new(
+                                            payload.notification.into(),
+                                            serialized_record,
+                                        ),
+                                    ));
+                                }
+                            }
+                        }
+                        .into_actor(self),
+                    ),
+                );
+            }
+        }
+    }
 }
 
 impl Actor for WebSocket {
     type Context = ws::WebsocketContext<Self>;
 
     fn started(&mut self, ctx: &mut Self::Context) {
-        // self.listen_for_notifications(ctx);
+        self.listen_for_notifications(ctx);
         if self.is_authenticated() {
             log::info!("Sending refresh token message");
             match NestedPublicUser::get(self.user().unwrap().id, &mut self.diesel_connection) {
@@ -270,12 +278,15 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                     query,
                                     number_of_results,
                                 } => {
-                                    let table: web_common::database::Table = match table_name.as_str().try_into() {
+                                    let table: web_common::database::Table = match table_name
+                                        .as_str()
+                                        .try_into()
+                                    {
                                         Ok(table) => table,
                                         Err(err) => {
                                             ctx.address().do_send(BackendMessage::TaskResult(
                                                 task.id(),
-                                                Err(ApiError::BadRequest(vec![err.to_string()]))
+                                                Err(ApiError::BadRequest(vec![err.to_string()])),
                                             ));
                                             return;
                                         }

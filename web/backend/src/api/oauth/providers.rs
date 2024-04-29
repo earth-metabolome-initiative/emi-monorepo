@@ -14,7 +14,8 @@ async fn get_providers(pool: web::Data<Pool<ConnectionManager<PgConnection>>>) -
     // We retrieve the system variables using dotenvy.
     dotenvy::dotenv().ok();
 
-    let providers = LoginProvider::get_all(&pool);
+    let mut conn = pool.get().expect("couldn't get db connection from pool");
+    let providers = LoginProvider::all(None, &mut conn);
 
     if providers.is_err() {
         return HttpResponse::InternalServerError().json(ApiError::internal_server_error());

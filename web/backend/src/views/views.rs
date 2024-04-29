@@ -1,14 +1,23 @@
-use serde::Deserialize;
-use serde::Serialize;
+#![allow(unused)]
+#![allow(clippy::all)]
+
 use diesel::Queryable;
 use diesel::QueryableByName;
+use diesel::Identifiable;
+use diesel::Insertable;
+use crate::schema::*;
+use diesel::Selectable;
+use serde::Deserialize;
+use serde::Serialize;
+use diesel::r2d2::ConnectionManager;
+use diesel::r2d2::PooledConnection;
+use diesel::prelude::*;
 use uuid::Uuid;
 use chrono::NaiveDateTime;
-use diesel::r2d2::PooledConnection;
-use diesel::r2d2::ConnectionManager;
-use diesel::prelude::*;
-#[derive(Deserialize, Serialize, Debug, PartialEq, Queryable, QueryableByName, Eq, Clone)]
-#[diesel(table_name = crate::views::schema::public_users)]
+use crate::views::schema::*;
+
+#[derive(Deserialize, Serialize, Debug, PartialEq, Eq, Clone, Identifiable, QueryableByName, Queryable)]
+#[diesel(table_name = public_users)]
 pub struct PublicUser {
     pub id: i32,
     pub first_name: String,
@@ -97,6 +106,9 @@ impl PublicUser {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
         if query.is_empty() {
             return Self::all(Some(limit as i64), connection);
         }
@@ -127,6 +139,9 @@ impl PublicUser {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
         if query.is_empty() {
             return Self::all(Some(limit as i64), connection);
         }
@@ -157,6 +172,9 @@ impl PublicUser {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
         if query.is_empty() {
             return Self::all(Some(limit as i64), connection);
         }
@@ -175,5 +193,3 @@ impl PublicUser {
             .load(connection)
 }
 }
-
-
