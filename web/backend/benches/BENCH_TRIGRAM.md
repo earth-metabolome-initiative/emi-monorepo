@@ -16,12 +16,12 @@ We have not yet measured the different memory usage of the data structures. We w
 
 | Lowercased | Data Structure                  | Index Type | Type       | Time 1      | Time 2      | Time 3      |
 |------------|---------------------------------|------------|------------|-------------|-------------|-------------|
-| Yes        | postgres similarity             | GIST       | -          | 3.0437 s    | 3.0453 s    | 3.0470 s    |
-| Yes        | postgres word similarity        | GIST       | -          | 2.1236 s    | 2.1250 s    | 2.1266 s    |
-| Yes        | postgres strict word similarity | GIST       | -          | 2.1334 s    | 2.1350 s    | 2.1367 s    |
-| Yes        | postgres similarity             | GIN        | -          | 308.55 ms   | 308.67 ms   | 308.79 ms   |
-| Yes        | postgres word similarity        | GIN        | -          | 111.33 ms   | 111.34 ms   | 111.34 ms   |
-| Yes        | postgres strict word similarity | GIN        | -          | 147.87 ms   | 147.88 ms   | 147.90 ms   |
+| Yes        | postgres similarity             | GIST       | Sequential | 3.0437 s    | 3.0453 s    | 3.0470 s    |
+| Yes        | postgres word similarity        | GIST       | Sequential | 2.1236 s    | 2.1250 s    | 2.1266 s    |
+| Yes        | postgres strict word similarity | GIST       | Sequential | 2.1334 s    | 2.1350 s    | 2.1367 s    |
+| Yes        | postgres similarity             | GIN        | Sequential | 308.55 ms   | 308.67 ms   | 308.79 ms   |
+| Yes        | postgres word similarity        | GIN        | Sequential | 111.33 ms   | 111.34 ms   | 111.34 ms   |
+| Yes        | postgres strict word similarity | GIN        | Sequential | 147.87 ms   | 147.88 ms   | 147.90 ms   |
 | No         | BiWebgraph                      | -          | Sequential | 4.7489 s    | 4.7495 s    | 4.7501 s    |
 | No         | Bit Field Vector                | -          | Sequential | 832.56 ms   | 832.71 ms   | 832.85 ms   |
 | No         | BiWebgraph                      | -          | Parallel   | 1.4514 s    | 1.4538 s    | 1.4564 s    |
