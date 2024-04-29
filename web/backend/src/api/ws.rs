@@ -10,6 +10,7 @@ pub mod projects;
 pub mod samples;
 pub mod users;
 pub mod taxa;
+pub mod teams;
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(start_websocket);

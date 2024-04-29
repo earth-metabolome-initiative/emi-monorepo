@@ -39,6 +39,9 @@ pub fn sidebar(props: &SidebarProps) -> Html {
                         <li>
                             <Link<AppRoute> to={AppRoute::NewSample}>{"New Sample"}</Link<AppRoute>>
                         </li>
+                        <li>
+                            <Link<AppRoute> to={AppRoute::NewTeam}>{"New Team"}</Link<AppRoute>>
+                        </li>
                         <li><Logout /></li>
                     }
                 </ul>

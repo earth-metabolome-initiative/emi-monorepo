@@ -412,8 +412,20 @@ diesel::table! {
 }
 
 diesel::table! {
+    team_states (id) {
+        id -> Int4,
+        name -> Text,
+        description -> Text,
+        font_awesome_icon -> Text,
+        icon_color -> Text,
+    }
+}
+
+diesel::table! {
     teams (id) {
         id -> Int4,
+        name -> Text,
+        description -> Text,
         parent_team_id -> Nullable<Int4>,
     }
 }
@@ -552,6 +564,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     sampling_procedures,
     spectra,
     spectra_collection,
+    team_states,
     teams,
     units,
     user_emails,

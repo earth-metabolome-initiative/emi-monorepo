@@ -42,6 +42,15 @@ impl Searchable for NestedSamplingProcedure {
         )
     }
 }
+impl Searchable for NestedTeam {
+    fn search_task(query: String, limit: u32) -> super::Select {
+        super::Select::search(
+             Table::Teams,
+              query,
+              limit,
+        )
+    }
+}
 impl Searchable for NestedPublicUser {
     fn search_task(query: String, limit: u32) -> super::Select {
         super::Select::search(
@@ -118,6 +127,24 @@ impl Searchable for SamplingProcedure {
     fn search_task(query: String, limit: u32) -> super::Select {
         super::Select::search(
              Table::SamplingProcedures,
+              query,
+              limit,
+        )
+    }
+}
+impl Searchable for TeamState {
+    fn search_task(query: String, limit: u32) -> super::Select {
+        super::Select::search(
+             Table::TeamStates,
+              query,
+              limit,
+        )
+    }
+}
+impl Searchable for Team {
+    fn search_task(query: String, limit: u32) -> super::Select {
+        super::Select::search(
+             Table::Teams,
               query,
               limit,
         )

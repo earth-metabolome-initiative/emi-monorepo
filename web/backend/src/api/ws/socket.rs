@@ -29,6 +29,7 @@ use web_common::database::Table;
 
 use super::projects::ProjectMessage;
 use super::samples::SampleMessage;
+use super::teams::TeamMessage;
 
 #[derive(Debug, Deserialize, Serialize)]
 struct NotificationRecord {
@@ -261,6 +262,12 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                     ctx.address().do_send(SampleMessage::NewSample(
                                         task.id(),
                                         new_sample.clone(),
+                                    ));
+                                }
+                                web_common::database::Insert::Team(new_team) => {
+                                    ctx.address().do_send(TeamMessage::NewTeam(
+                                        task.id(),
+                                        new_team.clone(),
                                     ));
                                 }
                             },
