@@ -9,7 +9,7 @@ use super::views::*;
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedBioOttRank {
     pub inner: BioOttRank,
-    pub font_awesome_icon: Option<FontAwesomeIcon>,
+    pub font_awesome_icon: FontAwesomeIcon,
 }
 #[cfg(feature = "frontend")]
 impl NestedBioOttRank {
@@ -27,7 +27,7 @@ impl NestedBioOttRank {
        if let Some(flat_struct) = BioOttRank::get(id, connection).await? {
         Ok(Some(Self {
             inner: if let Some(inner) = BioOttRank::get(flat_struct.id, connection).await? { inner } else {return Ok(None)},
-            font_awesome_icon: if let Some(font_awesome_icon_id) = flat_struct.font_awesome_icon_id { FontAwesomeIcon::get(font_awesome_icon_id, connection).await? } else { return Ok(None) },
+            font_awesome_icon: if let Some(font_awesome_icon) = FontAwesomeIcon::get(flat_struct.font_awesome_icon_id, connection).await? { font_awesome_icon } else {return Ok(None)},
         }))
        } else {
            Ok(None)

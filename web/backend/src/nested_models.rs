@@ -11,7 +11,7 @@ use crate::views::views::*;
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct NestedBioOttRank {
     pub inner: BioOttRank,
-    pub font_awesome_icon: Option<FontAwesomeIcon>,
+    pub font_awesome_icon: FontAwesomeIcon,
 }
 
 impl NestedBioOttRank {
@@ -25,7 +25,7 @@ impl NestedBioOttRank {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            font_awesome_icon: flat_struct.font_awesome_icon_id.map(|flat_struct| FontAwesomeIcon::get(flat_struct, connection)).transpose()?,
+            font_awesome_icon: FontAwesomeIcon::get(flat_struct.font_awesome_icon_id, connection)?,
                 inner: flat_struct,
         })
     }
@@ -117,7 +117,7 @@ impl From<web_common::database::nested_models::NestedBioOttRank> for NestedBioOt
     fn from(item: web_common::database::nested_models::NestedBioOttRank) -> Self {
         Self {
             inner: item.inner.into(),
-            font_awesome_icon: item.font_awesome_icon.map(|item| item.into()),
+            font_awesome_icon: item.font_awesome_icon.into(),
         }
     }
 }
@@ -125,7 +125,7 @@ impl From<NestedBioOttRank> for web_common::database::nested_models::NestedBioOt
     fn from(item: NestedBioOttRank) -> Self {
         Self {
             inner: item.inner.into(),
-            font_awesome_icon: item.font_awesome_icon.map(|item| item.into()),
+            font_awesome_icon: item.font_awesome_icon.into(),
         }
     }
 }

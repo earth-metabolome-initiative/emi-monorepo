@@ -7,7 +7,7 @@ use chrono::NaiveDateTime;
 pub struct BioOttRank {
     pub id: i32,
     pub name: String,
-    pub font_awesome_icon_id: Option<i32>,
+    pub font_awesome_icon_id: i32,
 }
 #[cfg(feature = "frontend")]
 impl BioOttRank {
@@ -15,10 +15,7 @@ impl BioOttRank {
         vec![
             gluesql::core::ast_builder::num(self.id),
             gluesql::core::ast_builder::text(self.name),
-            match self.font_awesome_icon_id {
-                Some(font_awesome_icon_id) => gluesql::core::ast_builder::num(font_awesome_icon_id),
-                None => gluesql::core::ast_builder::null(),
-            },
+            gluesql::core::ast_builder::num(self.font_awesome_icon_id),
         ]
     }
 
@@ -130,14 +127,11 @@ impl BioOttRank {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
-        let mut update_row = table("bio_ott_ranks")
+        table("bio_ott_ranks")
             .update()        
 .set("id", gluesql::core::ast_builder::num(self.id))        
-.set("name", gluesql::core::ast_builder::text(self.name));
-        if let Some(font_awesome_icon_id) = self.font_awesome_icon_id {
-            update_row = update_row.set("font_awesome_icon_id", gluesql::core::ast_builder::num(font_awesome_icon_id));
-        }
-            update_row.execute(connection)
+.set("name", gluesql::core::ast_builder::text(self.name))        
+.set("font_awesome_icon_id", gluesql::core::ast_builder::num(self.font_awesome_icon_id))            .execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -197,8 +191,7 @@ impl BioOttRank {
                 _ => unreachable!("Expected Str")
             },
             font_awesome_icon_id: match row.get("font_awesome_icon_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::I32(font_awesome_icon_id) => Some(font_awesome_icon_id.clone()),
+                gluesql::prelude::Value::I32(font_awesome_icon_id) => font_awesome_icon_id.clone(),
                 _ => unreachable!("Expected I32")
             },
         }

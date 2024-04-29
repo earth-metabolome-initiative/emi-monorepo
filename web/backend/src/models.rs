@@ -20,7 +20,7 @@ use chrono::NaiveDateTime;
 pub struct BioOttRank {
     pub id: i32,
     pub name: String,
-    pub font_awesome_icon_id: Option<i32>,
+    pub font_awesome_icon_id: i32,
 }
 
 impl From<BioOttRank> for web_common::database::tables::BioOttRank {

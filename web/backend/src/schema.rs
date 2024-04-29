@@ -4,7 +4,7 @@ diesel::table! {
     bio_ott_ranks (id) {
         id -> Int4,
         name -> Text,
-        font_awesome_icon_id -> Nullable<Int4>,
+        font_awesome_icon_id -> Int4,
     }
 }
 

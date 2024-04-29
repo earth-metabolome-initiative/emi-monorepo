@@ -10,7 +10,12 @@ impl RowToBadge for NestedBioOttTaxonItem {
             <div>
                 <p>
                     <i class={format!("fa-solid {} {}", self.font_awesome_icon.name, self.color.name)}></i>
+                    // we add the rank of the taxon to the badge
                     <span>{self.inner.name.format_match(query)}</span>
+                </p>
+                <p>
+                    <i class={format!("fa-solid {} grey", &self.ott_rank.font_awesome_icon.name)}></i>
+                    <span>{&self.ott_rank.inner.name}</span>
                 </p>
             </div>
         }
