@@ -37,7 +37,7 @@ struct NotificationRecord {
     notification: Notification,
     /// The unserialized record, which we cannot de-serialize
     /// a priori before deserializing the notification above.
-    record: String
+    record: String,
 }
 
 pub struct WebSocket {
@@ -142,7 +142,8 @@ impl WebSocket {
                                                     &mut diesel_connection,
                                                 )
                                                 .unwrap(),
-                                            ).unwrap()
+                                            )
+                                            .unwrap()
                                         }
                                         _ => {
                                             unimplemented!("Table not implemented: {:?}", table)
@@ -265,10 +266,8 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                     ));
                                 }
                                 web_common::database::Insert::Team(new_team) => {
-                                    ctx.address().do_send(TeamMessage::NewTeam(
-                                        task.id(),
-                                        new_team.clone(),
-                                    ));
+                                    ctx.address()
+                                        .do_send(TeamMessage::NewTeam(task.id(), new_team.clone()));
                                 }
                             },
                             web_common::database::Operation::Update(update) => match update {
@@ -343,6 +342,14 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                             }
                                             web_common::database::Table::SamplingProcedures => {
                                                 crate::models::SamplingProcedure::similarity_search(
+                                                    &query,
+                                                    Some(*number_of_results as i32),
+                                                    &mut self.diesel_connection,
+                                                )
+                                                .bincode_serialize()
+                                            }
+                                            web_common::database::Table::TeamStates => {
+                                                crate::models::TeamState::similarity_search(
                                                     &query,
                                                     Some(*number_of_results as i32),
                                                     &mut self.diesel_connection,
