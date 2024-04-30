@@ -1,2 +1,2 @@
 -- This file should undo anything in `up.sql`
-DROP TABLE team_states;
+DROP TABLE IF EXISTS team_states;

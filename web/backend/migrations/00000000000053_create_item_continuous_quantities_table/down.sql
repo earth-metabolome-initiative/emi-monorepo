@@ -1,2 +1,2 @@
 -- This file should undo anything in `up.sql`
-DROP TABLE item_continuous_quantities;
+DROP TABLE IF EXISTS item_continuous_quantities;

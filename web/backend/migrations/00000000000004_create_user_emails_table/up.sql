@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS user_emails (
 -- SQL defining the check_email_unique function creation.
 -- This function is used to check if the email is unique per user, meaning that
 -- two distinct users may not have the same email, even with different login providers.
-CREATE OR REPLACE FUNCTION check_email_unique() RETURNS TRIGGER AS $$
+CREATE FUNCTION check_email_unique() RETURNS TRIGGER AS $$
 BEGIN
     IF EXISTS (
         SELECT 1 

@@ -1,3 +1,3 @@
 -- This file should undo anything in `up.sql`
-DROP TABLE discrete_units;
+DROP TABLE IF EXISTS discrete_units;
 

@@ -1,4 +1,4 @@
-CREATE TABLE item_locations (
+CREATE TABLE IF NOT EXISTS item_locations (
     id UUID PRIMARY KEY,
     item_id UUID REFERENCES items(id) ON
     DELETE

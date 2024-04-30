@@ -1,5 +1,5 @@
 -- SQL defining the procedures table.
-CREATE TABLE bio_ott_ranks (
+CREATE TABLE IF NOT EXISTS bio_ott_ranks (
     id INTEGER PRIMARY KEY,
     -- the name of the taxon item
     name TEXT NOT NULL UNIQUE,

@@ -3,7 +3,7 @@
 -- The Oauth2 login providers are companies that allow users to login to the
 -- application using their credentials. The table is used to store the
 -- information about the login providers.
-CREATE TABLE login_providers (
+CREATE TABLE IF NOT EXISTS login_providers (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     font_awesome_icon VARCHAR(255) NOT NULL,

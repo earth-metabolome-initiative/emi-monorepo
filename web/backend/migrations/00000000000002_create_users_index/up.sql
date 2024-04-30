@@ -8,7 +8,7 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm;
 -- Since the operation needs to be immutable, we need to create a postgresql
 -- function that concatenates the three columns with spaces, and that handles
 -- the case where the middle_value is null.
-CREATE OR REPLACE FUNCTION f_concat_users_name(
+CREATE FUNCTION f_concat_users_name(
   first_value text,
   middle_value text,
   last_value text

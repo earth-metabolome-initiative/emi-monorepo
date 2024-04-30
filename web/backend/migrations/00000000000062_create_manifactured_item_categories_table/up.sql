@@ -2,7 +2,7 @@
 -- A manufactured type is an item type that can be manufactured, sold, and bought. As such it
 -- has a cost, its currency, and a cost per day for renting and the current of the renting
 -- cost.
-CREATE TABLE manufactured_item_categories (
+CREATE TABLE IF NOT EXISTS manufactured_item_categories (
   id SERIAL PRIMARY KEY,
   cost INTEGER NOT NULL,
   cost_per_day INTEGER NOT NULL,

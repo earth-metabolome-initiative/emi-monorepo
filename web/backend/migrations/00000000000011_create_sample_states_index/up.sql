@@ -2,7 +2,7 @@
 -- project states, including name and description.
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
-CREATE OR REPLACE FUNCTION f_concat_sample_states_name_description(
+CREATE FUNCTION f_concat_sample_states_name_description(
   name text,
   description text
 ) RETURNS text AS $$

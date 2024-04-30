@@ -1,2 +1,3 @@
 -- Down version of sampling_procedures_name_description_trgm_idx
 DROP INDEX IF EXISTS sampling_procedures_name_description_trgm_idx;
+DROP FUNCTION f_concat_sampling_procedures_name_description(text, text);

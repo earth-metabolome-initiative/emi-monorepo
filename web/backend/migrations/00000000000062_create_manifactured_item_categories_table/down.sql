@@ -1,2 +1,2 @@
 -- This file should undo anything in `up.sql`
-DROP TABLE manufactured_item_categories;
+DROP TABLE IF EXISTS manufactured_item_categories;

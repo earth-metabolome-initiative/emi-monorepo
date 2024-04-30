@@ -3,7 +3,7 @@
 -- grams, milliliters, or meters. This table defines the units of measure that are used to
 -- measure items. Some items may be measured reasonably in different units, and this table
 -- allows for the definition of the units of measure that are used to measure items.
-CREATE TABLE item_units (
+CREATE TABLE IF NOT EXISTS item_units (
     id UUID PRIMARY KEY,
     item_id UUID NOT NULL REFERENCES items(id) ON
     DELETE

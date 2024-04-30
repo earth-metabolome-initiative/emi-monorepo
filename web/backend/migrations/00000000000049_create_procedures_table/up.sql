@@ -1,5 +1,5 @@
 -- SQL defining the procedures table.
-CREATE TABLE procedures (
+CREATE TABLE IF NOT EXISTS procedures (
     id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     description TEXT,

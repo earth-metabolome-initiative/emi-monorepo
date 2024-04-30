@@ -1,5 +1,5 @@
 -- Your SQL goes here
-CREATE TABLE notifications (
+CREATE TABLE IF NOT EXISTS notifications (
     id SERIAL PRIMARY KEY,
     -- The user to whom the notification is addressed
     user_id INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,
@@ -14,7 +14,7 @@ CREATE TABLE notifications (
 
 -- We create a function that notifies the user when a row is
 -- inserted, edited or deleted in the notifications table.
-CREATE OR REPLACE FUNCTION notify_user()
+CREATE FUNCTION notify_user()
 RETURNS TRIGGER AS $$
 DECLARE
     serialized_record TEXT;

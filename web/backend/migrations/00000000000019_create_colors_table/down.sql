@@ -1,2 +1,2 @@
 -- This is a no-op SQL statement
-DROP TABLE colors;
+DROP TABLE IF EXISTS colors;

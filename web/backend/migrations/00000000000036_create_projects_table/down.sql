@@ -1,3 +1,3 @@
 -- SQL needed to drop the projects table.
 
-DROP TABLE projects;
+DROP TABLE IF EXISTS projects;

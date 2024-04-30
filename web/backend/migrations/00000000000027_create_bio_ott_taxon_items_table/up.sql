@@ -1,4 +1,4 @@
-CREATE TABLE bio_ott_taxon_items (
+CREATE TABLE IF NOT EXISTS bio_ott_taxon_items (
     id INTEGER PRIMARY KEY,
 
     -- the name of the taxon item

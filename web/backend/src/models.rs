@@ -6288,6 +6288,21 @@ impl Unit {
             .filter(units::dsl::id.eq(id))
             .first::<Self>(connection)
     }
+    /// Get the struct from the database by its name.
+    ///
+    /// # Arguments
+    /// * `name` - The name of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_name(
+        name: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::units;
+        units::dsl::units
+            .filter(units::dsl::name.eq(name))
+            .first::<Self>(connection)
+    }
 }
 #[derive(Queryable, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default, Identifiable, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = user_emails)]

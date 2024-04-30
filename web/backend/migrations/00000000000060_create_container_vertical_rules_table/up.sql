@@ -1,4 +1,4 @@
-CREATE TABLE container_vertical_rules (
+CREATE TABLE IF NOT EXISTS container_vertical_rules (
     id SERIAL PRIMARY KEY,
     created_by INTEGER REFERENCES users(id) ON
     DELETE

@@ -3,7 +3,7 @@
 -- This is a N to M relationship between samples and taxa.
 -- A sample can be associated to no or more taxa, and a taxon can be found in multiple samples.
 --
-CREATE TABLE sample_bio_ott_taxon_items (
+CREATE TABLE IF NOT EXISTS sample_bio_ott_taxon_items (
     id UUID PRIMARY KEY,
     created_by INTEGER NOT NULL REFERENCES users(id) ON
     DELETE

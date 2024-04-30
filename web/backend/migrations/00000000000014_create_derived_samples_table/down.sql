@@ -1,2 +1,2 @@
 -- This file should undo anything in `up.sql`
-DROP TABLE derived_samples;
+DROP TABLE IF EXISTS derived_samples;

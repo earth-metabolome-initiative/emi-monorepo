@@ -1,4 +1,4 @@
-CREATE TABLE container_horizontal_rules (
+CREATE TABLE IF NOT EXISTS container_horizontal_rules (
     id SERIAL PRIMARY KEY,
     created_by INTEGER NOT NULL REFERENCES users(id) ON
     DELETE

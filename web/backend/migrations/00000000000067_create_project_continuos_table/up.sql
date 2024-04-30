@@ -1,5 +1,5 @@
 -- Your SQL goes here
-CREATE TABLE project_requirements (
+CREATE TABLE IF NOT EXISTS project_requirements (
     id SERIAL PRIMARY KEY,
     created_by INTEGER NOT NULL REFERENCES users(id) ON
     DELETE

@@ -513,7 +513,6 @@ diesel::joinable!(sample_bio_ott_taxon_items -> users (created_by));
 diesel::joinable!(sampled_individual_bio_ott_taxon_items -> bio_ott_taxon_items (taxon_id));
 diesel::joinable!(sampled_individual_bio_ott_taxon_items -> sampled_individuals (sampled_individual_id));
 diesel::joinable!(sampled_individual_bio_ott_taxon_items -> users (created_by));
-diesel::joinable!(sampled_individuals -> items (id));
 diesel::joinable!(samples -> sample_states (state));
 diesel::joinable!(samples -> sampling_procedures (procedure_id));
 diesel::joinable!(sampling_procedures -> users (created_by));

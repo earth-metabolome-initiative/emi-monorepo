@@ -3390,6 +3390,52 @@ def generate_table_schema():
     if status != 0:
         raise Exception("The diesel_ext command failed.")
 
+def check_for_common_typos_in_migrations():
+    for directory in os.listdir("migrations"):
+        if not os.path.isdir(f"migrations/{directory}"):
+            continue
+
+        if not os.path.exists(f"migrations/{directory}/up.sql") or not os.path.exists(
+            f"migrations/{directory}/down.sql"
+        ):
+            continue
+
+        with open(f"migrations/{directory}/up.sql", "r") as up_file:
+            up_content = up_file.read()
+
+        with open(f"migrations/{directory}/down.sql", "r") as down_file:
+            down_content = down_file.read()
+        
+        if "CREATE TABLE IF EXISTS" in up_content:
+            raise Exception(
+                f"Migration `{directory}` contains a typo: `CREATE TABLE IF EXISTS` instead of `CREATE TABLE IF NOT EXISTS`."
+            )
+
+        if "DROP TABLE IF NOT EXISTS" in down_content:
+            raise Exception(
+                f"Migration `{directory}` contains a typo: `DROP TABLE IF NOT EXISTS` instead of `DROP TABLE IF EXISTS`."
+            )
+
+def ensures_gluesql_compliance():
+    for directory in os.listdir("migrations"):
+        if not os.path.isdir(f"migrations/{directory}"):
+            continue
+
+        if not os.path.exists(f"migrations/{directory}/up.sql") or not os.path.exists(
+            f"migrations/{directory}/down.sql"
+        ):
+            continue
+
+        with open(f"migrations/{directory}/up.sql", "r") as up_file:
+            up_content = up_file.read()
+        
+        if up_content.count("CREATE TABLE") != up_content.count("CREATE TABLE IF NOT EXISTS"):
+            raise Exception(
+                f"Migration `{directory}` does not use `CREATE TABLE IF NOT EXISTS` consistently. "
+                f"Replace the use of `CREATE TABLE` with `CREATE TABLE IF NOT EXISTS` in the `up.sql` file "
+                "so to avoid conflicts when running the migrations within GlueSQL."
+            )
+
 
 def ensures_migrations_simmetry():
     # We check that, if in a migration directory up.sql contains a
@@ -3401,7 +3447,6 @@ def ensures_migrations_simmetry():
         "CREATE INDEX": "DROP INDEX",
         "CREATE VIEW": "DROP VIEW",
         "CREATE FUNCTION": "DROP FUNCTION",
-        "CREATE FUNCTION IF NOT EXISTS": "DROP FUNCTION IF EXISTS",
         "CREATE TRIGGER": "DROP TRIGGER",
         "CREATE TYPE": "DROP TYPE",
     }
@@ -3413,6 +3458,9 @@ def ensures_migrations_simmetry():
         if not os.path.exists(f"migrations/{directory}/up.sql") or not os.path.exists(
             f"migrations/{directory}/down.sql"
         ):
+            continue
+
+        if directory == "00000000000000_diesel_initial_setup":
             continue
 
         with open(f"migrations/{directory}/up.sql", "r") as up_file:
@@ -3482,8 +3530,10 @@ if __name__ == "__main__":
     if not os.path.exists("./db_data/bio_ott_taxons.csv.gz"):
         retrieve_taxons()
 
-    # ensures_migrations_simmetry()
-    print("Ensured migrations simmetry.")
+    check_for_common_typos_in_migrations()
+    ensures_migrations_simmetry()
+    ensures_gluesql_compliance()
+    print("Ensured migrations simmetry & GlueSQL compliance.")
 
     generate_table_schema()
     print("Generated models.")

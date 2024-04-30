@@ -1,7 +1,7 @@
 -- SQL defining the procedure_continuous_requirements table.
 -- A procedure may require one or more items to be performed. This table defines the
 -- requirements of a procedure in terms of the number of items of a given category.
-CREATE TABLE procedure_continuous_requirements (
+CREATE TABLE IF NOT EXISTS procedure_continuous_requirements (
     id SERIAL PRIMARY KEY,
     created_by INTEGER NOT NULL REFERENCES users(id) ON
     DELETE

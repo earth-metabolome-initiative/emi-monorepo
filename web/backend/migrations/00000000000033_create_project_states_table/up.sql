@@ -1,5 +1,5 @@
 -- SQL defining a state that a project may be in.
-CREATE TABLE project_states (
+CREATE TABLE IF NOT EXISTS project_states (
     id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     description TEXT NOT NULL,

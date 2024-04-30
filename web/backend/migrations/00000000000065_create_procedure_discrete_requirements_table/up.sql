@@ -1,7 +1,7 @@
 -- SQL defining the procedure_discrete_requirements table.
 -- A procedure may require one or more items to be performed. This table defines the
 -- requirements of a procedure in terms of the number of items of a given category.
-CREATE TABLE procedure_discrete_requirements (
+CREATE TABLE IF NOT EXISTS procedure_discrete_requirements (
   id SERIAL PRIMARY KEY,
   created_by INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   procedure_id INTEGER NOT NULL REFERENCES procedures(id) ON DELETE CASCADE,
