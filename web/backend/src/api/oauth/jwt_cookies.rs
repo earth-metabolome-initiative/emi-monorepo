@@ -533,13 +533,6 @@ pub(crate) fn eliminate_cookies(mut builder: HttpResponseBuilder) -> HttpRespons
 }
 
 impl User {
-    pub(crate) fn is_token_expired<S>(token: S) -> Result<bool, String>
-    where
-        S: AsRef<str>,
-    {
-        JsonAccessToken::decode(token.as_ref()).map(|token| token.is_expired())
-    }
-
     pub(crate) async fn from_bearer_token<S>(
         redis_client: redis::Client,
         diesel_pool: Pool<ConnectionManager<PgConnection>>,

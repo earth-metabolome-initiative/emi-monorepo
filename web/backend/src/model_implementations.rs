@@ -156,41 +156,50 @@ impl User {
 
         conn.transaction::<_, ApiError, _>(|conn| {
             // First, we create the document for the profile picture.
-            let profile_picture_document = Document::new(
-                None,
-                self.id,
-                self.standard_profile_picture_path(),
-                png_format.id,
-                profile_picture.as_bytes().len() as i32,
-            )
-            .insert(conn)?;
+            let path = self.standard_profile_picture_path();
+            let profile_picture_document = match Document::from_path(&path, conn) {
+                Ok(document) => document,
+                Err(_) => Document::new(
+                    None,
+                    self.id,
+                    path,
+                    png_format.id,
+                    profile_picture.as_bytes().len() as i32,
+                )
+                .insert(conn)?,
+            };
+            let path = self.thumbnail_path();
             // Similarly, we create the document for the thumbnail.
-            let thumbnail_document = Document::new(
-                None,
-                self.id,
-                self.thumbnail_path(),
-                png_format.id,
-                thumbnail.as_bytes().len() as i32,
-            )
-            .insert(conn)?;
+            let thumbnail_document = match Document::from_path(&path, conn) {
+                Ok(document) => document,
+                Err(_) => Document::new(
+                    None,
+                    self.id,
+                    path,
+                    png_format.id,
+                    thumbnail.as_bytes().len() as i32,
+                )
+                .insert(conn)?,
+            };
             // We attempt to save the profile picture and thumbnail
-            let profile_picture_path =
-                NestedDocument::get(profile_picture_document.id, conn)?.internal_path();
+            let internal_profile_picture_path =
+                NestedDocument::from_flat(profile_picture_document, conn)?.internal_path();
             profile_picture
-                .save_with_format(&profile_picture_path, ImageFormat::Png)
+                .save_with_format(&internal_profile_picture_path, ImageFormat::Png)
                 .map_err(|err| {
                     log::error!(
                         "Failed to save profile picture: {}, {}",
                         err,
-                        profile_picture_path
+                        internal_profile_picture_path
                     );
                     err
                 })?;
-            let thumbnail_path = NestedDocument::get(thumbnail_document.id, conn)?.internal_path();
+            let internal_thumbnail_path =
+                NestedDocument::from_flat(thumbnail_document, conn)?.internal_path();
             thumbnail
-                .save_with_format(&thumbnail_path, ImageFormat::Png)
+                .save_with_format(&internal_thumbnail_path, ImageFormat::Png)
                 .map_err(|err| {
-                    log::error!("Failed to save thumbnail: {}, {}", err, thumbnail_path);
+                    log::error!("Failed to save thumbnail: {}, {}", err, internal_thumbnail_path);
                     err
                 })?;
             Ok(())

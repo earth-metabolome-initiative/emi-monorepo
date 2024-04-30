@@ -22,11 +22,8 @@
 use crate::router::AppRoute;
 use crate::stores::app_state::AppState;
 use crate::stores::user_state::UserState;
-use crate::utils::is_online;
-use gloo::timers::callback::Interval;
-use gluesql::core::executor::Payload;
+
 use web_common::api::ws::messages::*;
-use web_common::api::ApiError;
 use web_common::database::NestedPublicUser;
 use yew::prelude::*;
 use yew_agent::scope_ext::AgentScopeExt;
@@ -36,19 +33,16 @@ use yewdux::prelude::*;
 use crate::components::hamburger::Hamburger;
 use crate::components::search_bar::SearchBar;
 use crate::components::sidebar::Sidebar;
-use crate::stores::user_state::refresh_access_token;
-use crate::workers::{DBWorker, WebsocketWorker};
+use crate::workers::WebsocketWorker;
 use std::rc::Rc;
 use yew_agent::prelude::WorkerBridgeHandle;
 
 pub struct Navigator {
-    websocket: WorkerBridgeHandle<WebsocketWorker<FrontendMessage, BackendMessage>>,
+    websocket: WorkerBridgeHandle<WebsocketWorker>,
     user_state: Rc<UserState>,
     user_dispatch: Dispatch<UserState>,
     app_state: Rc<AppState>,
     app_dispatch: Dispatch<AppState>,
-    connectivity_checked: Option<Interval>,
-    database: WorkerBridgeHandle<DBWorker>,
 }
 
 impl Navigator {
@@ -59,14 +53,6 @@ impl Navigator {
     fn user(&self) -> Option<&NestedPublicUser> {
         self.user_state.user()
     }
-
-    fn complete_profile(&self) -> Option<&NestedPublicUser> {
-        self.user_state.complete_profile()
-    }
-
-    fn has_access_token(&self) -> bool {
-        self.user_state.has_access_token()
-    }
 }
 
 pub enum NavigatorMessage {
@@ -74,7 +60,6 @@ pub enum NavigatorMessage {
     UserState(Rc<UserState>),
     AppState(Rc<AppState>),
     ToggleSidebar,
-    ResumeTasks,
 }
 
 #[derive(Clone, Properties, PartialEq)]
@@ -101,102 +86,36 @@ impl Component for Navigator {
                     link.send_message(NavigatorMessage::Backend(message));
                 }
             })),
-            database: ctx.link().bridge_worker(Callback::from({
-                let link = ctx.link().clone();
-                move |message: Vec<Payload>| {
-                    log::info!("Received message from database: {:?}", message);
-                }
-            })),
             user_state,
             user_dispatch,
             app_state,
             app_dispatch,
-            connectivity_checked: None,
         }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             NavigatorMessage::UserState(user_state) => {
-                // if self.user_state == user_state {
-                //     return false;
-                // }
+                if self.user_state == user_state {
+                    return false;
+                }
                 self.user_state = user_state;
                 true
             }
             NavigatorMessage::AppState(app_state) => {
-                // if self.app_state == app_state {
-                //     return false;
-                // }
+                if self.app_state == app_state {
+                    return false;
+                }
 
                 self.app_state = app_state;
 
-                ctx.link().send_message(NavigatorMessage::ResumeTasks);
-
-                if let Some(interval) = self.connectivity_checked.take() {
-                    interval.cancel();
-                }
-                // We define an interval that check the internet connection every second and
-                // updates the app state accordingly when the connection status changes.
-                self.connectivity_checked = Some({
-                    let app_dispatch = self.app_dispatch.clone();
-                    let current_connection_status = self.app_state.connect_to_internet();
-                    Interval::new(1000, move || {
-                        let new_connection_status = is_online();
-                        if current_connection_status != new_connection_status {
-                            log::info!("Connection status changed to {}", new_connection_status);
-                            app_dispatch.reduce_mut(|state| {
-                                state.set_connect_to_internet(new_connection_status);
-                            });
-                        }
-                    })
-                });
-
                 true
             }
-            NavigatorMessage::ResumeTasks => {
-                let mut task_submitted = false;
-                if self.app_state.connect_to_internet() {
-                    let tasks = self.app_state.tasks();
-                    for task in tasks.iter() {
-                        if task.should_retry() {
-                            self.websocket.send(task.clone().into());
-                            task_submitted = true;
-                        }
-                    }
-                }
-                task_submitted
-            }
-            NavigatorMessage::Backend(BackendMessage::RefreshToken((user, refresh_token))) => {
+            NavigatorMessage::Backend(BackendMessage::RefreshUser(user)) => {
                 log::info!("Received new access token");
                 self.user_dispatch.reduce_mut(|state| {
-                    state.set_access_token(refresh_token);
                     state.set_user(user);
                 });
-                false
-            }
-            NavigatorMessage::Backend(BackendMessage::TaskResult(task_id, result)) => {
-                match result {
-                    Ok(()) => {
-                        self.app_dispatch.reduce_mut(|state| {
-                            state.remove_task(task_id);
-                        });
-                    }
-                    Err(api_error) => match api_error {
-                        ApiError::Unauthorized | ApiError::ExpiredAuthorization => {
-                            refresh_access_token(
-                                self.user_dispatch.clone(),
-                                ctx.props().navigator.clone(),
-                            );
-                        }
-                        ApiError::InternalServerError | ApiError::BadGateway => {}
-                        ApiError::BadRequest(_) | ApiError::InvalidFileFormat(_) => {
-                            self.app_dispatch.reduce_mut(|state| {
-                                state.remove_task(task_id);
-                            });
-                        }
-                    },
-                }
                 false
             }
             NavigatorMessage::Backend(BackendMessage::Notification(notification)) => {
@@ -232,8 +151,8 @@ impl Component for Navigator {
                         </Link<AppRoute>>
                     </h1>
                     <SearchBar />
-                    if self.has_access_token() {
-                        if let Some(user) = self.complete_profile() {
+                    if let Some(user) = self.user() {
+                        if user.has_complete_profile() {
                             <div class="user">
                                 if let Some(thumbnail) = &user.thumbnail {
                                     <img src={thumbnail.inner.path.clone()} alt={format!("{}'s avatar", user.inner.full_name())} />

@@ -6,7 +6,6 @@ CREATE TABLE sampled_individuals (
   id UUID PRIMARY KEY REFERENCES items(id) ON DELETE CASCADE
 );
 
-
 -- We also need to add a bi-directional cascade delete constraint to the items
 -- table, so that when a sampled individual is deleted, the corresponding item is also deleted.
 -- Since the items table is referenced by several other tables, we cannot add a cascade

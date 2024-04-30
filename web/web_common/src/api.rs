@@ -104,6 +104,14 @@ impl Into<HashSet<String>> for ApiError {
     }
 }
 
+#[cfg(feature = "frontend")]
+impl From<gluesql::prelude::Error> for ApiError {
+    fn from(e: gluesql::prelude::Error) -> Self {
+        log::error!("Glue error: {:?}", e);
+        Self::InternalServerError
+    }
+}
+
 #[cfg(feature = "backend")]
 impl From<diesel::result::Error> for ApiError {
     fn from(e: diesel::result::Error) -> Self {

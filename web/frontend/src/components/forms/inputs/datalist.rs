@@ -56,7 +56,7 @@ where
 }
 
 pub struct Datalist<Data> {
-    websocket: WorkerBridgeHandle<WebsocketWorker<FrontendMessage, BackendMessage>>,
+    websocket: WorkerBridgeHandle<WebsocketWorker>,
     errors: HashSet<String>,
     current_value: Option<String>,
     is_valid: Option<bool>,
@@ -93,12 +93,7 @@ pub enum DatalistMessage<Data> {
 
 impl<Data> Component for Datalist<Data>
 where
-    Data: 'static
-        + Clone
-        + PartialEq
-        + DeserializeOwned
-        + Searchable
-        + RowToBadge,
+    Data: 'static + Clone + PartialEq + DeserializeOwned + Searchable + RowToBadge,
 {
     type Message = DatalistMessage<Data>;
     type Properties = DatalistProp<Data>;
@@ -129,22 +124,16 @@ where
             DatalistMessage::Backend(message) => match message {
                 BackendMessage::SearchTable(_task_id, results) => {
                     self.number_of_search_queries -= 1;
-                    match results {
-                        Ok(results) => {
-                            ctx.link().send_message(DatalistMessage::UpdateCandidates(results
-                                .iter()
-                                .map(|row| {
-                                    bincode::deserialize(row).expect("Failed to convert row to data")
-                                })
-                                .collect()));
+                    ctx.link().send_message(DatalistMessage::UpdateCandidates(
+                        results
+                            .iter()
+                            .map(|row| {
+                                bincode::deserialize(row).expect("Failed to convert row to data")
+                            })
+                            .collect(),
+                    ));
 
-                            true
-                        }
-                        Err(error) => {
-                            log::error!("Error searching table: {:?}", error);
-                            false
-                        }
-                    }
+                    true
                 }
                 _ => false,
             },
@@ -341,7 +330,6 @@ where
                     link.send_message(DatalistMessage::RemoveErrors);
                     return;
                 }
-
             })
         };
 

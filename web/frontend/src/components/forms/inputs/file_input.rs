@@ -83,7 +83,7 @@ where
 }
 
 pub struct FileInput<Data> {
-    _websocket: WorkerBridgeHandle<WebsocketWorker<FrontendMessage, BackendMessage>>,
+    _websocket: WorkerBridgeHandle<WebsocketWorker>,
     errors: HashSet<String>,
     is_valid: Option<bool>,
     validation_timeout: Option<Timeout>,

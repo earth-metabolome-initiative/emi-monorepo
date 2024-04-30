@@ -71,6 +71,7 @@ pub trait FormBuildable: Clone + PartialEq + Serialize + 'static + Into<Task> {
     /// Returns the description to use for the Form.
     fn description() -> &'static str;
 
+    /// Returns whether this form requires authentication.
     fn requires_authentication() -> bool;
 }
 
@@ -86,7 +87,7 @@ where
 }
 
 pub struct InnerBasicForm<Data> {
-    websocket: WorkerBridgeHandle<WebsocketWorker<FrontendMessage, BackendMessage>>,
+    websocket: WorkerBridgeHandle<WebsocketWorker>,
     app_state: Rc<AppState>,
     app_dispatch: Dispatch<AppState>,
     user_state: Rc<UserState>,
@@ -142,23 +143,9 @@ where
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            FormMessage::Backend(BackendMessage::TaskResult(uuid, outcome)) => {
-                log::info!("Received task result");
-                if self.uuid == Some(uuid) {
-                    self.waiting_for_reply = false;
-                    match outcome {
-                        Ok(()) => {
-                            log::info!("Form submitted successfully");
-                            true
-                        }
-                        Err(errors) => {
-                            ctx.link().send_message(FormMessage::Errors(errors.into()));
-                            true
-                        }
-                    }
-                } else {
-                    false
-                }
+            FormMessage::Backend(BackendMessage::Error(_, error)) => {
+                ctx.link().send_message(FormMessage::Errors(error.into()));
+                false
             }
             FormMessage::Errors(errors) => {
                 self.errors = errors.into_iter().collect();
@@ -186,9 +173,7 @@ where
                 self.uuid = Some(task.id());
 
                 // Then, we send the data to the backend
-                self.app_dispatch.reduce_mut(move |state| {
-                    state.add_task(task);
-                });
+                self.websocket.send(FrontendMessage::Task(task));
 
                 self.waiting_for_reply = true;
 
@@ -202,12 +187,10 @@ where
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        if Data::requires_authentication() {
+        if Data::requires_authentication() && !self.user_state.has_user(){
             if let Some(navigator) = ctx.props().navigator.as_ref() {
-                if self.user_state.has_no_access_token() {
-                    log::info!("No access token found, redirecting to login page.");
-                    navigator.push(&AppRoute::Login);
-                }
+                log::info!("No access token found, redirecting to login page.");
+                navigator.push(&AppRoute::Login);
             }
         }
 

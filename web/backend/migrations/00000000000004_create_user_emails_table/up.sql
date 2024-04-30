@@ -3,7 +3,7 @@
 -- and are used to send notifications and other important information.
 -- They are all associated to a login provider.
 
-CREATE TABLE user_emails (
+CREATE TABLE IF NOT EXISTS user_emails (
     id SERIAL PRIMARY KEY,
     email VARCHAR(255) NOT NULL,
     user_id INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,

@@ -2,8 +2,6 @@
 use serde::Deserialize;
 use std::fmt::Display;
 
-use crate::database::Task;
-
 #[derive(Debug, Clone, Copy, PartialEq, Deserialize)]
 pub enum FormMethod {
     GET,    // Use GET to execute a query
@@ -101,4 +99,3 @@ pub trait TryFromCallback<T>: Sized {
     where
         C: FnOnce(Result<Self, Vec<String>>) + 'static;
 }
-

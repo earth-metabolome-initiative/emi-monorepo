@@ -2,7 +2,7 @@ use serde::Deserialize;
 use serde::Serialize;
 use uuid::Uuid;
 use chrono::NaiveDateTime;
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct BioOttRank {
     pub id: i32,
@@ -162,9 +162,13 @@ impl BioOttRank {
     /// Get all BioOttRank from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -173,6 +177,8 @@ impl BioOttRank {
         let select_row = table("bio_ott_ranks")
             .select()
             .project("id, name, font_awesome_icon_id")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -197,7 +203,7 @@ impl BioOttRank {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct BioOttTaxonItem {
     pub id: i32,
@@ -466,9 +472,13 @@ impl BioOttTaxonItem {
     /// Get all BioOttTaxonItem from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -477,6 +487,8 @@ impl BioOttTaxonItem {
         let select_row = table("bio_ott_taxon_items")
             .select()
             .project("id, name, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, font_awesome_icon_id, color_id")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -577,7 +589,7 @@ impl BioOttTaxonItem {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Color {
     pub id: i32,
@@ -737,9 +749,13 @@ impl Color {
     /// Get all Color from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -748,6 +764,8 @@ impl Color {
         let select_row = table("colors")
             .select()
             .project("id, name, hexadecimal_value")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -772,7 +790,7 @@ impl Color {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ContainerHorizontalRule {
     pub id: i32,
@@ -987,9 +1005,13 @@ impl ContainerHorizontalRule {
     /// Get all ContainerHorizontalRule from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -998,6 +1020,8 @@ impl ContainerHorizontalRule {
         let select_row = table("container_horizontal_rules")
             .select()
             .project("id, created_by, name, item_type_id, other_item_type_id, minimum_temperature, maximum_temperature, minimum_humidity, maximum_humidity, minimum_pressure, maximum_pressure")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -1060,7 +1084,7 @@ impl ContainerHorizontalRule {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ContainerVerticalRule {
     pub id: i32,
@@ -1275,9 +1299,13 @@ impl ContainerVerticalRule {
     /// Get all ContainerVerticalRule from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -1286,6 +1314,8 @@ impl ContainerVerticalRule {
         let select_row = table("container_vertical_rules")
             .select()
             .project("id, created_by, name, container_item_type_id, contained_item_type_id, minimum_temperature, maximum_temperature, minimum_humidity, maximum_humidity, minimum_pressure, maximum_pressure")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -1348,7 +1378,7 @@ impl ContainerVerticalRule {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ContinuousUnit {
     pub id: i32,
@@ -1502,9 +1532,13 @@ impl ContinuousUnit {
     /// Get all ContinuousUnit from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -1513,6 +1547,8 @@ impl ContinuousUnit {
         let select_row = table("continuous_units")
             .select()
             .project("id")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -1529,7 +1565,7 @@ impl ContinuousUnit {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct DerivedSample {
     pub id: i32,
@@ -1692,9 +1728,13 @@ impl DerivedSample {
     /// Get all DerivedSample from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -1703,6 +1743,8 @@ impl DerivedSample {
         let select_row = table("derived_samples")
             .select()
             .project("id, created_by, parent_sample_id, child_sample_id")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -1731,7 +1773,7 @@ impl DerivedSample {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct DiscreteUnit {
     pub id: i32,
@@ -1885,9 +1927,13 @@ impl DiscreteUnit {
     /// Get all DiscreteUnit from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -1896,6 +1942,8 @@ impl DiscreteUnit {
         let select_row = table("discrete_units")
             .select()
             .project("id")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -1912,7 +1960,7 @@ impl DiscreteUnit {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct DocumentFormat {
     pub id: i32,
@@ -2072,9 +2120,13 @@ impl DocumentFormat {
     /// Get all DocumentFormat from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -2083,6 +2135,8 @@ impl DocumentFormat {
         let select_row = table("document_formats")
             .select()
             .project("id, extension, mime_type")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -2107,7 +2161,7 @@ impl DocumentFormat {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Document {
     pub id: Uuid,
@@ -2273,9 +2327,13 @@ impl Document {
     /// Get all Document from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -2284,6 +2342,8 @@ impl Document {
         let select_row = table("documents")
             .select()
             .project("id, author_id, path, format_id, bytes")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -2316,7 +2376,7 @@ impl Document {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct FontAwesomeIcon {
     pub id: i32,
@@ -2473,9 +2533,13 @@ impl FontAwesomeIcon {
     /// Get all FontAwesomeIcon from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -2484,6 +2548,8 @@ impl FontAwesomeIcon {
         let select_row = table("font_awesome_icons")
             .select()
             .project("id, name")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -2504,7 +2570,7 @@ impl FontAwesomeIcon {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ItemCategory {
     pub id: i32,
@@ -2667,9 +2733,13 @@ impl ItemCategory {
     /// Get all ItemCategory from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -2678,6 +2748,8 @@ impl ItemCategory {
         let select_row = table("item_categories")
             .select()
             .project("id, name, description, created_by")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -2706,7 +2778,7 @@ impl ItemCategory {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ItemCategoryRelationship {
     pub id: i32,
@@ -2869,9 +2941,13 @@ impl ItemCategoryRelationship {
     /// Get all ItemCategoryRelationship from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -2880,6 +2956,8 @@ impl ItemCategoryRelationship {
         let select_row = table("item_category_relationships")
             .select()
             .project("id, parent_id, child_id, added_by")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -2908,7 +2986,7 @@ impl ItemCategoryRelationship {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ItemCategoryUnit {
     pub id: i32,
@@ -3068,9 +3146,13 @@ impl ItemCategoryUnit {
     /// Get all ItemCategoryUnit from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -3079,6 +3161,8 @@ impl ItemCategoryUnit {
         let select_row = table("item_category_units")
             .select()
             .project("id, item_category_id, unit_id")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -3103,7 +3187,7 @@ impl ItemCategoryUnit {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ItemContinuousQuantity {
     pub id: Uuid,
@@ -3286,9 +3370,13 @@ impl ItemContinuousQuantity {
     /// Get all ItemContinuousQuantity from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -3297,6 +3385,8 @@ impl ItemContinuousQuantity {
         let select_row = table("item_continuous_quantities")
             .select()
             .project("id, item_id, amount, unit_id, sensor_id, measured_at, measured_by")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -3339,7 +3429,7 @@ impl ItemContinuousQuantity {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ItemDiscreteQuantity {
     pub id: Uuid,
@@ -3514,9 +3604,13 @@ impl ItemDiscreteQuantity {
     /// Get all ItemDiscreteQuantity from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -3525,6 +3619,8 @@ impl ItemDiscreteQuantity {
         let select_row = table("item_discrete_quantities")
             .select()
             .project("id, item_id, quantity, unit_id, measured_at, measured_by")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -3562,7 +3658,7 @@ impl ItemDiscreteQuantity {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ItemLocation {
     pub id: Uuid,
@@ -3744,9 +3840,13 @@ impl ItemLocation {
     /// Get all ItemLocation from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -3755,6 +3855,8 @@ impl ItemLocation {
         let select_row = table("item_locations")
             .select()
             .project("id, item_id, located_by, located_at, location_id")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -3790,7 +3892,7 @@ impl ItemLocation {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ItemUnit {
     pub id: Uuid,
@@ -3950,9 +4052,13 @@ impl ItemUnit {
     /// Get all ItemUnit from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -3961,6 +4067,8 @@ impl ItemUnit {
         let select_row = table("item_units")
             .select()
             .project("id, item_id, unit_id")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -3985,7 +4093,7 @@ impl ItemUnit {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Item {
     pub id: Uuid,
@@ -4148,9 +4256,13 @@ impl Item {
     /// Get all Item from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -4159,6 +4271,8 @@ impl Item {
         let select_row = table("items")
             .select()
             .project("id, parent_id")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -4180,7 +4294,7 @@ impl Item {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Location {
     pub id: Uuid,
@@ -4423,9 +4537,13 @@ impl Location {
     /// Get all Location from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -4434,6 +4552,8 @@ impl Location {
         let select_row = table("locations")
             .select()
             .project("id, latitude_degrees, latitude_minutes, latitude_seconds, longitude_degrees, longitude_minutes, longitude_seconds, altitude, address, geolocalization_device_id, altitude_device_id, parent_location_id")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -4505,7 +4625,7 @@ impl Location {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct LoginProvider {
     pub id: i32,
@@ -4677,9 +4797,13 @@ impl LoginProvider {
     /// Get all LoginProvider from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -4688,6 +4812,8 @@ impl LoginProvider {
         let select_row = table("login_providers")
             .select()
             .project("id, name, font_awesome_icon, client_id_var_name, redirect_uri_var_name, oauth_url, scope")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -4728,7 +4854,7 @@ impl LoginProvider {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ManufacturedItemCategory {
     pub id: i32,
@@ -4894,9 +5020,13 @@ impl ManufacturedItemCategory {
     /// Get all ManufacturedItemCategory from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -4905,6 +5035,8 @@ impl ManufacturedItemCategory {
         let select_row = table("manufactured_item_categories")
             .select()
             .project("id, cost, cost_per_day, currency, manifacturer_id")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -4937,7 +5069,7 @@ impl ManufacturedItemCategory {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Notification {
     pub id: i32,
@@ -5103,9 +5235,13 @@ impl Notification {
     /// Get all Notification from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -5114,6 +5250,8 @@ impl Notification {
         let select_row = table("notifications")
             .select()
             .project("id, user_id, operation, table_name, read")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -5146,7 +5284,7 @@ impl Notification {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Organization {
     pub id: i32,
@@ -5312,9 +5450,13 @@ impl Organization {
     /// Get all Organization from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -5323,6 +5465,8 @@ impl Organization {
         let select_row = table("organizations")
             .select()
             .project("id, parent_organization_id, name")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -5348,7 +5492,7 @@ impl Organization {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct PrimaryUserEmail {
     pub id: i32,
@@ -5502,9 +5646,13 @@ impl PrimaryUserEmail {
     /// Get all PrimaryUserEmail from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -5513,6 +5661,8 @@ impl PrimaryUserEmail {
         let select_row = table("primary_user_emails")
             .select()
             .project("id")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -5529,7 +5679,7 @@ impl PrimaryUserEmail {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ProcedureContinuousRequirement {
     pub id: i32,
@@ -5704,9 +5854,13 @@ impl ProcedureContinuousRequirement {
     /// Get all ProcedureContinuousRequirement from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -5715,6 +5869,8 @@ impl ProcedureContinuousRequirement {
         let select_row = table("procedure_continuous_requirements")
             .select()
             .project("id, created_by, procedure_id, item_category_id, quantity, unit_id")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -5752,7 +5908,7 @@ impl ProcedureContinuousRequirement {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ProcedureDiscreteRequirement {
     pub id: i32,
@@ -5927,9 +6083,13 @@ impl ProcedureDiscreteRequirement {
     /// Get all ProcedureDiscreteRequirement from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -5938,6 +6098,8 @@ impl ProcedureDiscreteRequirement {
         let select_row = table("procedure_discrete_requirements")
             .select()
             .project("id, created_by, procedure_id, item_category_id, quantity, unit_id")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -5975,7 +6137,7 @@ impl ProcedureDiscreteRequirement {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Procedure {
     pub id: i32,
@@ -6149,9 +6311,13 @@ impl Procedure {
     /// Get all Procedure from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -6160,6 +6326,8 @@ impl Procedure {
         let select_row = table("procedures")
             .select()
             .project("id, name, description, created_by")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -6190,7 +6358,7 @@ impl Procedure {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ProjectRequirement {
     pub id: i32,
@@ -6365,9 +6533,13 @@ impl ProjectRequirement {
     /// Get all ProjectRequirement from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -6376,6 +6548,8 @@ impl ProjectRequirement {
         let select_row = table("project_requirements")
             .select()
             .project("id, created_by, project_id, item_category_id, quantity, unit_id")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -6413,7 +6587,7 @@ impl ProjectRequirement {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ProjectState {
     pub id: i32,
@@ -6579,9 +6753,13 @@ impl ProjectState {
     /// Get all ProjectState from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -6590,6 +6768,8 @@ impl ProjectState {
         let select_row = table("project_states")
             .select()
             .project("id, name, description, font_awesome_icon, icon_color")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -6622,7 +6802,7 @@ impl ProjectState {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Project {
     pub id: i32,
@@ -6835,9 +7015,13 @@ impl Project {
     /// Get all Project from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -6846,6 +7030,8 @@ impl Project {
         let select_row = table("projects")
             .select()
             .project("id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, expected_end_date, end_date")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -6911,7 +7097,7 @@ impl Project {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Role {
     pub id: i32,
@@ -7068,9 +7254,13 @@ impl Role {
     /// Get all Role from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -7079,6 +7269,8 @@ impl Role {
         let select_row = table("roles")
             .select()
             .project("id, name")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -7099,7 +7291,7 @@ impl Role {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SampleBioOttTaxonItem {
     pub id: Uuid,
@@ -7262,9 +7454,13 @@ impl SampleBioOttTaxonItem {
     /// Get all SampleBioOttTaxonItem from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -7273,6 +7469,8 @@ impl SampleBioOttTaxonItem {
         let select_row = table("sample_bio_ott_taxon_items")
             .select()
             .project("id, created_by, sample_id, taxon_id")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -7301,7 +7499,7 @@ impl SampleBioOttTaxonItem {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SampleState {
     pub id: i32,
@@ -7467,9 +7665,13 @@ impl SampleState {
     /// Get all SampleState from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -7478,6 +7680,8 @@ impl SampleState {
         let select_row = table("sample_states")
             .select()
             .project("id, name, description, font_awesome_icon, icon_color")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -7510,7 +7714,7 @@ impl SampleState {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SampledIndividualBioOttTaxonItem {
     pub id: Uuid,
@@ -7673,9 +7877,13 @@ impl SampledIndividualBioOttTaxonItem {
     /// Get all SampledIndividualBioOttTaxonItem from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -7684,6 +7892,8 @@ impl SampledIndividualBioOttTaxonItem {
         let select_row = table("sampled_individual_bio_ott_taxon_items")
             .select()
             .project("id, created_by, sampled_individual_id, taxon_id")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -7712,7 +7922,7 @@ impl SampledIndividualBioOttTaxonItem {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SampledIndividual {
     pub id: Uuid,
@@ -7866,9 +8076,13 @@ impl SampledIndividual {
     /// Get all SampledIndividual from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -7877,6 +8091,8 @@ impl SampledIndividual {
         let select_row = table("sampled_individuals")
             .select()
             .project("id")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -7893,7 +8109,7 @@ impl SampledIndividual {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Sample {
     pub id: Uuid,
@@ -8059,9 +8275,13 @@ impl Sample {
     /// Get all Sample from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -8070,6 +8290,8 @@ impl Sample {
         let select_row = table("samples")
             .select()
             .project("id, inserted_by, sampled_by, procedure_id, state")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -8102,7 +8324,7 @@ impl Sample {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SamplingProcedure {
     pub id: Uuid,
@@ -8276,9 +8498,13 @@ impl SamplingProcedure {
     /// Get all SamplingProcedure from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -8287,6 +8513,8 @@ impl SamplingProcedure {
         let select_row = table("sampling_procedures")
             .select()
             .project("id, name, description, created_by")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -8317,7 +8545,7 @@ impl SamplingProcedure {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Spectra {
     pub id: i32,
@@ -8474,9 +8702,13 @@ impl Spectra {
     /// Get all Spectra from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -8485,6 +8717,8 @@ impl Spectra {
         let select_row = table("spectra")
             .select()
             .project("id, spectra_collection_id")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -8505,7 +8739,7 @@ impl Spectra {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SpectraCollection {
     pub id: i32,
@@ -8665,9 +8899,13 @@ impl SpectraCollection {
     /// Get all SpectraCollection from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -8676,6 +8914,8 @@ impl SpectraCollection {
         let select_row = table("spectra_collection")
             .select()
             .project("id, sample_id, created_by")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -8700,7 +8940,7 @@ impl SpectraCollection {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct TeamState {
     pub id: i32,
@@ -8866,9 +9106,13 @@ impl TeamState {
     /// Get all TeamState from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -8877,6 +9121,8 @@ impl TeamState {
         let select_row = table("team_states")
             .select()
             .project("id, name, description, font_awesome_icon, icon_color")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -8909,7 +9155,7 @@ impl TeamState {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Team {
     pub id: i32,
@@ -9078,9 +9324,13 @@ impl Team {
     /// Get all Team from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -9089,6 +9339,8 @@ impl Team {
         let select_row = table("teams")
             .select()
             .project("id, name, description, parent_team_id")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -9118,7 +9370,7 @@ impl Team {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Unit {
     pub id: i32,
@@ -9281,9 +9533,13 @@ impl Unit {
     /// Get all Unit from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -9292,6 +9548,8 @@ impl Unit {
         let select_row = table("units")
             .select()
             .project("id, name, description, symbol")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -9320,7 +9578,7 @@ impl Unit {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct UserEmail {
     pub id: i32,
@@ -9483,9 +9741,13 @@ impl UserEmail {
     /// Get all UserEmail from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -9494,6 +9756,8 @@ impl UserEmail {
         let select_row = table("user_emails")
             .select()
             .project("id, email, user_id, login_provider_id")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()
@@ -9522,7 +9786,7 @@ impl UserEmail {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct User {
     pub id: i32,
@@ -9697,9 +9961,13 @@ impl User {
     /// Get all User from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -9708,6 +9976,8 @@ impl User {
         let select_row = table("users")
             .select()
             .project("id, first_name, middle_name, last_name, created_at, updated_at")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()

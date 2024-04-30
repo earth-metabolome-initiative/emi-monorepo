@@ -15,10 +15,14 @@ impl actix::Handler<ProjectMessage> for WebSocket {
     fn handle(&mut self, msg: ProjectMessage, ctx: &mut Self::Context) {
         match msg {
             ProjectMessage::NewProject(task_id, new_project) => {
-                ctx.binary(BackendMessage::TaskResult(
-                    task_id,
-                    new_project::handle_new_project(new_project),
-                ));
+                match new_project::handle_new_project(new_project) {
+                    Ok(_) => {
+                        ctx.binary(BackendMessage::Completed(task_id));
+                    }
+                    Err(e) => {
+                        ctx.binary(BackendMessage::Error(task_id, e));
+                    }
+                }
             }
         }
     }

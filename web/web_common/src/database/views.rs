@@ -2,7 +2,7 @@ use serde::Deserialize;
 use serde::Serialize;
 use uuid::Uuid;
 use chrono::NaiveDateTime;
-#[derive(Deserialize, Serialize, Debug, PartialEq, Eq, Clone)]
+#[derive(Deserialize, Serialize, Debug, PartialEq, Eq, Clone, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct PublicUser {
     pub id: i32,
@@ -193,9 +193,13 @@ impl PublicUser {
     /// Get all PublicUser from the database.
     ///
     /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -204,6 +208,8 @@ impl PublicUser {
         let select_row = table("public_users")
             .select()
             .project("id, first_name, middle_name, last_name, created_at, updated_at, thumbnail_id, picture_id")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
             .execute(connection)
             .await?;
         Ok(select_row.select()

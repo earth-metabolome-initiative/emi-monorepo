@@ -5,9 +5,19 @@ use crate::api::ws::messages::FrontendMessage;
 use crate::database::Operation;
 use crate::database::Task;
 
+use super::PrimaryKey;
+
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub enum Select {
-    Id(super::Table, uuid::Uuid),
+    Id {
+        table_name: String,
+        primary_key: PrimaryKey,
+    },
+    All {
+        table_name: String,
+        limit: i64,
+        offset: i64,
+    },
     SearchTable {
         table_name: String,
         query: String,
@@ -32,6 +42,20 @@ impl Select {
             table_name: table.into(),
             query,
             number_of_results,
+        }
+    }
+
+    /// Create a new `Select::All` query for a given `Table`.
+    /// 
+    /// # Arguments
+    /// * `table` - The table to select from.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    pub fn all(table: super::Table, limit: i64, offset: i64) -> Self {
+        Self::All {
+            table_name: table.into(),
+            limit,
+            offset,
         }
     }
 }

@@ -10,18 +10,19 @@ use yew_router::prelude::*;
 use yewdux::prelude::*;
 
 use crate::stores::user_state;
+use crate::stores::app_state;
 
 #[function_component(Logout)]
 /// Logout button for the sidebar.
 pub fn logout() -> Html {
     let (user, dispatch) = use_store::<user_state::UserState>();
+    let (_, app_dispatch) = use_store::<app_state::AppState>();
     let navigator = use_navigator().unwrap();
 
     let on_logout = Callback::from(move |_| {
         user_state::logout(
             dispatch.clone(),
-            navigator.clone(),
-            user.clone().access_token().cloned(),
+            app_dispatch.clone(),
         );
     });
 

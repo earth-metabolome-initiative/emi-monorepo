@@ -29,10 +29,7 @@ pub fn sidebar(props: &SidebarProps) -> Html {
                     <li>
                         <Link<AppRoute> to={AppRoute::Home}>{"Home"}</Link<AppRoute>>
                     </li>
-                    <li><a href="#">{"About"}</a></li>
-                    <li><a href="#">{"Services"}</a></li>
-                    <li><a href="#">{"Contact"}</a></li>
-                    if user.has_access_token() {
+                    if user.has_user() {
                         <li>
                             <Link<AppRoute> to={AppRoute::NewProject}>{"New Project"}</Link<AppRoute>>
                         </li>

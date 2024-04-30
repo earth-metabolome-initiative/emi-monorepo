@@ -8,13 +8,20 @@ use serde::{Deserialize, Serialize};
 pub struct NotificationMessage {
     notification: Notification,
     /// The bytes composing the row that was inserted, updated, or deleted.
-    row: Vec<u8>,
+    row: Option<Vec<u8>>,
 }
 
 impl NotificationMessage {
     /// Create a new notification message.
     pub fn new(notification: Notification, row: Vec<u8>) -> Self {
-        Self { notification, row }
+        Self { notification, row: Some(row) }
+    }
+
+    pub fn without_row(notification: Notification) -> Self {
+        Self {
+            notification,
+            row: None,
+        }
     }
 
     /// Get the notification.
@@ -23,7 +30,7 @@ impl NotificationMessage {
     }
 
     /// Get the row.
-    pub fn row(&self) -> &[u8] {
-        &self.row
+    pub fn row(&self) -> Option<&[u8]> {
+        self.row.as_deref()
     }
 }

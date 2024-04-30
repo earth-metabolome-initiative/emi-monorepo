@@ -14,13 +14,17 @@ impl actix::Handler<UserMessage> for WebSocket {
     fn handle(&mut self, msg: UserMessage, ctx: &mut Self::Context) {
         match msg {
             UserMessage::CompleteProfile(task_id, profile) => {
-                ctx.binary(BackendMessage::TaskResult(
-                    task_id,
-                    self.user.as_ref().unwrap().0.update_profile(
-                        &mut self.diesel_connection,
-                        profile,
-                    ),
-                ));
+                match self.user.as_ref().unwrap().0.update_profile(
+                    &mut self.diesel_connection,
+                    profile,
+                ) {
+                    Ok(_) => {
+                        ctx.binary(BackendMessage::Completed(task_id));
+                    }
+                    Err(e) => {
+                        ctx.binary(BackendMessage::Error(task_id, e));
+                    }
+                }
             }
         }
     }

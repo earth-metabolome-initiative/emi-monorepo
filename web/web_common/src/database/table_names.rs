@@ -166,7 +166,302 @@ impl std::convert::TryFrom<&str> for Table {
             "units" => Ok(Table::Units),
             "user_emails" => Ok(Table::UserEmails),
             "users" => Ok(Table::Users),
-            table_name => Err(format!("Unknown table name: {}", table_name)),
+            table_name => Err(format!("Unknown table name: {table_name}")),
+        }
+    }
+}
+impl std::convert::TryFrom<String> for Table {
+    type Error = String;
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        Self::try_from(value.as_str())
+    }
+}
+#[cfg(feature = "frontend")]
+impl Table {
+    /// Delete the row from the table.
+    ///
+    /// # Arguments
+    /// * `primary_key` - The primary key of the row.
+    /// * `connection` - The database connection.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete<C>(
+        &self,
+        primary_key: crate::database::operations::PrimaryKey,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        match self {
+            Table::BioOttRanks => {
+                crate::database::BioOttRank::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::BioOttTaxonItems => {
+                crate::database::BioOttTaxonItem::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::Colors => {
+                crate::database::Color::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::ContainerHorizontalRules => {
+                crate::database::ContainerHorizontalRule::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::ContainerVerticalRules => {
+                crate::database::ContainerVerticalRule::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::ContinuousUnits => {
+                crate::database::ContinuousUnit::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::DerivedSamples => {
+                crate::database::DerivedSample::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::DiscreteUnits => {
+                crate::database::DiscreteUnit::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::DocumentFormats => {
+                crate::database::DocumentFormat::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::Documents => {
+                crate::database::Document::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::FontAwesomeIcons => {
+                crate::database::FontAwesomeIcon::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::ItemCategories => {
+                crate::database::ItemCategory::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::ItemCategoryRelationships => {
+                crate::database::ItemCategoryRelationship::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::ItemCategoryUnits => {
+                crate::database::ItemCategoryUnit::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::ItemContinuousQuantities => {
+                crate::database::ItemContinuousQuantity::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::ItemDiscreteQuantities => {
+                crate::database::ItemDiscreteQuantity::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::ItemLocations => {
+                crate::database::ItemLocation::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::ItemUnits => {
+                crate::database::ItemUnit::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::Items => {
+                crate::database::Item::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::Locations => {
+                crate::database::Location::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::LoginProviders => {
+                crate::database::LoginProvider::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::ManufacturedItemCategories => {
+                crate::database::ManufacturedItemCategory::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::Notifications => {
+                crate::database::Notification::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::Organizations => {
+                crate::database::Organization::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::PrimaryUserEmails => {
+                crate::database::PrimaryUserEmail::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::ProcedureContinuousRequirements => {
+                crate::database::ProcedureContinuousRequirement::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::ProcedureDiscreteRequirements => {
+                crate::database::ProcedureDiscreteRequirement::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::Procedures => {
+                crate::database::Procedure::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::ProjectRequirements => {
+                crate::database::ProjectRequirement::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::ProjectStates => {
+                crate::database::ProjectState::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::Projects => {
+                crate::database::Project::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::PublicUsers => {
+                crate::database::PublicUser::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::Roles => {
+                crate::database::Role::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::SampleBioOttTaxonItems => {
+                crate::database::SampleBioOttTaxonItem::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::SampleStates => {
+                crate::database::SampleState::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::SampledIndividualBioOttTaxonItems => {
+                crate::database::SampledIndividualBioOttTaxonItem::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::SampledIndividuals => {
+                crate::database::SampledIndividual::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::Samples => {
+                crate::database::Sample::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::SamplingProcedures => {
+                crate::database::SamplingProcedure::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::Spectra => {
+                crate::database::Spectra::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::SpectraCollection => {
+                crate::database::SpectraCollection::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::TeamStates => {
+                crate::database::TeamState::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::Teams => {
+                crate::database::Team::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::Units => {
+                crate::database::Unit::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::UserEmails => {
+                crate::database::UserEmail::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::Users => {
+                crate::database::User::delete_from_id(primary_key.into(), connection).await
+            },
+        }
+    }
+    /// Get the row from the table by the primary key.
+    ///
+    /// # Arguments
+    /// * `primary_key` - The primary key of the row.
+    /// * `connection` - The database connection.
+    ///
+    /// # Returns
+    /// The row of the table.
+    pub async fn get<C>(
+        &self,
+        primary_key: crate::database::operations::PrimaryKey,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Vec<u8>>, crate::api::ApiError> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        Ok(match self {
+            Table::BioOttRanks => crate::database::NestedBioOttRank::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::BioOttTaxonItems => crate::database::NestedBioOttTaxonItem::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::Colors => crate::database::Color::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::ContainerHorizontalRules => crate::database::NestedContainerHorizontalRule::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::ContainerVerticalRules => crate::database::NestedContainerVerticalRule::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::ContinuousUnits => crate::database::ContinuousUnit::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::DerivedSamples => crate::database::NestedDerivedSample::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::DiscreteUnits => crate::database::DiscreteUnit::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::DocumentFormats => crate::database::DocumentFormat::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::Documents => crate::database::NestedDocument::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::FontAwesomeIcons => crate::database::FontAwesomeIcon::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::ItemCategories => crate::database::NestedItemCategory::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::ItemCategoryRelationships => crate::database::NestedItemCategoryRelationship::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::ItemCategoryUnits => crate::database::NestedItemCategoryUnit::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::ItemContinuousQuantities => crate::database::NestedItemContinuousQuantity::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::ItemDiscreteQuantities => crate::database::NestedItemDiscreteQuantity::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::ItemLocations => crate::database::NestedItemLocation::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::ItemUnits => crate::database::NestedItemUnit::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::Items => crate::database::NestedItem::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::Locations => crate::database::NestedLocation::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::LoginProviders => crate::database::LoginProvider::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::ManufacturedItemCategories => crate::database::NestedManufacturedItemCategory::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::Notifications => crate::database::NestedNotification::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::Organizations => crate::database::NestedOrganization::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::PrimaryUserEmails => crate::database::PrimaryUserEmail::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::ProcedureContinuousRequirements => crate::database::NestedProcedureContinuousRequirement::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::ProcedureDiscreteRequirements => crate::database::NestedProcedureDiscreteRequirement::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::Procedures => crate::database::NestedProcedure::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::ProjectRequirements => crate::database::NestedProjectRequirement::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::ProjectStates => crate::database::ProjectState::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::Projects => crate::database::NestedProject::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::PublicUsers => crate::database::NestedPublicUser::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::Roles => crate::database::Role::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::SampleBioOttTaxonItems => crate::database::NestedSampleBioOttTaxonItem::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::SampleStates => crate::database::SampleState::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::SampledIndividualBioOttTaxonItems => crate::database::NestedSampledIndividualBioOttTaxonItem::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::SampledIndividuals => crate::database::SampledIndividual::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::Samples => crate::database::NestedSample::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::SamplingProcedures => crate::database::NestedSamplingProcedure::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::Spectra => crate::database::NestedSpectra::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::SpectraCollection => crate::database::NestedSpectraCollection::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::TeamStates => crate::database::TeamState::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::Teams => crate::database::NestedTeam::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::Units => crate::database::Unit::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::UserEmails => crate::database::NestedUserEmail::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::Users => crate::database::User::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+        })
+    }
+    /// Get all the rows from the table.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
+    /// * `offset` - The number of rows to skip. By default `0`.
+    /// * `connection` - The database connection.
+    ///
+    /// # Returns
+    /// A vector of the rows of the table.
+    pub async fn all<C>(
+        &self,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Vec<u8>>, crate::api::ApiError> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        match self {
+            Table::BioOttRanks => crate::database::NestedBioOttRank::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::BioOttTaxonItems => crate::database::NestedBioOttTaxonItem::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::Colors => crate::database::Color::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::ContainerHorizontalRules => crate::database::NestedContainerHorizontalRule::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::ContainerVerticalRules => crate::database::NestedContainerVerticalRule::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::ContinuousUnits => crate::database::ContinuousUnit::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::DerivedSamples => crate::database::NestedDerivedSample::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::DiscreteUnits => crate::database::DiscreteUnit::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::DocumentFormats => crate::database::DocumentFormat::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::Documents => crate::database::NestedDocument::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::FontAwesomeIcons => crate::database::FontAwesomeIcon::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::ItemCategories => crate::database::NestedItemCategory::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::ItemCategoryRelationships => crate::database::NestedItemCategoryRelationship::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::ItemCategoryUnits => crate::database::NestedItemCategoryUnit::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::ItemContinuousQuantities => crate::database::NestedItemContinuousQuantity::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::ItemDiscreteQuantities => crate::database::NestedItemDiscreteQuantity::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::ItemLocations => crate::database::NestedItemLocation::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::ItemUnits => crate::database::NestedItemUnit::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::Items => crate::database::NestedItem::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::Locations => crate::database::NestedLocation::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::LoginProviders => crate::database::LoginProvider::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::ManufacturedItemCategories => crate::database::NestedManufacturedItemCategory::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::Notifications => crate::database::NestedNotification::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::Organizations => crate::database::NestedOrganization::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::PrimaryUserEmails => crate::database::PrimaryUserEmail::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::ProcedureContinuousRequirements => crate::database::NestedProcedureContinuousRequirement::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::ProcedureDiscreteRequirements => crate::database::NestedProcedureDiscreteRequirement::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::Procedures => crate::database::NestedProcedure::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::ProjectRequirements => crate::database::NestedProjectRequirement::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::ProjectStates => crate::database::ProjectState::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::Projects => crate::database::NestedProject::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::PublicUsers => crate::database::NestedPublicUser::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::Roles => crate::database::Role::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::SampleBioOttTaxonItems => crate::database::NestedSampleBioOttTaxonItem::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::SampleStates => crate::database::SampleState::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::SampledIndividualBioOttTaxonItems => crate::database::NestedSampledIndividualBioOttTaxonItem::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::SampledIndividuals => crate::database::SampledIndividual::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::Samples => crate::database::NestedSample::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::SamplingProcedures => crate::database::NestedSamplingProcedure::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::Spectra => crate::database::NestedSpectra::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::SpectraCollection => crate::database::NestedSpectraCollection::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::TeamStates => crate::database::TeamState::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::Teams => crate::database::NestedTeam::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::Units => crate::database::Unit::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::UserEmails => crate::database::NestedUserEmail::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::Users => crate::database::User::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
         }
     }
 }

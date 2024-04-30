@@ -6,7 +6,7 @@ use crate::api::ws::users::UserMessage;
 use crate::models::Notification;
 use crate::models::User;
 use crate::nested_models::NestedPublicUser;
-use crate::traits::bincode_serialize::BincodeSerialize;
+use crate::table_enumeration::*;
 use crate::DBPool;
 use crate::DieselConn;
 use actix::ActorContext;
@@ -45,7 +45,7 @@ pub struct WebSocket {
     pub(crate) user: Option<(User, AccessToken)>,
     diesel: DBPool,
     pub(crate) diesel_connection: DieselConn,
-    redis: redis::Client,
+    _redis: redis::Client,
     sqlx: SQLxPool<Postgres>,
     continuation_bytes: Vec<u8>,
 }
@@ -57,7 +57,7 @@ impl WebSocket {
             user: None,
             diesel_connection: diesel.get().unwrap(),
             diesel,
-            redis,
+            _redis: redis,
             sqlx,
             continuation_bytes: Vec::new(),
         }
@@ -65,10 +65,6 @@ impl WebSocket {
 
     fn user(&self) -> Option<&User> {
         self.user.as_ref().map(|(user, _)| user)
-    }
-
-    fn access_token(&self) -> Option<&AccessToken> {
-        self.user.as_ref().map(|(_, access_token)| access_token)
     }
 
     pub fn authenticated(
@@ -84,7 +80,7 @@ impl WebSocket {
             user: Some((user, access_token)),
             diesel_connection,
             diesel,
-            redis,
+            _redis: redis,
             sqlx,
             continuation_bytes: Vec::new(),
         }
@@ -176,10 +172,8 @@ impl Actor for WebSocket {
             log::info!("Sending refresh token message");
             match NestedPublicUser::get(self.user().unwrap().id, &mut self.diesel_connection) {
                 Ok(user) => {
-                    ctx.address().do_send(BackendMessage::RefreshToken((
-                        user.into(),
-                        self.access_token().unwrap().clone(),
-                    )));
+                    ctx.address()
+                        .do_send(BackendMessage::RefreshUser(user.into()));
                 }
                 Err(err) => {
                     log::error!("Error getting user: {:?}", err);
@@ -246,36 +240,33 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                     FrontendMessage::Close(_code) => {
                         ctx.stop();
                     }
-                    FrontendMessage::Task(task) => {
-                        if task.requires_authentication() && self.user.is_none() {
+                    FrontendMessage::Task(web_common::database::Task { id, operation, .. }) => {
+                        if operation.requires_authentication() && self.user.is_none() {
                             ctx.address().do_send(InternalMessage::Unauthorized);
                             return;
                         }
-                        match task.operation() {
+
+                        match operation {
                             web_common::database::Operation::Insert(insert) => match insert {
                                 web_common::database::Insert::Project(new_project) => {
                                     ctx.address().do_send(ProjectMessage::NewProject(
-                                        task.id(),
+                                        id,
                                         new_project.clone(),
                                     ));
                                 }
                                 web_common::database::Insert::Sample(new_sample) => {
-                                    ctx.address().do_send(SampleMessage::NewSample(
-                                        task.id(),
-                                        new_sample.clone(),
-                                    ));
+                                    ctx.address()
+                                        .do_send(SampleMessage::NewSample(id, new_sample.clone()));
                                 }
                                 web_common::database::Insert::Team(new_team) => {
                                     ctx.address()
-                                        .do_send(TeamMessage::NewTeam(task.id(), new_team.clone()));
+                                        .do_send(TeamMessage::NewTeam(id, new_team.clone()));
                                 }
                             },
                             web_common::database::Operation::Update(update) => match update {
                                 web_common::database::Update::CompleteProfile(profile) => {
-                                    ctx.address().do_send(UserMessage::CompleteProfile(
-                                        task.id(),
-                                        profile.clone(),
-                                    ));
+                                    ctx.address()
+                                        .do_send(UserMessage::CompleteProfile(id, profile.clone()));
                                 }
                             },
                             web_common::database::Operation::Select(select) => match select {
@@ -290,87 +281,123 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                     {
                                         Ok(table) => table,
                                         Err(err) => {
-                                            ctx.address().do_send(BackendMessage::TaskResult(
-                                                task.id(),
-                                                Err(ApiError::BadRequest(vec![err.to_string()])),
+                                            ctx.address().do_send(BackendMessage::Error(
+                                                id,
+                                                ApiError::BadRequest(vec![err.to_string()]),
                                             ));
                                             return;
                                         }
                                     };
-                                    ctx.address().do_send(BackendMessage::SearchTable(
-                                        task.id(),
-                                        match table {
-                                            web_common::database::Table::Projects => {
-                                                crate::nested_models::NestedProject::similarity_search(
-                                                    &query,
-                                                    Some(*number_of_results as i32),
-                                                    &mut self.diesel_connection,
-                                                )
-                                                .bincode_serialize()
-                                            }
-                                            web_common::database::Table::ProjectStates => {
-                                                crate::models::ProjectState::similarity_search(
-                                                    &query,
-                                                    Some(*number_of_results as i32),
-                                                    &mut self.diesel_connection,
-                                                )
-                                                .bincode_serialize()
-                                            }
-                                            web_common::database::Table::SampleStates => {
-                                                crate::models::SampleState::similarity_search(
-                                                    &query,
-                                                    Some(*number_of_results as i32),
-                                                    &mut self.diesel_connection,
-                                                )
-                                                .bincode_serialize()
-                                            }
-                                            web_common::database::Table::PublicUsers => {
-                                                crate::nested_models::NestedPublicUser::similarity_search(
-                                                    &query,
-                                                    Some(*number_of_results as i32),
-                                                    &mut self.diesel_connection,
-                                                )
-                                                .bincode_serialize()
-                                            }
-                                            web_common::database::Table::BioOttTaxonItems => {
-                                                crate::nested_models::NestedBioOttTaxonItem::strict_word_similarity_search(
-                                                    &query,
-                                                    Some(*number_of_results as i32),
-                                                    &mut self.diesel_connection,
-                                                )
-                                                .bincode_serialize()
-                                            }
-                                            web_common::database::Table::SamplingProcedures => {
-                                                crate::models::SamplingProcedure::similarity_search(
-                                                    &query,
-                                                    Some(*number_of_results as i32),
-                                                    &mut self.diesel_connection,
-                                                )
-                                                .bincode_serialize()
-                                            }
-                                            web_common::database::Table::TeamStates => {
-                                                crate::models::TeamState::similarity_search(
-                                                    &query,
-                                                    Some(*number_of_results as i32),
-                                                    &mut self.diesel_connection,
-                                                )
-                                                .bincode_serialize()
-                                            }
-                                            _ => {
-                                                unimplemented!("Table not implemented: {:?}", table)
-                                            }
-                                        },
+                                    match table.strict_word_similarity_search(
+                                        &query,
+                                        Some(number_of_results as i32),
+                                        &mut self.diesel_connection,
+                                    ) {
+                                        Ok(records) => {
+                                            ctx.address().do_send(BackendMessage::SearchTable(
+                                                id,
+                                                records,
+                                            ));
+                                        }
+                                        Err(err) => {
+                                            ctx.address().do_send(BackendMessage::Error(id, err));
+                                        }
+                                    }
+                                }
+                                web_common::database::Select::Id {
+                                    table_name,
+                                    primary_key,
+                                } => {
+                                    let table: web_common::database::Table = match table_name
+                                        .as_str()
+                                        .try_into()
+                                    {
+                                        Ok(table) => table,
+                                        Err(err) => {
+                                            ctx.address().do_send(BackendMessage::Error(
+                                                id,
+                                                ApiError::BadRequest(vec![err.to_string()]),
+                                            ));
+                                            return;
+                                        }
+                                    };
+                                    match <Table as IdentifiableTable>::get(
+                                        &table,
+                                        primary_key,
+                                        &mut self.diesel_connection,
+                                    ) {
+                                        Ok(record) => {
+                                            ctx.address()
+                                                .do_send(BackendMessage::GetTable(id, record));
+                                        }
+                                        Err(err) => {
+                                            ctx.address()
+                                                .do_send(BackendMessage::Error(id, err));
+                                        }
+                                    }
+                                }
+                                web_common::database::Select::All {
+                                    table_name,
+                                    limit,
+                                    offset,
+                                } => {
+                                    let table: web_common::database::Table = match table_name
+                                        .as_str()
+                                        .try_into()
+                                    {
+                                        Ok(table) => table,
+                                        Err(err) => {
+                                            ctx.address().do_send(BackendMessage::Error(
+                                                id,
+                                                ApiError::BadRequest(vec![err.to_string()]),
+                                            ));
+                                            return;
+                                        }
+                                    };
+
+                                    if !self.is_authenticated() && limit > 20 {
+                                        ctx.address().do_send(BackendMessage::Error(
+                                            id,
+                                            ApiError::Unauthorized,
+                                        ));
+                                        return;
+                                    }
+
+                                    if self.is_authenticated() && limit > 100 {
+                                        ctx.address().do_send(BackendMessage::Error(
+                                            id,
+                                            ApiError::BadRequest(vec![
+                                                "Limit cannot exceed 100".to_string(),
+                                            ]),
+                                        ));
+                                        return;
+                                    }
+
+                                    ctx.address().do_send(BackendMessage::AllTable(
+                                        id,
+                                        <Table as AllTable>::all(
+                                            &table,
+                                            Some(limit),
+                                            Some(offset),
+                                            &mut self.diesel_connection,
+                                        )
+                                        .unwrap(),
                                     ));
                                 }
-                                _ => {
-                                    unimplemented!(
-                                        "Operation not implemented: {:?}",
-                                        task.operation()
-                                    )
-                                }
                             },
-                            _ => {
-                                unimplemented!("Operation not implemented: {:?}", task.operation())
+                            web_common::database::Operation::Delete(table, primary_key) => {
+                                match <Table as DeletableTable>::delete(
+                                    &table,
+                                    primary_key,
+                                    &mut self.diesel_connection,
+                                ) {
+                                    Ok(_) => {
+                                        ctx.address().do_send(BackendMessage::Completed(id));
+                                    }
+                                    Err(err) => {
+                                        ctx.address().do_send(BackendMessage::Error(id, err));
+                                    }
+                                }
                             }
                         }
                     }

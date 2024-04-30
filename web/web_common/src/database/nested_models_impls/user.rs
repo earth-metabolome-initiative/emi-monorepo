@@ -21,6 +21,10 @@ impl NestedPublicUser {
             && self.thumbnail.is_some()
             && self.picture.is_some()
     }
+
+    pub fn has_incomplete_profile(&self) -> bool {
+        !self.has_complete_profile()
+    }
 }
 
 impl Display for NestedPublicUser {

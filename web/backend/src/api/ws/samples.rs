@@ -15,10 +15,14 @@ impl actix::Handler<SampleMessage> for WebSocket {
     fn handle(&mut self, msg: SampleMessage, ctx: &mut Self::Context) {
         match msg {
             SampleMessage::NewSample(task_id, new_sample) => {
-                ctx.binary(BackendMessage::TaskResult(
-                    task_id,
-                    new_sample::handle_new_sample(new_sample),
-                ));
+                match new_sample::handle_new_sample(new_sample) {
+                    Ok(_) => {
+                        ctx.binary(BackendMessage::Completed(task_id));
+                    }
+                    Err(e) => {
+                        ctx.binary(BackendMessage::Error(task_id, e));
+                    }
+                }
             }
         }
     }

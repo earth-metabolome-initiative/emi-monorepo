@@ -15,10 +15,14 @@ impl actix::Handler<TeamMessage> for WebSocket {
     fn handle(&mut self, msg: TeamMessage, ctx: &mut Self::Context) {
         match msg {
             TeamMessage::NewTeam(task_id, new_team) => {
-                ctx.binary(BackendMessage::TaskResult(
-                    task_id,
-                    new_team::handle_new_team(new_team),
-                ));
+                match new_team::handle_new_team(new_team) {
+                    Ok(_) => {
+                        ctx.binary(BackendMessage::Completed(task_id));
+                    }
+                    Err(e) => {
+                        ctx.binary(BackendMessage::Error(task_id, e));
+                    }
+                }
             }
         }
     }

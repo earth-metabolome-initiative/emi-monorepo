@@ -1,3 +1,11 @@
+//! This file is generated automatically and should not be modified.
+//!
+//! Any edits you may apply to this document will be overwritten next time the
+//! backend is generated. Refrain from making any changes to this file.
+
+//! If you need to make changes to the backend, please modify the `generate_models`
+//! document in the `migrations` folder.
+
 #![allow(unused)]
 #![allow(clippy::all)]
 
@@ -16,7 +24,7 @@ use uuid::Uuid;
 use chrono::NaiveDateTime;
 use crate::views::schema::*;
 
-#[derive(Deserialize, Serialize, Debug, PartialEq, Eq, Clone, Identifiable, QueryableByName, Queryable)]
+#[derive(Deserialize, Serialize, Debug, PartialEq, Eq, Clone, Default, Identifiable, QueryableByName, Queryable)]
 #[diesel(table_name = public_users)]
 pub struct PublicUser {
     pub id: i32,
@@ -63,20 +71,45 @@ impl PublicUser {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
-    /// * `limit` - The maximum number of structs to retrieve.
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
         limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::views::schema::public_users;
-        let query = public_users::dsl::public_users;
-        if let Some(limit) = limit {
-            query.limit(limit).load::<Self>(connection)
-        } else {
-            query.load::<Self>(connection)
-        }
+       public_users::dsl::public_users
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Delete the struct from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete(
+        &self,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<usize, diesel::result::Error> {
+        Self::delete_by_id(self.id, connection)
+    }
+    /// Delete the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete_by_id(
+        id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<usize, diesel::result::Error> {
+        diesel::delete(public_users::dsl::public_users
+            .filter(public_users::dsl::id.eq(id))
+        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -110,7 +143,7 @@ impl PublicUser {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), connection);
+            return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "WITH selected_ids AS (",
@@ -143,7 +176,7 @@ impl PublicUser {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), connection);
+            return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "WITH selected_ids AS (",
@@ -176,7 +209,7 @@ impl PublicUser {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), connection);
+            return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "WITH selected_ids AS (",

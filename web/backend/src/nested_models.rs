@@ -8,7 +8,7 @@ use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::PooledConnection;
 use crate::models::*;
 use crate::views::views::*;
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedBioOttRank {
     pub inner: BioOttRank,
     pub font_awesome_icon: FontAwesomeIcon,
@@ -34,13 +34,15 @@ impl NestedBioOttRank {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
-    /// * `limit` - The maximum number of rows to return.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
         limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        BioOttRank::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        BioOttRank::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedBioOttRank {
@@ -129,7 +131,7 @@ impl From<NestedBioOttRank> for web_common::database::nested_models::NestedBioOt
         }
     }
 }
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedBioOttTaxonItem {
     pub inner: BioOttTaxonItem,
     pub ott_rank: NestedBioOttRank,
@@ -175,13 +177,15 @@ impl NestedBioOttTaxonItem {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
-    /// * `limit` - The maximum number of rows to return.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
         limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        BioOttTaxonItem::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        BioOttTaxonItem::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedBioOttTaxonItem {
@@ -290,7 +294,7 @@ impl From<NestedBioOttTaxonItem> for web_common::database::nested_models::Nested
         }
     }
 }
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedContainerHorizontalRule {
     pub inner: ContainerHorizontalRule,
     pub created_by: User,
@@ -320,13 +324,15 @@ impl NestedContainerHorizontalRule {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
-    /// * `limit` - The maximum number of rows to return.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
         limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        ContainerHorizontalRule::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        ContainerHorizontalRule::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedContainerHorizontalRule {
@@ -377,7 +383,7 @@ impl From<NestedContainerHorizontalRule> for web_common::database::nested_models
         }
     }
 }
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedContainerVerticalRule {
     pub inner: ContainerVerticalRule,
     pub created_by: User,
@@ -407,13 +413,15 @@ impl NestedContainerVerticalRule {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
-    /// * `limit` - The maximum number of rows to return.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
         limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        ContainerVerticalRule::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        ContainerVerticalRule::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedContainerVerticalRule {
@@ -464,7 +472,7 @@ impl From<NestedContainerVerticalRule> for web_common::database::nested_models::
         }
     }
 }
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedDerivedSample {
     pub inner: DerivedSample,
     pub created_by: User,
@@ -494,13 +502,15 @@ impl NestedDerivedSample {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
-    /// * `limit` - The maximum number of rows to return.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
         limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        DerivedSample::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        DerivedSample::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedDerivedSample {
@@ -537,7 +547,7 @@ impl From<NestedDerivedSample> for web_common::database::nested_models::NestedDe
         }
     }
 }
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedDocument {
     pub inner: Document,
     pub author: User,
@@ -565,13 +575,15 @@ impl NestedDocument {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
-    /// * `limit` - The maximum number of rows to return.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
         limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        Document::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        Document::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedDocument {
@@ -620,7 +632,7 @@ impl From<NestedDocument> for web_common::database::nested_models::NestedDocumen
         }
     }
 }
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedItemCategory {
     pub inner: ItemCategory,
     pub created_by: User,
@@ -646,13 +658,15 @@ impl NestedItemCategory {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
-    /// * `limit` - The maximum number of rows to return.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
         limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        ItemCategory::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        ItemCategory::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedItemCategory {
@@ -699,7 +713,7 @@ impl From<NestedItemCategory> for web_common::database::nested_models::NestedIte
         }
     }
 }
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedItemCategoryRelationship {
     pub inner: ItemCategoryRelationship,
     pub parent: NestedItemCategory,
@@ -729,13 +743,15 @@ impl NestedItemCategoryRelationship {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
-    /// * `limit` - The maximum number of rows to return.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
         limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        ItemCategoryRelationship::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        ItemCategoryRelationship::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedItemCategoryRelationship {
@@ -772,7 +788,7 @@ impl From<NestedItemCategoryRelationship> for web_common::database::nested_model
         }
     }
 }
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedItemCategoryUnit {
     pub inner: ItemCategoryUnit,
     pub item_category: NestedItemCategory,
@@ -800,13 +816,15 @@ impl NestedItemCategoryUnit {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
-    /// * `limit` - The maximum number of rows to return.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
         limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        ItemCategoryUnit::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        ItemCategoryUnit::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedItemCategoryUnit {
@@ -841,7 +859,7 @@ impl From<NestedItemCategoryUnit> for web_common::database::nested_models::Neste
         }
     }
 }
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedItemContinuousQuantity {
     pub inner: ItemContinuousQuantity,
     pub item: NestedItem,
@@ -873,13 +891,15 @@ impl NestedItemContinuousQuantity {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
-    /// * `limit` - The maximum number of rows to return.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
         limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        ItemContinuousQuantity::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        ItemContinuousQuantity::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedItemContinuousQuantity {
@@ -918,7 +938,7 @@ impl From<NestedItemContinuousQuantity> for web_common::database::nested_models:
         }
     }
 }
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedItemDiscreteQuantity {
     pub inner: ItemDiscreteQuantity,
     pub item: NestedItem,
@@ -948,13 +968,15 @@ impl NestedItemDiscreteQuantity {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
-    /// * `limit` - The maximum number of rows to return.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
         limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        ItemDiscreteQuantity::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        ItemDiscreteQuantity::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedItemDiscreteQuantity {
@@ -991,7 +1013,7 @@ impl From<NestedItemDiscreteQuantity> for web_common::database::nested_models::N
         }
     }
 }
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedItemLocation {
     pub inner: ItemLocation,
     pub item: Option<NestedItem>,
@@ -1021,13 +1043,15 @@ impl NestedItemLocation {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
-    /// * `limit` - The maximum number of rows to return.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
         limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        ItemLocation::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        ItemLocation::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedItemLocation {
@@ -1064,7 +1088,7 @@ impl From<NestedItemLocation> for web_common::database::nested_models::NestedIte
         }
     }
 }
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedItemUnit {
     pub inner: ItemUnit,
     pub item: NestedItem,
@@ -1092,13 +1116,15 @@ impl NestedItemUnit {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
-    /// * `limit` - The maximum number of rows to return.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
         limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        ItemUnit::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        ItemUnit::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedItemUnit {
@@ -1133,7 +1159,7 @@ impl From<NestedItemUnit> for web_common::database::nested_models::NestedItemUni
         }
     }
 }
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedItem {
     pub inner: Item,
     pub parent: Option<Item>,
@@ -1159,13 +1185,15 @@ impl NestedItem {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
-    /// * `limit` - The maximum number of rows to return.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
         limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        Item::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        Item::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedItem {
@@ -1198,7 +1226,7 @@ impl From<NestedItem> for web_common::database::nested_models::NestedItem {
         }
     }
 }
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedLocation {
     pub inner: Location,
     pub geolocalization_device: Option<NestedItem>,
@@ -1228,13 +1256,15 @@ impl NestedLocation {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
-    /// * `limit` - The maximum number of rows to return.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
         limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        Location::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        Location::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedLocation {
@@ -1271,7 +1301,7 @@ impl From<NestedLocation> for web_common::database::nested_models::NestedLocatio
         }
     }
 }
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedManufacturedItemCategory {
     pub inner: ManufacturedItemCategory,
     pub manifacturer: NestedOrganization,
@@ -1297,13 +1327,15 @@ impl NestedManufacturedItemCategory {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
-    /// * `limit` - The maximum number of rows to return.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
         limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        ManufacturedItemCategory::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        ManufacturedItemCategory::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedManufacturedItemCategory {
@@ -1336,7 +1368,7 @@ impl From<NestedManufacturedItemCategory> for web_common::database::nested_model
         }
     }
 }
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedNotification {
     pub inner: Notification,
     pub user: User,
@@ -1362,13 +1394,15 @@ impl NestedNotification {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
-    /// * `limit` - The maximum number of rows to return.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
         limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        Notification::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        Notification::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedNotification {
@@ -1401,7 +1435,7 @@ impl From<NestedNotification> for web_common::database::nested_models::NestedNot
         }
     }
 }
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedOrganization {
     pub inner: Organization,
     pub parent_organization: Option<Organization>,
@@ -1427,13 +1461,15 @@ impl NestedOrganization {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
-    /// * `limit` - The maximum number of rows to return.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
         limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        Organization::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        Organization::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedOrganization {
@@ -1466,7 +1502,7 @@ impl From<NestedOrganization> for web_common::database::nested_models::NestedOrg
         }
     }
 }
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedProcedureContinuousRequirement {
     pub inner: ProcedureContinuousRequirement,
     pub created_by: User,
@@ -1498,13 +1534,15 @@ impl NestedProcedureContinuousRequirement {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
-    /// * `limit` - The maximum number of rows to return.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
         limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        ProcedureContinuousRequirement::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        ProcedureContinuousRequirement::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedProcedureContinuousRequirement {
@@ -1543,7 +1581,7 @@ impl From<NestedProcedureContinuousRequirement> for web_common::database::nested
         }
     }
 }
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedProcedureDiscreteRequirement {
     pub inner: ProcedureDiscreteRequirement,
     pub created_by: User,
@@ -1575,13 +1613,15 @@ impl NestedProcedureDiscreteRequirement {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
-    /// * `limit` - The maximum number of rows to return.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
         limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        ProcedureDiscreteRequirement::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        ProcedureDiscreteRequirement::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedProcedureDiscreteRequirement {
@@ -1620,7 +1660,7 @@ impl From<NestedProcedureDiscreteRequirement> for web_common::database::nested_m
         }
     }
 }
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedProcedure {
     pub inner: Procedure,
     pub created_by: Option<User>,
@@ -1646,13 +1686,15 @@ impl NestedProcedure {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
-    /// * `limit` - The maximum number of rows to return.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
         limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        Procedure::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        Procedure::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedProcedure {
@@ -1685,7 +1727,7 @@ impl From<NestedProcedure> for web_common::database::nested_models::NestedProced
         }
     }
 }
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedProjectRequirement {
     pub inner: ProjectRequirement,
     pub created_by: User,
@@ -1717,13 +1759,15 @@ impl NestedProjectRequirement {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
-    /// * `limit` - The maximum number of rows to return.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
         limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        ProjectRequirement::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        ProjectRequirement::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedProjectRequirement {
@@ -1762,7 +1806,7 @@ impl From<NestedProjectRequirement> for web_common::database::nested_models::Nes
         }
     }
 }
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedProject {
     pub inner: Project,
     pub state: ProjectState,
@@ -1792,13 +1836,15 @@ impl NestedProject {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
-    /// * `limit` - The maximum number of rows to return.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
         limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        Project::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        Project::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedProject {
@@ -1891,7 +1937,7 @@ impl From<NestedProject> for web_common::database::nested_models::NestedProject 
         }
     }
 }
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedSampleBioOttTaxonItem {
     pub inner: SampleBioOttTaxonItem,
     pub created_by: User,
@@ -1921,13 +1967,15 @@ impl NestedSampleBioOttTaxonItem {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
-    /// * `limit` - The maximum number of rows to return.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
         limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampleBioOttTaxonItem::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        SampleBioOttTaxonItem::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedSampleBioOttTaxonItem {
@@ -1964,7 +2012,7 @@ impl From<NestedSampleBioOttTaxonItem> for web_common::database::nested_models::
         }
     }
 }
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedSampledIndividualBioOttTaxonItem {
     pub inner: SampledIndividualBioOttTaxonItem,
     pub created_by: User,
@@ -1994,13 +2042,15 @@ impl NestedSampledIndividualBioOttTaxonItem {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
-    /// * `limit` - The maximum number of rows to return.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
         limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampledIndividualBioOttTaxonItem::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        SampledIndividualBioOttTaxonItem::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedSampledIndividualBioOttTaxonItem {
@@ -2037,7 +2087,7 @@ impl From<NestedSampledIndividualBioOttTaxonItem> for web_common::database::nest
         }
     }
 }
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedSample {
     pub inner: Sample,
     pub inserted_by: User,
@@ -2069,13 +2119,15 @@ impl NestedSample {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
-    /// * `limit` - The maximum number of rows to return.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
         limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        Sample::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        Sample::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedSample {
@@ -2114,7 +2166,7 @@ impl From<NestedSample> for web_common::database::nested_models::NestedSample {
         }
     }
 }
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedSamplingProcedure {
     pub inner: SamplingProcedure,
     pub created_by: Option<User>,
@@ -2140,13 +2192,15 @@ impl NestedSamplingProcedure {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
-    /// * `limit` - The maximum number of rows to return.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
         limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SamplingProcedure::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        SamplingProcedure::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedSamplingProcedure {
@@ -2221,7 +2275,7 @@ impl From<NestedSamplingProcedure> for web_common::database::nested_models::Nest
         }
     }
 }
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedSpectra {
     pub inner: Spectra,
     pub spectra_collection: NestedSpectraCollection,
@@ -2247,13 +2301,15 @@ impl NestedSpectra {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
-    /// * `limit` - The maximum number of rows to return.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
         limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        Spectra::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        Spectra::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedSpectra {
@@ -2286,7 +2342,7 @@ impl From<NestedSpectra> for web_common::database::nested_models::NestedSpectra 
         }
     }
 }
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedSpectraCollection {
     pub inner: SpectraCollection,
     pub sample: NestedSample,
@@ -2314,13 +2370,15 @@ impl NestedSpectraCollection {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
-    /// * `limit` - The maximum number of rows to return.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
         limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SpectraCollection::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        SpectraCollection::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedSpectraCollection {
@@ -2355,7 +2413,7 @@ impl From<NestedSpectraCollection> for web_common::database::nested_models::Nest
         }
     }
 }
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedTeam {
     pub inner: Team,
     pub parent_team: Option<Team>,
@@ -2381,13 +2439,15 @@ impl NestedTeam {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
-    /// * `limit` - The maximum number of rows to return.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
         limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        Team::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        Team::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedTeam {
@@ -2476,7 +2536,7 @@ impl From<NestedTeam> for web_common::database::nested_models::NestedTeam {
         }
     }
 }
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedUserEmail {
     pub inner: UserEmail,
     pub user: User,
@@ -2504,13 +2564,15 @@ impl NestedUserEmail {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
-    /// * `limit` - The maximum number of rows to return.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
         limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        UserEmail::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        UserEmail::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedUserEmail {
@@ -2545,7 +2607,7 @@ impl From<NestedUserEmail> for web_common::database::nested_models::NestedUserEm
         }
     }
 }
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedPublicUser {
     pub inner: PublicUser,
     pub thumbnail: Option<NestedDocument>,
@@ -2573,13 +2635,15 @@ impl NestedPublicUser {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
-    /// * `limit` - The maximum number of rows to return.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
         limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        PublicUser::all(limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        PublicUser::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedPublicUser {

@@ -1,15 +1,23 @@
 //! Module providing the websocket messages used in the application.
 use std::fmt::Debug;
 
-use crate::api::{oauth::jwt_cookies::AccessToken, ApiError};
+use crate::api::ApiError;
 use crate::database::*;
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CloseReason {
     code: u16,
     reason: Option<String>,
+}
+
+impl CloseReason {
+    pub fn new<S: ToString>(code: u16, reason: Option<S>) -> Self {
+        Self {
+            code,
+            reason: reason.map(|s| s.to_string()),
+        }
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -22,10 +30,13 @@ pub enum FrontendMessage {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum BackendMessage {
     Close(Option<CloseReason>),
-    RefreshToken((NestedPublicUser, AccessToken)),
+    RefreshUser(NestedPublicUser),
     Notification(NotificationMessage),
-    SearchTable(uuid::Uuid, Result<Vec<Vec<u8>>, ApiError>),
-    TaskResult(Uuid, Result<(), ApiError>),
+    SearchTable(uuid::Uuid, Vec<Vec<u8>>),
+    GetTable(uuid::Uuid, Vec<u8>),
+    AllTable(uuid::Uuid, Vec<Vec<u8>>),
+    Completed(uuid::Uuid),
+    Error(uuid::Uuid, ApiError),
 }
 
 #[cfg(feature = "backend")]
@@ -78,14 +89,18 @@ impl From<actix_web_actors::ws::Message> for FrontendMessage {
 }
 
 #[cfg(feature = "frontend")]
-impl From<gloo_net::websocket::Message> for BackendMessage {
-    fn from(msg: gloo_net::websocket::Message) -> Self {
-        match msg {
+impl TryFrom<gloo_net::websocket::Message> for BackendMessage {
+    type Error = ApiError;
+
+    fn try_from(value: gloo_net::websocket::Message) -> Result<Self, ApiError> {
+        match value {
             gloo_net::websocket::Message::Text(text) => {
                 log::error!("Unexpected text message from frontend: {:?}", text);
                 unreachable!("Unexpected text message from frontend");
             }
-            gloo_net::websocket::Message::Bytes(bin) => bincode::deserialize(&bin).unwrap(),
+            gloo_net::websocket::Message::Bytes(bin) => {
+                bincode::deserialize(&bin).map_err(ApiError::from)
+            }
         }
     }
 }
