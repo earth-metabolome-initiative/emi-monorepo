@@ -8,8 +8,8 @@ use yew_router::prelude::*;
 pub enum AppRoute {
     #[at("/login")]
     Login,
-    #[at("/profile")]
-    Profile,
+    // #[at("/profile")]
+    // Profile,
     #[at("/project/new")]
     NewProject,
     #[at("/sample/new")]
@@ -28,7 +28,7 @@ pub enum AppRoute {
 pub fn switch(switch: AppRoute) -> Html {
     match switch {
         AppRoute::Login => html! {<Login />},
-        AppRoute::Profile => html! {<Profile />},
+        // AppRoute::Profile => html! {<Profile />},
         AppRoute::NewProject => html! {<NewProjectPage />},
         AppRoute::NewSample => html! {<NewSamplePage />},
         AppRoute::NewTeam => html! {<NewTeamPage />},

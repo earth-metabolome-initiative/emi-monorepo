@@ -2,7 +2,6 @@ use crate::api::ws::messages::FrontendMessage;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use super::inserts::Insert;
 use super::roles::Role;
 use super::selects::Select;
 use super::Table;
@@ -68,13 +67,13 @@ pub enum Operation {
     Select(Select),
     // When the frontend wants to delete a row from a table
     // it sends a Delete message to the backend.
-    Delete(Table, PrimaryKey),
+    Delete(String, PrimaryKey),
     // When the frontend wants to update a row from a table
     // it sends a variant of the Update enumeration.
     Update(Update),
     // When the frontend wants to insert a row into a table
     // it sends a variant of the Insert enumeration.
-    Insert(Insert),
+    Insert(String, Vec<u8>),
 }
 
 impl Operation {
@@ -118,13 +117,6 @@ impl From<Operation> for Task {
     }
 }
 
-impl From<Operation> for FrontendMessage {
-    fn from(operation: Operation) -> Self {
-        let task: Task = operation.into();
-        task.into()
-    }
-}
-
 impl Task {
     pub fn id(&self) -> Uuid {
         self.id
@@ -153,8 +145,3 @@ impl Task {
     }
 }
 
-impl From<Task> for FrontendMessage {
-    fn from(task: Task) -> Self {
-        FrontendMessage::Task(task)
-    }
-}

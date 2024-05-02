@@ -58,18 +58,25 @@ will make use of the full path to the struct in the `web_common` crate so to avo
 
 import os
 import re
+import io
+import copy
 import shutil
 from typing import List, Optional, Tuple, Union
-
+from userinput import userinput
 import compress_json
 import pandas as pd
 import psycopg2
+from time import sleep
 from densify_directory_counter import densify_directory_counter
 from dotenv import load_dotenv
 from retrieve_taxons import retrieve_taxons
 from tqdm.auto import tqdm
+from insert_migration import insert_migration
 from functools import cache
 import glob
+
+
+TEXTUAL_DATA_TYPES = ["String"]
 
 
 def struct_name_from_table_name(table_name: str) -> str:
@@ -161,6 +168,9 @@ class AttributeMetadata:
             return f"Option<{data_type}>"
         return data_type
 
+    def raw_data_type(self) -> Union[str, "StructMetadata"]:
+        return self._data_type
+
     def data_type(self) -> str:
         if isinstance(self._data_type, StructMetadata):
             return self._data_type.name
@@ -168,6 +178,9 @@ class AttributeMetadata:
             return self._data_type
 
         raise ValueError("The data type must be either a string or a StructMetadata.")
+
+    def capitalized_name(self) -> str:
+        return "".join(word.capitalize() for word in self.name.split("_"))
 
     def implements_serialize(self) -> bool:
         return (
@@ -220,6 +233,8 @@ class AttributeMetadata:
                 "f64",
                 "Uuid",
                 "String",
+                "Vec<ApiError>",
+                "ApiError",
                 "NaiveDateTime",
             ]
             or isinstance(self._data_type, StructMetadata)
@@ -247,6 +262,9 @@ class TableStructMetadata:
                     f"and {self.richest_struct.name}."
                 )
         self.richest_struct = struct
+
+    def get_richest_struct(self) -> "StructMetadata":
+        return self.richest_struct
 
     def set_flat_struct(self, struct: "StructMetadata"):
         assert struct.table_name == self.table_name
@@ -277,6 +295,7 @@ class StructMetadata:
         self.table_name = table_name
         self.attributes: List[AttributeMetadata] = []
         self._derives: List[str] = []
+        self._decorators: List[str] = []
 
     def write_to(self, file: "File", diesel: Optional[str] = None):
         if diesel is not None:
@@ -286,6 +305,8 @@ class StructMetadata:
         file.write(f"#[derive({', '.join(self.derives(diesel=diesel))})]\n")
         if diesel is not None:
             file.write(f"#[diesel(table_name = {self.table_name})]\n")
+        for decorator in self._decorators:
+            file.write(f"#[{decorator}]\n")
         file.write(f"pub struct {self.name} {{\n")
         for attribute in self.attributes:
             file.write(f"    pub {attribute.name}: {attribute.format_data_type()},\n")
@@ -324,6 +345,9 @@ class StructMetadata:
 
     def add_derive(self, derive: str):
         self._derives.append(derive)
+
+    def add_decorator(self, decorator: str):
+        self._decorators.append(decorator)
 
     def contains_optional_fields(self) -> bool:
         return any(attribute.optional for attribute in self.attributes)
@@ -3374,6 +3398,1349 @@ def write_web_common_search_trait_implementations(
     tables.close()
 
 
+def derive_new_models(struct_metadatas: List[StructMetadata]) -> List[StructMetadata]:
+    """Returns list of the New{Model} structs.
+
+    Parameters
+    ----------
+    struct_metadatas : List[StructMetadata]
+        The list of the StructMetadata objects.
+
+    Implementation details
+    ----------------------
+    The New variants are used to either insert data in the database or,
+    when used in the frontend, employed as base for the html Forms.
+    The primary difference between the New variant and the original
+    variant is that the New variant does not contain the primary key
+    attribute - unless the primary key is an Uuid, in which case the
+    New variant is for all intents and purposes identical to the original
+    variant, and as such there is no need to derive a New variant.
+    """
+    # Temporary list of tables for which to refrain from generating
+    # the form component.
+    deny_list = [
+        "derived_samples",
+        "item_locations",
+        "item_units",
+        "items",
+        "locations",
+        "sample_bio_ott_taxon_items",
+        "sampled_individual_bio_ott_taxon_items",
+        "spectra",
+        "spectra_collections",
+        "user_emails",
+    ]
+
+    table_metadatas = find_foreign_keys()
+
+    for table_name in deny_list:
+        if not table_metadatas.is_table(table_name):
+            raise Exception(
+                f"Table {table_name} is in the deny list but does not exist in the database."
+            )
+
+    new_structs = []
+
+    target_columns = ["inserted_by", "created_by", "created_at", "updated_at"]
+
+    for struct in tqdm(
+        struct_metadatas,
+        desc="Deriving new structs",
+        unit="struct",
+        leave=False,
+    ):
+        if struct.table_name in deny_list:
+            continue
+
+        # If the struct has a single attribute,
+        # we do not derive a New variant.
+        if len(struct.attributes) == 1:
+            continue
+
+        new_struct = StructMetadata(
+            struct_name=f"New{struct.name}",
+            table_name=struct.table_name,
+        )
+        primary_key_name, primary_key_type = (
+            table_metadatas.get_primary_key_name_and_type(struct.table_name)
+        )
+
+        if primary_key_type == "uuid" and not any(
+            attribute.name in target_columns for attribute in struct.attributes
+        ):
+            new_structs.append(struct)
+            continue
+
+        for derive in struct.derives():
+            new_struct.add_derive(derive)
+
+        for attribute in struct.attributes:
+            if attribute.name == primary_key_name:
+                continue
+            if attribute.name in target_columns:
+                continue
+            new_struct.add_attribute(attribute)
+
+        new_structs.append(new_struct)
+
+    return new_structs
+
+
+def derive_new_nested_models(
+    new_flat_model_structs: List[StructMetadata],
+    nested_structs: List[StructMetadata],
+) -> List[StructMetadata]:
+    """Returns New Nested variant of the new model struct provided.
+
+    Parameters
+    ----------
+    new_flat_model_structs : List[StructMetadata]
+        The list of the Flat New{Model} structs.
+    nested_structs : List[StructMetadata]
+        The list of the existing nested variants.
+
+    Implementation details
+    ----------------------
+    The New Nested variants are used to insert data in the database
+    when the data is nested. The New Nested variants are used to
+    insert data in the database when the data is nested. The primary
+    difference between the New Nested variant and the original variant
+    is that the New Nested variant does not have a normal Flat variant
+    of the struct as the inner attribute, but has the New variant of the
+    Flat variant as the inner attribute, with the exception of when the
+    primary key is an Uuid, in which case the New Nested variant is for
+    all intents and purposes identical to the original variant, and as
+    such there is no need to derive a New Nested variant.
+    """
+
+    new_nested_model_structs = []
+
+    for flat_new_struct in tqdm(
+        new_flat_model_structs,
+        desc="Deriving new nested structs",
+        unit="struct",
+        leave=False,
+    ):
+        # We retrieve the Nested struct associated to the
+        # current flat new struct, which we can easily retrieve
+        # by searching for a struct associated with the same table.
+        #
+        # When there is no such struct, it means that there is no
+        # need to derive a Nested variant, as the current struct is
+        # a flat struct.
+
+        current_nested_struct = None
+        for nested_struct in nested_structs:
+            if nested_struct.table_name == flat_new_struct.table_name:
+                current_nested_struct = nested_struct
+                break
+
+        if current_nested_struct is None:
+            new_nested_model_structs.append(flat_new_struct)
+            continue
+
+        if not flat_new_struct.name.startswith("New"):
+            new_nested_model_structs.append(current_nested_struct)
+            continue
+
+        new_nested_struct = StructMetadata(
+            struct_name=f"Nested{flat_new_struct.name}",
+            table_name=flat_new_struct.table_name,
+        )
+
+        for derive in current_nested_struct.derives():
+            new_nested_struct.add_derive(derive)
+
+        for attribute in current_nested_struct.attributes:
+            if attribute.name == "inner":
+                new_nested_struct.add_attribute(
+                    AttributeMetadata(
+                        original_name="inner",
+                        name="inner",
+                        data_type=flat_new_struct,
+                        optional=False,
+                    )
+                )
+            else:
+                # We need to make sure that the current attribute
+                # in its normalized form appears in the flat version
+                # of the new struct. If it does not, we skip it, as
+                # we handle in the creation of the new struct the
+                # stripping of attributes that we do not want to be
+                # settable by the user, such as the created_at and
+                # updated_at attributes.
+                if (
+                    flat_new_struct.get_attribute_by_name(attribute.name) is None
+                    and flat_new_struct.get_attribute_by_name(f"{attribute.name}_id")
+                    is None
+                ):
+                    continue
+
+                new_nested_struct.add_attribute(attribute)
+
+        new_nested_model_structs.append(new_nested_struct)
+
+    return new_nested_model_structs
+
+
+def derive_new_model_builders(
+    new_struct_metadatas: List[StructMetadata],
+    tables: List[TableStructMetadata],
+) -> List[StructMetadata]:
+    """Returns list of the New{Model}Builder structs.
+
+    Parameters
+    ----------
+    new_struct_metadatas : List[StructMetadata]
+        The list of the StructMetadata objects.
+    tables : List[TableStructMetadata]
+        The list of the TableStructMetadata objects.
+
+    Implementation details
+    ----------------------
+    The New{Model}Builder structs are used to build the New{Model} structs.
+    Since they are builders, they contain option variants of the attributes
+    of the New{Model} structs. When the original attribute is already optional (Option<T>)
+    the New{Model}Builder attribute is not doubly optional (Option<Option<T>>), but simply optional
+    as the original attribute (Option<T>).
+    """
+    new_struct_builders = []
+    table_metadata = find_foreign_keys()
+
+    for struct in tqdm(
+        new_struct_metadatas,
+        desc="Deriving new structs",
+        unit="struct",
+        leave=False,
+    ):
+        new_struct_builder = StructMetadata(
+            struct_name=f"{struct.name}Builder",
+            table_name=struct.table_name,
+        )
+
+        new_struct_builder.add_derive("Store")
+        for derive in struct.derives():
+            new_struct_builder.add_derive(derive)
+
+        new_struct_builder.add_decorator('store(storage = "session")')
+
+        for attribute in struct.attributes:
+            if attribute.name == "inner":
+                if struct.is_nested():
+                    continue
+                else:
+                    raise ValueError(
+                        f"Struct {struct.name} is not nested, but has an inner attribute."
+                    )
+
+            # If this attribute is a struct, we make sure that it is
+            # the richest variant of the struct, as we want to expose
+            # the version for which we implement the APIs.
+            if isinstance(attribute.raw_data_type(), StructMetadata):
+                target_table_name = attribute.raw_data_type().table_name
+                table_struct = None
+                for table in tables:
+                    if table.table_name == target_table_name:
+                        table_struct = table
+                        break
+
+                if table_struct is None:
+                    raise Exception(
+                        f"Table {target_table_name} not found in the tables list."
+                    )
+
+                richest_struct = table_struct.get_richest_struct()
+                attribute = AttributeMetadata(
+                    original_name=attribute.original_name,
+                    name=attribute.name,
+                    data_type=richest_struct,
+                    optional=attribute.optional,
+                )
+
+            attribute = copy.deepcopy(attribute)
+            attribute.optional = True
+            new_struct_builder.add_attribute(attribute)
+
+        # When a struct is nested, we also need to expose in
+        # the builder the attributes of the nested struct that
+        # are not exposed as foreign keys, so as to populate them
+        # with the builder pattern.
+        if struct.is_nested():
+            inner = struct.get_attribute_by_name("inner")
+            foreign_keys = table_metadata.get_foreign_keys(struct.table_name)
+            primary_key_name, _ = table_metadata.get_primary_key_name_and_type(
+                struct.table_name
+            )
+
+            for attribute in inner.raw_data_type().attributes:
+                if attribute.name in foreign_keys:
+                    continue
+                if attribute.name == primary_key_name:
+                    continue
+                attribute = copy.deepcopy(attribute)
+                attribute.optional = True
+                new_struct_builder.add_attribute(attribute)
+
+        # For each attribute, for add new parameters that are vectors
+        # for ApiError and collect the errors associated to the specific
+        # attribute. This is useful for the frontend, where we can display
+        # the errors associated to the specific attribute. In order to
+        # easily distinguish these fields from the other fields and avoid
+        # name clashes, we prefix the attribute name with `errors_`.
+        new_attributes = []
+        for attribute in new_struct_builder.attributes:
+            new_attributes.append(
+                AttributeMetadata(
+                    original_name=attribute.original_name,
+                    name=f"errors_{attribute.name}",
+                    data_type="Vec<ApiError>",
+                    optional=False,
+                )
+            )
+
+        for attribute in new_attributes:
+            new_struct_builder.add_attribute(attribute)
+
+        new_struct_builders.append(new_struct_builder)
+
+    return new_struct_builders
+
+
+def write_web_common_new_structs(
+    new_struct_metadatas: List[StructMetadata],
+):
+    """Writes the new structs to the web_common crate."""
+
+    # For the time being, we simply write out the structs.
+    # In the near future, we will also implement several
+    # traits for these structs.
+
+    path = "../web_common/src/database/new_variants.rs"
+
+    document = open(path, "w", encoding="utf8")
+
+    # Preliminarly, we write a docstring at the very head
+    # of this submodule to explain what it does and warn the
+    # reader not to write anything in this file as it is
+    # automatically generated.
+
+    document.write(
+        "//! This module contains the new variants of the database models.\n"
+        "//!\n"
+        "//! This module is automatically generated. Do not write anything here.\n\n"
+    )
+
+    imports = [
+        "use uuid::Uuid;",
+        "use serde::{Deserialize, Serialize};",
+        "use chrono::NaiveDateTime;",
+    ]
+
+    for import_statement in imports:
+        document.write(f"{import_statement}\n")
+
+    document.write("\n")
+
+    for struct in tqdm(
+        new_struct_metadatas,
+        desc="Writing new structs",
+        unit="struct",
+        leave=False,
+    ):
+        # For simplicity, we included in this list
+        # all the new structs and also the structs for
+        # which we do not need to derive a new struct.
+        # We do not want to print the structs that are
+        # not new structs, so we filter them out.
+        if not struct.name.startswith("New"):
+            continue
+
+        struct.write_to(document)
+
+    document.flush()
+    document.close()
+
+
+def write_web_common_new_nested_structs(
+    new_nested_struct_metadatas: List[StructMetadata],
+):
+    """Writes the new nested structs to the web_common crate."""
+
+    # For the time being, we simply write out the structs.
+    # In the near future, we will also implement several
+    # traits for these structs.
+
+    path = "../web_common/src/database/new_nested_variants.rs"
+
+    document = open(path, "w", encoding="utf8")
+
+    # Preliminarly, we write a docstring at the very head
+    # of this submodule to explain what it does and warn the
+    # reader not to write anything in this file as it is
+    # automatically generated.
+
+    document.write(
+        "//! This module contains the new nested variants of the database models.\n"
+        "//!\n"
+        "//! This module is automatically generated. Do not write anything here.\n\n"
+    )
+
+    imports = ["use serde::{Deserialize, Serialize};", "use super::*;"]
+
+    for import_statement in imports:
+        document.write(f"{import_statement}\n")
+
+    document.write("\n")
+
+    for struct in tqdm(
+        new_nested_struct_metadatas,
+        desc="Writing new nested structs",
+        unit="struct",
+        leave=False,
+    ):
+        # For simplicity, we included in this list
+        # all the new structs and also the structs for
+        # which we do not need to derive a new struct.
+        # We do not want to print the structs that are
+        # not new structs, so we filter them out.
+        if not struct.name.startswith("NestedNew"):
+            continue
+
+        struct.write_to(document)
+
+    document.flush()
+    document.close()
+
+
+def write_frontend_builder_action_enumeration(
+    builder: StructMetadata,
+    document: "io.TextIO",
+):
+    """Writes the enumeration of the builder actions for the builder struct.
+
+    Parameters
+    ----------
+    builder : StructMetadata
+        The builder struct for which to write the enumeration.
+    document : io.TextIO
+        The document to write to.
+
+    Implementation details
+    ----------------------
+    This method writes the enumeration of the builder actions for the builder struct.
+    """
+
+    document.write(
+        f"#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]\n"
+        f"pub(super) enum {builder.name}Actions {{\n"
+    )
+
+    for attribute in builder.attributes:
+        # We do not want to include the errors attribute in the builder actions.
+        if (
+            attribute.name.startswith("errors_")
+            and attribute.data_type() == "Vec<ApiError>"
+        ):
+            continue
+
+        document.write(
+            f"    Set{attribute.capitalized_name()}({attribute.format_data_type()}),\n"
+        )
+
+    document.write("}\n\n")
+
+
+def write_frontend_form_builder_reducer(
+    builder: StructMetadata,
+    build_target: StructMetadata,
+    document: "io.TextIO",
+):
+    """Writes the reducer for the builder struct.
+
+    Parameters
+    ----------
+    builder : StructMetadata
+        The builder struct for which to write the reducer.
+    build_target : StructMetadata
+        The struct that the builder builds.
+    document : io.TextIO
+        The document to write to.
+
+    Implementation details
+    ----------------------
+    This method writes the reducer for the builder struct.
+    """
+
+    document.write(
+        f"impl Reducer<{builder.name}> for {builder.name}Actions {{\n"
+        f"    fn apply(self, mut state: std::rc::Rc<{builder.name}>) -> std::rc::Rc<{builder.name}> {{\n"
+        f"        let state_mut = Rc::make_mut(&mut state);\n"
+        f"        match self {{\n"
+    )
+
+    for attribute in builder.attributes:
+        # We do not want to include the errors attribute in the builder actions.
+        if (
+            attribute.name.startswith("errors_")
+            and attribute.data_type() == "Vec<ApiError>"
+        ):
+            continue
+
+        struct_attribute = build_target.get_attribute_by_name(attribute.name)
+
+        # If the build target is a nested struct, it may not contain in the
+        # external level the attribute that is present in the builder. In this
+        # case, we need to go look for it inside the inner attribute.
+        if struct_attribute is None:
+            if not build_target.is_nested():
+                raise Exception(
+                    f"Attribute {attribute.name} not found in the build target struct {build_target.name}."
+                )
+
+            inner_attribute = build_target.get_attribute_by_name("inner")
+            struct_attribute = inner_attribute.raw_data_type().get_attribute_by_name(
+                attribute.name
+            )
+
+        if struct_attribute is None:
+            raise Exception(
+                f"Attribute {attribute.name} not found in the build target struct {build_target.name}."
+            )
+
+        document.write(
+            f"            {builder.name}Actions::Set{attribute.capitalized_name()}({attribute.name}) => {{\n"
+        )
+
+        # If the attribute is solely optional in the builder, we need to check
+        # whether it is currently populated. If it is not, we return an error.
+        if not struct_attribute.optional and attribute.optional:
+            document.write(
+                f"        if {attribute.name}.is_none() {{\n"
+                f"            state_mut.errors_{attribute.name}.push(ApiError::BadRequest(vec![\n"
+                f'                "The {attribute.capitalized_name()} field is required.".to_string()\n'
+                "             ]));\n"
+                f"        }}\n"
+            )
+
+        document.write(
+            f"                state_mut.{attribute.name} = {attribute.name};\n"
+            "            }\n"
+        )
+
+    document.write("        }\n" "        state\n" "    }\n" "}\n")
+
+
+def write_frontend_form_builder_implementation(
+    builder: StructMetadata,
+    flat_build_target: StructMetadata,
+    document: "io.TextIO",
+):
+    """Writes the implementation of the FormBuilder trait for the builder struct.
+
+    Parameters
+    ----------
+    builder : StructMetadata
+        The builder struct for which to write the implementation.
+    flat_build_target : StructMetadata
+        The struct that the builder builds.
+    document : io.TextIO
+        The document to write to.
+
+    Implementation details
+    ----------------------
+    This method implements the FormBuilder trait for the provided builder struct.
+    """
+
+    assert not flat_build_target.is_nested()
+
+    document.write(
+        f"impl FormBuilder for {builder.name} {{\n"
+        f"    type Data = {flat_build_target.name};\n"
+        f"    type Actions = {builder.name}Actions;\n\n"
+        f"    fn has_errors(&self) -> bool {{\n"
+    )
+
+    error_vectors = [
+        attribute
+        for attribute in builder.attributes
+        if attribute.name.startswith("errors_")
+        and attribute.data_type() == "Vec<ApiError>"
+    ]
+
+    assert len(error_vectors) > 0
+
+    document.write(
+        " || ".join(
+            [f"!self.{error_vector.name}.is_empty()" for error_vector in error_vectors]
+        )
+        + "\n"
+    )
+
+    document.write("    }\n\n")
+
+    # TODO! ADD FORM LEVEL ERRORS HERE!
+    document.write(
+        f"    fn form_level_errors(&self) -> Vec<String> {{\n"
+        f"        vec![]\n"
+        f"    }}\n\n"
+    )
+    document.write("}\n")
+
+    # We implement the From method to convert the builder to the target struct.
+    document.write(
+        f"impl From<{builder.name}> for {flat_build_target.name} {{\n"
+        f"    fn from(builder: {builder.name}) -> Self {{\n"
+        f"        Self {{\n"
+    )
+
+    table_metadata = find_foreign_keys()
+
+    primary_key_name, _primary_key_type = table_metadata.get_primary_key_name_and_type(
+        flat_build_target.table_name
+    )
+
+    for attribute in flat_build_target.attributes:
+
+        # There are 3 cases to consider:
+        # 1. The attribute is present in the builder, and is not a nested attribute.
+        # 2. The attribute is present in the builder, and is a nested attribute, so we need to recover the inner attribute.
+        # 3. The attribute is not present in the builder, so we need to check whether the normalized version, with the _id suffix, is present.
+
+        builder_attribute = builder.get_attribute_by_name(attribute.name)
+
+        if builder_attribute is None and attribute.name.endswith("_id"):
+            builder_attribute = builder.get_attribute_by_name(attribute.name[:-3])
+
+        if builder_attribute is None:
+
+            if attribute.name == primary_key_name and attribute.data_type() == "Uuid":
+                document.write("            id: Uuid::new_v4(),\n")
+                continue
+
+            raise Exception(
+                f"Attribute {attribute.name} not found in the builder struct {builder.name}."
+            )
+
+        # At this point, we need to handle the case where the attribute is expected to be
+        # an option by the build target, and therefore we do not unwrap it, or alternatively
+        # the attribute is not expected to be an option by the build target, and therefore we
+        # unwrap it.
+        if attribute.optional:
+            if isinstance(builder_attribute.raw_data_type(), StructMetadata):
+                inner_primary_key_name, _primary_key_type = (
+                    table_metadata.get_primary_key_name_and_type(
+                        builder_attribute.raw_data_type().table_name
+                    )
+                )
+                if builder_attribute.raw_data_type().is_nested():
+                    document.write(
+                        f"            {attribute.name}: builder.{builder_attribute.name}.map(|{builder_attribute.name}| {builder_attribute.name}.inner.{inner_primary_key_name}),\n"
+                    )
+                else:
+                    document.write(
+                        f"            {attribute.name}: builder.{builder_attribute.name}.map(|{builder_attribute.name}| {builder_attribute.name}.{inner_primary_key_name}),\n"
+                    )
+            else:
+                document.write(
+                    f"            {attribute.name}: builder.{attribute.name},\n"
+                )
+        else:
+            if isinstance(builder_attribute.raw_data_type(), StructMetadata):
+                inner_primary_key_name, _primary_key_type = (
+                    table_metadata.get_primary_key_name_and_type(
+                        builder_attribute.raw_data_type().table_name
+                    )
+                )
+                if builder_attribute.raw_data_type().is_nested():
+                    document.write(
+                        f"            {attribute.name}: builder.{builder_attribute.name}.unwrap().inner.{inner_primary_key_name},\n"
+                    )
+                else:
+                    document.write(
+                        f"            {attribute.name}: builder.{builder_attribute.name}.unwrap().{inner_primary_key_name},\n"
+                    )
+            else:
+                document.write(
+                    f"            {attribute.name}: builder.{attribute.name}.unwrap(),\n"
+                )
+
+    document.write("        }\n" "    }\n" "}\n")
+
+
+def handle_missing_gin_index(
+    attribute: AttributeMetadata,
+):
+    # We prepare a message for the user to ask them whether we should generate the index
+    # automatically for them. The exception will be raised nevertheless, as creating an
+    # index in-medias-res will change many of the other metadata collected earlier on,
+    # and the pipeline has to be re-run from the beginning.
+
+    # First, we identify the migration the migration after which the index should be created.
+    # The index has to be created AFTER either the creation of the table or the population of the
+    # table with data, as the index will be created on the populated table. These names are the
+    # suffixes of the migrations, as the prefix is the number of the migration.
+    target_path_names = [
+        f"populate_{attribute.raw_data_type().table_name}_table",
+        f"create_{attribute.raw_data_type().table_name}_table",
+    ]
+
+    # We find the migration after which the index should be created.
+    target_migration = None
+    for target_path_name in target_path_names:
+        for migration in os.listdir("../backend/migrations"):
+            if migration.endswith(target_path_name):
+                target_migration = migration
+                break
+        if target_migration is not None:
+            break
+
+    migration_number = int(target_migration.split("_")[0])
+
+    index_migration_name = f"create_{attribute.raw_data_type().table_name}_index"
+
+    full_migration_name = (
+        f"{(str(migration_number + 1)).zfill(14)}_{index_migration_name}"
+    )
+
+    textual_columns = []
+
+    flat_struct = None
+
+    if attribute.raw_data_type().is_nested():
+        flat_struct = (
+            attribute.raw_data_type().get_attribute_by_name("inner").raw_data_type()
+        )
+    else:
+        flat_struct = attribute.raw_data_type()
+
+    for inner_attribute in flat_struct.attributes:
+        if inner_attribute.data_type() in TEXTUAL_DATA_TYPES:
+            textual_columns.append(inner_attribute)
+
+    if len(textual_columns) == 0:
+        raise Exception(
+            f"The table {attribute.raw_data_type().table_name} is not searchable as "
+            "we did not find a GIN trigram index for it. We cannot generate a datalist "
+            "for it - please create a GIN trigram index for it and try again. "
+            "If you have just created the index, recall that you may still need to run "
+            "that particular migration. Furthermore, we have not even found any textual "
+            "columns in the table, so we cannot help you creating the index. "
+            "This error was encountered while trying to generate "
+            f"the form for the {builder.name} builder."
+        )
+
+    if len(textual_columns) > 0:
+        print(
+            "The table is not searchable as we did not find a GIN trigram index for it."
+        )
+        print(
+            f"The following columns are searchable: {', '.join(textual_column.name for textual_column in textual_columns)}"
+        )
+        print(
+            f"We can generate a GIN trigram index for the table {attribute.raw_data_type().table_name}."
+        )
+        print(
+            f"We will generate part of the index in the migration {full_migration_name}."
+        )
+        print(f"You will still need to refine the index afterwards to your liking.")
+
+        user_answer = userinput(
+            name="Create GIN index?",
+            default=False,
+            validator="human_bool",
+            sanitizer="human_bool",
+            cache=False,
+        )
+
+        assert isinstance(user_answer, bool)
+
+        if user_answer:
+            print("We will generate the index in the migration.")
+            print("Please re-run pipeline once the index has been created.")
+            sleep(2)
+            insert_migration(
+                counter=migration_number + 1,
+                name=index_migration_name,
+            )
+
+            concatenate_columns = "_".join(
+                textual_column.name for textual_column in textual_columns
+            )
+
+            index_name = (
+                f"{attribute.raw_data_type().table_name}_{concatenate_columns}_trgm_idx"
+            )
+            function_name = None
+
+            with open(
+                f"./migrations/{full_migration_name}/up.sql", "w", encoding="utf8"
+            ) as up_index_migration:
+
+                up_index_migration.write(
+                    f"-- Create index to run approximate search queries on the {attribute.raw_data_type().table_name} table.\n"
+                    f"-- The search will be case insensitive and will use the trigram index.\n\n"
+                    "CREATE EXTENSION IF NOT EXISTS pg_trgm;\n\n"
+                )
+
+                if len(textual_columns) > 1:
+                    function_name = f"f_concat_{attribute.raw_data_type().table_name}_{concatenate_columns}"
+
+                    up_index_migration.write(f"CREATE FUNCTION {function_name}(\n")
+                    for inner_attribute in textual_columns:
+                        up_index_migration.write(f"{inner_attribute.name} text,\n")
+                    up_index_migration.write(
+                        ") RETURNS text AS $$\n"
+                        "BEGIN\n"
+                        "-- TODO! Add the concatenation logic here!\n"
+                        "END;\n"
+                        "$$ LANGUAGE plpgsql IMMUTABLE STRICT PARALLEL SAFE;\n\n"
+                    )
+
+                    up_index_migration.write(
+                        f"CREATE INDEX {index_name} ON {attribute.raw_data_type().table_name} USING gin (\n"
+                        f"{function_name}(\n"
+                    )
+                    for inner_attribute in textual_columns:
+                        up_index_migration.write(f"{inner_attribute.name},\n")
+
+                    up_index_migration.write(") gin_trgm_ops\n" ");\n")
+                else:
+                    up_index_migration.write(
+                        f"CREATE INDEX {index_name} ON {attribute.raw_data_type().table_name} USING gin (\n"
+                        f"    {textual_columns[0].name} gin_trgm_ops\n"
+                        ");\n"
+                    )
+
+            with open(
+                f"./migrations/{full_migration_name}/down.sql", "w", encoding="utf8"
+            ) as down_index_migration:
+                down_index_migration.write(
+                    f"-- Drop index on the {attribute.raw_data_type().table_name} table.\n"
+                    f"-- The index was used to run approximate search queries on the table.\n\n"
+                    f"DROP INDEX {index_name};\n"
+                )
+
+                if function_name is not None:
+                    down_index_migration.write(f"DROP FUNCTION {function_name}(")
+                    for inner_attribute in textual_columns:
+                        down_index_migration.write(f"{inner_attribute.name} text,\n")
+                    down_index_migration.write(");\n")
+        else:
+            print("Please create the index manually and re-run the pipeline.")
+            sleep(2)
+
+    raise Exception(
+        f"The table {attribute.raw_data_type().table_name} is not searchable as "
+        "we did not find a GIN trigram index for it. We cannot generate a datalist "
+        "for it - please create a GIN trigram index for it and try again. "
+        "If you have just created the index, recall that you may still need to run "
+        "that particular migration. This error was encountered while trying to generate "
+        f"the form for the {builder.name} builder."
+    )
+
+
+def implements_row_to_badge(
+    struct: StructMetadata,
+):
+    """Returns whether the struct implements the RowToBadge trait.
+
+    Parameters
+    ----------
+    struct : StructMetadata
+        The struct for which to check the implementation.
+
+    Returns
+    -------
+    bool
+        Whether the struct implements the RowToBadge trait.
+
+    Implementation details
+    ----------------------
+    This method checks whether the provided struct implements the RowToBadge trait.
+    """
+    # The standard position of the RowToBadge trait implementation is in the
+    # frontend crate, in the /src/components/row_to_badge/{table_name}.rs file.
+    # We check whether the file exists, and if it does, we check whether the
+    # struct implements the trait, meaning whether there appears therein the
+    # implementation of the RowToBadge trait for the struct:
+    #
+    # impl RowToBadge for {struct_name} {
+
+    # We check that this method is called at the correct position, in the
+    # backend crate.
+
+    assert os.getcwd().endswith("/backend")
+
+    path = f"../frontend/src/components/database/row_to_badge/{struct.table_name}.rs"
+
+    if not os.path.exists(path):
+        return False
+
+    module_path = f"../frontend/src/components/database/row_to_badge.rs"
+
+    # We check that the module is imported in the row_to_badge.rs file.
+    with open(module_path, "r", encoding="utf8") as module:
+        for line in module:
+            if line.startswith(f"pub mod {struct.table_name};"):
+                break
+        else:
+            return False
+
+    with open(path, "r", encoding="utf8") as document:
+        for line in document:
+            if line.startswith(f"impl RowToBadge for {struct.name} {{"):
+                return True
+
+    return False
+
+
+def handle_missing_row_to_badge_implementation(
+    struct: StructMetadata,
+):
+    """Handles the missing implementation of the RowToBadge trait.
+
+    Parameters
+    ----------
+    struct : StructMetadata
+        The struct for which to handle the missing implementation.
+
+    Implementation details
+    ----------------------
+    When the implementation of the RowToBadge trait is missing, this method
+    asks to the user whether the implementation should be generated automatically.
+    If so, we proceed to create the file at the expected location and write the
+    implementation of the trait for the struct, using a very rough first draft.
+    """
+
+    path = f"../frontend/src/components/database/row_to_badge/{struct.table_name}.rs"
+
+    # We check that the target implementation does not appear in some other file
+    # with the mistaken name.
+    for file in os.listdir("../frontend/src/components/database/row_to_badge"):
+        target_string = f"impl RowToBadge for {struct.name} {{"
+        with open(
+            f"../frontend/src/components/database/row_to_badge/{file}",
+            "r",
+            encoding="utf8",
+        ) as document:
+            for line in document:
+                if target_string in line:
+                    raise Exception(
+                        "We expected to find the RowToBadge implementation for the "
+                        f"{struct.name} struct in the {file} file, but it appears in the {path} file."
+                    )
+
+    print(
+        f"Should we create the RowToBadge implementation for the {struct.name} struct? "
+        f"It would be at the following location: {path}."
+    )
+
+    user_answer = userinput(
+        name="Create RowToBadge implementation?",
+        default="no",
+        validator="human_bool",
+        sanitizer="human_bool",
+    )
+
+    if user_answer:
+
+        # We retrieve the textual columns of the struct, as we will use them
+        # to generate the implementation of the RowToBadge trait.
+        index: PGIndex = find_pg_trgm_indices().get_table(struct.table_name)
+
+        # We retrieve the textual columns of the struct, and we check which of
+        # them appear in the index arguments.
+        search_columns = [
+            column
+            for column in (
+                struct.get_attribute_by_name("inner").raw_data_type().attributes
+                if struct.is_nested()
+                else struct.attributes
+            )
+            if column.data_type() in TEXTUAL_DATA_TYPES
+            and column.name in index.arguments
+        ]
+
+        assert len(search_columns) > 0
+
+        directory_name = os.path.dirname(path)
+        os.makedirs(directory_name, exist_ok=True)
+
+        with open(path, "w", encoding="utf8") as document:
+
+            document.write(
+                "use super::RowToBadge;\n"
+                "use crate::traits::format_match::FormatMatch;\n"
+                f"use web_common::database::{struct.name};\n"
+                "use yew::prelude::*;\n\n"
+            )
+
+            document.write(
+                f"impl RowToBadge for {struct.name} {{\n"
+                f"    fn to_datalist_badge(&self, query: &str) -> Html {{\n"
+                f"        html! {{\n"
+                f"            <div>\n"
+                f"                <p>\n"
+            )
+
+            font_awesome_icon = None
+
+            if struct.get_attribute_by_name("font_awesome_icon") is not None:
+                if struct.get_attribute_by_name("color") is not None:
+                    font_awesome_icon = '<i class={format!("{} {}", self.font_awesome_icon.name, self.color.name)}></i>'
+                else:
+                    font_awesome_icon = '<i class={format!("{} grey", self.font_awesome_icon.name)}></i>'
+            else:
+                font_awesome_icon = '<i class="fas fa-question grey"></i>'
+
+            document.write(f"                {font_awesome_icon}\n")
+
+            # we handle both the case where the column is optional and the case where it is not
+            for column in search_columns:
+                if column.optional:
+                    document.write(
+                        f"                if let Some(column.name) = self.{column.name}.as_ref() {{\n"
+                        f"                    <span>{{self.{column.name}.format_match(query)}}</span>\n"
+                        f"                }}\n"
+                    )
+                else:
+                    document.write(
+                        f"                    <span>{{self.{column.name}.format_match(query)}}</span>\n"
+                    )
+
+            document.write(
+                "                </p>\n"
+                "            </div>\n"
+                "        }\n"
+                "    }\n\n"
+            )
+
+            document.write(
+                f"    fn to_selected_datalist_badge(&self) -> Html {{\n"
+                f"        html! {{\n"
+                f"            <div>\n"
+                f"                <p>\n"
+            )
+
+            document.write(f"                {font_awesome_icon}\n")
+
+            # We only want to show a single column in the selected datalist badge.
+            # If the struct happens to have column called `name`, we use it, otherwise
+            # we use the first column that is searchable.
+            if struct.get_attribute_by_name("name") is not None:
+                document.write(
+                    f"                    <span>{{self.name.clone()}}</span>\n"
+                )
+            else:
+                document.write(
+                    f"                    <span>{{self.{search_columns[0].name}.clone()}}</span>\n"
+                )
+
+            document.write(
+                "                </p>\n" "            </div>\n" "        }\n" "    }\n"
+            )
+
+            # We implement the matches method, where we chain the columns that are searchable
+            # if the column name is not available.
+
+            document.write(f"    fn matches(&self, query: &str) -> bool {{\n")
+
+            if "name" in [column.name for column in search_columns]:
+                document.write(f"        self.name == query\n")
+            else:
+                column = search_columns[0]
+                if column.optional:
+                    document.write(
+                        f"        self.{column.name}.as_ref().map_or(false, |column| column == query)\n"
+                    )
+                else:
+                    document.write(f"        self.{column.name} == query\n")
+
+            document.write("    }\n")
+
+            document.write(f"    fn similarity_score(&self, query: &str) -> isize {{\n")
+
+            scores = []
+
+            for column in search_columns:
+                if column.optional:
+                    scores.append(
+                        f"self.{column.name}.as_ref().map_or(0, |column| column.similarity_score(query))"
+                    )
+                else:
+                    scores.append(f"self.{column.name}.similarity_score(query)")
+
+            scores_summatory = " + ".join(scores)
+            document.write(f"        {scores_summatory}\n")
+
+            document.write("    }\n")
+
+            document.write("fn primary_color_class(&self) -> &str {\n")
+
+            if struct.get_attribute_by_name("color") is not None:
+                document.write("        &self.color.name\n")
+            else:
+                document.write('        "grey"\n')
+
+            document.write("    }\n")
+
+            document.write("fn description(&self) -> &str {\n")
+
+            if struct.get_attribute_by_name("description") is not None:
+                document.write("        &self.description\n")
+            else:
+                document.write('        ""\n')
+
+            document.write("    }\n")
+
+            document.write("}\n")
+
+        # We import the new module in the:
+        path = "../frontend/src/components/database/row_to_badge.rs"
+
+        with open(path, "a", encoding="utf8") as document:
+            document.write(f"pub mod {struct.table_name};\n")
+
+        print(f"RowToBadge implementation for {struct.name} created.")
+        print("Please refine it and re-run the pipeline.")
+        sleep(2)
+
+        raise Exception(
+            f"The RowToBadge implementation for the {struct.name} struct is missing. "
+            "We have generated a rough first draft for you. Please refine it and re-run the pipeline."
+        )
+
+
+def write_frontend_yew_form(
+    builder: StructMetadata,
+    build_target: StructMetadata,
+    document: "io.TextIO",
+):
+    """Writes the Yew form for the builder struct.
+
+    Parameters
+    ----------
+    builder : StructMetadata
+        The builder struct for which to write the form.
+    build_target : StructMetadata
+        The struct that the builder builds.
+    document : io.TextIO
+        The document to write to.
+
+    Implementation details
+    ----------------------
+    This method writes the Yew form for the provided builder struct.
+    """
+
+    assert not build_target.is_nested()
+
+    trigram_indices = find_pg_trgm_indices()
+
+    form_component_name = f"{build_target.name}Form"
+
+    if form_component_name.startswith("Nested"):
+        form_component_name = form_component_name[6:]
+
+    # We generate the lowercased name of the form component by splitting
+    # on the uppercased letters and joining the resulting list with an
+    # underscore.
+    form_method_name = "_".join(re.findall("[A-Z][^A-Z]*", form_component_name)).lower()
+
+    document.write(
+        f"#[function_component({form_component_name})]\n"
+        f"pub fn {form_method_name}() -> Html {{\n"
+        f"    let (builder_store, builder_dispatch) = use_store::<{builder.name}>();\n"
+    )
+
+    for attribute in builder.attributes:
+        # We do not want to include the errors attribute in the builder actions.
+        if (
+            attribute.name.startswith("errors_")
+            and attribute.data_type() == "Vec<ApiError>"
+        ):
+            continue
+        
+        if attribute.data_type() == "bool":
+            document.write(
+                f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: bool| {builder.name}Actions::Set{attribute.capitalized_name()}(Some({attribute.name})));\n"
+            )
+        else:
+            document.write(
+                f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: {attribute.format_data_type()}| {builder.name}Actions::Set{attribute.capitalized_name()}({attribute.name}));\n"
+            )
+
+    document.write(
+        f"    html! {{\n"
+        f"        <BasicForm<{build_target.name}> builder={{builder_store.deref().clone()}}>\n"
+    )
+
+    for attribute in builder.attributes:
+
+        if (
+            attribute.name.startswith("errors_")
+            and attribute.data_type() == "Vec<ApiError>"
+        ):
+            continue
+
+        error_attribute = builder.get_attribute_by_name(f"errors_{attribute.name}")
+
+        if attribute.data_type() in ["String"]:
+            document.write(
+                f'            <BasicInput label="{attribute.capitalized_name()}" errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} value={{builder_store.{attribute.name}.clone()}} input_type={{InputType::Text}} />\n'
+            )
+            continue
+
+        if attribute.data_type() == "bool":
+            document.write(
+                f'            <Checkbox label="{attribute.capitalized_name()}" errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} value={{builder_store.{attribute.name}.unwrap_or(false)}} />\n'
+            )
+            continue
+
+        # If the attribute is a nested struct, we need to generate a Datalist
+        # that will allow the user to select the nested struct.
+        if isinstance(attribute.raw_data_type(), StructMetadata):
+            # We check that the table associated to the nested struct is searchable, otherwise
+            # we cannot generate the datalist for it and we need to raise an exception.
+            if not trigram_indices.has_table(attribute.raw_data_type().table_name):
+                handle_missing_gin_index(attribute)
+
+            # We check that the nested struct implements the RowToBadge trait, as we need to
+            # be able to convert the nested struct to a badge within the Datalist.
+            if not implements_row_to_badge(attribute.raw_data_type()):
+                handle_missing_row_to_badge_implementation(attribute.raw_data_type())
+                raise Exception(
+                    f"The struct {attribute.raw_data_type().name} does not implement the RowToBadge trait."
+                )
+
+            document.write(
+                f'            <Datalist<{attribute.data_type()}> builder={{set_{attribute.name}}} errors={{builder_store.{error_attribute.name}.clone()}} value={{builder_store.{attribute.name}.clone()}} label="{attribute.capitalized_name()}" />\n'
+            )
+            continue
+
+        # TODO! ADD MORE INPUT TYPES HERE!
+
+    document.write(f"        </BasicForm<{build_target.name}>>\n" f"    }}\n" f"}}\n")
+
+
+def write_frontend_form_buildable_implementation(
+    builder: StructMetadata,
+    build_target: StructMetadata,
+    document: "io.TextIO",
+):
+    """Writes the implementation of the Buildable trait for the target struct.
+
+    Parameters
+    ----------
+    builder : StructMetadata
+        The builder struct for which to write the implementation.
+    build_target : StructMetadata
+        The struct that the builder builds.
+    document : io.TextIO
+        The document to write to.
+
+    Implementation details
+    ----------------------
+    This method implements the Buildable trait for the provided struct.
+    """
+
+    capitalized_table_name = "".join(
+        word.capitalize() for word in build_target.table_name.split("_")
+    )
+
+    document.write(
+        f"impl FormBuildable for {build_target.name} {{\n"
+        f"    type Builder = {builder.name};\n"
+        f"    const TABLE: Table = Table::{capitalized_table_name};\n"
+        f"    const METHOD: FormMethod = FormMethod::POST;\n"  # Properly dispatch the method
+        f"    fn title() -> &'static str {{\n"
+        f'        "{build_target.name}"\n'  # TODO! Add the title
+        f"    }}\n"
+        f"    fn task_target() -> &'static str {{\n"
+        f'        "{build_target.name}"\n'  # TODO! Add the task target name
+        f"    }}\n"
+        f"    fn description() -> &'static str {{\n"
+        f'        concat!("Create a new {build_target.name}.",)\n'  # TODO! Add the description
+        f"    }}\n"
+        f"    fn requires_authentication() -> bool {{\n"
+        f"        true\n"  # TODO! Add the authentication requirement
+        f"    }}\n"
+        f"}}\n"
+    )
+
+
+def write_frontend_forms(
+    new_nested_struct_metadatas: List[StructMetadata],
+    new_struct_metadatas: List[StructMetadata],
+    new_model_builder_structs: List[StructMetadata],
+):
+    """Writes the frontend forms to the web_common crate."""
+
+    assert len(new_struct_metadatas) == len(new_model_builder_structs)
+    assert len(new_nested_struct_metadatas) == len(new_model_builder_structs)
+
+    # For the time being, we simply write out the structs.
+    # In the near future, we will also implement several
+    # traits for these structs.
+
+    path = "../frontend/src/components/forms/automatic_forms.rs"
+
+    document = open(path, "w", encoding="utf8")
+
+    # Preliminarly, we write a docstring at the very head
+    # of this submodule to explain what it does and warn the
+    # reader not to write anything in this file as it is
+    # automatically generated.
+
+    document.write(
+        "//! This module contains the forms for the frontend.\n"
+        "//!\n"
+        "//! This module is automatically generated. Do not write anything here.\n\n"
+    )
+
+    imports = [
+        "use serde::{Deserialize, Serialize};",
+        "use web_common::database::*;",
+        "use yew::prelude::*;",
+        "use yewdux::{use_store, Reducer, Store};",
+        "use crate::components::forms::*;",
+        "use web_common::api::form_traits::FormMethod;",
+        "use std::rc::Rc;",
+        "use uuid::Uuid;",
+        "use std::ops::Deref;",
+        "use chrono::NaiveDateTime;",
+        "use web_common::api::ApiError;",
+    ]
+
+    for import_statement in imports:
+        document.write(f"{import_statement}\n")
+
+    document.write("\n")
+
+    for builder, nested_target_struct, target_struct in tqdm(
+        zip(
+            new_model_builder_structs,
+            new_nested_struct_metadatas,
+            new_struct_metadatas,
+        ),
+        total=len(new_model_builder_structs),
+        desc="Writing new buiders",
+        unit="struct",
+        leave=False,
+    ):
+        assert builder.table_name == target_struct.table_name
+
+        builder.write_to(document)
+
+        write_frontend_builder_action_enumeration(builder, document)
+        write_frontend_form_builder_implementation(builder, target_struct, document)
+        write_frontend_form_buildable_implementation(builder, target_struct, document)
+        write_frontend_form_builder_reducer(builder, nested_target_struct, document)
+        write_frontend_yew_form(builder, target_struct, document)
+
+    document.flush()
+    document.close()
+
+
 def generate_table_schema():
     # Read the replacements from the JSON file
     replacements = compress_json.local_load("replacements.json")
@@ -3390,6 +4757,7 @@ def generate_table_schema():
     if status != 0:
         raise Exception("The diesel_ext command failed.")
 
+
 def check_for_common_typos_in_migrations():
     for directory in os.listdir("migrations"):
         if not os.path.isdir(f"migrations/{directory}"):
@@ -3405,7 +4773,7 @@ def check_for_common_typos_in_migrations():
 
         with open(f"migrations/{directory}/down.sql", "r") as down_file:
             down_content = down_file.read()
-        
+
         if "CREATE TABLE IF EXISTS" in up_content:
             raise Exception(
                 f"Migration `{directory}` contains a typo: `CREATE TABLE IF EXISTS` instead of `CREATE TABLE IF NOT EXISTS`."
@@ -3415,6 +4783,7 @@ def check_for_common_typos_in_migrations():
             raise Exception(
                 f"Migration `{directory}` contains a typo: `DROP TABLE IF NOT EXISTS` instead of `DROP TABLE IF EXISTS`."
             )
+
 
 def ensures_gluesql_compliance():
     for directory in os.listdir("migrations"):
@@ -3428,8 +4797,16 @@ def ensures_gluesql_compliance():
 
         with open(f"migrations/{directory}/up.sql", "r") as up_file:
             up_content = up_file.read()
-        
-        if up_content.count("CREATE TABLE") != up_content.count("CREATE TABLE IF NOT EXISTS"):
+
+        if "SERIAL PRIMARY KEY" in up_content:
+            raise Exception(
+                f"Migration `{directory}` contains a `SERIAL PRIMARY KEY` constraint, which is not supported by GlueSQL. "
+                "Please replace it with `INTEGER PRIMARY KEY`."
+            )
+
+        if up_content.count("CREATE TABLE") != up_content.count(
+            "CREATE TABLE IF NOT EXISTS"
+        ):
             raise Exception(
                 f"Migration `{directory}` does not use `CREATE TABLE IF NOT EXISTS` consistently. "
                 f"Replace the use of `CREATE TABLE` with `CREATE TABLE IF NOT EXISTS` in the `up.sql` file "
@@ -3446,7 +4823,7 @@ def ensures_migrations_simmetry():
         "CREATE TABLE IF NOT EXISTS": "DROP TABLE IF EXISTS",
         "CREATE INDEX": "DROP INDEX",
         "CREATE VIEW": "DROP VIEW",
-        "CREATE FUNCTION": "DROP FUNCTION",
+        # "CREATE FUNCTION": "DROP FUNCTION",
         "CREATE TRIGGER": "DROP TRIGGER",
         "CREATE TYPE": "DROP TYPE",
     }
@@ -3478,6 +4855,145 @@ def ensures_migrations_simmetry():
                 raise Exception(
                     f"Migration {directory} is not symmetric: down.sql contains `{down_key}` but up.sql does not contain `{up_key}`."
                 )
+
+
+def enforce_migration_naming_convention():
+    """Check that the migrations are named according to the convention."""
+
+    for directory in os.listdir("migrations"):
+        if not os.path.isdir(f"migrations/{directory}"):
+            continue
+
+        if not os.path.exists(f"migrations/{directory}/up.sql") or not os.path.exists(
+            f"migrations/{directory}/down.sql"
+        ):
+            continue
+
+        if directory == "00000000000000_diesel_initial_setup":
+            continue
+
+        with open(f"migrations/{directory}/up.sql", "r") as up_file:
+            up_content = up_file.read()
+
+        expected_name = directory
+
+        if "CREATE TABLE IF NOT EXISTS" in up_content:
+            # This document contains a table creation, and as such
+            # we expect its name to conform to {number_of_migration}_create_{table_name}_table
+            table_name = (
+                up_content.split("CREATE TABLE IF NOT EXISTS")[1].split("(")[0].strip()
+            )
+            number_of_migration = directory.split("_")[0]
+
+            expected_name = f"{number_of_migration}_create_{table_name}_table"
+
+        if directory != expected_name:
+            raise Exception(
+                f"Migration {directory} does not conform to the naming convention. "
+                f"Expected name: {expected_name}."
+            )
+
+
+def replace_serial_indices():
+    """Replaces SERIAL indices with INTEGER indices in the migrations.
+
+    Implementation details
+    ----------------------
+    GlueSQL, the database engine used in the frontend, does not support several
+    SQL features, including the SERIAL type. This function replaces the SERIAL
+    type with the INTEGER type in the migrations, and creates a new migration
+    inserted immediately after the one that contained the SERIAL type, to replace
+    the integer primary key with a SERIAL primary key. By splitting the migration
+    in two parts, we ensure that the first migration can be used as-is in the
+    frontend as well, while the second migration can be used in the backend.
+    """
+
+    serial_index_updated = True
+
+    while serial_index_updated:
+        serial_index_updated = False
+
+        for directory in os.listdir("migrations"):
+            if not os.path.isdir(f"migrations/{directory}"):
+                continue
+
+            if not os.path.exists(
+                f"migrations/{directory}/up.sql"
+            ) or not os.path.exists(f"migrations/{directory}/down.sql"):
+                continue
+
+            if directory == "00000000000000_diesel_initial_setup":
+                continue
+
+            with open(f"migrations/{directory}/up.sql", "r") as up_file:
+                up_content = up_file.read()
+
+            if "SERIAL PRIMARY KEY" in up_content:
+                print(f"Replacing SERIAL in {directory} for GlueSQL compliance.")
+
+                serial_index_updated = True
+                current_migration_code_str, directory_name = directory.split(
+                    "_", maxsplit=1
+                )
+
+                assert directory_name.startswith("create_") and directory_name.endswith(
+                    "_table"
+                )
+
+                table_name = directory_name[7:-6]
+
+                current_migration_code = int(current_migration_code_str)
+
+                new_migration_name = f"create_{table_name}_default_index"
+
+                insert_migration(
+                    counter=current_migration_code + 1, name=new_migration_name
+                )
+
+                # We replace the SERIAL PRIMARY KEY with INTEGER PRIMARY KEY
+                up_content = up_content.replace(
+                    "SERIAL PRIMARY KEY", "INTEGER PRIMARY KEY"
+                )
+
+                with open(f"migrations/{directory}/up.sql", "w") as up_file:
+                    up_file.write(up_content)
+
+                padded_migration_code = str(current_migration_code + 1).zfill(14)
+                full_new_migration_name = (
+                    f"{padded_migration_code}_{new_migration_name}"
+                )
+
+                # We write the up and down SQL files for the new migration
+                # that will replace the INTEGER PRIMARY KEY with a SERIAL
+                # PRIMARY KEY.
+
+                with open(
+                    f"migrations/{full_new_migration_name}/up.sql", "w"
+                ) as up_file:
+                    up_file.write(
+                        "-- This up migration replaces the INTEGER primary key with a SERIAL primary key.\n"
+                        "-- This migration is intended to be used in the backend.\n"
+                        "-- This migration is automatically generated.\n\n"
+                        f"CREATE SEQUENCE {table_name}_id_seq;\n"
+                        f"ALTER TABLE {table_name} ALTER COLUMN id SET DEFAULT nextval('{table_name}_id_seq');\n"
+                        f"ALTER TABLE {table_name} ALTER COLUMN id SET NOT NULL;\n"
+                        f"ALTER SEQUENCE {table_name}_id_seq OWNED BY {table_name}.id;\n"
+                    )
+
+                with open(
+                    f"migrations/{full_new_migration_name}/down.sql", "w"
+                ) as down_file:
+                    down_file.write(
+                        "-- This down migration drops what was created in the up migration.\n"
+                        "-- This migration is intended to be used in the backend.\n"
+                        "-- This migration is automatically generated.\n\n"
+                        f"ALTER SEQUENCE {table_name}_id_seq OWNED BY NONE;\n"
+                        f"ALTER TABLE {table_name} ALTER COLUMN id DROP DEFAULT;\n"
+                        f"DROP SEQUENCE {table_name}_id_seq;\n"
+                    )
+
+                # We break as the list of directories has now changed
+                break
 
 
 if __name__ == "__main__":
@@ -3530,6 +5046,8 @@ if __name__ == "__main__":
     if not os.path.exists("./db_data/bio_ott_taxons.csv.gz"):
         retrieve_taxons()
 
+    enforce_migration_naming_convention()
+    replace_serial_indices()
     check_for_common_typos_in_migrations()
     ensures_migrations_simmetry()
     ensures_gluesql_compliance()
@@ -3549,7 +5067,9 @@ if __name__ == "__main__":
 
     write_backend_structs("src/models.rs", "tables", table_structs)
     write_backend_structs("src/views/views.rs", "views", view_structs)
-    print("Generated From implementations for backend.")
+    print(
+        f"Generated {len(table_structs)} tables and {len(view_structs)} views implementations for backend."
+    )
 
     write_web_common_structs(table_structs, "tables", "Table")
     write_web_common_structs(view_structs, "views", "View")
@@ -3558,7 +5078,7 @@ if __name__ == "__main__":
     nested_structs: List[StructMetadata] = generate_nested_structs(
         "src/nested_models.rs", table_structs + view_structs
     )
-    print("Generated nested structs for backend.")
+    print(f"Generated {len(nested_structs)} nested structs for backend.")
 
     tables: List[TableStructMetadata] = write_webcommons_table_names_enumeration(
         table_structs + view_structs + nested_structs
@@ -3575,3 +5095,28 @@ if __name__ == "__main__":
         nested_structs + table_structs + view_structs
     )
     print("Generated search trait implementations for web_common.")
+
+    new_model_structs = derive_new_models(table_structs)
+    print(f"Derived {len(new_model_structs)} structs for the New versions")
+
+    new_nested_model_structs = derive_new_nested_models(
+        new_model_structs, nested_structs
+    )
+    print(
+        f"Derived {len(new_nested_model_structs)} structs for the Nested New versions"
+    )
+
+    new_model_builder_structs = derive_new_model_builders(
+        new_nested_model_structs, tables
+    )
+    print(f"Derived {len(new_model_builder_structs)} builders for the New versions")
+
+    write_web_common_new_structs(new_model_structs)
+    write_web_common_new_nested_structs(new_nested_model_structs)
+    print("Generated new structs for web_common.")
+
+    write_frontend_forms(
+        new_nested_model_structs,
+        new_model_structs,
+        new_model_builder_structs,
+    )

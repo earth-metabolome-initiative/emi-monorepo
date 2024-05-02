@@ -1,27 +1,28 @@
 //! Module providing a yew component that handles a basic input, which is meant to be used in combination with BasicForm.
 
-use std::collections::HashSet;
-
 use super::InputErrors;
 use crate::components::database::row_to_badge::RowToBadge;
+use crate::workers::ws_worker::ComponentMessage;
+use crate::workers::ws_worker::WebsocketMessage;
 use crate::workers::WebsocketWorker;
 use gloo::timers::callback::Timeout;
 use serde::de::DeserializeOwned;
 use wasm_bindgen::JsCast;
-use web_common::api::ws::messages::*;
 
+use web_common::api::ApiError;
 use web_common::database::Searchable;
 use yew::prelude::*;
 use yew_agent::prelude::WorkerBridgeHandle;
 use yew_agent::scope_ext::AgentScopeExt;
 
 #[derive(Clone, PartialEq, Properties)]
-pub struct DatalistProp<Data>
+pub struct MultiDatalistProp<Data>
 where
     Data: 'static + Clone + PartialEq,
 {
     pub label: String,
     pub builder: Callback<Vec<Data>>,
+    pub errors: Vec<ApiError>,
     #[prop_or(true)]
     pub show_label: bool,
     #[prop_or_default]
@@ -38,7 +39,7 @@ where
     pub number_of_candidates: u32,
 }
 
-impl<Data> DatalistProp<Data>
+impl<Data> MultiDatalistProp<Data>
 where
     Data: 'static + Clone + PartialEq,
 {
@@ -55,9 +56,9 @@ where
     }
 }
 
-pub struct Datalist<Data> {
+pub struct MultiDatalist<Data> {
     websocket: WorkerBridgeHandle<WebsocketWorker>,
-    errors: HashSet<String>,
+    errors: Vec<ApiError>,
     current_value: Option<String>,
     is_valid: Option<bool>,
     validation_timeout: Option<Timeout>,
@@ -75,11 +76,7 @@ pub struct Datalist<Data> {
 }
 
 pub enum DatalistMessage<Data> {
-    Backend(BackendMessage),
-    RemoveError(String),
-    RemoveErrors,
-    Validate(Result<Data, Vec<String>>),
-    StartValidationTimeout(Result<Data, Vec<String>>),
+    Backend(WebsocketMessage),
     UpdateCurrentValue(String),
     SearchCandidatesTimeout,
     SearchCandidates,
@@ -91,22 +88,22 @@ pub enum DatalistMessage<Data> {
     Blur,
 }
 
-impl<Data> Component for Datalist<Data>
+impl<Data> Component for MultiDatalist<Data>
 where
     Data: 'static + Clone + PartialEq + DeserializeOwned + Searchable + RowToBadge,
 {
     type Message = DatalistMessage<Data>;
-    type Properties = DatalistProp<Data>;
+    type Properties = MultiDatalistProp<Data>;
 
     fn create(ctx: &Context<Self>) -> Self {
         Self {
             websocket: ctx.link().bridge_worker(Callback::from({
                 let link = ctx.link().clone();
-                move |message: BackendMessage| {
+                move |message: WebsocketMessage| {
                     link.send_message(DatalistMessage::Backend(message));
                 }
             })),
-            errors: HashSet::new(),
+            errors: Vec::new(),
             is_valid: None,
             current_value: None,
             validation_timeout: None,
@@ -122,7 +119,7 @@ where
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             DatalistMessage::Backend(message) => match message {
-                BackendMessage::SearchTable(_task_id, results) => {
+                WebsocketMessage::SearchTable(results) => {
                     self.number_of_search_queries -= 1;
                     ctx.link().send_message(DatalistMessage::UpdateCandidates(
                         results
@@ -139,82 +136,17 @@ where
             },
             DatalistMessage::UpdateCandidates(candidates) => {
                 if candidates.is_empty() {
-                    self.errors.insert("No candidates found".to_string());
+                    self.errors.push(ApiError::BadRequest(
+                        vec!["No candidates found".to_string()],
+                    ));
                 } else {
-                    self.errors.remove("No candidates found");
+                    self.errors.clear();
                 }
                 if self.candidates == candidates {
                     return false;
                 }
                 self.candidates = candidates;
                 true
-            }
-            DatalistMessage::RemoveErrors => {
-                let mut changes = false;
-
-                if !self.errors.is_empty() {
-                    self.errors.clear();
-                    changes = true;
-                }
-
-                if self.is_valid.is_some() {
-                    self.is_valid = None;
-                    changes = true;
-                }
-
-                changes
-            }
-            DatalistMessage::RemoveError(error) => {
-                self.errors.remove(&error);
-                true
-            }
-            DatalistMessage::Validate(data) => {
-                if let Some(timeout) = self.validation_timeout.take() {
-                    timeout.cancel();
-                }
-
-                let mut change = false;
-
-                if !self.errors.is_empty() {
-                    self.errors.clear();
-                    change = true;
-                }
-
-                if let Err(errors) = data {
-                    for error in errors {
-                        self.errors.insert(error);
-                    }
-                    self.is_valid = Some(false);
-                    return true;
-                }
-
-                let data = data.unwrap();
-
-                // TODO! CONVERT INTO A CHECK ON THE DB!
-                // if let Err(errors) = data.validate() {
-                //     for error in errors.convert_to_string() {
-                //         self.errors.insert(error);
-                //     }
-                //     self.is_valid = Some(false);
-                //     change = true;
-                // }
-
-                if self.is_valid != Some(true) {
-                    self.is_valid = Some(true);
-                    change = true;
-                }
-
-                change
-            }
-            DatalistMessage::StartValidationTimeout(data) => {
-                let link = ctx.link().clone();
-                if let Some(timeout) = self.validation_timeout.take() {
-                    timeout.cancel();
-                }
-                self.validation_timeout = Some(Timeout::new(200, move || {
-                    link.send_message(DatalistMessage::Validate(data));
-                }));
-                false
             }
             DatalistMessage::SearchCandidates => {
                 // If ths system has already returned a list of candidates that is
@@ -226,8 +158,9 @@ where
                 //     return false;
                 // }
                 let query = self.current_value.clone().unwrap_or_else(|| "".to_string());
-                self.websocket
-                    .send(Data::search_task(query, ctx.props().number_of_candidates).into());
+                self.websocket.send(ComponentMessage::Operation(
+                    Data::search_task(query, ctx.props().number_of_candidates).into(),
+                ));
                 self.number_of_search_queries += 1;
                 false
             }
@@ -325,11 +258,6 @@ where
                     .value();
 
                 link.send_message(DatalistMessage::UpdateCurrentValue(value.clone()));
-
-                if props.optional && value.is_empty() {
-                    link.send_message(DatalistMessage::RemoveErrors);
-                    return;
-                }
             })
         };
 
@@ -340,37 +268,7 @@ where
             })
         };
 
-        let on_blur = {
-            let link = ctx.link().clone();
-            let props = ctx.props().clone();
-            Callback::from(move |input_event: FocusEvent| {
-                input_event.prevent_default();
-
-                // We extract the current value of the input field
-                let value = input_event
-                    .target()
-                    .unwrap()
-                    .dyn_into::<web_sys::HtmlInputElement>()
-                    .unwrap()
-                    .value();
-
-                if props.optional && value.is_empty() {
-                    link.send_message(DatalistMessage::RemoveErrors);
-                    return;
-                }
-                // link.send_message(DatalistMessage::Blur);
-                // link.send_message(DatalistMessage::StartValidationTimeout(data));
-            })
-        };
-
         let input_value = self.current_value.clone().unwrap_or_else(|| "".to_string());
-
-        let on_delete = {
-            let link = ctx.link().clone();
-            Callback::from(move |error: String| {
-                link.send_message(DatalistMessage::RemoveError(error));
-            })
-        };
 
         let current_value = self
             .current_value
@@ -397,7 +295,6 @@ where
                         placeholder={props.placeholder.clone().unwrap_or_else(|| props.label())}
                         oninput={on_input}
                         onfocus={on_focus}
-                        onblur={on_blur}
                         autocomplete="off"
                         spellcheck="false"
                         id={props.normalized_label()}
@@ -520,8 +417,45 @@ where
                         }
                     }}
                 }}
-                <InputErrors errors={self.errors.clone()} on_delete={on_delete} />
+                <InputErrors errors={self.errors.clone()} />
             </div>
         }
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct DatalistProp<Data>
+where
+    Data: 'static + Clone + PartialEq,
+{
+    pub label: String,
+    pub builder: Callback<Option<Data>>,
+    pub errors: Vec<ApiError>,
+    #[prop_or(true)]
+    pub show_label: bool,
+    #[prop_or_default]
+    pub placeholder: Option<String>,
+    #[prop_or_default]
+    pub value: Option<Data>,
+    #[prop_or(false)]
+    pub optional: bool,
+    #[prop_or(10)]
+    pub number_of_candidates: u32,
+}
+
+#[function_component(Datalist)]
+pub fn datalist<Data>(props: &DatalistProp<Data>) -> Html
+where
+    Data: 'static + Clone + PartialEq + DeserializeOwned + Searchable + RowToBadge,
+{
+    let builder_callback = {
+        let old_builder = props.builder.clone();
+        Callback::from(move |mut data: Vec<Data>| {
+            old_builder.emit(data.pop());
+        })
+    };
+
+    html! {
+        <MultiDatalist<Data> label={props.label.clone()} builder={builder_callback} errors={props.errors.clone()} show_label={props.show_label} placeholder={props.placeholder.clone()} value={props.value.clone().map_or_else(|| Vec::new(), |value| vec![value])} optional={props.optional} number_of_candidates={props.number_of_candidates} />
     }
 }

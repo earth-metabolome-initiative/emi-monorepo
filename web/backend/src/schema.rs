@@ -148,29 +148,6 @@ diesel::table! {
 }
 
 diesel::table! {
-    item_continuous_quantities (id) {
-        id -> Uuid,
-        item_id -> Uuid,
-        amount -> Int4,
-        unit_id -> Int4,
-        sensor_id -> Nullable<Uuid>,
-        measured_at -> Timestamp,
-        measured_by -> Nullable<Int4>,
-    }
-}
-
-diesel::table! {
-    item_discrete_quantities (id) {
-        id -> Uuid,
-        item_id -> Uuid,
-        quantity -> Int4,
-        unit_id -> Int4,
-        measured_at -> Timestamp,
-        measured_by -> Nullable<Int4>,
-    }
-}
-
-diesel::table! {
     item_locations (id) {
         id -> Uuid,
         item_id -> Nullable<Uuid>,
@@ -264,28 +241,6 @@ diesel::table! {
 diesel::table! {
     primary_user_emails (id) {
         id -> Int4,
-    }
-}
-
-diesel::table! {
-    procedure_continuous_requirements (id) {
-        id -> Int4,
-        created_by -> Int4,
-        procedure_id -> Int4,
-        item_category_id -> Int4,
-        quantity -> Int4,
-        unit_id -> Nullable<Int4>,
-    }
-}
-
-diesel::table! {
-    procedure_discrete_requirements (id) {
-        id -> Int4,
-        created_by -> Int4,
-        procedure_id -> Int4,
-        item_category_id -> Int4,
-        quantity -> Int4,
-        unit_id -> Nullable<Int4>,
     }
 }
 
@@ -404,7 +359,7 @@ diesel::table! {
 }
 
 diesel::table! {
-    spectra_collection (id) {
+    spectra_collections (id) {
         id -> Int4,
         sample_id -> Uuid,
         created_by -> Int4,
@@ -475,13 +430,6 @@ diesel::joinable!(item_categories -> users (created_by));
 diesel::joinable!(item_category_relationships -> users (added_by));
 diesel::joinable!(item_category_units -> item_categories (item_category_id));
 diesel::joinable!(item_category_units -> units (unit_id));
-diesel::joinable!(item_continuous_quantities -> continuous_units (unit_id));
-diesel::joinable!(item_continuous_quantities -> units (unit_id));
-diesel::joinable!(item_continuous_quantities -> users (measured_by));
-diesel::joinable!(item_discrete_quantities -> discrete_units (unit_id));
-diesel::joinable!(item_discrete_quantities -> items (item_id));
-diesel::joinable!(item_discrete_quantities -> units (unit_id));
-diesel::joinable!(item_discrete_quantities -> users (measured_by));
 diesel::joinable!(item_locations -> items (item_id));
 diesel::joinable!(item_locations -> locations (location_id));
 diesel::joinable!(item_locations -> users (located_by));
@@ -490,16 +438,6 @@ diesel::joinable!(item_units -> units (unit_id));
 diesel::joinable!(manufactured_item_categories -> organizations (manifacturer_id));
 diesel::joinable!(notifications -> users (user_id));
 diesel::joinable!(primary_user_emails -> user_emails (id));
-diesel::joinable!(procedure_continuous_requirements -> continuous_units (unit_id));
-diesel::joinable!(procedure_continuous_requirements -> item_categories (item_category_id));
-diesel::joinable!(procedure_continuous_requirements -> procedures (procedure_id));
-diesel::joinable!(procedure_continuous_requirements -> units (unit_id));
-diesel::joinable!(procedure_continuous_requirements -> users (created_by));
-diesel::joinable!(procedure_discrete_requirements -> discrete_units (unit_id));
-diesel::joinable!(procedure_discrete_requirements -> item_categories (item_category_id));
-diesel::joinable!(procedure_discrete_requirements -> procedures (procedure_id));
-diesel::joinable!(procedure_discrete_requirements -> units (unit_id));
-diesel::joinable!(procedure_discrete_requirements -> users (created_by));
 diesel::joinable!(procedures -> users (created_by));
 diesel::joinable!(project_requirements -> item_categories (item_category_id));
 diesel::joinable!(project_requirements -> projects (project_id));
@@ -516,9 +454,9 @@ diesel::joinable!(sampled_individual_bio_ott_taxon_items -> users (created_by));
 diesel::joinable!(samples -> sample_states (state));
 diesel::joinable!(samples -> sampling_procedures (procedure_id));
 diesel::joinable!(sampling_procedures -> users (created_by));
-diesel::joinable!(spectra -> spectra_collection (spectra_collection_id));
-diesel::joinable!(spectra_collection -> samples (sample_id));
-diesel::joinable!(spectra_collection -> users (created_by));
+diesel::joinable!(spectra -> spectra_collections (spectra_collection_id));
+diesel::joinable!(spectra_collections -> samples (sample_id));
+diesel::joinable!(spectra_collections -> users (created_by));
 diesel::joinable!(user_emails -> login_providers (login_provider_id));
 diesel::joinable!(user_emails -> users (user_id));
 
@@ -537,8 +475,6 @@ diesel::allow_tables_to_appear_in_same_query!(
     item_categories,
     item_category_relationships,
     item_category_units,
-    item_continuous_quantities,
-    item_discrete_quantities,
     item_locations,
     item_units,
     items,
@@ -548,8 +484,6 @@ diesel::allow_tables_to_appear_in_same_query!(
     notifications,
     organizations,
     primary_user_emails,
-    procedure_continuous_requirements,
-    procedure_discrete_requirements,
     procedures,
     project_requirements,
     project_states,
@@ -562,7 +496,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     samples,
     sampling_procedures,
     spectra,
-    spectra_collection,
+    spectra_collections,
     team_states,
     teams,
     units,

@@ -1,9 +1,14 @@
+use crate::components::forms::FormBuildable;
+
 use super::database_type::*;
 use futures::{SinkExt, StreamExt};
 use gloo::timers::callback::Timeout;
 use gloo_net::websocket::futures::WebSocket;
 use gluesql::prelude::*;
+use web_common::database::NestedPublicUser;
 // use sql_minifier::macros::load_sql;
+use serde::Deserialize;
+use serde::Serialize;
 use std::collections::HashMap;
 use std::collections::HashSet;
 use uuid::Uuid;
@@ -16,25 +21,54 @@ use web_common::database::NotificationMessage;
 use web_common::database::Operation;
 use web_common::database::Select;
 use web_common::database::Table;
-use web_common::database::Task;
 use yew::platform::spawn_local;
 use yew_agent::worker::HandlerId;
 use yew_agent::worker::Worker;
 
 const NOMINAL_CLOSURE_CODE: u16 = 1000;
 
+type UserId = i32;
+type DatabaseMessage = (Uuid, Option<UserId>, Operation);
+
 pub struct WebsocketWorker {
     subscribers: HashSet<HandlerId>,
     tasks: HashMap<Uuid, HandlerId>,
-    database: Option<Database>,
-    database_sender: futures::channel::mpsc::Sender<FrontendMessage>,
+    user: Option<NestedPublicUser>,
+    database_sender: futures::channel::mpsc::Sender<DatabaseMessage>,
     websocket_sender: Option<futures::channel::mpsc::Sender<FrontendMessage>>,
     reconnection_attempt: u32,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+/// Messages from the frontend to the web-worker.
+pub enum ComponentMessage {
+    Operation(Operation),
+}
+
+impl ComponentMessage {
+    pub(crate) fn insert<R: Serialize + FormBuildable>(row: &R) -> Self {
+        Self::Operation(Operation::Insert(
+            R::TABLE,
+            bincode::serialize(row).unwrap(),
+        ))
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+/// Messages from the websocket web-worker to the frontend.
+pub enum WebsocketMessage {
+    Notification(NotificationMessage),
+    SearchTable(Vec<Vec<u8>>),
+    GetTable(Vec<u8>),
+    AllTable(Vec<Vec<u8>>),
+    Completed,
+    Error(ApiError),
+    RefreshUser(NestedPublicUser),
+}
+
 pub enum InternalMessage {
     Backend(BackendMessage),
-    Frontend(HandlerId, FrontendMessage),
+    Frontend(HandlerId, ComponentMessage),
     Disconnect(Option<CloseReason>),
     Reconnect,
 }
@@ -42,107 +76,91 @@ pub enum InternalMessage {
 impl WebsocketWorker {
     fn connect_to_database(
         scope: yew_agent::prelude::WorkerScope<Self>,
-    ) -> futures::channel::mpsc::Sender<FrontendMessage> {
-        let (sender, mut receiver) = futures::channel::mpsc::channel::<FrontendMessage>(1000);
+    ) -> futures::channel::mpsc::Sender<DatabaseMessage> {
+        let (sender, mut receiver) = futures::channel::mpsc::channel::<DatabaseMessage>(1000);
 
         spawn_local(async move {
             let mut database = create_database().await;
 
-            while let Some(message) = receiver.next().await {
-                match message {
-                    FrontendMessage::Task(Task {
-                        id,
-                        start,
-                        attempts,
-                        operation,
-                    }) => {
-                        scope.send_message(InternalMessage::Backend(match operation {
-                            Operation::Delete(table, primary_key) => {
-                                match table.delete(primary_key, &mut database).await {
-                                    Ok(row) => BackendMessage::Notification(
-                                        NotificationMessage::without_row(Notification {
-                                            id: 0,
-                                            user_id: -1,
-                                            operation: "DELETE".to_string(),
-                                            table_name: table.to_string(),
-                                            read: false,
-                                        }),
-                                    ),
-                                    Err(err) => BackendMessage::Error(id, ApiError::from(err)),
-                                }
-                            }
-                            Operation::Insert(insert) => {
-                                // table.insert(insert)
-                                todo!()
-                            }
-                            Operation::Select(select) => {
-                                match select {
-                                    Select::Id {
-                                        table_name,
-                                        primary_key,
-                                    } => {
-                                        let table: Table = table_name.try_into().unwrap();
+            while let Some((task_id, user_id, operation)) = receiver.next().await {
+                // TODO!
+                // HANDLE THAT THE USER IS AUTHORIZED TO DO THE OPERATION!
+                // DO NOT ALLOW OFFLINE USERS TO DO ILLEGAL OPERATIONS!
 
-                                        match table.get(primary_key, &mut database).await {
-                                            Ok(Some(row)) => BackendMessage::GetTable(id, row),
-                                            Ok(None) => BackendMessage::Error(
-                                                id,
-                                                ApiError::BadRequest(vec![
-                                                    "No row found with the given primary key"
-                                                        .to_string(),
-                                                ]),
-                                            ),
-                                            Err(err) => {
-                                                BackendMessage::Error(id, err)
-                                            }
-                                        }
-                                    }
-                                    Select::All {
-                                        table_name,
-                                        limit,
-                                        offset,
-                                    } => {
-                                        let table: Table = table_name.try_into().unwrap();
-
-                                        match table
-                                            .all(Some(limit), Some(offset), &mut database)
-                                            .await
-                                        {
-                                            Ok(rows) => BackendMessage::AllTable(id, rows),
-                                            Err(err) => {
-                                                BackendMessage::Error(id, err)
-                                            }
-                                        }
-                                    }
-                                    Select::SearchTable {
-                                        table_name,
-                                        query,
-                                        number_of_results,
-                                    } => {
-                                        let table: Table = table_name.try_into().unwrap();
-
-                                        // Since GlueSQL does not support search queries, and we do not expect for the
-                                        // frontend side to ever need to search a very large table, we always return all
-                                        // of the rows in the table and then we let the datalist UI component handle the
-                                        // search directly. Still, just in case something unexpected happens, we limit the
-                                        // number of rows returned to 1_000.
-                                        match table.all(Some(1_000), None, &mut database).await {
-                                            Ok(rows) => BackendMessage::SearchTable(id, rows),
-                                            Err(err) => {
-                                                BackendMessage::Error(id, err)
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            Operation::Update(update) => {
-                                // table.update(update)
-                                todo!()
-                            }
-                        }));
+                scope.send_message(InternalMessage::Backend(match operation {
+                    Operation::Delete(table, primary_key) => {
+                        match table.delete(primary_key, &mut database).await {
+                            Ok(row) => BackendMessage::Notification(
+                                NotificationMessage::without_row(Notification {
+                                    id: 0,
+                                    user_id: user_id.unwrap(),
+                                    operation: "DELETE".to_string(),
+                                    table_name: table.to_string(),
+                                    read: false,
+                                }),
+                            ),
+                            Err(err) => BackendMessage::Error(task_id, ApiError::from(err)),
+                        }
                     }
-                    FrontendMessage::Close(_) => {}
-                }
+                    Operation::Insert(insert, serialized_row) => {
+                        // table.insert(insert)
+                        todo!()
+                    }
+                    Operation::Select(select) => {
+                        match select {
+                            Select::Id {
+                                table_name,
+                                primary_key,
+                            } => {
+                                let table: Table = table_name.try_into().unwrap();
+
+                                match table.get(primary_key, &mut database).await {
+                                    Ok(Some(row)) => BackendMessage::GetTable(task_id, row),
+                                    Ok(None) => BackendMessage::Error(
+                                        task_id,
+                                        ApiError::BadRequest(vec![
+                                            "No row found with the given primary key".to_string(),
+                                        ]),
+                                    ),
+                                    Err(err) => BackendMessage::Error(task_id, err),
+                                }
+                            }
+                            Select::All {
+                                table_name,
+                                limit,
+                                offset,
+                            } => {
+                                let table: Table = table_name.try_into().unwrap();
+
+                                match table.all(Some(limit), Some(offset), &mut database).await {
+                                    Ok(rows) => BackendMessage::AllTable(task_id, rows),
+                                    Err(err) => BackendMessage::Error(task_id, err),
+                                }
+                            }
+                            Select::SearchTable {
+                                table_name,
+                                query,
+                                number_of_results,
+                            } => {
+                                let table: Table = table_name.try_into().unwrap();
+
+                                // Since GlueSQL does not support search queries, and we do not expect for the
+                                // frontend side to ever need to search a very large table, we always return all
+                                // of the rows in the table and then we let the datalist UI component handle the
+                                // search directly. Still, just in case something unexpected happens, we limit the
+                                // number of rows returned to 1_000.
+                                match table.all(Some(1_000), None, &mut database).await {
+                                    Ok(rows) => BackendMessage::SearchTable(task_id, rows),
+                                    Err(err) => BackendMessage::Error(task_id, err),
+                                }
+                            }
+                        }
+                    }
+                    Operation::Update(update) => {
+                        // table.update(update)
+                        todo!()
+                    }
+                }));
             }
             log::debug!("Database sender closed");
         });
@@ -189,16 +207,14 @@ impl WebsocketWorker {
             spawn_local(async move {
                 while let Some(backend_message) = read.next().await {
                     match backend_message {
-                        Ok(message) => {
-                            match message.try_into() {
-                                Ok(message) => {
-                                    scope.send_message(InternalMessage::Backend(message));
-                                }
-                                Err(err) => {
-                                    log::error!("Error deserializing message: {:?}", err);
-                                }
+                        Ok(message) => match message.try_into() {
+                            Ok(message) => {
+                                scope.send_message(InternalMessage::Backend(message));
                             }
-                        }
+                            Err(err) => {
+                                log::error!("Error deserializing message: {:?}", err);
+                            }
+                        },
                         Err(err) => {
                             log::error!("Error reading from websocket: {:?}", err);
                             break;
@@ -215,16 +231,16 @@ impl WebsocketWorker {
 
 impl Worker for WebsocketWorker {
     type Message = InternalMessage;
-    type Input = FrontendMessage;
-    type Output = BackendMessage;
+    type Input = ComponentMessage;
+    type Output = WebsocketMessage;
 
     fn create(scope: &yew_agent::prelude::WorkerScope<Self>) -> Self {
         Self {
             subscribers: HashSet::new(),
             tasks: HashMap::new(),
+            user: None,
             websocket_sender: Self::connect_to_websocket(&scope).ok(),
             database_sender: Self::connect_to_database(scope.clone()),
-            database: None,
             reconnection_attempt: 0,
         }
     }
@@ -243,13 +259,13 @@ impl Worker for WebsocketWorker {
                     BackendMessage::Completed(task_id) => {
                         // We can remove this task from the queue.
                         if let Some(subscriber_id) = self.tasks.remove(&task_id) {
-                            scope.respond(subscriber_id, BackendMessage::Completed(task_id));
+                            scope.respond(subscriber_id, WebsocketMessage::Completed);
                         }
                     }
                     BackendMessage::Error(task_id, error) => {
                         // We can remove this task from the queue.
                         if let Some(subscriber_id) = self.tasks.remove(&task_id) {
-                            scope.respond(subscriber_id, BackendMessage::Error(task_id, error));
+                            scope.respond(subscriber_id, WebsocketMessage::Error(error));
                         }
                     }
                     BackendMessage::Close(close_reason) => {
@@ -260,39 +276,61 @@ impl Worker for WebsocketWorker {
                         // We save locally the table data (maybe?)
                         // We can remove this task from the queue.
                         if let Some(subscriber_id) = self.tasks.remove(&task_id) {
-                            scope.respond(subscriber_id, BackendMessage::GetTable(task_id, row));
+                            scope.respond(subscriber_id, WebsocketMessage::GetTable(row));
                         }
                     }
                     BackendMessage::AllTable(task_id, rows) => {
                         // We save locally the table data (maybe?)
                         if let Some(subscriber_id) = self.tasks.remove(&task_id) {
-                            scope.respond(subscriber_id, BackendMessage::AllTable(task_id, rows));
+                            scope.respond(subscriber_id, WebsocketMessage::AllTable(rows));
                         }
                     }
                     BackendMessage::SearchTable(task_id, rows) => {
                         // We save locally the search results (maybe?)
                         if let Some(subscriber_id) = self.tasks.remove(&task_id) {
-                            scope.respond(subscriber_id, BackendMessage::SearchTable(task_id, rows));
+                            scope.respond(subscriber_id, WebsocketMessage::SearchTable(rows));
                         }
                     }
                     BackendMessage::RefreshUser(user) => {
+                        self.user = Some(user.clone());
+
                         // We need to update the access token in the user state.
                         for sub in &self.subscribers {
-                            scope.respond(*sub, BackendMessage::RefreshUser(user.clone()));
+                            scope.respond(*sub, WebsocketMessage::RefreshUser(user.clone()));
                         }
                     }
                 };
             }
             InternalMessage::Frontend(subscribed_id, message) => {
-                if let FrontendMessage::Task(task) = &message {
-                    self.tasks.insert(task.id(), subscribed_id);
-                }
-                if self
-                    .websocket_sender
-                    .as_mut()
-                    .map_or(true, |sender| sender.try_send(message.clone()).is_err())
-                {
-                    self.database_sender.try_send(message).unwrap();
+                match message {
+                    ComponentMessage::Operation(operation) => {
+                        if operation.requires_authentication() && self.user.is_none() {
+                            // When the user is offline, but some operation requires authentication, we need to
+                            // return an error.
+                            scope.respond(
+                                subscribed_id,
+                                WebsocketMessage::Error(ApiError::Unauthorized),
+                            );
+                            return;
+                        }
+
+                        // TODO! Add here the task to the client database!
+                        let task_id = Uuid::new_v4();
+                        self.tasks.insert(task_id, subscribed_id);
+                        if self.websocket_sender.as_mut().map_or(true, |sender| {
+                            sender
+                                .try_send(FrontendMessage::Task(task_id, operation.clone()))
+                                .is_err()
+                        }) {
+                            self.database_sender
+                                .try_send((
+                                    task_id,
+                                    self.user.as_ref().map(|user| user.inner.id),
+                                    operation,
+                                ))
+                                .unwrap();
+                        }
+                    }
                 }
             }
             InternalMessage::Disconnect(_closure_code) => {

@@ -1,12 +1,14 @@
 //! Module providing a yew component that handles a basic input, which is meant to be used in combination with BasicForm.
 
 use wasm_bindgen::JsCast;
+use web_common::api::ApiError;
 use yew::prelude::*;
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct CheckboxProp {
     pub label: String,
     pub builder: Callback<bool>,
+    pub errors: Vec<ApiError>,
     #[prop_or(true)]
     pub show_label: bool,
     #[prop_or_default]

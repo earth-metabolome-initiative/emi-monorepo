@@ -1,9 +1,6 @@
 //! Submodule providing select queries, such as `Id` and `Search` queries.
 
 use serde::{Deserialize, Serialize};
-use crate::api::ws::messages::FrontendMessage;
-use crate::database::Operation;
-use crate::database::Task;
 
 use super::PrimaryKey;
 
@@ -63,13 +60,5 @@ impl Select {
 impl From<Select> for super::Operation {
     fn from(select: Select) -> Self {
         Self::Select(select)
-    }
-}
-
-impl From<Select> for FrontendMessage {
-    fn from(select: Select) -> Self {
-        let operation: Operation = select.into();
-        let task: Task = operation.into();
-        task.into()
     }
 }

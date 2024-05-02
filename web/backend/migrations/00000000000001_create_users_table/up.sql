@@ -1,7 +1,7 @@
 -- Your SQL goes here
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE IF NOT EXISTS users (
-    id SERIAL PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
     first_name VARCHAR NOT NULL DEFAULT '',
     middle_name VARCHAR,
     last_name VARCHAR NOT NULL DEFAULT '',

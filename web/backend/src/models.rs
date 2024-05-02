@@ -1466,6 +1466,93 @@ impl DocumentFormat {
             .filter(document_formats::dsl::extension.eq(extension))
             .first::<Self>(connection)
     }
+    /// Search for the struct by a given string by Postgres's `similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, extension, mime_type FROM document_formats ",
+            "WHERE $1 % f_concat_document_formats_extension_mime_type((extension)::text, (mime_type)::text) ",
+            "ORDER BY similarity($1, f_concat_document_formats_extension_mime_type((extension)::text, (mime_type)::text)) DESC LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, extension, mime_type FROM document_formats ",
+            "WHERE $1 <% f_concat_document_formats_extension_mime_type((extension)::text, (mime_type)::text) ",
+            "ORDER BY word_similarity($1, f_concat_document_formats_extension_mime_type((extension)::text, (mime_type)::text)) DESC LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, extension, mime_type FROM document_formats ",
+            "WHERE $1 <<% f_concat_document_formats_extension_mime_type((extension)::text, (mime_type)::text) ",
+            "ORDER BY strict_word_similarity($1, f_concat_document_formats_extension_mime_type((extension)::text, (mime_type)::text)) DESC LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
 }
 #[derive(Queryable, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default, Identifiable, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = documents)]
@@ -1955,6 +2042,93 @@ impl ItemCategory {
             .filter(item_categories::dsl::name.eq(name))
             .first::<Self>(connection)
     }
+    /// Search for the struct by a given string by Postgres's `similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, name, description, created_by FROM item_categories ",
+            "WHERE $1 % f_concat_item_categories_name_description(name, description) ",
+            "ORDER BY similarity($1, f_concat_item_categories_name_description(name, description)) DESC LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, name, description, created_by FROM item_categories ",
+            "WHERE $1 <% f_concat_item_categories_name_description(name, description) ",
+            "ORDER BY word_similarity($1, f_concat_item_categories_name_description(name, description)) DESC LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, name, description, created_by FROM item_categories ",
+            "WHERE $1 <<% f_concat_item_categories_name_description(name, description) ",
+            "ORDER BY strict_word_similarity($1, f_concat_item_categories_name_description(name, description)) DESC LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
 }
 #[derive(Queryable, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default, Identifiable, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = item_category_relationships)]
@@ -2190,261 +2364,6 @@ impl ItemCategoryUnit {
         use crate::schema::item_category_units;
         item_category_units::dsl::item_category_units
             .filter(item_category_units::dsl::id.eq(id))
-            .first::<Self>(connection)
-    }
-}
-#[derive(Queryable, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default, Identifiable, QueryableByName, Insertable, Selectable, AsChangeset)]
-#[diesel(table_name = item_continuous_quantities)]
-pub struct ItemContinuousQuantity {
-    pub id: Uuid,
-    pub item_id: Uuid,
-    pub amount: i32,
-    pub unit_id: i32,
-    pub sensor_id: Option<Uuid>,
-    pub measured_at: NaiveDateTime,
-    pub measured_by: Option<i32>,
-}
-
-impl From<ItemContinuousQuantity> for web_common::database::tables::ItemContinuousQuantity {
-    fn from(item: ItemContinuousQuantity) -> Self {
-        Self {
-            id: item.id,
-            item_id: item.item_id,
-            amount: item.amount,
-            unit_id: item.unit_id,
-            sensor_id: item.sensor_id,
-            measured_at: item.measured_at,
-            measured_by: item.measured_by,
-        }
-    }
-}
-
-impl From<web_common::database::tables::ItemContinuousQuantity> for ItemContinuousQuantity {
-    fn from(item: web_common::database::tables::ItemContinuousQuantity) -> Self {
-        Self {
-            id: item.id,
-            item_id: item.item_id,
-            amount: item.amount,
-            unit_id: item.unit_id,
-            sensor_id: item.sensor_id,
-            measured_at: item.measured_at,
-            measured_by: item.measured_by,
-        }
-    }
-}
-
-impl ItemContinuousQuantity {
-    /// Get all of the structs from the database.
-    ///
-    /// # Arguments
-    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
-    /// * `offset` - The number of structs to skip. By default, this is 0.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn all(
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::item_continuous_quantities;
-       item_continuous_quantities::dsl::item_continuous_quantities
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-    }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(item_continuous_quantities::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(item_continuous_quantities::table)
-            .values(self)
-            .on_conflict(item_continuous_quantities::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(self.id, connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-        id: Uuid,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(item_continuous_quantities::dsl::item_continuous_quantities
-            .filter(item_continuous_quantities::dsl::id.eq(id))
-        ).execute(connection)
-    }
-    /// Get the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn get(
-        id: Uuid,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::item_continuous_quantities;
-        item_continuous_quantities::dsl::item_continuous_quantities
-            .filter(item_continuous_quantities::dsl::id.eq(id))
-            .first::<Self>(connection)
-    }
-}
-#[derive(Queryable, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default, Identifiable, QueryableByName, Insertable, Selectable, AsChangeset)]
-#[diesel(table_name = item_discrete_quantities)]
-pub struct ItemDiscreteQuantity {
-    pub id: Uuid,
-    pub item_id: Uuid,
-    pub quantity: i32,
-    pub unit_id: i32,
-    pub measured_at: NaiveDateTime,
-    pub measured_by: Option<i32>,
-}
-
-impl From<ItemDiscreteQuantity> for web_common::database::tables::ItemDiscreteQuantity {
-    fn from(item: ItemDiscreteQuantity) -> Self {
-        Self {
-            id: item.id,
-            item_id: item.item_id,
-            quantity: item.quantity,
-            unit_id: item.unit_id,
-            measured_at: item.measured_at,
-            measured_by: item.measured_by,
-        }
-    }
-}
-
-impl From<web_common::database::tables::ItemDiscreteQuantity> for ItemDiscreteQuantity {
-    fn from(item: web_common::database::tables::ItemDiscreteQuantity) -> Self {
-        Self {
-            id: item.id,
-            item_id: item.item_id,
-            quantity: item.quantity,
-            unit_id: item.unit_id,
-            measured_at: item.measured_at,
-            measured_by: item.measured_by,
-        }
-    }
-}
-
-impl ItemDiscreteQuantity {
-    /// Get all of the structs from the database.
-    ///
-    /// # Arguments
-    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
-    /// * `offset` - The number of structs to skip. By default, this is 0.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn all(
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::item_discrete_quantities;
-       item_discrete_quantities::dsl::item_discrete_quantities
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-    }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(item_discrete_quantities::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(item_discrete_quantities::table)
-            .values(self)
-            .on_conflict(item_discrete_quantities::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(self.id, connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-        id: Uuid,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(item_discrete_quantities::dsl::item_discrete_quantities
-            .filter(item_discrete_quantities::dsl::id.eq(id))
-        ).execute(connection)
-    }
-    /// Get the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn get(
-        id: Uuid,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::item_discrete_quantities;
-        item_discrete_quantities::dsl::item_discrete_quantities
-            .filter(item_discrete_quantities::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -3437,6 +3356,93 @@ impl Organization {
             .filter(organizations::dsl::id.eq(id))
             .first::<Self>(connection)
     }
+    /// Search for the struct by a given string by Postgres's `similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, parent_organization_id, name FROM organizations ",
+            "WHERE $1 % name ",
+            "ORDER BY similarity($1, name) DESC LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, parent_organization_id, name FROM organizations ",
+            "WHERE $1 <% name ",
+            "ORDER BY word_similarity($1, name) DESC LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, parent_organization_id, name FROM organizations ",
+            "WHERE $1 <<% name ",
+            "ORDER BY strict_word_similarity($1, name) DESC LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
 }
 #[derive(Queryable, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default, Identifiable, QueryableByName, Insertable, Selectable)]
 #[diesel(table_name = primary_user_emails)]
@@ -3530,258 +3536,6 @@ impl PrimaryUserEmail {
         use crate::schema::primary_user_emails;
         primary_user_emails::dsl::primary_user_emails
             .filter(primary_user_emails::dsl::id.eq(id))
-            .first::<Self>(connection)
-    }
-}
-#[derive(Queryable, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default, Identifiable, QueryableByName, Insertable, Selectable, AsChangeset)]
-#[diesel(table_name = procedure_continuous_requirements)]
-pub struct ProcedureContinuousRequirement {
-    pub id: i32,
-    pub created_by: i32,
-    pub procedure_id: i32,
-    pub item_category_id: i32,
-    pub quantity: i32,
-    pub unit_id: Option<i32>,
-}
-
-impl From<ProcedureContinuousRequirement> for web_common::database::tables::ProcedureContinuousRequirement {
-    fn from(item: ProcedureContinuousRequirement) -> Self {
-        Self {
-            id: item.id,
-            created_by: item.created_by,
-            procedure_id: item.procedure_id,
-            item_category_id: item.item_category_id,
-            quantity: item.quantity,
-            unit_id: item.unit_id,
-        }
-    }
-}
-
-impl From<web_common::database::tables::ProcedureContinuousRequirement> for ProcedureContinuousRequirement {
-    fn from(item: web_common::database::tables::ProcedureContinuousRequirement) -> Self {
-        Self {
-            id: item.id,
-            created_by: item.created_by,
-            procedure_id: item.procedure_id,
-            item_category_id: item.item_category_id,
-            quantity: item.quantity,
-            unit_id: item.unit_id,
-        }
-    }
-}
-
-impl ProcedureContinuousRequirement {
-    /// Get all of the structs from the database.
-    ///
-    /// # Arguments
-    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
-    /// * `offset` - The number of structs to skip. By default, this is 0.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn all(
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::procedure_continuous_requirements;
-       procedure_continuous_requirements::dsl::procedure_continuous_requirements
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-    }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(procedure_continuous_requirements::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(procedure_continuous_requirements::table)
-            .values(self)
-            .on_conflict(procedure_continuous_requirements::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(self.id, connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-        id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(procedure_continuous_requirements::dsl::procedure_continuous_requirements
-            .filter(procedure_continuous_requirements::dsl::id.eq(id))
-        ).execute(connection)
-    }
-    /// Get the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn get(
-        id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::procedure_continuous_requirements;
-        procedure_continuous_requirements::dsl::procedure_continuous_requirements
-            .filter(procedure_continuous_requirements::dsl::id.eq(id))
-            .first::<Self>(connection)
-    }
-}
-#[derive(Queryable, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default, Identifiable, QueryableByName, Insertable, Selectable, AsChangeset)]
-#[diesel(table_name = procedure_discrete_requirements)]
-pub struct ProcedureDiscreteRequirement {
-    pub id: i32,
-    pub created_by: i32,
-    pub procedure_id: i32,
-    pub item_category_id: i32,
-    pub quantity: i32,
-    pub unit_id: Option<i32>,
-}
-
-impl From<ProcedureDiscreteRequirement> for web_common::database::tables::ProcedureDiscreteRequirement {
-    fn from(item: ProcedureDiscreteRequirement) -> Self {
-        Self {
-            id: item.id,
-            created_by: item.created_by,
-            procedure_id: item.procedure_id,
-            item_category_id: item.item_category_id,
-            quantity: item.quantity,
-            unit_id: item.unit_id,
-        }
-    }
-}
-
-impl From<web_common::database::tables::ProcedureDiscreteRequirement> for ProcedureDiscreteRequirement {
-    fn from(item: web_common::database::tables::ProcedureDiscreteRequirement) -> Self {
-        Self {
-            id: item.id,
-            created_by: item.created_by,
-            procedure_id: item.procedure_id,
-            item_category_id: item.item_category_id,
-            quantity: item.quantity,
-            unit_id: item.unit_id,
-        }
-    }
-}
-
-impl ProcedureDiscreteRequirement {
-    /// Get all of the structs from the database.
-    ///
-    /// # Arguments
-    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
-    /// * `offset` - The number of structs to skip. By default, this is 0.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn all(
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::procedure_discrete_requirements;
-       procedure_discrete_requirements::dsl::procedure_discrete_requirements
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-    }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(procedure_discrete_requirements::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(procedure_discrete_requirements::table)
-            .values(self)
-            .on_conflict(procedure_discrete_requirements::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(self.id, connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-        id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(procedure_discrete_requirements::dsl::procedure_discrete_requirements
-            .filter(procedure_discrete_requirements::dsl::id.eq(id))
-        ).execute(connection)
-    }
-    /// Get the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The ID of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn get(
-        id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::procedure_discrete_requirements;
-        procedure_discrete_requirements::dsl::procedure_discrete_requirements
-            .filter(procedure_discrete_requirements::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -5606,7 +5360,7 @@ impl Spectra {
     }
 }
 #[derive(Queryable, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default, Identifiable, QueryableByName, Insertable, Selectable, AsChangeset)]
-#[diesel(table_name = spectra_collection)]
+#[diesel(table_name = spectra_collections)]
 pub struct SpectraCollection {
     pub id: i32,
     pub sample_id: Uuid,
@@ -5646,8 +5400,8 @@ impl SpectraCollection {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::spectra_collection;
-       spectra_collection::dsl::spectra_collection
+        use crate::schema::spectra_collections;
+       spectra_collections::dsl::spectra_collections
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -5661,7 +5415,7 @@ impl SpectraCollection {
         &self,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(spectra_collection::table)
+        diesel::insert_into(spectra_collections::table)
             .values(self)
             .get_result(connection)
     }
@@ -5674,9 +5428,9 @@ impl SpectraCollection {
         &self,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(spectra_collection::table)
+        diesel::insert_into(spectra_collections::table)
             .values(self)
-            .on_conflict(spectra_collection::dsl::id)
+            .on_conflict(spectra_collections::dsl::id)
             .do_update()
             .set(self)
             .get_result(connection)
@@ -5702,8 +5456,8 @@ impl SpectraCollection {
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(spectra_collection::dsl::spectra_collection
-            .filter(spectra_collection::dsl::id.eq(id))
+        diesel::delete(spectra_collections::dsl::spectra_collections
+            .filter(spectra_collections::dsl::id.eq(id))
         ).execute(connection)
     }
     /// Get the struct from the database by its ID.
@@ -5716,9 +5470,9 @@ impl SpectraCollection {
         id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::spectra_collection;
-        spectra_collection::dsl::spectra_collection
-            .filter(spectra_collection::dsl::id.eq(id))
+        use crate::schema::spectra_collections;
+        spectra_collections::dsl::spectra_collections
+            .filter(spectra_collections::dsl::id.eq(id))
             .first::<Self>(connection)
     }
 }
@@ -6303,6 +6057,93 @@ impl Unit {
             .filter(units::dsl::name.eq(name))
             .first::<Self>(connection)
     }
+    /// Search for the struct by a given string by Postgres's `similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, name, description, symbol FROM units ",
+            "WHERE $1 % f_concat_units_name_description_symbol(name, description, symbol) ",
+            "ORDER BY similarity($1, f_concat_units_name_description_symbol(name, description, symbol)) DESC LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, name, description, symbol FROM units ",
+            "WHERE $1 <% f_concat_units_name_description_symbol(name, description, symbol) ",
+            "ORDER BY word_similarity($1, f_concat_units_name_description_symbol(name, description, symbol)) DESC LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, name, description, symbol FROM units ",
+            "WHERE $1 <<% f_concat_units_name_description_symbol(name, description, symbol) ",
+            "ORDER BY strict_word_similarity($1, f_concat_units_name_description_symbol(name, description, symbol)) DESC LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
 }
 #[derive(Queryable, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default, Identifiable, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = user_emails)]

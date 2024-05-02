@@ -13,6 +13,8 @@ use std::fmt::Formatter;
 use validator::Validate;
 use validator::ValidationError;
 
+use crate::api::ApiError;
+
 #[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
 pub struct Image {
     data: Vec<u8>,
@@ -66,7 +68,7 @@ impl AsRef<[u8]> for Image {
 }
 
 pub trait TryFromImage: Sized {
-    fn try_from_image(image: Image) -> Result<Self, Vec<String>>;
+    fn try_from_image(image: Image) -> Result<Self, ApiError>;
 }
 
 impl Validate for Image {
@@ -84,9 +86,9 @@ impl Validate for Image {
 
 #[cfg(feature = "frontend")]
 impl crate::api::form_traits::TryFromCallback<web_sys::File> for Image {
-    fn try_from_callback<C>(file: web_sys::File, callback: C) -> Result<(), Vec<String>>
+    fn try_from_callback<C>(file: web_sys::File, callback: C) -> Result<(), ApiError>
     where
-        C: FnOnce(Result<Self, Vec<String>>) + 'static,
+        C: FnOnce(Result<Self, ApiError>) + 'static,
     {
         use wasm_bindgen::JsCast;
 
@@ -108,7 +110,7 @@ impl crate::api::form_traits::TryFromCallback<web_sys::File> for Image {
 
                 match Image::try_from(data) {
                     Ok(image) => callback(Ok(image)),
-                    Err(errors) => callback(Err(errors)),
+                    Err(errors) => callback(Err(ApiError::BadRequest(errors))),
                 };
             });
 
@@ -144,7 +146,7 @@ impl TryFrom<Vec<u8>> for Image {
 }
 
 impl TryFromImage for Image {
-    fn try_from_image(image: Image) -> Result<Self, Vec<String>> {
+    fn try_from_image(image: Image) -> Result<Self, ApiError> {
         Ok(image)
     }
 }

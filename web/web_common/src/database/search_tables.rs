@@ -24,6 +24,24 @@ impl Searchable for NestedBioOttTaxonItem {
         )
     }
 }
+impl Searchable for NestedItemCategory {
+    fn search_task(query: String, limit: u32) -> super::Select {
+        super::Select::search(
+             Table::ItemCategories,
+              query,
+              limit,
+        )
+    }
+}
+impl Searchable for NestedOrganization {
+    fn search_task(query: String, limit: u32) -> super::Select {
+        super::Select::search(
+             Table::Organizations,
+              query,
+              limit,
+        )
+    }
+}
 impl Searchable for NestedProject {
     fn search_task(query: String, limit: u32) -> super::Select {
         super::Select::search(
@@ -87,10 +105,37 @@ impl Searchable for Color {
         )
     }
 }
+impl Searchable for DocumentFormat {
+    fn search_task(query: String, limit: u32) -> super::Select {
+        super::Select::search(
+             Table::DocumentFormats,
+              query,
+              limit,
+        )
+    }
+}
 impl Searchable for FontAwesomeIcon {
     fn search_task(query: String, limit: u32) -> super::Select {
         super::Select::search(
              Table::FontAwesomeIcons,
+              query,
+              limit,
+        )
+    }
+}
+impl Searchable for ItemCategory {
+    fn search_task(query: String, limit: u32) -> super::Select {
+        super::Select::search(
+             Table::ItemCategories,
+              query,
+              limit,
+        )
+    }
+}
+impl Searchable for Organization {
+    fn search_task(query: String, limit: u32) -> super::Select {
+        super::Select::search(
+             Table::Organizations,
               query,
               limit,
         )
@@ -145,6 +190,15 @@ impl Searchable for Team {
     fn search_task(query: String, limit: u32) -> super::Select {
         super::Select::search(
              Table::Teams,
+              query,
+              limit,
+        )
+    }
+}
+impl Searchable for Unit {
+    fn search_task(query: String, limit: u32) -> super::Select {
+        super::Select::search(
+             Table::Units,
               query,
               limit,
         )

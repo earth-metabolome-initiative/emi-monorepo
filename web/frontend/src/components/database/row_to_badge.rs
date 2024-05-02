@@ -1,5 +1,25 @@
 //! Submodule defining a trait to be implemented by types that can be converted to a badge.
 
+pub mod project_states;
+pub mod sample_states;
+pub mod team_states;
+pub mod projects;
+pub mod public_users;
+pub mod sampling_procedures;
+pub mod bio_ott_taxon_items;
+pub mod font_awesome_icons;
+pub mod bio_ott_ranks;
+pub mod colors;
+pub mod item_categories;
+pub mod users;
+pub mod document_formats;
+pub mod units;
+pub mod organizations;
+pub mod teams;
+
+
+
+
 /// Trait for types that can be converted to a badge.
 pub trait RowToBadge {
     /// Convert the implementing type to a badge.

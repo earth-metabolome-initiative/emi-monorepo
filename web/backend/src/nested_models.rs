@@ -697,6 +697,48 @@ impl NestedItemCategory {
         ItemCategory::from_name(name, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
+impl NestedItemCategory {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       ItemCategory::similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedItemCategory {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       ItemCategory::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedItemCategory {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn strict_word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       ItemCategory::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
 impl From<web_common::database::nested_models::NestedItemCategory> for NestedItemCategory {
     fn from(item: web_common::database::nested_models::NestedItemCategory) -> Self {
         Self {
@@ -856,160 +898,6 @@ impl From<NestedItemCategoryUnit> for web_common::database::nested_models::Neste
             inner: item.inner.into(),
             item_category: item.item_category.into(),
             unit: item.unit.into(),
-        }
-    }
-}
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
-pub struct NestedItemContinuousQuantity {
-    pub inner: ItemContinuousQuantity,
-    pub item: NestedItem,
-    pub unit: Unit,
-    pub sensor: Option<NestedItem>,
-    pub measured_by: Option<User>,
-}
-
-impl NestedItemContinuousQuantity {
-    /// Convert the flat struct to the nested struct.
-    ///
-    /// # Arguments
-    /// * `flat_struct` - The flat struct.
-    /// * `connection` - The database connection.
-    pub fn from_flat(
-        flat_struct: ItemContinuousQuantity,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
-        Ok(Self {
-            item: NestedItem::get(flat_struct.item_id, connection)?,
-            unit: Unit::get(flat_struct.unit_id, connection)?,
-            sensor: flat_struct.sensor_id.map(|flat_struct| NestedItem::get(flat_struct, connection)).transpose()?,
-            measured_by: flat_struct.measured_by.map(|flat_struct| User::get(flat_struct, connection)).transpose()?,
-                inner: flat_struct,
-        })
-    }
-}
-impl NestedItemContinuousQuantity {
-    /// Get all the nested structs from the database.
-    ///
-    /// # Arguments
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        ItemContinuousQuantity::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
-    }
-}
-impl NestedItemContinuousQuantity {
-    /// Get the nested struct from the provided primary key.
-    ///
-    /// # Arguments
-    /// * `id` - The primary key of the row.
-    /// * `connection` - The database connection.
-    pub fn get(
-        id: uuid::Uuid,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       ItemContinuousQuantity::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
-    }
-}
-impl From<web_common::database::nested_models::NestedItemContinuousQuantity> for NestedItemContinuousQuantity {
-    fn from(item: web_common::database::nested_models::NestedItemContinuousQuantity) -> Self {
-        Self {
-            inner: item.inner.into(),
-            item: item.item.into(),
-            unit: item.unit.into(),
-            sensor: item.sensor.map(|item| item.into()),
-            measured_by: item.measured_by.map(|item| item.into()),
-        }
-    }
-}
-impl From<NestedItemContinuousQuantity> for web_common::database::nested_models::NestedItemContinuousQuantity {
-    fn from(item: NestedItemContinuousQuantity) -> Self {
-        Self {
-            inner: item.inner.into(),
-            item: item.item.into(),
-            unit: item.unit.into(),
-            sensor: item.sensor.map(|item| item.into()),
-            measured_by: item.measured_by.map(|item| item.into()),
-        }
-    }
-}
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
-pub struct NestedItemDiscreteQuantity {
-    pub inner: ItemDiscreteQuantity,
-    pub item: NestedItem,
-    pub unit: Unit,
-    pub measured_by: Option<User>,
-}
-
-impl NestedItemDiscreteQuantity {
-    /// Convert the flat struct to the nested struct.
-    ///
-    /// # Arguments
-    /// * `flat_struct` - The flat struct.
-    /// * `connection` - The database connection.
-    pub fn from_flat(
-        flat_struct: ItemDiscreteQuantity,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
-        Ok(Self {
-            item: NestedItem::get(flat_struct.item_id, connection)?,
-            unit: Unit::get(flat_struct.unit_id, connection)?,
-            measured_by: flat_struct.measured_by.map(|flat_struct| User::get(flat_struct, connection)).transpose()?,
-                inner: flat_struct,
-        })
-    }
-}
-impl NestedItemDiscreteQuantity {
-    /// Get all the nested structs from the database.
-    ///
-    /// # Arguments
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        ItemDiscreteQuantity::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
-    }
-}
-impl NestedItemDiscreteQuantity {
-    /// Get the nested struct from the provided primary key.
-    ///
-    /// # Arguments
-    /// * `id` - The primary key of the row.
-    /// * `connection` - The database connection.
-    pub fn get(
-        id: uuid::Uuid,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       ItemDiscreteQuantity::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
-    }
-}
-impl From<web_common::database::nested_models::NestedItemDiscreteQuantity> for NestedItemDiscreteQuantity {
-    fn from(item: web_common::database::nested_models::NestedItemDiscreteQuantity) -> Self {
-        Self {
-            inner: item.inner.into(),
-            item: item.item.into(),
-            unit: item.unit.into(),
-            measured_by: item.measured_by.map(|item| item.into()),
-        }
-    }
-}
-impl From<NestedItemDiscreteQuantity> for web_common::database::nested_models::NestedItemDiscreteQuantity {
-    fn from(item: NestedItemDiscreteQuantity) -> Self {
-        Self {
-            inner: item.inner.into(),
-            item: item.item.into(),
-            unit: item.unit.into(),
-            measured_by: item.measured_by.map(|item| item.into()),
         }
     }
 }
@@ -1486,6 +1374,48 @@ impl NestedOrganization {
        Organization::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
+impl NestedOrganization {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       Organization::similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedOrganization {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       Organization::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedOrganization {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn strict_word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       Organization::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
 impl From<web_common::database::nested_models::NestedOrganization> for NestedOrganization {
     fn from(item: web_common::database::nested_models::NestedOrganization) -> Self {
         Self {
@@ -1499,164 +1429,6 @@ impl From<NestedOrganization> for web_common::database::nested_models::NestedOrg
         Self {
             inner: item.inner.into(),
             parent_organization: item.parent_organization.map(|item| item.into()),
-        }
-    }
-}
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
-pub struct NestedProcedureContinuousRequirement {
-    pub inner: ProcedureContinuousRequirement,
-    pub created_by: User,
-    pub procedure: NestedProcedure,
-    pub item_category: NestedItemCategory,
-    pub unit: Option<Unit>,
-}
-
-impl NestedProcedureContinuousRequirement {
-    /// Convert the flat struct to the nested struct.
-    ///
-    /// # Arguments
-    /// * `flat_struct` - The flat struct.
-    /// * `connection` - The database connection.
-    pub fn from_flat(
-        flat_struct: ProcedureContinuousRequirement,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
-        Ok(Self {
-            created_by: User::get(flat_struct.created_by, connection)?,
-            procedure: NestedProcedure::get(flat_struct.procedure_id, connection)?,
-            item_category: NestedItemCategory::get(flat_struct.item_category_id, connection)?,
-            unit: flat_struct.unit_id.map(|flat_struct| Unit::get(flat_struct, connection)).transpose()?,
-                inner: flat_struct,
-        })
-    }
-}
-impl NestedProcedureContinuousRequirement {
-    /// Get all the nested structs from the database.
-    ///
-    /// # Arguments
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        ProcedureContinuousRequirement::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
-    }
-}
-impl NestedProcedureContinuousRequirement {
-    /// Get the nested struct from the provided primary key.
-    ///
-    /// # Arguments
-    /// * `id` - The primary key of the row.
-    /// * `connection` - The database connection.
-    pub fn get(
-        id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       ProcedureContinuousRequirement::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
-    }
-}
-impl From<web_common::database::nested_models::NestedProcedureContinuousRequirement> for NestedProcedureContinuousRequirement {
-    fn from(item: web_common::database::nested_models::NestedProcedureContinuousRequirement) -> Self {
-        Self {
-            inner: item.inner.into(),
-            created_by: item.created_by.into(),
-            procedure: item.procedure.into(),
-            item_category: item.item_category.into(),
-            unit: item.unit.map(|item| item.into()),
-        }
-    }
-}
-impl From<NestedProcedureContinuousRequirement> for web_common::database::nested_models::NestedProcedureContinuousRequirement {
-    fn from(item: NestedProcedureContinuousRequirement) -> Self {
-        Self {
-            inner: item.inner.into(),
-            created_by: item.created_by.into(),
-            procedure: item.procedure.into(),
-            item_category: item.item_category.into(),
-            unit: item.unit.map(|item| item.into()),
-        }
-    }
-}
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
-pub struct NestedProcedureDiscreteRequirement {
-    pub inner: ProcedureDiscreteRequirement,
-    pub created_by: User,
-    pub procedure: NestedProcedure,
-    pub item_category: NestedItemCategory,
-    pub unit: Option<Unit>,
-}
-
-impl NestedProcedureDiscreteRequirement {
-    /// Convert the flat struct to the nested struct.
-    ///
-    /// # Arguments
-    /// * `flat_struct` - The flat struct.
-    /// * `connection` - The database connection.
-    pub fn from_flat(
-        flat_struct: ProcedureDiscreteRequirement,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
-        Ok(Self {
-            created_by: User::get(flat_struct.created_by, connection)?,
-            procedure: NestedProcedure::get(flat_struct.procedure_id, connection)?,
-            item_category: NestedItemCategory::get(flat_struct.item_category_id, connection)?,
-            unit: flat_struct.unit_id.map(|flat_struct| Unit::get(flat_struct, connection)).transpose()?,
-                inner: flat_struct,
-        })
-    }
-}
-impl NestedProcedureDiscreteRequirement {
-    /// Get all the nested structs from the database.
-    ///
-    /// # Arguments
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        ProcedureDiscreteRequirement::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
-    }
-}
-impl NestedProcedureDiscreteRequirement {
-    /// Get the nested struct from the provided primary key.
-    ///
-    /// # Arguments
-    /// * `id` - The primary key of the row.
-    /// * `connection` - The database connection.
-    pub fn get(
-        id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       ProcedureDiscreteRequirement::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
-    }
-}
-impl From<web_common::database::nested_models::NestedProcedureDiscreteRequirement> for NestedProcedureDiscreteRequirement {
-    fn from(item: web_common::database::nested_models::NestedProcedureDiscreteRequirement) -> Self {
-        Self {
-            inner: item.inner.into(),
-            created_by: item.created_by.into(),
-            procedure: item.procedure.into(),
-            item_category: item.item_category.into(),
-            unit: item.unit.map(|item| item.into()),
-        }
-    }
-}
-impl From<NestedProcedureDiscreteRequirement> for web_common::database::nested_models::NestedProcedureDiscreteRequirement {
-    fn from(item: NestedProcedureDiscreteRequirement) -> Self {
-        Self {
-            inner: item.inner.into(),
-            created_by: item.created_by.into(),
-            procedure: item.procedure.into(),
-            item_category: item.item_category.into(),
-            unit: item.unit.map(|item| item.into()),
         }
     }
 }

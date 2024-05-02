@@ -4,7 +4,7 @@
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
-use crate::custom_validators::validation_errors::TryFromString;
+use crate::{api::ApiError, custom_validators::validation_errors::TryFromString};
 
 #[derive(Debug, Clone, Serialize, PartialEq, Eq, Default, Hash, Deserialize)]
 #[repr(transparent)]
@@ -20,7 +20,7 @@ pub struct ValidatableString {
 }
 
 impl TryFromString for ValidatableString {
-    fn try_from_string(value: String) -> Result<Self, Vec<String>> {
+    fn try_from_string(value: String) -> Result<Self, ApiError> {
         Ok(Self { value })
     }
 }

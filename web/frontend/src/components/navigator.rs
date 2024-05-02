@@ -22,8 +22,8 @@
 use crate::router::AppRoute;
 use crate::stores::app_state::AppState;
 use crate::stores::user_state::UserState;
+use crate::workers::ws_worker::WebsocketMessage;
 
-use web_common::api::ws::messages::*;
 use web_common::database::NestedPublicUser;
 use yew::prelude::*;
 use yew_agent::scope_ext::AgentScopeExt;
@@ -56,7 +56,7 @@ impl Navigator {
 }
 
 pub enum NavigatorMessage {
-    Backend(BackendMessage),
+    Backend(WebsocketMessage),
     UserState(Rc<UserState>),
     AppState(Rc<AppState>),
     ToggleSidebar,
@@ -82,7 +82,7 @@ impl Component for Navigator {
         Self {
             websocket: ctx.link().bridge_worker(Callback::from({
                 let link = ctx.link().clone();
-                move |message: BackendMessage| {
+                move |message: WebsocketMessage| {
                     link.send_message(NavigatorMessage::Backend(message));
                 }
             })),
@@ -93,7 +93,7 @@ impl Component for Navigator {
         }
     }
 
-    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             NavigatorMessage::UserState(user_state) => {
                 if self.user_state == user_state {
@@ -111,14 +111,14 @@ impl Component for Navigator {
 
                 true
             }
-            NavigatorMessage::Backend(BackendMessage::RefreshUser(user)) => {
+            NavigatorMessage::Backend(WebsocketMessage::RefreshUser(user)) => {
                 log::info!("Received new access token");
                 self.user_dispatch.reduce_mut(|state| {
                     state.set_user(user);
                 });
                 false
             }
-            NavigatorMessage::Backend(BackendMessage::Notification(notification)) => {
+            NavigatorMessage::Backend(WebsocketMessage::Notification(notification)) => {
                 log::info!("Received notification: {:?}", notification);
                 false
             }
@@ -167,7 +167,7 @@ impl Component for Navigator {
                                 // }}
                             </div>
                         } else {
-                            <Link<AppRoute> classes="right_nav_button" to={AppRoute::Profile}>{"Complete profile"}</Link<AppRoute>>
+                            <Link<AppRoute> classes="right_nav_button" to={AppRoute::Home}>{"Complete profile"}</Link<AppRoute>>
                         }
                     } else {
                         <Link<AppRoute> classes="right_nav_button" to={AppRoute::Login}>{"Login"}</Link<AppRoute>>

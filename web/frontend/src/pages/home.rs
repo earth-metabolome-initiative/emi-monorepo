@@ -11,10 +11,10 @@ pub fn home() -> Html {
     let (user, _dispatch) = use_store::<UserState>();
     let navigator = use_navigator().unwrap();
 
-    if user.has_incomplete_profile() {
-        // If the user is logged in, but has yet to complete their profile, we redirect them to the profile page.
-        navigator.push(&AppRoute::Profile);
-    }
+    // if user.has_incomplete_profile() {
+    //     // If the user is logged in, but has yet to complete their profile, we redirect them to the profile page.
+    //     navigator.push(&AppRoute::Profile);
+    // }
 
     html! {
         <div class="fullscreen_center_app">

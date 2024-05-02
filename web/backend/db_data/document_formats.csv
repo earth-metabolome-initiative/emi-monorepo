@@ -1,0 +1,10 @@
+extension,mine_type
+pdf,application/pdf
+jpg,image/jpeg
+png,image/png
+mgf,chemical/x-mgf
+jpeg,image/jpeg
+csv,text/csv
+txt,text/plain
+webp,image/webp
+json,application/json

@@ -1,11 +1,11 @@
 //! Submodule providing the file input component for the frontend.
 
-use std::collections::HashSet;
 use std::hash::DefaultHasher;
 use std::hash::Hash;
 use std::hash::Hasher;
 
 use super::InputErrors;
+use crate::workers::ws_worker::WebsocketMessage;
 use crate::workers::WebsocketWorker;
 use gloo::timers::callback::Timeout;
 use validator::Validate;
@@ -13,7 +13,7 @@ use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
 use wasm_bindgen::JsValue;
 use web_common::api::form_traits::TryFromCallback;
-use web_common::api::ws::messages::*;
+use web_common::api::ApiError;
 use web_common::file_formats::GenericFileFormat;
 use yew::prelude::*;
 use yew_agent::prelude::WorkerBridgeHandle;
@@ -84,7 +84,7 @@ where
 
 pub struct FileInput<Data> {
     _websocket: WorkerBridgeHandle<WebsocketWorker>,
-    errors: HashSet<String>,
+    errors: Vec<ApiError>,
     is_valid: Option<bool>,
     validation_timeout: Option<Timeout>,
     files: Vec<web_sys::File>,
@@ -96,10 +96,8 @@ pub struct FileInput<Data> {
 }
 
 pub enum FileInputMessage<Data> {
-    Backend(BackendMessage),
-    RemoveError(String),
-    RemoveErrors,
-    Validate(Result<(web_sys::File, Data), Vec<String>>),
+    Backend(WebsocketMessage),
+    Validate(Result<(web_sys::File, Data), ApiError>),
     Files(web_sys::FileList),
     FilesRemoved(usize),
     SetTimeoutDropAreaVisibility(bool),
@@ -150,11 +148,11 @@ where
         Self {
             _websocket: ctx.link().bridge_worker(Callback::from({
                 let link = ctx.link().clone();
-                move |message: BackendMessage| {
+                move |message: WebsocketMessage| {
                     link.send_message(FileInputMessage::Backend(message));
                 }
             })),
-            errors: HashSet::new(),
+            errors: Vec::new(),
             is_valid: None,
             validation_timeout: None,
             files: Vec::new(),
@@ -176,21 +174,6 @@ where
                 } else {
                     false
                 }
-            }
-            FileInputMessage::RemoveErrors => {
-                let mut changes = false;
-
-                if !self.errors.is_empty() {
-                    self.errors.clear();
-                    changes = true;
-                }
-
-                if self.is_valid.is_some() {
-                    self.is_valid = None;
-                    changes = true;
-                }
-
-                changes
             }
             FileInputMessage::Files(files) => {
                 if files.length() == 0 {
@@ -224,12 +207,12 @@ where
 
                     if let Some(maximal_size) = ctx.props().maximal_size {
                         if file.size() as u64 > maximal_size {
-                            self.errors.insert(format!(
+                            self.errors.push(ApiError::BadRequest(vec![format!(
                                 "The file {} is too large. The maximal size is {}, but the file is {}.",
                                 file.name(),
                                 human_readable_size(maximal_size),
                                 human_readable_size(file.size() as u64)
-                            ));
+                            )]));
                             change = true;
                             continue;
                         }
@@ -239,21 +222,20 @@ where
                         match GenericFileFormat::try_from_mime(&file.type_()) {
                             Ok(format) => {
                                 if !allowed_formats.iter().any(|f| f == &format) {
-                                    self.errors.insert(format!(
+                                    self.errors.push(ApiError::BadRequest(vec![format!(
                                         concat!(
                                             "The file {} is not of an allowed format. ",
                                             "The allowed formats are: {}."
                                         ),
                                         file.type_(),
                                         ctx.props().human_readable_allowed_formats()
-                                    ));
+                                    )]));
                                     change = true;
                                     continue;
                                 }
                             }
                             Err(error) => {
-                                let errors: Vec<String> = error.into();
-                                self.errors.extend(errors.iter().cloned());
+                                self.errors.push(error);
                                 change = true;
                                 continue;
                             }
@@ -277,10 +259,6 @@ where
 
                 change
             }
-            FileInputMessage::RemoveError(error) => {
-                self.errors.remove(&error);
-                true
-            }
             FileInputMessage::Validate(data) => {
                 if let Some(timeout) = self.validation_timeout.take() {
                     timeout.cancel();
@@ -293,10 +271,8 @@ where
                         self.is_valid = Some(true);
                         ctx.props().builder.emit(self.parsed_files.clone());
                     }
-                    Err(errors) => {
-                        for error in errors {
-                            self.errors.insert(error);
-                        }
+                    Err(error) => {
+                        self.errors.push(error);
                         self.is_valid = Some(false);
                     }
                 }
@@ -405,13 +381,6 @@ where
             })
         };
 
-        let on_delete = {
-            let link = ctx.link().clone();
-            Callback::from(move |error: String| {
-                link.send_message(FileInputMessage::RemoveError(error));
-            })
-        };
-
         let on_drop = {
             let link = ctx.link().clone();
             Callback::from(move |drop_event: DragEvent| {
@@ -486,7 +455,7 @@ where
                         />
                     }
                 }}
-                <InputErrors errors={self.errors.clone()} on_delete={on_delete} />
+                <InputErrors errors={self.errors.clone()} />
             </div>
         }
     }

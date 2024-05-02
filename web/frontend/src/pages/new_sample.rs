@@ -1,13 +1,7 @@
 //! Page of the user profile, allowing the user to edit their profile.
 
-use crate::components::forms::sample::NewSampleForm;
-use crate::components::forms::BasicForm;
-use crate::router::AppRoute;
-use crate::stores::user_state::UserState;
-use wasm_bindgen::UnwrapThrowExt;
+use crate::components::forms::automatic_forms::NewSampleForm;
 use yew::prelude::*;
-use yew_router::prelude::*;
-use yewdux::prelude::*;
 
 #[function_component(NewSamplePage)]
 pub fn new_sample_page() -> Html {

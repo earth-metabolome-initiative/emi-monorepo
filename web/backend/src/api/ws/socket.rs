@@ -27,9 +27,6 @@ use web_common::api::ApiError;
 use web_common::database::NotificationMessage;
 use web_common::database::Table;
 
-use super::projects::ProjectMessage;
-use super::samples::SampleMessage;
-use super::teams::TeamMessage;
 
 #[derive(Debug, Deserialize, Serialize)]
 struct NotificationRecord {
@@ -240,33 +237,32 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                     FrontendMessage::Close(_code) => {
                         ctx.stop();
                     }
-                    FrontendMessage::Task(web_common::database::Task { id, operation, .. }) => {
+                    FrontendMessage::Task(task_id, operation) => {
                         if operation.requires_authentication() && self.user.is_none() {
                             ctx.address().do_send(InternalMessage::Unauthorized);
                             return;
                         }
 
                         match operation {
-                            web_common::database::Operation::Insert(insert) => match insert {
-                                web_common::database::Insert::Project(new_project) => {
-                                    ctx.address().do_send(ProjectMessage::NewProject(
-                                        id,
-                                        new_project.clone(),
-                                    ));
-                                }
-                                web_common::database::Insert::Sample(new_sample) => {
-                                    ctx.address()
-                                        .do_send(SampleMessage::NewSample(id, new_sample.clone()));
-                                }
-                                web_common::database::Insert::Team(new_team) => {
-                                    ctx.address()
-                                        .do_send(TeamMessage::NewTeam(id, new_team.clone()));
-                                }
-                            },
+                            web_common::database::Operation::Insert(table_name, row) => {
+                                let table: web_common::database::Table =
+                                    match table_name.as_str().try_into() {
+                                        Ok(table) => table,
+                                        Err(err) => {
+                                            ctx.address().do_send(BackendMessage::Error(
+                                                task_id,
+                                                ApiError::BadRequest(vec![err.to_string()]),
+                                            ));
+                                            return;
+                                        }
+                                    };
+                                // table.insert(row);
+                                todo!()
+                            }
                             web_common::database::Operation::Update(update) => match update {
                                 web_common::database::Update::CompleteProfile(profile) => {
                                     ctx.address()
-                                        .do_send(UserMessage::CompleteProfile(id, profile.clone()));
+                                        .do_send(UserMessage::CompleteProfile(task_id, profile.clone()));
                                 }
                             },
                             web_common::database::Operation::Select(select) => match select {
@@ -275,19 +271,17 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                     query,
                                     number_of_results,
                                 } => {
-                                    let table: web_common::database::Table = match table_name
-                                        .as_str()
-                                        .try_into()
-                                    {
-                                        Ok(table) => table,
-                                        Err(err) => {
-                                            ctx.address().do_send(BackendMessage::Error(
-                                                id,
-                                                ApiError::BadRequest(vec![err.to_string()]),
-                                            ));
-                                            return;
-                                        }
-                                    };
+                                    let table: web_common::database::Table =
+                                        match table_name.as_str().try_into() {
+                                            Ok(table) => table,
+                                            Err(err) => {
+                                                ctx.address().do_send(BackendMessage::Error(
+                                                    task_id,
+                                                    ApiError::BadRequest(vec![err.to_string()]),
+                                                ));
+                                                return;
+                                            }
+                                        };
                                     match table.strict_word_similarity_search(
                                         &query,
                                         Some(number_of_results as i32),
@@ -295,12 +289,12 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                     ) {
                                         Ok(records) => {
                                             ctx.address().do_send(BackendMessage::SearchTable(
-                                                id,
-                                                records,
+                                                task_id, records,
                                             ));
                                         }
                                         Err(err) => {
-                                            ctx.address().do_send(BackendMessage::Error(id, err));
+                                            ctx.address()
+                                                .do_send(BackendMessage::Error(task_id, err));
                                         }
                                     }
                                 }
@@ -308,19 +302,17 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                     table_name,
                                     primary_key,
                                 } => {
-                                    let table: web_common::database::Table = match table_name
-                                        .as_str()
-                                        .try_into()
-                                    {
-                                        Ok(table) => table,
-                                        Err(err) => {
-                                            ctx.address().do_send(BackendMessage::Error(
-                                                id,
-                                                ApiError::BadRequest(vec![err.to_string()]),
-                                            ));
-                                            return;
-                                        }
-                                    };
+                                    let table: web_common::database::Table =
+                                        match table_name.as_str().try_into() {
+                                            Ok(table) => table,
+                                            Err(err) => {
+                                                ctx.address().do_send(BackendMessage::Error(
+                                                    task_id,
+                                                    ApiError::BadRequest(vec![err.to_string()]),
+                                                ));
+                                                return;
+                                            }
+                                        };
                                     match <Table as IdentifiableTable>::get(
                                         &table,
                                         primary_key,
@@ -328,11 +320,11 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                     ) {
                                         Ok(record) => {
                                             ctx.address()
-                                                .do_send(BackendMessage::GetTable(id, record));
+                                                .do_send(BackendMessage::GetTable(task_id, record));
                                         }
                                         Err(err) => {
                                             ctx.address()
-                                                .do_send(BackendMessage::Error(id, err));
+                                                .do_send(BackendMessage::Error(task_id, err));
                                         }
                                     }
                                 }
@@ -341,23 +333,21 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                     limit,
                                     offset,
                                 } => {
-                                    let table: web_common::database::Table = match table_name
-                                        .as_str()
-                                        .try_into()
-                                    {
-                                        Ok(table) => table,
-                                        Err(err) => {
-                                            ctx.address().do_send(BackendMessage::Error(
-                                                id,
-                                                ApiError::BadRequest(vec![err.to_string()]),
-                                            ));
-                                            return;
-                                        }
-                                    };
+                                    let table: web_common::database::Table =
+                                        match table_name.as_str().try_into() {
+                                            Ok(table) => table,
+                                            Err(err) => {
+                                                ctx.address().do_send(BackendMessage::Error(
+                                                    task_id,
+                                                    ApiError::BadRequest(vec![err.to_string()]),
+                                                ));
+                                                return;
+                                            }
+                                        };
 
                                     if !self.is_authenticated() && limit > 20 {
                                         ctx.address().do_send(BackendMessage::Error(
-                                            id,
+                                            task_id,
                                             ApiError::Unauthorized,
                                         ));
                                         return;
@@ -365,16 +355,16 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
 
                                     if self.is_authenticated() && limit > 100 {
                                         ctx.address().do_send(BackendMessage::Error(
-                                            id,
+                                            task_id,
                                             ApiError::BadRequest(vec![
-                                                "Limit cannot exceed 100".to_string(),
+                                                "Limit cannot exceed 100".to_string()
                                             ]),
                                         ));
                                         return;
                                     }
 
                                     ctx.address().do_send(BackendMessage::AllTable(
-                                        id,
+                                        task_id,
                                         <Table as AllTable>::all(
                                             &table,
                                             Some(limit),
@@ -385,17 +375,29 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                     ));
                                 }
                             },
-                            web_common::database::Operation::Delete(table, primary_key) => {
+                            web_common::database::Operation::Delete(table_name, primary_key) => {
+                                let table: web_common::database::Table =
+                                    match table_name.as_str().try_into() {
+                                        Ok(table) => table,
+                                        Err(err) => {
+                                            ctx.address().do_send(BackendMessage::Error(
+                                                task_id,
+                                                ApiError::BadRequest(vec![err.to_string()]),
+                                            ));
+                                            return;
+                                        }
+                                    };
+
                                 match <Table as DeletableTable>::delete(
                                     &table,
                                     primary_key,
                                     &mut self.diesel_connection,
                                 ) {
                                     Ok(_) => {
-                                        ctx.address().do_send(BackendMessage::Completed(id));
+                                        ctx.address().do_send(BackendMessage::Completed(task_id));
                                     }
                                     Err(err) => {
-                                        ctx.address().do_send(BackendMessage::Error(id, err));
+                                        ctx.address().do_send(BackendMessage::Error(task_id, err));
                                     }
                                 }
                             }

@@ -20,8 +20,6 @@ pub enum Table {
     ItemCategories,
     ItemCategoryRelationships,
     ItemCategoryUnits,
-    ItemContinuousQuantities,
-    ItemDiscreteQuantities,
     ItemLocations,
     ItemUnits,
     Items,
@@ -31,8 +29,6 @@ pub enum Table {
     Notifications,
     Organizations,
     PrimaryUserEmails,
-    ProcedureContinuousRequirements,
-    ProcedureDiscreteRequirements,
     Procedures,
     ProjectRequirements,
     ProjectStates,
@@ -46,7 +42,7 @@ pub enum Table {
     Samples,
     SamplingProcedures,
     Spectra,
-    SpectraCollection,
+    SpectraCollections,
     TeamStates,
     Teams,
     Units,
@@ -71,8 +67,6 @@ impl AsRef<str> for Table {
             Table::ItemCategories => "item_categories",
             Table::ItemCategoryRelationships => "item_category_relationships",
             Table::ItemCategoryUnits => "item_category_units",
-            Table::ItemContinuousQuantities => "item_continuous_quantities",
-            Table::ItemDiscreteQuantities => "item_discrete_quantities",
             Table::ItemLocations => "item_locations",
             Table::ItemUnits => "item_units",
             Table::Items => "items",
@@ -82,8 +76,6 @@ impl AsRef<str> for Table {
             Table::Notifications => "notifications",
             Table::Organizations => "organizations",
             Table::PrimaryUserEmails => "primary_user_emails",
-            Table::ProcedureContinuousRequirements => "procedure_continuous_requirements",
-            Table::ProcedureDiscreteRequirements => "procedure_discrete_requirements",
             Table::Procedures => "procedures",
             Table::ProjectRequirements => "project_requirements",
             Table::ProjectStates => "project_states",
@@ -97,7 +89,7 @@ impl AsRef<str> for Table {
             Table::Samples => "samples",
             Table::SamplingProcedures => "sampling_procedures",
             Table::Spectra => "spectra",
-            Table::SpectraCollection => "spectra_collection",
+            Table::SpectraCollections => "spectra_collections",
             Table::TeamStates => "team_states",
             Table::Teams => "teams",
             Table::Units => "units",
@@ -134,8 +126,6 @@ impl std::convert::TryFrom<&str> for Table {
             "item_categories" => Ok(Table::ItemCategories),
             "item_category_relationships" => Ok(Table::ItemCategoryRelationships),
             "item_category_units" => Ok(Table::ItemCategoryUnits),
-            "item_continuous_quantities" => Ok(Table::ItemContinuousQuantities),
-            "item_discrete_quantities" => Ok(Table::ItemDiscreteQuantities),
             "item_locations" => Ok(Table::ItemLocations),
             "item_units" => Ok(Table::ItemUnits),
             "items" => Ok(Table::Items),
@@ -145,8 +135,6 @@ impl std::convert::TryFrom<&str> for Table {
             "notifications" => Ok(Table::Notifications),
             "organizations" => Ok(Table::Organizations),
             "primary_user_emails" => Ok(Table::PrimaryUserEmails),
-            "procedure_continuous_requirements" => Ok(Table::ProcedureContinuousRequirements),
-            "procedure_discrete_requirements" => Ok(Table::ProcedureDiscreteRequirements),
             "procedures" => Ok(Table::Procedures),
             "project_requirements" => Ok(Table::ProjectRequirements),
             "project_states" => Ok(Table::ProjectStates),
@@ -160,7 +148,7 @@ impl std::convert::TryFrom<&str> for Table {
             "samples" => Ok(Table::Samples),
             "sampling_procedures" => Ok(Table::SamplingProcedures),
             "spectra" => Ok(Table::Spectra),
-            "spectra_collection" => Ok(Table::SpectraCollection),
+            "spectra_collections" => Ok(Table::SpectraCollections),
             "team_states" => Ok(Table::TeamStates),
             "teams" => Ok(Table::Teams),
             "units" => Ok(Table::Units),
@@ -236,12 +224,6 @@ impl Table {
             Table::ItemCategoryUnits => {
                 crate::database::ItemCategoryUnit::delete_from_id(primary_key.into(), connection).await
             },
-            Table::ItemContinuousQuantities => {
-                crate::database::ItemContinuousQuantity::delete_from_id(primary_key.into(), connection).await
-            },
-            Table::ItemDiscreteQuantities => {
-                crate::database::ItemDiscreteQuantity::delete_from_id(primary_key.into(), connection).await
-            },
             Table::ItemLocations => {
                 crate::database::ItemLocation::delete_from_id(primary_key.into(), connection).await
             },
@@ -268,12 +250,6 @@ impl Table {
             },
             Table::PrimaryUserEmails => {
                 crate::database::PrimaryUserEmail::delete_from_id(primary_key.into(), connection).await
-            },
-            Table::ProcedureContinuousRequirements => {
-                crate::database::ProcedureContinuousRequirement::delete_from_id(primary_key.into(), connection).await
-            },
-            Table::ProcedureDiscreteRequirements => {
-                crate::database::ProcedureDiscreteRequirement::delete_from_id(primary_key.into(), connection).await
             },
             Table::Procedures => {
                 crate::database::Procedure::delete_from_id(primary_key.into(), connection).await
@@ -314,7 +290,7 @@ impl Table {
             Table::Spectra => {
                 crate::database::Spectra::delete_from_id(primary_key.into(), connection).await
             },
-            Table::SpectraCollection => {
+            Table::SpectraCollections => {
                 crate::database::SpectraCollection::delete_from_id(primary_key.into(), connection).await
             },
             Table::TeamStates => {
@@ -364,8 +340,6 @@ impl Table {
             Table::ItemCategories => crate::database::NestedItemCategory::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::ItemCategoryRelationships => crate::database::NestedItemCategoryRelationship::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::ItemCategoryUnits => crate::database::NestedItemCategoryUnit::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
-            Table::ItemContinuousQuantities => crate::database::NestedItemContinuousQuantity::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
-            Table::ItemDiscreteQuantities => crate::database::NestedItemDiscreteQuantity::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::ItemLocations => crate::database::NestedItemLocation::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::ItemUnits => crate::database::NestedItemUnit::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::Items => crate::database::NestedItem::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
@@ -375,8 +349,6 @@ impl Table {
             Table::Notifications => crate::database::NestedNotification::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::Organizations => crate::database::NestedOrganization::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::PrimaryUserEmails => crate::database::PrimaryUserEmail::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
-            Table::ProcedureContinuousRequirements => crate::database::NestedProcedureContinuousRequirement::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
-            Table::ProcedureDiscreteRequirements => crate::database::NestedProcedureDiscreteRequirement::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::Procedures => crate::database::NestedProcedure::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::ProjectRequirements => crate::database::NestedProjectRequirement::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::ProjectStates => crate::database::ProjectState::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
@@ -390,7 +362,7 @@ impl Table {
             Table::Samples => crate::database::NestedSample::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::SamplingProcedures => crate::database::NestedSamplingProcedure::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::Spectra => crate::database::NestedSpectra::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
-            Table::SpectraCollection => crate::database::NestedSpectraCollection::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::SpectraCollections => crate::database::NestedSpectraCollection::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::TeamStates => crate::database::TeamState::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::Teams => crate::database::NestedTeam::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::Units => crate::database::Unit::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
@@ -430,8 +402,6 @@ impl Table {
             Table::ItemCategories => crate::database::NestedItemCategory::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::ItemCategoryRelationships => crate::database::NestedItemCategoryRelationship::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::ItemCategoryUnits => crate::database::NestedItemCategoryUnit::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
-            Table::ItemContinuousQuantities => crate::database::NestedItemContinuousQuantity::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
-            Table::ItemDiscreteQuantities => crate::database::NestedItemDiscreteQuantity::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::ItemLocations => crate::database::NestedItemLocation::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::ItemUnits => crate::database::NestedItemUnit::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::Items => crate::database::NestedItem::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
@@ -441,8 +411,6 @@ impl Table {
             Table::Notifications => crate::database::NestedNotification::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::Organizations => crate::database::NestedOrganization::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::PrimaryUserEmails => crate::database::PrimaryUserEmail::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
-            Table::ProcedureContinuousRequirements => crate::database::NestedProcedureContinuousRequirement::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
-            Table::ProcedureDiscreteRequirements => crate::database::NestedProcedureDiscreteRequirement::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::Procedures => crate::database::NestedProcedure::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::ProjectRequirements => crate::database::NestedProjectRequirement::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::ProjectStates => crate::database::ProjectState::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
@@ -456,7 +424,7 @@ impl Table {
             Table::Samples => crate::database::NestedSample::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::SamplingProcedures => crate::database::NestedSamplingProcedure::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::Spectra => crate::database::NestedSpectra::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
-            Table::SpectraCollection => crate::database::NestedSpectraCollection::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::SpectraCollections => crate::database::NestedSpectraCollection::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::TeamStates => crate::database::TeamState::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::Teams => crate::database::NestedTeam::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::Units => crate::database::Unit::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),

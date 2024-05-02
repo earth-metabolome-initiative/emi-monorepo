@@ -5,6 +5,7 @@
 //! the image are within the specified ranges. The other structs are variants of the RangeShape
 //! with one of the ranges fixed to a specific value, so as to minimize the code duplication.
 
+use crate::api::ApiError;
 use crate::custom_validators::validation_errors::ValidationErrorToString;
 use crate::custom_validators::Image;
 use crate::custom_validators::TryFromImage;
@@ -137,9 +138,9 @@ where
         + serde::Serialize
         + validator::Validate,
 {
-    fn try_from_callback<C>(file: web_sys::File, callback: C) -> Result<(), Vec<String>>
+    fn try_from_callback<C>(file: web_sys::File, callback: C) -> Result<(), ApiError>
     where
-        C: FnOnce(Result<Self, Vec<String>>) + 'static,
+        C: FnOnce(Result<Self, ApiError>) + 'static,
     {
         V::try_from_callback(file, move |value| {
             match value {
@@ -148,7 +149,7 @@ where
                     let maybe_self = Self { value };
                     match maybe_self.validate() {
                         Ok(()) => callback(Ok(maybe_self)),
-                        Err(e) => callback(Err(e.convert_to_string())),
+                        Err(e) => callback(Err(e.convert_to_string().into())),
                     };
                 }
             };
@@ -169,12 +170,12 @@ where
         + serde::Serialize
         + validator::Validate,
 {
-    fn try_from_image(image: Image) -> Result<Self, Vec<String>> {
+    fn try_from_image(image: Image) -> Result<Self, ApiError> {
         let maybe_self = Self {
             value: V::try_from_image(image)?,
         };
         if let Err(e) = maybe_self.validate() {
-            return Err(e.convert_to_string());
+            return Err(e.convert_to_string().into());
         }
         Ok(maybe_self)
     }
@@ -193,14 +194,14 @@ where
         + serde::Serialize
         + validator::Validate,
 {
-    type Error = Vec<String>;
+    type Error = ApiError;
 
     fn try_from(value: Image) -> Result<Self, Self::Error> {
         let maybe_self = Self {
             value: V::try_from_image(value)?,
         };
         if let Err(e) = maybe_self.validate() {
-            return Err(e.convert_to_string());
+            return Err(e.convert_to_string().into());
         }
         Ok(maybe_self)
     }

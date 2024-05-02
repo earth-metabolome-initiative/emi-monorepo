@@ -1,12 +1,10 @@
 //! Submodule providing structs relative to the database.
-pub mod inserts;
 pub mod roles;
 pub mod selects;
 pub use selects::*;
 pub mod tables;
 pub mod updates;
 pub mod views;
-pub use inserts::Insert;
 pub use tables::*;
 pub use updates::Update;
 pub use views::*;
@@ -24,3 +22,7 @@ pub mod table_names;
 pub use table_names::*;
 pub mod search_tables;
 pub use search_tables::*;
+pub mod new_variants;
+pub use new_variants::*;
+pub mod new_nested_variants;
+pub use new_nested_variants::*;

@@ -1,6 +1,6 @@
 //! Submodule providing the version of the User Profile to be used with the CompleteProfile form.
 use super::Update;
-use crate::{custom_validators::*};
+use crate::{api::ApiError, custom_validators::*};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
@@ -26,7 +26,7 @@ impl CompleteProfile {
         middle_name: Option<String>,
         last_name: String,
         picture: Image,
-    ) -> Result<Self, Vec<String>> {
+    ) -> Result<Self, ApiError> {
         let profile = CompleteProfile {
             first_name: first_name.try_into()?,
             middle_name: middle_name
@@ -39,7 +39,6 @@ impl CompleteProfile {
         Ok(profile)
     }
 }
-
 
 impl From<CompleteProfile> for Update {
     fn from(update_profile: CompleteProfile) -> Self {
@@ -56,11 +55,5 @@ impl From<CompleteProfile> for crate::database::Operation {
 impl From<CompleteProfile> for crate::database::Task {
     fn from(update_profile: CompleteProfile) -> Self {
         crate::database::Operation::from(update_profile).into()
-    }
-}
-
-impl From<CompleteProfile> for crate::api::ws::messages::FrontendMessage {
-    fn from(update_profile: CompleteProfile) -> Self {
-        crate::api::ws::messages::FrontendMessage::Task(update_profile.into())
     }
 }

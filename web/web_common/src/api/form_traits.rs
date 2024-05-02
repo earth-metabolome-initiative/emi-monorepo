@@ -2,6 +2,8 @@
 use serde::Deserialize;
 use std::fmt::Display;
 
+use super::ApiError;
+
 #[derive(Debug, Clone, Copy, PartialEq, Deserialize)]
 pub enum FormMethod {
     GET,    // Use GET to execute a query
@@ -95,7 +97,7 @@ impl Display for FormMethod {
 }
 
 pub trait TryFromCallback<T>: Sized {
-    fn try_from_callback<C>(value: T, callback: C) -> Result<(), Vec<String>>
+    fn try_from_callback<C>(value: T, callback: C) -> Result<(), ApiError>
     where
-        C: FnOnce(Result<Self, Vec<String>>) + 'static;
+        C: FnOnce(Result<Self, ApiError>) + 'static;
 }

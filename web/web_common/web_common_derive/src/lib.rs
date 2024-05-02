@@ -96,14 +96,14 @@ pub fn custom_validator(args: TokenStream, mut input: TokenStream) -> TokenStrea
         impl<S> TryFrom<String> for #struct_name<S>
         where S: crate::custom_validators::validation_errors::TryFromString + AsRef<str> + serde::Serialize + validator::Validate,
         {
-            type Error = Vec<String>;
+            type Error = crate::api::ApiError;
 
             fn try_from(value: String) -> Result<Self, Self::Error> {
                 use validator::Validate;
                 use crate::custom_validators::validation_errors::ValidationErrorToString;
                 let maybe_self = Self { value: S::try_from_string(value)? };
                 if let Err(e) = maybe_self.validate() {
-                    return Err(e.convert_to_string());
+                    return Err(e.convert_to_string().into());
                 }
                 Ok(maybe_self)
             }
@@ -112,12 +112,12 @@ pub fn custom_validator(args: TokenStream, mut input: TokenStream) -> TokenStrea
         impl<S> crate::custom_validators::validation_errors::TryFromString for #struct_name<S>
         where S: AsRef<str> + serde::Serialize + validator::Validate + crate::custom_validators::validation_errors::TryFromString
         {
-            fn try_from_string(value: String) -> Result<Self, Vec<String>> {
+            fn try_from_string(value: String) -> Result<Self, crate::api::ApiError> {
                 use validator::Validate;
                 use crate::custom_validators::validation_errors::ValidationErrorToString;
                 let maybe_self = Self { value: S::try_from_string(value)? };
                 if let Err(e) = maybe_self.validate() {
-                    return Err(e.convert_to_string());
+                    return Err(e.convert_to_string().into());
                 }
                 Ok(maybe_self)
             }
@@ -220,14 +220,14 @@ pub fn image_validator(args: TokenStream, mut input: TokenStream) -> TokenStream
 
         impl<S> TryFrom<Image> for #struct_name<S>
         where S: crate::custom_validators::image::TryFromImage + AsRef<Image> + serde::Serialize + validator::Validate,        {
-            type Error = Vec<String>;
+            type Error = crate::api::ApiError;
 
             fn try_from(value: Image) -> Result<Self, Self::Error> {
                 use validator::Validate;
                 use crate::custom_validators::validation_errors::ValidationErrorToString;
                 let maybe_self = Self { value: S::try_from_image(value)?};
                 if let Err(e) = maybe_self.validate() {
-                    return Err(e.convert_to_string());
+                    return Err(e.convert_to_string().into());
                 }
                 Ok(maybe_self)
             }
@@ -235,12 +235,12 @@ pub fn image_validator(args: TokenStream, mut input: TokenStream) -> TokenStream
 
         impl<S> crate::custom_validators::image::TryFromImage for #struct_name<S>
         where S: crate::custom_validators::image::TryFromImage + AsRef<Image> + serde::Serialize + validator::Validate,        {
-            fn try_from_image(image: Image) -> Result<Self, Vec<String>> {
+            fn try_from_image(image: Image) -> Result<Self, crate::api::ApiError> {
                 use validator::Validate;
                 use crate::custom_validators::validation_errors::ValidationErrorToString;
                 let maybe_self = Self { value: S::try_from_image(image)?};
                 if let Err(e) = maybe_self.validate() {
-                    return Err(e.convert_to_string());
+                    return Err(e.convert_to_string().into());
                 }
                 Ok(maybe_self)
             }
@@ -250,9 +250,9 @@ pub fn image_validator(args: TokenStream, mut input: TokenStream) -> TokenStream
         impl<S> crate::api::form_traits::TryFromCallback<web_sys::File> for #struct_name<S>
             where
             S: crate::api::form_traits::TryFromCallback<web_sys::File> + AsRef<Image> + serde::Serialize + validator::Validate,        {
-            fn try_from_callback<C>(file: web_sys::File, callback: C) -> Result<(), Vec<String>>
+            fn try_from_callback<C>(file: web_sys::File, callback: C) -> Result<(), crate::api::ApiError>
             where
-                C: FnOnce(Result<Self, Vec<String>>) + 'static,
+                C: FnOnce(Result<Self, crate::api::ApiError>) + 'static,
             {
                 use validator::Validate;
                 use crate::custom_validators::validation_errors::ValidationErrorToString;
@@ -263,7 +263,7 @@ pub fn image_validator(args: TokenStream, mut input: TokenStream) -> TokenStream
                             let maybe_self = Self { value };
                             match maybe_self.validate() {
                                 Ok(()) => callback(Ok(maybe_self)),
-                                Err(e) => callback(Err(e.convert_to_string())),
+                                Err(e) => callback(Err(e.convert_to_string().into())),
                             };
                         }
                     };

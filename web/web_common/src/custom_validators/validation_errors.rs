@@ -1,8 +1,11 @@
 use validator::{ValidationError, ValidationErrors, ValidationErrorsKind};
 
+use crate::api::ApiError;
+
 pub trait ValidationErrorToString {
     fn convert_to_string(&self) -> Vec<String>;
 }
+
 
 impl ValidationErrorToString for ValidationError {
     fn convert_to_string(&self) -> Vec<String> {
@@ -34,11 +37,11 @@ impl ValidationErrorToString for ValidationErrors {
 }
 
 pub trait TryFromString: Sized {
-    fn try_from_string(value: String) -> Result<Self, Vec<String>>;
+    fn try_from_string(value: String) -> Result<Self, ApiError>;
 }
 
 impl TryFromString for String {
-    fn try_from_string(value: String) -> Result<Self, Vec<String>> {
+    fn try_from_string(value: String) -> Result<Self, ApiError> {
         Ok(value)
     }
 }

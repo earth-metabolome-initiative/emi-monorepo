@@ -4,6 +4,7 @@ use std::fmt::Debug;
 use crate::api::ApiError;
 use crate::database::*;
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CloseReason {
@@ -22,9 +23,8 @@ impl CloseReason {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum FrontendMessage {
-    //PopUp,
     Close(Option<CloseReason>),
-    Task(Task),
+    Task(Uuid, Operation),
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
