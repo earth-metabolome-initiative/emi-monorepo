@@ -9,12 +9,12 @@ impl RowToBadge for NestedBioOttTaxonItem {
         html! {
             <div>
                 <p>
-                    <i class={format!("fa-solid {} {}", self.font_awesome_icon.name, self.color.name)}></i>
+                    <i class={format!("fas {} {}", self.font_awesome_icon.name, self.color.name)}></i>
                     // we add the rank of the taxon to the badge
                     <span>{self.inner.name.format_match(query)}</span>
                 </p>
                 <p>
-                    <i class={format!("fa-solid {} grey", &self.ott_rank.font_awesome_icon.name)}></i>
+                    <i class={format!("fas {} grey", &self.ott_rank.font_awesome_icon.name)}></i>
                     <span>{&self.ott_rank.inner.name}</span>
                 </p>
             </div>
@@ -24,7 +24,7 @@ impl RowToBadge for NestedBioOttTaxonItem {
     fn to_selected_datalist_badge(&self) -> Html {
         html! {
             <p>
-            <i class={format!("fa-solid {} {}", self.font_awesome_icon.name, self.color.name)}></i>
+            <i class={format!("fas {} {}", self.font_awesome_icon.name, self.color.name)}></i>
                 <span>{&self.inner.name}</span>
             </p>
         }

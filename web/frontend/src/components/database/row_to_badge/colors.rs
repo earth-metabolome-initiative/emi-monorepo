@@ -8,7 +8,7 @@ impl RowToBadge for Color {
         html! {
             <div>
                 <p>
-                    <i class={format!("fa-solid fa-paint-roller {}", self.name)}></i>
+                    <i class={format!("fas fa-paint-roller {}", self.name)}></i>
                     <span>{self.name.format_match(query)}</span>
                 </p>
             </div>
@@ -19,7 +19,7 @@ impl RowToBadge for Color {
         html! {
             <div>
                 <p>
-                    <i class={format!("fa-solid fa-paint-roller {}", self.name)}></i>
+                    <i class={format!("fas fa-paint-roller {}", self.name)}></i>
                     <span>{self.name.clone()}</span>
                 </p>
             </div>
