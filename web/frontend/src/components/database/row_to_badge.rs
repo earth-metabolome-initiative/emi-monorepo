@@ -2,7 +2,6 @@
 
 pub mod project_states;
 pub mod sample_states;
-pub mod team_states;
 pub mod projects;
 pub mod public_users;
 pub mod sampling_procedures;
@@ -50,4 +49,3 @@ pub trait RowToBadge {
     /// Returns the description of this badge.
     fn description(&self) -> &str;
 }
-pub mod project_states;

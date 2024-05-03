@@ -21,3 +21,21 @@ impl RowToBadge for NestedSampleState {
             <div>
                 <p>
                 <i class={format!("{} {}", self.font_awesome_icon.name, self.color.name)}></i>
+                <span>{self.inner.name.clone()}</span>
+                </p>
+            </div>
+        }
+    }
+    fn matches(&self, query: &str) -> bool {
+        self.inner.name == query
+    }
+    fn similarity_score(&self, query: &str) -> isize {
+        self.inner.name.similarity_score(query) + self.inner.description.similarity_score(query)
+    }
+    fn primary_color_class(&self) -> &str {
+        &self.color.name
+    }
+    fn description(&self) -> &str {
+        &self.inner.description
+    }
+}
