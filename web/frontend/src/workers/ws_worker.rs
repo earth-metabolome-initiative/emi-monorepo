@@ -48,7 +48,7 @@ pub enum ComponentMessage {
 impl ComponentMessage {
     pub(crate) fn insert<R: Serialize + FormBuildable>(row: &R) -> Self {
         Self::Operation(Operation::Insert(
-            R::TABLE,
+            R::TABLE.to_string(),
             bincode::serialize(row).unwrap(),
         ))
     }
@@ -88,7 +88,8 @@ impl WebsocketWorker {
                 // DO NOT ALLOW OFFLINE USERS TO DO ILLEGAL OPERATIONS!
 
                 scope.send_message(InternalMessage::Backend(match operation {
-                    Operation::Delete(table, primary_key) => {
+                    Operation::Delete(table_name, primary_key) => {
+                        let table: Table = table_name.try_into().unwrap();
                         match table.delete(primary_key, &mut database).await {
                             Ok(row) => BackendMessage::Notification(
                                 NotificationMessage::without_row(Notification {
@@ -102,7 +103,8 @@ impl WebsocketWorker {
                             Err(err) => BackendMessage::Error(task_id, ApiError::from(err)),
                         }
                     }
-                    Operation::Insert(insert, serialized_row) => {
+                    Operation::Insert(table_name, serialized_row) => {
+                        let table: Table = table_name.try_into().unwrap();
                         // table.insert(insert)
                         todo!()
                     }
