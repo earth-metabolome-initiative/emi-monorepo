@@ -30,4 +30,27 @@ FROM
     JOIN font_awesome_icons ON tmp_team_states.font_awesome_icon = font_awesome_icons.name
     JOIN colors ON tmp_team_states.icon_color = colors.name;
 
+-- now we want to assert that the number of lines in the table is the same as the number 
+-- of lines in the temporary table
+DO $$ DECLARE tmp_team_states_count INTEGER;
+
+team_states_count INTEGER;
+
+BEGIN
+SELECT
+    COUNT(*) INTO tmp_team_states_count
+FROM
+    tmp_team_states;
+
+SELECT
+    COUNT(*) INTO team_states_count
+FROM
+    team_states;
+
+IF tmp_team_states_count <> team_states_count THEN RAISE EXCEPTION 'The number of rows in the temporary table is different from the number of rows in the table';
+
+END IF;
+
+END $$;
+
 DROP TABLE tmp_team_states;

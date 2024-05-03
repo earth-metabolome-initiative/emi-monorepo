@@ -1,4 +1,4 @@
 name,description,font_awesome_icon,icon_color
-Active,The team is currently active.,fa fa-check,green
-Dissolved,The team has been dissolved,fa fa-ban,red
-Paused,The team is currently paused.,fa fa-archive,yellow
+Active,The team is currently active.,fa-check,green
+Dissolved,The team has been dissolved,fa-ban,red
+Paused,The team is currently paused.,fa-archive,yellow

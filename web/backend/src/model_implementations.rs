@@ -199,7 +199,11 @@ impl User {
             thumbnail
                 .save_with_format(&internal_thumbnail_path, ImageFormat::Png)
                 .map_err(|err| {
-                    log::error!("Failed to save thumbnail: {}, {}", err, internal_thumbnail_path);
+                    log::error!(
+                        "Failed to save thumbnail: {}, {}",
+                        err,
+                        internal_thumbnail_path
+                    );
                     err
                 })?;
             Ok(())

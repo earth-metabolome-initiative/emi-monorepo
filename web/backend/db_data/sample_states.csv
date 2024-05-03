@@ -1,6 +1,6 @@
 name,description,font_awesome_icon,icon_color
-Active,The sample is currently active.,fa fa-check,green
-Cancelled,The sample has been cancelled.,fa fa-ban,red
-Completed,The sample has been completed.,fa-regular fa-circle-check,blue
-Paused,The sample is currently paused.,fa fa-archive,yellow
-Postponed,The sample has been postponed.,fa-regular fa-clock,orange
+Active,The sample is currently active.,fa-check,green
+Cancelled,The sample has been cancelled.,fa-ban,red
+Completed,The sample has been completed.,fa-circle-check,blue
+Paused,The sample is currently paused.,fa-archive,yellow
+Postponed,The sample has been postponed.,fa-clock,orange
