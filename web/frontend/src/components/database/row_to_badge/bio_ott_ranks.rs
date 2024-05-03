@@ -19,7 +19,7 @@ impl RowToBadge for NestedBioOttRank {
         html! {
             <div>
                 <p>
-                <i class={format!("{} grey", self.font_awesome_icon.name)}></i>
+                <i class={format!("fas {} grey", self.font_awesome_icon.name)}></i>
                     <span>{self.inner.name.clone()}</span>
                 </p>
             </div>

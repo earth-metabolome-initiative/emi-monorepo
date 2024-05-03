@@ -20,7 +20,7 @@ impl RowToBadge for NestedSampleState {
         html! {
             <div>
                 <p>
-                <i class={format!("{} {}", self.font_awesome_icon.name, self.color.name)}></i>
+                <i class={format!("fas {} {}", self.font_awesome_icon.name, self.color.name)}></i>
                 <span>{self.inner.name.clone()}</span>
                 </p>
             </div>
