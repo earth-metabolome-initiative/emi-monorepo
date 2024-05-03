@@ -50,3 +50,4 @@ pub trait RowToBadge {
     /// Returns the description of this badge.
     fn description(&self) -> &str;
 }
+pub mod project_states;

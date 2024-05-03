@@ -62,6 +62,13 @@ pub struct NestedNewItemCategoryUnit {
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
+pub struct NestedNewLoginProvider {
+    pub inner: NewLoginProvider,
+    pub font_awesome_icon: FontAwesomeIcon,
+    pub color: Color,
+}
+
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedNewManufacturedItemCategory {
     pub inner: NewManufacturedItemCategory,
     pub manifacturer: NestedOrganization,
@@ -93,10 +100,24 @@ pub struct NestedNewProjectRequirement {
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
+pub struct NestedNewProjectState {
+    pub inner: NewProjectState,
+    pub font_awesome_icon: FontAwesomeIcon,
+    pub color: Color,
+}
+
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedNewProject {
     pub inner: NewProject,
-    pub state: ProjectState,
+    pub state: NestedProjectState,
     pub parent_project: Option<Project>,
+}
+
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
+pub struct NestedNewSampleState {
+    pub inner: NewSampleState,
+    pub font_awesome_icon: FontAwesomeIcon,
+    pub color: Color,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
@@ -104,12 +125,19 @@ pub struct NestedNewSample {
     pub inner: NewSample,
     pub sampled_by: User,
     pub procedure: NestedSamplingProcedure,
-    pub state: SampleState,
+    pub state: NestedSampleState,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedNewSamplingProcedure {
     pub inner: NewSamplingProcedure,
+}
+
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
+pub struct NestedNewTeamState {
+    pub inner: NewTeamState,
+    pub font_awesome_icon: FontAwesomeIcon,
+    pub color: Color,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]

@@ -1,5 +1,5 @@
 //! This module contains the API for the OAuth2 providers.
-use crate::models::LoginProvider;
+use crate::nested_models::NestedLoginProvider;
 use actix_web::{get, web, HttpResponse, Responder};
 use diesel::pg::PgConnection;
 use diesel::r2d2::ConnectionManager;
@@ -15,7 +15,7 @@ async fn get_providers(pool: web::Data<Pool<ConnectionManager<PgConnection>>>) -
     dotenvy::dotenv().ok();
 
     let mut conn = pool.get().expect("couldn't get db connection from pool");
-    let providers = LoginProvider::all(None, None, &mut conn);
+    let providers = NestedLoginProvider::all(None, None, &mut conn);
 
     if providers.is_err() {
         return HttpResponse::InternalServerError().json(ApiError::internal_server_error());
@@ -25,21 +25,21 @@ async fn get_providers(pool: web::Data<Pool<ConnectionManager<PgConnection>>>) -
     let mut oauth_providers: Vec<OAuth2LoginProvider> = Vec::new();
 
     for provider in providers {
-        let client_id = env::var(provider.client_id_var_name);
-        let redirect_uri = env::var(provider.redirect_uri_var_name);
+        let client_id = env::var(provider.inner.client_id_var_name);
+        let redirect_uri = env::var(provider.inner.redirect_uri_var_name);
 
         if client_id.is_err() || redirect_uri.is_err() {
             return HttpResponse::InternalServerError().json(ApiError::internal_server_error());
         }
 
         oauth_providers.push(OAuth2LoginProvider {
-            id: provider.id,
-            name: provider.name,
-            font_awesome_icon: provider.font_awesome_icon,
+            id: provider.inner.id,
+            name: provider.inner.name,
+            font_awesome_icon: provider.font_awesome_icon.name,
             client_id: client_id.unwrap(),
             redirect_uri: redirect_uri.unwrap(),
-            oauth_url: provider.oauth_url,
-            scope: provider.scope,
+            oauth_url: provider.inner.oauth_url,
+            scope: provider.inner.scope,
         });
     }
 

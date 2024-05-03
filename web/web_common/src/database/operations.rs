@@ -1,10 +1,8 @@
-use crate::api::ws::messages::FrontendMessage;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use super::roles::Role;
 use super::selects::Select;
-use super::Table;
 use super::updates::Update;
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]

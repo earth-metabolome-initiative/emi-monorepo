@@ -4431,15 +4431,27 @@ def handle_missing_row_to_badge_implementation(
             # we handle both the case where the column is optional and the case where it is not
             for column in search_columns:
                 if column.optional:
-                    document.write(
-                        f"                if let Some(column.name) = self.{column.name}.as_ref() {{\n"
-                        f"                    <span>{{self.{column.name}.format_match(query)}}</span>\n"
-                        f"                }}\n"
-                    )
+                    if struct.is_nested():
+                        document.write(
+                            f"                if let Some({column.name}) = self.inner.{column.name}.as_ref() {{\n"
+                            f"                    <span>{{{column.name}.format_match(query)}}</span>\n"
+                            f"                }}\n"
+                        )
+                    else:
+                        document.write(
+                            f"                if let Some({column.name}) = self.{column.name}.as_ref() {{\n"
+                            f"                    <span>{{{column.name}.format_match(query)}}</span>\n"
+                            f"                }}\n"
+                        )
                 else:
-                    document.write(
-                        f"                    <span>{{self.{column.name}.format_match(query)}}</span>\n"
-                    )
+                    if struct.is_nested():
+                        document.write(
+                            f"                    <span>{{self.inner.{column.name}.format_match(query)}}</span>\n"
+                        )
+                    else:
+                        document.write(
+                            f"                    <span>{{self.{column.name}.format_match(query)}}</span>\n"
+                        )
 
             document.write(
                 "                </p>\n"
@@ -4461,13 +4473,24 @@ def handle_missing_row_to_badge_implementation(
             # If the struct happens to have column called `name`, we use it, otherwise
             # we use the first column that is searchable.
             if struct.get_attribute_by_name("name") is not None:
-                document.write(
-                    f"                    <span>{{self.name.clone()}}</span>\n"
-                )
+                if struct.is_nested():
+                    document.write(
+                        f"                <span>{{self.inner.name.clone()}}</span>\n"
+                    )
+                else:
+                    document.write(
+                        f"                    <span>{{self.name.clone()}}</span>\n"
+                    )
             else:
-                document.write(
-                    f"                    <span>{{self.{search_columns[0].name}.clone()}}</span>\n"
-                )
+                if struct.is_nested():
+                    document.write(
+                        f"                <span>{{self.inner.{search_columns[0].name}.clone()}}</span>\n"
+                    )
+                else:
+                    assert not search_columns[0].optional
+                    document.write(
+                        f"                    <span>{{self.{search_columns[0].name}.clone()}}</span>\n"
+                    )
 
             document.write(
                 "                </p>\n" "            </div>\n" "        }\n" "    }\n"
@@ -4479,15 +4502,26 @@ def handle_missing_row_to_badge_implementation(
             document.write(f"    fn matches(&self, query: &str) -> bool {{\n")
 
             if "name" in [column.name for column in search_columns]:
-                document.write(f"        self.name == query\n")
+                if struct.is_nested():
+                    document.write(f"        self.inner.name.format_match(query)\n")
+                else:
+                    document.write(f"        self.name == query\n")
             else:
                 column = search_columns[0]
                 if column.optional:
-                    document.write(
-                        f"        self.{column.name}.as_ref().map_or(false, |column| column == query)\n"
-                    )
+                    if struct.is_nested():
+                        document.write(
+                            f"        self.inner.{column.name}.as_ref().map_or(false, |column| column == query)\n"
+                        )
+                    else:
+                        document.write(
+                            f"        self.{column.name}.as_ref().map_or(false, |column| column == query)\n"
+                        )
                 else:
-                    document.write(f"        self.{column.name} == query\n")
+                    if struct.is_nested():
+                        document.write(f"        self.inner.{column.name} == query\n")
+                    else:
+                        document.write(f"        self.{column.name} == query\n")
 
             document.write("    }\n")
 
@@ -4497,11 +4531,19 @@ def handle_missing_row_to_badge_implementation(
 
             for column in search_columns:
                 if column.optional:
-                    scores.append(
-                        f"self.{column.name}.as_ref().map_or(0, |column| column.similarity_score(query))"
-                    )
+                    if struct.is_nested():
+                        scores.append(
+                            f"self.inner.{column.name}.as_ref().map_or(0, |column| column.similarity_score(query))"
+                        )
+                    else:
+                        scores.append(
+                            f"self.{column.name}.as_ref().map_or(0, |column| column.similarity_score(query))"
+                        )
                 else:
-                    scores.append(f"self.{column.name}.similarity_score(query)")
+                    if struct.is_nested():
+                        scores.append(f"self.inner.{column.name}.similarity_score(query)")
+                    else:
+                        scores.append(f"self.{column.name}.similarity_score(query)")
 
             scores_summatory = " + ".join(scores)
             document.write(f"        {scores_summatory}\n")
@@ -4519,8 +4561,11 @@ def handle_missing_row_to_badge_implementation(
 
             document.write("fn description(&self) -> &str {\n")
 
-            if struct.get_attribute_by_name("description") is not None:
-                document.write("        &self.description\n")
+            if "description" in [column.name for column in search_columns]:
+                if struct.is_nested():
+                    document.write(f"        &self.inner.description\n")
+                else:
+                    document.write("        &self.description\n")
             else:
                 document.write('        ""\n')
 
@@ -4935,7 +4980,6 @@ def enforce_migration_naming_convention():
                 "and replace it with `CREATE TEMPORARY TABLE`."
             )
 
-
         if "CREATE TABLE IF NOT EXISTS" in up_content:
             # This document contains a table creation, and as such
             # we expect its name to conform to {number_of_migration}_create_{table_name}_table
@@ -5105,9 +5149,9 @@ if __name__ == "__main__":
     if not os.path.exists("./db_data/bio_ott_taxons.csv.gz"):
         retrieve_taxons()
 
-    # enforce_migration_naming_convention()
+    enforce_migration_naming_convention()
     replace_serial_indices()
-    # check_for_common_typos_in_migrations()
+    check_for_common_typos_in_migrations()
     ensures_migrations_simmetry()
     ensures_gluesql_compliance()
     print("Ensured migrations simmetry & GlueSQL compliance.")

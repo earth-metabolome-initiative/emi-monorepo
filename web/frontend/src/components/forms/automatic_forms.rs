@@ -1377,17 +1377,19 @@ pub fn new_item_category_unit_form() -> Html {
         </BasicForm<NewItemCategoryUnit>>
     }
 }
-#[derive(Store, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Store, Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 #[store(storage = "session")]
-pub struct NewLoginProviderBuilder {
+pub struct NestedNewLoginProviderBuilder {
+    pub font_awesome_icon: Option<FontAwesomeIcon>,
+    pub color: Option<Color>,
     pub name: Option<String>,
-    pub font_awesome_icon: Option<String>,
     pub client_id_var_name: Option<String>,
     pub redirect_uri_var_name: Option<String>,
     pub oauth_url: Option<String>,
     pub scope: Option<String>,
-    pub errors_name: Vec<ApiError>,
     pub errors_font_awesome_icon: Vec<ApiError>,
+    pub errors_color: Vec<ApiError>,
+    pub errors_name: Vec<ApiError>,
     pub errors_client_id_var_name: Vec<ApiError>,
     pub errors_redirect_uri_var_name: Vec<ApiError>,
     pub errors_oauth_url: Vec<ApiError>,
@@ -1395,27 +1397,29 @@ pub struct NewLoginProviderBuilder {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub(super) enum NewLoginProviderBuilderActions {
+pub(super) enum NestedNewLoginProviderBuilderActions {
+    SetFontAwesomeIcon(Option<FontAwesomeIcon>),
+    SetColor(Option<Color>),
     SetName(Option<String>),
-    SetFontAwesomeIcon(Option<String>),
     SetClientIdVarName(Option<String>),
     SetRedirectUriVarName(Option<String>),
     SetOauthUrl(Option<String>),
     SetScope(Option<String>),
 }
 
-impl FormBuilder for NewLoginProviderBuilder {
+impl FormBuilder for NestedNewLoginProviderBuilder {
     type Data = NewLoginProvider;
-    type Actions = NewLoginProviderBuilderActions;
+    type Actions = NestedNewLoginProviderBuilderActions;
 
     fn has_errors(&self) -> bool {
-!self.errors_name.is_empty() || !self.errors_font_awesome_icon.is_empty() || !self.errors_client_id_var_name.is_empty() || !self.errors_redirect_uri_var_name.is_empty() || !self.errors_oauth_url.is_empty() || !self.errors_scope.is_empty()
+!self.errors_font_awesome_icon.is_empty() || !self.errors_color.is_empty() || !self.errors_name.is_empty() || !self.errors_client_id_var_name.is_empty() || !self.errors_redirect_uri_var_name.is_empty() || !self.errors_oauth_url.is_empty() || !self.errors_scope.is_empty()
     }
 
     fn can_submit(&self) -> bool {
         !self.has_errors()
-        && self.name.is_some()
         && self.font_awesome_icon.is_some()
+        && self.color.is_some()
+        && self.name.is_some()
         && self.client_id_var_name.is_some()
         && self.redirect_uri_var_name.is_some()
         && self.oauth_url.is_some()
@@ -1427,11 +1431,12 @@ impl FormBuilder for NewLoginProviderBuilder {
     }
 
 }
-impl From<NewLoginProviderBuilder> for NewLoginProvider {
-    fn from(builder: NewLoginProviderBuilder) -> Self {
+impl From<NestedNewLoginProviderBuilder> for NewLoginProvider {
+    fn from(builder: NestedNewLoginProviderBuilder) -> Self {
         Self {
             name: builder.name.unwrap(),
-            font_awesome_icon: builder.font_awesome_icon.unwrap(),
+            font_awesome_icon_id: builder.font_awesome_icon.unwrap().id,
+            color_id: builder.color.unwrap().id,
             client_id_var_name: builder.client_id_var_name.unwrap(),
             redirect_uri_var_name: builder.redirect_uri_var_name.unwrap(),
             oauth_url: builder.oauth_url.unwrap(),
@@ -1440,7 +1445,7 @@ impl From<NewLoginProviderBuilder> for NewLoginProvider {
     }
 }
 impl FormBuildable for NewLoginProvider {
-    type Builder = NewLoginProviderBuilder;
+    type Builder = NestedNewLoginProviderBuilder;
     const TABLE: Table = Table::LoginProviders;
     const METHOD: FormMethod = FormMethod::POST;
     fn title() -> &'static str {
@@ -1456,19 +1461,11 @@ impl FormBuildable for NewLoginProvider {
         true
     }
 }
-impl Reducer<NewLoginProviderBuilder> for NewLoginProviderBuilderActions {
-    fn apply(self, mut state: std::rc::Rc<NewLoginProviderBuilder>) -> std::rc::Rc<NewLoginProviderBuilder> {
+impl Reducer<NestedNewLoginProviderBuilder> for NestedNewLoginProviderBuilderActions {
+    fn apply(self, mut state: std::rc::Rc<NestedNewLoginProviderBuilder>) -> std::rc::Rc<NestedNewLoginProviderBuilder> {
         let state_mut = Rc::make_mut(&mut state);
         match self {
-            NewLoginProviderBuilderActions::SetName(name) => {
-        if name.is_none() {
-            state_mut.errors_name.push(ApiError::BadRequest(vec![
-                "The Name field is required.".to_string()
-             ]));
-        }
-                state_mut.name = name;
-            }
-            NewLoginProviderBuilderActions::SetFontAwesomeIcon(font_awesome_icon) => {
+            NestedNewLoginProviderBuilderActions::SetFontAwesomeIcon(font_awesome_icon) => {
         if font_awesome_icon.is_none() {
             state_mut.errors_font_awesome_icon.push(ApiError::BadRequest(vec![
                 "The FontAwesomeIcon field is required.".to_string()
@@ -1476,7 +1473,23 @@ impl Reducer<NewLoginProviderBuilder> for NewLoginProviderBuilderActions {
         }
                 state_mut.font_awesome_icon = font_awesome_icon;
             }
-            NewLoginProviderBuilderActions::SetClientIdVarName(client_id_var_name) => {
+            NestedNewLoginProviderBuilderActions::SetColor(color) => {
+        if color.is_none() {
+            state_mut.errors_color.push(ApiError::BadRequest(vec![
+                "The Color field is required.".to_string()
+             ]));
+        }
+                state_mut.color = color;
+            }
+            NestedNewLoginProviderBuilderActions::SetName(name) => {
+        if name.is_none() {
+            state_mut.errors_name.push(ApiError::BadRequest(vec![
+                "The Name field is required.".to_string()
+             ]));
+        }
+                state_mut.name = name;
+            }
+            NestedNewLoginProviderBuilderActions::SetClientIdVarName(client_id_var_name) => {
         if client_id_var_name.is_none() {
             state_mut.errors_client_id_var_name.push(ApiError::BadRequest(vec![
                 "The ClientIdVarName field is required.".to_string()
@@ -1484,7 +1497,7 @@ impl Reducer<NewLoginProviderBuilder> for NewLoginProviderBuilderActions {
         }
                 state_mut.client_id_var_name = client_id_var_name;
             }
-            NewLoginProviderBuilderActions::SetRedirectUriVarName(redirect_uri_var_name) => {
+            NestedNewLoginProviderBuilderActions::SetRedirectUriVarName(redirect_uri_var_name) => {
         if redirect_uri_var_name.is_none() {
             state_mut.errors_redirect_uri_var_name.push(ApiError::BadRequest(vec![
                 "The RedirectUriVarName field is required.".to_string()
@@ -1492,7 +1505,7 @@ impl Reducer<NewLoginProviderBuilder> for NewLoginProviderBuilderActions {
         }
                 state_mut.redirect_uri_var_name = redirect_uri_var_name;
             }
-            NewLoginProviderBuilderActions::SetOauthUrl(oauth_url) => {
+            NestedNewLoginProviderBuilderActions::SetOauthUrl(oauth_url) => {
         if oauth_url.is_none() {
             state_mut.errors_oauth_url.push(ApiError::BadRequest(vec![
                 "The OauthUrl field is required.".to_string()
@@ -1500,7 +1513,7 @@ impl Reducer<NewLoginProviderBuilder> for NewLoginProviderBuilderActions {
         }
                 state_mut.oauth_url = oauth_url;
             }
-            NewLoginProviderBuilderActions::SetScope(scope) => {
+            NestedNewLoginProviderBuilderActions::SetScope(scope) => {
         if scope.is_none() {
             state_mut.errors_scope.push(ApiError::BadRequest(vec![
                 "The Scope field is required.".to_string()
@@ -1514,17 +1527,19 @@ impl Reducer<NewLoginProviderBuilder> for NewLoginProviderBuilderActions {
 }
 #[function_component(NewLoginProviderForm)]
 pub fn new_login_provider_form() -> Html {
-    let (builder_store, builder_dispatch) = use_store::<NewLoginProviderBuilder>();
-    let set_name = builder_dispatch.apply_callback(|name: Option<String>| NewLoginProviderBuilderActions::SetName(name));
-    let set_font_awesome_icon = builder_dispatch.apply_callback(|font_awesome_icon: Option<String>| NewLoginProviderBuilderActions::SetFontAwesomeIcon(font_awesome_icon));
-    let set_client_id_var_name = builder_dispatch.apply_callback(|client_id_var_name: Option<String>| NewLoginProviderBuilderActions::SetClientIdVarName(client_id_var_name));
-    let set_redirect_uri_var_name = builder_dispatch.apply_callback(|redirect_uri_var_name: Option<String>| NewLoginProviderBuilderActions::SetRedirectUriVarName(redirect_uri_var_name));
-    let set_oauth_url = builder_dispatch.apply_callback(|oauth_url: Option<String>| NewLoginProviderBuilderActions::SetOauthUrl(oauth_url));
-    let set_scope = builder_dispatch.apply_callback(|scope: Option<String>| NewLoginProviderBuilderActions::SetScope(scope));
+    let (builder_store, builder_dispatch) = use_store::<NestedNewLoginProviderBuilder>();
+    let set_font_awesome_icon = builder_dispatch.apply_callback(|font_awesome_icon: Option<FontAwesomeIcon>| NestedNewLoginProviderBuilderActions::SetFontAwesomeIcon(font_awesome_icon));
+    let set_color = builder_dispatch.apply_callback(|color: Option<Color>| NestedNewLoginProviderBuilderActions::SetColor(color));
+    let set_name = builder_dispatch.apply_callback(|name: Option<String>| NestedNewLoginProviderBuilderActions::SetName(name));
+    let set_client_id_var_name = builder_dispatch.apply_callback(|client_id_var_name: Option<String>| NestedNewLoginProviderBuilderActions::SetClientIdVarName(client_id_var_name));
+    let set_redirect_uri_var_name = builder_dispatch.apply_callback(|redirect_uri_var_name: Option<String>| NestedNewLoginProviderBuilderActions::SetRedirectUriVarName(redirect_uri_var_name));
+    let set_oauth_url = builder_dispatch.apply_callback(|oauth_url: Option<String>| NestedNewLoginProviderBuilderActions::SetOauthUrl(oauth_url));
+    let set_scope = builder_dispatch.apply_callback(|scope: Option<String>| NestedNewLoginProviderBuilderActions::SetScope(scope));
     html! {
         <BasicForm<NewLoginProvider> builder={builder_store.deref().clone()}>
+            <Datalist<FontAwesomeIcon> builder={set_font_awesome_icon} errors={builder_store.errors_font_awesome_icon.clone()} value={builder_store.font_awesome_icon.clone()} label="FontAwesomeIcon" />
+            <Datalist<Color> builder={set_color} errors={builder_store.errors_color.clone()} value={builder_store.color.clone()} label="Color" />
             <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
-            <BasicInput label="FontAwesomeIcon" errors={builder_store.errors_font_awesome_icon.clone()} builder={set_font_awesome_icon} value={builder_store.font_awesome_icon.clone()} input_type={InputType::Text} />
             <BasicInput label="ClientIdVarName" errors={builder_store.errors_client_id_var_name.clone()} builder={set_client_id_var_name} value={builder_store.client_id_var_name.clone()} input_type={InputType::Text} />
             <BasicInput label="RedirectUriVarName" errors={builder_store.errors_redirect_uri_var_name.clone()} builder={set_redirect_uri_var_name} value={builder_store.redirect_uri_var_name.clone()} input_type={InputType::Text} />
             <BasicInput label="OauthUrl" errors={builder_store.errors_oauth_url.clone()} builder={set_oauth_url} value={builder_store.oauth_url.clone()} input_type={InputType::Text} />
@@ -2076,41 +2091,41 @@ pub fn new_project_requirement_form() -> Html {
         </BasicForm<NewProjectRequirement>>
     }
 }
-#[derive(Store, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Store, Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 #[store(storage = "session")]
-pub struct NewProjectStateBuilder {
+pub struct NestedNewProjectStateBuilder {
+    pub font_awesome_icon: Option<FontAwesomeIcon>,
+    pub color: Option<Color>,
     pub name: Option<String>,
     pub description: Option<String>,
-    pub font_awesome_icon: Option<String>,
-    pub icon_color: Option<String>,
+    pub errors_font_awesome_icon: Vec<ApiError>,
+    pub errors_color: Vec<ApiError>,
     pub errors_name: Vec<ApiError>,
     pub errors_description: Vec<ApiError>,
-    pub errors_font_awesome_icon: Vec<ApiError>,
-    pub errors_icon_color: Vec<ApiError>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub(super) enum NewProjectStateBuilderActions {
+pub(super) enum NestedNewProjectStateBuilderActions {
+    SetFontAwesomeIcon(Option<FontAwesomeIcon>),
+    SetColor(Option<Color>),
     SetName(Option<String>),
     SetDescription(Option<String>),
-    SetFontAwesomeIcon(Option<String>),
-    SetIconColor(Option<String>),
 }
 
-impl FormBuilder for NewProjectStateBuilder {
+impl FormBuilder for NestedNewProjectStateBuilder {
     type Data = NewProjectState;
-    type Actions = NewProjectStateBuilderActions;
+    type Actions = NestedNewProjectStateBuilderActions;
 
     fn has_errors(&self) -> bool {
-!self.errors_name.is_empty() || !self.errors_description.is_empty() || !self.errors_font_awesome_icon.is_empty() || !self.errors_icon_color.is_empty()
+!self.errors_font_awesome_icon.is_empty() || !self.errors_color.is_empty() || !self.errors_name.is_empty() || !self.errors_description.is_empty()
     }
 
     fn can_submit(&self) -> bool {
         !self.has_errors()
+        && self.font_awesome_icon.is_some()
+        && self.color.is_some()
         && self.name.is_some()
         && self.description.is_some()
-        && self.font_awesome_icon.is_some()
-        && self.icon_color.is_some()
     }
 
     fn form_level_errors(&self) -> Vec<String> {
@@ -2118,18 +2133,18 @@ impl FormBuilder for NewProjectStateBuilder {
     }
 
 }
-impl From<NewProjectStateBuilder> for NewProjectState {
-    fn from(builder: NewProjectStateBuilder) -> Self {
+impl From<NestedNewProjectStateBuilder> for NewProjectState {
+    fn from(builder: NestedNewProjectStateBuilder) -> Self {
         Self {
             name: builder.name.unwrap(),
             description: builder.description.unwrap(),
-            font_awesome_icon: builder.font_awesome_icon.unwrap(),
-            icon_color: builder.icon_color.unwrap(),
+            font_awesome_icon_id: builder.font_awesome_icon.unwrap().id,
+            color_id: builder.color.unwrap().id,
         }
     }
 }
 impl FormBuildable for NewProjectState {
-    type Builder = NewProjectStateBuilder;
+    type Builder = NestedNewProjectStateBuilder;
     const TABLE: Table = Table::ProjectStates;
     const METHOD: FormMethod = FormMethod::POST;
     fn title() -> &'static str {
@@ -2145,27 +2160,11 @@ impl FormBuildable for NewProjectState {
         true
     }
 }
-impl Reducer<NewProjectStateBuilder> for NewProjectStateBuilderActions {
-    fn apply(self, mut state: std::rc::Rc<NewProjectStateBuilder>) -> std::rc::Rc<NewProjectStateBuilder> {
+impl Reducer<NestedNewProjectStateBuilder> for NestedNewProjectStateBuilderActions {
+    fn apply(self, mut state: std::rc::Rc<NestedNewProjectStateBuilder>) -> std::rc::Rc<NestedNewProjectStateBuilder> {
         let state_mut = Rc::make_mut(&mut state);
         match self {
-            NewProjectStateBuilderActions::SetName(name) => {
-        if name.is_none() {
-            state_mut.errors_name.push(ApiError::BadRequest(vec![
-                "The Name field is required.".to_string()
-             ]));
-        }
-                state_mut.name = name;
-            }
-            NewProjectStateBuilderActions::SetDescription(description) => {
-        if description.is_none() {
-            state_mut.errors_description.push(ApiError::BadRequest(vec![
-                "The Description field is required.".to_string()
-             ]));
-        }
-                state_mut.description = description;
-            }
-            NewProjectStateBuilderActions::SetFontAwesomeIcon(font_awesome_icon) => {
+            NestedNewProjectStateBuilderActions::SetFontAwesomeIcon(font_awesome_icon) => {
         if font_awesome_icon.is_none() {
             state_mut.errors_font_awesome_icon.push(ApiError::BadRequest(vec![
                 "The FontAwesomeIcon field is required.".to_string()
@@ -2173,13 +2172,29 @@ impl Reducer<NewProjectStateBuilder> for NewProjectStateBuilderActions {
         }
                 state_mut.font_awesome_icon = font_awesome_icon;
             }
-            NewProjectStateBuilderActions::SetIconColor(icon_color) => {
-        if icon_color.is_none() {
-            state_mut.errors_icon_color.push(ApiError::BadRequest(vec![
-                "The IconColor field is required.".to_string()
+            NestedNewProjectStateBuilderActions::SetColor(color) => {
+        if color.is_none() {
+            state_mut.errors_color.push(ApiError::BadRequest(vec![
+                "The Color field is required.".to_string()
              ]));
         }
-                state_mut.icon_color = icon_color;
+                state_mut.color = color;
+            }
+            NestedNewProjectStateBuilderActions::SetName(name) => {
+        if name.is_none() {
+            state_mut.errors_name.push(ApiError::BadRequest(vec![
+                "The Name field is required.".to_string()
+             ]));
+        }
+                state_mut.name = name;
+            }
+            NestedNewProjectStateBuilderActions::SetDescription(description) => {
+        if description.is_none() {
+            state_mut.errors_description.push(ApiError::BadRequest(vec![
+                "The Description field is required.".to_string()
+             ]));
+        }
+                state_mut.description = description;
             }
         }
         state
@@ -2187,24 +2202,24 @@ impl Reducer<NewProjectStateBuilder> for NewProjectStateBuilderActions {
 }
 #[function_component(NewProjectStateForm)]
 pub fn new_project_state_form() -> Html {
-    let (builder_store, builder_dispatch) = use_store::<NewProjectStateBuilder>();
-    let set_name = builder_dispatch.apply_callback(|name: Option<String>| NewProjectStateBuilderActions::SetName(name));
-    let set_description = builder_dispatch.apply_callback(|description: Option<String>| NewProjectStateBuilderActions::SetDescription(description));
-    let set_font_awesome_icon = builder_dispatch.apply_callback(|font_awesome_icon: Option<String>| NewProjectStateBuilderActions::SetFontAwesomeIcon(font_awesome_icon));
-    let set_icon_color = builder_dispatch.apply_callback(|icon_color: Option<String>| NewProjectStateBuilderActions::SetIconColor(icon_color));
+    let (builder_store, builder_dispatch) = use_store::<NestedNewProjectStateBuilder>();
+    let set_font_awesome_icon = builder_dispatch.apply_callback(|font_awesome_icon: Option<FontAwesomeIcon>| NestedNewProjectStateBuilderActions::SetFontAwesomeIcon(font_awesome_icon));
+    let set_color = builder_dispatch.apply_callback(|color: Option<Color>| NestedNewProjectStateBuilderActions::SetColor(color));
+    let set_name = builder_dispatch.apply_callback(|name: Option<String>| NestedNewProjectStateBuilderActions::SetName(name));
+    let set_description = builder_dispatch.apply_callback(|description: Option<String>| NestedNewProjectStateBuilderActions::SetDescription(description));
     html! {
         <BasicForm<NewProjectState> builder={builder_store.deref().clone()}>
+            <Datalist<FontAwesomeIcon> builder={set_font_awesome_icon} errors={builder_store.errors_font_awesome_icon.clone()} value={builder_store.font_awesome_icon.clone()} label="FontAwesomeIcon" />
+            <Datalist<Color> builder={set_color} errors={builder_store.errors_color.clone()} value={builder_store.color.clone()} label="Color" />
             <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
             <BasicInput label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} input_type={InputType::Text} />
-            <BasicInput label="FontAwesomeIcon" errors={builder_store.errors_font_awesome_icon.clone()} builder={set_font_awesome_icon} value={builder_store.font_awesome_icon.clone()} input_type={InputType::Text} />
-            <BasicInput label="IconColor" errors={builder_store.errors_icon_color.clone()} builder={set_icon_color} value={builder_store.icon_color.clone()} input_type={InputType::Text} />
         </BasicForm<NewProjectState>>
     }
 }
 #[derive(Store, Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 #[store(storage = "session")]
 pub struct NestedNewProjectBuilder {
-    pub state: Option<ProjectState>,
+    pub state: Option<NestedProjectState>,
     pub parent_project: Option<NestedProject>,
     pub name: Option<String>,
     pub description: Option<String>,
@@ -2226,7 +2241,7 @@ pub struct NestedNewProjectBuilder {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub(super) enum NestedNewProjectBuilderActions {
-    SetState(Option<ProjectState>),
+    SetState(Option<NestedProjectState>),
     SetParentProject(Option<NestedProject>),
     SetName(Option<String>),
     SetDescription(Option<String>),
@@ -2264,7 +2279,7 @@ impl From<NestedNewProjectBuilder> for NewProject {
             name: builder.name.unwrap(),
             description: builder.description.unwrap(),
             public: builder.public.unwrap(),
-            state_id: builder.state.unwrap().id,
+            state_id: builder.state.unwrap().inner.id,
             parent_project_id: builder.parent_project.map(|parent_project| parent_project.inner.id),
             budget: builder.budget,
             expenses: builder.expenses,
@@ -2348,7 +2363,7 @@ impl Reducer<NestedNewProjectBuilder> for NestedNewProjectBuilderActions {
 #[function_component(NewProjectForm)]
 pub fn new_project_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<NestedNewProjectBuilder>();
-    let set_state = builder_dispatch.apply_callback(|state: Option<ProjectState>| NestedNewProjectBuilderActions::SetState(state));
+    let set_state = builder_dispatch.apply_callback(|state: Option<NestedProjectState>| NestedNewProjectBuilderActions::SetState(state));
     let set_parent_project = builder_dispatch.apply_callback(|parent_project: Option<NestedProject>| NestedNewProjectBuilderActions::SetParentProject(parent_project));
     let set_name = builder_dispatch.apply_callback(|name: Option<String>| NestedNewProjectBuilderActions::SetName(name));
     let set_description = builder_dispatch.apply_callback(|description: Option<String>| NestedNewProjectBuilderActions::SetDescription(description));
@@ -2359,7 +2374,7 @@ pub fn new_project_form() -> Html {
     let set_end_date = builder_dispatch.apply_callback(|end_date: Option<NaiveDateTime>| NestedNewProjectBuilderActions::SetEndDate(end_date));
     html! {
         <BasicForm<NewProject> builder={builder_store.deref().clone()}>
-            <Datalist<ProjectState> builder={set_state} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" />
+            <Datalist<NestedProjectState> builder={set_state} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" />
             <Datalist<NestedProject> builder={set_parent_project} errors={builder_store.errors_parent_project.clone()} value={builder_store.parent_project.clone()} label="ParentProject" />
             <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
             <BasicInput label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} input_type={InputType::Text} />
@@ -2447,41 +2462,41 @@ pub fn new_role_form() -> Html {
         </BasicForm<NewRole>>
     }
 }
-#[derive(Store, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Store, Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 #[store(storage = "session")]
-pub struct NewSampleStateBuilder {
+pub struct NestedNewSampleStateBuilder {
+    pub font_awesome_icon: Option<FontAwesomeIcon>,
+    pub color: Option<Color>,
     pub name: Option<String>,
     pub description: Option<String>,
-    pub font_awesome_icon: Option<String>,
-    pub icon_color: Option<String>,
+    pub errors_font_awesome_icon: Vec<ApiError>,
+    pub errors_color: Vec<ApiError>,
     pub errors_name: Vec<ApiError>,
     pub errors_description: Vec<ApiError>,
-    pub errors_font_awesome_icon: Vec<ApiError>,
-    pub errors_icon_color: Vec<ApiError>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub(super) enum NewSampleStateBuilderActions {
+pub(super) enum NestedNewSampleStateBuilderActions {
+    SetFontAwesomeIcon(Option<FontAwesomeIcon>),
+    SetColor(Option<Color>),
     SetName(Option<String>),
     SetDescription(Option<String>),
-    SetFontAwesomeIcon(Option<String>),
-    SetIconColor(Option<String>),
 }
 
-impl FormBuilder for NewSampleStateBuilder {
+impl FormBuilder for NestedNewSampleStateBuilder {
     type Data = NewSampleState;
-    type Actions = NewSampleStateBuilderActions;
+    type Actions = NestedNewSampleStateBuilderActions;
 
     fn has_errors(&self) -> bool {
-!self.errors_name.is_empty() || !self.errors_description.is_empty() || !self.errors_font_awesome_icon.is_empty() || !self.errors_icon_color.is_empty()
+!self.errors_font_awesome_icon.is_empty() || !self.errors_color.is_empty() || !self.errors_name.is_empty() || !self.errors_description.is_empty()
     }
 
     fn can_submit(&self) -> bool {
         !self.has_errors()
+        && self.font_awesome_icon.is_some()
+        && self.color.is_some()
         && self.name.is_some()
         && self.description.is_some()
-        && self.font_awesome_icon.is_some()
-        && self.icon_color.is_some()
     }
 
     fn form_level_errors(&self) -> Vec<String> {
@@ -2489,18 +2504,18 @@ impl FormBuilder for NewSampleStateBuilder {
     }
 
 }
-impl From<NewSampleStateBuilder> for NewSampleState {
-    fn from(builder: NewSampleStateBuilder) -> Self {
+impl From<NestedNewSampleStateBuilder> for NewSampleState {
+    fn from(builder: NestedNewSampleStateBuilder) -> Self {
         Self {
             name: builder.name.unwrap(),
             description: builder.description.unwrap(),
-            font_awesome_icon: builder.font_awesome_icon.unwrap(),
-            icon_color: builder.icon_color.unwrap(),
+            font_awesome_icon_id: builder.font_awesome_icon.unwrap().id,
+            color_id: builder.color.unwrap().id,
         }
     }
 }
 impl FormBuildable for NewSampleState {
-    type Builder = NewSampleStateBuilder;
+    type Builder = NestedNewSampleStateBuilder;
     const TABLE: Table = Table::SampleStates;
     const METHOD: FormMethod = FormMethod::POST;
     fn title() -> &'static str {
@@ -2516,27 +2531,11 @@ impl FormBuildable for NewSampleState {
         true
     }
 }
-impl Reducer<NewSampleStateBuilder> for NewSampleStateBuilderActions {
-    fn apply(self, mut state: std::rc::Rc<NewSampleStateBuilder>) -> std::rc::Rc<NewSampleStateBuilder> {
+impl Reducer<NestedNewSampleStateBuilder> for NestedNewSampleStateBuilderActions {
+    fn apply(self, mut state: std::rc::Rc<NestedNewSampleStateBuilder>) -> std::rc::Rc<NestedNewSampleStateBuilder> {
         let state_mut = Rc::make_mut(&mut state);
         match self {
-            NewSampleStateBuilderActions::SetName(name) => {
-        if name.is_none() {
-            state_mut.errors_name.push(ApiError::BadRequest(vec![
-                "The Name field is required.".to_string()
-             ]));
-        }
-                state_mut.name = name;
-            }
-            NewSampleStateBuilderActions::SetDescription(description) => {
-        if description.is_none() {
-            state_mut.errors_description.push(ApiError::BadRequest(vec![
-                "The Description field is required.".to_string()
-             ]));
-        }
-                state_mut.description = description;
-            }
-            NewSampleStateBuilderActions::SetFontAwesomeIcon(font_awesome_icon) => {
+            NestedNewSampleStateBuilderActions::SetFontAwesomeIcon(font_awesome_icon) => {
         if font_awesome_icon.is_none() {
             state_mut.errors_font_awesome_icon.push(ApiError::BadRequest(vec![
                 "The FontAwesomeIcon field is required.".to_string()
@@ -2544,13 +2543,29 @@ impl Reducer<NewSampleStateBuilder> for NewSampleStateBuilderActions {
         }
                 state_mut.font_awesome_icon = font_awesome_icon;
             }
-            NewSampleStateBuilderActions::SetIconColor(icon_color) => {
-        if icon_color.is_none() {
-            state_mut.errors_icon_color.push(ApiError::BadRequest(vec![
-                "The IconColor field is required.".to_string()
+            NestedNewSampleStateBuilderActions::SetColor(color) => {
+        if color.is_none() {
+            state_mut.errors_color.push(ApiError::BadRequest(vec![
+                "The Color field is required.".to_string()
              ]));
         }
-                state_mut.icon_color = icon_color;
+                state_mut.color = color;
+            }
+            NestedNewSampleStateBuilderActions::SetName(name) => {
+        if name.is_none() {
+            state_mut.errors_name.push(ApiError::BadRequest(vec![
+                "The Name field is required.".to_string()
+             ]));
+        }
+                state_mut.name = name;
+            }
+            NestedNewSampleStateBuilderActions::SetDescription(description) => {
+        if description.is_none() {
+            state_mut.errors_description.push(ApiError::BadRequest(vec![
+                "The Description field is required.".to_string()
+             ]));
+        }
+                state_mut.description = description;
             }
         }
         state
@@ -2558,17 +2573,17 @@ impl Reducer<NewSampleStateBuilder> for NewSampleStateBuilderActions {
 }
 #[function_component(NewSampleStateForm)]
 pub fn new_sample_state_form() -> Html {
-    let (builder_store, builder_dispatch) = use_store::<NewSampleStateBuilder>();
-    let set_name = builder_dispatch.apply_callback(|name: Option<String>| NewSampleStateBuilderActions::SetName(name));
-    let set_description = builder_dispatch.apply_callback(|description: Option<String>| NewSampleStateBuilderActions::SetDescription(description));
-    let set_font_awesome_icon = builder_dispatch.apply_callback(|font_awesome_icon: Option<String>| NewSampleStateBuilderActions::SetFontAwesomeIcon(font_awesome_icon));
-    let set_icon_color = builder_dispatch.apply_callback(|icon_color: Option<String>| NewSampleStateBuilderActions::SetIconColor(icon_color));
+    let (builder_store, builder_dispatch) = use_store::<NestedNewSampleStateBuilder>();
+    let set_font_awesome_icon = builder_dispatch.apply_callback(|font_awesome_icon: Option<FontAwesomeIcon>| NestedNewSampleStateBuilderActions::SetFontAwesomeIcon(font_awesome_icon));
+    let set_color = builder_dispatch.apply_callback(|color: Option<Color>| NestedNewSampleStateBuilderActions::SetColor(color));
+    let set_name = builder_dispatch.apply_callback(|name: Option<String>| NestedNewSampleStateBuilderActions::SetName(name));
+    let set_description = builder_dispatch.apply_callback(|description: Option<String>| NestedNewSampleStateBuilderActions::SetDescription(description));
     html! {
         <BasicForm<NewSampleState> builder={builder_store.deref().clone()}>
+            <Datalist<FontAwesomeIcon> builder={set_font_awesome_icon} errors={builder_store.errors_font_awesome_icon.clone()} value={builder_store.font_awesome_icon.clone()} label="FontAwesomeIcon" />
+            <Datalist<Color> builder={set_color} errors={builder_store.errors_color.clone()} value={builder_store.color.clone()} label="Color" />
             <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
             <BasicInput label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} input_type={InputType::Text} />
-            <BasicInput label="FontAwesomeIcon" errors={builder_store.errors_font_awesome_icon.clone()} builder={set_font_awesome_icon} value={builder_store.font_awesome_icon.clone()} input_type={InputType::Text} />
-            <BasicInput label="IconColor" errors={builder_store.errors_icon_color.clone()} builder={set_icon_color} value={builder_store.icon_color.clone()} input_type={InputType::Text} />
         </BasicForm<NewSampleState>>
     }
 }
@@ -2577,7 +2592,7 @@ pub fn new_sample_state_form() -> Html {
 pub struct NestedNewSampleBuilder {
     pub sampled_by: Option<User>,
     pub procedure: Option<NestedSamplingProcedure>,
-    pub state: Option<SampleState>,
+    pub state: Option<NestedSampleState>,
     pub errors_sampled_by: Vec<ApiError>,
     pub errors_procedure: Vec<ApiError>,
     pub errors_state: Vec<ApiError>,
@@ -2587,7 +2602,7 @@ pub struct NestedNewSampleBuilder {
 pub(super) enum NestedNewSampleBuilderActions {
     SetSampledBy(Option<User>),
     SetProcedure(Option<NestedSamplingProcedure>),
-    SetState(Option<SampleState>),
+    SetState(Option<NestedSampleState>),
 }
 
 impl FormBuilder for NestedNewSampleBuilder {
@@ -2615,7 +2630,7 @@ impl From<NestedNewSampleBuilder> for NewSample {
         Self {
             sampled_by: builder.sampled_by.unwrap().id,
             procedure_id: builder.procedure.unwrap().inner.id,
-            state: builder.state.unwrap().id,
+            state: builder.state.unwrap().inner.id,
         }
     }
 }
@@ -2673,12 +2688,12 @@ pub fn new_sample_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<NestedNewSampleBuilder>();
     let set_sampled_by = builder_dispatch.apply_callback(|sampled_by: Option<User>| NestedNewSampleBuilderActions::SetSampledBy(sampled_by));
     let set_procedure = builder_dispatch.apply_callback(|procedure: Option<NestedSamplingProcedure>| NestedNewSampleBuilderActions::SetProcedure(procedure));
-    let set_state = builder_dispatch.apply_callback(|state: Option<SampleState>| NestedNewSampleBuilderActions::SetState(state));
+    let set_state = builder_dispatch.apply_callback(|state: Option<NestedSampleState>| NestedNewSampleBuilderActions::SetState(state));
     html! {
         <BasicForm<NewSample> builder={builder_store.deref().clone()}>
             <Datalist<User> builder={set_sampled_by} errors={builder_store.errors_sampled_by.clone()} value={builder_store.sampled_by.clone()} label="SampledBy" />
             <Datalist<NestedSamplingProcedure> builder={set_procedure} errors={builder_store.errors_procedure.clone()} value={builder_store.procedure.clone()} label="Procedure" />
-            <Datalist<SampleState> builder={set_state} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" />
+            <Datalist<NestedSampleState> builder={set_state} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" />
         </BasicForm<NewSample>>
     }
 }
@@ -2771,41 +2786,41 @@ pub fn new_sampling_procedure_form() -> Html {
         </BasicForm<NewSamplingProcedure>>
     }
 }
-#[derive(Store, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Store, Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 #[store(storage = "session")]
-pub struct NewTeamStateBuilder {
+pub struct NestedNewTeamStateBuilder {
+    pub font_awesome_icon: Option<FontAwesomeIcon>,
+    pub color: Option<Color>,
     pub name: Option<String>,
     pub description: Option<String>,
-    pub font_awesome_icon: Option<String>,
-    pub icon_color: Option<String>,
+    pub errors_font_awesome_icon: Vec<ApiError>,
+    pub errors_color: Vec<ApiError>,
     pub errors_name: Vec<ApiError>,
     pub errors_description: Vec<ApiError>,
-    pub errors_font_awesome_icon: Vec<ApiError>,
-    pub errors_icon_color: Vec<ApiError>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub(super) enum NewTeamStateBuilderActions {
+pub(super) enum NestedNewTeamStateBuilderActions {
+    SetFontAwesomeIcon(Option<FontAwesomeIcon>),
+    SetColor(Option<Color>),
     SetName(Option<String>),
     SetDescription(Option<String>),
-    SetFontAwesomeIcon(Option<String>),
-    SetIconColor(Option<String>),
 }
 
-impl FormBuilder for NewTeamStateBuilder {
+impl FormBuilder for NestedNewTeamStateBuilder {
     type Data = NewTeamState;
-    type Actions = NewTeamStateBuilderActions;
+    type Actions = NestedNewTeamStateBuilderActions;
 
     fn has_errors(&self) -> bool {
-!self.errors_name.is_empty() || !self.errors_description.is_empty() || !self.errors_font_awesome_icon.is_empty() || !self.errors_icon_color.is_empty()
+!self.errors_font_awesome_icon.is_empty() || !self.errors_color.is_empty() || !self.errors_name.is_empty() || !self.errors_description.is_empty()
     }
 
     fn can_submit(&self) -> bool {
         !self.has_errors()
+        && self.font_awesome_icon.is_some()
+        && self.color.is_some()
         && self.name.is_some()
         && self.description.is_some()
-        && self.font_awesome_icon.is_some()
-        && self.icon_color.is_some()
     }
 
     fn form_level_errors(&self) -> Vec<String> {
@@ -2813,18 +2828,18 @@ impl FormBuilder for NewTeamStateBuilder {
     }
 
 }
-impl From<NewTeamStateBuilder> for NewTeamState {
-    fn from(builder: NewTeamStateBuilder) -> Self {
+impl From<NestedNewTeamStateBuilder> for NewTeamState {
+    fn from(builder: NestedNewTeamStateBuilder) -> Self {
         Self {
             name: builder.name.unwrap(),
             description: builder.description.unwrap(),
-            font_awesome_icon: builder.font_awesome_icon.unwrap(),
-            icon_color: builder.icon_color.unwrap(),
+            font_awesome_icon_id: builder.font_awesome_icon.unwrap().id,
+            color_id: builder.color.unwrap().id,
         }
     }
 }
 impl FormBuildable for NewTeamState {
-    type Builder = NewTeamStateBuilder;
+    type Builder = NestedNewTeamStateBuilder;
     const TABLE: Table = Table::TeamStates;
     const METHOD: FormMethod = FormMethod::POST;
     fn title() -> &'static str {
@@ -2840,27 +2855,11 @@ impl FormBuildable for NewTeamState {
         true
     }
 }
-impl Reducer<NewTeamStateBuilder> for NewTeamStateBuilderActions {
-    fn apply(self, mut state: std::rc::Rc<NewTeamStateBuilder>) -> std::rc::Rc<NewTeamStateBuilder> {
+impl Reducer<NestedNewTeamStateBuilder> for NestedNewTeamStateBuilderActions {
+    fn apply(self, mut state: std::rc::Rc<NestedNewTeamStateBuilder>) -> std::rc::Rc<NestedNewTeamStateBuilder> {
         let state_mut = Rc::make_mut(&mut state);
         match self {
-            NewTeamStateBuilderActions::SetName(name) => {
-        if name.is_none() {
-            state_mut.errors_name.push(ApiError::BadRequest(vec![
-                "The Name field is required.".to_string()
-             ]));
-        }
-                state_mut.name = name;
-            }
-            NewTeamStateBuilderActions::SetDescription(description) => {
-        if description.is_none() {
-            state_mut.errors_description.push(ApiError::BadRequest(vec![
-                "The Description field is required.".to_string()
-             ]));
-        }
-                state_mut.description = description;
-            }
-            NewTeamStateBuilderActions::SetFontAwesomeIcon(font_awesome_icon) => {
+            NestedNewTeamStateBuilderActions::SetFontAwesomeIcon(font_awesome_icon) => {
         if font_awesome_icon.is_none() {
             state_mut.errors_font_awesome_icon.push(ApiError::BadRequest(vec![
                 "The FontAwesomeIcon field is required.".to_string()
@@ -2868,13 +2867,29 @@ impl Reducer<NewTeamStateBuilder> for NewTeamStateBuilderActions {
         }
                 state_mut.font_awesome_icon = font_awesome_icon;
             }
-            NewTeamStateBuilderActions::SetIconColor(icon_color) => {
-        if icon_color.is_none() {
-            state_mut.errors_icon_color.push(ApiError::BadRequest(vec![
-                "The IconColor field is required.".to_string()
+            NestedNewTeamStateBuilderActions::SetColor(color) => {
+        if color.is_none() {
+            state_mut.errors_color.push(ApiError::BadRequest(vec![
+                "The Color field is required.".to_string()
              ]));
         }
-                state_mut.icon_color = icon_color;
+                state_mut.color = color;
+            }
+            NestedNewTeamStateBuilderActions::SetName(name) => {
+        if name.is_none() {
+            state_mut.errors_name.push(ApiError::BadRequest(vec![
+                "The Name field is required.".to_string()
+             ]));
+        }
+                state_mut.name = name;
+            }
+            NestedNewTeamStateBuilderActions::SetDescription(description) => {
+        if description.is_none() {
+            state_mut.errors_description.push(ApiError::BadRequest(vec![
+                "The Description field is required.".to_string()
+             ]));
+        }
+                state_mut.description = description;
             }
         }
         state
@@ -2882,17 +2897,17 @@ impl Reducer<NewTeamStateBuilder> for NewTeamStateBuilderActions {
 }
 #[function_component(NewTeamStateForm)]
 pub fn new_team_state_form() -> Html {
-    let (builder_store, builder_dispatch) = use_store::<NewTeamStateBuilder>();
-    let set_name = builder_dispatch.apply_callback(|name: Option<String>| NewTeamStateBuilderActions::SetName(name));
-    let set_description = builder_dispatch.apply_callback(|description: Option<String>| NewTeamStateBuilderActions::SetDescription(description));
-    let set_font_awesome_icon = builder_dispatch.apply_callback(|font_awesome_icon: Option<String>| NewTeamStateBuilderActions::SetFontAwesomeIcon(font_awesome_icon));
-    let set_icon_color = builder_dispatch.apply_callback(|icon_color: Option<String>| NewTeamStateBuilderActions::SetIconColor(icon_color));
+    let (builder_store, builder_dispatch) = use_store::<NestedNewTeamStateBuilder>();
+    let set_font_awesome_icon = builder_dispatch.apply_callback(|font_awesome_icon: Option<FontAwesomeIcon>| NestedNewTeamStateBuilderActions::SetFontAwesomeIcon(font_awesome_icon));
+    let set_color = builder_dispatch.apply_callback(|color: Option<Color>| NestedNewTeamStateBuilderActions::SetColor(color));
+    let set_name = builder_dispatch.apply_callback(|name: Option<String>| NestedNewTeamStateBuilderActions::SetName(name));
+    let set_description = builder_dispatch.apply_callback(|description: Option<String>| NestedNewTeamStateBuilderActions::SetDescription(description));
     html! {
         <BasicForm<NewTeamState> builder={builder_store.deref().clone()}>
+            <Datalist<FontAwesomeIcon> builder={set_font_awesome_icon} errors={builder_store.errors_font_awesome_icon.clone()} value={builder_store.font_awesome_icon.clone()} label="FontAwesomeIcon" />
+            <Datalist<Color> builder={set_color} errors={builder_store.errors_color.clone()} value={builder_store.color.clone()} label="Color" />
             <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
             <BasicInput label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} input_type={InputType::Text} />
-            <BasicInput label="FontAwesomeIcon" errors={builder_store.errors_font_awesome_icon.clone()} builder={set_font_awesome_icon} value={builder_store.font_awesome_icon.clone()} input_type={InputType::Text} />
-            <BasicInput label="IconColor" errors={builder_store.errors_icon_color.clone()} builder={set_icon_color} value={builder_store.icon_color.clone()} input_type={InputType::Text} />
         </BasicForm<NewTeamState>>
     }
 }

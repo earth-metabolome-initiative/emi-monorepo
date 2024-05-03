@@ -2,7 +2,7 @@
 --
 -- The file has headers:
 -- name,description,font_awesome_icon,icon_color
-CREATE TEMP TABLE tmp_project_states(
+CREATE TEMPORARY TABLE tmp_project_states(
     name TEXT,
     description TEXT,
     font_awesome_icon TEXT,

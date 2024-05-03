@@ -1190,6 +1190,77 @@ impl From<NestedLocation> for web_common::database::nested_models::NestedLocatio
     }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
+pub struct NestedLoginProvider {
+    pub inner: LoginProvider,
+    pub font_awesome_icon: FontAwesomeIcon,
+    pub color: Color,
+}
+
+impl NestedLoginProvider {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: LoginProvider,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            font_awesome_icon: FontAwesomeIcon::get(flat_struct.font_awesome_icon_id, connection)?,
+            color: Color::get(flat_struct.color_id, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedLoginProvider {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
+    /// * `connection` - The database connection.
+    pub fn all(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        LoginProvider::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedLoginProvider {
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `id` - The primary key of the row.
+    /// * `connection` - The database connection.
+    pub fn get(
+        id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+       LoginProvider::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+    }
+}
+impl From<web_common::database::nested_models::NestedLoginProvider> for NestedLoginProvider {
+    fn from(item: web_common::database::nested_models::NestedLoginProvider) -> Self {
+        Self {
+            inner: item.inner.into(),
+            font_awesome_icon: item.font_awesome_icon.into(),
+            color: item.color.into(),
+        }
+    }
+}
+impl From<NestedLoginProvider> for web_common::database::nested_models::NestedLoginProvider {
+    fn from(item: NestedLoginProvider) -> Self {
+        Self {
+            inner: item.inner.into(),
+            font_awesome_icon: item.font_awesome_icon.into(),
+            color: item.color.into(),
+        }
+    }
+}
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedManufacturedItemCategory {
     pub inner: ManufacturedItemCategory,
     pub manifacturer: NestedOrganization,
@@ -1579,9 +1650,122 @@ impl From<NestedProjectRequirement> for web_common::database::nested_models::Nes
     }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
+pub struct NestedProjectState {
+    pub inner: ProjectState,
+    pub font_awesome_icon: FontAwesomeIcon,
+    pub color: Color,
+}
+
+impl NestedProjectState {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: ProjectState,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            font_awesome_icon: FontAwesomeIcon::get(flat_struct.font_awesome_icon_id, connection)?,
+            color: Color::get(flat_struct.color_id, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedProjectState {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
+    /// * `connection` - The database connection.
+    pub fn all(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        ProjectState::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedProjectState {
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `id` - The primary key of the row.
+    /// * `connection` - The database connection.
+    pub fn get(
+        id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+       ProjectState::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+    }
+}
+impl NestedProjectState {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       ProjectState::similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedProjectState {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       ProjectState::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedProjectState {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn strict_word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       ProjectState::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl From<web_common::database::nested_models::NestedProjectState> for NestedProjectState {
+    fn from(item: web_common::database::nested_models::NestedProjectState) -> Self {
+        Self {
+            inner: item.inner.into(),
+            font_awesome_icon: item.font_awesome_icon.into(),
+            color: item.color.into(),
+        }
+    }
+}
+impl From<NestedProjectState> for web_common::database::nested_models::NestedProjectState {
+    fn from(item: NestedProjectState) -> Self {
+        Self {
+            inner: item.inner.into(),
+            font_awesome_icon: item.font_awesome_icon.into(),
+            color: item.color.into(),
+        }
+    }
+}
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedProject {
     pub inner: Project,
-    pub state: ProjectState,
+    pub state: NestedProjectState,
     pub parent_project: Option<Project>,
     pub created_by: User,
 }
@@ -1597,7 +1781,7 @@ impl NestedProject {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            state: ProjectState::get(flat_struct.state_id, connection)?,
+            state: NestedProjectState::get(flat_struct.state_id, connection)?,
             parent_project: flat_struct.parent_project_id.map(|flat_struct| Project::get(flat_struct, connection)).transpose()?,
             created_by: User::get(flat_struct.created_by, connection)?,
                 inner: flat_struct,
@@ -1785,6 +1969,119 @@ impl From<NestedSampleBioOttTaxonItem> for web_common::database::nested_models::
     }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
+pub struct NestedSampleState {
+    pub inner: SampleState,
+    pub font_awesome_icon: FontAwesomeIcon,
+    pub color: Color,
+}
+
+impl NestedSampleState {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: SampleState,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            font_awesome_icon: FontAwesomeIcon::get(flat_struct.font_awesome_icon_id, connection)?,
+            color: Color::get(flat_struct.color_id, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedSampleState {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
+    /// * `connection` - The database connection.
+    pub fn all(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        SampleState::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedSampleState {
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `id` - The primary key of the row.
+    /// * `connection` - The database connection.
+    pub fn get(
+        id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+       SampleState::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+    }
+}
+impl NestedSampleState {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       SampleState::similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedSampleState {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       SampleState::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedSampleState {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn strict_word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       SampleState::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl From<web_common::database::nested_models::NestedSampleState> for NestedSampleState {
+    fn from(item: web_common::database::nested_models::NestedSampleState) -> Self {
+        Self {
+            inner: item.inner.into(),
+            font_awesome_icon: item.font_awesome_icon.into(),
+            color: item.color.into(),
+        }
+    }
+}
+impl From<NestedSampleState> for web_common::database::nested_models::NestedSampleState {
+    fn from(item: NestedSampleState) -> Self {
+        Self {
+            inner: item.inner.into(),
+            font_awesome_icon: item.font_awesome_icon.into(),
+            color: item.color.into(),
+        }
+    }
+}
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedSampledIndividualBioOttTaxonItem {
     pub inner: SampledIndividualBioOttTaxonItem,
     pub created_by: User,
@@ -1865,7 +2162,7 @@ pub struct NestedSample {
     pub inserted_by: User,
     pub sampled_by: User,
     pub procedure: NestedSamplingProcedure,
-    pub state: SampleState,
+    pub state: NestedSampleState,
 }
 
 impl NestedSample {
@@ -1882,7 +2179,7 @@ impl NestedSample {
             inserted_by: User::get(flat_struct.inserted_by, connection)?,
             sampled_by: User::get(flat_struct.sampled_by, connection)?,
             procedure: NestedSamplingProcedure::get(flat_struct.procedure_id, connection)?,
-            state: SampleState::get(flat_struct.state, connection)?,
+            state: NestedSampleState::get(flat_struct.state, connection)?,
                 inner: flat_struct,
         })
     }
@@ -2186,6 +2483,119 @@ impl From<NestedSpectraCollection> for web_common::database::nested_models::Nest
     }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
+pub struct NestedTeamState {
+    pub inner: TeamState,
+    pub font_awesome_icon: FontAwesomeIcon,
+    pub color: Color,
+}
+
+impl NestedTeamState {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: TeamState,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            font_awesome_icon: FontAwesomeIcon::get(flat_struct.font_awesome_icon_id, connection)?,
+            color: Color::get(flat_struct.color_id, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedTeamState {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
+    /// * `connection` - The database connection.
+    pub fn all(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        TeamState::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedTeamState {
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `id` - The primary key of the row.
+    /// * `connection` - The database connection.
+    pub fn get(
+        id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+       TeamState::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+    }
+}
+impl NestedTeamState {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       TeamState::similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedTeamState {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       TeamState::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedTeamState {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn strict_word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       TeamState::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl From<web_common::database::nested_models::NestedTeamState> for NestedTeamState {
+    fn from(item: web_common::database::nested_models::NestedTeamState) -> Self {
+        Self {
+            inner: item.inner.into(),
+            font_awesome_icon: item.font_awesome_icon.into(),
+            color: item.color.into(),
+        }
+    }
+}
+impl From<NestedTeamState> for web_common::database::nested_models::NestedTeamState {
+    fn from(item: NestedTeamState) -> Self {
+        Self {
+            inner: item.inner.into(),
+            font_awesome_icon: item.font_awesome_icon.into(),
+            color: item.color.into(),
+        }
+    }
+}
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedTeam {
     pub inner: Team,
     pub parent_team: Option<Team>,
@@ -2312,7 +2722,7 @@ impl From<NestedTeam> for web_common::database::nested_models::NestedTeam {
 pub struct NestedUserEmail {
     pub inner: UserEmail,
     pub user: User,
-    pub login_provider: LoginProvider,
+    pub login_provider: NestedLoginProvider,
 }
 
 impl NestedUserEmail {
@@ -2327,7 +2737,7 @@ impl NestedUserEmail {
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
             user: User::get(flat_struct.user_id, connection)?,
-            login_provider: LoginProvider::get(flat_struct.login_provider_id, connection)?,
+            login_provider: NestedLoginProvider::get(flat_struct.login_provider_id, connection)?,
                 inner: flat_struct,
         })
     }

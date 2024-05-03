@@ -2870,7 +2870,8 @@ impl Location {
 pub struct LoginProvider {
     pub id: i32,
     pub name: String,
-    pub font_awesome_icon: String,
+    pub font_awesome_icon_id: i32,
+    pub color_id: i32,
     pub client_id_var_name: String,
     pub redirect_uri_var_name: String,
     pub oauth_url: String,
@@ -2882,7 +2883,8 @@ impl From<LoginProvider> for web_common::database::tables::LoginProvider {
         Self {
             id: item.id,
             name: item.name,
-            font_awesome_icon: item.font_awesome_icon,
+            font_awesome_icon_id: item.font_awesome_icon_id,
+            color_id: item.color_id,
             client_id_var_name: item.client_id_var_name,
             redirect_uri_var_name: item.redirect_uri_var_name,
             oauth_url: item.oauth_url,
@@ -2896,7 +2898,8 @@ impl From<web_common::database::tables::LoginProvider> for LoginProvider {
         Self {
             id: item.id,
             name: item.name,
-            font_awesome_icon: item.font_awesome_icon,
+            font_awesome_icon_id: item.font_awesome_icon_id,
+            color_id: item.color_id,
             client_id_var_name: item.client_id_var_name,
             redirect_uri_var_name: item.redirect_uri_var_name,
             oauth_url: item.oauth_url,
@@ -3791,8 +3794,8 @@ pub struct ProjectState {
     pub id: i32,
     pub name: String,
     pub description: String,
-    pub font_awesome_icon: String,
-    pub icon_color: String,
+    pub font_awesome_icon_id: i32,
+    pub color_id: i32,
 }
 
 impl From<ProjectState> for web_common::database::tables::ProjectState {
@@ -3801,8 +3804,8 @@ impl From<ProjectState> for web_common::database::tables::ProjectState {
             id: item.id,
             name: item.name,
             description: item.description,
-            font_awesome_icon: item.font_awesome_icon,
-            icon_color: item.icon_color,
+            font_awesome_icon_id: item.font_awesome_icon_id,
+            color_id: item.color_id,
         }
     }
 }
@@ -3813,8 +3816,8 @@ impl From<web_common::database::tables::ProjectState> for ProjectState {
             id: item.id,
             name: item.name,
             description: item.description,
-            font_awesome_icon: item.font_awesome_icon,
-            icon_color: item.icon_color,
+            font_awesome_icon_id: item.font_awesome_icon_id,
+            color_id: item.color_id,
         }
     }
 }
@@ -3927,7 +3930,7 @@ impl ProjectState {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, font_awesome_icon, icon_color FROM project_states ",
+            "SELECT id, name, description, font_awesome_icon_id, color_id FROM project_states ",
             "WHERE $1 % f_concat_project_states_name_description(name, description) ",
             "ORDER BY similarity($1, f_concat_project_states_name_description(name, description)) DESC LIMIT $2",
         );
@@ -3956,7 +3959,7 @@ impl ProjectState {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, font_awesome_icon, icon_color FROM project_states ",
+            "SELECT id, name, description, font_awesome_icon_id, color_id FROM project_states ",
             "WHERE $1 <% f_concat_project_states_name_description(name, description) ",
             "ORDER BY word_similarity($1, f_concat_project_states_name_description(name, description)) DESC LIMIT $2",
         );
@@ -3985,7 +3988,7 @@ impl ProjectState {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, font_awesome_icon, icon_color FROM project_states ",
+            "SELECT id, name, description, font_awesome_icon_id, color_id FROM project_states ",
             "WHERE $1 <<% f_concat_project_states_name_description(name, description) ",
             "ORDER BY strict_word_similarity($1, f_concat_project_states_name_description(name, description)) DESC LIMIT $2",
         );
@@ -4496,8 +4499,8 @@ pub struct SampleState {
     pub id: i32,
     pub name: String,
     pub description: String,
-    pub font_awesome_icon: String,
-    pub icon_color: String,
+    pub font_awesome_icon_id: i32,
+    pub color_id: i32,
 }
 
 impl From<SampleState> for web_common::database::tables::SampleState {
@@ -4506,8 +4509,8 @@ impl From<SampleState> for web_common::database::tables::SampleState {
             id: item.id,
             name: item.name,
             description: item.description,
-            font_awesome_icon: item.font_awesome_icon,
-            icon_color: item.icon_color,
+            font_awesome_icon_id: item.font_awesome_icon_id,
+            color_id: item.color_id,
         }
     }
 }
@@ -4518,8 +4521,8 @@ impl From<web_common::database::tables::SampleState> for SampleState {
             id: item.id,
             name: item.name,
             description: item.description,
-            font_awesome_icon: item.font_awesome_icon,
-            icon_color: item.icon_color,
+            font_awesome_icon_id: item.font_awesome_icon_id,
+            color_id: item.color_id,
         }
     }
 }
@@ -4632,7 +4635,7 @@ impl SampleState {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, font_awesome_icon, icon_color FROM sample_states ",
+            "SELECT id, name, description, font_awesome_icon_id, color_id FROM sample_states ",
             "WHERE $1 % f_concat_sample_states_name_description(name, description) ",
             "ORDER BY similarity($1, f_concat_sample_states_name_description(name, description)) DESC LIMIT $2",
         );
@@ -4661,7 +4664,7 @@ impl SampleState {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, font_awesome_icon, icon_color FROM sample_states ",
+            "SELECT id, name, description, font_awesome_icon_id, color_id FROM sample_states ",
             "WHERE $1 <% f_concat_sample_states_name_description(name, description) ",
             "ORDER BY word_similarity($1, f_concat_sample_states_name_description(name, description)) DESC LIMIT $2",
         );
@@ -4690,7 +4693,7 @@ impl SampleState {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, font_awesome_icon, icon_color FROM sample_states ",
+            "SELECT id, name, description, font_awesome_icon_id, color_id FROM sample_states ",
             "WHERE $1 <<% f_concat_sample_states_name_description(name, description) ",
             "ORDER BY strict_word_similarity($1, f_concat_sample_states_name_description(name, description)) DESC LIMIT $2",
         );
@@ -5482,8 +5485,8 @@ pub struct TeamState {
     pub id: i32,
     pub name: String,
     pub description: String,
-    pub font_awesome_icon: String,
-    pub icon_color: String,
+    pub font_awesome_icon_id: i32,
+    pub color_id: i32,
 }
 
 impl From<TeamState> for web_common::database::tables::TeamState {
@@ -5492,8 +5495,8 @@ impl From<TeamState> for web_common::database::tables::TeamState {
             id: item.id,
             name: item.name,
             description: item.description,
-            font_awesome_icon: item.font_awesome_icon,
-            icon_color: item.icon_color,
+            font_awesome_icon_id: item.font_awesome_icon_id,
+            color_id: item.color_id,
         }
     }
 }
@@ -5504,8 +5507,8 @@ impl From<web_common::database::tables::TeamState> for TeamState {
             id: item.id,
             name: item.name,
             description: item.description,
-            font_awesome_icon: item.font_awesome_icon,
-            icon_color: item.icon_color,
+            font_awesome_icon_id: item.font_awesome_icon_id,
+            color_id: item.color_id,
         }
     }
 }
@@ -5598,21 +5601,6 @@ impl TeamState {
             .filter(team_states::dsl::id.eq(id))
             .first::<Self>(connection)
     }
-    /// Get the struct from the database by its name.
-    ///
-    /// # Arguments
-    /// * `name` - The name of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn from_name(
-        name: &str,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::team_states;
-        team_states::dsl::team_states
-            .filter(team_states::dsl::name.eq(name))
-            .first::<Self>(connection)
-    }
     /// Search for the struct by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
@@ -5633,7 +5621,7 @@ impl TeamState {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, font_awesome_icon, icon_color FROM team_states ",
+            "SELECT id, name, description, font_awesome_icon_id, color_id FROM team_states ",
             "WHERE $1 % f_concat_team_states_name_description(name, description) ",
             "ORDER BY similarity($1, f_concat_team_states_name_description(name, description)) DESC LIMIT $2",
         );
@@ -5662,7 +5650,7 @@ impl TeamState {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, font_awesome_icon, icon_color FROM team_states ",
+            "SELECT id, name, description, font_awesome_icon_id, color_id FROM team_states ",
             "WHERE $1 <% f_concat_team_states_name_description(name, description) ",
             "ORDER BY word_similarity($1, f_concat_team_states_name_description(name, description)) DESC LIMIT $2",
         );
@@ -5691,7 +5679,7 @@ impl TeamState {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, font_awesome_icon, icon_color FROM team_states ",
+            "SELECT id, name, description, font_awesome_icon_id, color_id FROM team_states ",
             "WHERE $1 <<% f_concat_team_states_name_description(name, description) ",
             "ORDER BY strict_word_similarity($1, f_concat_team_states_name_description(name, description)) DESC LIMIT $2",
         );

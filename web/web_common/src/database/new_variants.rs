@@ -99,7 +99,8 @@ pub struct NewItemCategoryUnit {
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewLoginProvider {
     pub name: String,
-    pub font_awesome_icon: String,
+    pub font_awesome_icon_id: i32,
+    pub color_id: i32,
     pub client_id_var_name: String,
     pub redirect_uri_var_name: String,
     pub oauth_url: String,
@@ -146,8 +147,8 @@ pub struct NewProjectRequirement {
 pub struct NewProjectState {
     pub name: String,
     pub description: String,
-    pub font_awesome_icon: String,
-    pub icon_color: String,
+    pub font_awesome_icon_id: i32,
+    pub color_id: i32,
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
@@ -172,8 +173,8 @@ pub struct NewRole {
 pub struct NewSampleState {
     pub name: String,
     pub description: String,
-    pub font_awesome_icon: String,
-    pub icon_color: String,
+    pub font_awesome_icon_id: i32,
+    pub color_id: i32,
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
@@ -193,8 +194,8 @@ pub struct NewSamplingProcedure {
 pub struct NewTeamState {
     pub name: String,
     pub description: String,
-    pub font_awesome_icon: String,
-    pub icon_color: String,
+    pub font_awesome_icon_id: i32,
+    pub color_id: i32,
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]

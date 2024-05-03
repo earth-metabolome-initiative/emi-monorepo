@@ -1,4 +1,4 @@
-CREATE TEMP TABLE tmp_login_providers(
+CREATE TEMPORARY TABLE tmp_login_providers(
     name TEXT,
     font_awesome_icon TEXT,
     color TEXT,

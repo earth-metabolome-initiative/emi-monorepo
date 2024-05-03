@@ -42,6 +42,15 @@ impl Searchable for NestedOrganization {
         )
     }
 }
+impl Searchable for NestedProjectState {
+    fn search_task(query: String, limit: u32) -> super::Select {
+        super::Select::search(
+             Table::ProjectStates,
+              query,
+              limit,
+        )
+    }
+}
 impl Searchable for NestedProject {
     fn search_task(query: String, limit: u32) -> super::Select {
         super::Select::search(
@@ -51,10 +60,28 @@ impl Searchable for NestedProject {
         )
     }
 }
+impl Searchable for NestedSampleState {
+    fn search_task(query: String, limit: u32) -> super::Select {
+        super::Select::search(
+             Table::SampleStates,
+              query,
+              limit,
+        )
+    }
+}
 impl Searchable for NestedSamplingProcedure {
     fn search_task(query: String, limit: u32) -> super::Select {
         super::Select::search(
              Table::SamplingProcedures,
+              query,
+              limit,
+        )
+    }
+}
+impl Searchable for NestedTeamState {
+    fn search_task(query: String, limit: u32) -> super::Select {
+        super::Select::search(
+             Table::TeamStates,
               query,
               limit,
         )
