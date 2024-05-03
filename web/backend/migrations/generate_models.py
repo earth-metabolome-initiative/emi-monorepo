@@ -4619,9 +4619,9 @@ def write_frontend_yew_form(
 
         # TODO! ADD MORE INPUT TYPES HERE!
         
-        raise Exception(
-            f"Attribute {attribute.name} of type {attribute.data_type()} not supported in the frontend form generation."
-        )
+        # raise Exception(
+        #     f"Attribute {attribute.name} of type {attribute.data_type()} not supported in the frontend form generation."
+        # )
 
     document.write(f"        </BasicForm<{build_target.name}>>\n" f"    }}\n" f"}}\n")
 
