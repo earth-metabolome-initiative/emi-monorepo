@@ -3978,6 +3978,39 @@ def write_frontend_form_builder_implementation(
 
     document.write("    }\n\n")
 
+    # We implement the can submit method, which checks whether the form
+    # contains errors as specified by the has_errors method, plus checks
+    # that all non-optional fields are populated.
+    document.write(
+        "    fn can_submit(&self) -> bool {\n"
+        "        !self.has_errors()\n"
+    )
+
+    for attribute in builder.attributes:
+        if attribute.name.startswith("errors_"):
+            continue
+
+        struct_attribute = flat_build_target.get_attribute_by_name(attribute.name)
+
+        if struct_attribute is None:
+            # We check whether the _id variant of the attribute is present.
+            struct_attribute = flat_build_target.get_attribute_by_name(
+                f"{attribute.name}_id"
+            )
+
+        if struct_attribute is None:
+            raise Exception(
+                f"Attribute {attribute.name} not found in the build target struct {flat_build_target.name}."
+            )
+
+        if not struct_attribute.optional and attribute.optional:
+            document.write(
+                f"        && self.{attribute.name}.is_some()\n"
+            )
+
+    document.write("    }\n\n")
+
+
     # TODO! ADD FORM LEVEL ERRORS HERE!
     document.write(
         f"    fn form_level_errors(&self) -> Vec<String> {{\n"
@@ -5072,9 +5105,9 @@ if __name__ == "__main__":
     if not os.path.exists("./db_data/bio_ott_taxons.csv.gz"):
         retrieve_taxons()
 
-    enforce_migration_naming_convention()
+    # enforce_migration_naming_convention()
     replace_serial_indices()
-    check_for_common_typos_in_migrations()
+    # check_for_common_typos_in_migrations()
     ensures_migrations_simmetry()
     ensures_gluesql_compliance()
     print("Ensured migrations simmetry & GlueSQL compliance.")

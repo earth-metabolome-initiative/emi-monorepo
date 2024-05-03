@@ -2,17 +2,17 @@
 //!
 //! This module is automatically generated. Do not write anything here.
 
-use crate::components::forms::*;
-use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
-use std::ops::Deref;
-use std::rc::Rc;
-use uuid::Uuid;
-use web_common::api::form_traits::FormMethod;
-use web_common::api::ApiError;
 use web_common::database::*;
 use yew::prelude::*;
 use yewdux::{use_store, Reducer, Store};
+use crate::components::forms::*;
+use web_common::api::form_traits::FormMethod;
+use std::rc::Rc;
+use uuid::Uuid;
+use std::ops::Deref;
+use chrono::NaiveDateTime;
+use web_common::api::ApiError;
 
 #[derive(Store, Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 #[store(storage = "session")]
@@ -34,12 +34,19 @@ impl FormBuilder for NestedNewBioOttRankBuilder {
     type Actions = NestedNewBioOttRankBuilderActions;
 
     fn has_errors(&self) -> bool {
-        !self.errors_font_awesome_icon.is_empty() || !self.errors_name.is_empty()
+!self.errors_font_awesome_icon.is_empty() || !self.errors_name.is_empty()
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.font_awesome_icon.is_some()
+        && self.name.is_some()
     }
 
     fn form_level_errors(&self) -> Vec<String> {
         vec![]
     }
+
 }
 impl From<NestedNewBioOttRankBuilder> for NewBioOttRank {
     fn from(builder: NestedNewBioOttRankBuilder) -> Self {
@@ -67,28 +74,23 @@ impl FormBuildable for NewBioOttRank {
     }
 }
 impl Reducer<NestedNewBioOttRankBuilder> for NestedNewBioOttRankBuilderActions {
-    fn apply(
-        self,
-        mut state: std::rc::Rc<NestedNewBioOttRankBuilder>,
-    ) -> std::rc::Rc<NestedNewBioOttRankBuilder> {
+    fn apply(self, mut state: std::rc::Rc<NestedNewBioOttRankBuilder>) -> std::rc::Rc<NestedNewBioOttRankBuilder> {
         let state_mut = Rc::make_mut(&mut state);
         match self {
             NestedNewBioOttRankBuilderActions::SetFontAwesomeIcon(font_awesome_icon) => {
-                if font_awesome_icon.is_none() {
-                    state_mut
-                        .errors_font_awesome_icon
-                        .push(ApiError::BadRequest(vec![
-                            "The FontAwesomeIcon field is required.".to_string(),
-                        ]));
-                }
+        if font_awesome_icon.is_none() {
+            state_mut.errors_font_awesome_icon.push(ApiError::BadRequest(vec![
+                "The FontAwesomeIcon field is required.".to_string()
+             ]));
+        }
                 state_mut.font_awesome_icon = font_awesome_icon;
             }
             NestedNewBioOttRankBuilderActions::SetName(name) => {
-                if name.is_none() {
-                    state_mut.errors_name.push(ApiError::BadRequest(vec![
-                        "The Name field is required.".to_string(),
-                    ]));
-                }
+        if name.is_none() {
+            state_mut.errors_name.push(ApiError::BadRequest(vec![
+                "The Name field is required.".to_string()
+             ]));
+        }
                 state_mut.name = name;
             }
         }
@@ -98,12 +100,8 @@ impl Reducer<NestedNewBioOttRankBuilder> for NestedNewBioOttRankBuilderActions {
 #[function_component(NewBioOttRankForm)]
 pub fn new_bio_ott_rank_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<NestedNewBioOttRankBuilder>();
-    let set_font_awesome_icon =
-        builder_dispatch.apply_callback(|font_awesome_icon: Option<FontAwesomeIcon>| {
-            NestedNewBioOttRankBuilderActions::SetFontAwesomeIcon(font_awesome_icon)
-        });
-    let set_name = builder_dispatch
-        .apply_callback(|name: Option<String>| NestedNewBioOttRankBuilderActions::SetName(name));
+    let set_font_awesome_icon = builder_dispatch.apply_callback(|font_awesome_icon: Option<FontAwesomeIcon>| NestedNewBioOttRankBuilderActions::SetFontAwesomeIcon(font_awesome_icon));
+    let set_name = builder_dispatch.apply_callback(|name: Option<String>| NestedNewBioOttRankBuilderActions::SetName(name));
     html! {
         <BasicForm<NewBioOttRank> builder={builder_store.deref().clone()}>
             <Datalist<FontAwesomeIcon> builder={set_font_awesome_icon} errors={builder_store.errors_font_awesome_icon.clone()} value={builder_store.font_awesome_icon.clone()} label="FontAwesomeIcon" />
@@ -179,29 +177,23 @@ impl FormBuilder for NestedNewBioOttTaxonItemBuilder {
     type Actions = NestedNewBioOttTaxonItemBuilderActions;
 
     fn has_errors(&self) -> bool {
-        !self.errors_ott_rank.is_empty()
-            || !self.errors_domain.is_empty()
-            || !self.errors_kingdom.is_empty()
-            || !self.errors_phylum.is_empty()
-            || !self.errors_class.is_empty()
-            || !self.errors_order.is_empty()
-            || !self.errors_family.is_empty()
-            || !self.errors_genus.is_empty()
-            || !self.errors_parent.is_empty()
-            || !self.errors_font_awesome_icon.is_empty()
-            || !self.errors_color.is_empty()
-            || !self.errors_name.is_empty()
-            || !self.errors_ott_id.is_empty()
-            || !self.errors_wikidata_id.is_empty()
-            || !self.errors_ncbi_id.is_empty()
-            || !self.errors_gbif_id.is_empty()
-            || !self.errors_irmng_id.is_empty()
-            || !self.errors_worms_id.is_empty()
+!self.errors_ott_rank.is_empty() || !self.errors_domain.is_empty() || !self.errors_kingdom.is_empty() || !self.errors_phylum.is_empty() || !self.errors_class.is_empty() || !self.errors_order.is_empty() || !self.errors_family.is_empty() || !self.errors_genus.is_empty() || !self.errors_parent.is_empty() || !self.errors_font_awesome_icon.is_empty() || !self.errors_color.is_empty() || !self.errors_name.is_empty() || !self.errors_ott_id.is_empty() || !self.errors_wikidata_id.is_empty() || !self.errors_ncbi_id.is_empty() || !self.errors_gbif_id.is_empty() || !self.errors_irmng_id.is_empty() || !self.errors_worms_id.is_empty()
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.ott_rank.is_some()
+        && self.parent.is_some()
+        && self.font_awesome_icon.is_some()
+        && self.color.is_some()
+        && self.name.is_some()
+        && self.ott_id.is_some()
     }
 
     fn form_level_errors(&self) -> Vec<String> {
         vec![]
     }
+
 }
 impl From<NestedNewBioOttTaxonItemBuilder> for NewBioOttTaxonItem {
     fn from(builder: NestedNewBioOttTaxonItemBuilder) -> Self {
@@ -245,18 +237,15 @@ impl FormBuildable for NewBioOttTaxonItem {
     }
 }
 impl Reducer<NestedNewBioOttTaxonItemBuilder> for NestedNewBioOttTaxonItemBuilderActions {
-    fn apply(
-        self,
-        mut state: std::rc::Rc<NestedNewBioOttTaxonItemBuilder>,
-    ) -> std::rc::Rc<NestedNewBioOttTaxonItemBuilder> {
+    fn apply(self, mut state: std::rc::Rc<NestedNewBioOttTaxonItemBuilder>) -> std::rc::Rc<NestedNewBioOttTaxonItemBuilder> {
         let state_mut = Rc::make_mut(&mut state);
         match self {
             NestedNewBioOttTaxonItemBuilderActions::SetOttRank(ott_rank) => {
-                if ott_rank.is_none() {
-                    state_mut.errors_ott_rank.push(ApiError::BadRequest(vec![
-                        "The OttRank field is required.".to_string(),
-                    ]));
-                }
+        if ott_rank.is_none() {
+            state_mut.errors_ott_rank.push(ApiError::BadRequest(vec![
+                "The OttRank field is required.".to_string()
+             ]));
+        }
                 state_mut.ott_rank = ott_rank;
             }
             NestedNewBioOttTaxonItemBuilderActions::SetDomain(domain) => {
@@ -281,45 +270,43 @@ impl Reducer<NestedNewBioOttTaxonItemBuilder> for NestedNewBioOttTaxonItemBuilde
                 state_mut.genus = genus;
             }
             NestedNewBioOttTaxonItemBuilderActions::SetParent(parent) => {
-                if parent.is_none() {
-                    state_mut.errors_parent.push(ApiError::BadRequest(vec![
-                        "The Parent field is required.".to_string(),
-                    ]));
-                }
+        if parent.is_none() {
+            state_mut.errors_parent.push(ApiError::BadRequest(vec![
+                "The Parent field is required.".to_string()
+             ]));
+        }
                 state_mut.parent = parent;
             }
             NestedNewBioOttTaxonItemBuilderActions::SetFontAwesomeIcon(font_awesome_icon) => {
-                if font_awesome_icon.is_none() {
-                    state_mut
-                        .errors_font_awesome_icon
-                        .push(ApiError::BadRequest(vec![
-                            "The FontAwesomeIcon field is required.".to_string(),
-                        ]));
-                }
+        if font_awesome_icon.is_none() {
+            state_mut.errors_font_awesome_icon.push(ApiError::BadRequest(vec![
+                "The FontAwesomeIcon field is required.".to_string()
+             ]));
+        }
                 state_mut.font_awesome_icon = font_awesome_icon;
             }
             NestedNewBioOttTaxonItemBuilderActions::SetColor(color) => {
-                if color.is_none() {
-                    state_mut.errors_color.push(ApiError::BadRequest(vec![
-                        "The Color field is required.".to_string(),
-                    ]));
-                }
+        if color.is_none() {
+            state_mut.errors_color.push(ApiError::BadRequest(vec![
+                "The Color field is required.".to_string()
+             ]));
+        }
                 state_mut.color = color;
             }
             NestedNewBioOttTaxonItemBuilderActions::SetName(name) => {
-                if name.is_none() {
-                    state_mut.errors_name.push(ApiError::BadRequest(vec![
-                        "The Name field is required.".to_string(),
-                    ]));
-                }
+        if name.is_none() {
+            state_mut.errors_name.push(ApiError::BadRequest(vec![
+                "The Name field is required.".to_string()
+             ]));
+        }
                 state_mut.name = name;
             }
             NestedNewBioOttTaxonItemBuilderActions::SetOttId(ott_id) => {
-                if ott_id.is_none() {
-                    state_mut.errors_ott_id.push(ApiError::BadRequest(vec![
-                        "The OttId field is required.".to_string(),
-                    ]));
-                }
+        if ott_id.is_none() {
+            state_mut.errors_ott_id.push(ApiError::BadRequest(vec![
+                "The OttId field is required.".to_string()
+             ]));
+        }
                 state_mut.ott_id = ott_id;
             }
             NestedNewBioOttTaxonItemBuilderActions::SetWikidataId(wikidata_id) => {
@@ -344,61 +331,24 @@ impl Reducer<NestedNewBioOttTaxonItemBuilder> for NestedNewBioOttTaxonItemBuilde
 #[function_component(NewBioOttTaxonItemForm)]
 pub fn new_bio_ott_taxon_item_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<NestedNewBioOttTaxonItemBuilder>();
-    let set_ott_rank = builder_dispatch.apply_callback(|ott_rank: Option<NestedBioOttRank>| {
-        NestedNewBioOttTaxonItemBuilderActions::SetOttRank(ott_rank)
-    });
-    let set_domain = builder_dispatch.apply_callback(|domain: Option<NestedBioOttTaxonItem>| {
-        NestedNewBioOttTaxonItemBuilderActions::SetDomain(domain)
-    });
-    let set_kingdom = builder_dispatch.apply_callback(|kingdom: Option<NestedBioOttTaxonItem>| {
-        NestedNewBioOttTaxonItemBuilderActions::SetKingdom(kingdom)
-    });
-    let set_phylum = builder_dispatch.apply_callback(|phylum: Option<NestedBioOttTaxonItem>| {
-        NestedNewBioOttTaxonItemBuilderActions::SetPhylum(phylum)
-    });
-    let set_class = builder_dispatch.apply_callback(|class: Option<NestedBioOttTaxonItem>| {
-        NestedNewBioOttTaxonItemBuilderActions::SetClass(class)
-    });
-    let set_order = builder_dispatch.apply_callback(|order: Option<NestedBioOttTaxonItem>| {
-        NestedNewBioOttTaxonItemBuilderActions::SetOrder(order)
-    });
-    let set_family = builder_dispatch.apply_callback(|family: Option<NestedBioOttTaxonItem>| {
-        NestedNewBioOttTaxonItemBuilderActions::SetFamily(family)
-    });
-    let set_genus = builder_dispatch.apply_callback(|genus: Option<NestedBioOttTaxonItem>| {
-        NestedNewBioOttTaxonItemBuilderActions::SetGenus(genus)
-    });
-    let set_parent = builder_dispatch.apply_callback(|parent: Option<NestedBioOttTaxonItem>| {
-        NestedNewBioOttTaxonItemBuilderActions::SetParent(parent)
-    });
-    let set_font_awesome_icon =
-        builder_dispatch.apply_callback(|font_awesome_icon: Option<FontAwesomeIcon>| {
-            NestedNewBioOttTaxonItemBuilderActions::SetFontAwesomeIcon(font_awesome_icon)
-        });
-    let set_color = builder_dispatch.apply_callback(|color: Option<Color>| {
-        NestedNewBioOttTaxonItemBuilderActions::SetColor(color)
-    });
-    let set_name = builder_dispatch.apply_callback(|name: Option<String>| {
-        NestedNewBioOttTaxonItemBuilderActions::SetName(name)
-    });
-    let set_ott_id = builder_dispatch.apply_callback(|ott_id: Option<i32>| {
-        NestedNewBioOttTaxonItemBuilderActions::SetOttId(ott_id)
-    });
-    let set_wikidata_id = builder_dispatch.apply_callback(|wikidata_id: Option<i32>| {
-        NestedNewBioOttTaxonItemBuilderActions::SetWikidataId(wikidata_id)
-    });
-    let set_ncbi_id = builder_dispatch.apply_callback(|ncbi_id: Option<i32>| {
-        NestedNewBioOttTaxonItemBuilderActions::SetNcbiId(ncbi_id)
-    });
-    let set_gbif_id = builder_dispatch.apply_callback(|gbif_id: Option<i32>| {
-        NestedNewBioOttTaxonItemBuilderActions::SetGbifId(gbif_id)
-    });
-    let set_irmng_id = builder_dispatch.apply_callback(|irmng_id: Option<i32>| {
-        NestedNewBioOttTaxonItemBuilderActions::SetIrmngId(irmng_id)
-    });
-    let set_worms_id = builder_dispatch.apply_callback(|worms_id: Option<i32>| {
-        NestedNewBioOttTaxonItemBuilderActions::SetWormsId(worms_id)
-    });
+    let set_ott_rank = builder_dispatch.apply_callback(|ott_rank: Option<NestedBioOttRank>| NestedNewBioOttTaxonItemBuilderActions::SetOttRank(ott_rank));
+    let set_domain = builder_dispatch.apply_callback(|domain: Option<NestedBioOttTaxonItem>| NestedNewBioOttTaxonItemBuilderActions::SetDomain(domain));
+    let set_kingdom = builder_dispatch.apply_callback(|kingdom: Option<NestedBioOttTaxonItem>| NestedNewBioOttTaxonItemBuilderActions::SetKingdom(kingdom));
+    let set_phylum = builder_dispatch.apply_callback(|phylum: Option<NestedBioOttTaxonItem>| NestedNewBioOttTaxonItemBuilderActions::SetPhylum(phylum));
+    let set_class = builder_dispatch.apply_callback(|class: Option<NestedBioOttTaxonItem>| NestedNewBioOttTaxonItemBuilderActions::SetClass(class));
+    let set_order = builder_dispatch.apply_callback(|order: Option<NestedBioOttTaxonItem>| NestedNewBioOttTaxonItemBuilderActions::SetOrder(order));
+    let set_family = builder_dispatch.apply_callback(|family: Option<NestedBioOttTaxonItem>| NestedNewBioOttTaxonItemBuilderActions::SetFamily(family));
+    let set_genus = builder_dispatch.apply_callback(|genus: Option<NestedBioOttTaxonItem>| NestedNewBioOttTaxonItemBuilderActions::SetGenus(genus));
+    let set_parent = builder_dispatch.apply_callback(|parent: Option<NestedBioOttTaxonItem>| NestedNewBioOttTaxonItemBuilderActions::SetParent(parent));
+    let set_font_awesome_icon = builder_dispatch.apply_callback(|font_awesome_icon: Option<FontAwesomeIcon>| NestedNewBioOttTaxonItemBuilderActions::SetFontAwesomeIcon(font_awesome_icon));
+    let set_color = builder_dispatch.apply_callback(|color: Option<Color>| NestedNewBioOttTaxonItemBuilderActions::SetColor(color));
+    let set_name = builder_dispatch.apply_callback(|name: Option<String>| NestedNewBioOttTaxonItemBuilderActions::SetName(name));
+    let set_ott_id = builder_dispatch.apply_callback(|ott_id: Option<i32>| NestedNewBioOttTaxonItemBuilderActions::SetOttId(ott_id));
+    let set_wikidata_id = builder_dispatch.apply_callback(|wikidata_id: Option<i32>| NestedNewBioOttTaxonItemBuilderActions::SetWikidataId(wikidata_id));
+    let set_ncbi_id = builder_dispatch.apply_callback(|ncbi_id: Option<i32>| NestedNewBioOttTaxonItemBuilderActions::SetNcbiId(ncbi_id));
+    let set_gbif_id = builder_dispatch.apply_callback(|gbif_id: Option<i32>| NestedNewBioOttTaxonItemBuilderActions::SetGbifId(gbif_id));
+    let set_irmng_id = builder_dispatch.apply_callback(|irmng_id: Option<i32>| NestedNewBioOttTaxonItemBuilderActions::SetIrmngId(irmng_id));
+    let set_worms_id = builder_dispatch.apply_callback(|worms_id: Option<i32>| NestedNewBioOttTaxonItemBuilderActions::SetWormsId(worms_id));
     html! {
         <BasicForm<NewBioOttTaxonItem> builder={builder_store.deref().clone()}>
             <Datalist<NestedBioOttRank> builder={set_ott_rank} errors={builder_store.errors_ott_rank.clone()} value={builder_store.ott_rank.clone()} label="OttRank" />
@@ -436,12 +386,19 @@ impl FormBuilder for NewColorBuilder {
     type Actions = NewColorBuilderActions;
 
     fn has_errors(&self) -> bool {
-        !self.errors_name.is_empty() || !self.errors_hexadecimal_value.is_empty()
+!self.errors_name.is_empty() || !self.errors_hexadecimal_value.is_empty()
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.name.is_some()
+        && self.hexadecimal_value.is_some()
     }
 
     fn form_level_errors(&self) -> Vec<String> {
         vec![]
     }
+
 }
 impl From<NewColorBuilder> for NewColor {
     fn from(builder: NewColorBuilder) -> Self {
@@ -473,21 +430,19 @@ impl Reducer<NewColorBuilder> for NewColorBuilderActions {
         let state_mut = Rc::make_mut(&mut state);
         match self {
             NewColorBuilderActions::SetName(name) => {
-                if name.is_none() {
-                    state_mut.errors_name.push(ApiError::BadRequest(vec![
-                        "The Name field is required.".to_string(),
-                    ]));
-                }
+        if name.is_none() {
+            state_mut.errors_name.push(ApiError::BadRequest(vec![
+                "The Name field is required.".to_string()
+             ]));
+        }
                 state_mut.name = name;
             }
             NewColorBuilderActions::SetHexadecimalValue(hexadecimal_value) => {
-                if hexadecimal_value.is_none() {
-                    state_mut
-                        .errors_hexadecimal_value
-                        .push(ApiError::BadRequest(vec![
-                            "The HexadecimalValue field is required.".to_string(),
-                        ]));
-                }
+        if hexadecimal_value.is_none() {
+            state_mut.errors_hexadecimal_value.push(ApiError::BadRequest(vec![
+                "The HexadecimalValue field is required.".to_string()
+             ]));
+        }
                 state_mut.hexadecimal_value = hexadecimal_value;
             }
         }
@@ -497,12 +452,8 @@ impl Reducer<NewColorBuilder> for NewColorBuilderActions {
 #[function_component(NewColorForm)]
 pub fn new_color_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<NewColorBuilder>();
-    let set_name = builder_dispatch
-        .apply_callback(|name: Option<String>| NewColorBuilderActions::SetName(name));
-    let set_hexadecimal_value =
-        builder_dispatch.apply_callback(|hexadecimal_value: Option<String>| {
-            NewColorBuilderActions::SetHexadecimalValue(hexadecimal_value)
-        });
+    let set_name = builder_dispatch.apply_callback(|name: Option<String>| NewColorBuilderActions::SetName(name));
+    let set_hexadecimal_value = builder_dispatch.apply_callback(|hexadecimal_value: Option<String>| NewColorBuilderActions::SetHexadecimalValue(hexadecimal_value));
     html! {
         <BasicForm<NewColor> builder={builder_store.deref().clone()}>
             <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
@@ -551,20 +502,20 @@ impl FormBuilder for NestedNewContainerHorizontalRuleBuilder {
     type Actions = NestedNewContainerHorizontalRuleBuilderActions;
 
     fn has_errors(&self) -> bool {
-        !self.errors_item_type.is_empty()
-            || !self.errors_other_item_type.is_empty()
-            || !self.errors_name.is_empty()
-            || !self.errors_minimum_temperature.is_empty()
-            || !self.errors_maximum_temperature.is_empty()
-            || !self.errors_minimum_humidity.is_empty()
-            || !self.errors_maximum_humidity.is_empty()
-            || !self.errors_minimum_pressure.is_empty()
-            || !self.errors_maximum_pressure.is_empty()
+!self.errors_item_type.is_empty() || !self.errors_other_item_type.is_empty() || !self.errors_name.is_empty() || !self.errors_minimum_temperature.is_empty() || !self.errors_maximum_temperature.is_empty() || !self.errors_minimum_humidity.is_empty() || !self.errors_maximum_humidity.is_empty() || !self.errors_minimum_pressure.is_empty() || !self.errors_maximum_pressure.is_empty()
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.item_type.is_some()
+        && self.other_item_type.is_some()
+        && self.name.is_some()
     }
 
     fn form_level_errors(&self) -> Vec<String> {
         vec![]
     }
+
 }
 impl From<NestedNewContainerHorizontalRuleBuilder> for NewContainerHorizontalRule {
     fn from(builder: NestedNewContainerHorizontalRuleBuilder) -> Self {
@@ -598,69 +549,50 @@ impl FormBuildable for NewContainerHorizontalRule {
         true
     }
 }
-impl Reducer<NestedNewContainerHorizontalRuleBuilder>
-    for NestedNewContainerHorizontalRuleBuilderActions
-{
-    fn apply(
-        self,
-        mut state: std::rc::Rc<NestedNewContainerHorizontalRuleBuilder>,
-    ) -> std::rc::Rc<NestedNewContainerHorizontalRuleBuilder> {
+impl Reducer<NestedNewContainerHorizontalRuleBuilder> for NestedNewContainerHorizontalRuleBuilderActions {
+    fn apply(self, mut state: std::rc::Rc<NestedNewContainerHorizontalRuleBuilder>) -> std::rc::Rc<NestedNewContainerHorizontalRuleBuilder> {
         let state_mut = Rc::make_mut(&mut state);
         match self {
             NestedNewContainerHorizontalRuleBuilderActions::SetItemType(item_type) => {
-                if item_type.is_none() {
-                    state_mut.errors_item_type.push(ApiError::BadRequest(vec![
-                        "The ItemType field is required.".to_string(),
-                    ]));
-                }
+        if item_type.is_none() {
+            state_mut.errors_item_type.push(ApiError::BadRequest(vec![
+                "The ItemType field is required.".to_string()
+             ]));
+        }
                 state_mut.item_type = item_type;
             }
             NestedNewContainerHorizontalRuleBuilderActions::SetOtherItemType(other_item_type) => {
-                if other_item_type.is_none() {
-                    state_mut
-                        .errors_other_item_type
-                        .push(ApiError::BadRequest(vec![
-                            "The OtherItemType field is required.".to_string(),
-                        ]));
-                }
+        if other_item_type.is_none() {
+            state_mut.errors_other_item_type.push(ApiError::BadRequest(vec![
+                "The OtherItemType field is required.".to_string()
+             ]));
+        }
                 state_mut.other_item_type = other_item_type;
             }
             NestedNewContainerHorizontalRuleBuilderActions::SetName(name) => {
-                if name.is_none() {
-                    state_mut.errors_name.push(ApiError::BadRequest(vec![
-                        "The Name field is required.".to_string(),
-                    ]));
-                }
+        if name.is_none() {
+            state_mut.errors_name.push(ApiError::BadRequest(vec![
+                "The Name field is required.".to_string()
+             ]));
+        }
                 state_mut.name = name;
             }
-            NestedNewContainerHorizontalRuleBuilderActions::SetMinimumTemperature(
-                minimum_temperature,
-            ) => {
+            NestedNewContainerHorizontalRuleBuilderActions::SetMinimumTemperature(minimum_temperature) => {
                 state_mut.minimum_temperature = minimum_temperature;
             }
-            NestedNewContainerHorizontalRuleBuilderActions::SetMaximumTemperature(
-                maximum_temperature,
-            ) => {
+            NestedNewContainerHorizontalRuleBuilderActions::SetMaximumTemperature(maximum_temperature) => {
                 state_mut.maximum_temperature = maximum_temperature;
             }
-            NestedNewContainerHorizontalRuleBuilderActions::SetMinimumHumidity(
-                minimum_humidity,
-            ) => {
+            NestedNewContainerHorizontalRuleBuilderActions::SetMinimumHumidity(minimum_humidity) => {
                 state_mut.minimum_humidity = minimum_humidity;
             }
-            NestedNewContainerHorizontalRuleBuilderActions::SetMaximumHumidity(
-                maximum_humidity,
-            ) => {
+            NestedNewContainerHorizontalRuleBuilderActions::SetMaximumHumidity(maximum_humidity) => {
                 state_mut.maximum_humidity = maximum_humidity;
             }
-            NestedNewContainerHorizontalRuleBuilderActions::SetMinimumPressure(
-                minimum_pressure,
-            ) => {
+            NestedNewContainerHorizontalRuleBuilderActions::SetMinimumPressure(minimum_pressure) => {
                 state_mut.minimum_pressure = minimum_pressure;
             }
-            NestedNewContainerHorizontalRuleBuilderActions::SetMaximumPressure(
-                maximum_pressure,
-            ) => {
+            NestedNewContainerHorizontalRuleBuilderActions::SetMaximumPressure(maximum_pressure) => {
                 state_mut.maximum_pressure = maximum_pressure;
             }
         }
@@ -670,40 +602,15 @@ impl Reducer<NestedNewContainerHorizontalRuleBuilder>
 #[function_component(NewContainerHorizontalRuleForm)]
 pub fn new_container_horizontal_rule_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<NestedNewContainerHorizontalRuleBuilder>();
-    let set_item_type = builder_dispatch.apply_callback(|item_type: Option<NestedItemCategory>| {
-        NestedNewContainerHorizontalRuleBuilderActions::SetItemType(item_type)
-    });
-    let set_other_item_type =
-        builder_dispatch.apply_callback(|other_item_type: Option<NestedItemCategory>| {
-            NestedNewContainerHorizontalRuleBuilderActions::SetOtherItemType(other_item_type)
-        });
-    let set_name = builder_dispatch.apply_callback(|name: Option<String>| {
-        NestedNewContainerHorizontalRuleBuilderActions::SetName(name)
-    });
-    let set_minimum_temperature =
-        builder_dispatch.apply_callback(|minimum_temperature: Option<i32>| {
-            NestedNewContainerHorizontalRuleBuilderActions::SetMinimumTemperature(
-                minimum_temperature,
-            )
-        });
-    let set_maximum_temperature =
-        builder_dispatch.apply_callback(|maximum_temperature: Option<i32>| {
-            NestedNewContainerHorizontalRuleBuilderActions::SetMaximumTemperature(
-                maximum_temperature,
-            )
-        });
-    let set_minimum_humidity = builder_dispatch.apply_callback(|minimum_humidity: Option<i32>| {
-        NestedNewContainerHorizontalRuleBuilderActions::SetMinimumHumidity(minimum_humidity)
-    });
-    let set_maximum_humidity = builder_dispatch.apply_callback(|maximum_humidity: Option<i32>| {
-        NestedNewContainerHorizontalRuleBuilderActions::SetMaximumHumidity(maximum_humidity)
-    });
-    let set_minimum_pressure = builder_dispatch.apply_callback(|minimum_pressure: Option<i32>| {
-        NestedNewContainerHorizontalRuleBuilderActions::SetMinimumPressure(minimum_pressure)
-    });
-    let set_maximum_pressure = builder_dispatch.apply_callback(|maximum_pressure: Option<i32>| {
-        NestedNewContainerHorizontalRuleBuilderActions::SetMaximumPressure(maximum_pressure)
-    });
+    let set_item_type = builder_dispatch.apply_callback(|item_type: Option<NestedItemCategory>| NestedNewContainerHorizontalRuleBuilderActions::SetItemType(item_type));
+    let set_other_item_type = builder_dispatch.apply_callback(|other_item_type: Option<NestedItemCategory>| NestedNewContainerHorizontalRuleBuilderActions::SetOtherItemType(other_item_type));
+    let set_name = builder_dispatch.apply_callback(|name: Option<String>| NestedNewContainerHorizontalRuleBuilderActions::SetName(name));
+    let set_minimum_temperature = builder_dispatch.apply_callback(|minimum_temperature: Option<i32>| NestedNewContainerHorizontalRuleBuilderActions::SetMinimumTemperature(minimum_temperature));
+    let set_maximum_temperature = builder_dispatch.apply_callback(|maximum_temperature: Option<i32>| NestedNewContainerHorizontalRuleBuilderActions::SetMaximumTemperature(maximum_temperature));
+    let set_minimum_humidity = builder_dispatch.apply_callback(|minimum_humidity: Option<i32>| NestedNewContainerHorizontalRuleBuilderActions::SetMinimumHumidity(minimum_humidity));
+    let set_maximum_humidity = builder_dispatch.apply_callback(|maximum_humidity: Option<i32>| NestedNewContainerHorizontalRuleBuilderActions::SetMaximumHumidity(maximum_humidity));
+    let set_minimum_pressure = builder_dispatch.apply_callback(|minimum_pressure: Option<i32>| NestedNewContainerHorizontalRuleBuilderActions::SetMinimumPressure(minimum_pressure));
+    let set_maximum_pressure = builder_dispatch.apply_callback(|maximum_pressure: Option<i32>| NestedNewContainerHorizontalRuleBuilderActions::SetMaximumPressure(maximum_pressure));
     html! {
         <BasicForm<NewContainerHorizontalRule> builder={builder_store.deref().clone()}>
             <Datalist<NestedItemCategory> builder={set_item_type} errors={builder_store.errors_item_type.clone()} value={builder_store.item_type.clone()} label="ItemType" />
@@ -753,20 +660,20 @@ impl FormBuilder for NestedNewContainerVerticalRuleBuilder {
     type Actions = NestedNewContainerVerticalRuleBuilderActions;
 
     fn has_errors(&self) -> bool {
-        !self.errors_container_item_type.is_empty()
-            || !self.errors_contained_item_type.is_empty()
-            || !self.errors_name.is_empty()
-            || !self.errors_minimum_temperature.is_empty()
-            || !self.errors_maximum_temperature.is_empty()
-            || !self.errors_minimum_humidity.is_empty()
-            || !self.errors_maximum_humidity.is_empty()
-            || !self.errors_minimum_pressure.is_empty()
-            || !self.errors_maximum_pressure.is_empty()
+!self.errors_container_item_type.is_empty() || !self.errors_contained_item_type.is_empty() || !self.errors_name.is_empty() || !self.errors_minimum_temperature.is_empty() || !self.errors_maximum_temperature.is_empty() || !self.errors_minimum_humidity.is_empty() || !self.errors_maximum_humidity.is_empty() || !self.errors_minimum_pressure.is_empty() || !self.errors_maximum_pressure.is_empty()
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.container_item_type.is_some()
+        && self.contained_item_type.is_some()
+        && self.name.is_some()
     }
 
     fn form_level_errors(&self) -> Vec<String> {
         vec![]
     }
+
 }
 impl From<NestedNewContainerVerticalRuleBuilder> for NewContainerVerticalRule {
     fn from(builder: NestedNewContainerVerticalRuleBuilder) -> Self {
@@ -800,55 +707,38 @@ impl FormBuildable for NewContainerVerticalRule {
         true
     }
 }
-impl Reducer<NestedNewContainerVerticalRuleBuilder>
-    for NestedNewContainerVerticalRuleBuilderActions
-{
-    fn apply(
-        self,
-        mut state: std::rc::Rc<NestedNewContainerVerticalRuleBuilder>,
-    ) -> std::rc::Rc<NestedNewContainerVerticalRuleBuilder> {
+impl Reducer<NestedNewContainerVerticalRuleBuilder> for NestedNewContainerVerticalRuleBuilderActions {
+    fn apply(self, mut state: std::rc::Rc<NestedNewContainerVerticalRuleBuilder>) -> std::rc::Rc<NestedNewContainerVerticalRuleBuilder> {
         let state_mut = Rc::make_mut(&mut state);
         match self {
-            NestedNewContainerVerticalRuleBuilderActions::SetContainerItemType(
-                container_item_type,
-            ) => {
-                if container_item_type.is_none() {
-                    state_mut
-                        .errors_container_item_type
-                        .push(ApiError::BadRequest(vec![
-                            "The ContainerItemType field is required.".to_string(),
-                        ]));
-                }
+            NestedNewContainerVerticalRuleBuilderActions::SetContainerItemType(container_item_type) => {
+        if container_item_type.is_none() {
+            state_mut.errors_container_item_type.push(ApiError::BadRequest(vec![
+                "The ContainerItemType field is required.".to_string()
+             ]));
+        }
                 state_mut.container_item_type = container_item_type;
             }
-            NestedNewContainerVerticalRuleBuilderActions::SetContainedItemType(
-                contained_item_type,
-            ) => {
-                if contained_item_type.is_none() {
-                    state_mut
-                        .errors_contained_item_type
-                        .push(ApiError::BadRequest(vec![
-                            "The ContainedItemType field is required.".to_string(),
-                        ]));
-                }
+            NestedNewContainerVerticalRuleBuilderActions::SetContainedItemType(contained_item_type) => {
+        if contained_item_type.is_none() {
+            state_mut.errors_contained_item_type.push(ApiError::BadRequest(vec![
+                "The ContainedItemType field is required.".to_string()
+             ]));
+        }
                 state_mut.contained_item_type = contained_item_type;
             }
             NestedNewContainerVerticalRuleBuilderActions::SetName(name) => {
-                if name.is_none() {
-                    state_mut.errors_name.push(ApiError::BadRequest(vec![
-                        "The Name field is required.".to_string(),
-                    ]));
-                }
+        if name.is_none() {
+            state_mut.errors_name.push(ApiError::BadRequest(vec![
+                "The Name field is required.".to_string()
+             ]));
+        }
                 state_mut.name = name;
             }
-            NestedNewContainerVerticalRuleBuilderActions::SetMinimumTemperature(
-                minimum_temperature,
-            ) => {
+            NestedNewContainerVerticalRuleBuilderActions::SetMinimumTemperature(minimum_temperature) => {
                 state_mut.minimum_temperature = minimum_temperature;
             }
-            NestedNewContainerVerticalRuleBuilderActions::SetMaximumTemperature(
-                maximum_temperature,
-            ) => {
+            NestedNewContainerVerticalRuleBuilderActions::SetMaximumTemperature(maximum_temperature) => {
                 state_mut.maximum_temperature = maximum_temperature;
             }
             NestedNewContainerVerticalRuleBuilderActions::SetMinimumHumidity(minimum_humidity) => {
@@ -870,37 +760,15 @@ impl Reducer<NestedNewContainerVerticalRuleBuilder>
 #[function_component(NewContainerVerticalRuleForm)]
 pub fn new_container_vertical_rule_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<NestedNewContainerVerticalRuleBuilder>();
-    let set_container_item_type =
-        builder_dispatch.apply_callback(|container_item_type: Option<NestedItemCategory>| {
-            NestedNewContainerVerticalRuleBuilderActions::SetContainerItemType(container_item_type)
-        });
-    let set_contained_item_type =
-        builder_dispatch.apply_callback(|contained_item_type: Option<NestedItemCategory>| {
-            NestedNewContainerVerticalRuleBuilderActions::SetContainedItemType(contained_item_type)
-        });
-    let set_name = builder_dispatch.apply_callback(|name: Option<String>| {
-        NestedNewContainerVerticalRuleBuilderActions::SetName(name)
-    });
-    let set_minimum_temperature =
-        builder_dispatch.apply_callback(|minimum_temperature: Option<i32>| {
-            NestedNewContainerVerticalRuleBuilderActions::SetMinimumTemperature(minimum_temperature)
-        });
-    let set_maximum_temperature =
-        builder_dispatch.apply_callback(|maximum_temperature: Option<i32>| {
-            NestedNewContainerVerticalRuleBuilderActions::SetMaximumTemperature(maximum_temperature)
-        });
-    let set_minimum_humidity = builder_dispatch.apply_callback(|minimum_humidity: Option<i32>| {
-        NestedNewContainerVerticalRuleBuilderActions::SetMinimumHumidity(minimum_humidity)
-    });
-    let set_maximum_humidity = builder_dispatch.apply_callback(|maximum_humidity: Option<i32>| {
-        NestedNewContainerVerticalRuleBuilderActions::SetMaximumHumidity(maximum_humidity)
-    });
-    let set_minimum_pressure = builder_dispatch.apply_callback(|minimum_pressure: Option<i32>| {
-        NestedNewContainerVerticalRuleBuilderActions::SetMinimumPressure(minimum_pressure)
-    });
-    let set_maximum_pressure = builder_dispatch.apply_callback(|maximum_pressure: Option<i32>| {
-        NestedNewContainerVerticalRuleBuilderActions::SetMaximumPressure(maximum_pressure)
-    });
+    let set_container_item_type = builder_dispatch.apply_callback(|container_item_type: Option<NestedItemCategory>| NestedNewContainerVerticalRuleBuilderActions::SetContainerItemType(container_item_type));
+    let set_contained_item_type = builder_dispatch.apply_callback(|contained_item_type: Option<NestedItemCategory>| NestedNewContainerVerticalRuleBuilderActions::SetContainedItemType(contained_item_type));
+    let set_name = builder_dispatch.apply_callback(|name: Option<String>| NestedNewContainerVerticalRuleBuilderActions::SetName(name));
+    let set_minimum_temperature = builder_dispatch.apply_callback(|minimum_temperature: Option<i32>| NestedNewContainerVerticalRuleBuilderActions::SetMinimumTemperature(minimum_temperature));
+    let set_maximum_temperature = builder_dispatch.apply_callback(|maximum_temperature: Option<i32>| NestedNewContainerVerticalRuleBuilderActions::SetMaximumTemperature(maximum_temperature));
+    let set_minimum_humidity = builder_dispatch.apply_callback(|minimum_humidity: Option<i32>| NestedNewContainerVerticalRuleBuilderActions::SetMinimumHumidity(minimum_humidity));
+    let set_maximum_humidity = builder_dispatch.apply_callback(|maximum_humidity: Option<i32>| NestedNewContainerVerticalRuleBuilderActions::SetMaximumHumidity(maximum_humidity));
+    let set_minimum_pressure = builder_dispatch.apply_callback(|minimum_pressure: Option<i32>| NestedNewContainerVerticalRuleBuilderActions::SetMinimumPressure(minimum_pressure));
+    let set_maximum_pressure = builder_dispatch.apply_callback(|maximum_pressure: Option<i32>| NestedNewContainerVerticalRuleBuilderActions::SetMaximumPressure(maximum_pressure));
     html! {
         <BasicForm<NewContainerVerticalRule> builder={builder_store.deref().clone()}>
             <Datalist<NestedItemCategory> builder={set_container_item_type} errors={builder_store.errors_container_item_type.clone()} value={builder_store.container_item_type.clone()} label="ContainerItemType" />
@@ -929,12 +797,19 @@ impl FormBuilder for NewDocumentFormatBuilder {
     type Actions = NewDocumentFormatBuilderActions;
 
     fn has_errors(&self) -> bool {
-        !self.errors_extension.is_empty() || !self.errors_mime_type.is_empty()
+!self.errors_extension.is_empty() || !self.errors_mime_type.is_empty()
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.extension.is_some()
+        && self.mime_type.is_some()
     }
 
     fn form_level_errors(&self) -> Vec<String> {
         vec![]
     }
+
 }
 impl From<NewDocumentFormatBuilder> for NewDocumentFormat {
     fn from(builder: NewDocumentFormatBuilder) -> Self {
@@ -962,26 +837,23 @@ impl FormBuildable for NewDocumentFormat {
     }
 }
 impl Reducer<NewDocumentFormatBuilder> for NewDocumentFormatBuilderActions {
-    fn apply(
-        self,
-        mut state: std::rc::Rc<NewDocumentFormatBuilder>,
-    ) -> std::rc::Rc<NewDocumentFormatBuilder> {
+    fn apply(self, mut state: std::rc::Rc<NewDocumentFormatBuilder>) -> std::rc::Rc<NewDocumentFormatBuilder> {
         let state_mut = Rc::make_mut(&mut state);
         match self {
             NewDocumentFormatBuilderActions::SetExtension(extension) => {
-                if extension.is_none() {
-                    state_mut.errors_extension.push(ApiError::BadRequest(vec![
-                        "The Extension field is required.".to_string(),
-                    ]));
-                }
+        if extension.is_none() {
+            state_mut.errors_extension.push(ApiError::BadRequest(vec![
+                "The Extension field is required.".to_string()
+             ]));
+        }
                 state_mut.extension = extension;
             }
             NewDocumentFormatBuilderActions::SetMimeType(mime_type) => {
-                if mime_type.is_none() {
-                    state_mut.errors_mime_type.push(ApiError::BadRequest(vec![
-                        "The MimeType field is required.".to_string(),
-                    ]));
-                }
+        if mime_type.is_none() {
+            state_mut.errors_mime_type.push(ApiError::BadRequest(vec![
+                "The MimeType field is required.".to_string()
+             ]));
+        }
                 state_mut.mime_type = mime_type;
             }
         }
@@ -991,12 +863,8 @@ impl Reducer<NewDocumentFormatBuilder> for NewDocumentFormatBuilderActions {
 #[function_component(NewDocumentFormatForm)]
 pub fn new_document_format_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<NewDocumentFormatBuilder>();
-    let set_extension = builder_dispatch.apply_callback(|extension: Option<String>| {
-        NewDocumentFormatBuilderActions::SetExtension(extension)
-    });
-    let set_mime_type = builder_dispatch.apply_callback(|mime_type: Option<String>| {
-        NewDocumentFormatBuilderActions::SetMimeType(mime_type)
-    });
+    let set_extension = builder_dispatch.apply_callback(|extension: Option<String>| NewDocumentFormatBuilderActions::SetExtension(extension));
+    let set_mime_type = builder_dispatch.apply_callback(|mime_type: Option<String>| NewDocumentFormatBuilderActions::SetMimeType(mime_type));
     html! {
         <BasicForm<NewDocumentFormat> builder={builder_store.deref().clone()}>
             <BasicInput label="Extension" errors={builder_store.errors_extension.clone()} builder={set_extension} value={builder_store.extension.clone()} input_type={InputType::Text} />
@@ -1030,15 +898,21 @@ impl FormBuilder for NestedDocumentBuilder {
     type Actions = NestedDocumentBuilderActions;
 
     fn has_errors(&self) -> bool {
-        !self.errors_author.is_empty()
-            || !self.errors_format.is_empty()
-            || !self.errors_path.is_empty()
-            || !self.errors_bytes.is_empty()
+!self.errors_author.is_empty() || !self.errors_format.is_empty() || !self.errors_path.is_empty() || !self.errors_bytes.is_empty()
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.author.is_some()
+        && self.format.is_some()
+        && self.path.is_some()
+        && self.bytes.is_some()
     }
 
     fn form_level_errors(&self) -> Vec<String> {
         vec![]
     }
+
 }
 impl From<NestedDocumentBuilder> for Document {
     fn from(builder: NestedDocumentBuilder) -> Self {
@@ -1069,42 +943,39 @@ impl FormBuildable for Document {
     }
 }
 impl Reducer<NestedDocumentBuilder> for NestedDocumentBuilderActions {
-    fn apply(
-        self,
-        mut state: std::rc::Rc<NestedDocumentBuilder>,
-    ) -> std::rc::Rc<NestedDocumentBuilder> {
+    fn apply(self, mut state: std::rc::Rc<NestedDocumentBuilder>) -> std::rc::Rc<NestedDocumentBuilder> {
         let state_mut = Rc::make_mut(&mut state);
         match self {
             NestedDocumentBuilderActions::SetAuthor(author) => {
-                if author.is_none() {
-                    state_mut.errors_author.push(ApiError::BadRequest(vec![
-                        "The Author field is required.".to_string(),
-                    ]));
-                }
+        if author.is_none() {
+            state_mut.errors_author.push(ApiError::BadRequest(vec![
+                "The Author field is required.".to_string()
+             ]));
+        }
                 state_mut.author = author;
             }
             NestedDocumentBuilderActions::SetFormat(format) => {
-                if format.is_none() {
-                    state_mut.errors_format.push(ApiError::BadRequest(vec![
-                        "The Format field is required.".to_string(),
-                    ]));
-                }
+        if format.is_none() {
+            state_mut.errors_format.push(ApiError::BadRequest(vec![
+                "The Format field is required.".to_string()
+             ]));
+        }
                 state_mut.format = format;
             }
             NestedDocumentBuilderActions::SetPath(path) => {
-                if path.is_none() {
-                    state_mut.errors_path.push(ApiError::BadRequest(vec![
-                        "The Path field is required.".to_string(),
-                    ]));
-                }
+        if path.is_none() {
+            state_mut.errors_path.push(ApiError::BadRequest(vec![
+                "The Path field is required.".to_string()
+             ]));
+        }
                 state_mut.path = path;
             }
             NestedDocumentBuilderActions::SetBytes(bytes) => {
-                if bytes.is_none() {
-                    state_mut.errors_bytes.push(ApiError::BadRequest(vec![
-                        "The Bytes field is required.".to_string(),
-                    ]));
-                }
+        if bytes.is_none() {
+            state_mut.errors_bytes.push(ApiError::BadRequest(vec![
+                "The Bytes field is required.".to_string()
+             ]));
+        }
                 state_mut.bytes = bytes;
             }
         }
@@ -1114,15 +985,10 @@ impl Reducer<NestedDocumentBuilder> for NestedDocumentBuilderActions {
 #[function_component(DocumentForm)]
 pub fn document_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<NestedDocumentBuilder>();
-    let set_author = builder_dispatch
-        .apply_callback(|author: Option<User>| NestedDocumentBuilderActions::SetAuthor(author));
-    let set_format = builder_dispatch.apply_callback(|format: Option<DocumentFormat>| {
-        NestedDocumentBuilderActions::SetFormat(format)
-    });
-    let set_path = builder_dispatch
-        .apply_callback(|path: Option<String>| NestedDocumentBuilderActions::SetPath(path));
-    let set_bytes = builder_dispatch
-        .apply_callback(|bytes: Option<i32>| NestedDocumentBuilderActions::SetBytes(bytes));
+    let set_author = builder_dispatch.apply_callback(|author: Option<User>| NestedDocumentBuilderActions::SetAuthor(author));
+    let set_format = builder_dispatch.apply_callback(|format: Option<DocumentFormat>| NestedDocumentBuilderActions::SetFormat(format));
+    let set_path = builder_dispatch.apply_callback(|path: Option<String>| NestedDocumentBuilderActions::SetPath(path));
+    let set_bytes = builder_dispatch.apply_callback(|bytes: Option<i32>| NestedDocumentBuilderActions::SetBytes(bytes));
     html! {
         <BasicForm<Document> builder={builder_store.deref().clone()}>
             <Datalist<User> builder={set_author} errors={builder_store.errors_author.clone()} value={builder_store.author.clone()} label="Author" />
@@ -1148,12 +1014,18 @@ impl FormBuilder for NewFontAwesomeIconBuilder {
     type Actions = NewFontAwesomeIconBuilderActions;
 
     fn has_errors(&self) -> bool {
-        !self.errors_name.is_empty()
+!self.errors_name.is_empty()
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.name.is_some()
     }
 
     fn form_level_errors(&self) -> Vec<String> {
         vec![]
     }
+
 }
 impl From<NewFontAwesomeIconBuilder> for NewFontAwesomeIcon {
     fn from(builder: NewFontAwesomeIconBuilder) -> Self {
@@ -1180,18 +1052,15 @@ impl FormBuildable for NewFontAwesomeIcon {
     }
 }
 impl Reducer<NewFontAwesomeIconBuilder> for NewFontAwesomeIconBuilderActions {
-    fn apply(
-        self,
-        mut state: std::rc::Rc<NewFontAwesomeIconBuilder>,
-    ) -> std::rc::Rc<NewFontAwesomeIconBuilder> {
+    fn apply(self, mut state: std::rc::Rc<NewFontAwesomeIconBuilder>) -> std::rc::Rc<NewFontAwesomeIconBuilder> {
         let state_mut = Rc::make_mut(&mut state);
         match self {
             NewFontAwesomeIconBuilderActions::SetName(name) => {
-                if name.is_none() {
-                    state_mut.errors_name.push(ApiError::BadRequest(vec![
-                        "The Name field is required.".to_string(),
-                    ]));
-                }
+        if name.is_none() {
+            state_mut.errors_name.push(ApiError::BadRequest(vec![
+                "The Name field is required.".to_string()
+             ]));
+        }
                 state_mut.name = name;
             }
         }
@@ -1201,8 +1070,7 @@ impl Reducer<NewFontAwesomeIconBuilder> for NewFontAwesomeIconBuilderActions {
 #[function_component(NewFontAwesomeIconForm)]
 pub fn new_font_awesome_icon_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<NewFontAwesomeIconBuilder>();
-    let set_name = builder_dispatch
-        .apply_callback(|name: Option<String>| NewFontAwesomeIconBuilderActions::SetName(name));
+    let set_name = builder_dispatch.apply_callback(|name: Option<String>| NewFontAwesomeIconBuilderActions::SetName(name));
     html! {
         <BasicForm<NewFontAwesomeIcon> builder={builder_store.deref().clone()}>
             <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
@@ -1229,12 +1097,19 @@ impl FormBuilder for NestedNewItemCategoryBuilder {
     type Actions = NestedNewItemCategoryBuilderActions;
 
     fn has_errors(&self) -> bool {
-        !self.errors_name.is_empty() || !self.errors_description.is_empty()
+!self.errors_name.is_empty() || !self.errors_description.is_empty()
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.name.is_some()
+        && self.description.is_some()
     }
 
     fn form_level_errors(&self) -> Vec<String> {
         vec![]
     }
+
 }
 impl From<NestedNewItemCategoryBuilder> for NewItemCategory {
     fn from(builder: NestedNewItemCategoryBuilder) -> Self {
@@ -1262,26 +1137,23 @@ impl FormBuildable for NewItemCategory {
     }
 }
 impl Reducer<NestedNewItemCategoryBuilder> for NestedNewItemCategoryBuilderActions {
-    fn apply(
-        self,
-        mut state: std::rc::Rc<NestedNewItemCategoryBuilder>,
-    ) -> std::rc::Rc<NestedNewItemCategoryBuilder> {
+    fn apply(self, mut state: std::rc::Rc<NestedNewItemCategoryBuilder>) -> std::rc::Rc<NestedNewItemCategoryBuilder> {
         let state_mut = Rc::make_mut(&mut state);
         match self {
             NestedNewItemCategoryBuilderActions::SetName(name) => {
-                if name.is_none() {
-                    state_mut.errors_name.push(ApiError::BadRequest(vec![
-                        "The Name field is required.".to_string(),
-                    ]));
-                }
+        if name.is_none() {
+            state_mut.errors_name.push(ApiError::BadRequest(vec![
+                "The Name field is required.".to_string()
+             ]));
+        }
                 state_mut.name = name;
             }
             NestedNewItemCategoryBuilderActions::SetDescription(description) => {
-                if description.is_none() {
-                    state_mut.errors_description.push(ApiError::BadRequest(vec![
-                        "The Description field is required.".to_string(),
-                    ]));
-                }
+        if description.is_none() {
+            state_mut.errors_description.push(ApiError::BadRequest(vec![
+                "The Description field is required.".to_string()
+             ]));
+        }
                 state_mut.description = description;
             }
         }
@@ -1291,11 +1163,8 @@ impl Reducer<NestedNewItemCategoryBuilder> for NestedNewItemCategoryBuilderActio
 #[function_component(NewItemCategoryForm)]
 pub fn new_item_category_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<NestedNewItemCategoryBuilder>();
-    let set_name = builder_dispatch
-        .apply_callback(|name: Option<String>| NestedNewItemCategoryBuilderActions::SetName(name));
-    let set_description = builder_dispatch.apply_callback(|description: Option<String>| {
-        NestedNewItemCategoryBuilderActions::SetDescription(description)
-    });
+    let set_name = builder_dispatch.apply_callback(|name: Option<String>| NestedNewItemCategoryBuilderActions::SetName(name));
+    let set_description = builder_dispatch.apply_callback(|description: Option<String>| NestedNewItemCategoryBuilderActions::SetDescription(description));
     html! {
         <BasicForm<NewItemCategory> builder={builder_store.deref().clone()}>
             <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
@@ -1326,14 +1195,20 @@ impl FormBuilder for NestedNewItemCategoryRelationshipBuilder {
     type Actions = NestedNewItemCategoryRelationshipBuilderActions;
 
     fn has_errors(&self) -> bool {
-        !self.errors_parent.is_empty()
-            || !self.errors_child.is_empty()
-            || !self.errors_added_by.is_empty()
+!self.errors_parent.is_empty() || !self.errors_child.is_empty() || !self.errors_added_by.is_empty()
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.parent.is_some()
+        && self.child.is_some()
+        && self.added_by.is_some()
     }
 
     fn form_level_errors(&self) -> Vec<String> {
         vec![]
     }
+
 }
 impl From<NestedNewItemCategoryRelationshipBuilder> for NewItemCategoryRelationship {
     fn from(builder: NestedNewItemCategoryRelationshipBuilder) -> Self {
@@ -1361,37 +1236,32 @@ impl FormBuildable for NewItemCategoryRelationship {
         true
     }
 }
-impl Reducer<NestedNewItemCategoryRelationshipBuilder>
-    for NestedNewItemCategoryRelationshipBuilderActions
-{
-    fn apply(
-        self,
-        mut state: std::rc::Rc<NestedNewItemCategoryRelationshipBuilder>,
-    ) -> std::rc::Rc<NestedNewItemCategoryRelationshipBuilder> {
+impl Reducer<NestedNewItemCategoryRelationshipBuilder> for NestedNewItemCategoryRelationshipBuilderActions {
+    fn apply(self, mut state: std::rc::Rc<NestedNewItemCategoryRelationshipBuilder>) -> std::rc::Rc<NestedNewItemCategoryRelationshipBuilder> {
         let state_mut = Rc::make_mut(&mut state);
         match self {
             NestedNewItemCategoryRelationshipBuilderActions::SetParent(parent) => {
-                if parent.is_none() {
-                    state_mut.errors_parent.push(ApiError::BadRequest(vec![
-                        "The Parent field is required.".to_string(),
-                    ]));
-                }
+        if parent.is_none() {
+            state_mut.errors_parent.push(ApiError::BadRequest(vec![
+                "The Parent field is required.".to_string()
+             ]));
+        }
                 state_mut.parent = parent;
             }
             NestedNewItemCategoryRelationshipBuilderActions::SetChild(child) => {
-                if child.is_none() {
-                    state_mut.errors_child.push(ApiError::BadRequest(vec![
-                        "The Child field is required.".to_string(),
-                    ]));
-                }
+        if child.is_none() {
+            state_mut.errors_child.push(ApiError::BadRequest(vec![
+                "The Child field is required.".to_string()
+             ]));
+        }
                 state_mut.child = child;
             }
             NestedNewItemCategoryRelationshipBuilderActions::SetAddedBy(added_by) => {
-                if added_by.is_none() {
-                    state_mut.errors_added_by.push(ApiError::BadRequest(vec![
-                        "The AddedBy field is required.".to_string(),
-                    ]));
-                }
+        if added_by.is_none() {
+            state_mut.errors_added_by.push(ApiError::BadRequest(vec![
+                "The AddedBy field is required.".to_string()
+             ]));
+        }
                 state_mut.added_by = added_by;
             }
         }
@@ -1401,15 +1271,9 @@ impl Reducer<NestedNewItemCategoryRelationshipBuilder>
 #[function_component(NewItemCategoryRelationshipForm)]
 pub fn new_item_category_relationship_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<NestedNewItemCategoryRelationshipBuilder>();
-    let set_parent = builder_dispatch.apply_callback(|parent: Option<NestedItemCategory>| {
-        NestedNewItemCategoryRelationshipBuilderActions::SetParent(parent)
-    });
-    let set_child = builder_dispatch.apply_callback(|child: Option<NestedItemCategory>| {
-        NestedNewItemCategoryRelationshipBuilderActions::SetChild(child)
-    });
-    let set_added_by = builder_dispatch.apply_callback(|added_by: Option<User>| {
-        NestedNewItemCategoryRelationshipBuilderActions::SetAddedBy(added_by)
-    });
+    let set_parent = builder_dispatch.apply_callback(|parent: Option<NestedItemCategory>| NestedNewItemCategoryRelationshipBuilderActions::SetParent(parent));
+    let set_child = builder_dispatch.apply_callback(|child: Option<NestedItemCategory>| NestedNewItemCategoryRelationshipBuilderActions::SetChild(child));
+    let set_added_by = builder_dispatch.apply_callback(|added_by: Option<User>| NestedNewItemCategoryRelationshipBuilderActions::SetAddedBy(added_by));
     html! {
         <BasicForm<NewItemCategoryRelationship> builder={builder_store.deref().clone()}>
             <Datalist<NestedItemCategory> builder={set_parent} errors={builder_store.errors_parent.clone()} value={builder_store.parent.clone()} label="Parent" />
@@ -1438,12 +1302,19 @@ impl FormBuilder for NestedNewItemCategoryUnitBuilder {
     type Actions = NestedNewItemCategoryUnitBuilderActions;
 
     fn has_errors(&self) -> bool {
-        !self.errors_item_category.is_empty() || !self.errors_unit.is_empty()
+!self.errors_item_category.is_empty() || !self.errors_unit.is_empty()
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.item_category.is_some()
+        && self.unit.is_some()
     }
 
     fn form_level_errors(&self) -> Vec<String> {
         vec![]
     }
+
 }
 impl From<NestedNewItemCategoryUnitBuilder> for NewItemCategoryUnit {
     fn from(builder: NestedNewItemCategoryUnitBuilder) -> Self {
@@ -1471,28 +1342,23 @@ impl FormBuildable for NewItemCategoryUnit {
     }
 }
 impl Reducer<NestedNewItemCategoryUnitBuilder> for NestedNewItemCategoryUnitBuilderActions {
-    fn apply(
-        self,
-        mut state: std::rc::Rc<NestedNewItemCategoryUnitBuilder>,
-    ) -> std::rc::Rc<NestedNewItemCategoryUnitBuilder> {
+    fn apply(self, mut state: std::rc::Rc<NestedNewItemCategoryUnitBuilder>) -> std::rc::Rc<NestedNewItemCategoryUnitBuilder> {
         let state_mut = Rc::make_mut(&mut state);
         match self {
             NestedNewItemCategoryUnitBuilderActions::SetItemCategory(item_category) => {
-                if item_category.is_none() {
-                    state_mut
-                        .errors_item_category
-                        .push(ApiError::BadRequest(vec![
-                            "The ItemCategory field is required.".to_string(),
-                        ]));
-                }
+        if item_category.is_none() {
+            state_mut.errors_item_category.push(ApiError::BadRequest(vec![
+                "The ItemCategory field is required.".to_string()
+             ]));
+        }
                 state_mut.item_category = item_category;
             }
             NestedNewItemCategoryUnitBuilderActions::SetUnit(unit) => {
-                if unit.is_none() {
-                    state_mut.errors_unit.push(ApiError::BadRequest(vec![
-                        "The Unit field is required.".to_string(),
-                    ]));
-                }
+        if unit.is_none() {
+            state_mut.errors_unit.push(ApiError::BadRequest(vec![
+                "The Unit field is required.".to_string()
+             ]));
+        }
                 state_mut.unit = unit;
             }
         }
@@ -1502,13 +1368,8 @@ impl Reducer<NestedNewItemCategoryUnitBuilder> for NestedNewItemCategoryUnitBuil
 #[function_component(NewItemCategoryUnitForm)]
 pub fn new_item_category_unit_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<NestedNewItemCategoryUnitBuilder>();
-    let set_item_category =
-        builder_dispatch.apply_callback(|item_category: Option<NestedItemCategory>| {
-            NestedNewItemCategoryUnitBuilderActions::SetItemCategory(item_category)
-        });
-    let set_unit = builder_dispatch.apply_callback(|unit: Option<Unit>| {
-        NestedNewItemCategoryUnitBuilderActions::SetUnit(unit)
-    });
+    let set_item_category = builder_dispatch.apply_callback(|item_category: Option<NestedItemCategory>| NestedNewItemCategoryUnitBuilderActions::SetItemCategory(item_category));
+    let set_unit = builder_dispatch.apply_callback(|unit: Option<Unit>| NestedNewItemCategoryUnitBuilderActions::SetUnit(unit));
     html! {
         <BasicForm<NewItemCategoryUnit> builder={builder_store.deref().clone()}>
             <Datalist<NestedItemCategory> builder={set_item_category} errors={builder_store.errors_item_category.clone()} value={builder_store.item_category.clone()} label="ItemCategory" />
@@ -1548,17 +1409,23 @@ impl FormBuilder for NewLoginProviderBuilder {
     type Actions = NewLoginProviderBuilderActions;
 
     fn has_errors(&self) -> bool {
-        !self.errors_name.is_empty()
-            || !self.errors_font_awesome_icon.is_empty()
-            || !self.errors_client_id_var_name.is_empty()
-            || !self.errors_redirect_uri_var_name.is_empty()
-            || !self.errors_oauth_url.is_empty()
-            || !self.errors_scope.is_empty()
+!self.errors_name.is_empty() || !self.errors_font_awesome_icon.is_empty() || !self.errors_client_id_var_name.is_empty() || !self.errors_redirect_uri_var_name.is_empty() || !self.errors_oauth_url.is_empty() || !self.errors_scope.is_empty()
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.name.is_some()
+        && self.font_awesome_icon.is_some()
+        && self.client_id_var_name.is_some()
+        && self.redirect_uri_var_name.is_some()
+        && self.oauth_url.is_some()
+        && self.scope.is_some()
     }
 
     fn form_level_errors(&self) -> Vec<String> {
         vec![]
     }
+
 }
 impl From<NewLoginProviderBuilder> for NewLoginProvider {
     fn from(builder: NewLoginProviderBuilder) -> Self {
@@ -1590,64 +1457,55 @@ impl FormBuildable for NewLoginProvider {
     }
 }
 impl Reducer<NewLoginProviderBuilder> for NewLoginProviderBuilderActions {
-    fn apply(
-        self,
-        mut state: std::rc::Rc<NewLoginProviderBuilder>,
-    ) -> std::rc::Rc<NewLoginProviderBuilder> {
+    fn apply(self, mut state: std::rc::Rc<NewLoginProviderBuilder>) -> std::rc::Rc<NewLoginProviderBuilder> {
         let state_mut = Rc::make_mut(&mut state);
         match self {
             NewLoginProviderBuilderActions::SetName(name) => {
-                if name.is_none() {
-                    state_mut.errors_name.push(ApiError::BadRequest(vec![
-                        "The Name field is required.".to_string(),
-                    ]));
-                }
+        if name.is_none() {
+            state_mut.errors_name.push(ApiError::BadRequest(vec![
+                "The Name field is required.".to_string()
+             ]));
+        }
                 state_mut.name = name;
             }
             NewLoginProviderBuilderActions::SetFontAwesomeIcon(font_awesome_icon) => {
-                if font_awesome_icon.is_none() {
-                    state_mut
-                        .errors_font_awesome_icon
-                        .push(ApiError::BadRequest(vec![
-                            "The FontAwesomeIcon field is required.".to_string(),
-                        ]));
-                }
+        if font_awesome_icon.is_none() {
+            state_mut.errors_font_awesome_icon.push(ApiError::BadRequest(vec![
+                "The FontAwesomeIcon field is required.".to_string()
+             ]));
+        }
                 state_mut.font_awesome_icon = font_awesome_icon;
             }
             NewLoginProviderBuilderActions::SetClientIdVarName(client_id_var_name) => {
-                if client_id_var_name.is_none() {
-                    state_mut
-                        .errors_client_id_var_name
-                        .push(ApiError::BadRequest(vec![
-                            "The ClientIdVarName field is required.".to_string(),
-                        ]));
-                }
+        if client_id_var_name.is_none() {
+            state_mut.errors_client_id_var_name.push(ApiError::BadRequest(vec![
+                "The ClientIdVarName field is required.".to_string()
+             ]));
+        }
                 state_mut.client_id_var_name = client_id_var_name;
             }
             NewLoginProviderBuilderActions::SetRedirectUriVarName(redirect_uri_var_name) => {
-                if redirect_uri_var_name.is_none() {
-                    state_mut
-                        .errors_redirect_uri_var_name
-                        .push(ApiError::BadRequest(vec![
-                            "The RedirectUriVarName field is required.".to_string(),
-                        ]));
-                }
+        if redirect_uri_var_name.is_none() {
+            state_mut.errors_redirect_uri_var_name.push(ApiError::BadRequest(vec![
+                "The RedirectUriVarName field is required.".to_string()
+             ]));
+        }
                 state_mut.redirect_uri_var_name = redirect_uri_var_name;
             }
             NewLoginProviderBuilderActions::SetOauthUrl(oauth_url) => {
-                if oauth_url.is_none() {
-                    state_mut.errors_oauth_url.push(ApiError::BadRequest(vec![
-                        "The OauthUrl field is required.".to_string(),
-                    ]));
-                }
+        if oauth_url.is_none() {
+            state_mut.errors_oauth_url.push(ApiError::BadRequest(vec![
+                "The OauthUrl field is required.".to_string()
+             ]));
+        }
                 state_mut.oauth_url = oauth_url;
             }
             NewLoginProviderBuilderActions::SetScope(scope) => {
-                if scope.is_none() {
-                    state_mut.errors_scope.push(ApiError::BadRequest(vec![
-                        "The Scope field is required.".to_string(),
-                    ]));
-                }
+        if scope.is_none() {
+            state_mut.errors_scope.push(ApiError::BadRequest(vec![
+                "The Scope field is required.".to_string()
+             ]));
+        }
                 state_mut.scope = scope;
             }
         }
@@ -1657,25 +1515,12 @@ impl Reducer<NewLoginProviderBuilder> for NewLoginProviderBuilderActions {
 #[function_component(NewLoginProviderForm)]
 pub fn new_login_provider_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<NewLoginProviderBuilder>();
-    let set_name = builder_dispatch
-        .apply_callback(|name: Option<String>| NewLoginProviderBuilderActions::SetName(name));
-    let set_font_awesome_icon =
-        builder_dispatch.apply_callback(|font_awesome_icon: Option<String>| {
-            NewLoginProviderBuilderActions::SetFontAwesomeIcon(font_awesome_icon)
-        });
-    let set_client_id_var_name =
-        builder_dispatch.apply_callback(|client_id_var_name: Option<String>| {
-            NewLoginProviderBuilderActions::SetClientIdVarName(client_id_var_name)
-        });
-    let set_redirect_uri_var_name =
-        builder_dispatch.apply_callback(|redirect_uri_var_name: Option<String>| {
-            NewLoginProviderBuilderActions::SetRedirectUriVarName(redirect_uri_var_name)
-        });
-    let set_oauth_url = builder_dispatch.apply_callback(|oauth_url: Option<String>| {
-        NewLoginProviderBuilderActions::SetOauthUrl(oauth_url)
-    });
-    let set_scope = builder_dispatch
-        .apply_callback(|scope: Option<String>| NewLoginProviderBuilderActions::SetScope(scope));
+    let set_name = builder_dispatch.apply_callback(|name: Option<String>| NewLoginProviderBuilderActions::SetName(name));
+    let set_font_awesome_icon = builder_dispatch.apply_callback(|font_awesome_icon: Option<String>| NewLoginProviderBuilderActions::SetFontAwesomeIcon(font_awesome_icon));
+    let set_client_id_var_name = builder_dispatch.apply_callback(|client_id_var_name: Option<String>| NewLoginProviderBuilderActions::SetClientIdVarName(client_id_var_name));
+    let set_redirect_uri_var_name = builder_dispatch.apply_callback(|redirect_uri_var_name: Option<String>| NewLoginProviderBuilderActions::SetRedirectUriVarName(redirect_uri_var_name));
+    let set_oauth_url = builder_dispatch.apply_callback(|oauth_url: Option<String>| NewLoginProviderBuilderActions::SetOauthUrl(oauth_url));
+    let set_scope = builder_dispatch.apply_callback(|scope: Option<String>| NewLoginProviderBuilderActions::SetScope(scope));
     html! {
         <BasicForm<NewLoginProvider> builder={builder_store.deref().clone()}>
             <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
@@ -1713,15 +1558,21 @@ impl FormBuilder for NestedNewManufacturedItemCategoryBuilder {
     type Actions = NestedNewManufacturedItemCategoryBuilderActions;
 
     fn has_errors(&self) -> bool {
-        !self.errors_manifacturer.is_empty()
-            || !self.errors_cost.is_empty()
-            || !self.errors_cost_per_day.is_empty()
-            || !self.errors_currency.is_empty()
+!self.errors_manifacturer.is_empty() || !self.errors_cost.is_empty() || !self.errors_cost_per_day.is_empty() || !self.errors_currency.is_empty()
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.manifacturer.is_some()
+        && self.cost.is_some()
+        && self.cost_per_day.is_some()
+        && self.currency.is_some()
     }
 
     fn form_level_errors(&self) -> Vec<String> {
         vec![]
     }
+
 }
 impl From<NestedNewManufacturedItemCategoryBuilder> for NewManufacturedItemCategory {
     fn from(builder: NestedNewManufacturedItemCategoryBuilder) -> Self {
@@ -1750,49 +1601,40 @@ impl FormBuildable for NewManufacturedItemCategory {
         true
     }
 }
-impl Reducer<NestedNewManufacturedItemCategoryBuilder>
-    for NestedNewManufacturedItemCategoryBuilderActions
-{
-    fn apply(
-        self,
-        mut state: std::rc::Rc<NestedNewManufacturedItemCategoryBuilder>,
-    ) -> std::rc::Rc<NestedNewManufacturedItemCategoryBuilder> {
+impl Reducer<NestedNewManufacturedItemCategoryBuilder> for NestedNewManufacturedItemCategoryBuilderActions {
+    fn apply(self, mut state: std::rc::Rc<NestedNewManufacturedItemCategoryBuilder>) -> std::rc::Rc<NestedNewManufacturedItemCategoryBuilder> {
         let state_mut = Rc::make_mut(&mut state);
         match self {
             NestedNewManufacturedItemCategoryBuilderActions::SetManifacturer(manifacturer) => {
-                if manifacturer.is_none() {
-                    state_mut
-                        .errors_manifacturer
-                        .push(ApiError::BadRequest(vec![
-                            "The Manifacturer field is required.".to_string(),
-                        ]));
-                }
+        if manifacturer.is_none() {
+            state_mut.errors_manifacturer.push(ApiError::BadRequest(vec![
+                "The Manifacturer field is required.".to_string()
+             ]));
+        }
                 state_mut.manifacturer = manifacturer;
             }
             NestedNewManufacturedItemCategoryBuilderActions::SetCost(cost) => {
-                if cost.is_none() {
-                    state_mut.errors_cost.push(ApiError::BadRequest(vec![
-                        "The Cost field is required.".to_string(),
-                    ]));
-                }
+        if cost.is_none() {
+            state_mut.errors_cost.push(ApiError::BadRequest(vec![
+                "The Cost field is required.".to_string()
+             ]));
+        }
                 state_mut.cost = cost;
             }
             NestedNewManufacturedItemCategoryBuilderActions::SetCostPerDay(cost_per_day) => {
-                if cost_per_day.is_none() {
-                    state_mut
-                        .errors_cost_per_day
-                        .push(ApiError::BadRequest(vec![
-                            "The CostPerDay field is required.".to_string(),
-                        ]));
-                }
+        if cost_per_day.is_none() {
+            state_mut.errors_cost_per_day.push(ApiError::BadRequest(vec![
+                "The CostPerDay field is required.".to_string()
+             ]));
+        }
                 state_mut.cost_per_day = cost_per_day;
             }
             NestedNewManufacturedItemCategoryBuilderActions::SetCurrency(currency) => {
-                if currency.is_none() {
-                    state_mut.errors_currency.push(ApiError::BadRequest(vec![
-                        "The Currency field is required.".to_string(),
-                    ]));
-                }
+        if currency.is_none() {
+            state_mut.errors_currency.push(ApiError::BadRequest(vec![
+                "The Currency field is required.".to_string()
+             ]));
+        }
                 state_mut.currency = currency;
             }
         }
@@ -1802,19 +1644,10 @@ impl Reducer<NestedNewManufacturedItemCategoryBuilder>
 #[function_component(NewManufacturedItemCategoryForm)]
 pub fn new_manufactured_item_category_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<NestedNewManufacturedItemCategoryBuilder>();
-    let set_manifacturer =
-        builder_dispatch.apply_callback(|manifacturer: Option<NestedOrganization>| {
-            NestedNewManufacturedItemCategoryBuilderActions::SetManifacturer(manifacturer)
-        });
-    let set_cost = builder_dispatch.apply_callback(|cost: Option<i32>| {
-        NestedNewManufacturedItemCategoryBuilderActions::SetCost(cost)
-    });
-    let set_cost_per_day = builder_dispatch.apply_callback(|cost_per_day: Option<i32>| {
-        NestedNewManufacturedItemCategoryBuilderActions::SetCostPerDay(cost_per_day)
-    });
-    let set_currency = builder_dispatch.apply_callback(|currency: Option<String>| {
-        NestedNewManufacturedItemCategoryBuilderActions::SetCurrency(currency)
-    });
+    let set_manifacturer = builder_dispatch.apply_callback(|manifacturer: Option<NestedOrganization>| NestedNewManufacturedItemCategoryBuilderActions::SetManifacturer(manifacturer));
+    let set_cost = builder_dispatch.apply_callback(|cost: Option<i32>| NestedNewManufacturedItemCategoryBuilderActions::SetCost(cost));
+    let set_cost_per_day = builder_dispatch.apply_callback(|cost_per_day: Option<i32>| NestedNewManufacturedItemCategoryBuilderActions::SetCostPerDay(cost_per_day));
+    let set_currency = builder_dispatch.apply_callback(|currency: Option<String>| NestedNewManufacturedItemCategoryBuilderActions::SetCurrency(currency));
     html! {
         <BasicForm<NewManufacturedItemCategory> builder={builder_store.deref().clone()}>
             <Datalist<NestedOrganization> builder={set_manifacturer} errors={builder_store.errors_manifacturer.clone()} value={builder_store.manifacturer.clone()} label="Manifacturer" />
@@ -1848,15 +1681,21 @@ impl FormBuilder for NestedNewNotificationBuilder {
     type Actions = NestedNewNotificationBuilderActions;
 
     fn has_errors(&self) -> bool {
-        !self.errors_user.is_empty()
-            || !self.errors_operation.is_empty()
-            || !self.errors_table_name.is_empty()
-            || !self.errors_read.is_empty()
+!self.errors_user.is_empty() || !self.errors_operation.is_empty() || !self.errors_table_name.is_empty() || !self.errors_read.is_empty()
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.user.is_some()
+        && self.operation.is_some()
+        && self.table_name.is_some()
+        && self.read.is_some()
     }
 
     fn form_level_errors(&self) -> Vec<String> {
         vec![]
     }
+
 }
 impl From<NestedNewNotificationBuilder> for NewNotification {
     fn from(builder: NestedNewNotificationBuilder) -> Self {
@@ -1886,42 +1725,39 @@ impl FormBuildable for NewNotification {
     }
 }
 impl Reducer<NestedNewNotificationBuilder> for NestedNewNotificationBuilderActions {
-    fn apply(
-        self,
-        mut state: std::rc::Rc<NestedNewNotificationBuilder>,
-    ) -> std::rc::Rc<NestedNewNotificationBuilder> {
+    fn apply(self, mut state: std::rc::Rc<NestedNewNotificationBuilder>) -> std::rc::Rc<NestedNewNotificationBuilder> {
         let state_mut = Rc::make_mut(&mut state);
         match self {
             NestedNewNotificationBuilderActions::SetUser(user) => {
-                if user.is_none() {
-                    state_mut.errors_user.push(ApiError::BadRequest(vec![
-                        "The User field is required.".to_string(),
-                    ]));
-                }
+        if user.is_none() {
+            state_mut.errors_user.push(ApiError::BadRequest(vec![
+                "The User field is required.".to_string()
+             ]));
+        }
                 state_mut.user = user;
             }
             NestedNewNotificationBuilderActions::SetOperation(operation) => {
-                if operation.is_none() {
-                    state_mut.errors_operation.push(ApiError::BadRequest(vec![
-                        "The Operation field is required.".to_string(),
-                    ]));
-                }
+        if operation.is_none() {
+            state_mut.errors_operation.push(ApiError::BadRequest(vec![
+                "The Operation field is required.".to_string()
+             ]));
+        }
                 state_mut.operation = operation;
             }
             NestedNewNotificationBuilderActions::SetTableName(table_name) => {
-                if table_name.is_none() {
-                    state_mut.errors_table_name.push(ApiError::BadRequest(vec![
-                        "The TableName field is required.".to_string(),
-                    ]));
-                }
+        if table_name.is_none() {
+            state_mut.errors_table_name.push(ApiError::BadRequest(vec![
+                "The TableName field is required.".to_string()
+             ]));
+        }
                 state_mut.table_name = table_name;
             }
             NestedNewNotificationBuilderActions::SetRead(read) => {
-                if read.is_none() {
-                    state_mut.errors_read.push(ApiError::BadRequest(vec![
-                        "The Read field is required.".to_string(),
-                    ]));
-                }
+        if read.is_none() {
+            state_mut.errors_read.push(ApiError::BadRequest(vec![
+                "The Read field is required.".to_string()
+             ]));
+        }
                 state_mut.read = read;
             }
         }
@@ -1931,16 +1767,10 @@ impl Reducer<NestedNewNotificationBuilder> for NestedNewNotificationBuilderActio
 #[function_component(NewNotificationForm)]
 pub fn new_notification_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<NestedNewNotificationBuilder>();
-    let set_user = builder_dispatch
-        .apply_callback(|user: Option<User>| NestedNewNotificationBuilderActions::SetUser(user));
-    let set_operation = builder_dispatch.apply_callback(|operation: Option<String>| {
-        NestedNewNotificationBuilderActions::SetOperation(operation)
-    });
-    let set_table_name = builder_dispatch.apply_callback(|table_name: Option<String>| {
-        NestedNewNotificationBuilderActions::SetTableName(table_name)
-    });
-    let set_read = builder_dispatch
-        .apply_callback(|read: bool| NestedNewNotificationBuilderActions::SetRead(Some(read)));
+    let set_user = builder_dispatch.apply_callback(|user: Option<User>| NestedNewNotificationBuilderActions::SetUser(user));
+    let set_operation = builder_dispatch.apply_callback(|operation: Option<String>| NestedNewNotificationBuilderActions::SetOperation(operation));
+    let set_table_name = builder_dispatch.apply_callback(|table_name: Option<String>| NestedNewNotificationBuilderActions::SetTableName(table_name));
+    let set_read = builder_dispatch.apply_callback(|read: bool| NestedNewNotificationBuilderActions::SetRead(Some(read)));
     html! {
         <BasicForm<NewNotification> builder={builder_store.deref().clone()}>
             <Datalist<User> builder={set_user} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" />
@@ -1970,19 +1800,23 @@ impl FormBuilder for NestedNewOrganizationBuilder {
     type Actions = NestedNewOrganizationBuilderActions;
 
     fn has_errors(&self) -> bool {
-        !self.errors_parent_organization.is_empty() || !self.errors_name.is_empty()
+!self.errors_parent_organization.is_empty() || !self.errors_name.is_empty()
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.name.is_some()
     }
 
     fn form_level_errors(&self) -> Vec<String> {
         vec![]
     }
+
 }
 impl From<NestedNewOrganizationBuilder> for NewOrganization {
     fn from(builder: NestedNewOrganizationBuilder) -> Self {
         Self {
-            parent_organization_id: builder
-                .parent_organization
-                .map(|parent_organization| parent_organization.inner.id),
+            parent_organization_id: builder.parent_organization.map(|parent_organization| parent_organization.inner.id),
             name: builder.name.unwrap(),
         }
     }
@@ -2005,21 +1839,18 @@ impl FormBuildable for NewOrganization {
     }
 }
 impl Reducer<NestedNewOrganizationBuilder> for NestedNewOrganizationBuilderActions {
-    fn apply(
-        self,
-        mut state: std::rc::Rc<NestedNewOrganizationBuilder>,
-    ) -> std::rc::Rc<NestedNewOrganizationBuilder> {
+    fn apply(self, mut state: std::rc::Rc<NestedNewOrganizationBuilder>) -> std::rc::Rc<NestedNewOrganizationBuilder> {
         let state_mut = Rc::make_mut(&mut state);
         match self {
             NestedNewOrganizationBuilderActions::SetParentOrganization(parent_organization) => {
                 state_mut.parent_organization = parent_organization;
             }
             NestedNewOrganizationBuilderActions::SetName(name) => {
-                if name.is_none() {
-                    state_mut.errors_name.push(ApiError::BadRequest(vec![
-                        "The Name field is required.".to_string(),
-                    ]));
-                }
+        if name.is_none() {
+            state_mut.errors_name.push(ApiError::BadRequest(vec![
+                "The Name field is required.".to_string()
+             ]));
+        }
                 state_mut.name = name;
             }
         }
@@ -2029,12 +1860,8 @@ impl Reducer<NestedNewOrganizationBuilder> for NestedNewOrganizationBuilderActio
 #[function_component(NewOrganizationForm)]
 pub fn new_organization_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<NestedNewOrganizationBuilder>();
-    let set_parent_organization =
-        builder_dispatch.apply_callback(|parent_organization: Option<NestedOrganization>| {
-            NestedNewOrganizationBuilderActions::SetParentOrganization(parent_organization)
-        });
-    let set_name = builder_dispatch
-        .apply_callback(|name: Option<String>| NestedNewOrganizationBuilderActions::SetName(name));
+    let set_parent_organization = builder_dispatch.apply_callback(|parent_organization: Option<NestedOrganization>| NestedNewOrganizationBuilderActions::SetParentOrganization(parent_organization));
+    let set_name = builder_dispatch.apply_callback(|name: Option<String>| NestedNewOrganizationBuilderActions::SetName(name));
     html! {
         <BasicForm<NewOrganization> builder={builder_store.deref().clone()}>
             <Datalist<NestedOrganization> builder={set_parent_organization} errors={builder_store.errors_parent_organization.clone()} value={builder_store.parent_organization.clone()} label="ParentOrganization" />
@@ -2062,12 +1889,18 @@ impl FormBuilder for NestedNewProcedureBuilder {
     type Actions = NestedNewProcedureBuilderActions;
 
     fn has_errors(&self) -> bool {
-        !self.errors_name.is_empty() || !self.errors_description.is_empty()
+!self.errors_name.is_empty() || !self.errors_description.is_empty()
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.name.is_some()
     }
 
     fn form_level_errors(&self) -> Vec<String> {
         vec![]
     }
+
 }
 impl From<NestedNewProcedureBuilder> for NewProcedure {
     fn from(builder: NestedNewProcedureBuilder) -> Self {
@@ -2095,18 +1928,15 @@ impl FormBuildable for NewProcedure {
     }
 }
 impl Reducer<NestedNewProcedureBuilder> for NestedNewProcedureBuilderActions {
-    fn apply(
-        self,
-        mut state: std::rc::Rc<NestedNewProcedureBuilder>,
-    ) -> std::rc::Rc<NestedNewProcedureBuilder> {
+    fn apply(self, mut state: std::rc::Rc<NestedNewProcedureBuilder>) -> std::rc::Rc<NestedNewProcedureBuilder> {
         let state_mut = Rc::make_mut(&mut state);
         match self {
             NestedNewProcedureBuilderActions::SetName(name) => {
-                if name.is_none() {
-                    state_mut.errors_name.push(ApiError::BadRequest(vec![
-                        "The Name field is required.".to_string(),
-                    ]));
-                }
+        if name.is_none() {
+            state_mut.errors_name.push(ApiError::BadRequest(vec![
+                "The Name field is required.".to_string()
+             ]));
+        }
                 state_mut.name = name;
             }
             NestedNewProcedureBuilderActions::SetDescription(description) => {
@@ -2119,11 +1949,8 @@ impl Reducer<NestedNewProcedureBuilder> for NestedNewProcedureBuilderActions {
 #[function_component(NewProcedureForm)]
 pub fn new_procedure_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<NestedNewProcedureBuilder>();
-    let set_name = builder_dispatch
-        .apply_callback(|name: Option<String>| NestedNewProcedureBuilderActions::SetName(name));
-    let set_description = builder_dispatch.apply_callback(|description: Option<String>| {
-        NestedNewProcedureBuilderActions::SetDescription(description)
-    });
+    let set_name = builder_dispatch.apply_callback(|name: Option<String>| NestedNewProcedureBuilderActions::SetName(name));
+    let set_description = builder_dispatch.apply_callback(|description: Option<String>| NestedNewProcedureBuilderActions::SetDescription(description));
     html! {
         <BasicForm<NewProcedure> builder={builder_store.deref().clone()}>
             <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
@@ -2157,15 +1984,20 @@ impl FormBuilder for NestedNewProjectRequirementBuilder {
     type Actions = NestedNewProjectRequirementBuilderActions;
 
     fn has_errors(&self) -> bool {
-        !self.errors_project.is_empty()
-            || !self.errors_item_category.is_empty()
-            || !self.errors_unit.is_empty()
-            || !self.errors_quantity.is_empty()
+!self.errors_project.is_empty() || !self.errors_item_category.is_empty() || !self.errors_unit.is_empty() || !self.errors_quantity.is_empty()
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.project.is_some()
+        && self.item_category.is_some()
+        && self.quantity.is_some()
     }
 
     fn form_level_errors(&self) -> Vec<String> {
         vec![]
     }
+
 }
 impl From<NestedNewProjectRequirementBuilder> for NewProjectRequirement {
     fn from(builder: NestedNewProjectRequirementBuilder) -> Self {
@@ -2195,39 +2027,34 @@ impl FormBuildable for NewProjectRequirement {
     }
 }
 impl Reducer<NestedNewProjectRequirementBuilder> for NestedNewProjectRequirementBuilderActions {
-    fn apply(
-        self,
-        mut state: std::rc::Rc<NestedNewProjectRequirementBuilder>,
-    ) -> std::rc::Rc<NestedNewProjectRequirementBuilder> {
+    fn apply(self, mut state: std::rc::Rc<NestedNewProjectRequirementBuilder>) -> std::rc::Rc<NestedNewProjectRequirementBuilder> {
         let state_mut = Rc::make_mut(&mut state);
         match self {
             NestedNewProjectRequirementBuilderActions::SetProject(project) => {
-                if project.is_none() {
-                    state_mut.errors_project.push(ApiError::BadRequest(vec![
-                        "The Project field is required.".to_string(),
-                    ]));
-                }
+        if project.is_none() {
+            state_mut.errors_project.push(ApiError::BadRequest(vec![
+                "The Project field is required.".to_string()
+             ]));
+        }
                 state_mut.project = project;
             }
             NestedNewProjectRequirementBuilderActions::SetItemCategory(item_category) => {
-                if item_category.is_none() {
-                    state_mut
-                        .errors_item_category
-                        .push(ApiError::BadRequest(vec![
-                            "The ItemCategory field is required.".to_string(),
-                        ]));
-                }
+        if item_category.is_none() {
+            state_mut.errors_item_category.push(ApiError::BadRequest(vec![
+                "The ItemCategory field is required.".to_string()
+             ]));
+        }
                 state_mut.item_category = item_category;
             }
             NestedNewProjectRequirementBuilderActions::SetUnit(unit) => {
                 state_mut.unit = unit;
             }
             NestedNewProjectRequirementBuilderActions::SetQuantity(quantity) => {
-                if quantity.is_none() {
-                    state_mut.errors_quantity.push(ApiError::BadRequest(vec![
-                        "The Quantity field is required.".to_string(),
-                    ]));
-                }
+        if quantity.is_none() {
+            state_mut.errors_quantity.push(ApiError::BadRequest(vec![
+                "The Quantity field is required.".to_string()
+             ]));
+        }
                 state_mut.quantity = quantity;
             }
         }
@@ -2237,19 +2064,10 @@ impl Reducer<NestedNewProjectRequirementBuilder> for NestedNewProjectRequirement
 #[function_component(NewProjectRequirementForm)]
 pub fn new_project_requirement_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<NestedNewProjectRequirementBuilder>();
-    let set_project = builder_dispatch.apply_callback(|project: Option<NestedProject>| {
-        NestedNewProjectRequirementBuilderActions::SetProject(project)
-    });
-    let set_item_category =
-        builder_dispatch.apply_callback(|item_category: Option<NestedItemCategory>| {
-            NestedNewProjectRequirementBuilderActions::SetItemCategory(item_category)
-        });
-    let set_unit = builder_dispatch.apply_callback(|unit: Option<Unit>| {
-        NestedNewProjectRequirementBuilderActions::SetUnit(unit)
-    });
-    let set_quantity = builder_dispatch.apply_callback(|quantity: Option<i32>| {
-        NestedNewProjectRequirementBuilderActions::SetQuantity(quantity)
-    });
+    let set_project = builder_dispatch.apply_callback(|project: Option<NestedProject>| NestedNewProjectRequirementBuilderActions::SetProject(project));
+    let set_item_category = builder_dispatch.apply_callback(|item_category: Option<NestedItemCategory>| NestedNewProjectRequirementBuilderActions::SetItemCategory(item_category));
+    let set_unit = builder_dispatch.apply_callback(|unit: Option<Unit>| NestedNewProjectRequirementBuilderActions::SetUnit(unit));
+    let set_quantity = builder_dispatch.apply_callback(|quantity: Option<i32>| NestedNewProjectRequirementBuilderActions::SetQuantity(quantity));
     html! {
         <BasicForm<NewProjectRequirement> builder={builder_store.deref().clone()}>
             <Datalist<NestedProject> builder={set_project} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" />
@@ -2284,15 +2102,21 @@ impl FormBuilder for NewProjectStateBuilder {
     type Actions = NewProjectStateBuilderActions;
 
     fn has_errors(&self) -> bool {
-        !self.errors_name.is_empty()
-            || !self.errors_description.is_empty()
-            || !self.errors_font_awesome_icon.is_empty()
-            || !self.errors_icon_color.is_empty()
+!self.errors_name.is_empty() || !self.errors_description.is_empty() || !self.errors_font_awesome_icon.is_empty() || !self.errors_icon_color.is_empty()
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.name.is_some()
+        && self.description.is_some()
+        && self.font_awesome_icon.is_some()
+        && self.icon_color.is_some()
     }
 
     fn form_level_errors(&self) -> Vec<String> {
         vec![]
     }
+
 }
 impl From<NewProjectStateBuilder> for NewProjectState {
     fn from(builder: NewProjectStateBuilder) -> Self {
@@ -2322,44 +2146,39 @@ impl FormBuildable for NewProjectState {
     }
 }
 impl Reducer<NewProjectStateBuilder> for NewProjectStateBuilderActions {
-    fn apply(
-        self,
-        mut state: std::rc::Rc<NewProjectStateBuilder>,
-    ) -> std::rc::Rc<NewProjectStateBuilder> {
+    fn apply(self, mut state: std::rc::Rc<NewProjectStateBuilder>) -> std::rc::Rc<NewProjectStateBuilder> {
         let state_mut = Rc::make_mut(&mut state);
         match self {
             NewProjectStateBuilderActions::SetName(name) => {
-                if name.is_none() {
-                    state_mut.errors_name.push(ApiError::BadRequest(vec![
-                        "The Name field is required.".to_string(),
-                    ]));
-                }
+        if name.is_none() {
+            state_mut.errors_name.push(ApiError::BadRequest(vec![
+                "The Name field is required.".to_string()
+             ]));
+        }
                 state_mut.name = name;
             }
             NewProjectStateBuilderActions::SetDescription(description) => {
-                if description.is_none() {
-                    state_mut.errors_description.push(ApiError::BadRequest(vec![
-                        "The Description field is required.".to_string(),
-                    ]));
-                }
+        if description.is_none() {
+            state_mut.errors_description.push(ApiError::BadRequest(vec![
+                "The Description field is required.".to_string()
+             ]));
+        }
                 state_mut.description = description;
             }
             NewProjectStateBuilderActions::SetFontAwesomeIcon(font_awesome_icon) => {
-                if font_awesome_icon.is_none() {
-                    state_mut
-                        .errors_font_awesome_icon
-                        .push(ApiError::BadRequest(vec![
-                            "The FontAwesomeIcon field is required.".to_string(),
-                        ]));
-                }
+        if font_awesome_icon.is_none() {
+            state_mut.errors_font_awesome_icon.push(ApiError::BadRequest(vec![
+                "The FontAwesomeIcon field is required.".to_string()
+             ]));
+        }
                 state_mut.font_awesome_icon = font_awesome_icon;
             }
             NewProjectStateBuilderActions::SetIconColor(icon_color) => {
-                if icon_color.is_none() {
-                    state_mut.errors_icon_color.push(ApiError::BadRequest(vec![
-                        "The IconColor field is required.".to_string(),
-                    ]));
-                }
+        if icon_color.is_none() {
+            state_mut.errors_icon_color.push(ApiError::BadRequest(vec![
+                "The IconColor field is required.".to_string()
+             ]));
+        }
                 state_mut.icon_color = icon_color;
             }
         }
@@ -2369,18 +2188,10 @@ impl Reducer<NewProjectStateBuilder> for NewProjectStateBuilderActions {
 #[function_component(NewProjectStateForm)]
 pub fn new_project_state_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<NewProjectStateBuilder>();
-    let set_name = builder_dispatch
-        .apply_callback(|name: Option<String>| NewProjectStateBuilderActions::SetName(name));
-    let set_description = builder_dispatch.apply_callback(|description: Option<String>| {
-        NewProjectStateBuilderActions::SetDescription(description)
-    });
-    let set_font_awesome_icon =
-        builder_dispatch.apply_callback(|font_awesome_icon: Option<String>| {
-            NewProjectStateBuilderActions::SetFontAwesomeIcon(font_awesome_icon)
-        });
-    let set_icon_color = builder_dispatch.apply_callback(|icon_color: Option<String>| {
-        NewProjectStateBuilderActions::SetIconColor(icon_color)
-    });
+    let set_name = builder_dispatch.apply_callback(|name: Option<String>| NewProjectStateBuilderActions::SetName(name));
+    let set_description = builder_dispatch.apply_callback(|description: Option<String>| NewProjectStateBuilderActions::SetDescription(description));
+    let set_font_awesome_icon = builder_dispatch.apply_callback(|font_awesome_icon: Option<String>| NewProjectStateBuilderActions::SetFontAwesomeIcon(font_awesome_icon));
+    let set_icon_color = builder_dispatch.apply_callback(|icon_color: Option<String>| NewProjectStateBuilderActions::SetIconColor(icon_color));
     html! {
         <BasicForm<NewProjectState> builder={builder_store.deref().clone()}>
             <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
@@ -2431,20 +2242,21 @@ impl FormBuilder for NestedNewProjectBuilder {
     type Actions = NestedNewProjectBuilderActions;
 
     fn has_errors(&self) -> bool {
-        !self.errors_state.is_empty()
-            || !self.errors_parent_project.is_empty()
-            || !self.errors_name.is_empty()
-            || !self.errors_description.is_empty()
-            || !self.errors_public.is_empty()
-            || !self.errors_budget.is_empty()
-            || !self.errors_expenses.is_empty()
-            || !self.errors_expected_end_date.is_empty()
-            || !self.errors_end_date.is_empty()
+!self.errors_state.is_empty() || !self.errors_parent_project.is_empty() || !self.errors_name.is_empty() || !self.errors_description.is_empty() || !self.errors_public.is_empty() || !self.errors_budget.is_empty() || !self.errors_expenses.is_empty() || !self.errors_expected_end_date.is_empty() || !self.errors_end_date.is_empty()
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.state.is_some()
+        && self.name.is_some()
+        && self.description.is_some()
+        && self.public.is_some()
     }
 
     fn form_level_errors(&self) -> Vec<String> {
         vec![]
     }
+
 }
 impl From<NestedNewProjectBuilder> for NewProject {
     fn from(builder: NestedNewProjectBuilder) -> Self {
@@ -2453,9 +2265,7 @@ impl From<NestedNewProjectBuilder> for NewProject {
             description: builder.description.unwrap(),
             public: builder.public.unwrap(),
             state_id: builder.state.unwrap().id,
-            parent_project_id: builder
-                .parent_project
-                .map(|parent_project| parent_project.inner.id),
+            parent_project_id: builder.parent_project.map(|parent_project| parent_project.inner.id),
             budget: builder.budget,
             expenses: builder.expenses,
             expected_end_date: builder.expected_end_date,
@@ -2481,45 +2291,42 @@ impl FormBuildable for NewProject {
     }
 }
 impl Reducer<NestedNewProjectBuilder> for NestedNewProjectBuilderActions {
-    fn apply(
-        self,
-        mut state: std::rc::Rc<NestedNewProjectBuilder>,
-    ) -> std::rc::Rc<NestedNewProjectBuilder> {
+    fn apply(self, mut state: std::rc::Rc<NestedNewProjectBuilder>) -> std::rc::Rc<NestedNewProjectBuilder> {
         let state_mut = Rc::make_mut(&mut state);
         match self {
             NestedNewProjectBuilderActions::SetState(state) => {
-                if state.is_none() {
-                    state_mut.errors_state.push(ApiError::BadRequest(vec![
-                        "The State field is required.".to_string(),
-                    ]));
-                }
+        if state.is_none() {
+            state_mut.errors_state.push(ApiError::BadRequest(vec![
+                "The State field is required.".to_string()
+             ]));
+        }
                 state_mut.state = state;
             }
             NestedNewProjectBuilderActions::SetParentProject(parent_project) => {
                 state_mut.parent_project = parent_project;
             }
             NestedNewProjectBuilderActions::SetName(name) => {
-                if name.is_none() {
-                    state_mut.errors_name.push(ApiError::BadRequest(vec![
-                        "The Name field is required.".to_string(),
-                    ]));
-                }
+        if name.is_none() {
+            state_mut.errors_name.push(ApiError::BadRequest(vec![
+                "The Name field is required.".to_string()
+             ]));
+        }
                 state_mut.name = name;
             }
             NestedNewProjectBuilderActions::SetDescription(description) => {
-                if description.is_none() {
-                    state_mut.errors_description.push(ApiError::BadRequest(vec![
-                        "The Description field is required.".to_string(),
-                    ]));
-                }
+        if description.is_none() {
+            state_mut.errors_description.push(ApiError::BadRequest(vec![
+                "The Description field is required.".to_string()
+             ]));
+        }
                 state_mut.description = description;
             }
             NestedNewProjectBuilderActions::SetPublic(public) => {
-                if public.is_none() {
-                    state_mut.errors_public.push(ApiError::BadRequest(vec![
-                        "The Public field is required.".to_string(),
-                    ]));
-                }
+        if public.is_none() {
+            state_mut.errors_public.push(ApiError::BadRequest(vec![
+                "The Public field is required.".to_string()
+             ]));
+        }
                 state_mut.public = public;
             }
             NestedNewProjectBuilderActions::SetBudget(budget) => {
@@ -2541,32 +2348,15 @@ impl Reducer<NestedNewProjectBuilder> for NestedNewProjectBuilderActions {
 #[function_component(NewProjectForm)]
 pub fn new_project_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<NestedNewProjectBuilder>();
-    let set_state = builder_dispatch.apply_callback(|state: Option<ProjectState>| {
-        NestedNewProjectBuilderActions::SetState(state)
-    });
-    let set_parent_project =
-        builder_dispatch.apply_callback(|parent_project: Option<NestedProject>| {
-            NestedNewProjectBuilderActions::SetParentProject(parent_project)
-        });
-    let set_name = builder_dispatch
-        .apply_callback(|name: Option<String>| NestedNewProjectBuilderActions::SetName(name));
-    let set_description = builder_dispatch.apply_callback(|description: Option<String>| {
-        NestedNewProjectBuilderActions::SetDescription(description)
-    });
-    let set_public = builder_dispatch
-        .apply_callback(|public: bool| NestedNewProjectBuilderActions::SetPublic(Some(public)));
-    let set_budget = builder_dispatch
-        .apply_callback(|budget: Option<i64>| NestedNewProjectBuilderActions::SetBudget(budget));
-    let set_expenses = builder_dispatch.apply_callback(|expenses: Option<i64>| {
-        NestedNewProjectBuilderActions::SetExpenses(expenses)
-    });
-    let set_expected_end_date =
-        builder_dispatch.apply_callback(|expected_end_date: Option<NaiveDateTime>| {
-            NestedNewProjectBuilderActions::SetExpectedEndDate(expected_end_date)
-        });
-    let set_end_date = builder_dispatch.apply_callback(|end_date: Option<NaiveDateTime>| {
-        NestedNewProjectBuilderActions::SetEndDate(end_date)
-    });
+    let set_state = builder_dispatch.apply_callback(|state: Option<ProjectState>| NestedNewProjectBuilderActions::SetState(state));
+    let set_parent_project = builder_dispatch.apply_callback(|parent_project: Option<NestedProject>| NestedNewProjectBuilderActions::SetParentProject(parent_project));
+    let set_name = builder_dispatch.apply_callback(|name: Option<String>| NestedNewProjectBuilderActions::SetName(name));
+    let set_description = builder_dispatch.apply_callback(|description: Option<String>| NestedNewProjectBuilderActions::SetDescription(description));
+    let set_public = builder_dispatch.apply_callback(|public: bool| NestedNewProjectBuilderActions::SetPublic(Some(public)));
+    let set_budget = builder_dispatch.apply_callback(|budget: Option<i64>| NestedNewProjectBuilderActions::SetBudget(budget));
+    let set_expenses = builder_dispatch.apply_callback(|expenses: Option<i64>| NestedNewProjectBuilderActions::SetExpenses(expenses));
+    let set_expected_end_date = builder_dispatch.apply_callback(|expected_end_date: Option<NaiveDateTime>| NestedNewProjectBuilderActions::SetExpectedEndDate(expected_end_date));
+    let set_end_date = builder_dispatch.apply_callback(|end_date: Option<NaiveDateTime>| NestedNewProjectBuilderActions::SetEndDate(end_date));
     html! {
         <BasicForm<NewProject> builder={builder_store.deref().clone()}>
             <Datalist<ProjectState> builder={set_state} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" />
@@ -2594,12 +2384,18 @@ impl FormBuilder for NewRoleBuilder {
     type Actions = NewRoleBuilderActions;
 
     fn has_errors(&self) -> bool {
-        !self.errors_name.is_empty()
+!self.errors_name.is_empty()
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.name.is_some()
     }
 
     fn form_level_errors(&self) -> Vec<String> {
         vec![]
     }
+
 }
 impl From<NewRoleBuilder> for NewRole {
     fn from(builder: NewRoleBuilder) -> Self {
@@ -2630,11 +2426,11 @@ impl Reducer<NewRoleBuilder> for NewRoleBuilderActions {
         let state_mut = Rc::make_mut(&mut state);
         match self {
             NewRoleBuilderActions::SetName(name) => {
-                if name.is_none() {
-                    state_mut.errors_name.push(ApiError::BadRequest(vec![
-                        "The Name field is required.".to_string(),
-                    ]));
-                }
+        if name.is_none() {
+            state_mut.errors_name.push(ApiError::BadRequest(vec![
+                "The Name field is required.".to_string()
+             ]));
+        }
                 state_mut.name = name;
             }
         }
@@ -2644,8 +2440,7 @@ impl Reducer<NewRoleBuilder> for NewRoleBuilderActions {
 #[function_component(NewRoleForm)]
 pub fn new_role_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<NewRoleBuilder>();
-    let set_name = builder_dispatch
-        .apply_callback(|name: Option<String>| NewRoleBuilderActions::SetName(name));
+    let set_name = builder_dispatch.apply_callback(|name: Option<String>| NewRoleBuilderActions::SetName(name));
     html! {
         <BasicForm<NewRole> builder={builder_store.deref().clone()}>
             <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
@@ -2678,15 +2473,21 @@ impl FormBuilder for NewSampleStateBuilder {
     type Actions = NewSampleStateBuilderActions;
 
     fn has_errors(&self) -> bool {
-        !self.errors_name.is_empty()
-            || !self.errors_description.is_empty()
-            || !self.errors_font_awesome_icon.is_empty()
-            || !self.errors_icon_color.is_empty()
+!self.errors_name.is_empty() || !self.errors_description.is_empty() || !self.errors_font_awesome_icon.is_empty() || !self.errors_icon_color.is_empty()
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.name.is_some()
+        && self.description.is_some()
+        && self.font_awesome_icon.is_some()
+        && self.icon_color.is_some()
     }
 
     fn form_level_errors(&self) -> Vec<String> {
         vec![]
     }
+
 }
 impl From<NewSampleStateBuilder> for NewSampleState {
     fn from(builder: NewSampleStateBuilder) -> Self {
@@ -2716,44 +2517,39 @@ impl FormBuildable for NewSampleState {
     }
 }
 impl Reducer<NewSampleStateBuilder> for NewSampleStateBuilderActions {
-    fn apply(
-        self,
-        mut state: std::rc::Rc<NewSampleStateBuilder>,
-    ) -> std::rc::Rc<NewSampleStateBuilder> {
+    fn apply(self, mut state: std::rc::Rc<NewSampleStateBuilder>) -> std::rc::Rc<NewSampleStateBuilder> {
         let state_mut = Rc::make_mut(&mut state);
         match self {
             NewSampleStateBuilderActions::SetName(name) => {
-                if name.is_none() {
-                    state_mut.errors_name.push(ApiError::BadRequest(vec![
-                        "The Name field is required.".to_string(),
-                    ]));
-                }
+        if name.is_none() {
+            state_mut.errors_name.push(ApiError::BadRequest(vec![
+                "The Name field is required.".to_string()
+             ]));
+        }
                 state_mut.name = name;
             }
             NewSampleStateBuilderActions::SetDescription(description) => {
-                if description.is_none() {
-                    state_mut.errors_description.push(ApiError::BadRequest(vec![
-                        "The Description field is required.".to_string(),
-                    ]));
-                }
+        if description.is_none() {
+            state_mut.errors_description.push(ApiError::BadRequest(vec![
+                "The Description field is required.".to_string()
+             ]));
+        }
                 state_mut.description = description;
             }
             NewSampleStateBuilderActions::SetFontAwesomeIcon(font_awesome_icon) => {
-                if font_awesome_icon.is_none() {
-                    state_mut
-                        .errors_font_awesome_icon
-                        .push(ApiError::BadRequest(vec![
-                            "The FontAwesomeIcon field is required.".to_string(),
-                        ]));
-                }
+        if font_awesome_icon.is_none() {
+            state_mut.errors_font_awesome_icon.push(ApiError::BadRequest(vec![
+                "The FontAwesomeIcon field is required.".to_string()
+             ]));
+        }
                 state_mut.font_awesome_icon = font_awesome_icon;
             }
             NewSampleStateBuilderActions::SetIconColor(icon_color) => {
-                if icon_color.is_none() {
-                    state_mut.errors_icon_color.push(ApiError::BadRequest(vec![
-                        "The IconColor field is required.".to_string(),
-                    ]));
-                }
+        if icon_color.is_none() {
+            state_mut.errors_icon_color.push(ApiError::BadRequest(vec![
+                "The IconColor field is required.".to_string()
+             ]));
+        }
                 state_mut.icon_color = icon_color;
             }
         }
@@ -2763,18 +2559,10 @@ impl Reducer<NewSampleStateBuilder> for NewSampleStateBuilderActions {
 #[function_component(NewSampleStateForm)]
 pub fn new_sample_state_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<NewSampleStateBuilder>();
-    let set_name = builder_dispatch
-        .apply_callback(|name: Option<String>| NewSampleStateBuilderActions::SetName(name));
-    let set_description = builder_dispatch.apply_callback(|description: Option<String>| {
-        NewSampleStateBuilderActions::SetDescription(description)
-    });
-    let set_font_awesome_icon =
-        builder_dispatch.apply_callback(|font_awesome_icon: Option<String>| {
-            NewSampleStateBuilderActions::SetFontAwesomeIcon(font_awesome_icon)
-        });
-    let set_icon_color = builder_dispatch.apply_callback(|icon_color: Option<String>| {
-        NewSampleStateBuilderActions::SetIconColor(icon_color)
-    });
+    let set_name = builder_dispatch.apply_callback(|name: Option<String>| NewSampleStateBuilderActions::SetName(name));
+    let set_description = builder_dispatch.apply_callback(|description: Option<String>| NewSampleStateBuilderActions::SetDescription(description));
+    let set_font_awesome_icon = builder_dispatch.apply_callback(|font_awesome_icon: Option<String>| NewSampleStateBuilderActions::SetFontAwesomeIcon(font_awesome_icon));
+    let set_icon_color = builder_dispatch.apply_callback(|icon_color: Option<String>| NewSampleStateBuilderActions::SetIconColor(icon_color));
     html! {
         <BasicForm<NewSampleState> builder={builder_store.deref().clone()}>
             <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
@@ -2807,14 +2595,20 @@ impl FormBuilder for NestedNewSampleBuilder {
     type Actions = NestedNewSampleBuilderActions;
 
     fn has_errors(&self) -> bool {
-        !self.errors_sampled_by.is_empty()
-            || !self.errors_procedure.is_empty()
-            || !self.errors_state.is_empty()
+!self.errors_sampled_by.is_empty() || !self.errors_procedure.is_empty() || !self.errors_state.is_empty()
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.sampled_by.is_some()
+        && self.procedure.is_some()
+        && self.state.is_some()
     }
 
     fn form_level_errors(&self) -> Vec<String> {
         vec![]
     }
+
 }
 impl From<NestedNewSampleBuilder> for NewSample {
     fn from(builder: NestedNewSampleBuilder) -> Self {
@@ -2843,34 +2637,31 @@ impl FormBuildable for NewSample {
     }
 }
 impl Reducer<NestedNewSampleBuilder> for NestedNewSampleBuilderActions {
-    fn apply(
-        self,
-        mut state: std::rc::Rc<NestedNewSampleBuilder>,
-    ) -> std::rc::Rc<NestedNewSampleBuilder> {
+    fn apply(self, mut state: std::rc::Rc<NestedNewSampleBuilder>) -> std::rc::Rc<NestedNewSampleBuilder> {
         let state_mut = Rc::make_mut(&mut state);
         match self {
             NestedNewSampleBuilderActions::SetSampledBy(sampled_by) => {
-                if sampled_by.is_none() {
-                    state_mut.errors_sampled_by.push(ApiError::BadRequest(vec![
-                        "The SampledBy field is required.".to_string(),
-                    ]));
-                }
+        if sampled_by.is_none() {
+            state_mut.errors_sampled_by.push(ApiError::BadRequest(vec![
+                "The SampledBy field is required.".to_string()
+             ]));
+        }
                 state_mut.sampled_by = sampled_by;
             }
             NestedNewSampleBuilderActions::SetProcedure(procedure) => {
-                if procedure.is_none() {
-                    state_mut.errors_procedure.push(ApiError::BadRequest(vec![
-                        "The Procedure field is required.".to_string(),
-                    ]));
-                }
+        if procedure.is_none() {
+            state_mut.errors_procedure.push(ApiError::BadRequest(vec![
+                "The Procedure field is required.".to_string()
+             ]));
+        }
                 state_mut.procedure = procedure;
             }
             NestedNewSampleBuilderActions::SetState(state) => {
-                if state.is_none() {
-                    state_mut.errors_state.push(ApiError::BadRequest(vec![
-                        "The State field is required.".to_string(),
-                    ]));
-                }
+        if state.is_none() {
+            state_mut.errors_state.push(ApiError::BadRequest(vec![
+                "The State field is required.".to_string()
+             ]));
+        }
                 state_mut.state = state;
             }
         }
@@ -2880,16 +2671,9 @@ impl Reducer<NestedNewSampleBuilder> for NestedNewSampleBuilderActions {
 #[function_component(NewSampleForm)]
 pub fn new_sample_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<NestedNewSampleBuilder>();
-    let set_sampled_by = builder_dispatch.apply_callback(|sampled_by: Option<User>| {
-        NestedNewSampleBuilderActions::SetSampledBy(sampled_by)
-    });
-    let set_procedure =
-        builder_dispatch.apply_callback(|procedure: Option<NestedSamplingProcedure>| {
-            NestedNewSampleBuilderActions::SetProcedure(procedure)
-        });
-    let set_state = builder_dispatch.apply_callback(|state: Option<SampleState>| {
-        NestedNewSampleBuilderActions::SetState(state)
-    });
+    let set_sampled_by = builder_dispatch.apply_callback(|sampled_by: Option<User>| NestedNewSampleBuilderActions::SetSampledBy(sampled_by));
+    let set_procedure = builder_dispatch.apply_callback(|procedure: Option<NestedSamplingProcedure>| NestedNewSampleBuilderActions::SetProcedure(procedure));
+    let set_state = builder_dispatch.apply_callback(|state: Option<SampleState>| NestedNewSampleBuilderActions::SetState(state));
     html! {
         <BasicForm<NewSample> builder={builder_store.deref().clone()}>
             <Datalist<User> builder={set_sampled_by} errors={builder_store.errors_sampled_by.clone()} value={builder_store.sampled_by.clone()} label="SampledBy" />
@@ -2918,12 +2702,18 @@ impl FormBuilder for NestedNewSamplingProcedureBuilder {
     type Actions = NestedNewSamplingProcedureBuilderActions;
 
     fn has_errors(&self) -> bool {
-        !self.errors_name.is_empty() || !self.errors_description.is_empty()
+!self.errors_name.is_empty() || !self.errors_description.is_empty()
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.name.is_some()
     }
 
     fn form_level_errors(&self) -> Vec<String> {
         vec![]
     }
+
 }
 impl From<NestedNewSamplingProcedureBuilder> for NewSamplingProcedure {
     fn from(builder: NestedNewSamplingProcedureBuilder) -> Self {
@@ -2951,18 +2741,15 @@ impl FormBuildable for NewSamplingProcedure {
     }
 }
 impl Reducer<NestedNewSamplingProcedureBuilder> for NestedNewSamplingProcedureBuilderActions {
-    fn apply(
-        self,
-        mut state: std::rc::Rc<NestedNewSamplingProcedureBuilder>,
-    ) -> std::rc::Rc<NestedNewSamplingProcedureBuilder> {
+    fn apply(self, mut state: std::rc::Rc<NestedNewSamplingProcedureBuilder>) -> std::rc::Rc<NestedNewSamplingProcedureBuilder> {
         let state_mut = Rc::make_mut(&mut state);
         match self {
             NestedNewSamplingProcedureBuilderActions::SetName(name) => {
-                if name.is_none() {
-                    state_mut.errors_name.push(ApiError::BadRequest(vec![
-                        "The Name field is required.".to_string(),
-                    ]));
-                }
+        if name.is_none() {
+            state_mut.errors_name.push(ApiError::BadRequest(vec![
+                "The Name field is required.".to_string()
+             ]));
+        }
                 state_mut.name = name;
             }
             NestedNewSamplingProcedureBuilderActions::SetDescription(description) => {
@@ -2975,12 +2762,8 @@ impl Reducer<NestedNewSamplingProcedureBuilder> for NestedNewSamplingProcedureBu
 #[function_component(NewSamplingProcedureForm)]
 pub fn new_sampling_procedure_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<NestedNewSamplingProcedureBuilder>();
-    let set_name = builder_dispatch.apply_callback(|name: Option<String>| {
-        NestedNewSamplingProcedureBuilderActions::SetName(name)
-    });
-    let set_description = builder_dispatch.apply_callback(|description: Option<String>| {
-        NestedNewSamplingProcedureBuilderActions::SetDescription(description)
-    });
+    let set_name = builder_dispatch.apply_callback(|name: Option<String>| NestedNewSamplingProcedureBuilderActions::SetName(name));
+    let set_description = builder_dispatch.apply_callback(|description: Option<String>| NestedNewSamplingProcedureBuilderActions::SetDescription(description));
     html! {
         <BasicForm<NewSamplingProcedure> builder={builder_store.deref().clone()}>
             <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
@@ -3014,15 +2797,21 @@ impl FormBuilder for NewTeamStateBuilder {
     type Actions = NewTeamStateBuilderActions;
 
     fn has_errors(&self) -> bool {
-        !self.errors_name.is_empty()
-            || !self.errors_description.is_empty()
-            || !self.errors_font_awesome_icon.is_empty()
-            || !self.errors_icon_color.is_empty()
+!self.errors_name.is_empty() || !self.errors_description.is_empty() || !self.errors_font_awesome_icon.is_empty() || !self.errors_icon_color.is_empty()
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.name.is_some()
+        && self.description.is_some()
+        && self.font_awesome_icon.is_some()
+        && self.icon_color.is_some()
     }
 
     fn form_level_errors(&self) -> Vec<String> {
         vec![]
     }
+
 }
 impl From<NewTeamStateBuilder> for NewTeamState {
     fn from(builder: NewTeamStateBuilder) -> Self {
@@ -3052,44 +2841,39 @@ impl FormBuildable for NewTeamState {
     }
 }
 impl Reducer<NewTeamStateBuilder> for NewTeamStateBuilderActions {
-    fn apply(
-        self,
-        mut state: std::rc::Rc<NewTeamStateBuilder>,
-    ) -> std::rc::Rc<NewTeamStateBuilder> {
+    fn apply(self, mut state: std::rc::Rc<NewTeamStateBuilder>) -> std::rc::Rc<NewTeamStateBuilder> {
         let state_mut = Rc::make_mut(&mut state);
         match self {
             NewTeamStateBuilderActions::SetName(name) => {
-                if name.is_none() {
-                    state_mut.errors_name.push(ApiError::BadRequest(vec![
-                        "The Name field is required.".to_string(),
-                    ]));
-                }
+        if name.is_none() {
+            state_mut.errors_name.push(ApiError::BadRequest(vec![
+                "The Name field is required.".to_string()
+             ]));
+        }
                 state_mut.name = name;
             }
             NewTeamStateBuilderActions::SetDescription(description) => {
-                if description.is_none() {
-                    state_mut.errors_description.push(ApiError::BadRequest(vec![
-                        "The Description field is required.".to_string(),
-                    ]));
-                }
+        if description.is_none() {
+            state_mut.errors_description.push(ApiError::BadRequest(vec![
+                "The Description field is required.".to_string()
+             ]));
+        }
                 state_mut.description = description;
             }
             NewTeamStateBuilderActions::SetFontAwesomeIcon(font_awesome_icon) => {
-                if font_awesome_icon.is_none() {
-                    state_mut
-                        .errors_font_awesome_icon
-                        .push(ApiError::BadRequest(vec![
-                            "The FontAwesomeIcon field is required.".to_string(),
-                        ]));
-                }
+        if font_awesome_icon.is_none() {
+            state_mut.errors_font_awesome_icon.push(ApiError::BadRequest(vec![
+                "The FontAwesomeIcon field is required.".to_string()
+             ]));
+        }
                 state_mut.font_awesome_icon = font_awesome_icon;
             }
             NewTeamStateBuilderActions::SetIconColor(icon_color) => {
-                if icon_color.is_none() {
-                    state_mut.errors_icon_color.push(ApiError::BadRequest(vec![
-                        "The IconColor field is required.".to_string(),
-                    ]));
-                }
+        if icon_color.is_none() {
+            state_mut.errors_icon_color.push(ApiError::BadRequest(vec![
+                "The IconColor field is required.".to_string()
+             ]));
+        }
                 state_mut.icon_color = icon_color;
             }
         }
@@ -3099,18 +2883,10 @@ impl Reducer<NewTeamStateBuilder> for NewTeamStateBuilderActions {
 #[function_component(NewTeamStateForm)]
 pub fn new_team_state_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<NewTeamStateBuilder>();
-    let set_name = builder_dispatch
-        .apply_callback(|name: Option<String>| NewTeamStateBuilderActions::SetName(name));
-    let set_description = builder_dispatch.apply_callback(|description: Option<String>| {
-        NewTeamStateBuilderActions::SetDescription(description)
-    });
-    let set_font_awesome_icon =
-        builder_dispatch.apply_callback(|font_awesome_icon: Option<String>| {
-            NewTeamStateBuilderActions::SetFontAwesomeIcon(font_awesome_icon)
-        });
-    let set_icon_color = builder_dispatch.apply_callback(|icon_color: Option<String>| {
-        NewTeamStateBuilderActions::SetIconColor(icon_color)
-    });
+    let set_name = builder_dispatch.apply_callback(|name: Option<String>| NewTeamStateBuilderActions::SetName(name));
+    let set_description = builder_dispatch.apply_callback(|description: Option<String>| NewTeamStateBuilderActions::SetDescription(description));
+    let set_font_awesome_icon = builder_dispatch.apply_callback(|font_awesome_icon: Option<String>| NewTeamStateBuilderActions::SetFontAwesomeIcon(font_awesome_icon));
+    let set_icon_color = builder_dispatch.apply_callback(|icon_color: Option<String>| NewTeamStateBuilderActions::SetIconColor(icon_color));
     html! {
         <BasicForm<NewTeamState> builder={builder_store.deref().clone()}>
             <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
@@ -3143,14 +2919,19 @@ impl FormBuilder for NestedNewTeamBuilder {
     type Actions = NestedNewTeamBuilderActions;
 
     fn has_errors(&self) -> bool {
-        !self.errors_parent_team.is_empty()
-            || !self.errors_name.is_empty()
-            || !self.errors_description.is_empty()
+!self.errors_parent_team.is_empty() || !self.errors_name.is_empty() || !self.errors_description.is_empty()
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.name.is_some()
+        && self.description.is_some()
     }
 
     fn form_level_errors(&self) -> Vec<String> {
         vec![]
     }
+
 }
 impl From<NestedNewTeamBuilder> for NewTeam {
     fn from(builder: NestedNewTeamBuilder) -> Self {
@@ -3179,29 +2960,26 @@ impl FormBuildable for NewTeam {
     }
 }
 impl Reducer<NestedNewTeamBuilder> for NestedNewTeamBuilderActions {
-    fn apply(
-        self,
-        mut state: std::rc::Rc<NestedNewTeamBuilder>,
-    ) -> std::rc::Rc<NestedNewTeamBuilder> {
+    fn apply(self, mut state: std::rc::Rc<NestedNewTeamBuilder>) -> std::rc::Rc<NestedNewTeamBuilder> {
         let state_mut = Rc::make_mut(&mut state);
         match self {
             NestedNewTeamBuilderActions::SetParentTeam(parent_team) => {
                 state_mut.parent_team = parent_team;
             }
             NestedNewTeamBuilderActions::SetName(name) => {
-                if name.is_none() {
-                    state_mut.errors_name.push(ApiError::BadRequest(vec![
-                        "The Name field is required.".to_string(),
-                    ]));
-                }
+        if name.is_none() {
+            state_mut.errors_name.push(ApiError::BadRequest(vec![
+                "The Name field is required.".to_string()
+             ]));
+        }
                 state_mut.name = name;
             }
             NestedNewTeamBuilderActions::SetDescription(description) => {
-                if description.is_none() {
-                    state_mut.errors_description.push(ApiError::BadRequest(vec![
-                        "The Description field is required.".to_string(),
-                    ]));
-                }
+        if description.is_none() {
+            state_mut.errors_description.push(ApiError::BadRequest(vec![
+                "The Description field is required.".to_string()
+             ]));
+        }
                 state_mut.description = description;
             }
         }
@@ -3211,14 +2989,9 @@ impl Reducer<NestedNewTeamBuilder> for NestedNewTeamBuilderActions {
 #[function_component(NewTeamForm)]
 pub fn new_team_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<NestedNewTeamBuilder>();
-    let set_parent_team = builder_dispatch.apply_callback(|parent_team: Option<NestedTeam>| {
-        NestedNewTeamBuilderActions::SetParentTeam(parent_team)
-    });
-    let set_name = builder_dispatch
-        .apply_callback(|name: Option<String>| NestedNewTeamBuilderActions::SetName(name));
-    let set_description = builder_dispatch.apply_callback(|description: Option<String>| {
-        NestedNewTeamBuilderActions::SetDescription(description)
-    });
+    let set_parent_team = builder_dispatch.apply_callback(|parent_team: Option<NestedTeam>| NestedNewTeamBuilderActions::SetParentTeam(parent_team));
+    let set_name = builder_dispatch.apply_callback(|name: Option<String>| NestedNewTeamBuilderActions::SetName(name));
+    let set_description = builder_dispatch.apply_callback(|description: Option<String>| NestedNewTeamBuilderActions::SetDescription(description));
     html! {
         <BasicForm<NewTeam> builder={builder_store.deref().clone()}>
             <Datalist<NestedTeam> builder={set_parent_team} errors={builder_store.errors_parent_team.clone()} value={builder_store.parent_team.clone()} label="ParentTeam" />
@@ -3250,14 +3023,20 @@ impl FormBuilder for NewUnitBuilder {
     type Actions = NewUnitBuilderActions;
 
     fn has_errors(&self) -> bool {
-        !self.errors_name.is_empty()
-            || !self.errors_description.is_empty()
-            || !self.errors_symbol.is_empty()
+!self.errors_name.is_empty() || !self.errors_description.is_empty() || !self.errors_symbol.is_empty()
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.name.is_some()
+        && self.description.is_some()
+        && self.symbol.is_some()
     }
 
     fn form_level_errors(&self) -> Vec<String> {
         vec![]
     }
+
 }
 impl From<NewUnitBuilder> for NewUnit {
     fn from(builder: NewUnitBuilder) -> Self {
@@ -3290,27 +3069,27 @@ impl Reducer<NewUnitBuilder> for NewUnitBuilderActions {
         let state_mut = Rc::make_mut(&mut state);
         match self {
             NewUnitBuilderActions::SetName(name) => {
-                if name.is_none() {
-                    state_mut.errors_name.push(ApiError::BadRequest(vec![
-                        "The Name field is required.".to_string(),
-                    ]));
-                }
+        if name.is_none() {
+            state_mut.errors_name.push(ApiError::BadRequest(vec![
+                "The Name field is required.".to_string()
+             ]));
+        }
                 state_mut.name = name;
             }
             NewUnitBuilderActions::SetDescription(description) => {
-                if description.is_none() {
-                    state_mut.errors_description.push(ApiError::BadRequest(vec![
-                        "The Description field is required.".to_string(),
-                    ]));
-                }
+        if description.is_none() {
+            state_mut.errors_description.push(ApiError::BadRequest(vec![
+                "The Description field is required.".to_string()
+             ]));
+        }
                 state_mut.description = description;
             }
             NewUnitBuilderActions::SetSymbol(symbol) => {
-                if symbol.is_none() {
-                    state_mut.errors_symbol.push(ApiError::BadRequest(vec![
-                        "The Symbol field is required.".to_string(),
-                    ]));
-                }
+        if symbol.is_none() {
+            state_mut.errors_symbol.push(ApiError::BadRequest(vec![
+                "The Symbol field is required.".to_string()
+             ]));
+        }
                 state_mut.symbol = symbol;
             }
         }
@@ -3320,13 +3099,9 @@ impl Reducer<NewUnitBuilder> for NewUnitBuilderActions {
 #[function_component(NewUnitForm)]
 pub fn new_unit_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<NewUnitBuilder>();
-    let set_name = builder_dispatch
-        .apply_callback(|name: Option<String>| NewUnitBuilderActions::SetName(name));
-    let set_description = builder_dispatch.apply_callback(|description: Option<String>| {
-        NewUnitBuilderActions::SetDescription(description)
-    });
-    let set_symbol = builder_dispatch
-        .apply_callback(|symbol: Option<String>| NewUnitBuilderActions::SetSymbol(symbol));
+    let set_name = builder_dispatch.apply_callback(|name: Option<String>| NewUnitBuilderActions::SetName(name));
+    let set_description = builder_dispatch.apply_callback(|description: Option<String>| NewUnitBuilderActions::SetDescription(description));
+    let set_symbol = builder_dispatch.apply_callback(|symbol: Option<String>| NewUnitBuilderActions::SetSymbol(symbol));
     html! {
         <BasicForm<NewUnit> builder={builder_store.deref().clone()}>
             <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
@@ -3358,14 +3133,19 @@ impl FormBuilder for NewUserBuilder {
     type Actions = NewUserBuilderActions;
 
     fn has_errors(&self) -> bool {
-        !self.errors_first_name.is_empty()
-            || !self.errors_middle_name.is_empty()
-            || !self.errors_last_name.is_empty()
+!self.errors_first_name.is_empty() || !self.errors_middle_name.is_empty() || !self.errors_last_name.is_empty()
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.first_name.is_some()
+        && self.last_name.is_some()
     }
 
     fn form_level_errors(&self) -> Vec<String> {
         vec![]
     }
+
 }
 impl From<NewUserBuilder> for NewUser {
     fn from(builder: NewUserBuilder) -> Self {
@@ -3398,22 +3178,22 @@ impl Reducer<NewUserBuilder> for NewUserBuilderActions {
         let state_mut = Rc::make_mut(&mut state);
         match self {
             NewUserBuilderActions::SetFirstName(first_name) => {
-                if first_name.is_none() {
-                    state_mut.errors_first_name.push(ApiError::BadRequest(vec![
-                        "The FirstName field is required.".to_string(),
-                    ]));
-                }
+        if first_name.is_none() {
+            state_mut.errors_first_name.push(ApiError::BadRequest(vec![
+                "The FirstName field is required.".to_string()
+             ]));
+        }
                 state_mut.first_name = first_name;
             }
             NewUserBuilderActions::SetMiddleName(middle_name) => {
                 state_mut.middle_name = middle_name;
             }
             NewUserBuilderActions::SetLastName(last_name) => {
-                if last_name.is_none() {
-                    state_mut.errors_last_name.push(ApiError::BadRequest(vec![
-                        "The LastName field is required.".to_string(),
-                    ]));
-                }
+        if last_name.is_none() {
+            state_mut.errors_last_name.push(ApiError::BadRequest(vec![
+                "The LastName field is required.".to_string()
+             ]));
+        }
                 state_mut.last_name = last_name;
             }
         }
@@ -3423,14 +3203,9 @@ impl Reducer<NewUserBuilder> for NewUserBuilderActions {
 #[function_component(NewUserForm)]
 pub fn new_user_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<NewUserBuilder>();
-    let set_first_name = builder_dispatch.apply_callback(|first_name: Option<String>| {
-        NewUserBuilderActions::SetFirstName(first_name)
-    });
-    let set_middle_name = builder_dispatch.apply_callback(|middle_name: Option<String>| {
-        NewUserBuilderActions::SetMiddleName(middle_name)
-    });
-    let set_last_name = builder_dispatch
-        .apply_callback(|last_name: Option<String>| NewUserBuilderActions::SetLastName(last_name));
+    let set_first_name = builder_dispatch.apply_callback(|first_name: Option<String>| NewUserBuilderActions::SetFirstName(first_name));
+    let set_middle_name = builder_dispatch.apply_callback(|middle_name: Option<String>| NewUserBuilderActions::SetMiddleName(middle_name));
+    let set_last_name = builder_dispatch.apply_callback(|last_name: Option<String>| NewUserBuilderActions::SetLastName(last_name));
     html! {
         <BasicForm<NewUser> builder={builder_store.deref().clone()}>
             <BasicInput label="FirstName" errors={builder_store.errors_first_name.clone()} builder={set_first_name} value={builder_store.first_name.clone()} input_type={InputType::Text} />

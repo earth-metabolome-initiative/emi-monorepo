@@ -25,8 +25,11 @@ pub(super) trait FormBuilder:
     type Data: FormBuildable<Builder = Self>;
     type Actions: Reducer<Self>;
 
-    /// Returns whether the form is buildable.
+    /// Returns whether the form contains errors.
     fn has_errors(&self) -> bool;
+
+    /// Returns whether the can currently be submitted.
+    fn can_submit(&self) -> bool;
 
     /// Returns the form level errors.
     ///
@@ -180,7 +183,7 @@ where
             })
         };
 
-        let submit_button_disabled = ctx.props().builder.has_errors();
+        let submit_button_disabled = !ctx.props().builder.can_submit();
 
         let classes = format!(
             "standard-form{}",
@@ -201,11 +204,6 @@ where
             "You cannot submit the form until all the fields are valid"
         } else {
             "Submit the form"
-        };
-
-        let on_delete = {
-            let link = ctx.link().clone();
-            Callback::from(move |error: String| {})
         };
 
         html! {
