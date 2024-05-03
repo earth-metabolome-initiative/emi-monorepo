@@ -4957,6 +4957,40 @@ def ensures_migrations_simmetry():
 def enforce_migration_naming_convention():
     """Check that the migrations are named according to the convention."""
 
+    # We check that if a migration directory contains a population of a given table,
+    # we verify that if there is also another migration that creates a search index
+    # as indicated by the suffix `_index`, the migration that populates the table must
+    # have a lower number than the migration that creates the search index.
+    migrations = [
+        directory
+        for directory in os.listdir("migrations")
+        if os.path.isdir(f"migrations/{directory}") and os.path.exists(f"migrations/{directory}/up.sql")
+    ]
+
+    for migration in migrations:
+        str_number, migration_name = migration.split("_", maxsplit=1)
+        number = int(str_number)
+        if migration_name.startswith("populate_") and migration_name.endswith("_table"):
+            trimmed_migration_name = migration_name[9:-6]
+            search_index_migration_name = f"create_{trimmed_migration_name}_index"
+
+            # We search if there exist a migration with a name ending with the 
+            # migration name we just determined.
+
+            for other_migration in migrations:
+                if other_migration.endswith(search_index_migration_name):
+                    other_str_number, other_migration_name = other_migration.split("_", maxsplit=1)
+                    other_number = int(other_str_number)
+
+                    if other_number < number:
+                        raise Exception(
+                            f"Migration {migration} populates a table, "
+                            f"but there exists a migration {other_migration} that creates "
+                            "a search index for the same table, and it has a lower number "
+                            "than the migration that populates the table."
+                        )
+
+
     for directory in os.listdir("migrations"):
         if not os.path.isdir(f"migrations/{directory}"):
             continue
