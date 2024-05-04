@@ -10,7 +10,6 @@ use crate::DBPool;
 use crate::DieselConn;
 use actix::ActorContext;
 use actix::AsyncContext;
-use actix::Message;
 use actix::SpawnHandle;
 use actix::WrapFuture;
 use actix::{Actor, StreamHandler};
