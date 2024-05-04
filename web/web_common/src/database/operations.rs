@@ -88,7 +88,27 @@ impl Operation {
         vec![]
     }
 
+    /// Returns whether the current operation is an insert.
+    pub fn is_insert(&self) -> bool {
+        match self {
+            Operation::Insert(_, _) => true,
+            _ => false,
+        }
+    }
+
+    /// Returns whether the current operation is a delete.
+    pub fn is_delete(&self) -> bool {
+        match self {
+            Operation::Delete(_, _) => true,
+            _ => false,
+        }
+    }
+
     pub fn requires_authentication(&self) -> bool {
+        if self.is_insert() || self.is_delete() {
+            return true;
+        }
+
         self.authorizations().iter().any(|auth| match auth {
             Authorization::LoggedUser => true,
             Authorization::Editable(_, roles) => !roles.contains(&Role::Anonymous),

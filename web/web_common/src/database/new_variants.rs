@@ -7,40 +7,6 @@ use serde::{Deserialize, Serialize};
 use chrono::NaiveDateTime;
 
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct NewBioOttRank {
-    pub name: String,
-    pub font_awesome_icon_id: i32,
-}
-
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct NewBioOttTaxonItem {
-    pub name: String,
-    pub ott_id: i32,
-    pub ott_rank_id: i32,
-    pub wikidata_id: Option<i32>,
-    pub ncbi_id: Option<i32>,
-    pub gbif_id: Option<i32>,
-    pub irmng_id: Option<i32>,
-    pub worms_id: Option<i32>,
-    pub domain_id: Option<i32>,
-    pub kingdom_id: Option<i32>,
-    pub phylum_id: Option<i32>,
-    pub class_id: Option<i32>,
-    pub order_id: Option<i32>,
-    pub family_id: Option<i32>,
-    pub genus_id: Option<i32>,
-    pub parent_id: i32,
-    pub font_awesome_icon_id: i32,
-    pub color_id: i32,
-}
-
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct NewColor {
-    pub name: String,
-    pub hexadecimal_value: String,
-}
-
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewContainerHorizontalRule {
     pub name: String,
     pub item_type_id: i32,
@@ -67,66 +33,9 @@ pub struct NewContainerVerticalRule {
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct NewDocumentFormat {
-    pub extension: String,
-    pub mime_type: String,
-}
-
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct NewFontAwesomeIcon {
-    pub name: String,
-}
-
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewItemCategory {
     pub name: String,
     pub description: String,
-}
-
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct NewItemCategoryRelationship {
-    pub parent_id: i32,
-    pub child_id: i32,
-    pub added_by: i32,
-}
-
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct NewItemCategoryUnit {
-    pub item_category_id: i32,
-    pub unit_id: i32,
-}
-
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct NewLoginProvider {
-    pub name: String,
-    pub font_awesome_icon_id: i32,
-    pub color_id: i32,
-    pub client_id_var_name: String,
-    pub redirect_uri_var_name: String,
-    pub oauth_url: String,
-    pub scope: String,
-}
-
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct NewManufacturedItemCategory {
-    pub cost: i32,
-    pub cost_per_day: i32,
-    pub currency: String,
-    pub manifacturer_id: i32,
-}
-
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct NewNotification {
-    pub user_id: i32,
-    pub operation: String,
-    pub table_name: String,
-    pub read: bool,
-}
-
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct NewOrganization {
-    pub parent_organization_id: Option<i32>,
-    pub name: String,
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
@@ -144,14 +53,6 @@ pub struct NewProjectRequirement {
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct NewProjectState {
-    pub name: String,
-    pub description: String,
-    pub font_awesome_icon_id: i32,
-    pub color_id: i32,
-}
-
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewProject {
     pub name: String,
     pub description: String,
@@ -165,57 +66,112 @@ pub struct NewProject {
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct NewRole {
-    pub name: String,
-}
-
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct NewSampleState {
-    pub name: String,
-    pub description: String,
-    pub font_awesome_icon_id: i32,
-    pub color_id: i32,
-}
-
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewSample {
+    pub id: Uuid,
     pub sampled_by: i32,
     pub procedure_id: Uuid,
     pub state: i32,
 }
 
+#[cfg(feature = "frontend")]
+impl NewSample {
+    pub fn into_row(self, inserted_by: i32) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::num(inserted_by),
+            gluesql::core::ast_builder::uuid(self.id.to_string()),
+            gluesql::core::ast_builder::num(self.sampled_by),
+            gluesql::core::ast_builder::uuid(self.procedure_id.to_string()),
+            gluesql::core::ast_builder::num(self.state),
+        ]
+    }
+
+    /// Insert the NewSample into the database.
+    ///
+    /// # Arguments
+    /// * `inserted_by` - The id of the user inserting the row.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows inserted in table NewSample
+    pub async fn insert<C>(
+        self,
+        inserted_by: i32,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<super::Sample, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let id = self.id;
+        table("samples")
+            .insert()
+            .columns("inserted_by,id,sampled_by,procedure_id,state")
+            .values(vec![self.into_row(inserted_by)])
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
+                 _ => unreachable!("Payload must be an Insert"),
+             })?;
+        super::Sample::get(id, connection).await.map(|maybe_row| maybe_row.unwrap())
+    }
+
+}
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewSamplingProcedure {
+    pub id: Uuid,
     pub name: String,
     pub description: Option<String>,
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct NewTeamState {
-    pub name: String,
-    pub description: String,
-    pub font_awesome_icon_id: i32,
-    pub color_id: i32,
-}
+#[cfg(feature = "frontend")]
+impl NewSamplingProcedure {
+    pub fn into_row(self, created_by: i32) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::num(created_by),
+            gluesql::core::ast_builder::uuid(self.id.to_string()),
+            gluesql::core::ast_builder::text(self.name),
+            match self.description {
+                Some(description) => gluesql::core::ast_builder::text(description),
+                None => gluesql::core::ast_builder::null(),
+            },
+        ]
+    }
 
+    /// Insert the NewSamplingProcedure into the database.
+    ///
+    /// # Arguments
+    /// * `created_by` - The id of the user inserting the row.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows inserted in table NewSamplingProcedure
+    pub async fn insert<C>(
+        self,
+        created_by: i32,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<super::SamplingProcedure, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let id = self.id;
+        table("sampling_procedures")
+            .insert()
+            .columns("created_by,id,name,description")
+            .values(vec![self.into_row(created_by)])
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
+                 _ => unreachable!("Payload must be an Insert"),
+             })?;
+        super::SamplingProcedure::get(id, connection).await.map(|maybe_row| maybe_row.unwrap())
+    }
+
+}
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewTeam {
     pub name: String,
     pub description: String,
     pub parent_team_id: Option<i32>,
-}
-
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct NewUnit {
-    pub name: String,
-    pub description: String,
-    pub symbol: String,
-}
-
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct NewUser {
-    pub first_name: String,
-    pub middle_name: Option<String>,
-    pub last_name: String,
 }
 

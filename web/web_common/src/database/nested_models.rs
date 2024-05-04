@@ -63,6 +63,20 @@ impl NestedBioOttRank {
          }
          Ok(nested_structs)
     }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.update_or_insert(connection).await?;
+        self.font_awesome_icon.update_or_insert(connection).await?;
+        Ok(())
+    }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedBioOttTaxonItem {
@@ -141,6 +155,44 @@ impl NestedBioOttTaxonItem {
          }
          Ok(nested_structs)
     }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.update_or_insert(connection).await?;
+        self.ott_rank.update_or_insert(connection).await?;
+        if let Some(domain) = self.domain {
+            domain.update_or_insert(connection).await?;
+        }
+        if let Some(kingdom) = self.kingdom {
+            kingdom.update_or_insert(connection).await?;
+        }
+        if let Some(phylum) = self.phylum {
+            phylum.update_or_insert(connection).await?;
+        }
+        if let Some(class) = self.class {
+            class.update_or_insert(connection).await?;
+        }
+        if let Some(order) = self.order {
+            order.update_or_insert(connection).await?;
+        }
+        if let Some(family) = self.family {
+            family.update_or_insert(connection).await?;
+        }
+        if let Some(genus) = self.genus {
+            genus.update_or_insert(connection).await?;
+        }
+        self.parent.update_or_insert(connection).await?;
+        self.font_awesome_icon.update_or_insert(connection).await?;
+        self.color.update_or_insert(connection).await?;
+        Ok(())
+    }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedContainerHorizontalRule {
@@ -202,6 +254,22 @@ impl NestedContainerHorizontalRule {
              nested_structs.push(Self::from_flat(flat_struct, connection).await?);
          }
          Ok(nested_structs)
+    }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.update_or_insert(connection).await?;
+        self.created_by.update_or_insert(connection).await?;
+        self.item_type.update_or_insert(connection).await?;
+        self.other_item_type.update_or_insert(connection).await?;
+        Ok(())
     }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
@@ -265,6 +333,22 @@ impl NestedContainerVerticalRule {
          }
          Ok(nested_structs)
     }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.update_or_insert(connection).await?;
+        self.created_by.update_or_insert(connection).await?;
+        self.container_item_type.update_or_insert(connection).await?;
+        self.contained_item_type.update_or_insert(connection).await?;
+        Ok(())
+    }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedDerivedSample {
@@ -327,6 +411,22 @@ impl NestedDerivedSample {
          }
          Ok(nested_structs)
     }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.update_or_insert(connection).await?;
+        self.created_by.update_or_insert(connection).await?;
+        self.parent_sample.update_or_insert(connection).await?;
+        self.child_sample.update_or_insert(connection).await?;
+        Ok(())
+    }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedDocument {
@@ -387,6 +487,21 @@ impl NestedDocument {
          }
          Ok(nested_structs)
     }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.update_or_insert(connection).await?;
+        self.author.update_or_insert(connection).await?;
+        self.format.update_or_insert(connection).await?;
+        Ok(())
+    }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedItemCategory {
@@ -444,6 +559,20 @@ impl NestedItemCategory {
              nested_structs.push(Self::from_flat(flat_struct, connection).await?);
          }
          Ok(nested_structs)
+    }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.update_or_insert(connection).await?;
+        self.created_by.update_or_insert(connection).await?;
+        Ok(())
     }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
@@ -507,6 +636,22 @@ impl NestedItemCategoryRelationship {
          }
          Ok(nested_structs)
     }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.update_or_insert(connection).await?;
+        self.parent.update_or_insert(connection).await?;
+        self.child.update_or_insert(connection).await?;
+        self.added_by.update_or_insert(connection).await?;
+        Ok(())
+    }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedItemCategoryUnit {
@@ -566,6 +711,21 @@ impl NestedItemCategoryUnit {
              nested_structs.push(Self::from_flat(flat_struct, connection).await?);
          }
          Ok(nested_structs)
+    }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.update_or_insert(connection).await?;
+        self.item_category.update_or_insert(connection).await?;
+        self.unit.update_or_insert(connection).await?;
+        Ok(())
     }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
@@ -629,6 +789,28 @@ impl NestedItemLocation {
          }
          Ok(nested_structs)
     }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.update_or_insert(connection).await?;
+        if let Some(item) = self.item {
+            item.update_or_insert(connection).await?;
+        }
+        if let Some(located_by) = self.located_by {
+            located_by.update_or_insert(connection).await?;
+        }
+        if let Some(location) = self.location {
+            location.update_or_insert(connection).await?;
+        }
+        Ok(())
+    }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedItemUnit {
@@ -689,6 +871,21 @@ impl NestedItemUnit {
          }
          Ok(nested_structs)
     }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.update_or_insert(connection).await?;
+        self.item.update_or_insert(connection).await?;
+        self.unit.update_or_insert(connection).await?;
+        Ok(())
+    }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedItem {
@@ -746,6 +943,22 @@ impl NestedItem {
              nested_structs.push(Self::from_flat(flat_struct, connection).await?);
          }
          Ok(nested_structs)
+    }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.update_or_insert(connection).await?;
+        if let Some(parent) = self.parent {
+            parent.update_or_insert(connection).await?;
+        }
+        Ok(())
     }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
@@ -809,6 +1022,28 @@ impl NestedLocation {
          }
          Ok(nested_structs)
     }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.update_or_insert(connection).await?;
+        if let Some(geolocalization_device) = self.geolocalization_device {
+            geolocalization_device.update_or_insert(connection).await?;
+        }
+        if let Some(altitude_device) = self.altitude_device {
+            altitude_device.update_or_insert(connection).await?;
+        }
+        if let Some(parent_location) = self.parent_location {
+            parent_location.update_or_insert(connection).await?;
+        }
+        Ok(())
+    }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedLoginProvider {
@@ -869,6 +1104,21 @@ impl NestedLoginProvider {
          }
          Ok(nested_structs)
     }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.update_or_insert(connection).await?;
+        self.font_awesome_icon.update_or_insert(connection).await?;
+        self.color.update_or_insert(connection).await?;
+        Ok(())
+    }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedManufacturedItemCategory {
@@ -926,6 +1176,20 @@ impl NestedManufacturedItemCategory {
              nested_structs.push(Self::from_flat(flat_struct, connection).await?);
          }
          Ok(nested_structs)
+    }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.update_or_insert(connection).await?;
+        self.manifacturer.update_or_insert(connection).await?;
+        Ok(())
     }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
@@ -985,6 +1249,20 @@ impl NestedNotification {
          }
          Ok(nested_structs)
     }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.update_or_insert(connection).await?;
+        self.user.update_or_insert(connection).await?;
+        Ok(())
+    }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedOrganization {
@@ -1043,11 +1321,27 @@ impl NestedOrganization {
          }
          Ok(nested_structs)
     }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.update_or_insert(connection).await?;
+        if let Some(parent_organization) = self.parent_organization {
+            parent_organization.update_or_insert(connection).await?;
+        }
+        Ok(())
+    }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedProcedure {
     pub inner: Procedure,
-    pub created_by: Option<User>,
+    pub created_by: User,
 }
 #[cfg(feature = "frontend")]
 impl NestedProcedure {
@@ -1061,7 +1355,7 @@ impl NestedProcedure {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            created_by: if let Some(created_by) = flat_struct.created_by { User::get(created_by, connection).await? } else { None },
+            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
             inner: flat_struct,
         })
     }
@@ -1100,6 +1394,20 @@ impl NestedProcedure {
              nested_structs.push(Self::from_flat(flat_struct, connection).await?);
          }
          Ok(nested_structs)
+    }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.update_or_insert(connection).await?;
+        self.created_by.update_or_insert(connection).await?;
+        Ok(())
     }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
@@ -1165,6 +1473,25 @@ impl NestedProjectRequirement {
          }
          Ok(nested_structs)
     }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.update_or_insert(connection).await?;
+        self.created_by.update_or_insert(connection).await?;
+        self.project.update_or_insert(connection).await?;
+        self.item_category.update_or_insert(connection).await?;
+        if let Some(unit) = self.unit {
+            unit.update_or_insert(connection).await?;
+        }
+        Ok(())
+    }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedProjectState {
@@ -1224,6 +1551,21 @@ impl NestedProjectState {
              nested_structs.push(Self::from_flat(flat_struct, connection).await?);
          }
          Ok(nested_structs)
+    }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.update_or_insert(connection).await?;
+        self.font_awesome_icon.update_or_insert(connection).await?;
+        self.color.update_or_insert(connection).await?;
+        Ok(())
     }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
@@ -1287,6 +1629,24 @@ impl NestedProject {
          }
          Ok(nested_structs)
     }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.update_or_insert(connection).await?;
+        self.state.update_or_insert(connection).await?;
+        if let Some(parent_project) = self.parent_project {
+            parent_project.update_or_insert(connection).await?;
+        }
+        self.created_by.update_or_insert(connection).await?;
+        Ok(())
+    }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedSampleBioOttTaxonItem {
@@ -1349,6 +1709,22 @@ impl NestedSampleBioOttTaxonItem {
          }
          Ok(nested_structs)
     }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.update_or_insert(connection).await?;
+        self.created_by.update_or_insert(connection).await?;
+        self.sample.update_or_insert(connection).await?;
+        self.taxon.update_or_insert(connection).await?;
+        Ok(())
+    }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedSampleState {
@@ -1408,6 +1784,21 @@ impl NestedSampleState {
              nested_structs.push(Self::from_flat(flat_struct, connection).await?);
          }
          Ok(nested_structs)
+    }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.update_or_insert(connection).await?;
+        self.font_awesome_icon.update_or_insert(connection).await?;
+        self.color.update_or_insert(connection).await?;
+        Ok(())
     }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
@@ -1470,6 +1861,22 @@ impl NestedSampledIndividualBioOttTaxonItem {
              nested_structs.push(Self::from_flat(flat_struct, connection).await?);
          }
          Ok(nested_structs)
+    }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.update_or_insert(connection).await?;
+        self.created_by.update_or_insert(connection).await?;
+        self.sampled_individual.update_or_insert(connection).await?;
+        self.taxon.update_or_insert(connection).await?;
+        Ok(())
     }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
@@ -1535,11 +1942,28 @@ impl NestedSample {
          }
          Ok(nested_structs)
     }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.update_or_insert(connection).await?;
+        self.inserted_by.update_or_insert(connection).await?;
+        self.sampled_by.update_or_insert(connection).await?;
+        self.procedure.update_or_insert(connection).await?;
+        self.state.update_or_insert(connection).await?;
+        Ok(())
+    }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedSamplingProcedure {
     pub inner: SamplingProcedure,
-    pub created_by: Option<User>,
+    pub created_by: User,
 }
 #[cfg(feature = "frontend")]
 impl NestedSamplingProcedure {
@@ -1553,7 +1977,7 @@ impl NestedSamplingProcedure {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            created_by: if let Some(created_by) = flat_struct.created_by { User::get(created_by, connection).await? } else { None },
+            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
             inner: flat_struct,
         })
     }
@@ -1592,6 +2016,20 @@ impl NestedSamplingProcedure {
              nested_structs.push(Self::from_flat(flat_struct, connection).await?);
          }
          Ok(nested_structs)
+    }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.update_or_insert(connection).await?;
+        self.created_by.update_or_insert(connection).await?;
+        Ok(())
     }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
@@ -1650,6 +2088,20 @@ impl NestedSpectra {
              nested_structs.push(Self::from_flat(flat_struct, connection).await?);
          }
          Ok(nested_structs)
+    }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.update_or_insert(connection).await?;
+        self.spectra_collection.update_or_insert(connection).await?;
+        Ok(())
     }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
@@ -1711,6 +2163,21 @@ impl NestedSpectraCollection {
          }
          Ok(nested_structs)
     }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.update_or_insert(connection).await?;
+        self.sample.update_or_insert(connection).await?;
+        self.created_by.update_or_insert(connection).await?;
+        Ok(())
+    }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedTeamState {
@@ -1771,11 +2238,27 @@ impl NestedTeamState {
          }
          Ok(nested_structs)
     }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.update_or_insert(connection).await?;
+        self.font_awesome_icon.update_or_insert(connection).await?;
+        self.color.update_or_insert(connection).await?;
+        Ok(())
+    }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedTeam {
     pub inner: Team,
     pub parent_team: Option<Team>,
+    pub created_by: User,
 }
 #[cfg(feature = "frontend")]
 impl NestedTeam {
@@ -1790,6 +2273,7 @@ impl NestedTeam {
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
             parent_team: if let Some(parent_team_id) = flat_struct.parent_team_id { Team::get(parent_team_id, connection).await? } else { None },
+            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
             inner: flat_struct,
         })
     }
@@ -1828,6 +2312,23 @@ impl NestedTeam {
              nested_structs.push(Self::from_flat(flat_struct, connection).await?);
          }
          Ok(nested_structs)
+    }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.update_or_insert(connection).await?;
+        if let Some(parent_team) = self.parent_team {
+            parent_team.update_or_insert(connection).await?;
+        }
+        self.created_by.update_or_insert(connection).await?;
+        Ok(())
     }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
@@ -1889,6 +2390,21 @@ impl NestedUserEmail {
          }
          Ok(nested_structs)
     }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.update_or_insert(connection).await?;
+        self.user.update_or_insert(connection).await?;
+        self.login_provider.update_or_insert(connection).await?;
+        Ok(())
+    }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedPublicUser {
@@ -1948,5 +2464,24 @@ impl NestedPublicUser {
              nested_structs.push(Self::from_flat(flat_struct, connection).await?);
          }
          Ok(nested_structs)
+    }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.update_or_insert(connection).await?;
+        if let Some(thumbnail) = self.thumbnail {
+            thumbnail.update_or_insert(connection).await?;
+        }
+        if let Some(picture) = self.picture {
+            picture.update_or_insert(connection).await?;
+        }
+        Ok(())
     }
 }

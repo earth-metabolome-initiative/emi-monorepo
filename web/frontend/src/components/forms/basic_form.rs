@@ -65,6 +65,9 @@ pub trait FormBuildable: Clone + PartialEq + Serialize + 'static {
 
     /// Returns whether this form requires authentication.
     fn requires_authentication() -> bool;
+
+    /// Returns whether the form can be submitted while offline.
+    fn can_operate_offline() -> bool;
 }
 
 #[derive(Clone, PartialEq, Properties)]
@@ -124,7 +127,16 @@ where
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            FormMessage::Backend(WebsocketMessage::Error(error)) => false,
+            FormMessage::Backend(WebsocketMessage::Error(error)) => {
+                self.errors = vec![error];
+                self.waiting_for_reply = false;
+                true
+            },
+            FormMessage::Backend(WebsocketMessage::Completed) => {
+                self.waiting_for_reply = false;
+                self.errors.clear();
+                true
+            }
             FormMessage::Backend(_) => false,
             FormMessage::UserState(user_state) => {
                 if self.user_state == user_state {
@@ -134,12 +146,6 @@ where
                 true
             }
             FormMessage::Submit => {
-                let mut change = false;
-                if !self.errors.is_empty() {
-                    self.errors.clear();
-                    change = true;
-                }
-
                 let data = ctx.props().builder.clone().into();
 
                 // Then, we send the data to the backend
@@ -157,8 +163,7 @@ where
                 });
 
                 self.waiting_for_reply = true;
-
-                change
+                true
             }
         }
     }

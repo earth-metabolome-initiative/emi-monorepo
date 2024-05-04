@@ -6,5 +6,10 @@ CREATE TABLE IF NOT EXISTS teams (
     -- a description of the team
     description TEXT NOT NULL,
     parent_team_id INTEGER REFERENCES teams(id) ON
-    DELETE CASCADE
+    DELETE
+        CASCADE,
+        -- The user who created the team
+        created_by INTEGER NOT NULL REFERENCES users(id) ON
+    DELETE
+        CASCADE
 );

@@ -105,8 +105,22 @@ impl WebsocketWorker {
                     }
                     Operation::Insert(table_name, serialized_row) => {
                         let table: Table = table_name.try_into().unwrap();
-                        // table.insert(insert)
-                        todo!()
+                        match table
+                            .insert(serialized_row, user_id.unwrap(), &mut database)
+                            .await
+                        {
+                            Ok(row) => BackendMessage::Notification(NotificationMessage::new(
+                                Notification {
+                                    id: 0,
+                                    user_id: user_id.unwrap(),
+                                    operation: "INSERT".to_string(),
+                                    table_name: table.to_string(),
+                                    read: false,
+                                },
+                                row,
+                            )),
+                            Err(err) => BackendMessage::Error(task_id, ApiError::from(err)),
+                        }
                     }
                     Operation::Select(select) => {
                         match select {
@@ -255,16 +269,19 @@ impl Worker for WebsocketWorker {
         match internal_message {
             InternalMessage::Backend(backend_message) => {
                 match backend_message {
-                    BackendMessage::Notification(_notification) => {
+                    BackendMessage::Notification(notification) => {
                         // TODO! HANDLE UPDATE OF THE DATABASE!
+                        log::debug!("Notification received: {:?}", notification);
                     }
                     BackendMessage::Completed(task_id) => {
+                        log::debug!("Task completed: {:?}", task_id);
                         // We can remove this task from the queue.
                         if let Some(subscriber_id) = self.tasks.remove(&task_id) {
                             scope.respond(subscriber_id, WebsocketMessage::Completed);
                         }
                     }
                     BackendMessage::Error(task_id, error) => {
+                        log::debug!("Task failed: {:?}", error);
                         // We can remove this task from the queue.
                         if let Some(subscriber_id) = self.tasks.remove(&task_id) {
                             scope.respond(subscriber_id, WebsocketMessage::Error(error));

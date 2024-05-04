@@ -70,35 +70,6 @@ impl BioOttRank {
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(bio_ott_ranks::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(bio_ott_ranks::table)
-            .values(self)
-            .on_conflict(bio_ott_ranks::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
-    }
     /// Delete the struct from the database.
     ///
     /// # Arguments
@@ -337,35 +308,6 @@ impl BioOttTaxonItem {
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(bio_ott_taxon_items::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(bio_ott_taxon_items::table)
-            .values(self)
-            .on_conflict(bio_ott_taxon_items::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
-    }
     /// Delete the struct from the database.
     ///
     /// # Arguments
@@ -555,35 +497,6 @@ impl Color {
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(colors::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(colors::table)
-            .values(self)
-            .on_conflict(colors::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
     }
     /// Delete the struct from the database.
     ///
@@ -784,35 +697,6 @@ impl ContainerHorizontalRule {
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(container_horizontal_rules::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(container_horizontal_rules::table)
-            .values(self)
-            .on_conflict(container_horizontal_rules::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
-    }
     /// Delete the struct from the database.
     ///
     /// # Arguments
@@ -940,35 +824,6 @@ impl ContainerVerticalRule {
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(container_vertical_rules::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(container_vertical_rules::table)
-            .values(self)
-            .on_conflict(container_vertical_rules::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
-    }
     /// Delete the struct from the database.
     ///
     /// # Arguments
@@ -1066,19 +921,6 @@ impl ContinuousUnit {
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(continuous_units::table)
-            .values(self)
-            .get_result(connection)
-    }
     /// Delete the struct from the database.
     ///
     /// # Arguments
@@ -1170,35 +1012,6 @@ impl DerivedSample {
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(derived_samples::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(derived_samples::table)
-            .values(self)
-            .on_conflict(derived_samples::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
-    }
     /// Delete the struct from the database.
     ///
     /// # Arguments
@@ -1280,19 +1093,6 @@ impl DiscreteUnit {
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(discrete_units::table)
-            .values(self)
-            .get_result(connection)
     }
     /// Delete the struct from the database.
     ///
@@ -1381,35 +1181,6 @@ impl DocumentFormat {
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(document_formats::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(document_formats::table)
-            .values(self)
-            .on_conflict(document_formats::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
     }
     /// Delete the struct from the database.
     ///
@@ -1607,35 +1378,6 @@ impl Document {
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(documents::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(documents::table)
-            .values(self)
-            .on_conflict(documents::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
-    }
     /// Delete the struct from the database.
     ///
     /// # Arguments
@@ -1735,35 +1477,6 @@ impl FontAwesomeIcon {
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(font_awesome_icons::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(font_awesome_icons::table)
-            .values(self)
-            .on_conflict(font_awesome_icons::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
     }
     /// Delete the struct from the database.
     ///
@@ -1958,35 +1671,6 @@ impl ItemCategory {
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(item_categories::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(item_categories::table)
-            .values(self)
-            .on_conflict(item_categories::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
-    }
     /// Delete the struct from the database.
     ///
     /// # Arguments
@@ -2180,35 +1864,6 @@ impl ItemCategoryRelationship {
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(item_category_relationships::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(item_category_relationships::table)
-            .values(self)
-            .on_conflict(item_category_relationships::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
-    }
     /// Delete the struct from the database.
     ///
     /// # Arguments
@@ -2296,35 +1951,6 @@ impl ItemCategoryUnit {
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(item_category_units::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(item_category_units::table)
-            .values(self)
-            .on_conflict(item_category_units::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
     }
     /// Delete the struct from the database.
     ///
@@ -2420,35 +2046,6 @@ impl ItemLocation {
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(item_locations::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(item_locations::table)
-            .values(self)
-            .on_conflict(item_locations::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
-    }
     /// Delete the struct from the database.
     ///
     /// # Arguments
@@ -2537,35 +2134,6 @@ impl ItemUnit {
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(item_units::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(item_units::table)
-            .values(self)
-            .on_conflict(item_units::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
-    }
     /// Delete the struct from the database.
     ///
     /// # Arguments
@@ -2650,35 +2218,6 @@ impl Item {
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(items::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(items::table)
-            .values(self)
-            .on_conflict(items::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
     }
     /// Delete the struct from the database.
     ///
@@ -2795,35 +2334,6 @@ impl Location {
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(locations::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(locations::table)
-            .values(self)
-            .on_conflict(locations::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
-    }
     /// Delete the struct from the database.
     ///
     /// # Arguments
@@ -2927,35 +2437,6 @@ impl LoginProvider {
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(login_providers::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(login_providers::table)
-            .values(self)
-            .on_conflict(login_providers::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
-    }
     /// Delete the struct from the database.
     ///
     /// # Arguments
@@ -3049,35 +2530,6 @@ impl ManufacturedItemCategory {
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(manufactured_item_categories::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(manufactured_item_categories::table)
-            .values(self)
-            .on_conflict(manufactured_item_categories::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
     }
     /// Delete the struct from the database.
     ///
@@ -3173,35 +2625,6 @@ impl Notification {
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(notifications::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(notifications::table)
-            .values(self)
-            .on_conflict(notifications::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
-    }
     /// Delete the struct from the database.
     ///
     /// # Arguments
@@ -3247,16 +2670,18 @@ impl Notification {
 #[diesel(table_name = organizations)]
 pub struct Organization {
     pub id: i32,
-    pub parent_organization_id: Option<i32>,
     pub name: String,
+    pub description: String,
+    pub parent_organization_id: Option<i32>,
 }
 
 impl From<Organization> for web_common::database::tables::Organization {
     fn from(item: Organization) -> Self {
         Self {
             id: item.id,
-            parent_organization_id: item.parent_organization_id,
             name: item.name,
+            description: item.description,
+            parent_organization_id: item.parent_organization_id,
         }
     }
 }
@@ -3265,8 +2690,9 @@ impl From<web_common::database::tables::Organization> for Organization {
     fn from(item: web_common::database::tables::Organization) -> Self {
         Self {
             id: item.id,
-            parent_organization_id: item.parent_organization_id,
             name: item.name,
+            description: item.description,
+            parent_organization_id: item.parent_organization_id,
         }
     }
 }
@@ -3289,35 +2715,6 @@ impl Organization {
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(organizations::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(organizations::table)
-            .values(self)
-            .on_conflict(organizations::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
     }
     /// Delete the struct from the database.
     ///
@@ -3359,6 +2756,21 @@ impl Organization {
             .filter(organizations::dsl::id.eq(id))
             .first::<Self>(connection)
     }
+    /// Get the struct from the database by its name.
+    ///
+    /// # Arguments
+    /// * `name` - The name of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_name(
+        name: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::organizations;
+        organizations::dsl::organizations
+            .filter(organizations::dsl::name.eq(name))
+            .first::<Self>(connection)
+    }
     /// Search for the struct by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
@@ -3379,7 +2791,7 @@ impl Organization {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, parent_organization_id, name FROM organizations ",
+            "SELECT id, name, description, parent_organization_id FROM organizations ",
             "WHERE $1 % name ",
             "ORDER BY similarity($1, name) DESC LIMIT $2",
         );
@@ -3408,7 +2820,7 @@ impl Organization {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, parent_organization_id, name FROM organizations ",
+            "SELECT id, name, description, parent_organization_id FROM organizations ",
             "WHERE $1 <% name ",
             "ORDER BY word_similarity($1, name) DESC LIMIT $2",
         );
@@ -3437,7 +2849,7 @@ impl Organization {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, parent_organization_id, name FROM organizations ",
+            "SELECT id, name, description, parent_organization_id FROM organizations ",
             "WHERE $1 <<% name ",
             "ORDER BY strict_word_similarity($1, name) DESC LIMIT $2",
         );
@@ -3488,19 +2900,6 @@ impl PrimaryUserEmail {
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(primary_user_emails::table)
-            .values(self)
-            .get_result(connection)
-    }
     /// Delete the struct from the database.
     ///
     /// # Arguments
@@ -3548,7 +2947,7 @@ pub struct Procedure {
     pub id: i32,
     pub name: String,
     pub description: Option<String>,
-    pub created_by: Option<i32>,
+    pub created_by: i32,
 }
 
 impl From<Procedure> for web_common::database::tables::Procedure {
@@ -3592,35 +2991,6 @@ impl Procedure {
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(procedures::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(procedures::table)
-            .values(self)
-            .on_conflict(procedures::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
-    }
     /// Delete the struct from the database.
     ///
     /// # Arguments
@@ -3659,6 +3029,21 @@ impl Procedure {
         use crate::schema::procedures;
         procedures::dsl::procedures
             .filter(procedures::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+    /// Get the struct from the database by its name.
+    ///
+    /// # Arguments
+    /// * `name` - The name of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_name(
+        name: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::procedures;
+        procedures::dsl::procedures
+            .filter(procedures::dsl::name.eq(name))
             .first::<Self>(connection)
     }
 }
@@ -3717,35 +3102,6 @@ impl ProjectRequirement {
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(project_requirements::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(project_requirements::table)
-            .values(self)
-            .on_conflict(project_requirements::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
     }
     /// Delete the struct from the database.
     ///
@@ -3840,35 +3196,6 @@ impl ProjectState {
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(project_states::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(project_states::table)
-            .values(self)
-            .on_conflict(project_states::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
     }
     /// Delete the struct from the database.
     ///
@@ -4072,35 +3399,6 @@ impl Project {
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(projects::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(projects::table)
-            .values(self)
-            .on_conflict(projects::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
-    }
     /// Delete the struct from the database.
     ///
     /// # Arguments
@@ -4288,35 +3586,6 @@ impl Role {
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(roles::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(roles::table)
-            .values(self)
-            .on_conflict(roles::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
-    }
     /// Delete the struct from the database.
     ///
     /// # Arguments
@@ -4423,35 +3692,6 @@ impl SampleBioOttTaxonItem {
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(sample_bio_ott_taxon_items::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(sample_bio_ott_taxon_items::table)
-            .values(self)
-            .on_conflict(sample_bio_ott_taxon_items::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
-    }
     /// Delete the struct from the database.
     ///
     /// # Arguments
@@ -4545,35 +3785,6 @@ impl SampleState {
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(sample_states::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(sample_states::table)
-            .values(self)
-            .on_conflict(sample_states::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
     }
     /// Delete the struct from the database.
     ///
@@ -4753,35 +3964,6 @@ impl SampledIndividualBioOttTaxonItem {
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(sampled_individual_bio_ott_taxon_items::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(sampled_individual_bio_ott_taxon_items::table)
-            .values(self)
-            .on_conflict(sampled_individual_bio_ott_taxon_items::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
-    }
     /// Delete the struct from the database.
     ///
     /// # Arguments
@@ -4863,19 +4045,6 @@ impl SampledIndividual {
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(sampled_individuals::table)
-            .values(self)
-            .get_result(connection)
     }
     /// Delete the struct from the database.
     ///
@@ -4971,35 +4140,6 @@ impl Sample {
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(samples::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(samples::table)
-            .values(self)
-            .on_conflict(samples::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
-    }
     /// Delete the struct from the database.
     ///
     /// # Arguments
@@ -5047,7 +4187,7 @@ pub struct SamplingProcedure {
     pub id: Uuid,
     pub name: String,
     pub description: Option<String>,
-    pub created_by: Option<i32>,
+    pub created_by: i32,
 }
 
 impl From<SamplingProcedure> for web_common::database::tables::SamplingProcedure {
@@ -5090,35 +4230,6 @@ impl SamplingProcedure {
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(sampling_procedures::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(sampling_procedures::table)
-            .values(self)
-            .on_conflict(sampling_procedures::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
     }
     /// Delete the struct from the database.
     ///
@@ -5292,35 +4403,6 @@ impl Spectra {
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(spectra::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(spectra::table)
-            .values(self)
-            .on_conflict(spectra::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
-    }
     /// Delete the struct from the database.
     ///
     /// # Arguments
@@ -5408,35 +4490,6 @@ impl SpectraCollection {
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(spectra_collections::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(spectra_collections::table)
-            .values(self)
-            .on_conflict(spectra_collections::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
     }
     /// Delete the struct from the database.
     ///
@@ -5531,35 +4584,6 @@ impl TeamState {
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(team_states::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(team_states::table)
-            .values(self)
-            .on_conflict(team_states::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
     }
     /// Delete the struct from the database.
     ///
@@ -5696,6 +4720,7 @@ pub struct Team {
     pub name: String,
     pub description: String,
     pub parent_team_id: Option<i32>,
+    pub created_by: i32,
 }
 
 impl From<Team> for web_common::database::tables::Team {
@@ -5705,6 +4730,7 @@ impl From<Team> for web_common::database::tables::Team {
             name: item.name,
             description: item.description,
             parent_team_id: item.parent_team_id,
+            created_by: item.created_by,
         }
     }
 }
@@ -5716,6 +4742,7 @@ impl From<web_common::database::tables::Team> for Team {
             name: item.name,
             description: item.description,
             parent_team_id: item.parent_team_id,
+            created_by: item.created_by,
         }
     }
 }
@@ -5738,35 +4765,6 @@ impl Team {
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(teams::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(teams::table)
-            .values(self)
-            .on_conflict(teams::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
     }
     /// Delete the struct from the database.
     ///
@@ -5843,7 +4841,7 @@ impl Team {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, parent_team_id FROM teams ",
+            "SELECT id, name, description, parent_team_id, created_by FROM teams ",
             "WHERE $1 % f_concat_teams_name_description(name, description) ",
             "ORDER BY similarity($1, f_concat_teams_name_description(name, description)) DESC LIMIT $2",
         );
@@ -5872,7 +4870,7 @@ impl Team {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, parent_team_id FROM teams ",
+            "SELECT id, name, description, parent_team_id, created_by FROM teams ",
             "WHERE $1 <% f_concat_teams_name_description(name, description) ",
             "ORDER BY word_similarity($1, f_concat_teams_name_description(name, description)) DESC LIMIT $2",
         );
@@ -5901,7 +4899,7 @@ impl Team {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, parent_team_id FROM teams ",
+            "SELECT id, name, description, parent_team_id, created_by FROM teams ",
             "WHERE $1 <<% f_concat_teams_name_description(name, description) ",
             "ORDER BY strict_word_similarity($1, f_concat_teams_name_description(name, description)) DESC LIMIT $2",
         );
@@ -5960,35 +4958,6 @@ impl Unit {
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(units::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(units::table)
-            .values(self)
-            .on_conflict(units::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
     }
     /// Delete the struct from the database.
     ///
@@ -6183,35 +5152,6 @@ impl UserEmail {
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(user_emails::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(user_emails::table)
-            .values(self)
-            .on_conflict(user_emails::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
-    }
     /// Delete the struct from the database.
     ///
     /// # Arguments
@@ -6308,35 +5248,6 @@ impl User {
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Insert the struct into the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(users::table)
-            .values(self)
-            .get_result(connection)
-    }
-    /// Insert the struct into the database or update it if it already exists.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn insert_or_update(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        diesel::insert_into(users::table)
-            .values(self)
-            .on_conflict(users::dsl::id)
-            .do_update()
-            .set(self)
-            .get_result(connection)
     }
     /// Delete the struct from the database.
     ///

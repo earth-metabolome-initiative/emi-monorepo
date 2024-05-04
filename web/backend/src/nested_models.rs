@@ -1446,6 +1446,20 @@ impl NestedOrganization {
     }
 }
 impl NestedOrganization {
+    /// Get the nested struct from the provided name.
+    ///
+    /// # Arguments
+    /// * `name` - The name of the row.
+    /// * `connection` - The database connection.
+    pub fn from_name(
+        name: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+        Organization::from_name(name, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+    }
+}
+impl NestedOrganization {
     /// Search the table by the query.
     ///
     /// # Arguments
@@ -1506,7 +1520,7 @@ impl From<NestedOrganization> for web_common::database::nested_models::NestedOrg
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedProcedure {
     pub inner: Procedure,
-    pub created_by: Option<User>,
+    pub created_by: User,
 }
 
 impl NestedProcedure {
@@ -1520,7 +1534,7 @@ impl NestedProcedure {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            created_by: flat_struct.created_by.map(|flat_struct| User::get(flat_struct, connection)).transpose()?,
+            created_by: User::get(flat_struct.created_by, connection)?,
                 inner: flat_struct,
         })
     }
@@ -1554,11 +1568,25 @@ impl NestedProcedure {
        Procedure::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
+impl NestedProcedure {
+    /// Get the nested struct from the provided name.
+    ///
+    /// # Arguments
+    /// * `name` - The name of the row.
+    /// * `connection` - The database connection.
+    pub fn from_name(
+        name: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+        Procedure::from_name(name, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+    }
+}
 impl From<web_common::database::nested_models::NestedProcedure> for NestedProcedure {
     fn from(item: web_common::database::nested_models::NestedProcedure) -> Self {
         Self {
             inner: item.inner.into(),
-            created_by: item.created_by.map(|item| item.into()),
+            created_by: item.created_by.into(),
         }
     }
 }
@@ -1566,7 +1594,7 @@ impl From<NestedProcedure> for web_common::database::nested_models::NestedProced
     fn from(item: NestedProcedure) -> Self {
         Self {
             inner: item.inner.into(),
-            created_by: item.created_by.map(|item| item.into()),
+            created_by: item.created_by.into(),
         }
     }
 }
@@ -2238,7 +2266,7 @@ impl From<NestedSample> for web_common::database::nested_models::NestedSample {
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedSamplingProcedure {
     pub inner: SamplingProcedure,
-    pub created_by: Option<User>,
+    pub created_by: User,
 }
 
 impl NestedSamplingProcedure {
@@ -2252,7 +2280,7 @@ impl NestedSamplingProcedure {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            created_by: flat_struct.created_by.map(|flat_struct| User::get(flat_struct, connection)).transpose()?,
+            created_by: User::get(flat_struct.created_by, connection)?,
                 inner: flat_struct,
         })
     }
@@ -2332,7 +2360,7 @@ impl From<web_common::database::nested_models::NestedSamplingProcedure> for Nest
     fn from(item: web_common::database::nested_models::NestedSamplingProcedure) -> Self {
         Self {
             inner: item.inner.into(),
-            created_by: item.created_by.map(|item| item.into()),
+            created_by: item.created_by.into(),
         }
     }
 }
@@ -2340,7 +2368,7 @@ impl From<NestedSamplingProcedure> for web_common::database::nested_models::Nest
     fn from(item: NestedSamplingProcedure) -> Self {
         Self {
             inner: item.inner.into(),
-            created_by: item.created_by.map(|item| item.into()),
+            created_by: item.created_by.into(),
         }
     }
 }
@@ -2599,6 +2627,7 @@ impl From<NestedTeamState> for web_common::database::nested_models::NestedTeamSt
 pub struct NestedTeam {
     pub inner: Team,
     pub parent_team: Option<Team>,
+    pub created_by: User,
 }
 
 impl NestedTeam {
@@ -2613,6 +2642,7 @@ impl NestedTeam {
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
             parent_team: flat_struct.parent_team_id.map(|flat_struct| Team::get(flat_struct, connection)).transpose()?,
+            created_by: User::get(flat_struct.created_by, connection)?,
                 inner: flat_struct,
         })
     }
@@ -2707,6 +2737,7 @@ impl From<web_common::database::nested_models::NestedTeam> for NestedTeam {
         Self {
             inner: item.inner.into(),
             parent_team: item.parent_team.map(|item| item.into()),
+            created_by: item.created_by.into(),
         }
     }
 }
@@ -2715,6 +2746,7 @@ impl From<NestedTeam> for web_common::database::nested_models::NestedTeam {
         Self {
             inner: item.inner.into(),
             parent_team: item.parent_team.map(|item| item.into()),
+            created_by: item.created_by.into(),
         }
     }
 }

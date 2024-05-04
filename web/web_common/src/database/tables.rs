@@ -4824,19 +4824,21 @@ impl Notification {
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Organization {
     pub id: i32,
-    pub parent_organization_id: Option<i32>,
     pub name: String,
+    pub description: String,
+    pub parent_organization_id: Option<i32>,
 }
 #[cfg(feature = "frontend")]
 impl Organization {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
             gluesql::core::ast_builder::num(self.id),
+            gluesql::core::ast_builder::text(self.name),
+            gluesql::core::ast_builder::text(self.description),
             match self.parent_organization_id {
                 Some(parent_organization_id) => gluesql::core::ast_builder::num(parent_organization_id),
                 None => gluesql::core::ast_builder::null(),
             },
-            gluesql::core::ast_builder::text(self.name),
         ]
     }
 
@@ -4856,7 +4858,7 @@ impl Organization {
         use gluesql::core::ast_builder::*;
         table("organizations")
             .insert()
-            .columns("id, parent_organization_id, name")
+            .columns("id, name, description, parent_organization_id")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -4882,7 +4884,7 @@ impl Organization {
         let select_row = table("organizations")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, parent_organization_id, name")
+            .project("id, name, description, parent_organization_id")
             .limit(1)
             .execute(connection)
             .await?;
@@ -4951,7 +4953,8 @@ impl Organization {
         let mut update_row = table("organizations")
             .update()        
 .set("id", gluesql::core::ast_builder::num(self.id))        
-.set("name", gluesql::core::ast_builder::text(self.name));
+.set("name", gluesql::core::ast_builder::text(self.name))        
+.set("description", gluesql::core::ast_builder::text(self.description));
         if let Some(parent_organization_id) = self.parent_organization_id {
             update_row = update_row.set("parent_organization_id", gluesql::core::ast_builder::num(parent_organization_id));
         }
@@ -5000,7 +5003,7 @@ impl Organization {
         use gluesql::core::ast_builder::*;
         let select_row = table("organizations")
             .select()
-            .project("id, parent_organization_id, name")
+            .project("id, name, description, parent_organization_id")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -5016,14 +5019,18 @@ impl Organization {
                 gluesql::prelude::Value::I32(id) => id.clone(),
                 _ => unreachable!("Expected I32")
             },
+            name: match row.get("name").unwrap() {
+                gluesql::prelude::Value::Str(name) => name.clone(),
+                _ => unreachable!("Expected Str")
+            },
+            description: match row.get("description").unwrap() {
+                gluesql::prelude::Value::Str(description) => description.clone(),
+                _ => unreachable!("Expected Str")
+            },
             parent_organization_id: match row.get("parent_organization_id").unwrap() {
                 gluesql::prelude::Value::Null => None,
                 gluesql::prelude::Value::I32(parent_organization_id) => Some(parent_organization_id.clone()),
                 _ => unreachable!("Expected I32")
-            },
-            name: match row.get("name").unwrap() {
-                gluesql::prelude::Value::Str(name) => name.clone(),
-                _ => unreachable!("Expected Str")
             },
         }
     }
@@ -5221,7 +5228,7 @@ pub struct Procedure {
     pub id: i32,
     pub name: String,
     pub description: Option<String>,
-    pub created_by: Option<i32>,
+    pub created_by: i32,
 }
 #[cfg(feature = "frontend")]
 impl Procedure {
@@ -5233,10 +5240,7 @@ impl Procedure {
                 Some(description) => gluesql::core::ast_builder::text(description),
                 None => gluesql::core::ast_builder::null(),
             },
-            match self.created_by {
-                Some(created_by) => gluesql::core::ast_builder::num(created_by),
-                None => gluesql::core::ast_builder::null(),
-            },
+            gluesql::core::ast_builder::num(self.created_by),
         ]
     }
 
@@ -5351,12 +5355,10 @@ impl Procedure {
         let mut update_row = table("procedures")
             .update()        
 .set("id", gluesql::core::ast_builder::num(self.id))        
-.set("name", gluesql::core::ast_builder::text(self.name));
+.set("name", gluesql::core::ast_builder::text(self.name))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by));
         if let Some(description) = self.description {
             update_row = update_row.set("description", gluesql::core::ast_builder::text(description));
-        }
-        if let Some(created_by) = self.created_by {
-            update_row = update_row.set("created_by", gluesql::core::ast_builder::num(created_by));
         }
             update_row.execute(connection)
             .await
@@ -5429,8 +5431,7 @@ impl Procedure {
                 _ => unreachable!("Expected Str")
             },
             created_by: match row.get("created_by").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::I32(created_by) => Some(created_by.clone()),
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
                 _ => unreachable!("Expected I32")
             },
         }
@@ -7408,7 +7409,7 @@ pub struct SamplingProcedure {
     pub id: Uuid,
     pub name: String,
     pub description: Option<String>,
-    pub created_by: Option<i32>,
+    pub created_by: i32,
 }
 #[cfg(feature = "frontend")]
 impl SamplingProcedure {
@@ -7420,10 +7421,7 @@ impl SamplingProcedure {
                 Some(description) => gluesql::core::ast_builder::text(description),
                 None => gluesql::core::ast_builder::null(),
             },
-            match self.created_by {
-                Some(created_by) => gluesql::core::ast_builder::num(created_by),
-                None => gluesql::core::ast_builder::null(),
-            },
+            gluesql::core::ast_builder::num(self.created_by),
         ]
     }
 
@@ -7538,12 +7536,10 @@ impl SamplingProcedure {
         let mut update_row = table("sampling_procedures")
             .update()        
 .set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
-.set("name", gluesql::core::ast_builder::text(self.name));
+.set("name", gluesql::core::ast_builder::text(self.name))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by));
         if let Some(description) = self.description {
             update_row = update_row.set("description", gluesql::core::ast_builder::text(description));
-        }
-        if let Some(created_by) = self.created_by {
-            update_row = update_row.set("created_by", gluesql::core::ast_builder::num(created_by));
         }
             update_row.execute(connection)
             .await
@@ -7616,8 +7612,7 @@ impl SamplingProcedure {
                 _ => unreachable!("Expected Str")
             },
             created_by: match row.get("created_by").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::I32(created_by) => Some(created_by.clone()),
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
                 _ => unreachable!("Expected I32")
             },
         }
@@ -8240,6 +8235,7 @@ pub struct Team {
     pub name: String,
     pub description: String,
     pub parent_team_id: Option<i32>,
+    pub created_by: i32,
 }
 #[cfg(feature = "frontend")]
 impl Team {
@@ -8252,6 +8248,7 @@ impl Team {
                 Some(parent_team_id) => gluesql::core::ast_builder::num(parent_team_id),
                 None => gluesql::core::ast_builder::null(),
             },
+            gluesql::core::ast_builder::num(self.created_by),
         ]
     }
 
@@ -8271,7 +8268,7 @@ impl Team {
         use gluesql::core::ast_builder::*;
         table("teams")
             .insert()
-            .columns("id, name, description, parent_team_id")
+            .columns("id, name, description, parent_team_id, created_by")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -8297,7 +8294,7 @@ impl Team {
         let select_row = table("teams")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, name, description, parent_team_id")
+            .project("id, name, description, parent_team_id, created_by")
             .limit(1)
             .execute(connection)
             .await?;
@@ -8367,7 +8364,8 @@ impl Team {
             .update()        
 .set("id", gluesql::core::ast_builder::num(self.id))        
 .set("name", gluesql::core::ast_builder::text(self.name))        
-.set("description", gluesql::core::ast_builder::text(self.description));
+.set("description", gluesql::core::ast_builder::text(self.description))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by));
         if let Some(parent_team_id) = self.parent_team_id {
             update_row = update_row.set("parent_team_id", gluesql::core::ast_builder::num(parent_team_id));
         }
@@ -8416,7 +8414,7 @@ impl Team {
         use gluesql::core::ast_builder::*;
         let select_row = table("teams")
             .select()
-            .project("id, name, description, parent_team_id")
+            .project("id, name, description, parent_team_id, created_by")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -8443,6 +8441,10 @@ impl Team {
             parent_team_id: match row.get("parent_team_id").unwrap() {
                 gluesql::prelude::Value::Null => None,
                 gluesql::prelude::Value::I32(parent_team_id) => Some(parent_team_id.clone()),
+                _ => unreachable!("Expected I32")
+            },
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
                 _ => unreachable!("Expected I32")
             },
         }

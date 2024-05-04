@@ -24,9 +24,9 @@ use sqlx::{Pool as SQLxPool, Postgres};
 use web_common::api::oauth::jwt_cookies::AccessToken;
 use web_common::api::ws::messages::{BackendMessage, FrontendMessage};
 use web_common::api::ApiError;
+use web_common::database::NestedProject;
 use web_common::database::NotificationMessage;
 use web_common::database::Table;
-
 
 #[derive(Debug, Deserialize, Serialize)]
 struct NotificationRecord {
@@ -138,6 +138,19 @@ impl WebSocket {
                                             )
                                             .unwrap()
                                         }
+                                        Table::Projects => {
+                                            let flat_struct: crate::models::Project =
+                                                serde_json::from_str(&payload.record)
+                                                    .expect("Error deserializing Project");
+                                            let frontend_variant: web_common::database::NestedProject = crate::nested_models::NestedProject::from_flat(
+                                                flat_struct,
+                                                &mut diesel_connection,
+                                            ).unwrap().into();
+                                            bincode::serialize(
+                                                &frontend_variant,
+                                            )
+                                            .unwrap()
+                                        }
                                         _ => {
                                             unimplemented!("Table not implemented: {:?}", table)
                                         }
@@ -239,12 +252,13 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                     }
                     FrontendMessage::Task(task_id, operation) => {
                         if operation.requires_authentication() && self.user.is_none() {
-                            ctx.address().do_send(InternalMessage::Unauthorized);
+                            ctx.address()
+                                .do_send(BackendMessage::Error(task_id, ApiError::Unauthorized));
                             return;
                         }
 
                         match operation {
-                            web_common::database::Operation::Insert(table_name, row) => {
+                            web_common::database::Operation::Insert(table_name, new_row) => {
                                 let table: web_common::database::Table =
                                     match table_name.as_str().try_into() {
                                         Ok(table) => table,
@@ -256,13 +270,26 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                             return;
                                         }
                                     };
-                                // table.insert(row);
-                                todo!()
+                                match <Table as InsertableTable>::insert(
+                                    &table,
+                                    new_row,
+                                    self.user().map(|user| user.id).unwrap(),
+                                    &mut self.diesel_connection,
+                                ) {
+                                    Ok(_) => {
+                                        ctx.address().do_send(BackendMessage::Completed(task_id));
+                                    }
+                                    Err(err) => {
+                                        ctx.address().do_send(BackendMessage::Error(task_id, err));
+                                    }
+                                }
                             }
                             web_common::database::Operation::Update(update) => match update {
                                 web_common::database::Update::CompleteProfile(profile) => {
-                                    ctx.address()
-                                        .do_send(UserMessage::CompleteProfile(task_id, profile.clone()));
+                                    ctx.address().do_send(UserMessage::CompleteProfile(
+                                        task_id,
+                                        profile.clone(),
+                                    ));
                                 }
                             },
                             web_common::database::Operation::Select(select) => match select {

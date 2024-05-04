@@ -78,6 +78,39 @@ import glob
 
 TEXTUAL_DATA_TYPES = ["String"]
 
+GLUESQL_TYPES_MAPPING = {
+    "i8": "gluesql::core::ast_builder::num({})",
+    "i16": "gluesql::core::ast_builder::num({})",
+    "i32": "gluesql::core::ast_builder::num({})",
+    "i64": "gluesql::core::ast_builder::num({})",
+    "i128": "gluesql::core::ast_builder::num({})",
+    "u8": "gluesql::core::ast_builder::num({})",
+    "u16": "gluesql::core::ast_builder::num({})",
+    "u32": "gluesql::core::ast_builder::num({})",
+    "u64": "gluesql::core::ast_builder::num({})",
+    "u128": "gluesql::core::ast_builder::num({})",
+    "f32": "gluesql::core::ast_builder::num({})",
+    "f64": "gluesql::core::ast_builder::num({})",
+    "String": "gluesql::core::ast_builder::text({})",
+    "Uuid": "gluesql::core::ast_builder::uuid({}.to_string())",
+    "bool": "({}.into())",
+    "NaiveDateTime": "gluesql::core::ast_builder::timestamp({}.to_string())",
+    "DateTime<Utc>": "gluesql::core::ast_builder::timestamp({}.to_string())",
+}
+
+TEMPORARELY_IGNORED_TABLES = [
+    "derived_samples",
+    "item_locations",
+    "item_units",
+    "items",
+    "locations",
+    "sample_bio_ott_taxon_items",
+    "sampled_individual_bio_ott_taxon_items",
+    "spectra",
+    "spectra_collections",
+    "user_emails",
+]
+
 
 def struct_name_from_table_name(table_name: str) -> str:
     """Convert the table name to the struct name."""
@@ -207,6 +240,44 @@ class AttributeMetadata:
             and self._data_type.can_implement_eq()
         )
 
+    def is_creator_user_id(self) -> bool:
+        return (
+            isinstance(self._data_type, StructMetadata)
+            and self._data_type.is_insertable()
+            or self.name in ("inserted_by", "created_by")
+        )
+
+    def is_creation_timestamp(self) -> bool:
+        return self.name in ("inserted_at", "created_at")
+
+    def is_updater_user_id(self) -> bool:
+        return (
+            isinstance(self._data_type, StructMetadata)
+            and self._data_type.is_updatable()
+            or self.name in ("updated_by",)
+        )
+
+    def is_update_timestamp(self) -> bool:
+        return self.name in ("updated_at",)
+
+    def is_automatically_determined_column(self) -> bool:
+        return any(
+            [
+                self.is_creator_user_id(),
+                self.is_creation_timestamp(),
+                self.is_updater_user_id(),
+                self.is_update_timestamp(),
+            ]
+        )
+
+    def requires_authentication(self) -> bool:
+        return (
+            isinstance(self._data_type, StructMetadata)
+            and self._data_type.requires_authentication()
+            or self.is_creator_user_id()
+            or self.is_updater_user_id()
+        )
+
     def __eq__(self, other: "AttributeMetadata") -> bool:
         return (
             self.name == other.name
@@ -245,12 +316,78 @@ class AttributeMetadata:
 class TableStructMetadata:
 
     def __init__(self, table_name: str):
-        self.table_name = table_name
+        self.name = table_name
         self.richest_struct: StructMetadata = None
         self.flat_struct: StructMetadata = None
+        self.new_flat_struct: StructMetadata = None
+
+    def requires_authentication(self) -> bool:
+        """Returns whether the table requires authentication.
+
+        Implementation details
+        -----------------------
+        A struct requires authentication to operate on it (either
+        insert or update) if it contains a field that is either the
+        creator user ID or the updater user ID.
+        """
+        return any(
+            attribute.requires_authentication()
+            for attribute in self.richest_struct.attributes
+        )
+
+    def is_updatable(self) -> bool:
+        """Returns whether the table is updatable.
+
+        Implementation details
+        -----------------------
+        A table is updatable if the associated struct has at least a
+        field containing the updater user ID.
+        """
+        return any(
+            attribute.is_updater_user_id()
+            for attribute in self.richest_struct.attributes
+        )
+
+    def is_insertable(self) -> bool:
+        """Returns whether the table is insertable.
+
+        Implementation details
+        -----------------------
+        A table is insertable if the associated struct has at least a
+        field containing the creator user ID.
+        """
+        return any(
+            attribute.is_creator_user_id()
+            for attribute in self.flat_struct.attributes
+        )
+
+    def has_uuid_primary_key(self) -> bool:
+        """Returns whether the table has a UUID primary key.
+
+        Implementation details
+        -----------------------
+        This method returns whether the primary key of the table is
+        a UUID.
+        """
+        return self.richest_struct.has_uuid_primary_key()
+
+    def set_new_flat_struct(self, struct: "StructMetadata"):
+        assert struct.table_name == self.name
+        assert not struct.is_nested()
+        assert struct.is_new_variant()
+        if self.new_flat_struct is not None:
+            raise ValueError(
+                "The new flat struct has already been set. This is unexpected. Please check the table and the structs associated to it."
+            )
+        self.new_flat_struct = struct
+
+    def get_new_flat_struct(self) -> "StructMetadata":
+        if self.new_flat_struct is None:
+            raise ValueError(f"The new flat struct has not been set for the table {self.name}.")
+        return self.new_flat_struct
 
     def set_richest_struct(self, struct: "StructMetadata"):
-        assert struct.table_name == self.table_name
+        assert struct.table_name == self.name
         if self.richest_struct is not None:
             if self.richest_struct.is_nested() and not struct.is_nested():
                 return
@@ -258,7 +395,7 @@ class TableStructMetadata:
                 raise ValueError(
                     "This table has several nested structs. This is not supported and "
                     "is unexpected. Please check the table and the structs associated to it. "
-                    f"The table name is {self.table_name} and the provided structs are {struct.name} "
+                    f"The table name is {self.name} and the provided structs are {struct.name} "
                     f"and {self.richest_struct.name}."
                 )
         self.richest_struct = struct
@@ -267,7 +404,7 @@ class TableStructMetadata:
         return self.richest_struct
 
     def set_flat_struct(self, struct: "StructMetadata"):
-        assert struct.table_name == self.table_name
+        assert struct.table_name == self.name
         if struct.is_nested():
             raise ValueError(
                 "The flat struct cannot be a nested struct. Please provide a struct that is not nested."
@@ -281,11 +418,14 @@ class TableStructMetadata:
     def flat_struct_name(self) -> str:
         return self.flat_struct.name
 
+    def new_flat_struct_name(self) -> str:
+        return self.get_new_flat_struct().name
+
     def richest_struct_name(self) -> str:
         return self.richest_struct.name
 
     def camel_cased(self) -> str:
-        return "".join(word.capitalize() for word in self.table_name.split("_"))
+        return "".join(word.capitalize() for word in self.name.split("_"))
 
 
 class StructMetadata:
@@ -296,6 +436,44 @@ class StructMetadata:
         self.attributes: List[AttributeMetadata] = []
         self._derives: List[str] = []
         self._decorators: List[str] = []
+        self._flat_variant: Optional[StructMetadata] = None
+
+    def requires_authentication(self) -> bool:
+        """Returns whether the struct requires authentication.
+
+        Implementation details
+        -----------------------
+        A struct requires authentication to operate on it (either
+        insert or update) if it contains a field that is either the
+        creator user ID or the updater user ID.
+        """
+        if self._flat_variant is not None:
+            return self._flat_variant.requires_authentication()
+        return any(attribute.requires_authentication() for attribute in self.attributes)
+
+    def is_updatable(self) -> bool:
+        """Returns whether the struct is updatable.
+
+        Implementation details
+        -----------------------
+        A struct is updatable if it contains at least a field containing
+        the updater user ID.
+        """
+        if self._flat_variant is not None:
+            return self._flat_variant.is_updatable()
+        return any(attribute.is_updater_user_id() for attribute in self.attributes)
+
+    def is_insertable(self) -> bool:
+        """Returns whether the struct is insertable.
+
+        Implementation details
+        -----------------------
+        A struct is insertable if it contains at least a field containing
+        the creator user ID.
+        """
+        if self._flat_variant is not None:
+            return self._flat_variant.is_insertable()
+        return any(attribute.is_creator_user_id() for attribute in self.attributes)
 
     def write_to(self, file: "File", diesel: Optional[str] = None):
         if diesel is not None:
@@ -311,6 +489,20 @@ class StructMetadata:
         for attribute in self.attributes:
             file.write(f"    pub {attribute.name}: {attribute.format_data_type()},\n")
         file.write("}\n\n")
+
+    def is_new_variant(self) -> bool:
+        return self._flat_variant is not None and self.name.startswith("New")
+
+    def set_flat_variant(self, struct: "StructMetadata"):
+        assert struct.table_name == self.table_name
+        assert not struct.is_nested()
+        self._flat_variant = struct
+
+    def get_flat_variant(self) -> "StructMetadata":
+        if self._flat_variant is None:
+            raise ValueError("The flat variant has not been set.")
+
+        return self._flat_variant
 
     def has_undefined_nested_dependencies(self) -> bool:
         """Returns whether the struct has undefined nested dependencies.
@@ -365,6 +557,29 @@ class StructMetadata:
             self.attributes[0].name
             == table_metadata.get_primary_key_name_and_type(self.table_name)[0]
         )
+
+    def get_creator_user_id_attribute(self) -> AttributeMetadata:
+        if self.is_new_variant():
+            return self.get_flat_variant().get_creator_user_id_attribute()
+        for attribute in self.attributes:
+            if attribute.is_creator_user_id():
+                return attribute
+        raise ValueError("The struct does not contain a creator user ID attribute.")
+
+    @cache
+    def has_uuid_primary_key(self) -> bool:
+        """Returns whether the struct has a UUID primary key.
+
+        Implementation details
+        -----------------------
+        This method returns whether the primary key of the struct is
+        a UUID.
+        """
+        table_metadata = find_foreign_keys()
+        primary_key_name, primary_key_type = (
+            table_metadata.get_primary_key_name_and_type(self.table_name)
+        )
+        return primary_key_type == "uuid"
 
     def derives(self, diesel: Optional[str] = None) -> List[str]:
         """Returns the list of derives for the struct.
@@ -1278,49 +1493,6 @@ def write_backend_structs(
             elif table_metadatas.is_view(struct.table_name):
                 primary_key = struct.get_attribute_by_name("id")
 
-            # If the current struct type we are processing is a table, we also provide
-            # the insert and insert_or_update methods. The insert method inserts a new
-            # row in the table with the values of the struct. The insert_or_update method
-            # inserts a new row in the table with the values of the struct if the row does
-            # not exist, otherwise it updates the row with the values of the struct.
-            # Additionally, we also implement the delete method.
-            if table_type == "tables":
-                file.write(
-                    "    /// Insert the struct into the database.\n"
-                    "    ///\n"
-                    "    /// # Arguments\n"
-                    "    /// * `connection` - The connection to the database.\n"
-                    "    ///\n"
-                    "    pub fn insert(\n"
-                    "        &self,\n"
-                    "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
-                    "    ) -> Result<Self, diesel::result::Error> {\n"
-                    f"        diesel::insert_into({struct.table_name}::table)\n"
-                    f"            .values(self)\n"
-                    "            .get_result(connection)\n"
-                    "    }\n"
-                )
-
-                if not struct.only_primary_key():
-                    file.write(
-                        "    /// Insert the struct into the database or update it if it already exists.\n"
-                        "    ///\n"
-                        "    /// # Arguments\n"
-                        "    /// * `connection` - The connection to the database.\n"
-                        "    ///\n"
-                        "    pub fn insert_or_update(\n"
-                        "        &self,\n"
-                        "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
-                        "    ) -> Result<Self, diesel::result::Error> {\n"
-                        f"        diesel::insert_into({struct.table_name}::table)\n"
-                        f"            .values(self)\n"
-                        f"            .on_conflict({struct.table_name}::dsl::{primary_key.name})\n"
-                        f"            .do_update()\n"
-                        f"            .set(self)\n"
-                        f"            .get_result(connection)\n"
-                        "    }\n"
-                    )
-
             if primary_key is not None:
                 file.write(
                     "    /// Delete the struct from the database.\n"
@@ -1668,27 +1840,8 @@ def write_web_common_structs(
         # As first thing, we implement the `into_row` method for the struct. This method
         # converts the struct into a vector of `gluesql::core::ast_builder::ExprList`
         # variants, which are used to insert the struct into the GlueSQL database.
-        types_and_methods = {
-            "i8": "gluesql::core::ast_builder::num({})",
-            "i16": "gluesql::core::ast_builder::num({})",
-            "i32": "gluesql::core::ast_builder::num({})",
-            "i64": "gluesql::core::ast_builder::num({})",
-            "i128": "gluesql::core::ast_builder::num({})",
-            "u8": "gluesql::core::ast_builder::num({})",
-            "u16": "gluesql::core::ast_builder::num({})",
-            "u32": "gluesql::core::ast_builder::num({})",
-            "u64": "gluesql::core::ast_builder::num({})",
-            "u128": "gluesql::core::ast_builder::num({})",
-            "f32": "gluesql::core::ast_builder::num({})",
-            "f64": "gluesql::core::ast_builder::num({})",
-            "String": "gluesql::core::ast_builder::text({})",
-            "Uuid": "gluesql::core::ast_builder::uuid({}.to_string())",
-            "bool": "({}.into())",
-            "NaiveDateTime": "gluesql::core::ast_builder::timestamp({}.to_string())",
-            "DateTime<Utc>": "gluesql::core::ast_builder::timestamp({}.to_string())",
-        }
 
-        update_types_and_methods = types_and_methods.copy()
+        update_types_and_methods = GLUESQL_TYPES_MAPPING.copy()
         update_types_and_methods["bool"] = "{}"
 
         tables.write(
@@ -1699,10 +1852,10 @@ def write_web_common_structs(
         for attribute in struct.attributes:
 
             if attribute.optional:
-                if attribute.data_type() in types_and_methods:
+                if attribute.data_type() in GLUESQL_TYPES_MAPPING:
                     tables.write(f"            match self.{attribute.name} {{\n")
                     tables.write(
-                        f"                Some({attribute.name}) => {types_and_methods[attribute.data_type()].format(attribute.name)},\n"
+                        f"                Some({attribute.name}) => {GLUESQL_TYPES_MAPPING[attribute.data_type()].format(attribute.name)},\n"
                     )
                     tables.write(
                         "                None => gluesql::core::ast_builder::null(),\n"
@@ -1713,9 +1866,9 @@ def write_web_common_structs(
                         f"The type {attribute.data_type()} is not supported. "
                         f"The struct {struct.name} contains an {attribute.data_type()}. "
                     )
-            elif attribute.data_type() in types_and_methods:
+            elif attribute.data_type() in GLUESQL_TYPES_MAPPING:
                 tables.write(
-                    f"            {types_and_methods[attribute.data_type()].format(f'self.{attribute.name}')},\n"
+                    f"            {GLUESQL_TYPES_MAPPING[attribute.data_type()].format(f'self.{attribute.name}')},\n"
                 )
             else:
                 raise NotImplementedError(
@@ -2889,6 +3042,40 @@ def write_web_common_nested_structs(path: str, nested_structs: List[StructMetada
             "    }\n"
         )
 
+        # We implement the update_or_insert method for the struct when the frontend feature
+        # is enabled using GlueSQL. This method will be extremely similar to the `update_or_insert`
+        # for the flat version of the struct, with the important difference that we will call it
+        # on all of its attributes that are nested structs.
+
+        tables.write(
+            "    /// Update or insert the nested struct into the database.\n"
+            "    ///\n"
+            "    /// # Arguments\n"
+            "    /// * `connection` - The database connection.\n"
+            "    pub async fn update_or_insert<C>(\n"
+            "        self,\n"
+            "        connection: &mut gluesql::prelude::Glue<C>,\n"
+            "    ) -> Result<(), gluesql::prelude::Error> where\n"
+            "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
+            "    {\n"
+        )
+        for attribute in struct_metadata.attributes:
+            assert isinstance(attribute.raw_data_type(), StructMetadata)
+
+            if attribute.optional:
+                tables.write(
+                    f"        if let Some({attribute.name}) = self.{attribute.name} {{\n"
+                    f"            {attribute.name}.update_or_insert(connection).await?;\n"
+                    "        }\n"
+                )
+            else:
+                tables.write(
+                    f"        self.{attribute.name}.update_or_insert(connection).await?;\n"
+                )
+
+        tables.write("        Ok(())\n" "    }\n")
+
+
         tables.write("}\n")
 
     tables.close()
@@ -2896,6 +3083,7 @@ def write_web_common_nested_structs(path: str, nested_structs: List[StructMetada
 
 def write_webcommons_table_names_enumeration(
     struct_metadatas: List[StructMetadata],
+    new_model_structs: List[StructMetadata],
 ) -> List[TableStructMetadata]:
     imports = [
         "use serde::Deserialize;",
@@ -2936,8 +3124,14 @@ def write_webcommons_table_names_enumeration(
         if not struct.is_nested():
             tables[struct.table_name].set_flat_struct(struct)
 
+    # We set the new flat model struct variant for each of the tables,
+    # when it is available.
+    for struct in new_model_structs:
+        assert struct.table_name in tables, f"Table {struct.table_name} not found."
+        tables[struct.table_name].set_new_flat_struct(struct)
+
     tables: List[TableStructMetadata] = sorted(
-        list(tables.values()), key=lambda x: x.table_name
+        list(tables.values()), key=lambda x: x.name
     )
 
     document.write("#[derive(" + ", ".join(derives) + ")]\n")
@@ -2953,7 +3147,7 @@ def write_webcommons_table_names_enumeration(
     document.write("        match self {\n")
     for table in tables:
         document.write(
-            f'            Table::{table.camel_cased()} => "{table.table_name}",\n'
+            f'            Table::{table.camel_cased()} => "{table.name}",\n'
         )
     document.write("        }\n")
     document.write("    }\n")
@@ -2985,7 +3179,7 @@ def write_webcommons_table_names_enumeration(
     document.write("        match value {\n")
     for table in tables:
         document.write(
-            f'            "{table.table_name}" => Ok(Table::{table.camel_cased()}),\n'
+            f'            "{table.name}" => Ok(Table::{table.camel_cased()}),\n'
         )
     document.write(
         '            table_name => Err(format!("Unknown table name: {table_name}")),\n'
@@ -3102,6 +3296,123 @@ def write_webcommons_table_names_enumeration(
 
     document.write("        }\n    }\n")
 
+    # Next, we implement the insert method for the Table enum, which receives a bincode-serialized
+    # row of the flat table variant and a connection to the database. The method returns a Result,
+    # where the Ok variant is the bincode-serialized version of the richest struct of the table variant,
+    # associated with the newly inserted row, while the Err variant contains an ApiError. The insert
+    # method is available only for a subset of the tables, namely those that have a column with the
+    # information of which user inserted the row.
+    # Each variant deserializes the received row, which is the flat
+    # new variant, and calls its insert method providing to it the connection, which returns the flat
+    # standard struct. When the table has a richer variant than the flat one, we convert the flat struct
+    # to the richest struct using the `from_flat` method. We then serialize the struct and return it.
+
+    document.write(
+        "    /// Insert a new row into the table.\n"
+        "    ///\n"
+        "    /// # Arguments\n"
+        "    /// * `new_row` - The bincode-serialized row of the table.\n"
+        "    /// * `user_id` - The user ID of the user performing the operation.\n"
+        "    /// * `connection` - The database connection.\n"
+        "    ///\n"
+        "    /// # Returns\n"
+        "    /// The bincode-serialized row of the table.\n"
+        "    pub async fn insert<C>(\n"
+        "        &self,\n"
+        "        new_row: Vec<u8>,\n"
+        "        user_id: i32,\n"
+        "        connection: &mut gluesql::prelude::Glue<C>,\n"
+        "    ) -> Result<Vec<u8>, crate::api::ApiError> where\n"
+        "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
+        "    {\n"
+        "        Ok(match self {\n"
+    )
+
+    for table in tables:
+        if not table.is_insertable():
+            document.write(
+                f'            Table::{table.camel_cased()} => unimplemented!("Insert not implemented for {table.name}."),\n'
+            )
+            continue
+
+        # As another check, if the primary key of this table is NOT a UUID, it does not make sense to
+        # have it insertable from the frontend, as the primary key is generated by the database itself
+        # and does not support a distributed index.
+        if not table.has_uuid_primary_key():
+            document.write(
+                f'            Table::{table.camel_cased()} => unimplemented!("Insert not implemented for {table.name} in frontend as it does not have a UUID primary key."),\n'
+            )
+            continue
+
+        if table.name in TEMPORARELY_IGNORED_TABLES:
+            document.write(
+                f'            Table::{table.camel_cased()} => todo!("Insert not implemented for {table.name}."),\n'
+            )
+            continue
+
+        document.write(
+            f"            Table::{table.camel_cased()} => {{\n"
+            f"                let new_row: super::{table.new_flat_struct_name()} = bincode::deserialize::<super::{table.new_flat_struct_name()}>(&new_row).map_err(crate::api::ApiError::from)?;\n"
+            f"                let inserted_row: super::{table.flat_struct_name()} = new_row.insert(user_id, connection).await?;\n"
+        )
+
+        # If the table has a richer variant than the flat one, we convert the flat struct
+        # to the richest struct using the `from_flat` method.
+        if table.get_richest_struct().is_nested():
+            document.write(
+                f"                let nested_row = super::{table.get_richest_struct().name}::from_flat(inserted_row, connection).await?;\n"
+                "                 bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?\n"
+            )
+        else:
+            document.write(
+                "                bincode::serialize(&inserted_row).map_err(crate::api::ApiError::from)?\n"
+            )
+
+        document.write("            },\n")
+
+    document.write("})\n")
+
+    document.write("    }\n")
+
+    # Next, we implement the update or insert method for the Table enum, which receives a bincode-serialized
+    # rows of the richest table variant (not a new one) and a connection to the database. This method is used
+    # to sync the client-side database with information newly provided by the server. It does not receive,
+    # differently from the insert method, the user ID, as the user ID is already present in the row. The method
+    # returns a Result, where the Ok variant is an empty tuple, while the Err variant contains an ApiError.
+    # This method is available for ALL tables, not only those that have a column with the information of which
+    # user inserted the row.
+
+    document.write(
+        "    /// Update or insert a row into the table.\n"
+        "    ///\n"
+        "    /// # Arguments\n"
+        "    /// * `rows` - The bincode-serialized rows of the table.\n"
+        "    /// * `connection` - The database connection.\n"
+        "    ///\n"
+        "    /// # Returns\n"
+        "    /// An empty tuple.\n"
+        "    pub async fn update_or_insert<C>(\n"
+        "        &self,\n"
+        "        rows: Vec<Vec<u8>>,"
+        "        connection: &mut gluesql::prelude::Glue<C>,\n"
+        "    ) -> Result<(), crate::api::ApiError> where\n"
+        "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
+        "    {\n"
+        "        match self {\n"
+    )
+
+    for table in tables:
+        document.write(
+            f"            Table::{table.camel_cased()} => {{\n"
+            f"                for row in rows {{\n"
+            f"                    let row: super::{table.richest_struct_name()} = bincode::deserialize::<super::{table.richest_struct_name()}>(&row).map_err(crate::api::ApiError::from)?;\n"
+            f"                    row.update_or_insert(connection).await?;\n"
+            "                }\n"
+            "            },\n"
+        )
+
+    document.write("        }\n    Ok(())}\n")
+
     document.write("}\n")
 
     document.flush()
@@ -3146,6 +3457,7 @@ def write_diesel_table_names_enumeration(
         "use crate::views::*;",
         "use diesel::r2d2::PooledConnection;",
         "use diesel::r2d2::ConnectionManager;",
+        "use crate::new_variants::InsertRow;"
     ]
 
     for import_statement in imports:
@@ -3196,13 +3508,13 @@ def write_diesel_table_names_enumeration(
         )
 
         for table in tables:
-            if search_indices.has_table(table.table_name):
+            if search_indices.has_table(table.name):
                 document.write(
                     f"            web_common::database::Table::{table.camel_cased()} => {table.richest_struct_name()}::{similarity_method}_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),\n"
                 )
             else:
                 document.write(
-                    f'            web_common::database::Table::{table.camel_cased()} => unimplemented!("Table `{table.table_name}` does not have a GIN similarity index."),\n'
+                    f'            web_common::database::Table::{table.camel_cased()} => unimplemented!("Table `{table.name}` does not have a GIN similarity index."),\n'
                 )
 
         document.write("        }\n" "    }\n")
@@ -3340,6 +3652,86 @@ def write_diesel_table_names_enumeration(
 
     document.write("        }\n    }\n}\n")
 
+    # We create a method to insert new rows in the database. The method receives a bincode-serialized
+    # row of the new flat variant of the table, the id of the user inserting the row, and a connection
+    # to the database. The method returns a Result, where the Ok variant is the bincode-serialized
+    # version of the richest struct of the table variant, associated with the newly inserted row, while
+    # the Err variant contains an ApiError. The insert method is only available for a subset of the tables
+    # as determined by the is_insertable method of the table. When the table is not insertable, we panic
+    # with the unreachable!() macro, which explains that the table is not insertable as it does not have
+    # a known column associated to a creator user id.
+
+    document.write(
+        "/// Trait providing the insert method for the Table enum.\n"
+        "pub trait InsertableTable {\n"
+        "    /// Insert a new row into the table.\n"
+        "    ///\n"
+        "    /// # Arguments\n"
+        "    /// * `row` - The bincode-serialized row of the table.\n"
+        "    /// * `user_id` - The id of the user inserting the row.\n"
+        "    /// * `connection` - The database connection.\n"
+        "    ///\n"
+        "    /// # Returns\n"
+        "    /// The bincode-serialized row of the table.\n"
+        "    fn insert(\n"
+        "         &self,\n"
+        "         row: Vec<u8>,\n"
+        "         user_id: i32,\n"
+        "         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+        ") -> Result<Vec<u8>, web_common::api::ApiError>;\n"
+        "}\n\n"
+    )
+
+    document.write(
+        "impl InsertableTable for web_common::database::Table {\n\n"
+        "    fn insert(\n"
+        "        &self,\n"
+        "        row: Vec<u8>,\n"
+        "        user_id: i32,\n"
+        "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+        "    ) -> Result<Vec<u8>, web_common::api::ApiError> {\n"
+        "        Ok(match self {\n"
+    )
+
+    for table in tables:
+        if not table.is_insertable():
+            document.write(
+                f'            web_common::database::Table::{table.camel_cased()} => unreachable!("Table `{table.name}` is not insertable as it does not have a known column associated to a creator user id."),\n'
+            )
+            continue
+
+        if table.name in TEMPORARELY_IGNORED_TABLES:
+            document.write(
+                f'            web_common::database::Table::{table.camel_cased()} => todo!("Insert not implemented for {table.name}."),\n'
+            )
+            continue
+
+        document.write(
+            f"            web_common::database::Table::{table.camel_cased()} => {{\n"
+            f"                let row: web_common::database::{table.new_flat_struct_name()} = bincode::deserialize::<web_common::database::{table.new_flat_struct_name()}>(&row).map_err(web_common::api::ApiError::from)?;\n"
+            f"                let inserted_row: crate::models::{table.flat_struct_name()} = <web_common::database::{table.new_flat_struct_name()} as InsertRow>::insert(row, user_id, connection)?;\n"
+        )
+
+        # If the table has a richer variant than the flat one, we convert the flat struct
+        # to the richest struct using the `from_flat` method.
+        if table.get_richest_struct().is_nested():
+            document.write(
+                f"                let nested_row = crate::nested_models::{table.get_richest_struct().name}::from_flat(inserted_row, connection)?;\n"
+                "                 bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?\n"
+            )
+        else:
+            document.write(
+                "                 bincode::serialize(&inserted_row).map_err(web_common::api::ApiError::from)?\n"
+            )
+
+        document.write("            },\n")
+
+    document.write("})\n")
+
+    document.write("    }\n")
+
+    document.write("}\n")
+
     document.flush()
     document.close()
 
@@ -3418,22 +3810,10 @@ def derive_new_models(struct_metadatas: List[StructMetadata]) -> List[StructMeta
     """
     # Temporary list of tables for which to refrain from generating
     # the form component.
-    deny_list = [
-        "derived_samples",
-        "item_locations",
-        "item_units",
-        "items",
-        "locations",
-        "sample_bio_ott_taxon_items",
-        "sampled_individual_bio_ott_taxon_items",
-        "spectra",
-        "spectra_collections",
-        "user_emails",
-    ]
-
+    
     table_metadatas = find_foreign_keys()
 
-    for table_name in deny_list:
+    for table_name in TEMPORARELY_IGNORED_TABLES:
         if not table_metadatas.is_table(table_name):
             raise Exception(
                 f"Table {table_name} is in the deny list but does not exist in the database."
@@ -3441,16 +3821,19 @@ def derive_new_models(struct_metadatas: List[StructMetadata]) -> List[StructMeta
 
     new_structs = []
 
-    target_columns = ["inserted_by", "created_by", "created_at", "updated_at"]
-
     for struct in tqdm(
         struct_metadatas,
         desc="Deriving new structs",
         unit="struct",
         leave=False,
     ):
-        if struct.table_name in deny_list:
+        if not struct.is_insertable():
             continue
+
+        if struct.table_name in TEMPORARELY_IGNORED_TABLES:
+            continue
+
+        assert not struct.is_nested()
 
         # If the struct has a single attribute,
         # we do not derive a New variant.
@@ -3461,12 +3844,16 @@ def derive_new_models(struct_metadatas: List[StructMetadata]) -> List[StructMeta
             struct_name=f"New{struct.name}",
             table_name=struct.table_name,
         )
+
+        new_struct.set_flat_variant(struct)
+
         primary_key_name, primary_key_type = (
             table_metadatas.get_primary_key_name_and_type(struct.table_name)
         )
 
         if primary_key_type == "uuid" and not any(
-            attribute.name in target_columns for attribute in struct.attributes
+            attribute.is_automatically_determined_column()
+            for attribute in struct.attributes
         ):
             new_structs.append(struct)
             continue
@@ -3475,9 +3862,9 @@ def derive_new_models(struct_metadatas: List[StructMetadata]) -> List[StructMeta
             new_struct.add_derive(derive)
 
         for attribute in struct.attributes:
-            if attribute.name == primary_key_name:
+            if attribute.name == primary_key_name and primary_key_type != "uuid":
                 continue
-            if attribute.name in target_columns:
+            if attribute.is_automatically_determined_column():
                 continue
             new_struct.add_attribute(attribute)
 
@@ -3640,7 +4027,7 @@ def derive_new_model_builders(
                 target_table_name = attribute.raw_data_type().table_name
                 table_struct = None
                 for table in tables:
-                    if table.table_name == target_table_name:
+                    if table.name == target_table_name:
                         table_struct = table
                         break
 
@@ -3741,25 +4128,278 @@ def write_web_common_new_structs(
 
     document.write("\n")
 
+    table_metadatas = find_foreign_keys()
+
     for struct in tqdm(
         new_struct_metadatas,
         desc="Writing new structs",
         unit="struct",
         leave=False,
     ):
-        # For simplicity, we included in this list
-        # all the new structs and also the structs for
-        # which we do not need to derive a new struct.
-        # We do not want to print the structs that are
-        # not new structs, so we filter them out.
-        if not struct.name.startswith("New"):
-            continue
+        assert struct.is_new_variant()
 
         struct.write_to(document)
+
+        if not struct.has_uuid_primary_key():
+            continue
+
+        # When the frontend flag is enables, we implement the insert method for the new flat struct.
+        # This method receives the user id of the user inserting the row and the connection to the database.
+        # The method returns a Result, where the Ok variant is the flat variant of the struct associated with
+        # the newly inserted row, while the Err variant contains an ApiError.
+
+        # First thing, we determine the name of the attribute that contains the user id. This is not directly
+        # an attribute of the new variant, as it is not set by the user, but it is available as part of the
+        # associated flat variant.
+        creator_user_id_attribute: AttributeMetadata = (
+            struct.get_creator_user_id_attribute()
+        )
+
+        primary_key_name, _ = table_metadatas.get_primary_key_name_and_type(
+            struct.table_name
+        )
+
+        columns = []
+
+        document.write(
+            f"#[cfg(feature = \"frontend\")]\n"
+            f"impl {struct.name} {{\n"
+        )
+
+        document.write(
+            f"    pub fn into_row(self, {creator_user_id_attribute.name}: {creator_user_id_attribute.format_data_type()}) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {{\n"
+        )
+
+        document.write("        vec![\n")
+        for attribute in [creator_user_id_attribute] + struct.attributes:
+            columns.append(attribute.name)
+
+            if attribute.name == creator_user_id_attribute.name:
+                self_attribute_name = attribute.name
+            else:
+                self_attribute_name = f"self.{attribute.name}"
+
+            if attribute.optional:
+                if attribute.data_type() in GLUESQL_TYPES_MAPPING:
+                    document.write(
+                        f"            match {self_attribute_name} {{\n"
+                        f"                Some({attribute.name}) => {GLUESQL_TYPES_MAPPING[attribute.data_type()].format(attribute.name)},\n"
+                        "                None => gluesql::core::ast_builder::null(),\n"
+                        "            },\n"
+                    )
+                else:
+                    raise NotImplementedError(
+                        f"The type {attribute.data_type()} is not supported. "
+                        f"The struct {struct.name} contains an {attribute.data_type()}. "
+                    )
+            elif attribute.data_type() in GLUESQL_TYPES_MAPPING:
+                document.write(
+                    f"            {GLUESQL_TYPES_MAPPING[attribute.data_type()].format(self_attribute_name)},\n"
+                )
+            else:
+                raise NotImplementedError(
+                    f"The type {attribute.data_type()} is not supported."
+                )
+
+        document.write("        ]\n    }\n\n")
+
+        # We implement the `insert` method for the struct. This method
+        # receives a connection to the GlueSQL database and inserts the
+        # struct into the database.
+        document.write(
+            f"    /// Insert the {struct.name} into the database.\n"
+            "    ///\n"
+            "    /// # Arguments\n"
+            f"    /// * `{creator_user_id_attribute.name}` - The id of the user inserting the row.\n"
+            "    /// * `connection` - The connection to the database.\n"
+            "    ///\n"
+            "    /// # Returns\n"
+            f"    /// The number of rows inserted in table {struct.name}\n"
+            "    pub async fn insert<C>(\n"
+            "        self,\n"
+            f"        {creator_user_id_attribute.name}: {creator_user_id_attribute.format_data_type()},\n"
+            "        connection: &mut gluesql::prelude::Glue<C>,\n"
+            f"    ) -> Result<super::{struct.get_flat_variant().name}, gluesql::prelude::Error> where\n"
+            "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
+            "    {\n"
+            "        use gluesql::core::ast_builder::*;\n"
+            f"        let {primary_key_name} = self.{primary_key_name};\n"
+            f'        table("{struct.table_name}")\n'
+            "            .insert()\n"
+            f'            .columns("{",".join(columns)}")\n'
+            f"            .values(vec![self.into_row({creator_user_id_attribute.name})])\n"
+            "            .execute(connection)\n"
+            "            .await\n"
+            "             .map(|payload| match payload {\n"
+            "                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,\n"
+            '                 _ => unreachable!("Payload must be an Insert"),\n'
+            "             })?;\n"
+            f"        super::{struct.get_flat_variant().name}::get({primary_key_name}, connection).await.map(|maybe_row| maybe_row.unwrap())\n"
+            "    }\n\n"
+        )
+
+        document.write("}\n")
 
     document.flush()
     document.close()
 
+
+def write_diesel_new_structs(
+    new_struct_metadatas: List[StructMetadata],
+):
+    """Writes to the backend the diesel methods for the new structs.
+    
+    Parameters
+    ----------
+    new_struct_metadatas : List[StructMetadata]
+        The list of the StructMetadata objects.
+    """
+
+    path = "./src/new_variants.rs"
+
+    document = open(path, "w", encoding="utf8")   
+
+    # First of all, we write a docstring that warns the reader
+    # not to write anything in this file as it is automatically
+    # generated.
+
+    document.write(
+        "//! This module contains the new variants of the database models.\n"
+        "//!\n"
+        "//! This module is automatically generated. Do not write anything here.\n\n"
+    )
+
+    imports = [
+        "use diesel::prelude::*;",
+        "use crate::models::*;",
+        "use crate::schema::*;",
+        "use diesel::r2d2::PooledConnection;",
+        "use diesel::r2d2::ConnectionManager;",
+        "use uuid::Uuid;",
+        "use chrono::NaiveDateTime;",
+    ]
+
+    for import_statement in imports:
+        document.write(f"{import_statement}\n") 
+
+    document.write("\n")
+
+    # Since the new variants are defined in the web_common crate, in order to
+    # implement methods for the backend we need to import the new variants from
+    # the web_common crate and define new traits for the new variants. We also
+    # need to implement these traits for the new variants, of course.
+
+    # Because of how Diesel works, we need to define new structs that are an 
+    # intermediate representation of the row. These structs have all of the 
+    # attributes of the new variant, plus the attribute associated with the
+    # creator user id. These intermediate variants are private to this document
+    # as they are not used outside of it. They derive the Insertable trait from
+    # Diesel, which is used to insert the row in the database.
+
+    # We start by defining the trait InsertRow, which is implemented by the new
+    # variants and provides the insert method for the new variants. The insert
+    # method receives the user id of the user inserting the row and the connection
+    # to the database. The same trait also has an associated type, which is the
+    # intermediate variant that is used to insert the row in the database, and a
+    # method that receives the self and user id and returns the intermediate variant.
+    # The insert method returns the newly inserted row, which is the flat variant
+    # of the new flat variant.
+
+    document.write(
+        "/// Trait providing the insert method for the new variants.\n"
+        "pub(super) trait InsertRow {\n"
+        "    /// The intermediate representation of the row.\n"
+        "    type Intermediate;\n\n"
+        "    /// The flat variant of the new variant.\n"
+        "    type Flat;\n\n"
+        "    /// Convert the new variant into the intermediate representation.\n"
+        "    fn to_intermediate(self, user_id: i32) -> Self::Intermediate;\n\n"
+        "    /// Insert the row into the database.\n"
+        "    fn insert(\n"
+        "        self,\n"
+        "        user_id: i32,\n"
+        "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+        "    ) -> Result<Self::Flat, diesel::result::Error>;\n"
+        "}\n\n"
+    )
+
+    for struct in tqdm(
+        new_struct_metadatas,
+        desc="Writing new structs",
+        unit="struct",
+        leave=False,
+    ):
+        assert struct.is_new_variant()
+
+        creator_user_id_attribute: AttributeMetadata = (
+            struct.get_creator_user_id_attribute()
+        )
+
+        assert not creator_user_id_attribute.optional, (
+            f"The attribute {creator_user_id_attribute.name} of the struct {struct.name} "
+            "is optional, but it should not be. Most likely, you forgot to add NOT NULL "
+            f"to the attribute in the database im the table {struct.table_name}."
+        )
+
+        assert not isinstance(creator_user_id_attribute, StructMetadata)
+
+        intermediate_struct_name = f"Intermediate{struct.get_flat_variant().name}"
+
+        # First, we write the intermediate struct that is used to insert the row in the database.
+        document.write(
+            f"/// Intermediate representation of the new variant {struct.name}.\n"
+            "#[derive(Insertable)]\n"
+            f"#[diesel(table_name = {struct.table_name})]\n"
+            f"pub(super) struct {intermediate_struct_name} {{\n"
+        )
+
+        all_attributes: List[AttributeMetadata] = [creator_user_id_attribute] + struct.attributes
+
+        for attribute in all_attributes:
+            document.write(
+                f"    {attribute.name}: {attribute.format_data_type()},\n"
+            )
+
+        document.write("}\n\n")
+
+        # Next, we implement the InsertRow trait for the new variant.
+        document.write(
+            f"impl InsertRow for web_common::database::{struct.name} {{\n"
+            f"    type Intermediate = {intermediate_struct_name};\n"
+            f"    type Flat = {struct.get_flat_variant().name};\n\n"
+            f"    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {{\n"
+            f"        {intermediate_struct_name} {{\n"
+        )
+
+        for attribute in all_attributes:
+            if attribute.name == creator_user_id_attribute.name:
+                document.write(
+                    f"            {attribute.name}: user_id,\n"
+                )
+            else:
+                document.write(
+                    f"            {attribute.name}: self.{attribute.name},\n"
+                )
+
+        document.write("        }\n    }\n\n")
+
+        document.write(
+            "    fn insert(\n"
+            "        self,\n"
+            "        user_id: i32,\n"
+            "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+            "    ) -> Result<Self::Flat, diesel::result::Error> {\n"
+            f"        use crate::schema::{struct.table_name};\n"
+            f"        diesel::insert_into({struct.table_name}::dsl::{struct.table_name})\n"
+            "            .values(self.to_intermediate(user_id))\n"
+            "            .get_result(connection)\n"
+            "    }\n"
+            "}\n\n"
+        )
+
+    document.flush()
+    document.close()
+        
 
 def write_web_common_new_nested_structs(
     new_nested_struct_metadatas: List[StructMetadata],
@@ -3982,8 +4622,7 @@ def write_frontend_form_builder_implementation(
     # contains errors as specified by the has_errors method, plus checks
     # that all non-optional fields are populated.
     document.write(
-        "    fn can_submit(&self) -> bool {\n"
-        "        !self.has_errors()\n"
+        "    fn can_submit(&self) -> bool {\n" "        !self.has_errors()\n"
     )
 
     for attribute in builder.attributes:
@@ -4004,12 +4643,9 @@ def write_frontend_form_builder_implementation(
             )
 
         if not struct_attribute.optional and attribute.optional:
-            document.write(
-                f"        && self.{attribute.name}.is_some()\n"
-            )
+            document.write(f"        && self.{attribute.name}.is_some()\n")
 
     document.write("    }\n\n")
-
 
     # TODO! ADD FORM LEVEL ERRORS HERE!
     document.write(
@@ -4541,7 +5177,9 @@ def handle_missing_row_to_badge_implementation(
                         )
                 else:
                     if struct.is_nested():
-                        scores.append(f"self.inner.{column.name}.similarity_score(query)")
+                        scores.append(
+                            f"self.inner.{column.name}.similarity_score(query)"
+                        )
                     else:
                         scores.append(f"self.{column.name}.similarity_score(query)")
 
@@ -4637,7 +5275,7 @@ def write_frontend_yew_form(
             and attribute.data_type() == "Vec<ApiError>"
         ):
             continue
-        
+
         if attribute.data_type() == "bool":
             document.write(
                 f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: bool| {builder.name}Actions::Set{attribute.capitalized_name()}(Some({attribute.name})));\n"
@@ -4696,7 +5334,7 @@ def write_frontend_yew_form(
             continue
 
         # TODO! ADD MORE INPUT TYPES HERE!
-        
+
         # raise Exception(
         #     f"Attribute {attribute.name} of type {attribute.data_type()} not supported in the frontend form generation."
         # )
@@ -4744,7 +5382,10 @@ def write_frontend_form_buildable_implementation(
         f'        concat!("Create a new {build_target.name}.",)\n'  # TODO! Add the description
         f"    }}\n"
         f"    fn requires_authentication() -> bool {{\n"
-        f"        true\n"  # TODO! Add the authentication requirement
+        f"        {'true' if build_target.requires_authentication() else 'false'}\n"
+        f"    }}\n"
+        f"    fn can_operate_offline() -> bool {{\n"
+        f"        {'true' if build_target.has_uuid_primary_key() else 'false'}\n"
         f"    }}\n"
         f"}}\n"
     )
@@ -4874,7 +5515,9 @@ def check_for_common_typos_in_migrations():
         ):
             if "CREATE TEMPORARY TABLE" in content:
                 # We retrieve the name of the temporary table.
-                table_name = content.split("CREATE TEMPORARY TABLE")[1].split("(")[0].strip()
+                table_name = (
+                    content.split("CREATE TEMPORARY TABLE")[1].split("(")[0].strip()
+                )
                 # We check that the deletion of the temporary table is present in the up migration.
                 if f"DROP TABLE {table_name}" not in content:
                     raise Exception(
@@ -4964,7 +5607,8 @@ def enforce_migration_naming_convention():
     migrations = [
         directory
         for directory in os.listdir("migrations")
-        if os.path.isdir(f"migrations/{directory}") and os.path.exists(f"migrations/{directory}/up.sql")
+        if os.path.isdir(f"migrations/{directory}")
+        and os.path.exists(f"migrations/{directory}/up.sql")
     ]
 
     for migration in migrations:
@@ -4974,12 +5618,14 @@ def enforce_migration_naming_convention():
             trimmed_migration_name = migration_name[9:-6]
             search_index_migration_name = f"create_{trimmed_migration_name}_index"
 
-            # We search if there exist a migration with a name ending with the 
+            # We search if there exist a migration with a name ending with the
             # migration name we just determined.
 
             for other_migration in migrations:
                 if other_migration.endswith(search_index_migration_name):
-                    other_str_number, other_migration_name = other_migration.split("_", maxsplit=1)
+                    other_str_number, other_migration_name = other_migration.split(
+                        "_", maxsplit=1
+                    )
                     other_number = int(other_str_number)
 
                     if other_number < number:
@@ -4989,7 +5635,6 @@ def enforce_migration_naming_convention():
                             "a search index for the same table, and it has a lower number "
                             "than the migration that populates the table."
                         )
-
 
     for directory in os.listdir("migrations"):
         if not os.path.isdir(f"migrations/{directory}"):
@@ -5217,8 +5862,11 @@ if __name__ == "__main__":
     )
     print(f"Generated {len(nested_structs)} nested structs for backend.")
 
+    new_model_structs = derive_new_models(table_structs)
+    print(f"Derived {len(new_model_structs)} structs for the New versions")
+
     tables: List[TableStructMetadata] = write_webcommons_table_names_enumeration(
-        table_structs + view_structs + nested_structs
+        table_structs + view_structs + nested_structs, new_model_structs
     )
     print("Generated table names enumeration for web_common.")
 
@@ -5233,9 +5881,7 @@ if __name__ == "__main__":
     )
     print("Generated search trait implementations for web_common.")
 
-    new_model_structs = derive_new_models(table_structs)
-    print(f"Derived {len(new_model_structs)} structs for the New versions")
-
+    # TODO: CHECK: Maybe we do not need nested new struct?
     new_nested_model_structs = derive_new_nested_models(
         new_model_structs, nested_structs
     )
@@ -5251,6 +5897,9 @@ if __name__ == "__main__":
     write_web_common_new_structs(new_model_structs)
     write_web_common_new_nested_structs(new_nested_model_structs)
     print("Generated new structs for web_common.")
+
+    write_diesel_new_structs(new_model_structs)
+    print("Generated new structs for diesel.")
 
     write_frontend_forms(
         new_nested_model_structs,

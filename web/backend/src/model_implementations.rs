@@ -154,60 +154,61 @@ impl User {
 
         let png_format = DocumentFormat::from_extension("png", conn)?;
 
-        conn.transaction::<_, ApiError, _>(|conn| {
-            // First, we create the document for the profile picture.
-            let path = self.standard_profile_picture_path();
-            let profile_picture_document = match Document::from_path(&path, conn) {
-                Ok(document) => document,
-                Err(_) => Document::new(
-                    None,
-                    self.id,
-                    path,
-                    png_format.id,
-                    profile_picture.as_bytes().len() as i32,
-                )
-                .insert(conn)?,
-            };
-            let path = self.thumbnail_path();
-            // Similarly, we create the document for the thumbnail.
-            let thumbnail_document = match Document::from_path(&path, conn) {
-                Ok(document) => document,
-                Err(_) => Document::new(
-                    None,
-                    self.id,
-                    path,
-                    png_format.id,
-                    thumbnail.as_bytes().len() as i32,
-                )
-                .insert(conn)?,
-            };
-            // We attempt to save the profile picture and thumbnail
-            let internal_profile_picture_path =
-                NestedDocument::from_flat(profile_picture_document, conn)?.internal_path();
-            profile_picture
-                .save_with_format(&internal_profile_picture_path, ImageFormat::Png)
-                .map_err(|err| {
-                    log::error!(
-                        "Failed to save profile picture: {}, {}",
-                        err,
-                        internal_profile_picture_path
-                    );
-                    err
-                })?;
-            let internal_thumbnail_path =
-                NestedDocument::from_flat(thumbnail_document, conn)?.internal_path();
-            thumbnail
-                .save_with_format(&internal_thumbnail_path, ImageFormat::Png)
-                .map_err(|err| {
-                    log::error!(
-                        "Failed to save thumbnail: {}, {}",
-                        err,
-                        internal_thumbnail_path
-                    );
-                    err
-                })?;
-            Ok(())
-        })
+        Ok(())
+        // conn.transaction::<_, ApiError, _>(|conn| {
+        //     // First, we create the document for the profile picture.
+        //     let path = self.standard_profile_picture_path();
+        //     let profile_picture_document = match Document::from_path(&path, conn) {
+        //         Ok(document) => document,
+        //         Err(_) => NewDocument::new(
+        //             None,
+        //             self.id,
+        //             path,
+        //             png_format.id,
+        //             profile_picture.as_bytes().len() as i32,
+        //         )
+        //         .insert(conn)?,
+        //     };
+        //     let path = self.thumbnail_path();
+        //     // Similarly, we create the document for the thumbnail.
+        //     let thumbnail_document = match Document::from_path(&path, conn) {
+        //         Ok(document) => document,
+        //         Err(_) => Document::new(
+        //             None,
+        //             self.id,
+        //             path,
+        //             png_format.id,
+        //             thumbnail.as_bytes().len() as i32,
+        //         )
+        //         .insert(conn)?,
+        //     };
+        //     // We attempt to save the profile picture and thumbnail
+        //     let internal_profile_picture_path =
+        //         NestedDocument::from_flat(profile_picture_document, conn)?.internal_path();
+        //     profile_picture
+        //         .save_with_format(&internal_profile_picture_path, ImageFormat::Png)
+        //         .map_err(|err| {
+        //             log::error!(
+        //                 "Failed to save profile picture: {}, {}",
+        //                 err,
+        //                 internal_profile_picture_path
+        //             );
+        //             err
+        //         })?;
+        //     let internal_thumbnail_path =
+        //         NestedDocument::from_flat(thumbnail_document, conn)?.internal_path();
+        //     thumbnail
+        //         .save_with_format(&internal_thumbnail_path, ImageFormat::Png)
+        //         .map_err(|err| {
+        //             log::error!(
+        //                 "Failed to save thumbnail: {}, {}",
+        //                 err,
+        //                 internal_thumbnail_path
+        //             );
+        //             err
+        //         })?;
+        //     Ok(())
+        // })
     }
 
     pub fn thumbnail_path(&self) -> String {

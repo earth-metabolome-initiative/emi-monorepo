@@ -7,6 +7,7 @@ use crate::nested_models::*;
 use crate::views::*;
 use diesel::r2d2::PooledConnection;
 use diesel::r2d2::ConnectionManager;
+use crate::new_variants::InsertRow;
 
 /// Trait providing the search method for the Table enum.
 pub trait SearchableTable {
@@ -408,5 +409,123 @@ impl AllTable for web_common::database::Table {
             web_common::database::Table::UserEmails => NestedUserEmail::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::Users => User::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
         }
+    }
+}
+/// Trait providing the insert method for the Table enum.
+pub trait InsertableTable {
+    /// Insert a new row into the table.
+    ///
+    /// # Arguments
+    /// * `row` - The bincode-serialized row of the table.
+    /// * `user_id` - The id of the user inserting the row.
+    /// * `connection` - The database connection.
+    ///
+    /// # Returns
+    /// The bincode-serialized row of the table.
+    fn insert(
+         &self,
+         row: Vec<u8>,
+         user_id: i32,
+         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+) -> Result<Vec<u8>, web_common::api::ApiError>;
+}
+
+impl InsertableTable for web_common::database::Table {
+
+    fn insert(
+        &self,
+        row: Vec<u8>,
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<u8>, web_common::api::ApiError> {
+        Ok(match self {
+            web_common::database::Table::BioOttRanks => unreachable!("Table `bio_ott_ranks` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::BioOttTaxonItems => unreachable!("Table `bio_ott_taxon_items` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::Colors => unreachable!("Table `colors` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::ContainerHorizontalRules => {
+                let row: web_common::database::NewContainerHorizontalRule = bincode::deserialize::<web_common::database::NewContainerHorizontalRule>(&row).map_err(web_common::api::ApiError::from)?;
+                let inserted_row: crate::models::ContainerHorizontalRule = <web_common::database::NewContainerHorizontalRule as InsertRow>::insert(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedContainerHorizontalRule::from_flat(inserted_row, connection)?;
+                 bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::ContainerVerticalRules => {
+                let row: web_common::database::NewContainerVerticalRule = bincode::deserialize::<web_common::database::NewContainerVerticalRule>(&row).map_err(web_common::api::ApiError::from)?;
+                let inserted_row: crate::models::ContainerVerticalRule = <web_common::database::NewContainerVerticalRule as InsertRow>::insert(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedContainerVerticalRule::from_flat(inserted_row, connection)?;
+                 bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::ContinuousUnits => unreachable!("Table `continuous_units` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::DerivedSamples => todo!("Insert not implemented for derived_samples."),
+            web_common::database::Table::DiscreteUnits => unreachable!("Table `discrete_units` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::DocumentFormats => unreachable!("Table `document_formats` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::Documents => unreachable!("Table `documents` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::FontAwesomeIcons => unreachable!("Table `font_awesome_icons` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::ItemCategories => {
+                let row: web_common::database::NewItemCategory = bincode::deserialize::<web_common::database::NewItemCategory>(&row).map_err(web_common::api::ApiError::from)?;
+                let inserted_row: crate::models::ItemCategory = <web_common::database::NewItemCategory as InsertRow>::insert(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedItemCategory::from_flat(inserted_row, connection)?;
+                 bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::ItemCategoryRelationships => unreachable!("Table `item_category_relationships` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::ItemCategoryUnits => unreachable!("Table `item_category_units` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::ItemLocations => unreachable!("Table `item_locations` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::ItemUnits => unreachable!("Table `item_units` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::Items => unreachable!("Table `items` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::Locations => unreachable!("Table `locations` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::LoginProviders => unreachable!("Table `login_providers` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::ManufacturedItemCategories => unreachable!("Table `manufactured_item_categories` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::Notifications => unreachable!("Table `notifications` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::Organizations => unreachable!("Table `organizations` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::PrimaryUserEmails => unreachable!("Table `primary_user_emails` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::Procedures => {
+                let row: web_common::database::NewProcedure = bincode::deserialize::<web_common::database::NewProcedure>(&row).map_err(web_common::api::ApiError::from)?;
+                let inserted_row: crate::models::Procedure = <web_common::database::NewProcedure as InsertRow>::insert(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedProcedure::from_flat(inserted_row, connection)?;
+                 bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::ProjectRequirements => {
+                let row: web_common::database::NewProjectRequirement = bincode::deserialize::<web_common::database::NewProjectRequirement>(&row).map_err(web_common::api::ApiError::from)?;
+                let inserted_row: crate::models::ProjectRequirement = <web_common::database::NewProjectRequirement as InsertRow>::insert(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedProjectRequirement::from_flat(inserted_row, connection)?;
+                 bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::ProjectStates => unreachable!("Table `project_states` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::Projects => {
+                let row: web_common::database::NewProject = bincode::deserialize::<web_common::database::NewProject>(&row).map_err(web_common::api::ApiError::from)?;
+                let inserted_row: crate::models::Project = <web_common::database::NewProject as InsertRow>::insert(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedProject::from_flat(inserted_row, connection)?;
+                 bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::PublicUsers => unreachable!("Table `public_users` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::Roles => unreachable!("Table `roles` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::SampleBioOttTaxonItems => todo!("Insert not implemented for sample_bio_ott_taxon_items."),
+            web_common::database::Table::SampleStates => unreachable!("Table `sample_states` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::SampledIndividualBioOttTaxonItems => todo!("Insert not implemented for sampled_individual_bio_ott_taxon_items."),
+            web_common::database::Table::SampledIndividuals => unreachable!("Table `sampled_individuals` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::Samples => {
+                let row: web_common::database::NewSample = bincode::deserialize::<web_common::database::NewSample>(&row).map_err(web_common::api::ApiError::from)?;
+                let inserted_row: crate::models::Sample = <web_common::database::NewSample as InsertRow>::insert(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedSample::from_flat(inserted_row, connection)?;
+                 bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::SamplingProcedures => {
+                let row: web_common::database::NewSamplingProcedure = bincode::deserialize::<web_common::database::NewSamplingProcedure>(&row).map_err(web_common::api::ApiError::from)?;
+                let inserted_row: crate::models::SamplingProcedure = <web_common::database::NewSamplingProcedure as InsertRow>::insert(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedSamplingProcedure::from_flat(inserted_row, connection)?;
+                 bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::Spectra => unreachable!("Table `spectra` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::SpectraCollections => todo!("Insert not implemented for spectra_collections."),
+            web_common::database::Table::TeamStates => unreachable!("Table `team_states` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::Teams => {
+                let row: web_common::database::NewTeam = bincode::deserialize::<web_common::database::NewTeam>(&row).map_err(web_common::api::ApiError::from)?;
+                let inserted_row: crate::models::Team = <web_common::database::NewTeam as InsertRow>::insert(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedTeam::from_flat(inserted_row, connection)?;
+                 bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::Units => unreachable!("Table `units` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::UserEmails => unreachable!("Table `user_emails` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::Users => unreachable!("Table `users` is not insertable as it does not have a known column associated to a creator user id."),
+})
     }
 }

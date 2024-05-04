@@ -432,4 +432,345 @@ impl Table {
             Table::Users => crate::database::User::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
         }
     }
+    /// Insert a new row into the table.
+    ///
+    /// # Arguments
+    /// * `new_row` - The bincode-serialized row of the table.
+    /// * `user_id` - The user ID of the user performing the operation.
+    /// * `connection` - The database connection.
+    ///
+    /// # Returns
+    /// The bincode-serialized row of the table.
+    pub async fn insert<C>(
+        &self,
+        new_row: Vec<u8>,
+        user_id: i32,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<u8>, crate::api::ApiError> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        Ok(match self {
+            Table::BioOttRanks => unimplemented!("Insert not implemented for bio_ott_ranks."),
+            Table::BioOttTaxonItems => unimplemented!("Insert not implemented for bio_ott_taxon_items."),
+            Table::Colors => unimplemented!("Insert not implemented for colors."),
+            Table::ContainerHorizontalRules => unimplemented!("Insert not implemented for container_horizontal_rules in frontend as it does not have a UUID primary key."),
+            Table::ContainerVerticalRules => unimplemented!("Insert not implemented for container_vertical_rules in frontend as it does not have a UUID primary key."),
+            Table::ContinuousUnits => unimplemented!("Insert not implemented for continuous_units."),
+            Table::DerivedSamples => unimplemented!("Insert not implemented for derived_samples in frontend as it does not have a UUID primary key."),
+            Table::DiscreteUnits => unimplemented!("Insert not implemented for discrete_units."),
+            Table::DocumentFormats => unimplemented!("Insert not implemented for document_formats."),
+            Table::Documents => unimplemented!("Insert not implemented for documents."),
+            Table::FontAwesomeIcons => unimplemented!("Insert not implemented for font_awesome_icons."),
+            Table::ItemCategories => unimplemented!("Insert not implemented for item_categories in frontend as it does not have a UUID primary key."),
+            Table::ItemCategoryRelationships => unimplemented!("Insert not implemented for item_category_relationships."),
+            Table::ItemCategoryUnits => unimplemented!("Insert not implemented for item_category_units."),
+            Table::ItemLocations => unimplemented!("Insert not implemented for item_locations."),
+            Table::ItemUnits => unimplemented!("Insert not implemented for item_units."),
+            Table::Items => unimplemented!("Insert not implemented for items."),
+            Table::Locations => unimplemented!("Insert not implemented for locations."),
+            Table::LoginProviders => unimplemented!("Insert not implemented for login_providers."),
+            Table::ManufacturedItemCategories => unimplemented!("Insert not implemented for manufactured_item_categories."),
+            Table::Notifications => unimplemented!("Insert not implemented for notifications."),
+            Table::Organizations => unimplemented!("Insert not implemented for organizations."),
+            Table::PrimaryUserEmails => unimplemented!("Insert not implemented for primary_user_emails."),
+            Table::Procedures => unimplemented!("Insert not implemented for procedures in frontend as it does not have a UUID primary key."),
+            Table::ProjectRequirements => unimplemented!("Insert not implemented for project_requirements in frontend as it does not have a UUID primary key."),
+            Table::ProjectStates => unimplemented!("Insert not implemented for project_states."),
+            Table::Projects => unimplemented!("Insert not implemented for projects in frontend as it does not have a UUID primary key."),
+            Table::PublicUsers => unimplemented!("Insert not implemented for public_users."),
+            Table::Roles => unimplemented!("Insert not implemented for roles."),
+            Table::SampleBioOttTaxonItems => todo!("Insert not implemented for sample_bio_ott_taxon_items."),
+            Table::SampleStates => unimplemented!("Insert not implemented for sample_states."),
+            Table::SampledIndividualBioOttTaxonItems => todo!("Insert not implemented for sampled_individual_bio_ott_taxon_items."),
+            Table::SampledIndividuals => unimplemented!("Insert not implemented for sampled_individuals."),
+            Table::Samples => {
+                let new_row: super::NewSample = bincode::deserialize::<super::NewSample>(&new_row).map_err(crate::api::ApiError::from)?;
+                let inserted_row: super::Sample = new_row.insert(user_id, connection).await?;
+                let nested_row = super::NestedSample::from_flat(inserted_row, connection).await?;
+                 bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
+            },
+            Table::SamplingProcedures => {
+                let new_row: super::NewSamplingProcedure = bincode::deserialize::<super::NewSamplingProcedure>(&new_row).map_err(crate::api::ApiError::from)?;
+                let inserted_row: super::SamplingProcedure = new_row.insert(user_id, connection).await?;
+                let nested_row = super::NestedSamplingProcedure::from_flat(inserted_row, connection).await?;
+                 bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
+            },
+            Table::Spectra => unimplemented!("Insert not implemented for spectra."),
+            Table::SpectraCollections => unimplemented!("Insert not implemented for spectra_collections in frontend as it does not have a UUID primary key."),
+            Table::TeamStates => unimplemented!("Insert not implemented for team_states."),
+            Table::Teams => unimplemented!("Insert not implemented for teams in frontend as it does not have a UUID primary key."),
+            Table::Units => unimplemented!("Insert not implemented for units."),
+            Table::UserEmails => unimplemented!("Insert not implemented for user_emails."),
+            Table::Users => unimplemented!("Insert not implemented for users."),
+})
+    }
+    /// Update or insert a row into the table.
+    ///
+    /// # Arguments
+    /// * `rows` - The bincode-serialized rows of the table.
+    /// * `connection` - The database connection.
+    ///
+    /// # Returns
+    /// An empty tuple.
+    pub async fn update_or_insert<C>(
+        &self,
+        rows: Vec<Vec<u8>>,        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), crate::api::ApiError> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        match self {
+            Table::BioOttRanks => {
+                for row in rows {
+                    let row: super::NestedBioOttRank = bincode::deserialize::<super::NestedBioOttRank>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::BioOttTaxonItems => {
+                for row in rows {
+                    let row: super::NestedBioOttTaxonItem = bincode::deserialize::<super::NestedBioOttTaxonItem>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::Colors => {
+                for row in rows {
+                    let row: super::Color = bincode::deserialize::<super::Color>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::ContainerHorizontalRules => {
+                for row in rows {
+                    let row: super::NestedContainerHorizontalRule = bincode::deserialize::<super::NestedContainerHorizontalRule>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::ContainerVerticalRules => {
+                for row in rows {
+                    let row: super::NestedContainerVerticalRule = bincode::deserialize::<super::NestedContainerVerticalRule>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::ContinuousUnits => {
+                for row in rows {
+                    let row: super::ContinuousUnit = bincode::deserialize::<super::ContinuousUnit>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::DerivedSamples => {
+                for row in rows {
+                    let row: super::NestedDerivedSample = bincode::deserialize::<super::NestedDerivedSample>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::DiscreteUnits => {
+                for row in rows {
+                    let row: super::DiscreteUnit = bincode::deserialize::<super::DiscreteUnit>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::DocumentFormats => {
+                for row in rows {
+                    let row: super::DocumentFormat = bincode::deserialize::<super::DocumentFormat>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::Documents => {
+                for row in rows {
+                    let row: super::NestedDocument = bincode::deserialize::<super::NestedDocument>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::FontAwesomeIcons => {
+                for row in rows {
+                    let row: super::FontAwesomeIcon = bincode::deserialize::<super::FontAwesomeIcon>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::ItemCategories => {
+                for row in rows {
+                    let row: super::NestedItemCategory = bincode::deserialize::<super::NestedItemCategory>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::ItemCategoryRelationships => {
+                for row in rows {
+                    let row: super::NestedItemCategoryRelationship = bincode::deserialize::<super::NestedItemCategoryRelationship>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::ItemCategoryUnits => {
+                for row in rows {
+                    let row: super::NestedItemCategoryUnit = bincode::deserialize::<super::NestedItemCategoryUnit>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::ItemLocations => {
+                for row in rows {
+                    let row: super::NestedItemLocation = bincode::deserialize::<super::NestedItemLocation>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::ItemUnits => {
+                for row in rows {
+                    let row: super::NestedItemUnit = bincode::deserialize::<super::NestedItemUnit>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::Items => {
+                for row in rows {
+                    let row: super::NestedItem = bincode::deserialize::<super::NestedItem>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::Locations => {
+                for row in rows {
+                    let row: super::NestedLocation = bincode::deserialize::<super::NestedLocation>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::LoginProviders => {
+                for row in rows {
+                    let row: super::NestedLoginProvider = bincode::deserialize::<super::NestedLoginProvider>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::ManufacturedItemCategories => {
+                for row in rows {
+                    let row: super::NestedManufacturedItemCategory = bincode::deserialize::<super::NestedManufacturedItemCategory>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::Notifications => {
+                for row in rows {
+                    let row: super::NestedNotification = bincode::deserialize::<super::NestedNotification>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::Organizations => {
+                for row in rows {
+                    let row: super::NestedOrganization = bincode::deserialize::<super::NestedOrganization>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::PrimaryUserEmails => {
+                for row in rows {
+                    let row: super::PrimaryUserEmail = bincode::deserialize::<super::PrimaryUserEmail>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::Procedures => {
+                for row in rows {
+                    let row: super::NestedProcedure = bincode::deserialize::<super::NestedProcedure>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::ProjectRequirements => {
+                for row in rows {
+                    let row: super::NestedProjectRequirement = bincode::deserialize::<super::NestedProjectRequirement>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::ProjectStates => {
+                for row in rows {
+                    let row: super::NestedProjectState = bincode::deserialize::<super::NestedProjectState>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::Projects => {
+                for row in rows {
+                    let row: super::NestedProject = bincode::deserialize::<super::NestedProject>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::PublicUsers => {
+                for row in rows {
+                    let row: super::NestedPublicUser = bincode::deserialize::<super::NestedPublicUser>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::Roles => {
+                for row in rows {
+                    let row: super::Role = bincode::deserialize::<super::Role>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::SampleBioOttTaxonItems => {
+                for row in rows {
+                    let row: super::NestedSampleBioOttTaxonItem = bincode::deserialize::<super::NestedSampleBioOttTaxonItem>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::SampleStates => {
+                for row in rows {
+                    let row: super::NestedSampleState = bincode::deserialize::<super::NestedSampleState>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::SampledIndividualBioOttTaxonItems => {
+                for row in rows {
+                    let row: super::NestedSampledIndividualBioOttTaxonItem = bincode::deserialize::<super::NestedSampledIndividualBioOttTaxonItem>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::SampledIndividuals => {
+                for row in rows {
+                    let row: super::SampledIndividual = bincode::deserialize::<super::SampledIndividual>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::Samples => {
+                for row in rows {
+                    let row: super::NestedSample = bincode::deserialize::<super::NestedSample>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::SamplingProcedures => {
+                for row in rows {
+                    let row: super::NestedSamplingProcedure = bincode::deserialize::<super::NestedSamplingProcedure>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::Spectra => {
+                for row in rows {
+                    let row: super::NestedSpectra = bincode::deserialize::<super::NestedSpectra>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::SpectraCollections => {
+                for row in rows {
+                    let row: super::NestedSpectraCollection = bincode::deserialize::<super::NestedSpectraCollection>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::TeamStates => {
+                for row in rows {
+                    let row: super::NestedTeamState = bincode::deserialize::<super::NestedTeamState>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::Teams => {
+                for row in rows {
+                    let row: super::NestedTeam = bincode::deserialize::<super::NestedTeam>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::Units => {
+                for row in rows {
+                    let row: super::Unit = bincode::deserialize::<super::Unit>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::UserEmails => {
+                for row in rows {
+                    let row: super::NestedUserEmail = bincode::deserialize::<super::NestedUserEmail>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::Users => {
+                for row in rows {
+                    let row: super::User = bincode::deserialize::<super::User>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+        }
+    Ok(())}
 }
