@@ -143,6 +143,9 @@ class PGIndices:
         self.indices = indices
         self.foreign_keys_information = find_foreign_keys()
 
+    def tables(self) -> List[str]:
+        return list(set(index.table_name for index in self.indices))
+
     def has_table(self, table_name: str) -> bool:
         if self.foreign_keys_information.is_view(table_name):
             view_columns = self.foreign_keys_information.extract_view_columns(
@@ -772,6 +775,9 @@ class TableMetadata:
         self.table_metadata = table_metadata
         self._view_names: List[str] = []
         self._table_names: List[str] = []
+
+    def tables(self) -> List[str]:
+        return self.table_metadata["referencing_table"].unique().tolist()
 
     def is_table(self, table_name: str) -> bool:
         """Returns whether the table is a table."""
@@ -5611,12 +5617,40 @@ def enforce_migration_naming_convention():
         and os.path.exists(f"migrations/{directory}/up.sql")
     ]
 
+    # We check that all directories are named in one of the following patterns:
+    # {number_of_migration}_create_{table_name}_table
+    # {number_of_migration}_create_{table_name}_view
+    # {number_of_migration}_populate_{table_name}_table
+    # {number_of_migration}_create_{table_name}_gin_index
+    # {number_of_migration}_create_{table_name}_sequential_index
+    # {number_of_migration}_create_{table_name}_notification_trigger
+
+    # We iterate over the migrations and check that the naming convention is respected.
+    for migration in migrations:
+        if migration == "00000000000000_diesel_initial_setup":
+            continue
+
+        migration_number, migration_name = migration.split("_", maxsplit=1)
+
+        if not any([
+            migration_name.startswith("create_") and migration_name.endswith("_table"),
+            migration_name.startswith("create_") and migration_name.endswith("_view"),
+            migration_name.startswith("populate_") and migration_name.endswith("_table"),
+            migration_name.startswith("create_") and migration_name.endswith("_gin_index"),
+            migration_name.startswith("create_") and migration_name.endswith("_sequential_index"),
+            migration_name.startswith("create_") and migration_name.endswith("_notification_trigger"),
+        ]):
+            raise Exception(
+                f"Migration {migration} does not conform to the naming convention. "
+                "Please rename it to match the naming convention."
+            )
+
     for migration in migrations:
         str_number, migration_name = migration.split("_", maxsplit=1)
         number = int(str_number)
         if migration_name.startswith("populate_") and migration_name.endswith("_table"):
             trimmed_migration_name = migration_name[9:-6]
-            search_index_migration_name = f"create_{trimmed_migration_name}_index"
+            search_index_migration_name = f"create_{trimmed_migration_name}_gin_index"
 
             # We search if there exist a migration with a name ending with the
             # migration name we just determined.
