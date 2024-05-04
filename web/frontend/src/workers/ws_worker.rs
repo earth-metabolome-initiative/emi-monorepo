@@ -172,9 +172,24 @@ impl WebsocketWorker {
                             }
                         }
                     }
-                    Operation::Update(update) => {
-                        // table.update(update)
-                        todo!()
+                    Operation::Update(table_name, serialized_row) => {
+                        let table: Table = table_name.try_into().unwrap();
+                        match table
+                            .update(serialized_row, user_id.unwrap(), &mut database)
+                            .await
+                        {
+                            Ok(row) => BackendMessage::Notification(NotificationMessage::new(
+                                Notification {
+                                    id: 0,
+                                    user_id: user_id.unwrap(),
+                                    operation: "UPDATE".to_string(),
+                                    table_name: table.to_string(),
+                                    read: false,
+                                },
+                                row,
+                            )),
+                            Err(err) => BackendMessage::Error(task_id, ApiError::from(err)),
+                        }
                     }
                 }));
             }

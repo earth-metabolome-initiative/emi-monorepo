@@ -1796,6 +1796,7 @@ pub struct NestedProject {
     pub state: NestedProjectState,
     pub parent_project: Option<Project>,
     pub created_by: User,
+    pub updated_by: User,
 }
 
 impl NestedProject {
@@ -1812,6 +1813,7 @@ impl NestedProject {
             state: NestedProjectState::get(flat_struct.state_id, connection)?,
             parent_project: flat_struct.parent_project_id.map(|flat_struct| Project::get(flat_struct, connection)).transpose()?,
             created_by: User::get(flat_struct.created_by, connection)?,
+            updated_by: User::get(flat_struct.updated_by, connection)?,
                 inner: flat_struct,
         })
     }
@@ -1908,6 +1910,7 @@ impl From<web_common::database::nested_models::NestedProject> for NestedProject 
             state: item.state.into(),
             parent_project: item.parent_project.map(|item| item.into()),
             created_by: item.created_by.into(),
+            updated_by: item.updated_by.into(),
         }
     }
 }
@@ -1918,6 +1921,7 @@ impl From<NestedProject> for web_common::database::nested_models::NestedProject 
             state: item.state.into(),
             parent_project: item.parent_project.map(|item| item.into()),
             created_by: item.created_by.into(),
+            updated_by: item.updated_by.into(),
         }
     }
 }

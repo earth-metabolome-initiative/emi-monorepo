@@ -12,6 +12,8 @@ CREATE TABLE IF NOT EXISTS projects (
         expenses BIGINT DEFAULT NULL,
         created_by INTEGER NOT NULL REFERENCES users(id),
         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_by INTEGER NOT NULL REFERENCES users(id),
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         expected_end_date TIMESTAMP DEFAULT NULL,
         end_date TIMESTAMP DEFAULT NULL
 );

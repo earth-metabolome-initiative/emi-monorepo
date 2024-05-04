@@ -14,7 +14,6 @@ use validator::Validate;
 use web_common::api::ApiError;
 use web_common::custom_validators::Image;
 use web_common::custom_validators::ImageSize;
-use web_common::database::updates::CompleteProfile;
 
 impl NestedDocument {
     pub fn internal_path(&self) -> String {
@@ -222,43 +221,43 @@ impl User {
         web_common::database::views::PublicUser::profile_picture_path(self.id, &ImageSize::Standard)
     }
 
-    /// Method to update a user's name.
-    ///
-    /// # Arguments
-    /// * `conn` - A connection to the database.
-    /// * `profile` - The data to use to complete the profile.
-    pub fn update_profile(
-        &self,
-        conn: &mut DieselConn,
-        new_profile: CompleteProfile,
-    ) -> Result<(), ApiError> {
-        new_profile.validate()?;
+    // Method to update a user's name.
+    //
+    // # Arguments
+    // * `conn` - A connection to the database.
+    // * `profile` - The data to use to complete the profile.
+    // pub fn update_profile(
+    //     &self,
+    //     conn: &mut DieselConn,
+    //     new_profile: CompleteProfile,
+    // ) -> Result<(), ApiError> {
+    //     new_profile.validate()?;
 
-        let picture: Image = new_profile.picture.into();
-        let squared_profile_picture = picture.to_face_square().map_err(|errors| {
-            log::error!("Failed to square profile picture: {}", errors.join(", "));
-            ApiError::internal_server_error()
-        })?;
+    //     let picture: Image = new_profile.picture.into();
+    //     let squared_profile_picture = picture.to_face_square().map_err(|errors| {
+    //         log::error!("Failed to square profile picture: {}", errors.join(", "));
+    //         ApiError::internal_server_error()
+    //     })?;
 
-        conn.batch_execute("SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;")
-            .expect("Failed to set transaction isolation level");
+    //     conn.batch_execute("SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;")
+    //         .expect("Failed to set transaction isolation level");
 
-        // We need to execute multiple queries in a single transaction so to
-        // avoid that the user is left with a profile picture but no name or vice versa.
-        conn.transaction::<_, ApiError, _>(|conn| {
-            use crate::schema::users::dsl::*;
-            diesel::update(users.filter(id.eq(self.id)))
-                .set((
-                    first_name.eq(new_profile.first_name.to_string()),
-                    middle_name.eq(new_profile.middle_name.map(|s| s.to_string())),
-                    last_name.eq(new_profile.last_name.to_string()),
-                ))
-                .execute(conn)?;
+    //     // We need to execute multiple queries in a single transaction so to
+    //     // avoid that the user is left with a profile picture but no name or vice versa.
+    //     conn.transaction::<_, ApiError, _>(|conn| {
+    //         use crate::schema::users::dsl::*;
+    //         diesel::update(users.filter(id.eq(self.id)))
+    //             .set((
+    //                 first_name.eq(new_profile.first_name.to_string()),
+    //                 middle_name.eq(new_profile.middle_name.map(|s| s.to_string())),
+    //                 last_name.eq(new_profile.last_name.to_string()),
+    //             ))
+    //             .execute(conn)?;
 
-            self.insert_profile_pictures(squared_profile_picture, conn)?;
-            Ok(())
-        })
-    }
+    //         self.insert_profile_pictures(squared_profile_picture, conn)?;
+    //         Ok(())
+    //     })
+    // }
 }
 
 impl Document {

@@ -2,7 +2,6 @@
 
 use std::mem::swap;
 
-use crate::api::ws::users::UserMessage;
 use crate::models::Notification;
 use crate::models::User;
 use crate::nested_models::NestedPublicUser;
@@ -24,7 +23,6 @@ use sqlx::{Pool as SQLxPool, Postgres};
 use web_common::api::oauth::jwt_cookies::AccessToken;
 use web_common::api::ws::messages::{BackendMessage, FrontendMessage};
 use web_common::api::ApiError;
-use web_common::database::NestedProject;
 use web_common::database::NotificationMessage;
 use web_common::database::Table;
 
@@ -284,14 +282,32 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                     }
                                 }
                             }
-                            web_common::database::Operation::Update(update) => match update {
-                                web_common::database::Update::CompleteProfile(profile) => {
-                                    ctx.address().do_send(UserMessage::CompleteProfile(
-                                        task_id,
-                                        profile.clone(),
-                                    ));
+                            web_common::database::Operation::Update(table_name, row_to_update) => {
+                                let table: web_common::database::Table =
+                                    match table_name.as_str().try_into() {
+                                        Ok(table) => table,
+                                        Err(err) => {
+                                            ctx.address().do_send(BackendMessage::Error(
+                                                task_id,
+                                                ApiError::BadRequest(vec![err.to_string()]),
+                                            ));
+                                            return;
+                                        }
+                                    };
+                                match <Table as UpdatableTable>::update(
+                                    &table,
+                                    row_to_update,
+                                    self.user().map(|user| user.id).unwrap(),
+                                    &mut self.diesel_connection,
+                                ) {
+                                    Ok(_) => {
+                                        ctx.address().do_send(BackendMessage::Completed(task_id));
+                                    }
+                                    Err(err) => {
+                                        ctx.address().do_send(BackendMessage::Error(task_id, err));
+                                    }
                                 }
-                            },
+                            }
                             web_common::database::Operation::Select(select) => match select {
                                 web_common::database::selects::Select::SearchTable {
                                     table_name,

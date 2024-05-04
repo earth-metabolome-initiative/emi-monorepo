@@ -287,6 +287,8 @@ diesel::table! {
         expenses -> Nullable<Int8>,
         created_by -> Int4,
         created_at -> Timestamp,
+        updated_by -> Int4,
+        updated_at -> Timestamp,
         expected_end_date -> Nullable<Timestamp>,
         end_date -> Nullable<Timestamp>,
     }
@@ -450,7 +452,6 @@ diesel::joinable!(project_requirements -> users (created_by));
 diesel::joinable!(project_states -> colors (color_id));
 diesel::joinable!(project_states -> font_awesome_icons (font_awesome_icon_id));
 diesel::joinable!(projects -> project_states (state_id));
-diesel::joinable!(projects -> users (created_by));
 diesel::joinable!(sample_bio_ott_taxon_items -> bio_ott_taxon_items (taxon_id));
 diesel::joinable!(sample_bio_ott_taxon_items -> samples (sample_id));
 diesel::joinable!(sample_bio_ott_taxon_items -> users (created_by));

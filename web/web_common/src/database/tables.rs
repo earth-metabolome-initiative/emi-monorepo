@@ -5894,6 +5894,8 @@ pub struct Project {
     pub expenses: Option<i64>,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
     pub expected_end_date: Option<NaiveDateTime>,
     pub end_date: Option<NaiveDateTime>,
 }
@@ -5920,6 +5922,8 @@ impl Project {
             },
             gluesql::core::ast_builder::num(self.created_by),
             gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+            gluesql::core::ast_builder::num(self.updated_by),
+            gluesql::core::ast_builder::timestamp(self.updated_at.to_string()),
             match self.expected_end_date {
                 Some(expected_end_date) => gluesql::core::ast_builder::timestamp(expected_end_date.to_string()),
                 None => gluesql::core::ast_builder::null(),
@@ -5947,7 +5951,7 @@ impl Project {
         use gluesql::core::ast_builder::*;
         table("projects")
             .insert()
-            .columns("id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, expected_end_date, end_date")
+            .columns("id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -5973,7 +5977,7 @@ impl Project {
         let select_row = table("projects")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, expected_end_date, end_date")
+            .project("id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date")
             .limit(1)
             .execute(connection)
             .await?;
@@ -6047,7 +6051,9 @@ impl Project {
 .set("public", self.public)        
 .set("state_id", gluesql::core::ast_builder::num(self.state_id))        
 .set("created_by", gluesql::core::ast_builder::num(self.created_by))        
-.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()));
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
+.set("updated_by", gluesql::core::ast_builder::num(self.updated_by))        
+.set("updated_at", gluesql::core::ast_builder::timestamp(self.updated_at.to_string()));
         if let Some(parent_project_id) = self.parent_project_id {
             update_row = update_row.set("parent_project_id", gluesql::core::ast_builder::num(parent_project_id));
         }
@@ -6108,7 +6114,7 @@ impl Project {
         use gluesql::core::ast_builder::*;
         let select_row = table("projects")
             .select()
-            .project("id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, expected_end_date, end_date")
+            .project("id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -6161,6 +6167,14 @@ impl Project {
             },
             created_at: match row.get("created_at").unwrap() {
                 gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
+            updated_by: match row.get("updated_by").unwrap() {
+                gluesql::prelude::Value::I32(updated_by) => updated_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            updated_at: match row.get("updated_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(updated_at) => updated_at.clone(),
                 _ => unreachable!("Expected Timestamp")
             },
             expected_end_date: match row.get("expected_end_date").unwrap() {

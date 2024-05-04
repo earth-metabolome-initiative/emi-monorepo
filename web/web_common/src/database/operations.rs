@@ -3,7 +3,6 @@ use uuid::Uuid;
 
 use super::roles::Role;
 use super::selects::Select;
-use super::updates::Update;
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
 pub enum Authorization {
@@ -68,7 +67,7 @@ pub enum Operation {
     Delete(String, PrimaryKey),
     // When the frontend wants to update a row from a table
     // it sends a variant of the Update enumeration.
-    Update(Update),
+    Update(String, Vec<u8>),
     // When the frontend wants to insert a row into a table
     // it sends a variant of the Insert enumeration.
     Insert(String, Vec<u8>),
@@ -104,8 +103,16 @@ impl Operation {
         }
     }
 
+    /// Returns whether the current operation is an update.
+    pub fn is_update(&self) -> bool {
+        match self {
+            Operation::Update(_, _) => true,
+            _ => false,
+        }
+    }
+
     pub fn requires_authentication(&self) -> bool {
-        if self.is_insert() || self.is_delete() {
+        if self.is_insert() || self.is_delete() || self.is_update() {
             return true;
         }
 

@@ -7,6 +7,7 @@ pub mod transactions;
 pub mod views;
 pub mod table_enumeration;
 pub mod new_variants;
+pub mod update_variants;
 
 use diesel::prelude::*;
 use diesel::r2d2::{self, ConnectionManager, Pool};

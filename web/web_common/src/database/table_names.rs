@@ -504,6 +504,75 @@ impl Table {
             Table::Users => unimplemented!("Insert not implemented for users."),
 })
     }
+    /// Update a row in the table.
+    ///
+    /// # Arguments
+    /// * `update_row` - The bincode-serialized row of the table.
+    /// * `user_id` - The user ID of the user performing the operation.
+    /// * `connection` - The database connection.
+    ///
+    /// # Returns
+    /// The bincode-serialized row of the table.
+    pub async fn update<C>(
+        &self,
+        update_row: Vec<u8>,
+        user_id: i32,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<u8>, crate::api::ApiError> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        Ok(match self {
+            Table::BioOttRanks => unimplemented!("Update not implemented for bio_ott_ranks."),
+            Table::BioOttTaxonItems => unimplemented!("Update not implemented for bio_ott_taxon_items."),
+            Table::Colors => unimplemented!("Update not implemented for colors."),
+            Table::ContainerHorizontalRules => unimplemented!("Update not implemented for container_horizontal_rules."),
+            Table::ContainerVerticalRules => unimplemented!("Update not implemented for container_vertical_rules."),
+            Table::ContinuousUnits => unimplemented!("Update not implemented for continuous_units."),
+            Table::DerivedSamples => unimplemented!("Update not implemented for derived_samples."),
+            Table::DiscreteUnits => unimplemented!("Update not implemented for discrete_units."),
+            Table::DocumentFormats => unimplemented!("Update not implemented for document_formats."),
+            Table::Documents => unimplemented!("Update not implemented for documents."),
+            Table::FontAwesomeIcons => unimplemented!("Update not implemented for font_awesome_icons."),
+            Table::ItemCategories => unimplemented!("Update not implemented for item_categories."),
+            Table::ItemCategoryRelationships => unimplemented!("Update not implemented for item_category_relationships."),
+            Table::ItemCategoryUnits => unimplemented!("Update not implemented for item_category_units."),
+            Table::ItemLocations => unimplemented!("Update not implemented for item_locations."),
+            Table::ItemUnits => unimplemented!("Update not implemented for item_units."),
+            Table::Items => unimplemented!("Update not implemented for items."),
+            Table::Locations => unimplemented!("Update not implemented for locations."),
+            Table::LoginProviders => unimplemented!("Update not implemented for login_providers."),
+            Table::ManufacturedItemCategories => unimplemented!("Update not implemented for manufactured_item_categories."),
+            Table::Notifications => unimplemented!("Update not implemented for notifications."),
+            Table::Organizations => unimplemented!("Update not implemented for organizations."),
+            Table::PrimaryUserEmails => unimplemented!("Update not implemented for primary_user_emails."),
+            Table::Procedures => unimplemented!("Update not implemented for procedures."),
+            Table::ProjectRequirements => unimplemented!("Update not implemented for project_requirements."),
+            Table::ProjectStates => unimplemented!("Update not implemented for project_states."),
+            Table::Projects => {
+                let update_row: super::UpdateProject = bincode::deserialize::<super::UpdateProject>(&update_row).map_err(crate::api::ApiError::from)?;
+                let id = update_row.id;
+                update_row.update(user_id, connection).await?;
+                let updated_row: super::Project = super::Project::get(id, connection).await?.unwrap();
+                let nested_row = super::NestedProject::from_flat(updated_row, connection).await?;
+                 bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
+            },
+            Table::PublicUsers => unimplemented!("Update not implemented for public_users."),
+            Table::Roles => unimplemented!("Update not implemented for roles."),
+            Table::SampleBioOttTaxonItems => unimplemented!("Update not implemented for sample_bio_ott_taxon_items."),
+            Table::SampleStates => unimplemented!("Update not implemented for sample_states."),
+            Table::SampledIndividualBioOttTaxonItems => unimplemented!("Update not implemented for sampled_individual_bio_ott_taxon_items."),
+            Table::SampledIndividuals => unimplemented!("Update not implemented for sampled_individuals."),
+            Table::Samples => unimplemented!("Update not implemented for samples."),
+            Table::SamplingProcedures => unimplemented!("Update not implemented for sampling_procedures."),
+            Table::Spectra => unimplemented!("Update not implemented for spectra."),
+            Table::SpectraCollections => unimplemented!("Update not implemented for spectra_collections."),
+            Table::TeamStates => unimplemented!("Update not implemented for team_states."),
+            Table::Teams => unimplemented!("Update not implemented for teams."),
+            Table::Units => unimplemented!("Update not implemented for units."),
+            Table::UserEmails => unimplemented!("Update not implemented for user_emails."),
+            Table::Users => unimplemented!("Update not implemented for users."),
+})
+    }
     /// Update or insert a row into the table.
     ///
     /// # Arguments

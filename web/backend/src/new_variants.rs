@@ -32,7 +32,7 @@ pub(super) trait InsertRow {
 /// Intermediate representation of the new variant NewContainerHorizontalRule.
 #[derive(Insertable)]
 #[diesel(table_name = container_horizontal_rules)]
-pub(super) struct IntermediateContainerHorizontalRule {
+pub(super) struct IntermediateNewContainerHorizontalRule {
     created_by: i32,
     name: String,
     item_type_id: i32,
@@ -46,11 +46,11 @@ pub(super) struct IntermediateContainerHorizontalRule {
 }
 
 impl InsertRow for web_common::database::NewContainerHorizontalRule {
-    type Intermediate = IntermediateContainerHorizontalRule;
+    type Intermediate = IntermediateNewContainerHorizontalRule;
     type Flat = ContainerHorizontalRule;
 
     fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
-        IntermediateContainerHorizontalRule {
+        IntermediateNewContainerHorizontalRule {
             created_by: user_id,
             name: self.name,
             item_type_id: self.item_type_id,
@@ -79,7 +79,7 @@ impl InsertRow for web_common::database::NewContainerHorizontalRule {
 /// Intermediate representation of the new variant NewContainerVerticalRule.
 #[derive(Insertable)]
 #[diesel(table_name = container_vertical_rules)]
-pub(super) struct IntermediateContainerVerticalRule {
+pub(super) struct IntermediateNewContainerVerticalRule {
     created_by: i32,
     name: String,
     container_item_type_id: i32,
@@ -93,11 +93,11 @@ pub(super) struct IntermediateContainerVerticalRule {
 }
 
 impl InsertRow for web_common::database::NewContainerVerticalRule {
-    type Intermediate = IntermediateContainerVerticalRule;
+    type Intermediate = IntermediateNewContainerVerticalRule;
     type Flat = ContainerVerticalRule;
 
     fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
-        IntermediateContainerVerticalRule {
+        IntermediateNewContainerVerticalRule {
             created_by: user_id,
             name: self.name,
             container_item_type_id: self.container_item_type_id,
@@ -126,18 +126,18 @@ impl InsertRow for web_common::database::NewContainerVerticalRule {
 /// Intermediate representation of the new variant NewItemCategory.
 #[derive(Insertable)]
 #[diesel(table_name = item_categories)]
-pub(super) struct IntermediateItemCategory {
+pub(super) struct IntermediateNewItemCategory {
     created_by: i32,
     name: String,
     description: String,
 }
 
 impl InsertRow for web_common::database::NewItemCategory {
-    type Intermediate = IntermediateItemCategory;
+    type Intermediate = IntermediateNewItemCategory;
     type Flat = ItemCategory;
 
     fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
-        IntermediateItemCategory {
+        IntermediateNewItemCategory {
             created_by: user_id,
             name: self.name,
             description: self.description,
@@ -159,18 +159,18 @@ impl InsertRow for web_common::database::NewItemCategory {
 /// Intermediate representation of the new variant NewProcedure.
 #[derive(Insertable)]
 #[diesel(table_name = procedures)]
-pub(super) struct IntermediateProcedure {
+pub(super) struct IntermediateNewProcedure {
     created_by: i32,
     name: String,
     description: Option<String>,
 }
 
 impl InsertRow for web_common::database::NewProcedure {
-    type Intermediate = IntermediateProcedure;
+    type Intermediate = IntermediateNewProcedure;
     type Flat = Procedure;
 
     fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
-        IntermediateProcedure {
+        IntermediateNewProcedure {
             created_by: user_id,
             name: self.name,
             description: self.description,
@@ -192,7 +192,7 @@ impl InsertRow for web_common::database::NewProcedure {
 /// Intermediate representation of the new variant NewProjectRequirement.
 #[derive(Insertable)]
 #[diesel(table_name = project_requirements)]
-pub(super) struct IntermediateProjectRequirement {
+pub(super) struct IntermediateNewProjectRequirement {
     created_by: i32,
     project_id: i32,
     item_category_id: i32,
@@ -201,11 +201,11 @@ pub(super) struct IntermediateProjectRequirement {
 }
 
 impl InsertRow for web_common::database::NewProjectRequirement {
-    type Intermediate = IntermediateProjectRequirement;
+    type Intermediate = IntermediateNewProjectRequirement;
     type Flat = ProjectRequirement;
 
     fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
-        IntermediateProjectRequirement {
+        IntermediateNewProjectRequirement {
             created_by: user_id,
             project_id: self.project_id,
             item_category_id: self.item_category_id,
@@ -229,7 +229,7 @@ impl InsertRow for web_common::database::NewProjectRequirement {
 /// Intermediate representation of the new variant NewProject.
 #[derive(Insertable)]
 #[diesel(table_name = projects)]
-pub(super) struct IntermediateProject {
+pub(super) struct IntermediateNewProject {
     created_by: i32,
     name: String,
     description: String,
@@ -243,11 +243,11 @@ pub(super) struct IntermediateProject {
 }
 
 impl InsertRow for web_common::database::NewProject {
-    type Intermediate = IntermediateProject;
+    type Intermediate = IntermediateNewProject;
     type Flat = Project;
 
     fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
-        IntermediateProject {
+        IntermediateNewProject {
             created_by: user_id,
             name: self.name,
             description: self.description,
@@ -276,7 +276,7 @@ impl InsertRow for web_common::database::NewProject {
 /// Intermediate representation of the new variant NewSample.
 #[derive(Insertable)]
 #[diesel(table_name = samples)]
-pub(super) struct IntermediateSample {
+pub(super) struct IntermediateNewSample {
     inserted_by: i32,
     id: Uuid,
     sampled_by: i32,
@@ -285,11 +285,11 @@ pub(super) struct IntermediateSample {
 }
 
 impl InsertRow for web_common::database::NewSample {
-    type Intermediate = IntermediateSample;
+    type Intermediate = IntermediateNewSample;
     type Flat = Sample;
 
     fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
-        IntermediateSample {
+        IntermediateNewSample {
             inserted_by: user_id,
             id: self.id,
             sampled_by: self.sampled_by,
@@ -313,7 +313,7 @@ impl InsertRow for web_common::database::NewSample {
 /// Intermediate representation of the new variant NewSamplingProcedure.
 #[derive(Insertable)]
 #[diesel(table_name = sampling_procedures)]
-pub(super) struct IntermediateSamplingProcedure {
+pub(super) struct IntermediateNewSamplingProcedure {
     created_by: i32,
     id: Uuid,
     name: String,
@@ -321,11 +321,11 @@ pub(super) struct IntermediateSamplingProcedure {
 }
 
 impl InsertRow for web_common::database::NewSamplingProcedure {
-    type Intermediate = IntermediateSamplingProcedure;
+    type Intermediate = IntermediateNewSamplingProcedure;
     type Flat = SamplingProcedure;
 
     fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
-        IntermediateSamplingProcedure {
+        IntermediateNewSamplingProcedure {
             created_by: user_id,
             id: self.id,
             name: self.name,
@@ -348,7 +348,7 @@ impl InsertRow for web_common::database::NewSamplingProcedure {
 /// Intermediate representation of the new variant NewTeam.
 #[derive(Insertable)]
 #[diesel(table_name = teams)]
-pub(super) struct IntermediateTeam {
+pub(super) struct IntermediateNewTeam {
     created_by: i32,
     name: String,
     description: String,
@@ -356,11 +356,11 @@ pub(super) struct IntermediateTeam {
 }
 
 impl InsertRow for web_common::database::NewTeam {
-    type Intermediate = IntermediateTeam;
+    type Intermediate = IntermediateNewTeam;
     type Flat = Team;
 
     fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
-        IntermediateTeam {
+        IntermediateNewTeam {
             created_by: user_id,
             name: self.name,
             description: self.description,

@@ -3338,6 +3338,8 @@ pub struct Project {
     pub expenses: Option<i64>,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
     pub expected_end_date: Option<NaiveDateTime>,
     pub end_date: Option<NaiveDateTime>,
 }
@@ -3355,6 +3357,8 @@ impl From<Project> for web_common::database::tables::Project {
             expenses: item.expenses,
             created_by: item.created_by,
             created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
             expected_end_date: item.expected_end_date,
             end_date: item.end_date,
         }
@@ -3374,6 +3378,8 @@ impl From<web_common::database::tables::Project> for Project {
             expenses: item.expenses,
             created_by: item.created_by,
             created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
             expected_end_date: item.expected_end_date,
             end_date: item.end_date,
         }
@@ -3474,7 +3480,7 @@ impl Project {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, expected_end_date, end_date FROM projects ",
+            "SELECT id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date FROM projects ",
             "WHERE $1 % f_concat_projects_name_description(name, description) ",
             "ORDER BY similarity($1, f_concat_projects_name_description(name, description)) DESC LIMIT $2",
         );
@@ -3503,7 +3509,7 @@ impl Project {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, expected_end_date, end_date FROM projects ",
+            "SELECT id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date FROM projects ",
             "WHERE $1 <% f_concat_projects_name_description(name, description) ",
             "ORDER BY word_similarity($1, f_concat_projects_name_description(name, description)) DESC LIMIT $2",
         );
@@ -3532,7 +3538,7 @@ impl Project {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, expected_end_date, end_date FROM projects ",
+            "SELECT id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date FROM projects ",
             "WHERE $1 <<% f_concat_projects_name_description(name, description) ",
             "ORDER BY strict_word_similarity($1, f_concat_projects_name_description(name, description)) DESC LIMIT $2",
         );

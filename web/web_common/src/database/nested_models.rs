@@ -1574,6 +1574,7 @@ pub struct NestedProject {
     pub state: NestedProjectState,
     pub parent_project: Option<Project>,
     pub created_by: User,
+    pub updated_by: User,
 }
 #[cfg(feature = "frontend")]
 impl NestedProject {
@@ -1590,6 +1591,7 @@ impl NestedProject {
             state: NestedProjectState::get(flat_struct.state_id, connection).await?.unwrap(),
             parent_project: if let Some(parent_project_id) = flat_struct.parent_project_id { Project::get(parent_project_id, connection).await? } else { None },
             created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
+            updated_by: User::get(flat_struct.updated_by, connection).await?.unwrap(),
             inner: flat_struct,
         })
     }
@@ -1645,6 +1647,7 @@ impl NestedProject {
             parent_project.update_or_insert(connection).await?;
         }
         self.created_by.update_or_insert(connection).await?;
+        self.updated_by.update_or_insert(connection).await?;
         Ok(())
     }
 }
