@@ -200,24 +200,6 @@ impl actix::Handler<BackendMessage> for WebSocket {
     }
 }
 
-#[derive(Debug, Message)]
-#[rtype(result = "()")]
-enum InternalMessage {
-    Unauthorized,
-}
-
-impl actix::Handler<InternalMessage> for WebSocket {
-    type Result = ();
-
-    fn handle(&mut self, msg: InternalMessage, ctx: &mut Self::Context) {
-        match msg {
-            InternalMessage::Unauthorized => {
-                ctx.close(Some(ws::CloseCode::Policy.into()));
-            }
-        }
-    }
-}
-
 impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
     fn handle(&mut self, msg: Result<ws::Message, ws::ProtocolError>, ctx: &mut Self::Context) {
         match msg {
