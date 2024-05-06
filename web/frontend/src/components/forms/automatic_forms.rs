@@ -2,23 +2,22 @@
 //!
 //! This module is automatically generated. Do not write anything here.
 
+use crate::components::forms::*;
+use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
+use std::ops::Deref;
+use std::rc::Rc;
+use uuid::Uuid;
+use web_common::api::form_traits::FormMethod;
+use web_common::api::ApiError;
 use web_common::database::*;
 use yew::prelude::*;
 use yewdux::{use_store, Reducer, Store};
-use crate::components::forms::*;
-use web_common::api::form_traits::FormMethod;
-use std::rc::Rc;
-use uuid::Uuid;
-use std::ops::Deref;
-use chrono::NaiveDateTime;
-use web_common::api::ApiError;
 
-#[derive(Store, Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
+#[derive(Store, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[store(storage = "session")]
-pub struct NestedNewContainerHorizontalRuleBuilder {
-    pub item_type: Option<NestedItemCategory>,
-    pub other_item_type: Option<NestedItemCategory>,
+pub struct ContainerHorizontalRuleBuilder {
+    pub id: Option<i32>,
     pub name: Option<String>,
     pub minimum_temperature: Option<i32>,
     pub maximum_temperature: Option<i32>,
@@ -26,8 +25,8 @@ pub struct NestedNewContainerHorizontalRuleBuilder {
     pub maximum_humidity: Option<i32>,
     pub minimum_pressure: Option<i32>,
     pub maximum_pressure: Option<i32>,
-    pub errors_item_type: Vec<ApiError>,
-    pub errors_other_item_type: Vec<ApiError>,
+    pub item_type: Option<NestedItemCategory>,
+    pub other_item_type: Option<NestedItemCategory>,
     pub errors_name: Vec<ApiError>,
     pub errors_minimum_temperature: Vec<ApiError>,
     pub errors_maximum_temperature: Vec<ApiError>,
@@ -35,12 +34,12 @@ pub struct NestedNewContainerHorizontalRuleBuilder {
     pub errors_maximum_humidity: Vec<ApiError>,
     pub errors_minimum_pressure: Vec<ApiError>,
     pub errors_maximum_pressure: Vec<ApiError>,
+    pub errors_item_type: Vec<ApiError>,
+    pub errors_other_item_type: Vec<ApiError>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub(super) enum NestedNewContainerHorizontalRuleBuilderActions {
-    SetItemType(Option<NestedItemCategory>),
-    SetOtherItemType(Option<NestedItemCategory>),
+pub(super) enum ContainerHorizontalRuleActions {
     SetName(Option<String>),
     SetMinimumTemperature(Option<i32>),
     SetMaximumTemperature(Option<i32>),
@@ -48,30 +47,99 @@ pub(super) enum NestedNewContainerHorizontalRuleBuilderActions {
     SetMaximumHumidity(Option<i32>),
     SetMinimumPressure(Option<i32>),
     SetMaximumPressure(Option<i32>),
+    SetItemType(Option<NestedItemCategory>),
+    SetOtherItemType(Option<NestedItemCategory>),
 }
 
-impl FormBuilder for NestedNewContainerHorizontalRuleBuilder {
-    type Data = NewContainerHorizontalRule;
-    type Actions = NestedNewContainerHorizontalRuleBuilderActions;
+impl Reducer<ContainerHorizontalRuleBuilder> for ContainerHorizontalRuleActions {
+    fn apply(
+        self,
+        mut state: std::rc::Rc<ContainerHorizontalRuleBuilder>,
+    ) -> std::rc::Rc<ContainerHorizontalRuleBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            ContainerHorizontalRuleActions::SetName(name) => {
+                state_mut.errors_name.clear();
+                if name.is_none() {
+                    state_mut.errors_name.push(ApiError::BadRequest(vec![
+                        "The Name field is required.".to_string(),
+                    ]));
+                }
+                state_mut.name = name;
+            }
+            ContainerHorizontalRuleActions::SetMinimumTemperature(minimum_temperature) => {
+                state_mut.errors_minimum_temperature.clear();
+                state_mut.minimum_temperature = minimum_temperature;
+            }
+            ContainerHorizontalRuleActions::SetMaximumTemperature(maximum_temperature) => {
+                state_mut.errors_maximum_temperature.clear();
+                state_mut.maximum_temperature = maximum_temperature;
+            }
+            ContainerHorizontalRuleActions::SetMinimumHumidity(minimum_humidity) => {
+                state_mut.errors_minimum_humidity.clear();
+                state_mut.minimum_humidity = minimum_humidity;
+            }
+            ContainerHorizontalRuleActions::SetMaximumHumidity(maximum_humidity) => {
+                state_mut.errors_maximum_humidity.clear();
+                state_mut.maximum_humidity = maximum_humidity;
+            }
+            ContainerHorizontalRuleActions::SetMinimumPressure(minimum_pressure) => {
+                state_mut.errors_minimum_pressure.clear();
+                state_mut.minimum_pressure = minimum_pressure;
+            }
+            ContainerHorizontalRuleActions::SetMaximumPressure(maximum_pressure) => {
+                state_mut.errors_maximum_pressure.clear();
+                state_mut.maximum_pressure = maximum_pressure;
+            }
+            ContainerHorizontalRuleActions::SetItemType(item_type) => {
+                state_mut.errors_item_type.clear();
+                if item_type.is_none() {
+                    state_mut.errors_item_type.push(ApiError::BadRequest(vec![
+                        "The ItemType field is required.".to_string(),
+                    ]));
+                }
+                state_mut.item_type = item_type;
+            }
+            ContainerHorizontalRuleActions::SetOtherItemType(other_item_type) => {
+                state_mut.errors_other_item_type.clear();
+                if other_item_type.is_none() {
+                    state_mut
+                        .errors_other_item_type
+                        .push(ApiError::BadRequest(vec![
+                            "The OtherItemType field is required.".to_string(),
+                        ]));
+                }
+                state_mut.other_item_type = other_item_type;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for ContainerHorizontalRuleBuilder {
+    type Actions = ContainerHorizontalRuleActions;
 
     fn has_errors(&self) -> bool {
-!self.errors_item_type.is_empty() || !self.errors_other_item_type.is_empty() || !self.errors_name.is_empty() || !self.errors_minimum_temperature.is_empty() || !self.errors_maximum_temperature.is_empty() || !self.errors_minimum_humidity.is_empty() || !self.errors_maximum_humidity.is_empty() || !self.errors_minimum_pressure.is_empty() || !self.errors_maximum_pressure.is_empty()
+        !self.errors_name.is_empty()
+            || !self.errors_minimum_temperature.is_empty()
+            || !self.errors_maximum_temperature.is_empty()
+            || !self.errors_minimum_humidity.is_empty()
+            || !self.errors_maximum_humidity.is_empty()
+            || !self.errors_minimum_pressure.is_empty()
+            || !self.errors_maximum_pressure.is_empty()
+            || !self.errors_item_type.is_empty()
+            || !self.errors_other_item_type.is_empty()
     }
 
     fn can_submit(&self) -> bool {
         !self.has_errors()
-        && self.item_type.is_some()
-        && self.other_item_type.is_some()
-        && self.name.is_some()
+            && self.name.is_some()
+            && self.item_type.is_some()
+            && self.other_item_type.is_some()
     }
-
-    fn form_level_errors(&self) -> Vec<String> {
-        vec![]
-    }
-
 }
-impl From<NestedNewContainerHorizontalRuleBuilder> for NewContainerHorizontalRule {
-    fn from(builder: NestedNewContainerHorizontalRuleBuilder) -> Self {
+
+impl From<ContainerHorizontalRuleBuilder> for NewContainerHorizontalRule {
+    fn from(builder: ContainerHorizontalRuleBuilder) -> Self {
         Self {
             name: builder.name.unwrap(),
             item_type_id: builder.item_type.unwrap().inner.id,
@@ -85,10 +153,25 @@ impl From<NestedNewContainerHorizontalRuleBuilder> for NewContainerHorizontalRul
         }
     }
 }
+impl From<ContainerHorizontalRuleBuilder> for UpdateContainerHorizontalRule {
+    fn from(builder: ContainerHorizontalRuleBuilder) -> Self {
+        Self {
+            id: builder.id.unwrap(),
+            name: builder.name.unwrap(),
+            item_type_id: builder.item_type.unwrap().inner.id,
+            other_item_type_id: builder.other_item_type.unwrap().inner.id,
+            minimum_temperature: builder.minimum_temperature,
+            maximum_temperature: builder.maximum_temperature,
+            minimum_humidity: builder.minimum_humidity,
+            maximum_humidity: builder.maximum_humidity,
+            minimum_pressure: builder.minimum_pressure,
+            maximum_pressure: builder.maximum_pressure,
+        }
+    }
+}
 impl FormBuildable for NewContainerHorizontalRule {
-    type Builder = NestedNewContainerHorizontalRuleBuilder;
+    type Builder = ContainerHorizontalRuleBuilder;
     const TABLE: Table = Table::ContainerHorizontalRules;
-    const METHOD: FormMethod = FormMethod::POST;
     fn title() -> &'static str {
         "NewContainerHorizontalRule"
     }
@@ -105,81 +188,118 @@ impl FormBuildable for NewContainerHorizontalRule {
         false
     }
 }
-impl Reducer<NestedNewContainerHorizontalRuleBuilder> for NestedNewContainerHorizontalRuleBuilderActions {
-    fn apply(self, mut state: std::rc::Rc<NestedNewContainerHorizontalRuleBuilder>) -> std::rc::Rc<NestedNewContainerHorizontalRuleBuilder> {
-        let state_mut = Rc::make_mut(&mut state);
-        match self {
-            NestedNewContainerHorizontalRuleBuilderActions::SetItemType(item_type) => {
-        if item_type.is_none() {
-            state_mut.errors_item_type.push(ApiError::BadRequest(vec![
-                "The ItemType field is required.".to_string()
-             ]));
-        }
-                state_mut.item_type = item_type;
-            }
-            NestedNewContainerHorizontalRuleBuilderActions::SetOtherItemType(other_item_type) => {
-        if other_item_type.is_none() {
-            state_mut.errors_other_item_type.push(ApiError::BadRequest(vec![
-                "The OtherItemType field is required.".to_string()
-             ]));
-        }
-                state_mut.other_item_type = other_item_type;
-            }
-            NestedNewContainerHorizontalRuleBuilderActions::SetName(name) => {
-        if name.is_none() {
-            state_mut.errors_name.push(ApiError::BadRequest(vec![
-                "The Name field is required.".to_string()
-             ]));
-        }
-                state_mut.name = name;
-            }
-            NestedNewContainerHorizontalRuleBuilderActions::SetMinimumTemperature(minimum_temperature) => {
-                state_mut.minimum_temperature = minimum_temperature;
-            }
-            NestedNewContainerHorizontalRuleBuilderActions::SetMaximumTemperature(maximum_temperature) => {
-                state_mut.maximum_temperature = maximum_temperature;
-            }
-            NestedNewContainerHorizontalRuleBuilderActions::SetMinimumHumidity(minimum_humidity) => {
-                state_mut.minimum_humidity = minimum_humidity;
-            }
-            NestedNewContainerHorizontalRuleBuilderActions::SetMaximumHumidity(maximum_humidity) => {
-                state_mut.maximum_humidity = maximum_humidity;
-            }
-            NestedNewContainerHorizontalRuleBuilderActions::SetMinimumPressure(minimum_pressure) => {
-                state_mut.minimum_pressure = minimum_pressure;
-            }
-            NestedNewContainerHorizontalRuleBuilderActions::SetMaximumPressure(maximum_pressure) => {
-                state_mut.maximum_pressure = maximum_pressure;
-            }
-        }
-        state
+
+impl FormBuildable for UpdateContainerHorizontalRule {
+    type Builder = ContainerHorizontalRuleBuilder;
+    const TABLE: Table = Table::ContainerHorizontalRules;
+    fn title() -> &'static str {
+        "UpdateContainerHorizontalRule"
+    }
+    fn task_target() -> &'static str {
+        "UpdateContainerHorizontalRule"
+    }
+    fn description() -> &'static str {
+        concat!("Create a new UpdateContainerHorizontalRule.",)
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        true
     }
 }
-#[function_component(NewContainerHorizontalRuleForm)]
-pub fn new_container_horizontal_rule_form() -> Html {
-    let (builder_store, builder_dispatch) = use_store::<NestedNewContainerHorizontalRuleBuilder>();
-    let set_item_type = builder_dispatch.apply_callback(|item_type: Option<NestedItemCategory>| NestedNewContainerHorizontalRuleBuilderActions::SetItemType(item_type));
-    let set_other_item_type = builder_dispatch.apply_callback(|other_item_type: Option<NestedItemCategory>| NestedNewContainerHorizontalRuleBuilderActions::SetOtherItemType(other_item_type));
-    let set_name = builder_dispatch.apply_callback(|name: Option<String>| NestedNewContainerHorizontalRuleBuilderActions::SetName(name));
-    let set_minimum_temperature = builder_dispatch.apply_callback(|minimum_temperature: Option<i32>| NestedNewContainerHorizontalRuleBuilderActions::SetMinimumTemperature(minimum_temperature));
-    let set_maximum_temperature = builder_dispatch.apply_callback(|maximum_temperature: Option<i32>| NestedNewContainerHorizontalRuleBuilderActions::SetMaximumTemperature(maximum_temperature));
-    let set_minimum_humidity = builder_dispatch.apply_callback(|minimum_humidity: Option<i32>| NestedNewContainerHorizontalRuleBuilderActions::SetMinimumHumidity(minimum_humidity));
-    let set_maximum_humidity = builder_dispatch.apply_callback(|maximum_humidity: Option<i32>| NestedNewContainerHorizontalRuleBuilderActions::SetMaximumHumidity(maximum_humidity));
-    let set_minimum_pressure = builder_dispatch.apply_callback(|minimum_pressure: Option<i32>| NestedNewContainerHorizontalRuleBuilderActions::SetMinimumPressure(minimum_pressure));
-    let set_maximum_pressure = builder_dispatch.apply_callback(|maximum_pressure: Option<i32>| NestedNewContainerHorizontalRuleBuilderActions::SetMaximumPressure(maximum_pressure));
+
+#[function_component(CreateContainerHorizontalRuleForm)]
+pub fn create_container_horizontal_rule_form() -> Html {
+    let (builder_store, builder_dispatch) = use_store::<ContainerHorizontalRuleBuilder>();
+    let set_name = builder_dispatch
+        .apply_callback(|name: Option<String>| ContainerHorizontalRuleActions::SetName(name));
+    let set_minimum_temperature =
+        builder_dispatch.apply_callback(|minimum_temperature: Option<i32>| {
+            ContainerHorizontalRuleActions::SetMinimumTemperature(minimum_temperature)
+        });
+    let set_maximum_temperature =
+        builder_dispatch.apply_callback(|maximum_temperature: Option<i32>| {
+            ContainerHorizontalRuleActions::SetMaximumTemperature(maximum_temperature)
+        });
+    let set_minimum_humidity = builder_dispatch.apply_callback(|minimum_humidity: Option<i32>| {
+        ContainerHorizontalRuleActions::SetMinimumHumidity(minimum_humidity)
+    });
+    let set_maximum_humidity = builder_dispatch.apply_callback(|maximum_humidity: Option<i32>| {
+        ContainerHorizontalRuleActions::SetMaximumHumidity(maximum_humidity)
+    });
+    let set_minimum_pressure = builder_dispatch.apply_callback(|minimum_pressure: Option<i32>| {
+        ContainerHorizontalRuleActions::SetMinimumPressure(minimum_pressure)
+    });
+    let set_maximum_pressure = builder_dispatch.apply_callback(|maximum_pressure: Option<i32>| {
+        ContainerHorizontalRuleActions::SetMaximumPressure(maximum_pressure)
+    });
+    let set_item_type = builder_dispatch.apply_callback(|item_type: Option<NestedItemCategory>| {
+        ContainerHorizontalRuleActions::SetItemType(item_type)
+    });
+    let set_other_item_type =
+        builder_dispatch.apply_callback(|other_item_type: Option<NestedItemCategory>| {
+            ContainerHorizontalRuleActions::SetOtherItemType(other_item_type)
+        });
     html! {
-        <BasicForm<NewContainerHorizontalRule> builder={builder_store.deref().clone()}>
+        <BasicForm<NewContainerHorizontalRule> method={FormMethod::POST} builder={builder_store.deref().clone()}>
+            <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
             <Datalist<NestedItemCategory> builder={set_item_type} errors={builder_store.errors_item_type.clone()} value={builder_store.item_type.clone()} label="ItemType" />
             <Datalist<NestedItemCategory> builder={set_other_item_type} errors={builder_store.errors_other_item_type.clone()} value={builder_store.other_item_type.clone()} label="OtherItemType" />
-            <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
         </BasicForm<NewContainerHorizontalRule>>
     }
 }
-#[derive(Store, Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
+#[derive(Clone, PartialEq, Properties)]
+pub struct UpdateContainerHorizontalRuleFormProp {
+    pub id: i32,
+}
+
+#[function_component(UpdateContainerHorizontalRuleForm)]
+pub fn update_container_horizontal_rule_form(
+    props: &UpdateContainerHorizontalRuleFormProp,
+) -> Html {
+    let (builder_store, builder_dispatch) = use_store::<ContainerHorizontalRuleBuilder>();
+    let set_name = builder_dispatch
+        .apply_callback(|name: Option<String>| ContainerHorizontalRuleActions::SetName(name));
+    let set_minimum_temperature =
+        builder_dispatch.apply_callback(|minimum_temperature: Option<i32>| {
+            ContainerHorizontalRuleActions::SetMinimumTemperature(minimum_temperature)
+        });
+    let set_maximum_temperature =
+        builder_dispatch.apply_callback(|maximum_temperature: Option<i32>| {
+            ContainerHorizontalRuleActions::SetMaximumTemperature(maximum_temperature)
+        });
+    let set_minimum_humidity = builder_dispatch.apply_callback(|minimum_humidity: Option<i32>| {
+        ContainerHorizontalRuleActions::SetMinimumHumidity(minimum_humidity)
+    });
+    let set_maximum_humidity = builder_dispatch.apply_callback(|maximum_humidity: Option<i32>| {
+        ContainerHorizontalRuleActions::SetMaximumHumidity(maximum_humidity)
+    });
+    let set_minimum_pressure = builder_dispatch.apply_callback(|minimum_pressure: Option<i32>| {
+        ContainerHorizontalRuleActions::SetMinimumPressure(minimum_pressure)
+    });
+    let set_maximum_pressure = builder_dispatch.apply_callback(|maximum_pressure: Option<i32>| {
+        ContainerHorizontalRuleActions::SetMaximumPressure(maximum_pressure)
+    });
+    let set_item_type = builder_dispatch.apply_callback(|item_type: Option<NestedItemCategory>| {
+        ContainerHorizontalRuleActions::SetItemType(item_type)
+    });
+    let set_other_item_type =
+        builder_dispatch.apply_callback(|other_item_type: Option<NestedItemCategory>| {
+            ContainerHorizontalRuleActions::SetOtherItemType(other_item_type)
+        });
+    html! {
+        <BasicForm<UpdateContainerHorizontalRule> method={FormMethod::PUT} builder={builder_store.deref().clone()}>
+            <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
+            <Datalist<NestedItemCategory> builder={set_item_type} errors={builder_store.errors_item_type.clone()} value={builder_store.item_type.clone()} label="ItemType" />
+            <Datalist<NestedItemCategory> builder={set_other_item_type} errors={builder_store.errors_other_item_type.clone()} value={builder_store.other_item_type.clone()} label="OtherItemType" />
+        </BasicForm<UpdateContainerHorizontalRule>>
+    }
+}
+#[derive(Store, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[store(storage = "session")]
-pub struct NestedNewContainerVerticalRuleBuilder {
-    pub container_item_type: Option<NestedItemCategory>,
-    pub contained_item_type: Option<NestedItemCategory>,
+pub struct ContainerVerticalRuleBuilder {
+    pub id: Option<i32>,
     pub name: Option<String>,
     pub minimum_temperature: Option<i32>,
     pub maximum_temperature: Option<i32>,
@@ -187,8 +307,8 @@ pub struct NestedNewContainerVerticalRuleBuilder {
     pub maximum_humidity: Option<i32>,
     pub minimum_pressure: Option<i32>,
     pub maximum_pressure: Option<i32>,
-    pub errors_container_item_type: Vec<ApiError>,
-    pub errors_contained_item_type: Vec<ApiError>,
+    pub container_item_type: Option<NestedItemCategory>,
+    pub contained_item_type: Option<NestedItemCategory>,
     pub errors_name: Vec<ApiError>,
     pub errors_minimum_temperature: Vec<ApiError>,
     pub errors_maximum_temperature: Vec<ApiError>,
@@ -196,12 +316,12 @@ pub struct NestedNewContainerVerticalRuleBuilder {
     pub errors_maximum_humidity: Vec<ApiError>,
     pub errors_minimum_pressure: Vec<ApiError>,
     pub errors_maximum_pressure: Vec<ApiError>,
+    pub errors_container_item_type: Vec<ApiError>,
+    pub errors_contained_item_type: Vec<ApiError>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub(super) enum NestedNewContainerVerticalRuleBuilderActions {
-    SetContainerItemType(Option<NestedItemCategory>),
-    SetContainedItemType(Option<NestedItemCategory>),
+pub(super) enum ContainerVerticalRuleActions {
     SetName(Option<String>),
     SetMinimumTemperature(Option<i32>),
     SetMaximumTemperature(Option<i32>),
@@ -209,30 +329,101 @@ pub(super) enum NestedNewContainerVerticalRuleBuilderActions {
     SetMaximumHumidity(Option<i32>),
     SetMinimumPressure(Option<i32>),
     SetMaximumPressure(Option<i32>),
+    SetContainerItemType(Option<NestedItemCategory>),
+    SetContainedItemType(Option<NestedItemCategory>),
 }
 
-impl FormBuilder for NestedNewContainerVerticalRuleBuilder {
-    type Data = NewContainerVerticalRule;
-    type Actions = NestedNewContainerVerticalRuleBuilderActions;
+impl Reducer<ContainerVerticalRuleBuilder> for ContainerVerticalRuleActions {
+    fn apply(
+        self,
+        mut state: std::rc::Rc<ContainerVerticalRuleBuilder>,
+    ) -> std::rc::Rc<ContainerVerticalRuleBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            ContainerVerticalRuleActions::SetName(name) => {
+                state_mut.errors_name.clear();
+                if name.is_none() {
+                    state_mut.errors_name.push(ApiError::BadRequest(vec![
+                        "The Name field is required.".to_string(),
+                    ]));
+                }
+                state_mut.name = name;
+            }
+            ContainerVerticalRuleActions::SetMinimumTemperature(minimum_temperature) => {
+                state_mut.errors_minimum_temperature.clear();
+                state_mut.minimum_temperature = minimum_temperature;
+            }
+            ContainerVerticalRuleActions::SetMaximumTemperature(maximum_temperature) => {
+                state_mut.errors_maximum_temperature.clear();
+                state_mut.maximum_temperature = maximum_temperature;
+            }
+            ContainerVerticalRuleActions::SetMinimumHumidity(minimum_humidity) => {
+                state_mut.errors_minimum_humidity.clear();
+                state_mut.minimum_humidity = minimum_humidity;
+            }
+            ContainerVerticalRuleActions::SetMaximumHumidity(maximum_humidity) => {
+                state_mut.errors_maximum_humidity.clear();
+                state_mut.maximum_humidity = maximum_humidity;
+            }
+            ContainerVerticalRuleActions::SetMinimumPressure(minimum_pressure) => {
+                state_mut.errors_minimum_pressure.clear();
+                state_mut.minimum_pressure = minimum_pressure;
+            }
+            ContainerVerticalRuleActions::SetMaximumPressure(maximum_pressure) => {
+                state_mut.errors_maximum_pressure.clear();
+                state_mut.maximum_pressure = maximum_pressure;
+            }
+            ContainerVerticalRuleActions::SetContainerItemType(container_item_type) => {
+                state_mut.errors_container_item_type.clear();
+                if container_item_type.is_none() {
+                    state_mut
+                        .errors_container_item_type
+                        .push(ApiError::BadRequest(vec![
+                            "The ContainerItemType field is required.".to_string(),
+                        ]));
+                }
+                state_mut.container_item_type = container_item_type;
+            }
+            ContainerVerticalRuleActions::SetContainedItemType(contained_item_type) => {
+                state_mut.errors_contained_item_type.clear();
+                if contained_item_type.is_none() {
+                    state_mut
+                        .errors_contained_item_type
+                        .push(ApiError::BadRequest(vec![
+                            "The ContainedItemType field is required.".to_string(),
+                        ]));
+                }
+                state_mut.contained_item_type = contained_item_type;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for ContainerVerticalRuleBuilder {
+    type Actions = ContainerVerticalRuleActions;
 
     fn has_errors(&self) -> bool {
-!self.errors_container_item_type.is_empty() || !self.errors_contained_item_type.is_empty() || !self.errors_name.is_empty() || !self.errors_minimum_temperature.is_empty() || !self.errors_maximum_temperature.is_empty() || !self.errors_minimum_humidity.is_empty() || !self.errors_maximum_humidity.is_empty() || !self.errors_minimum_pressure.is_empty() || !self.errors_maximum_pressure.is_empty()
+        !self.errors_name.is_empty()
+            || !self.errors_minimum_temperature.is_empty()
+            || !self.errors_maximum_temperature.is_empty()
+            || !self.errors_minimum_humidity.is_empty()
+            || !self.errors_maximum_humidity.is_empty()
+            || !self.errors_minimum_pressure.is_empty()
+            || !self.errors_maximum_pressure.is_empty()
+            || !self.errors_container_item_type.is_empty()
+            || !self.errors_contained_item_type.is_empty()
     }
 
     fn can_submit(&self) -> bool {
         !self.has_errors()
-        && self.container_item_type.is_some()
-        && self.contained_item_type.is_some()
-        && self.name.is_some()
+            && self.name.is_some()
+            && self.container_item_type.is_some()
+            && self.contained_item_type.is_some()
     }
-
-    fn form_level_errors(&self) -> Vec<String> {
-        vec![]
-    }
-
 }
-impl From<NestedNewContainerVerticalRuleBuilder> for NewContainerVerticalRule {
-    fn from(builder: NestedNewContainerVerticalRuleBuilder) -> Self {
+
+impl From<ContainerVerticalRuleBuilder> for NewContainerVerticalRule {
+    fn from(builder: ContainerVerticalRuleBuilder) -> Self {
         Self {
             name: builder.name.unwrap(),
             container_item_type_id: builder.container_item_type.unwrap().inner.id,
@@ -246,10 +437,25 @@ impl From<NestedNewContainerVerticalRuleBuilder> for NewContainerVerticalRule {
         }
     }
 }
+impl From<ContainerVerticalRuleBuilder> for UpdateContainerVerticalRule {
+    fn from(builder: ContainerVerticalRuleBuilder) -> Self {
+        Self {
+            id: builder.id.unwrap(),
+            name: builder.name.unwrap(),
+            container_item_type_id: builder.container_item_type.unwrap().inner.id,
+            contained_item_type_id: builder.contained_item_type.unwrap().inner.id,
+            minimum_temperature: builder.minimum_temperature,
+            maximum_temperature: builder.maximum_temperature,
+            minimum_humidity: builder.minimum_humidity,
+            maximum_humidity: builder.maximum_humidity,
+            minimum_pressure: builder.minimum_pressure,
+            maximum_pressure: builder.maximum_pressure,
+        }
+    }
+}
 impl FormBuildable for NewContainerVerticalRule {
-    type Builder = NestedNewContainerVerticalRuleBuilder;
+    type Builder = ContainerVerticalRuleBuilder;
     const TABLE: Table = Table::ContainerVerticalRules;
-    const METHOD: FormMethod = FormMethod::POST;
     fn title() -> &'static str {
         "NewContainerVerticalRule"
     }
@@ -266,79 +472,118 @@ impl FormBuildable for NewContainerVerticalRule {
         false
     }
 }
-impl Reducer<NestedNewContainerVerticalRuleBuilder> for NestedNewContainerVerticalRuleBuilderActions {
-    fn apply(self, mut state: std::rc::Rc<NestedNewContainerVerticalRuleBuilder>) -> std::rc::Rc<NestedNewContainerVerticalRuleBuilder> {
-        let state_mut = Rc::make_mut(&mut state);
-        match self {
-            NestedNewContainerVerticalRuleBuilderActions::SetContainerItemType(container_item_type) => {
-        if container_item_type.is_none() {
-            state_mut.errors_container_item_type.push(ApiError::BadRequest(vec![
-                "The ContainerItemType field is required.".to_string()
-             ]));
-        }
-                state_mut.container_item_type = container_item_type;
-            }
-            NestedNewContainerVerticalRuleBuilderActions::SetContainedItemType(contained_item_type) => {
-        if contained_item_type.is_none() {
-            state_mut.errors_contained_item_type.push(ApiError::BadRequest(vec![
-                "The ContainedItemType field is required.".to_string()
-             ]));
-        }
-                state_mut.contained_item_type = contained_item_type;
-            }
-            NestedNewContainerVerticalRuleBuilderActions::SetName(name) => {
-        if name.is_none() {
-            state_mut.errors_name.push(ApiError::BadRequest(vec![
-                "The Name field is required.".to_string()
-             ]));
-        }
-                state_mut.name = name;
-            }
-            NestedNewContainerVerticalRuleBuilderActions::SetMinimumTemperature(minimum_temperature) => {
-                state_mut.minimum_temperature = minimum_temperature;
-            }
-            NestedNewContainerVerticalRuleBuilderActions::SetMaximumTemperature(maximum_temperature) => {
-                state_mut.maximum_temperature = maximum_temperature;
-            }
-            NestedNewContainerVerticalRuleBuilderActions::SetMinimumHumidity(minimum_humidity) => {
-                state_mut.minimum_humidity = minimum_humidity;
-            }
-            NestedNewContainerVerticalRuleBuilderActions::SetMaximumHumidity(maximum_humidity) => {
-                state_mut.maximum_humidity = maximum_humidity;
-            }
-            NestedNewContainerVerticalRuleBuilderActions::SetMinimumPressure(minimum_pressure) => {
-                state_mut.minimum_pressure = minimum_pressure;
-            }
-            NestedNewContainerVerticalRuleBuilderActions::SetMaximumPressure(maximum_pressure) => {
-                state_mut.maximum_pressure = maximum_pressure;
-            }
-        }
-        state
+
+impl FormBuildable for UpdateContainerVerticalRule {
+    type Builder = ContainerVerticalRuleBuilder;
+    const TABLE: Table = Table::ContainerVerticalRules;
+    fn title() -> &'static str {
+        "UpdateContainerVerticalRule"
+    }
+    fn task_target() -> &'static str {
+        "UpdateContainerVerticalRule"
+    }
+    fn description() -> &'static str {
+        concat!("Create a new UpdateContainerVerticalRule.",)
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        true
     }
 }
-#[function_component(NewContainerVerticalRuleForm)]
-pub fn new_container_vertical_rule_form() -> Html {
-    let (builder_store, builder_dispatch) = use_store::<NestedNewContainerVerticalRuleBuilder>();
-    let set_container_item_type = builder_dispatch.apply_callback(|container_item_type: Option<NestedItemCategory>| NestedNewContainerVerticalRuleBuilderActions::SetContainerItemType(container_item_type));
-    let set_contained_item_type = builder_dispatch.apply_callback(|contained_item_type: Option<NestedItemCategory>| NestedNewContainerVerticalRuleBuilderActions::SetContainedItemType(contained_item_type));
-    let set_name = builder_dispatch.apply_callback(|name: Option<String>| NestedNewContainerVerticalRuleBuilderActions::SetName(name));
-    let set_minimum_temperature = builder_dispatch.apply_callback(|minimum_temperature: Option<i32>| NestedNewContainerVerticalRuleBuilderActions::SetMinimumTemperature(minimum_temperature));
-    let set_maximum_temperature = builder_dispatch.apply_callback(|maximum_temperature: Option<i32>| NestedNewContainerVerticalRuleBuilderActions::SetMaximumTemperature(maximum_temperature));
-    let set_minimum_humidity = builder_dispatch.apply_callback(|minimum_humidity: Option<i32>| NestedNewContainerVerticalRuleBuilderActions::SetMinimumHumidity(minimum_humidity));
-    let set_maximum_humidity = builder_dispatch.apply_callback(|maximum_humidity: Option<i32>| NestedNewContainerVerticalRuleBuilderActions::SetMaximumHumidity(maximum_humidity));
-    let set_minimum_pressure = builder_dispatch.apply_callback(|minimum_pressure: Option<i32>| NestedNewContainerVerticalRuleBuilderActions::SetMinimumPressure(minimum_pressure));
-    let set_maximum_pressure = builder_dispatch.apply_callback(|maximum_pressure: Option<i32>| NestedNewContainerVerticalRuleBuilderActions::SetMaximumPressure(maximum_pressure));
+
+#[function_component(CreateContainerVerticalRuleForm)]
+pub fn create_container_vertical_rule_form() -> Html {
+    let (builder_store, builder_dispatch) = use_store::<ContainerVerticalRuleBuilder>();
+    let set_name = builder_dispatch
+        .apply_callback(|name: Option<String>| ContainerVerticalRuleActions::SetName(name));
+    let set_minimum_temperature =
+        builder_dispatch.apply_callback(|minimum_temperature: Option<i32>| {
+            ContainerVerticalRuleActions::SetMinimumTemperature(minimum_temperature)
+        });
+    let set_maximum_temperature =
+        builder_dispatch.apply_callback(|maximum_temperature: Option<i32>| {
+            ContainerVerticalRuleActions::SetMaximumTemperature(maximum_temperature)
+        });
+    let set_minimum_humidity = builder_dispatch.apply_callback(|minimum_humidity: Option<i32>| {
+        ContainerVerticalRuleActions::SetMinimumHumidity(minimum_humidity)
+    });
+    let set_maximum_humidity = builder_dispatch.apply_callback(|maximum_humidity: Option<i32>| {
+        ContainerVerticalRuleActions::SetMaximumHumidity(maximum_humidity)
+    });
+    let set_minimum_pressure = builder_dispatch.apply_callback(|minimum_pressure: Option<i32>| {
+        ContainerVerticalRuleActions::SetMinimumPressure(minimum_pressure)
+    });
+    let set_maximum_pressure = builder_dispatch.apply_callback(|maximum_pressure: Option<i32>| {
+        ContainerVerticalRuleActions::SetMaximumPressure(maximum_pressure)
+    });
+    let set_container_item_type =
+        builder_dispatch.apply_callback(|container_item_type: Option<NestedItemCategory>| {
+            ContainerVerticalRuleActions::SetContainerItemType(container_item_type)
+        });
+    let set_contained_item_type =
+        builder_dispatch.apply_callback(|contained_item_type: Option<NestedItemCategory>| {
+            ContainerVerticalRuleActions::SetContainedItemType(contained_item_type)
+        });
     html! {
-        <BasicForm<NewContainerVerticalRule> builder={builder_store.deref().clone()}>
+        <BasicForm<NewContainerVerticalRule> method={FormMethod::POST} builder={builder_store.deref().clone()}>
+            <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
             <Datalist<NestedItemCategory> builder={set_container_item_type} errors={builder_store.errors_container_item_type.clone()} value={builder_store.container_item_type.clone()} label="ContainerItemType" />
             <Datalist<NestedItemCategory> builder={set_contained_item_type} errors={builder_store.errors_contained_item_type.clone()} value={builder_store.contained_item_type.clone()} label="ContainedItemType" />
-            <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
         </BasicForm<NewContainerVerticalRule>>
     }
 }
-#[derive(Store, Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
+#[derive(Clone, PartialEq, Properties)]
+pub struct UpdateContainerVerticalRuleFormProp {
+    pub id: i32,
+}
+
+#[function_component(UpdateContainerVerticalRuleForm)]
+pub fn update_container_vertical_rule_form(props: &UpdateContainerVerticalRuleFormProp) -> Html {
+    let (builder_store, builder_dispatch) = use_store::<ContainerVerticalRuleBuilder>();
+    let set_name = builder_dispatch
+        .apply_callback(|name: Option<String>| ContainerVerticalRuleActions::SetName(name));
+    let set_minimum_temperature =
+        builder_dispatch.apply_callback(|minimum_temperature: Option<i32>| {
+            ContainerVerticalRuleActions::SetMinimumTemperature(minimum_temperature)
+        });
+    let set_maximum_temperature =
+        builder_dispatch.apply_callback(|maximum_temperature: Option<i32>| {
+            ContainerVerticalRuleActions::SetMaximumTemperature(maximum_temperature)
+        });
+    let set_minimum_humidity = builder_dispatch.apply_callback(|minimum_humidity: Option<i32>| {
+        ContainerVerticalRuleActions::SetMinimumHumidity(minimum_humidity)
+    });
+    let set_maximum_humidity = builder_dispatch.apply_callback(|maximum_humidity: Option<i32>| {
+        ContainerVerticalRuleActions::SetMaximumHumidity(maximum_humidity)
+    });
+    let set_minimum_pressure = builder_dispatch.apply_callback(|minimum_pressure: Option<i32>| {
+        ContainerVerticalRuleActions::SetMinimumPressure(minimum_pressure)
+    });
+    let set_maximum_pressure = builder_dispatch.apply_callback(|maximum_pressure: Option<i32>| {
+        ContainerVerticalRuleActions::SetMaximumPressure(maximum_pressure)
+    });
+    let set_container_item_type =
+        builder_dispatch.apply_callback(|container_item_type: Option<NestedItemCategory>| {
+            ContainerVerticalRuleActions::SetContainerItemType(container_item_type)
+        });
+    let set_contained_item_type =
+        builder_dispatch.apply_callback(|contained_item_type: Option<NestedItemCategory>| {
+            ContainerVerticalRuleActions::SetContainedItemType(contained_item_type)
+        });
+    html! {
+        <BasicForm<UpdateContainerVerticalRule> method={FormMethod::PUT} builder={builder_store.deref().clone()}>
+            <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
+            <Datalist<NestedItemCategory> builder={set_container_item_type} errors={builder_store.errors_container_item_type.clone()} value={builder_store.container_item_type.clone()} label="ContainerItemType" />
+            <Datalist<NestedItemCategory> builder={set_contained_item_type} errors={builder_store.errors_contained_item_type.clone()} value={builder_store.contained_item_type.clone()} label="ContainedItemType" />
+        </BasicForm<UpdateContainerVerticalRule>>
+    }
+}
+#[derive(Store, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[store(storage = "session")]
-pub struct NestedNewItemCategoryBuilder {
+pub struct ItemCategoryBuilder {
+    pub id: Option<i32>,
     pub name: Option<String>,
     pub description: Option<String>,
     pub errors_name: Vec<ApiError>,
@@ -346,42 +591,72 @@ pub struct NestedNewItemCategoryBuilder {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub(super) enum NestedNewItemCategoryBuilderActions {
+pub(super) enum ItemCategoryActions {
     SetName(Option<String>),
     SetDescription(Option<String>),
 }
 
-impl FormBuilder for NestedNewItemCategoryBuilder {
-    type Data = NewItemCategory;
-    type Actions = NestedNewItemCategoryBuilderActions;
+impl Reducer<ItemCategoryBuilder> for ItemCategoryActions {
+    fn apply(
+        self,
+        mut state: std::rc::Rc<ItemCategoryBuilder>,
+    ) -> std::rc::Rc<ItemCategoryBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            ItemCategoryActions::SetName(name) => {
+                state_mut.errors_name.clear();
+                if name.is_none() {
+                    state_mut.errors_name.push(ApiError::BadRequest(vec![
+                        "The Name field is required.".to_string(),
+                    ]));
+                }
+                state_mut.name = name;
+            }
+            ItemCategoryActions::SetDescription(description) => {
+                state_mut.errors_description.clear();
+                if description.is_none() {
+                    state_mut.errors_description.push(ApiError::BadRequest(vec![
+                        "The Description field is required.".to_string(),
+                    ]));
+                }
+                state_mut.description = description;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for ItemCategoryBuilder {
+    type Actions = ItemCategoryActions;
 
     fn has_errors(&self) -> bool {
-!self.errors_name.is_empty() || !self.errors_description.is_empty()
+        !self.errors_name.is_empty() || !self.errors_description.is_empty()
     }
 
     fn can_submit(&self) -> bool {
-        !self.has_errors()
-        && self.name.is_some()
-        && self.description.is_some()
+        !self.has_errors() && self.name.is_some() && self.description.is_some()
     }
-
-    fn form_level_errors(&self) -> Vec<String> {
-        vec![]
-    }
-
 }
-impl From<NestedNewItemCategoryBuilder> for NewItemCategory {
-    fn from(builder: NestedNewItemCategoryBuilder) -> Self {
+
+impl From<ItemCategoryBuilder> for NewItemCategory {
+    fn from(builder: ItemCategoryBuilder) -> Self {
         Self {
             name: builder.name.unwrap(),
             description: builder.description.unwrap(),
         }
     }
 }
+impl From<ItemCategoryBuilder> for UpdateItemCategory {
+    fn from(builder: ItemCategoryBuilder) -> Self {
+        Self {
+            id: builder.id.unwrap(),
+            name: builder.name.unwrap(),
+            description: builder.description.unwrap(),
+        }
+    }
+}
 impl FormBuildable for NewItemCategory {
-    type Builder = NestedNewItemCategoryBuilder;
+    type Builder = ItemCategoryBuilder;
     const TABLE: Table = Table::ItemCategories;
-    const METHOD: FormMethod = FormMethod::POST;
     fn title() -> &'static str {
         "NewItemCategory"
     }
@@ -398,45 +673,66 @@ impl FormBuildable for NewItemCategory {
         false
     }
 }
-impl Reducer<NestedNewItemCategoryBuilder> for NestedNewItemCategoryBuilderActions {
-    fn apply(self, mut state: std::rc::Rc<NestedNewItemCategoryBuilder>) -> std::rc::Rc<NestedNewItemCategoryBuilder> {
-        let state_mut = Rc::make_mut(&mut state);
-        match self {
-            NestedNewItemCategoryBuilderActions::SetName(name) => {
-        if name.is_none() {
-            state_mut.errors_name.push(ApiError::BadRequest(vec![
-                "The Name field is required.".to_string()
-             ]));
-        }
-                state_mut.name = name;
-            }
-            NestedNewItemCategoryBuilderActions::SetDescription(description) => {
-        if description.is_none() {
-            state_mut.errors_description.push(ApiError::BadRequest(vec![
-                "The Description field is required.".to_string()
-             ]));
-        }
-                state_mut.description = description;
-            }
-        }
-        state
+
+impl FormBuildable for UpdateItemCategory {
+    type Builder = ItemCategoryBuilder;
+    const TABLE: Table = Table::ItemCategories;
+    fn title() -> &'static str {
+        "UpdateItemCategory"
+    }
+    fn task_target() -> &'static str {
+        "UpdateItemCategory"
+    }
+    fn description() -> &'static str {
+        concat!("Create a new UpdateItemCategory.",)
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        true
     }
 }
-#[function_component(NewItemCategoryForm)]
-pub fn new_item_category_form() -> Html {
-    let (builder_store, builder_dispatch) = use_store::<NestedNewItemCategoryBuilder>();
-    let set_name = builder_dispatch.apply_callback(|name: Option<String>| NestedNewItemCategoryBuilderActions::SetName(name));
-    let set_description = builder_dispatch.apply_callback(|description: Option<String>| NestedNewItemCategoryBuilderActions::SetDescription(description));
+
+#[function_component(CreateItemCategoryForm)]
+pub fn create_item_category_form() -> Html {
+    let (builder_store, builder_dispatch) = use_store::<ItemCategoryBuilder>();
+    let set_name =
+        builder_dispatch.apply_callback(|name: Option<String>| ItemCategoryActions::SetName(name));
+    let set_description = builder_dispatch.apply_callback(|description: Option<String>| {
+        ItemCategoryActions::SetDescription(description)
+    });
     html! {
-        <BasicForm<NewItemCategory> builder={builder_store.deref().clone()}>
+        <BasicForm<NewItemCategory> method={FormMethod::POST} builder={builder_store.deref().clone()}>
             <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
             <BasicInput label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} input_type={InputType::Text} />
         </BasicForm<NewItemCategory>>
     }
 }
-#[derive(Store, Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
+#[derive(Clone, PartialEq, Properties)]
+pub struct UpdateItemCategoryFormProp {
+    pub id: i32,
+}
+
+#[function_component(UpdateItemCategoryForm)]
+pub fn update_item_category_form(props: &UpdateItemCategoryFormProp) -> Html {
+    let (builder_store, builder_dispatch) = use_store::<ItemCategoryBuilder>();
+    let set_name =
+        builder_dispatch.apply_callback(|name: Option<String>| ItemCategoryActions::SetName(name));
+    let set_description = builder_dispatch.apply_callback(|description: Option<String>| {
+        ItemCategoryActions::SetDescription(description)
+    });
+    html! {
+        <BasicForm<UpdateItemCategory> method={FormMethod::PUT} builder={builder_store.deref().clone()}>
+            <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
+            <BasicInput label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} input_type={InputType::Text} />
+        </BasicForm<UpdateItemCategory>>
+    }
+}
+#[derive(Store, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[store(storage = "session")]
-pub struct NestedNewProcedureBuilder {
+pub struct ProcedureBuilder {
+    pub id: Option<i32>,
     pub name: Option<String>,
     pub description: Option<String>,
     pub errors_name: Vec<ApiError>,
@@ -444,41 +740,64 @@ pub struct NestedNewProcedureBuilder {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub(super) enum NestedNewProcedureBuilderActions {
+pub(super) enum ProcedureActions {
     SetName(Option<String>),
     SetDescription(Option<String>),
 }
 
-impl FormBuilder for NestedNewProcedureBuilder {
-    type Data = NewProcedure;
-    type Actions = NestedNewProcedureBuilderActions;
+impl Reducer<ProcedureBuilder> for ProcedureActions {
+    fn apply(self, mut state: std::rc::Rc<ProcedureBuilder>) -> std::rc::Rc<ProcedureBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            ProcedureActions::SetName(name) => {
+                state_mut.errors_name.clear();
+                if name.is_none() {
+                    state_mut.errors_name.push(ApiError::BadRequest(vec![
+                        "The Name field is required.".to_string(),
+                    ]));
+                }
+                state_mut.name = name;
+            }
+            ProcedureActions::SetDescription(description) => {
+                state_mut.errors_description.clear();
+                state_mut.description = description;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for ProcedureBuilder {
+    type Actions = ProcedureActions;
 
     fn has_errors(&self) -> bool {
-!self.errors_name.is_empty() || !self.errors_description.is_empty()
+        !self.errors_name.is_empty() || !self.errors_description.is_empty()
     }
 
     fn can_submit(&self) -> bool {
-        !self.has_errors()
-        && self.name.is_some()
+        !self.has_errors() && self.name.is_some()
     }
-
-    fn form_level_errors(&self) -> Vec<String> {
-        vec![]
-    }
-
 }
-impl From<NestedNewProcedureBuilder> for NewProcedure {
-    fn from(builder: NestedNewProcedureBuilder) -> Self {
+
+impl From<ProcedureBuilder> for NewProcedure {
+    fn from(builder: ProcedureBuilder) -> Self {
         Self {
             name: builder.name.unwrap(),
             description: builder.description,
         }
     }
 }
+impl From<ProcedureBuilder> for UpdateProcedure {
+    fn from(builder: ProcedureBuilder) -> Self {
+        Self {
+            id: builder.id.unwrap(),
+            name: builder.name.unwrap(),
+            description: builder.description,
+        }
+    }
+}
 impl FormBuildable for NewProcedure {
-    type Builder = NestedNewProcedureBuilder;
+    type Builder = ProcedureBuilder;
     const TABLE: Table = Table::Procedures;
-    const METHOD: FormMethod = FormMethod::POST;
     fn title() -> &'static str {
         "NewProcedure"
     }
@@ -495,80 +814,148 @@ impl FormBuildable for NewProcedure {
         false
     }
 }
-impl Reducer<NestedNewProcedureBuilder> for NestedNewProcedureBuilderActions {
-    fn apply(self, mut state: std::rc::Rc<NestedNewProcedureBuilder>) -> std::rc::Rc<NestedNewProcedureBuilder> {
-        let state_mut = Rc::make_mut(&mut state);
-        match self {
-            NestedNewProcedureBuilderActions::SetName(name) => {
-        if name.is_none() {
-            state_mut.errors_name.push(ApiError::BadRequest(vec![
-                "The Name field is required.".to_string()
-             ]));
-        }
-                state_mut.name = name;
-            }
-            NestedNewProcedureBuilderActions::SetDescription(description) => {
-                state_mut.description = description;
-            }
-        }
-        state
+
+impl FormBuildable for UpdateProcedure {
+    type Builder = ProcedureBuilder;
+    const TABLE: Table = Table::Procedures;
+    fn title() -> &'static str {
+        "UpdateProcedure"
+    }
+    fn task_target() -> &'static str {
+        "UpdateProcedure"
+    }
+    fn description() -> &'static str {
+        concat!("Create a new UpdateProcedure.",)
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        true
     }
 }
-#[function_component(NewProcedureForm)]
-pub fn new_procedure_form() -> Html {
-    let (builder_store, builder_dispatch) = use_store::<NestedNewProcedureBuilder>();
-    let set_name = builder_dispatch.apply_callback(|name: Option<String>| NestedNewProcedureBuilderActions::SetName(name));
-    let set_description = builder_dispatch.apply_callback(|description: Option<String>| NestedNewProcedureBuilderActions::SetDescription(description));
+
+#[function_component(CreateProcedureForm)]
+pub fn create_procedure_form() -> Html {
+    let (builder_store, builder_dispatch) = use_store::<ProcedureBuilder>();
+    let set_name =
+        builder_dispatch.apply_callback(|name: Option<String>| ProcedureActions::SetName(name));
+    let set_description = builder_dispatch.apply_callback(|description: Option<String>| {
+        ProcedureActions::SetDescription(description)
+    });
     html! {
-        <BasicForm<NewProcedure> builder={builder_store.deref().clone()}>
+        <BasicForm<NewProcedure> method={FormMethod::POST} builder={builder_store.deref().clone()}>
             <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
             <BasicInput label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} input_type={InputType::Text} />
         </BasicForm<NewProcedure>>
     }
 }
-#[derive(Store, Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
+#[derive(Clone, PartialEq, Properties)]
+pub struct UpdateProcedureFormProp {
+    pub id: i32,
+}
+
+#[function_component(UpdateProcedureForm)]
+pub fn update_procedure_form(props: &UpdateProcedureFormProp) -> Html {
+    let (builder_store, builder_dispatch) = use_store::<ProcedureBuilder>();
+    let set_name =
+        builder_dispatch.apply_callback(|name: Option<String>| ProcedureActions::SetName(name));
+    let set_description = builder_dispatch.apply_callback(|description: Option<String>| {
+        ProcedureActions::SetDescription(description)
+    });
+    html! {
+        <BasicForm<UpdateProcedure> method={FormMethod::PUT} builder={builder_store.deref().clone()}>
+            <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
+            <BasicInput label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} input_type={InputType::Text} />
+        </BasicForm<UpdateProcedure>>
+    }
+}
+#[derive(Store, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[store(storage = "session")]
-pub struct NestedNewProjectRequirementBuilder {
+pub struct ProjectRequirementBuilder {
+    pub id: Option<i32>,
+    pub quantity: Option<i32>,
     pub project: Option<NestedProject>,
     pub item_category: Option<NestedItemCategory>,
     pub unit: Option<Unit>,
-    pub quantity: Option<i32>,
+    pub errors_quantity: Vec<ApiError>,
     pub errors_project: Vec<ApiError>,
     pub errors_item_category: Vec<ApiError>,
     pub errors_unit: Vec<ApiError>,
-    pub errors_quantity: Vec<ApiError>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub(super) enum NestedNewProjectRequirementBuilderActions {
+pub(super) enum ProjectRequirementActions {
+    SetQuantity(Option<i32>),
     SetProject(Option<NestedProject>),
     SetItemCategory(Option<NestedItemCategory>),
     SetUnit(Option<Unit>),
-    SetQuantity(Option<i32>),
 }
 
-impl FormBuilder for NestedNewProjectRequirementBuilder {
-    type Data = NewProjectRequirement;
-    type Actions = NestedNewProjectRequirementBuilderActions;
+impl Reducer<ProjectRequirementBuilder> for ProjectRequirementActions {
+    fn apply(
+        self,
+        mut state: std::rc::Rc<ProjectRequirementBuilder>,
+    ) -> std::rc::Rc<ProjectRequirementBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            ProjectRequirementActions::SetQuantity(quantity) => {
+                state_mut.errors_quantity.clear();
+                if quantity.is_none() {
+                    state_mut.errors_quantity.push(ApiError::BadRequest(vec![
+                        "The Quantity field is required.".to_string(),
+                    ]));
+                }
+                state_mut.quantity = quantity;
+            }
+            ProjectRequirementActions::SetProject(project) => {
+                state_mut.errors_project.clear();
+                if project.is_none() {
+                    state_mut.errors_project.push(ApiError::BadRequest(vec![
+                        "The Project field is required.".to_string(),
+                    ]));
+                }
+                state_mut.project = project;
+            }
+            ProjectRequirementActions::SetItemCategory(item_category) => {
+                state_mut.errors_item_category.clear();
+                if item_category.is_none() {
+                    state_mut
+                        .errors_item_category
+                        .push(ApiError::BadRequest(vec![
+                            "The ItemCategory field is required.".to_string(),
+                        ]));
+                }
+                state_mut.item_category = item_category;
+            }
+            ProjectRequirementActions::SetUnit(unit) => {
+                state_mut.errors_unit.clear();
+                state_mut.unit = unit;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for ProjectRequirementBuilder {
+    type Actions = ProjectRequirementActions;
 
     fn has_errors(&self) -> bool {
-!self.errors_project.is_empty() || !self.errors_item_category.is_empty() || !self.errors_unit.is_empty() || !self.errors_quantity.is_empty()
+        !self.errors_quantity.is_empty()
+            || !self.errors_project.is_empty()
+            || !self.errors_item_category.is_empty()
+            || !self.errors_unit.is_empty()
     }
 
     fn can_submit(&self) -> bool {
         !self.has_errors()
-        && self.project.is_some()
-        && self.item_category.is_some()
-        && self.quantity.is_some()
+            && self.quantity.is_some()
+            && self.project.is_some()
+            && self.item_category.is_some()
     }
-
-    fn form_level_errors(&self) -> Vec<String> {
-        vec![]
-    }
-
 }
-impl From<NestedNewProjectRequirementBuilder> for NewProjectRequirement {
-    fn from(builder: NestedNewProjectRequirementBuilder) -> Self {
+
+impl From<ProjectRequirementBuilder> for NewProjectRequirement {
+    fn from(builder: ProjectRequirementBuilder) -> Self {
         Self {
             project_id: builder.project.unwrap().inner.id,
             item_category_id: builder.item_category.unwrap().inner.id,
@@ -577,10 +964,20 @@ impl From<NestedNewProjectRequirementBuilder> for NewProjectRequirement {
         }
     }
 }
+impl From<ProjectRequirementBuilder> for UpdateProjectRequirement {
+    fn from(builder: ProjectRequirementBuilder) -> Self {
+        Self {
+            id: builder.id.unwrap(),
+            project_id: builder.project.unwrap().inner.id,
+            item_category_id: builder.item_category.unwrap().inner.id,
+            quantity: builder.quantity.unwrap(),
+            unit_id: builder.unit.map(|unit| unit.id),
+        }
+    }
+}
 impl FormBuildable for NewProjectRequirement {
-    type Builder = NestedNewProjectRequirementBuilder;
+    type Builder = ProjectRequirementBuilder;
     const TABLE: Table = Table::ProjectRequirements;
-    const METHOD: FormMethod = FormMethod::POST;
     fn title() -> &'static str {
         "NewProjectRequirement"
     }
@@ -597,61 +994,80 @@ impl FormBuildable for NewProjectRequirement {
         false
     }
 }
-impl Reducer<NestedNewProjectRequirementBuilder> for NestedNewProjectRequirementBuilderActions {
-    fn apply(self, mut state: std::rc::Rc<NestedNewProjectRequirementBuilder>) -> std::rc::Rc<NestedNewProjectRequirementBuilder> {
-        let state_mut = Rc::make_mut(&mut state);
-        match self {
-            NestedNewProjectRequirementBuilderActions::SetProject(project) => {
-        if project.is_none() {
-            state_mut.errors_project.push(ApiError::BadRequest(vec![
-                "The Project field is required.".to_string()
-             ]));
-        }
-                state_mut.project = project;
-            }
-            NestedNewProjectRequirementBuilderActions::SetItemCategory(item_category) => {
-        if item_category.is_none() {
-            state_mut.errors_item_category.push(ApiError::BadRequest(vec![
-                "The ItemCategory field is required.".to_string()
-             ]));
-        }
-                state_mut.item_category = item_category;
-            }
-            NestedNewProjectRequirementBuilderActions::SetUnit(unit) => {
-                state_mut.unit = unit;
-            }
-            NestedNewProjectRequirementBuilderActions::SetQuantity(quantity) => {
-        if quantity.is_none() {
-            state_mut.errors_quantity.push(ApiError::BadRequest(vec![
-                "The Quantity field is required.".to_string()
-             ]));
-        }
-                state_mut.quantity = quantity;
-            }
-        }
-        state
+
+impl FormBuildable for UpdateProjectRequirement {
+    type Builder = ProjectRequirementBuilder;
+    const TABLE: Table = Table::ProjectRequirements;
+    fn title() -> &'static str {
+        "UpdateProjectRequirement"
+    }
+    fn task_target() -> &'static str {
+        "UpdateProjectRequirement"
+    }
+    fn description() -> &'static str {
+        concat!("Create a new UpdateProjectRequirement.",)
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        true
     }
 }
-#[function_component(NewProjectRequirementForm)]
-pub fn new_project_requirement_form() -> Html {
-    let (builder_store, builder_dispatch) = use_store::<NestedNewProjectRequirementBuilder>();
-    let set_project = builder_dispatch.apply_callback(|project: Option<NestedProject>| NestedNewProjectRequirementBuilderActions::SetProject(project));
-    let set_item_category = builder_dispatch.apply_callback(|item_category: Option<NestedItemCategory>| NestedNewProjectRequirementBuilderActions::SetItemCategory(item_category));
-    let set_unit = builder_dispatch.apply_callback(|unit: Option<Unit>| NestedNewProjectRequirementBuilderActions::SetUnit(unit));
-    let set_quantity = builder_dispatch.apply_callback(|quantity: Option<i32>| NestedNewProjectRequirementBuilderActions::SetQuantity(quantity));
+
+#[function_component(CreateProjectRequirementForm)]
+pub fn create_project_requirement_form() -> Html {
+    let (builder_store, builder_dispatch) = use_store::<ProjectRequirementBuilder>();
+    let set_quantity = builder_dispatch
+        .apply_callback(|quantity: Option<i32>| ProjectRequirementActions::SetQuantity(quantity));
+    let set_project = builder_dispatch.apply_callback(|project: Option<NestedProject>| {
+        ProjectRequirementActions::SetProject(project)
+    });
+    let set_item_category =
+        builder_dispatch.apply_callback(|item_category: Option<NestedItemCategory>| {
+            ProjectRequirementActions::SetItemCategory(item_category)
+        });
+    let set_unit = builder_dispatch
+        .apply_callback(|unit: Option<Unit>| ProjectRequirementActions::SetUnit(unit));
     html! {
-        <BasicForm<NewProjectRequirement> builder={builder_store.deref().clone()}>
+        <BasicForm<NewProjectRequirement> method={FormMethod::POST} builder={builder_store.deref().clone()}>
             <Datalist<NestedProject> builder={set_project} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" />
             <Datalist<NestedItemCategory> builder={set_item_category} errors={builder_store.errors_item_category.clone()} value={builder_store.item_category.clone()} label="ItemCategory" />
             <Datalist<Unit> builder={set_unit} errors={builder_store.errors_unit.clone()} value={builder_store.unit.clone()} label="Unit" />
         </BasicForm<NewProjectRequirement>>
     }
 }
-#[derive(Store, Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
+#[derive(Clone, PartialEq, Properties)]
+pub struct UpdateProjectRequirementFormProp {
+    pub id: i32,
+}
+
+#[function_component(UpdateProjectRequirementForm)]
+pub fn update_project_requirement_form(props: &UpdateProjectRequirementFormProp) -> Html {
+    let (builder_store, builder_dispatch) = use_store::<ProjectRequirementBuilder>();
+    let set_quantity = builder_dispatch
+        .apply_callback(|quantity: Option<i32>| ProjectRequirementActions::SetQuantity(quantity));
+    let set_project = builder_dispatch.apply_callback(|project: Option<NestedProject>| {
+        ProjectRequirementActions::SetProject(project)
+    });
+    let set_item_category =
+        builder_dispatch.apply_callback(|item_category: Option<NestedItemCategory>| {
+            ProjectRequirementActions::SetItemCategory(item_category)
+        });
+    let set_unit = builder_dispatch
+        .apply_callback(|unit: Option<Unit>| ProjectRequirementActions::SetUnit(unit));
+    html! {
+        <BasicForm<UpdateProjectRequirement> method={FormMethod::PUT} builder={builder_store.deref().clone()}>
+            <Datalist<NestedProject> builder={set_project} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" />
+            <Datalist<NestedItemCategory> builder={set_item_category} errors={builder_store.errors_item_category.clone()} value={builder_store.item_category.clone()} label="ItemCategory" />
+            <Datalist<Unit> builder={set_unit} errors={builder_store.errors_unit.clone()} value={builder_store.unit.clone()} label="Unit" />
+        </BasicForm<UpdateProjectRequirement>>
+    }
+}
+#[derive(Store, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[store(storage = "session")]
-pub struct NestedNewProjectBuilder {
-    pub state: Option<NestedProjectState>,
-    pub parent_project: Option<NestedProject>,
+pub struct ProjectBuilder {
+    pub id: Option<i32>,
     pub name: Option<String>,
     pub description: Option<String>,
     pub public: Option<bool>,
@@ -659,8 +1075,8 @@ pub struct NestedNewProjectBuilder {
     pub expenses: Option<i64>,
     pub expected_end_date: Option<NaiveDateTime>,
     pub end_date: Option<NaiveDateTime>,
-    pub errors_state: Vec<ApiError>,
-    pub errors_parent_project: Vec<ApiError>,
+    pub state: Option<NestedProjectState>,
+    pub parent_project: Option<NestedProject>,
     pub errors_name: Vec<ApiError>,
     pub errors_description: Vec<ApiError>,
     pub errors_public: Vec<ApiError>,
@@ -668,12 +1084,12 @@ pub struct NestedNewProjectBuilder {
     pub errors_expenses: Vec<ApiError>,
     pub errors_expected_end_date: Vec<ApiError>,
     pub errors_end_date: Vec<ApiError>,
+    pub errors_state: Vec<ApiError>,
+    pub errors_parent_project: Vec<ApiError>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub(super) enum NestedNewProjectBuilderActions {
-    SetState(Option<NestedProjectState>),
-    SetParentProject(Option<NestedProject>),
+pub(super) enum ProjectActions {
     SetName(Option<String>),
     SetDescription(Option<String>),
     SetPublic(Option<bool>),
@@ -681,37 +1097,126 @@ pub(super) enum NestedNewProjectBuilderActions {
     SetExpenses(Option<i64>),
     SetExpectedEndDate(Option<NaiveDateTime>),
     SetEndDate(Option<NaiveDateTime>),
+    SetState(Option<NestedProjectState>),
+    SetParentProject(Option<NestedProject>),
 }
 
-impl FormBuilder for NestedNewProjectBuilder {
-    type Data = NewProject;
-    type Actions = NestedNewProjectBuilderActions;
+impl Reducer<ProjectBuilder> for ProjectActions {
+    fn apply(self, mut state: std::rc::Rc<ProjectBuilder>) -> std::rc::Rc<ProjectBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            ProjectActions::SetName(name) => {
+                state_mut.errors_name.clear();
+                if name.is_none() {
+                    state_mut.errors_name.push(ApiError::BadRequest(vec![
+                        "The Name field is required.".to_string(),
+                    ]));
+                }
+                state_mut.name = name;
+            }
+            ProjectActions::SetDescription(description) => {
+                state_mut.errors_description.clear();
+                if description.is_none() {
+                    state_mut.errors_description.push(ApiError::BadRequest(vec![
+                        "The Description field is required.".to_string(),
+                    ]));
+                }
+                state_mut.description = description;
+            }
+            ProjectActions::SetPublic(public) => {
+                state_mut.errors_public.clear();
+                if public.is_none() {
+                    state_mut.errors_public.push(ApiError::BadRequest(vec![
+                        "The Public field is required.".to_string(),
+                    ]));
+                }
+                state_mut.public = public;
+            }
+            ProjectActions::SetBudget(budget) => {
+                state_mut.errors_budget.clear();
+                state_mut.budget = budget;
+            }
+            ProjectActions::SetExpenses(expenses) => {
+                state_mut.errors_expenses.clear();
+                state_mut.expenses = expenses;
+            }
+            ProjectActions::SetExpectedEndDate(expected_end_date) => {
+                state_mut.errors_expected_end_date.clear();
+                state_mut.expected_end_date = expected_end_date;
+            }
+            ProjectActions::SetEndDate(end_date) => {
+                state_mut.errors_end_date.clear();
+                state_mut.end_date = end_date;
+            }
+            ProjectActions::SetState(state) => {
+                state_mut.errors_state.clear();
+                if state.is_none() {
+                    state_mut.errors_state.push(ApiError::BadRequest(vec![
+                        "The State field is required.".to_string(),
+                    ]));
+                }
+                state_mut.state = state;
+            }
+            ProjectActions::SetParentProject(parent_project) => {
+                state_mut.errors_parent_project.clear();
+                state_mut.parent_project = parent_project;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for ProjectBuilder {
+    type Actions = ProjectActions;
 
     fn has_errors(&self) -> bool {
-!self.errors_state.is_empty() || !self.errors_parent_project.is_empty() || !self.errors_name.is_empty() || !self.errors_description.is_empty() || !self.errors_public.is_empty() || !self.errors_budget.is_empty() || !self.errors_expenses.is_empty() || !self.errors_expected_end_date.is_empty() || !self.errors_end_date.is_empty()
+        !self.errors_name.is_empty()
+            || !self.errors_description.is_empty()
+            || !self.errors_public.is_empty()
+            || !self.errors_budget.is_empty()
+            || !self.errors_expenses.is_empty()
+            || !self.errors_expected_end_date.is_empty()
+            || !self.errors_end_date.is_empty()
+            || !self.errors_state.is_empty()
+            || !self.errors_parent_project.is_empty()
     }
 
     fn can_submit(&self) -> bool {
         !self.has_errors()
-        && self.state.is_some()
-        && self.name.is_some()
-        && self.description.is_some()
-        && self.public.is_some()
+            && self.name.is_some()
+            && self.description.is_some()
+            && self.public.is_some()
+            && self.state.is_some()
     }
-
-    fn form_level_errors(&self) -> Vec<String> {
-        vec![]
-    }
-
 }
-impl From<NestedNewProjectBuilder> for NewProject {
-    fn from(builder: NestedNewProjectBuilder) -> Self {
+
+impl From<ProjectBuilder> for NewProject {
+    fn from(builder: ProjectBuilder) -> Self {
         Self {
             name: builder.name.unwrap(),
             description: builder.description.unwrap(),
             public: builder.public.unwrap(),
             state_id: builder.state.unwrap().inner.id,
-            parent_project_id: builder.parent_project.map(|parent_project| parent_project.inner.id),
+            parent_project_id: builder
+                .parent_project
+                .map(|parent_project| parent_project.inner.id),
+            budget: builder.budget,
+            expenses: builder.expenses,
+            expected_end_date: builder.expected_end_date,
+            end_date: builder.end_date,
+        }
+    }
+}
+impl From<ProjectBuilder> for UpdateProject {
+    fn from(builder: ProjectBuilder) -> Self {
+        Self {
+            id: builder.id.unwrap(),
+            name: builder.name.unwrap(),
+            description: builder.description.unwrap(),
+            public: builder.public.unwrap(),
+            state_id: builder.state.unwrap().inner.id,
+            parent_project_id: builder
+                .parent_project
+                .map(|parent_project| parent_project.inner.id),
             budget: builder.budget,
             expenses: builder.expenses,
             expected_end_date: builder.expected_end_date,
@@ -720,9 +1225,8 @@ impl From<NestedNewProjectBuilder> for NewProject {
     }
 }
 impl FormBuildable for NewProject {
-    type Builder = NestedNewProjectBuilder;
+    type Builder = ProjectBuilder;
     const TABLE: Table = Table::Projects;
-    const METHOD: FormMethod = FormMethod::POST;
     fn title() -> &'static str {
         "NewProject"
     }
@@ -739,86 +1243,220 @@ impl FormBuildable for NewProject {
         false
     }
 }
-impl Reducer<NestedNewProjectBuilder> for NestedNewProjectBuilderActions {
-    fn apply(self, mut state: std::rc::Rc<NestedNewProjectBuilder>) -> std::rc::Rc<NestedNewProjectBuilder> {
+
+impl FormBuildable for UpdateProject {
+    type Builder = ProjectBuilder;
+    const TABLE: Table = Table::Projects;
+    fn title() -> &'static str {
+        "UpdateProject"
+    }
+    fn task_target() -> &'static str {
+        "UpdateProject"
+    }
+    fn description() -> &'static str {
+        concat!("Create a new UpdateProject.",)
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        true
+    }
+}
+
+#[function_component(CreateProjectForm)]
+pub fn create_project_form() -> Html {
+    let (builder_store, builder_dispatch) = use_store::<ProjectBuilder>();
+    let set_name =
+        builder_dispatch.apply_callback(|name: Option<String>| ProjectActions::SetName(name));
+    let set_description = builder_dispatch
+        .apply_callback(|description: Option<String>| ProjectActions::SetDescription(description));
+    let set_public =
+        builder_dispatch.apply_callback(|public: bool| ProjectActions::SetPublic(Some(public)));
+    let set_budget =
+        builder_dispatch.apply_callback(|budget: Option<i64>| ProjectActions::SetBudget(budget));
+    let set_expenses = builder_dispatch
+        .apply_callback(|expenses: Option<i64>| ProjectActions::SetExpenses(expenses));
+    let set_expected_end_date =
+        builder_dispatch.apply_callback(|expected_end_date: Option<NaiveDateTime>| {
+            ProjectActions::SetExpectedEndDate(expected_end_date)
+        });
+    let set_end_date = builder_dispatch
+        .apply_callback(|end_date: Option<NaiveDateTime>| ProjectActions::SetEndDate(end_date));
+    let set_state = builder_dispatch
+        .apply_callback(|state: Option<NestedProjectState>| ProjectActions::SetState(state));
+    let set_parent_project =
+        builder_dispatch.apply_callback(|parent_project: Option<NestedProject>| {
+            ProjectActions::SetParentProject(parent_project)
+        });
+    html! {
+        <BasicForm<NewProject> method={FormMethod::POST} builder={builder_store.deref().clone()}>
+            <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
+            <BasicInput label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} input_type={InputType::Text} />
+            <Checkbox label="Public" errors={builder_store.errors_public.clone()} builder={set_public} value={builder_store.public.unwrap_or(false)} />
+            <Datalist<NestedProjectState> builder={set_state} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" />
+            <Datalist<NestedProject> builder={set_parent_project} errors={builder_store.errors_parent_project.clone()} value={builder_store.parent_project.clone()} label="ParentProject" />
+        </BasicForm<NewProject>>
+    }
+}
+#[derive(Clone, PartialEq, Properties)]
+pub struct UpdateProjectFormProp {
+    pub id: i32,
+}
+
+#[function_component(UpdateProjectForm)]
+pub fn update_project_form(props: &UpdateProjectFormProp) -> Html {
+    let (builder_store, builder_dispatch) = use_store::<ProjectBuilder>();
+    let set_name =
+        builder_dispatch.apply_callback(|name: Option<String>| ProjectActions::SetName(name));
+    let set_description = builder_dispatch
+        .apply_callback(|description: Option<String>| ProjectActions::SetDescription(description));
+    let set_public =
+        builder_dispatch.apply_callback(|public: bool| ProjectActions::SetPublic(Some(public)));
+    let set_budget =
+        builder_dispatch.apply_callback(|budget: Option<i64>| ProjectActions::SetBudget(budget));
+    let set_expenses = builder_dispatch
+        .apply_callback(|expenses: Option<i64>| ProjectActions::SetExpenses(expenses));
+    let set_expected_end_date =
+        builder_dispatch.apply_callback(|expected_end_date: Option<NaiveDateTime>| {
+            ProjectActions::SetExpectedEndDate(expected_end_date)
+        });
+    let set_end_date = builder_dispatch
+        .apply_callback(|end_date: Option<NaiveDateTime>| ProjectActions::SetEndDate(end_date));
+    let set_state = builder_dispatch
+        .apply_callback(|state: Option<NestedProjectState>| ProjectActions::SetState(state));
+    let set_parent_project =
+        builder_dispatch.apply_callback(|parent_project: Option<NestedProject>| {
+            ProjectActions::SetParentProject(parent_project)
+        });
+    html! {
+        <BasicForm<UpdateProject> method={FormMethod::PUT} builder={builder_store.deref().clone()}>
+            <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
+            <BasicInput label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} input_type={InputType::Text} />
+            <Checkbox label="Public" errors={builder_store.errors_public.clone()} builder={set_public} value={builder_store.public.unwrap_or(false)} />
+            <Datalist<NestedProjectState> builder={set_state} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" />
+            <Datalist<NestedProject> builder={set_parent_project} errors={builder_store.errors_parent_project.clone()} value={builder_store.parent_project.clone()} label="ParentProject" />
+        </BasicForm<UpdateProject>>
+    }
+}
+#[derive(Store, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[store(storage = "session")]
+pub struct SampledIndividualBuilder {
+    pub id: Option<Uuid>,
+    pub name: Option<String>,
+    pub tagged: Option<bool>,
+    pub errors_name: Vec<ApiError>,
+    pub errors_tagged: Vec<ApiError>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub(super) enum SampledIndividualActions {
+    SetName(Option<String>),
+    SetTagged(Option<bool>),
+}
+
+impl Reducer<SampledIndividualBuilder> for SampledIndividualActions {
+    fn apply(
+        self,
+        mut state: std::rc::Rc<SampledIndividualBuilder>,
+    ) -> std::rc::Rc<SampledIndividualBuilder> {
         let state_mut = Rc::make_mut(&mut state);
         match self {
-            NestedNewProjectBuilderActions::SetState(state) => {
-        if state.is_none() {
-            state_mut.errors_state.push(ApiError::BadRequest(vec![
-                "The State field is required.".to_string()
-             ]));
-        }
-                state_mut.state = state;
-            }
-            NestedNewProjectBuilderActions::SetParentProject(parent_project) => {
-                state_mut.parent_project = parent_project;
-            }
-            NestedNewProjectBuilderActions::SetName(name) => {
-        if name.is_none() {
-            state_mut.errors_name.push(ApiError::BadRequest(vec![
-                "The Name field is required.".to_string()
-             ]));
-        }
+            SampledIndividualActions::SetName(name) => {
+                state_mut.errors_name.clear();
                 state_mut.name = name;
             }
-            NestedNewProjectBuilderActions::SetDescription(description) => {
-        if description.is_none() {
-            state_mut.errors_description.push(ApiError::BadRequest(vec![
-                "The Description field is required.".to_string()
-             ]));
-        }
-                state_mut.description = description;
-            }
-            NestedNewProjectBuilderActions::SetPublic(public) => {
-        if public.is_none() {
-            state_mut.errors_public.push(ApiError::BadRequest(vec![
-                "The Public field is required.".to_string()
-             ]));
-        }
-                state_mut.public = public;
-            }
-            NestedNewProjectBuilderActions::SetBudget(budget) => {
-                state_mut.budget = budget;
-            }
-            NestedNewProjectBuilderActions::SetExpenses(expenses) => {
-                state_mut.expenses = expenses;
-            }
-            NestedNewProjectBuilderActions::SetExpectedEndDate(expected_end_date) => {
-                state_mut.expected_end_date = expected_end_date;
-            }
-            NestedNewProjectBuilderActions::SetEndDate(end_date) => {
-                state_mut.end_date = end_date;
+            SampledIndividualActions::SetTagged(tagged) => {
+                state_mut.errors_tagged.clear();
+                if tagged.is_none() {
+                    state_mut.errors_tagged.push(ApiError::BadRequest(vec![
+                        "The Tagged field is required.".to_string(),
+                    ]));
+                }
+                state_mut.tagged = tagged;
             }
         }
         state
     }
 }
-#[function_component(NewProjectForm)]
-pub fn new_project_form() -> Html {
-    let (builder_store, builder_dispatch) = use_store::<NestedNewProjectBuilder>();
-    let set_state = builder_dispatch.apply_callback(|state: Option<NestedProjectState>| NestedNewProjectBuilderActions::SetState(state));
-    let set_parent_project = builder_dispatch.apply_callback(|parent_project: Option<NestedProject>| NestedNewProjectBuilderActions::SetParentProject(parent_project));
-    let set_name = builder_dispatch.apply_callback(|name: Option<String>| NestedNewProjectBuilderActions::SetName(name));
-    let set_description = builder_dispatch.apply_callback(|description: Option<String>| NestedNewProjectBuilderActions::SetDescription(description));
-    let set_public = builder_dispatch.apply_callback(|public: bool| NestedNewProjectBuilderActions::SetPublic(Some(public)));
-    let set_budget = builder_dispatch.apply_callback(|budget: Option<i64>| NestedNewProjectBuilderActions::SetBudget(budget));
-    let set_expenses = builder_dispatch.apply_callback(|expenses: Option<i64>| NestedNewProjectBuilderActions::SetExpenses(expenses));
-    let set_expected_end_date = builder_dispatch.apply_callback(|expected_end_date: Option<NaiveDateTime>| NestedNewProjectBuilderActions::SetExpectedEndDate(expected_end_date));
-    let set_end_date = builder_dispatch.apply_callback(|end_date: Option<NaiveDateTime>| NestedNewProjectBuilderActions::SetEndDate(end_date));
-    html! {
-        <BasicForm<NewProject> builder={builder_store.deref().clone()}>
-            <Datalist<NestedProjectState> builder={set_state} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" />
-            <Datalist<NestedProject> builder={set_parent_project} errors={builder_store.errors_parent_project.clone()} value={builder_store.parent_project.clone()} label="ParentProject" />
-            <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
-            <BasicInput label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} input_type={InputType::Text} />
-            <Checkbox label="Public" errors={builder_store.errors_public.clone()} builder={set_public} value={builder_store.public.unwrap_or(false)} />
-        </BasicForm<NewProject>>
+impl FormBuilder for SampledIndividualBuilder {
+    type Actions = SampledIndividualActions;
+
+    fn has_errors(&self) -> bool {
+        !self.errors_name.is_empty() || !self.errors_tagged.is_empty()
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors() && self.tagged.is_some()
     }
 }
-#[derive(Store, Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
+
+impl From<SampledIndividualBuilder> for NewSampledIndividual {
+    fn from(builder: SampledIndividualBuilder) -> Self {
+        Self {
+            id: builder.id.unwrap_or_else(Uuid::new_v4),
+            name: builder.name,
+            tagged: builder.tagged.unwrap(),
+        }
+    }
+}
+impl FormBuildable for NewSampledIndividual {
+    type Builder = SampledIndividualBuilder;
+    const TABLE: Table = Table::SampledIndividuals;
+    fn title() -> &'static str {
+        "NewSampledIndividual"
+    }
+    fn task_target() -> &'static str {
+        "NewSampledIndividual"
+    }
+    fn description() -> &'static str {
+        concat!("Create a new NewSampledIndividual.",)
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        true
+    }
+}
+
+#[function_component(CreateSampledIndividualForm)]
+pub fn create_sampled_individual_form() -> Html {
+    let (builder_store, builder_dispatch) = use_store::<SampledIndividualBuilder>();
+    let set_name = builder_dispatch
+        .apply_callback(|name: Option<String>| SampledIndividualActions::SetName(name));
+    let set_tagged = builder_dispatch
+        .apply_callback(|tagged: bool| SampledIndividualActions::SetTagged(Some(tagged)));
+    html! {
+        <BasicForm<NewSampledIndividual> method={FormMethod::POST} builder={builder_store.deref().clone()}>
+            <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
+            <Checkbox label="Tagged" errors={builder_store.errors_tagged.clone()} builder={set_tagged} value={builder_store.tagged.unwrap_or(false)} />
+        </BasicForm<NewSampledIndividual>>
+    }
+}
+#[derive(Clone, PartialEq, Properties)]
+pub struct UpdateSampledIndividualFormProp {
+    pub id: Uuid,
+}
+
+#[function_component(UpdateSampledIndividualForm)]
+pub fn update_sampled_individual_form(props: &UpdateSampledIndividualFormProp) -> Html {
+    let (builder_store, builder_dispatch) = use_store::<SampledIndividualBuilder>();
+    let set_name = builder_dispatch
+        .apply_callback(|name: Option<String>| SampledIndividualActions::SetName(name));
+    let set_tagged = builder_dispatch
+        .apply_callback(|tagged: bool| SampledIndividualActions::SetTagged(Some(tagged)));
+    html! {
+        <BasicForm<NewSampledIndividual> method={FormMethod::PUT} builder={builder_store.deref().clone()}>
+            <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
+            <Checkbox label="Tagged" errors={builder_store.errors_tagged.clone()} builder={set_tagged} value={builder_store.tagged.unwrap_or(false)} />
+        </BasicForm<NewSampledIndividual>>
+    }
+}
+#[derive(Store, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[store(storage = "session")]
-pub struct NestedNewSampleBuilder {
+pub struct SampleBuilder {
+    pub id: Option<Uuid>,
     pub sampled_by: Option<User>,
     pub procedure: Option<NestedSamplingProcedure>,
     pub state: Option<NestedSampleState>,
@@ -828,36 +1466,68 @@ pub struct NestedNewSampleBuilder {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub(super) enum NestedNewSampleBuilderActions {
+pub(super) enum SampleActions {
     SetSampledBy(Option<User>),
     SetProcedure(Option<NestedSamplingProcedure>),
     SetState(Option<NestedSampleState>),
 }
 
-impl FormBuilder for NestedNewSampleBuilder {
-    type Data = NewSample;
-    type Actions = NestedNewSampleBuilderActions;
+impl Reducer<SampleBuilder> for SampleActions {
+    fn apply(self, mut state: std::rc::Rc<SampleBuilder>) -> std::rc::Rc<SampleBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            SampleActions::SetSampledBy(sampled_by) => {
+                state_mut.errors_sampled_by.clear();
+                if sampled_by.is_none() {
+                    state_mut.errors_sampled_by.push(ApiError::BadRequest(vec![
+                        "The SampledBy field is required.".to_string(),
+                    ]));
+                }
+                state_mut.sampled_by = sampled_by;
+            }
+            SampleActions::SetProcedure(procedure) => {
+                state_mut.errors_procedure.clear();
+                if procedure.is_none() {
+                    state_mut.errors_procedure.push(ApiError::BadRequest(vec![
+                        "The Procedure field is required.".to_string(),
+                    ]));
+                }
+                state_mut.procedure = procedure;
+            }
+            SampleActions::SetState(state) => {
+                state_mut.errors_state.clear();
+                if state.is_none() {
+                    state_mut.errors_state.push(ApiError::BadRequest(vec![
+                        "The State field is required.".to_string(),
+                    ]));
+                }
+                state_mut.state = state;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for SampleBuilder {
+    type Actions = SampleActions;
 
     fn has_errors(&self) -> bool {
-!self.errors_sampled_by.is_empty() || !self.errors_procedure.is_empty() || !self.errors_state.is_empty()
+        !self.errors_sampled_by.is_empty()
+            || !self.errors_procedure.is_empty()
+            || !self.errors_state.is_empty()
     }
 
     fn can_submit(&self) -> bool {
         !self.has_errors()
-        && self.sampled_by.is_some()
-        && self.procedure.is_some()
-        && self.state.is_some()
+            && self.sampled_by.is_some()
+            && self.procedure.is_some()
+            && self.state.is_some()
     }
-
-    fn form_level_errors(&self) -> Vec<String> {
-        vec![]
-    }
-
 }
-impl From<NestedNewSampleBuilder> for NewSample {
-    fn from(builder: NestedNewSampleBuilder) -> Self {
+
+impl From<SampleBuilder> for NewSample {
+    fn from(builder: SampleBuilder) -> Self {
         Self {
-            id: Uuid::new_v4(),
+            id: builder.id.unwrap_or_else(Uuid::new_v4),
             sampled_by: builder.sampled_by.unwrap().id,
             procedure_id: builder.procedure.unwrap().inner.id,
             state: builder.state.unwrap().inner.id,
@@ -865,9 +1535,8 @@ impl From<NestedNewSampleBuilder> for NewSample {
     }
 }
 impl FormBuildable for NewSample {
-    type Builder = NestedNewSampleBuilder;
+    type Builder = SampleBuilder;
     const TABLE: Table = Table::Samples;
-    const METHOD: FormMethod = FormMethod::POST;
     fn title() -> &'static str {
         "NewSample"
     }
@@ -884,55 +1553,54 @@ impl FormBuildable for NewSample {
         true
     }
 }
-impl Reducer<NestedNewSampleBuilder> for NestedNewSampleBuilderActions {
-    fn apply(self, mut state: std::rc::Rc<NestedNewSampleBuilder>) -> std::rc::Rc<NestedNewSampleBuilder> {
-        let state_mut = Rc::make_mut(&mut state);
-        match self {
-            NestedNewSampleBuilderActions::SetSampledBy(sampled_by) => {
-        if sampled_by.is_none() {
-            state_mut.errors_sampled_by.push(ApiError::BadRequest(vec![
-                "The SampledBy field is required.".to_string()
-             ]));
-        }
-                state_mut.sampled_by = sampled_by;
-            }
-            NestedNewSampleBuilderActions::SetProcedure(procedure) => {
-        if procedure.is_none() {
-            state_mut.errors_procedure.push(ApiError::BadRequest(vec![
-                "The Procedure field is required.".to_string()
-             ]));
-        }
-                state_mut.procedure = procedure;
-            }
-            NestedNewSampleBuilderActions::SetState(state) => {
-        if state.is_none() {
-            state_mut.errors_state.push(ApiError::BadRequest(vec![
-                "The State field is required.".to_string()
-             ]));
-        }
-                state_mut.state = state;
-            }
-        }
-        state
-    }
-}
-#[function_component(NewSampleForm)]
-pub fn new_sample_form() -> Html {
-    let (builder_store, builder_dispatch) = use_store::<NestedNewSampleBuilder>();
-    let set_sampled_by = builder_dispatch.apply_callback(|sampled_by: Option<User>| NestedNewSampleBuilderActions::SetSampledBy(sampled_by));
-    let set_procedure = builder_dispatch.apply_callback(|procedure: Option<NestedSamplingProcedure>| NestedNewSampleBuilderActions::SetProcedure(procedure));
-    let set_state = builder_dispatch.apply_callback(|state: Option<NestedSampleState>| NestedNewSampleBuilderActions::SetState(state));
+
+#[function_component(CreateSampleForm)]
+pub fn create_sample_form() -> Html {
+    let (builder_store, builder_dispatch) = use_store::<SampleBuilder>();
+    let set_sampled_by = builder_dispatch
+        .apply_callback(|sampled_by: Option<User>| SampleActions::SetSampledBy(sampled_by));
+    let set_procedure =
+        builder_dispatch.apply_callback(|procedure: Option<NestedSamplingProcedure>| {
+            SampleActions::SetProcedure(procedure)
+        });
+    let set_state = builder_dispatch
+        .apply_callback(|state: Option<NestedSampleState>| SampleActions::SetState(state));
     html! {
-        <BasicForm<NewSample> builder={builder_store.deref().clone()}>
+        <BasicForm<NewSample> method={FormMethod::POST} builder={builder_store.deref().clone()}>
             <Datalist<User> builder={set_sampled_by} errors={builder_store.errors_sampled_by.clone()} value={builder_store.sampled_by.clone()} label="SampledBy" />
             <Datalist<NestedSamplingProcedure> builder={set_procedure} errors={builder_store.errors_procedure.clone()} value={builder_store.procedure.clone()} label="Procedure" />
             <Datalist<NestedSampleState> builder={set_state} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" />
         </BasicForm<NewSample>>
     }
 }
-#[derive(Store, Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
+#[derive(Clone, PartialEq, Properties)]
+pub struct UpdateSampleFormProp {
+    pub id: Uuid,
+}
+
+#[function_component(UpdateSampleForm)]
+pub fn update_sample_form(props: &UpdateSampleFormProp) -> Html {
+    let (builder_store, builder_dispatch) = use_store::<SampleBuilder>();
+    let set_sampled_by = builder_dispatch
+        .apply_callback(|sampled_by: Option<User>| SampleActions::SetSampledBy(sampled_by));
+    let set_procedure =
+        builder_dispatch.apply_callback(|procedure: Option<NestedSamplingProcedure>| {
+            SampleActions::SetProcedure(procedure)
+        });
+    let set_state = builder_dispatch
+        .apply_callback(|state: Option<NestedSampleState>| SampleActions::SetState(state));
+    html! {
+        <BasicForm<NewSample> method={FormMethod::PUT} builder={builder_store.deref().clone()}>
+            <Datalist<User> builder={set_sampled_by} errors={builder_store.errors_sampled_by.clone()} value={builder_store.sampled_by.clone()} label="SampledBy" />
+            <Datalist<NestedSamplingProcedure> builder={set_procedure} errors={builder_store.errors_procedure.clone()} value={builder_store.procedure.clone()} label="Procedure" />
+            <Datalist<NestedSampleState> builder={set_state} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" />
+        </BasicForm<NewSample>>
+    }
+}
+#[derive(Store, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[store(storage = "session")]
-pub struct NestedNewSamplingProcedureBuilder {
+pub struct SamplingProcedureBuilder {
+    pub id: Option<Uuid>,
     pub name: Option<String>,
     pub description: Option<String>,
     pub errors_name: Vec<ApiError>,
@@ -940,42 +1608,59 @@ pub struct NestedNewSamplingProcedureBuilder {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub(super) enum NestedNewSamplingProcedureBuilderActions {
+pub(super) enum SamplingProcedureActions {
     SetName(Option<String>),
     SetDescription(Option<String>),
 }
 
-impl FormBuilder for NestedNewSamplingProcedureBuilder {
-    type Data = NewSamplingProcedure;
-    type Actions = NestedNewSamplingProcedureBuilderActions;
+impl Reducer<SamplingProcedureBuilder> for SamplingProcedureActions {
+    fn apply(
+        self,
+        mut state: std::rc::Rc<SamplingProcedureBuilder>,
+    ) -> std::rc::Rc<SamplingProcedureBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            SamplingProcedureActions::SetName(name) => {
+                state_mut.errors_name.clear();
+                if name.is_none() {
+                    state_mut.errors_name.push(ApiError::BadRequest(vec![
+                        "The Name field is required.".to_string(),
+                    ]));
+                }
+                state_mut.name = name;
+            }
+            SamplingProcedureActions::SetDescription(description) => {
+                state_mut.errors_description.clear();
+                state_mut.description = description;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for SamplingProcedureBuilder {
+    type Actions = SamplingProcedureActions;
 
     fn has_errors(&self) -> bool {
-!self.errors_name.is_empty() || !self.errors_description.is_empty()
+        !self.errors_name.is_empty() || !self.errors_description.is_empty()
     }
 
     fn can_submit(&self) -> bool {
-        !self.has_errors()
-        && self.name.is_some()
+        !self.has_errors() && self.name.is_some()
     }
-
-    fn form_level_errors(&self) -> Vec<String> {
-        vec![]
-    }
-
 }
-impl From<NestedNewSamplingProcedureBuilder> for NewSamplingProcedure {
-    fn from(builder: NestedNewSamplingProcedureBuilder) -> Self {
+
+impl From<SamplingProcedureBuilder> for NewSamplingProcedure {
+    fn from(builder: SamplingProcedureBuilder) -> Self {
         Self {
-            id: Uuid::new_v4(),
+            id: builder.id.unwrap_or_else(Uuid::new_v4),
             name: builder.name.unwrap(),
             description: builder.description,
         }
     }
 }
 impl FormBuildable for NewSamplingProcedure {
-    type Builder = NestedNewSamplingProcedureBuilder;
+    type Builder = SamplingProcedureBuilder;
     const TABLE: Table = Table::SamplingProcedures;
-    const METHOD: FormMethod = FormMethod::POST;
     fn title() -> &'static str {
         "NewSamplingProcedure"
     }
@@ -992,76 +1677,107 @@ impl FormBuildable for NewSamplingProcedure {
         true
     }
 }
-impl Reducer<NestedNewSamplingProcedureBuilder> for NestedNewSamplingProcedureBuilderActions {
-    fn apply(self, mut state: std::rc::Rc<NestedNewSamplingProcedureBuilder>) -> std::rc::Rc<NestedNewSamplingProcedureBuilder> {
-        let state_mut = Rc::make_mut(&mut state);
-        match self {
-            NestedNewSamplingProcedureBuilderActions::SetName(name) => {
-        if name.is_none() {
-            state_mut.errors_name.push(ApiError::BadRequest(vec![
-                "The Name field is required.".to_string()
-             ]));
-        }
-                state_mut.name = name;
-            }
-            NestedNewSamplingProcedureBuilderActions::SetDescription(description) => {
-                state_mut.description = description;
-            }
-        }
-        state
-    }
-}
-#[function_component(NewSamplingProcedureForm)]
-pub fn new_sampling_procedure_form() -> Html {
-    let (builder_store, builder_dispatch) = use_store::<NestedNewSamplingProcedureBuilder>();
-    let set_name = builder_dispatch.apply_callback(|name: Option<String>| NestedNewSamplingProcedureBuilderActions::SetName(name));
-    let set_description = builder_dispatch.apply_callback(|description: Option<String>| NestedNewSamplingProcedureBuilderActions::SetDescription(description));
+
+#[function_component(CreateSamplingProcedureForm)]
+pub fn create_sampling_procedure_form() -> Html {
+    let (builder_store, builder_dispatch) = use_store::<SamplingProcedureBuilder>();
+    let set_name = builder_dispatch
+        .apply_callback(|name: Option<String>| SamplingProcedureActions::SetName(name));
+    let set_description = builder_dispatch.apply_callback(|description: Option<String>| {
+        SamplingProcedureActions::SetDescription(description)
+    });
     html! {
-        <BasicForm<NewSamplingProcedure> builder={builder_store.deref().clone()}>
+        <BasicForm<NewSamplingProcedure> method={FormMethod::POST} builder={builder_store.deref().clone()}>
             <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
             <BasicInput label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} input_type={InputType::Text} />
         </BasicForm<NewSamplingProcedure>>
     }
 }
-#[derive(Store, Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
+#[derive(Clone, PartialEq, Properties)]
+pub struct UpdateSamplingProcedureFormProp {
+    pub id: Uuid,
+}
+
+#[function_component(UpdateSamplingProcedureForm)]
+pub fn update_sampling_procedure_form(props: &UpdateSamplingProcedureFormProp) -> Html {
+    let (builder_store, builder_dispatch) = use_store::<SamplingProcedureBuilder>();
+    let set_name = builder_dispatch
+        .apply_callback(|name: Option<String>| SamplingProcedureActions::SetName(name));
+    let set_description = builder_dispatch.apply_callback(|description: Option<String>| {
+        SamplingProcedureActions::SetDescription(description)
+    });
+    html! {
+        <BasicForm<NewSamplingProcedure> method={FormMethod::PUT} builder={builder_store.deref().clone()}>
+            <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
+            <BasicInput label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} input_type={InputType::Text} />
+        </BasicForm<NewSamplingProcedure>>
+    }
+}
+#[derive(Store, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[store(storage = "session")]
-pub struct NestedNewTeamBuilder {
-    pub parent_team: Option<NestedTeam>,
+pub struct TeamBuilder {
+    pub id: Option<i32>,
     pub name: Option<String>,
     pub description: Option<String>,
-    pub errors_parent_team: Vec<ApiError>,
+    pub parent_team: Option<NestedTeam>,
     pub errors_name: Vec<ApiError>,
     pub errors_description: Vec<ApiError>,
+    pub errors_parent_team: Vec<ApiError>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub(super) enum NestedNewTeamBuilderActions {
-    SetParentTeam(Option<NestedTeam>),
+pub(super) enum TeamActions {
     SetName(Option<String>),
     SetDescription(Option<String>),
+    SetParentTeam(Option<NestedTeam>),
 }
 
-impl FormBuilder for NestedNewTeamBuilder {
-    type Data = NewTeam;
-    type Actions = NestedNewTeamBuilderActions;
+impl Reducer<TeamBuilder> for TeamActions {
+    fn apply(self, mut state: std::rc::Rc<TeamBuilder>) -> std::rc::Rc<TeamBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            TeamActions::SetName(name) => {
+                state_mut.errors_name.clear();
+                if name.is_none() {
+                    state_mut.errors_name.push(ApiError::BadRequest(vec![
+                        "The Name field is required.".to_string(),
+                    ]));
+                }
+                state_mut.name = name;
+            }
+            TeamActions::SetDescription(description) => {
+                state_mut.errors_description.clear();
+                if description.is_none() {
+                    state_mut.errors_description.push(ApiError::BadRequest(vec![
+                        "The Description field is required.".to_string(),
+                    ]));
+                }
+                state_mut.description = description;
+            }
+            TeamActions::SetParentTeam(parent_team) => {
+                state_mut.errors_parent_team.clear();
+                state_mut.parent_team = parent_team;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for TeamBuilder {
+    type Actions = TeamActions;
 
     fn has_errors(&self) -> bool {
-!self.errors_parent_team.is_empty() || !self.errors_name.is_empty() || !self.errors_description.is_empty()
+        !self.errors_name.is_empty()
+            || !self.errors_description.is_empty()
+            || !self.errors_parent_team.is_empty()
     }
 
     fn can_submit(&self) -> bool {
-        !self.has_errors()
-        && self.name.is_some()
-        && self.description.is_some()
+        !self.has_errors() && self.name.is_some() && self.description.is_some()
     }
-
-    fn form_level_errors(&self) -> Vec<String> {
-        vec![]
-    }
-
 }
-impl From<NestedNewTeamBuilder> for NewTeam {
-    fn from(builder: NestedNewTeamBuilder) -> Self {
+
+impl From<TeamBuilder> for NewTeam {
+    fn from(builder: TeamBuilder) -> Self {
         Self {
             name: builder.name.unwrap(),
             description: builder.description.unwrap(),
@@ -1069,10 +1785,19 @@ impl From<NestedNewTeamBuilder> for NewTeam {
         }
     }
 }
+impl From<TeamBuilder> for UpdateTeam {
+    fn from(builder: TeamBuilder) -> Self {
+        Self {
+            id: builder.id.unwrap(),
+            name: builder.name.unwrap(),
+            description: builder.description.unwrap(),
+            parent_team_id: builder.parent_team.map(|parent_team| parent_team.inner.id),
+        }
+    }
+}
 impl FormBuildable for NewTeam {
-    type Builder = NestedNewTeamBuilder;
+    type Builder = TeamBuilder;
     const TABLE: Table = Table::Teams;
-    const METHOD: FormMethod = FormMethod::POST;
     fn title() -> &'static str {
         "NewTeam"
     }
@@ -1089,44 +1814,63 @@ impl FormBuildable for NewTeam {
         false
     }
 }
-impl Reducer<NestedNewTeamBuilder> for NestedNewTeamBuilderActions {
-    fn apply(self, mut state: std::rc::Rc<NestedNewTeamBuilder>) -> std::rc::Rc<NestedNewTeamBuilder> {
-        let state_mut = Rc::make_mut(&mut state);
-        match self {
-            NestedNewTeamBuilderActions::SetParentTeam(parent_team) => {
-                state_mut.parent_team = parent_team;
-            }
-            NestedNewTeamBuilderActions::SetName(name) => {
-        if name.is_none() {
-            state_mut.errors_name.push(ApiError::BadRequest(vec![
-                "The Name field is required.".to_string()
-             ]));
-        }
-                state_mut.name = name;
-            }
-            NestedNewTeamBuilderActions::SetDescription(description) => {
-        if description.is_none() {
-            state_mut.errors_description.push(ApiError::BadRequest(vec![
-                "The Description field is required.".to_string()
-             ]));
-        }
-                state_mut.description = description;
-            }
-        }
-        state
+
+impl FormBuildable for UpdateTeam {
+    type Builder = TeamBuilder;
+    const TABLE: Table = Table::Teams;
+    fn title() -> &'static str {
+        "UpdateTeam"
+    }
+    fn task_target() -> &'static str {
+        "UpdateTeam"
+    }
+    fn description() -> &'static str {
+        concat!("Create a new UpdateTeam.",)
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        true
     }
 }
-#[function_component(NewTeamForm)]
-pub fn new_team_form() -> Html {
-    let (builder_store, builder_dispatch) = use_store::<NestedNewTeamBuilder>();
-    let set_parent_team = builder_dispatch.apply_callback(|parent_team: Option<NestedTeam>| NestedNewTeamBuilderActions::SetParentTeam(parent_team));
-    let set_name = builder_dispatch.apply_callback(|name: Option<String>| NestedNewTeamBuilderActions::SetName(name));
-    let set_description = builder_dispatch.apply_callback(|description: Option<String>| NestedNewTeamBuilderActions::SetDescription(description));
+
+#[function_component(CreateTeamForm)]
+pub fn create_team_form() -> Html {
+    let (builder_store, builder_dispatch) = use_store::<TeamBuilder>();
+    let set_name =
+        builder_dispatch.apply_callback(|name: Option<String>| TeamActions::SetName(name));
+    let set_description = builder_dispatch
+        .apply_callback(|description: Option<String>| TeamActions::SetDescription(description));
+    let set_parent_team = builder_dispatch
+        .apply_callback(|parent_team: Option<NestedTeam>| TeamActions::SetParentTeam(parent_team));
     html! {
-        <BasicForm<NewTeam> builder={builder_store.deref().clone()}>
-            <Datalist<NestedTeam> builder={set_parent_team} errors={builder_store.errors_parent_team.clone()} value={builder_store.parent_team.clone()} label="ParentTeam" />
+        <BasicForm<NewTeam> method={FormMethod::POST} builder={builder_store.deref().clone()}>
             <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
             <BasicInput label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} input_type={InputType::Text} />
+            <Datalist<NestedTeam> builder={set_parent_team} errors={builder_store.errors_parent_team.clone()} value={builder_store.parent_team.clone()} label="ParentTeam" />
         </BasicForm<NewTeam>>
+    }
+}
+#[derive(Clone, PartialEq, Properties)]
+pub struct UpdateTeamFormProp {
+    pub id: i32,
+}
+
+#[function_component(UpdateTeamForm)]
+pub fn update_team_form(props: &UpdateTeamFormProp) -> Html {
+    let (builder_store, builder_dispatch) = use_store::<TeamBuilder>();
+    let set_name =
+        builder_dispatch.apply_callback(|name: Option<String>| TeamActions::SetName(name));
+    let set_description = builder_dispatch
+        .apply_callback(|description: Option<String>| TeamActions::SetDescription(description));
+    let set_parent_team = builder_dispatch
+        .apply_callback(|parent_team: Option<NestedTeam>| TeamActions::SetParentTeam(parent_team));
+    html! {
+        <BasicForm<UpdateTeam> method={FormMethod::PUT} builder={builder_store.deref().clone()}>
+            <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
+            <BasicInput label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} input_type={InputType::Text} />
+            <Datalist<NestedTeam> builder={set_parent_team} errors={builder_store.errors_parent_team.clone()} value={builder_store.parent_team.clone()} label="ParentTeam" />
+        </BasicForm<UpdateTeam>>
     }
 }

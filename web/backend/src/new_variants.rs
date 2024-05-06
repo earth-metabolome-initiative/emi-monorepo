@@ -43,6 +43,7 @@ pub(super) struct IntermediateNewContainerHorizontalRule {
     maximum_humidity: Option<i32>,
     minimum_pressure: Option<i32>,
     maximum_pressure: Option<i32>,
+    updated_by: i32,
 }
 
 impl InsertRow for web_common::database::NewContainerHorizontalRule {
@@ -61,6 +62,7 @@ impl InsertRow for web_common::database::NewContainerHorizontalRule {
             maximum_humidity: self.maximum_humidity,
             minimum_pressure: self.minimum_pressure,
             maximum_pressure: self.maximum_pressure,
+            updated_by: user_id,
         }
     }
 
@@ -90,6 +92,7 @@ pub(super) struct IntermediateNewContainerVerticalRule {
     maximum_humidity: Option<i32>,
     minimum_pressure: Option<i32>,
     maximum_pressure: Option<i32>,
+    updated_by: i32,
 }
 
 impl InsertRow for web_common::database::NewContainerVerticalRule {
@@ -108,6 +111,7 @@ impl InsertRow for web_common::database::NewContainerVerticalRule {
             maximum_humidity: self.maximum_humidity,
             minimum_pressure: self.minimum_pressure,
             maximum_pressure: self.maximum_pressure,
+            updated_by: user_id,
         }
     }
 
@@ -130,6 +134,7 @@ pub(super) struct IntermediateNewItemCategory {
     created_by: i32,
     name: String,
     description: String,
+    updated_by: i32,
 }
 
 impl InsertRow for web_common::database::NewItemCategory {
@@ -141,6 +146,7 @@ impl InsertRow for web_common::database::NewItemCategory {
             created_by: user_id,
             name: self.name,
             description: self.description,
+            updated_by: user_id,
         }
     }
 
@@ -163,6 +169,7 @@ pub(super) struct IntermediateNewProcedure {
     created_by: i32,
     name: String,
     description: Option<String>,
+    updated_by: i32,
 }
 
 impl InsertRow for web_common::database::NewProcedure {
@@ -174,6 +181,7 @@ impl InsertRow for web_common::database::NewProcedure {
             created_by: user_id,
             name: self.name,
             description: self.description,
+            updated_by: user_id,
         }
     }
 
@@ -198,6 +206,7 @@ pub(super) struct IntermediateNewProjectRequirement {
     item_category_id: i32,
     quantity: i32,
     unit_id: Option<i32>,
+    updated_by: i32,
 }
 
 impl InsertRow for web_common::database::NewProjectRequirement {
@@ -211,6 +220,7 @@ impl InsertRow for web_common::database::NewProjectRequirement {
             item_category_id: self.item_category_id,
             quantity: self.quantity,
             unit_id: self.unit_id,
+            updated_by: user_id,
         }
     }
 
@@ -240,6 +250,7 @@ pub(super) struct IntermediateNewProject {
     expenses: Option<i64>,
     expected_end_date: Option<NaiveDateTime>,
     end_date: Option<NaiveDateTime>,
+    updated_by: i32,
 }
 
 impl InsertRow for web_common::database::NewProject {
@@ -258,6 +269,7 @@ impl InsertRow for web_common::database::NewProject {
             expenses: self.expenses,
             expected_end_date: self.expected_end_date,
             end_date: self.end_date,
+            updated_by: user_id,
         }
     }
 
@@ -273,6 +285,43 @@ impl InsertRow for web_common::database::NewProject {
     }
 }
 
+/// Intermediate representation of the new variant NewSampledIndividual.
+#[derive(Insertable)]
+#[diesel(table_name = sampled_individuals)]
+pub(super) struct IntermediateNewSampledIndividual {
+    created_by: i32,
+    id: Uuid,
+    name: Option<String>,
+    tagged: bool,
+    updated_by: i32,
+}
+
+impl InsertRow for web_common::database::NewSampledIndividual {
+    type Intermediate = IntermediateNewSampledIndividual;
+    type Flat = SampledIndividual;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewSampledIndividual {
+            created_by: user_id,
+            id: self.id,
+            name: self.name,
+            tagged: self.tagged,
+            updated_by: user_id,
+        }
+    }
+
+    fn insert(
+        self,
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::sampled_individuals;
+        diesel::insert_into(sampled_individuals::dsl::sampled_individuals)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
 /// Intermediate representation of the new variant NewSample.
 #[derive(Insertable)]
 #[diesel(table_name = samples)]
@@ -282,6 +331,7 @@ pub(super) struct IntermediateNewSample {
     sampled_by: i32,
     procedure_id: Uuid,
     state: i32,
+    updated_by: i32,
 }
 
 impl InsertRow for web_common::database::NewSample {
@@ -295,6 +345,7 @@ impl InsertRow for web_common::database::NewSample {
             sampled_by: self.sampled_by,
             procedure_id: self.procedure_id,
             state: self.state,
+            updated_by: user_id,
         }
     }
 
@@ -318,6 +369,7 @@ pub(super) struct IntermediateNewSamplingProcedure {
     id: Uuid,
     name: String,
     description: Option<String>,
+    updated_by: i32,
 }
 
 impl InsertRow for web_common::database::NewSamplingProcedure {
@@ -330,6 +382,7 @@ impl InsertRow for web_common::database::NewSamplingProcedure {
             id: self.id,
             name: self.name,
             description: self.description,
+            updated_by: user_id,
         }
     }
 
@@ -353,6 +406,7 @@ pub(super) struct IntermediateNewTeam {
     name: String,
     description: String,
     parent_team_id: Option<i32>,
+    updated_by: i32,
 }
 
 impl InsertRow for web_common::database::NewTeam {
@@ -365,6 +419,7 @@ impl InsertRow for web_common::database::NewTeam {
             name: self.name,
             description: self.description,
             parent_team_id: self.parent_team_id,
+            updated_by: user_id,
         }
     }
 

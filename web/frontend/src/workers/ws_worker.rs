@@ -335,22 +335,24 @@ impl Worker for WebsocketWorker {
                     }
                 };
             }
-            InternalMessage::Frontend(subscribed_id, message) => {
+            InternalMessage::Frontend(subscriber_id, message) => {
                 match message {
                     ComponentMessage::Operation(operation) => {
                         if operation.requires_authentication() && self.user.is_none() {
                             // When the user is offline, but some operation requires authentication, we need to
                             // return an error.
                             scope.respond(
-                                subscribed_id,
+                                subscriber_id,
                                 WebsocketMessage::Error(ApiError::Unauthorized),
                             );
                             return;
                         }
 
                         // TODO! Add here the task to the client database!
+
                         let task_id = Uuid::new_v4();
-                        self.tasks.insert(task_id, subscribed_id);
+                        self.tasks.insert(task_id, subscriber_id);
+                        
                         if self.websocket_sender.as_mut().map_or(true, |sender| {
                             sender
                                 .try_send(FrontendMessage::Task(task_id, operation.clone()))

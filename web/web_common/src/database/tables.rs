@@ -795,6 +795,9 @@ impl Color {
 pub struct ContainerHorizontalRule {
     pub id: i32,
     pub created_by: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
     pub name: String,
     pub item_type_id: i32,
     pub other_item_type_id: i32,
@@ -811,6 +814,9 @@ impl ContainerHorizontalRule {
         vec![
             gluesql::core::ast_builder::num(self.id),
             gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+            gluesql::core::ast_builder::num(self.updated_by),
+            gluesql::core::ast_builder::timestamp(self.updated_at.to_string()),
             gluesql::core::ast_builder::text(self.name),
             gluesql::core::ast_builder::num(self.item_type_id),
             gluesql::core::ast_builder::num(self.other_item_type_id),
@@ -857,7 +863,7 @@ impl ContainerHorizontalRule {
         use gluesql::core::ast_builder::*;
         table("container_horizontal_rules")
             .insert()
-            .columns("id, created_by, name, item_type_id, other_item_type_id, minimum_temperature, maximum_temperature, minimum_humidity, maximum_humidity, minimum_pressure, maximum_pressure")
+            .columns("id, created_by, created_at, updated_by, updated_at, name, item_type_id, other_item_type_id, minimum_temperature, maximum_temperature, minimum_humidity, maximum_humidity, minimum_pressure, maximum_pressure")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -883,7 +889,7 @@ impl ContainerHorizontalRule {
         let select_row = table("container_horizontal_rules")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, created_by, name, item_type_id, other_item_type_id, minimum_temperature, maximum_temperature, minimum_humidity, maximum_humidity, minimum_pressure, maximum_pressure")
+            .project("id, created_by, created_at, updated_by, updated_at, name, item_type_id, other_item_type_id, minimum_temperature, maximum_temperature, minimum_humidity, maximum_humidity, minimum_pressure, maximum_pressure")
             .limit(1)
             .execute(connection)
             .await?;
@@ -953,6 +959,9 @@ impl ContainerHorizontalRule {
             .update()        
 .set("id", gluesql::core::ast_builder::num(self.id))        
 .set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
+.set("updated_by", gluesql::core::ast_builder::num(self.updated_by))        
+.set("updated_at", gluesql::core::ast_builder::timestamp(self.updated_at.to_string()))        
 .set("name", gluesql::core::ast_builder::text(self.name))        
 .set("item_type_id", gluesql::core::ast_builder::num(self.item_type_id))        
 .set("other_item_type_id", gluesql::core::ast_builder::num(self.other_item_type_id));
@@ -1019,7 +1028,7 @@ impl ContainerHorizontalRule {
         use gluesql::core::ast_builder::*;
         let select_row = table("container_horizontal_rules")
             .select()
-            .project("id, created_by, name, item_type_id, other_item_type_id, minimum_temperature, maximum_temperature, minimum_humidity, maximum_humidity, minimum_pressure, maximum_pressure")
+            .project("id, created_by, created_at, updated_by, updated_at, name, item_type_id, other_item_type_id, minimum_temperature, maximum_temperature, minimum_humidity, maximum_humidity, minimum_pressure, maximum_pressure")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -1038,6 +1047,18 @@ impl ContainerHorizontalRule {
             created_by: match row.get("created_by").unwrap() {
                 gluesql::prelude::Value::I32(created_by) => created_by.clone(),
                 _ => unreachable!("Expected I32")
+            },
+            created_at: match row.get("created_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
+            updated_by: match row.get("updated_by").unwrap() {
+                gluesql::prelude::Value::I32(updated_by) => updated_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            updated_at: match row.get("updated_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(updated_at) => updated_at.clone(),
+                _ => unreachable!("Expected Timestamp")
             },
             name: match row.get("name").unwrap() {
                 gluesql::prelude::Value::Str(name) => name.clone(),
@@ -1089,6 +1110,9 @@ impl ContainerHorizontalRule {
 pub struct ContainerVerticalRule {
     pub id: i32,
     pub created_by: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
     pub name: String,
     pub container_item_type_id: i32,
     pub contained_item_type_id: i32,
@@ -1105,6 +1129,9 @@ impl ContainerVerticalRule {
         vec![
             gluesql::core::ast_builder::num(self.id),
             gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+            gluesql::core::ast_builder::num(self.updated_by),
+            gluesql::core::ast_builder::timestamp(self.updated_at.to_string()),
             gluesql::core::ast_builder::text(self.name),
             gluesql::core::ast_builder::num(self.container_item_type_id),
             gluesql::core::ast_builder::num(self.contained_item_type_id),
@@ -1151,7 +1178,7 @@ impl ContainerVerticalRule {
         use gluesql::core::ast_builder::*;
         table("container_vertical_rules")
             .insert()
-            .columns("id, created_by, name, container_item_type_id, contained_item_type_id, minimum_temperature, maximum_temperature, minimum_humidity, maximum_humidity, minimum_pressure, maximum_pressure")
+            .columns("id, created_by, created_at, updated_by, updated_at, name, container_item_type_id, contained_item_type_id, minimum_temperature, maximum_temperature, minimum_humidity, maximum_humidity, minimum_pressure, maximum_pressure")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -1177,7 +1204,7 @@ impl ContainerVerticalRule {
         let select_row = table("container_vertical_rules")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, created_by, name, container_item_type_id, contained_item_type_id, minimum_temperature, maximum_temperature, minimum_humidity, maximum_humidity, minimum_pressure, maximum_pressure")
+            .project("id, created_by, created_at, updated_by, updated_at, name, container_item_type_id, contained_item_type_id, minimum_temperature, maximum_temperature, minimum_humidity, maximum_humidity, minimum_pressure, maximum_pressure")
             .limit(1)
             .execute(connection)
             .await?;
@@ -1247,6 +1274,9 @@ impl ContainerVerticalRule {
             .update()        
 .set("id", gluesql::core::ast_builder::num(self.id))        
 .set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
+.set("updated_by", gluesql::core::ast_builder::num(self.updated_by))        
+.set("updated_at", gluesql::core::ast_builder::timestamp(self.updated_at.to_string()))        
 .set("name", gluesql::core::ast_builder::text(self.name))        
 .set("container_item_type_id", gluesql::core::ast_builder::num(self.container_item_type_id))        
 .set("contained_item_type_id", gluesql::core::ast_builder::num(self.contained_item_type_id));
@@ -1313,7 +1343,7 @@ impl ContainerVerticalRule {
         use gluesql::core::ast_builder::*;
         let select_row = table("container_vertical_rules")
             .select()
-            .project("id, created_by, name, container_item_type_id, contained_item_type_id, minimum_temperature, maximum_temperature, minimum_humidity, maximum_humidity, minimum_pressure, maximum_pressure")
+            .project("id, created_by, created_at, updated_by, updated_at, name, container_item_type_id, contained_item_type_id, minimum_temperature, maximum_temperature, minimum_humidity, maximum_humidity, minimum_pressure, maximum_pressure")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -1332,6 +1362,18 @@ impl ContainerVerticalRule {
             created_by: match row.get("created_by").unwrap() {
                 gluesql::prelude::Value::I32(created_by) => created_by.clone(),
                 _ => unreachable!("Expected I32")
+            },
+            created_at: match row.get("created_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
+            updated_by: match row.get("updated_by").unwrap() {
+                gluesql::prelude::Value::I32(updated_by) => updated_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            updated_at: match row.get("updated_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(updated_at) => updated_at.clone(),
+                _ => unreachable!("Expected Timestamp")
             },
             name: match row.get("name").unwrap() {
                 gluesql::prelude::Value::Str(name) => name.clone(),
@@ -1570,6 +1612,9 @@ impl ContinuousUnit {
 pub struct DerivedSample {
     pub id: i32,
     pub created_by: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
     pub parent_sample_id: Uuid,
     pub child_sample_id: Uuid,
 }
@@ -1579,6 +1624,9 @@ impl DerivedSample {
         vec![
             gluesql::core::ast_builder::num(self.id),
             gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+            gluesql::core::ast_builder::num(self.updated_by),
+            gluesql::core::ast_builder::timestamp(self.updated_at.to_string()),
             gluesql::core::ast_builder::uuid(self.parent_sample_id.to_string()),
             gluesql::core::ast_builder::uuid(self.child_sample_id.to_string()),
         ]
@@ -1600,7 +1648,7 @@ impl DerivedSample {
         use gluesql::core::ast_builder::*;
         table("derived_samples")
             .insert()
-            .columns("id, created_by, parent_sample_id, child_sample_id")
+            .columns("id, created_by, created_at, updated_by, updated_at, parent_sample_id, child_sample_id")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -1626,7 +1674,7 @@ impl DerivedSample {
         let select_row = table("derived_samples")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, created_by, parent_sample_id, child_sample_id")
+            .project("id, created_by, created_at, updated_by, updated_at, parent_sample_id, child_sample_id")
             .limit(1)
             .execute(connection)
             .await?;
@@ -1696,6 +1744,9 @@ impl DerivedSample {
             .update()        
 .set("id", gluesql::core::ast_builder::num(self.id))        
 .set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
+.set("updated_by", gluesql::core::ast_builder::num(self.updated_by))        
+.set("updated_at", gluesql::core::ast_builder::timestamp(self.updated_at.to_string()))        
 .set("parent_sample_id", gluesql::core::ast_builder::uuid(self.parent_sample_id.to_string()))        
 .set("child_sample_id", gluesql::core::ast_builder::uuid(self.child_sample_id.to_string()))            .execute(connection)
             .await
@@ -1742,7 +1793,7 @@ impl DerivedSample {
         use gluesql::core::ast_builder::*;
         let select_row = table("derived_samples")
             .select()
-            .project("id, created_by, parent_sample_id, child_sample_id")
+            .project("id, created_by, created_at, updated_by, updated_at, parent_sample_id, child_sample_id")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -1761,6 +1812,18 @@ impl DerivedSample {
             created_by: match row.get("created_by").unwrap() {
                 gluesql::prelude::Value::I32(created_by) => created_by.clone(),
                 _ => unreachable!("Expected I32")
+            },
+            created_at: match row.get("created_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
+            updated_by: match row.get("updated_by").unwrap() {
+                gluesql::prelude::Value::I32(updated_by) => updated_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            updated_at: match row.get("updated_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(updated_at) => updated_at.clone(),
+                _ => unreachable!("Expected Timestamp")
             },
             parent_sample_id: match row.get("parent_sample_id").unwrap() {
                 gluesql::prelude::Value::Uuid(parent_sample_id) => Uuid::from_u128(*parent_sample_id),
@@ -2577,6 +2640,9 @@ pub struct ItemCategory {
     pub name: String,
     pub description: String,
     pub created_by: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
 }
 #[cfg(feature = "frontend")]
 impl ItemCategory {
@@ -2586,6 +2652,9 @@ impl ItemCategory {
             gluesql::core::ast_builder::text(self.name),
             gluesql::core::ast_builder::text(self.description),
             gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+            gluesql::core::ast_builder::num(self.updated_by),
+            gluesql::core::ast_builder::timestamp(self.updated_at.to_string()),
         ]
     }
 
@@ -2605,7 +2674,7 @@ impl ItemCategory {
         use gluesql::core::ast_builder::*;
         table("item_categories")
             .insert()
-            .columns("id, name, description, created_by")
+            .columns("id, name, description, created_by, created_at, updated_by, updated_at")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -2631,7 +2700,7 @@ impl ItemCategory {
         let select_row = table("item_categories")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, name, description, created_by")
+            .project("id, name, description, created_by, created_at, updated_by, updated_at")
             .limit(1)
             .execute(connection)
             .await?;
@@ -2702,7 +2771,10 @@ impl ItemCategory {
 .set("id", gluesql::core::ast_builder::num(self.id))        
 .set("name", gluesql::core::ast_builder::text(self.name))        
 .set("description", gluesql::core::ast_builder::text(self.description))        
-.set("created_by", gluesql::core::ast_builder::num(self.created_by))            .execute(connection)
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
+.set("updated_by", gluesql::core::ast_builder::num(self.updated_by))        
+.set("updated_at", gluesql::core::ast_builder::timestamp(self.updated_at.to_string()))            .execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -2747,7 +2819,7 @@ impl ItemCategory {
         use gluesql::core::ast_builder::*;
         let select_row = table("item_categories")
             .select()
-            .project("id, name, description, created_by")
+            .project("id, name, description, created_by, created_at, updated_by, updated_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -2774,6 +2846,18 @@ impl ItemCategory {
             created_by: match row.get("created_by").unwrap() {
                 gluesql::prelude::Value::I32(created_by) => created_by.clone(),
                 _ => unreachable!("Expected I32")
+            },
+            created_at: match row.get("created_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
+            updated_by: match row.get("updated_by").unwrap() {
+                gluesql::prelude::Value::I32(updated_by) => updated_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            updated_at: match row.get("updated_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(updated_at) => updated_at.clone(),
+                _ => unreachable!("Expected Timestamp")
             },
         }
     }
@@ -5229,6 +5313,9 @@ pub struct Procedure {
     pub name: String,
     pub description: Option<String>,
     pub created_by: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
 }
 #[cfg(feature = "frontend")]
 impl Procedure {
@@ -5241,6 +5328,9 @@ impl Procedure {
                 None => gluesql::core::ast_builder::null(),
             },
             gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+            gluesql::core::ast_builder::num(self.updated_by),
+            gluesql::core::ast_builder::timestamp(self.updated_at.to_string()),
         ]
     }
 
@@ -5260,7 +5350,7 @@ impl Procedure {
         use gluesql::core::ast_builder::*;
         table("procedures")
             .insert()
-            .columns("id, name, description, created_by")
+            .columns("id, name, description, created_by, created_at, updated_by, updated_at")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -5286,7 +5376,7 @@ impl Procedure {
         let select_row = table("procedures")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, name, description, created_by")
+            .project("id, name, description, created_by, created_at, updated_by, updated_at")
             .limit(1)
             .execute(connection)
             .await?;
@@ -5356,7 +5446,10 @@ impl Procedure {
             .update()        
 .set("id", gluesql::core::ast_builder::num(self.id))        
 .set("name", gluesql::core::ast_builder::text(self.name))        
-.set("created_by", gluesql::core::ast_builder::num(self.created_by));
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
+.set("updated_by", gluesql::core::ast_builder::num(self.updated_by))        
+.set("updated_at", gluesql::core::ast_builder::timestamp(self.updated_at.to_string()));
         if let Some(description) = self.description {
             update_row = update_row.set("description", gluesql::core::ast_builder::text(description));
         }
@@ -5405,7 +5498,7 @@ impl Procedure {
         use gluesql::core::ast_builder::*;
         let select_row = table("procedures")
             .select()
-            .project("id, name, description, created_by")
+            .project("id, name, description, created_by, created_at, updated_by, updated_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -5434,6 +5527,18 @@ impl Procedure {
                 gluesql::prelude::Value::I32(created_by) => created_by.clone(),
                 _ => unreachable!("Expected I32")
             },
+            created_at: match row.get("created_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
+            updated_by: match row.get("updated_by").unwrap() {
+                gluesql::prelude::Value::I32(updated_by) => updated_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            updated_at: match row.get("updated_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(updated_at) => updated_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
         }
     }
 }
@@ -5442,6 +5547,9 @@ impl Procedure {
 pub struct ProjectRequirement {
     pub id: i32,
     pub created_by: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
     pub project_id: i32,
     pub item_category_id: i32,
     pub quantity: i32,
@@ -5453,6 +5561,9 @@ impl ProjectRequirement {
         vec![
             gluesql::core::ast_builder::num(self.id),
             gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+            gluesql::core::ast_builder::num(self.updated_by),
+            gluesql::core::ast_builder::timestamp(self.updated_at.to_string()),
             gluesql::core::ast_builder::num(self.project_id),
             gluesql::core::ast_builder::num(self.item_category_id),
             gluesql::core::ast_builder::num(self.quantity),
@@ -5479,7 +5590,7 @@ impl ProjectRequirement {
         use gluesql::core::ast_builder::*;
         table("project_requirements")
             .insert()
-            .columns("id, created_by, project_id, item_category_id, quantity, unit_id")
+            .columns("id, created_by, created_at, updated_by, updated_at, project_id, item_category_id, quantity, unit_id")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -5505,7 +5616,7 @@ impl ProjectRequirement {
         let select_row = table("project_requirements")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, created_by, project_id, item_category_id, quantity, unit_id")
+            .project("id, created_by, created_at, updated_by, updated_at, project_id, item_category_id, quantity, unit_id")
             .limit(1)
             .execute(connection)
             .await?;
@@ -5575,6 +5686,9 @@ impl ProjectRequirement {
             .update()        
 .set("id", gluesql::core::ast_builder::num(self.id))        
 .set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
+.set("updated_by", gluesql::core::ast_builder::num(self.updated_by))        
+.set("updated_at", gluesql::core::ast_builder::timestamp(self.updated_at.to_string()))        
 .set("project_id", gluesql::core::ast_builder::num(self.project_id))        
 .set("item_category_id", gluesql::core::ast_builder::num(self.item_category_id))        
 .set("quantity", gluesql::core::ast_builder::num(self.quantity));
@@ -5626,7 +5740,7 @@ impl ProjectRequirement {
         use gluesql::core::ast_builder::*;
         let select_row = table("project_requirements")
             .select()
-            .project("id, created_by, project_id, item_category_id, quantity, unit_id")
+            .project("id, created_by, created_at, updated_by, updated_at, project_id, item_category_id, quantity, unit_id")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -5645,6 +5759,18 @@ impl ProjectRequirement {
             created_by: match row.get("created_by").unwrap() {
                 gluesql::prelude::Value::I32(created_by) => created_by.clone(),
                 _ => unreachable!("Expected I32")
+            },
+            created_at: match row.get("created_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
+            updated_by: match row.get("updated_by").unwrap() {
+                gluesql::prelude::Value::I32(updated_by) => updated_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            updated_at: match row.get("updated_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(updated_at) => updated_at.clone(),
+                _ => unreachable!("Expected Timestamp")
             },
             project_id: match row.get("project_id").unwrap() {
                 gluesql::prelude::Value::I32(project_id) => project_id.clone(),
@@ -7019,12 +7145,27 @@ impl SampledIndividualBioOttTaxonItem {
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SampledIndividual {
     pub id: Uuid,
+    pub created_by: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
+    pub name: Option<String>,
+    pub tagged: bool,
 }
 #[cfg(feature = "frontend")]
 impl SampledIndividual {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
             gluesql::core::ast_builder::uuid(self.id.to_string()),
+            gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+            gluesql::core::ast_builder::num(self.updated_by),
+            gluesql::core::ast_builder::timestamp(self.updated_at.to_string()),
+            match self.name {
+                Some(name) => gluesql::core::ast_builder::text(name),
+                None => gluesql::core::ast_builder::null(),
+            },
+            (self.tagged.into()),
         ]
     }
 
@@ -7044,7 +7185,7 @@ impl SampledIndividual {
         use gluesql::core::ast_builder::*;
         table("sampled_individuals")
             .insert()
-            .columns("id")
+            .columns("id, created_by, created_at, updated_by, updated_at, name, tagged")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -7070,7 +7211,7 @@ impl SampledIndividual {
         let select_row = table("sampled_individuals")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id")
+            .project("id, created_by, created_at, updated_by, updated_at, name, tagged")
             .limit(1)
             .execute(connection)
             .await?;
@@ -7136,9 +7277,18 @@ impl SampledIndividual {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
-        table("sampled_individuals")
+        let mut update_row = table("sampled_individuals")
             .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))            .execute(connection)
+.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
+.set("updated_by", gluesql::core::ast_builder::num(self.updated_by))        
+.set("updated_at", gluesql::core::ast_builder::timestamp(self.updated_at.to_string()))        
+.set("tagged", self.tagged);
+        if let Some(name) = self.name {
+            update_row = update_row.set("name", gluesql::core::ast_builder::text(name));
+        }
+            update_row.execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -7183,7 +7333,7 @@ impl SampledIndividual {
         use gluesql::core::ast_builder::*;
         let select_row = table("sampled_individuals")
             .select()
-            .project("id")
+            .project("id, created_by, created_at, updated_by, updated_at, name, tagged")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -7199,6 +7349,31 @@ impl SampledIndividual {
                 gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
                 _ => unreachable!("Expected Uuid"),
             },
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_at: match row.get("created_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
+            updated_by: match row.get("updated_by").unwrap() {
+                gluesql::prelude::Value::I32(updated_by) => updated_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            updated_at: match row.get("updated_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(updated_at) => updated_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
+            name: match row.get("name").unwrap() {
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::Str(name) => Some(name.clone()),
+                _ => unreachable!("Expected Str")
+            },
+            tagged: match row.get("tagged").unwrap() {
+                gluesql::prelude::Value::Bool(tagged) => tagged.clone(),
+                _ => unreachable!("Expected Bool")
+            },
         }
     }
 }
@@ -7208,6 +7383,9 @@ pub struct Sample {
     pub id: Uuid,
     pub inserted_by: i32,
     pub sampled_by: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
     pub procedure_id: Uuid,
     pub state: i32,
 }
@@ -7218,6 +7396,9 @@ impl Sample {
             gluesql::core::ast_builder::uuid(self.id.to_string()),
             gluesql::core::ast_builder::num(self.inserted_by),
             gluesql::core::ast_builder::num(self.sampled_by),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+            gluesql::core::ast_builder::num(self.updated_by),
+            gluesql::core::ast_builder::timestamp(self.updated_at.to_string()),
             gluesql::core::ast_builder::uuid(self.procedure_id.to_string()),
             gluesql::core::ast_builder::num(self.state),
         ]
@@ -7239,7 +7420,7 @@ impl Sample {
         use gluesql::core::ast_builder::*;
         table("samples")
             .insert()
-            .columns("id, inserted_by, sampled_by, procedure_id, state")
+            .columns("id, inserted_by, sampled_by, created_at, updated_by, updated_at, procedure_id, state")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -7265,7 +7446,7 @@ impl Sample {
         let select_row = table("samples")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, inserted_by, sampled_by, procedure_id, state")
+            .project("id, inserted_by, sampled_by, created_at, updated_by, updated_at, procedure_id, state")
             .limit(1)
             .execute(connection)
             .await?;
@@ -7336,6 +7517,9 @@ impl Sample {
 .set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
 .set("inserted_by", gluesql::core::ast_builder::num(self.inserted_by))        
 .set("sampled_by", gluesql::core::ast_builder::num(self.sampled_by))        
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
+.set("updated_by", gluesql::core::ast_builder::num(self.updated_by))        
+.set("updated_at", gluesql::core::ast_builder::timestamp(self.updated_at.to_string()))        
 .set("procedure_id", gluesql::core::ast_builder::uuid(self.procedure_id.to_string()))        
 .set("state", gluesql::core::ast_builder::num(self.state))            .execute(connection)
             .await
@@ -7382,7 +7566,7 @@ impl Sample {
         use gluesql::core::ast_builder::*;
         let select_row = table("samples")
             .select()
-            .project("id, inserted_by, sampled_by, procedure_id, state")
+            .project("id, inserted_by, sampled_by, created_at, updated_by, updated_at, procedure_id, state")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -7406,6 +7590,18 @@ impl Sample {
                 gluesql::prelude::Value::I32(sampled_by) => sampled_by.clone(),
                 _ => unreachable!("Expected I32")
             },
+            created_at: match row.get("created_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
+            updated_by: match row.get("updated_by").unwrap() {
+                gluesql::prelude::Value::I32(updated_by) => updated_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            updated_at: match row.get("updated_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(updated_at) => updated_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
             procedure_id: match row.get("procedure_id").unwrap() {
                 gluesql::prelude::Value::Uuid(procedure_id) => Uuid::from_u128(*procedure_id),
                 _ => unreachable!("Expected Uuid"),
@@ -7424,6 +7620,9 @@ pub struct SamplingProcedure {
     pub name: String,
     pub description: Option<String>,
     pub created_by: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
 }
 #[cfg(feature = "frontend")]
 impl SamplingProcedure {
@@ -7436,6 +7635,9 @@ impl SamplingProcedure {
                 None => gluesql::core::ast_builder::null(),
             },
             gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+            gluesql::core::ast_builder::num(self.updated_by),
+            gluesql::core::ast_builder::timestamp(self.updated_at.to_string()),
         ]
     }
 
@@ -7455,7 +7657,7 @@ impl SamplingProcedure {
         use gluesql::core::ast_builder::*;
         table("sampling_procedures")
             .insert()
-            .columns("id, name, description, created_by")
+            .columns("id, name, description, created_by, created_at, updated_by, updated_at")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -7481,7 +7683,7 @@ impl SamplingProcedure {
         let select_row = table("sampling_procedures")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, name, description, created_by")
+            .project("id, name, description, created_by, created_at, updated_by, updated_at")
             .limit(1)
             .execute(connection)
             .await?;
@@ -7551,7 +7753,10 @@ impl SamplingProcedure {
             .update()        
 .set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
 .set("name", gluesql::core::ast_builder::text(self.name))        
-.set("created_by", gluesql::core::ast_builder::num(self.created_by));
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
+.set("updated_by", gluesql::core::ast_builder::num(self.updated_by))        
+.set("updated_at", gluesql::core::ast_builder::timestamp(self.updated_at.to_string()));
         if let Some(description) = self.description {
             update_row = update_row.set("description", gluesql::core::ast_builder::text(description));
         }
@@ -7600,7 +7805,7 @@ impl SamplingProcedure {
         use gluesql::core::ast_builder::*;
         let select_row = table("sampling_procedures")
             .select()
-            .project("id, name, description, created_by")
+            .project("id, name, description, created_by, created_at, updated_by, updated_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -7628,6 +7833,18 @@ impl SamplingProcedure {
             created_by: match row.get("created_by").unwrap() {
                 gluesql::prelude::Value::I32(created_by) => created_by.clone(),
                 _ => unreachable!("Expected I32")
+            },
+            created_at: match row.get("created_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
+            updated_by: match row.get("updated_by").unwrap() {
+                gluesql::prelude::Value::I32(updated_by) => updated_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            updated_at: match row.get("updated_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(updated_at) => updated_at.clone(),
+                _ => unreachable!("Expected Timestamp")
             },
         }
     }
@@ -8250,6 +8467,9 @@ pub struct Team {
     pub description: String,
     pub parent_team_id: Option<i32>,
     pub created_by: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
 }
 #[cfg(feature = "frontend")]
 impl Team {
@@ -8263,6 +8483,9 @@ impl Team {
                 None => gluesql::core::ast_builder::null(),
             },
             gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+            gluesql::core::ast_builder::num(self.updated_by),
+            gluesql::core::ast_builder::timestamp(self.updated_at.to_string()),
         ]
     }
 
@@ -8282,7 +8505,7 @@ impl Team {
         use gluesql::core::ast_builder::*;
         table("teams")
             .insert()
-            .columns("id, name, description, parent_team_id, created_by")
+            .columns("id, name, description, parent_team_id, created_by, created_at, updated_by, updated_at")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -8308,7 +8531,7 @@ impl Team {
         let select_row = table("teams")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, name, description, parent_team_id, created_by")
+            .project("id, name, description, parent_team_id, created_by, created_at, updated_by, updated_at")
             .limit(1)
             .execute(connection)
             .await?;
@@ -8379,7 +8602,10 @@ impl Team {
 .set("id", gluesql::core::ast_builder::num(self.id))        
 .set("name", gluesql::core::ast_builder::text(self.name))        
 .set("description", gluesql::core::ast_builder::text(self.description))        
-.set("created_by", gluesql::core::ast_builder::num(self.created_by));
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
+.set("updated_by", gluesql::core::ast_builder::num(self.updated_by))        
+.set("updated_at", gluesql::core::ast_builder::timestamp(self.updated_at.to_string()));
         if let Some(parent_team_id) = self.parent_team_id {
             update_row = update_row.set("parent_team_id", gluesql::core::ast_builder::num(parent_team_id));
         }
@@ -8428,7 +8654,7 @@ impl Team {
         use gluesql::core::ast_builder::*;
         let select_row = table("teams")
             .select()
-            .project("id, name, description, parent_team_id, created_by")
+            .project("id, name, description, parent_team_id, created_by, created_at, updated_by, updated_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -8460,6 +8686,18 @@ impl Team {
             created_by: match row.get("created_by").unwrap() {
                 gluesql::prelude::Value::I32(created_by) => created_by.clone(),
                 _ => unreachable!("Expected I32")
+            },
+            created_at: match row.get("created_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
+            updated_by: match row.get("updated_by").unwrap() {
+                gluesql::prelude::Value::I32(updated_by) => updated_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            updated_at: match row.get("updated_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(updated_at) => updated_at.clone(),
+                _ => unreachable!("Expected Timestamp")
             },
         }
     }

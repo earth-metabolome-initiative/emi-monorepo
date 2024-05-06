@@ -631,6 +631,9 @@ impl Color {
 pub struct ContainerHorizontalRule {
     pub id: i32,
     pub created_by: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
     pub name: String,
     pub item_type_id: i32,
     pub other_item_type_id: i32,
@@ -647,6 +650,9 @@ impl From<ContainerHorizontalRule> for web_common::database::tables::ContainerHo
         Self {
             id: item.id,
             created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
             name: item.name,
             item_type_id: item.item_type_id,
             other_item_type_id: item.other_item_type_id,
@@ -665,6 +671,9 @@ impl From<web_common::database::tables::ContainerHorizontalRule> for ContainerHo
         Self {
             id: item.id,
             created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
             name: item.name,
             item_type_id: item.item_type_id,
             other_item_type_id: item.other_item_type_id,
@@ -758,6 +767,9 @@ impl ContainerHorizontalRule {
 pub struct ContainerVerticalRule {
     pub id: i32,
     pub created_by: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
     pub name: String,
     pub container_item_type_id: i32,
     pub contained_item_type_id: i32,
@@ -774,6 +786,9 @@ impl From<ContainerVerticalRule> for web_common::database::tables::ContainerVert
         Self {
             id: item.id,
             created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
             name: item.name,
             container_item_type_id: item.container_item_type_id,
             contained_item_type_id: item.contained_item_type_id,
@@ -792,6 +807,9 @@ impl From<web_common::database::tables::ContainerVerticalRule> for ContainerVert
         Self {
             id: item.id,
             created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
             name: item.name,
             container_item_type_id: item.container_item_type_id,
             contained_item_type_id: item.contained_item_type_id,
@@ -967,6 +985,9 @@ impl ContinuousUnit {
 pub struct DerivedSample {
     pub id: i32,
     pub created_by: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
     pub parent_sample_id: Uuid,
     pub child_sample_id: Uuid,
 }
@@ -976,6 +997,9 @@ impl From<DerivedSample> for web_common::database::tables::DerivedSample {
         Self {
             id: item.id,
             created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
             parent_sample_id: item.parent_sample_id,
             child_sample_id: item.child_sample_id,
         }
@@ -987,6 +1011,9 @@ impl From<web_common::database::tables::DerivedSample> for DerivedSample {
         Self {
             id: item.id,
             created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
             parent_sample_id: item.parent_sample_id,
             child_sample_id: item.child_sample_id,
         }
@@ -1628,6 +1655,9 @@ pub struct ItemCategory {
     pub name: String,
     pub description: String,
     pub created_by: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
 }
 
 impl From<ItemCategory> for web_common::database::tables::ItemCategory {
@@ -1637,6 +1667,9 @@ impl From<ItemCategory> for web_common::database::tables::ItemCategory {
             name: item.name,
             description: item.description,
             created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
         }
     }
 }
@@ -1648,6 +1681,9 @@ impl From<web_common::database::tables::ItemCategory> for ItemCategory {
             name: item.name,
             description: item.description,
             created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
         }
     }
 }
@@ -1746,7 +1782,7 @@ impl ItemCategory {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, created_by FROM item_categories ",
+            "SELECT id, name, description, created_by, created_at, updated_by, updated_at FROM item_categories ",
             "WHERE $1 % f_concat_item_categories_name_description(name, description) ",
             "ORDER BY similarity($1, f_concat_item_categories_name_description(name, description)) DESC LIMIT $2",
         );
@@ -1775,7 +1811,7 @@ impl ItemCategory {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, created_by FROM item_categories ",
+            "SELECT id, name, description, created_by, created_at, updated_by, updated_at FROM item_categories ",
             "WHERE $1 <% f_concat_item_categories_name_description(name, description) ",
             "ORDER BY word_similarity($1, f_concat_item_categories_name_description(name, description)) DESC LIMIT $2",
         );
@@ -1804,7 +1840,7 @@ impl ItemCategory {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, created_by FROM item_categories ",
+            "SELECT id, name, description, created_by, created_at, updated_by, updated_at FROM item_categories ",
             "WHERE $1 <<% f_concat_item_categories_name_description(name, description) ",
             "ORDER BY strict_word_similarity($1, f_concat_item_categories_name_description(name, description)) DESC LIMIT $2",
         );
@@ -2948,6 +2984,9 @@ pub struct Procedure {
     pub name: String,
     pub description: Option<String>,
     pub created_by: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
 }
 
 impl From<Procedure> for web_common::database::tables::Procedure {
@@ -2957,6 +2996,9 @@ impl From<Procedure> for web_common::database::tables::Procedure {
             name: item.name,
             description: item.description,
             created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
         }
     }
 }
@@ -2968,6 +3010,9 @@ impl From<web_common::database::tables::Procedure> for Procedure {
             name: item.name,
             description: item.description,
             created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
         }
     }
 }
@@ -3052,6 +3097,9 @@ impl Procedure {
 pub struct ProjectRequirement {
     pub id: i32,
     pub created_by: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
     pub project_id: i32,
     pub item_category_id: i32,
     pub quantity: i32,
@@ -3063,6 +3111,9 @@ impl From<ProjectRequirement> for web_common::database::tables::ProjectRequireme
         Self {
             id: item.id,
             created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
             project_id: item.project_id,
             item_category_id: item.item_category_id,
             quantity: item.quantity,
@@ -3076,6 +3127,9 @@ impl From<web_common::database::tables::ProjectRequirement> for ProjectRequireme
         Self {
             id: item.id,
             created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
             project_id: item.project_id,
             item_category_id: item.item_category_id,
             quantity: item.quantity,
@@ -4011,16 +4065,28 @@ impl SampledIndividualBioOttTaxonItem {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default, Identifiable, QueryableByName, Insertable, Selectable)]
+#[derive(Queryable, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default, Identifiable, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sampled_individuals)]
 pub struct SampledIndividual {
     pub id: Uuid,
+    pub created_by: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
+    pub name: Option<String>,
+    pub tagged: bool,
 }
 
 impl From<SampledIndividual> for web_common::database::tables::SampledIndividual {
     fn from(item: SampledIndividual) -> Self {
         Self {
             id: item.id,
+            created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
+            name: item.name,
+            tagged: item.tagged,
         }
     }
 }
@@ -4029,6 +4095,12 @@ impl From<web_common::database::tables::SampledIndividual> for SampledIndividual
     fn from(item: web_common::database::tables::SampledIndividual) -> Self {
         Self {
             id: item.id,
+            created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
+            name: item.name,
+            tagged: item.tagged,
         }
     }
 }
@@ -4099,6 +4171,9 @@ pub struct Sample {
     pub id: Uuid,
     pub inserted_by: i32,
     pub sampled_by: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
     pub procedure_id: Uuid,
     pub state: i32,
 }
@@ -4109,6 +4184,9 @@ impl From<Sample> for web_common::database::tables::Sample {
             id: item.id,
             inserted_by: item.inserted_by,
             sampled_by: item.sampled_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
             procedure_id: item.procedure_id,
             state: item.state,
         }
@@ -4121,6 +4199,9 @@ impl From<web_common::database::tables::Sample> for Sample {
             id: item.id,
             inserted_by: item.inserted_by,
             sampled_by: item.sampled_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
             procedure_id: item.procedure_id,
             state: item.state,
         }
@@ -4194,6 +4275,9 @@ pub struct SamplingProcedure {
     pub name: String,
     pub description: Option<String>,
     pub created_by: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
 }
 
 impl From<SamplingProcedure> for web_common::database::tables::SamplingProcedure {
@@ -4203,6 +4287,9 @@ impl From<SamplingProcedure> for web_common::database::tables::SamplingProcedure
             name: item.name,
             description: item.description,
             created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
         }
     }
 }
@@ -4214,6 +4301,9 @@ impl From<web_common::database::tables::SamplingProcedure> for SamplingProcedure
             name: item.name,
             description: item.description,
             created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
         }
     }
 }
@@ -4297,7 +4387,7 @@ impl SamplingProcedure {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, created_by FROM sampling_procedures ",
+            "SELECT id, name, description, created_by, created_at, updated_by, updated_at FROM sampling_procedures ",
             "WHERE $1 % f_concat_sampling_procedures_name_description(name, description) ",
             "ORDER BY similarity($1, f_concat_sampling_procedures_name_description(name, description)) DESC LIMIT $2",
         );
@@ -4326,7 +4416,7 @@ impl SamplingProcedure {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, created_by FROM sampling_procedures ",
+            "SELECT id, name, description, created_by, created_at, updated_by, updated_at FROM sampling_procedures ",
             "WHERE $1 <% f_concat_sampling_procedures_name_description(name, description) ",
             "ORDER BY word_similarity($1, f_concat_sampling_procedures_name_description(name, description)) DESC LIMIT $2",
         );
@@ -4355,7 +4445,7 @@ impl SamplingProcedure {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, created_by FROM sampling_procedures ",
+            "SELECT id, name, description, created_by, created_at, updated_by, updated_at FROM sampling_procedures ",
             "WHERE $1 <<% f_concat_sampling_procedures_name_description(name, description) ",
             "ORDER BY strict_word_similarity($1, f_concat_sampling_procedures_name_description(name, description)) DESC LIMIT $2",
         );
@@ -4727,6 +4817,9 @@ pub struct Team {
     pub description: String,
     pub parent_team_id: Option<i32>,
     pub created_by: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
 }
 
 impl From<Team> for web_common::database::tables::Team {
@@ -4737,6 +4830,9 @@ impl From<Team> for web_common::database::tables::Team {
             description: item.description,
             parent_team_id: item.parent_team_id,
             created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
         }
     }
 }
@@ -4749,6 +4845,9 @@ impl From<web_common::database::tables::Team> for Team {
             description: item.description,
             parent_team_id: item.parent_team_id,
             created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
         }
     }
 }
@@ -4847,7 +4946,7 @@ impl Team {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, parent_team_id, created_by FROM teams ",
+            "SELECT id, name, description, parent_team_id, created_by, created_at, updated_by, updated_at FROM teams ",
             "WHERE $1 % f_concat_teams_name_description(name, description) ",
             "ORDER BY similarity($1, f_concat_teams_name_description(name, description)) DESC LIMIT $2",
         );
@@ -4876,7 +4975,7 @@ impl Team {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, parent_team_id, created_by FROM teams ",
+            "SELECT id, name, description, parent_team_id, created_by, created_at, updated_by, updated_at FROM teams ",
             "WHERE $1 <% f_concat_teams_name_description(name, description) ",
             "ORDER BY word_similarity($1, f_concat_teams_name_description(name, description)) DESC LIMIT $2",
         );
@@ -4905,7 +5004,7 @@ impl Team {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, parent_team_id, created_by FROM teams ",
+            "SELECT id, name, description, parent_team_id, created_by, created_at, updated_by, updated_at FROM teams ",
             "WHERE $1 <<% f_concat_teams_name_description(name, description) ",
             "ORDER BY strict_word_similarity($1, f_concat_teams_name_description(name, description)) DESC LIMIT $2",
         );

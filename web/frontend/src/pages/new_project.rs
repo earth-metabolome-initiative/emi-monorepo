@@ -1,6 +1,6 @@
 //! Page of the user profile, allowing the user to edit their profile.
 
-use crate::components::forms::automatic_forms::NewProjectForm;
+use crate::components::forms::automatic_forms::CreateProjectForm;
 use yew::prelude::*;
 
 #[function_component(NewProjectPage)]
@@ -10,7 +10,7 @@ pub fn new_project_page() -> Html {
     html! {
         // <div class="fullscreen_center_app">
             <div class="new_project">
-                <NewProjectForm />
+                <CreateProjectForm />
             </div>
         // </div>
     }

@@ -3,6 +3,11 @@ CREATE TABLE IF NOT EXISTS container_vertical_rules (
     created_by INTEGER REFERENCES users(id) ON
     DELETE
         CASCADE NOT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_by INTEGER REFERENCES users(id) ON
+    DELETE
+        CASCADE NOT NULL,
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         name TEXT NOT NULL UNIQUE,
         container_item_type_id INTEGER REFERENCES item_categories(id) ON
     DELETE

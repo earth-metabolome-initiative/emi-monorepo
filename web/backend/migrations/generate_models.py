@@ -244,21 +244,13 @@ class AttributeMetadata:
         )
 
     def is_creator_user_id(self) -> bool:
-        return (
-            isinstance(self._data_type, StructMetadata)
-            and self._data_type.is_insertable()
-            or self.name in ("inserted_by", "created_by")
-        )
+        return self.name in ("inserted_by", "created_by")
 
     def is_creation_timestamp(self) -> bool:
         return self.name in ("inserted_at", "created_at")
 
     def is_updater_user_id(self) -> bool:
-        return (
-            isinstance(self._data_type, StructMetadata)
-            and self._data_type.is_updatable()
-            or self.name in ("updated_by",)
-        )
+        return self.name in ("updated_by",)
 
     def is_update_timestamp(self) -> bool:
         return self.name in ("updated_at",)
@@ -468,6 +460,9 @@ class StructMetadata:
         self._derives: List[str] = []
         self._decorators: List[str] = []
         self._flat_variant: Optional[StructMetadata] = None
+        self._richest_variant: Optional[StructMetadata] = None
+        self._new_variant: Optional[StructMetadata] = None
+        self._update_variant: Optional[StructMetadata] = None
 
     def requires_authentication(self) -> bool:
         """Returns whether the struct requires authentication.
@@ -547,6 +542,59 @@ class StructMetadata:
 
         return self._flat_variant
 
+    def set_richest_variant(self, struct: "StructMetadata"):
+        assert struct.table_name == self.table_name
+        self._richest_variant = struct
+
+    def get_richest_variant(self) -> "StructMetadata":
+        if self._richest_variant is None:
+            raise ValueError("The richest variant has not been set.")
+
+        return self._richest_variant
+
+    def set_new_variant(self, struct: "StructMetadata"):
+        assert struct.table_name == self.table_name
+        assert struct.is_new_variant()
+        self._new_variant = struct
+
+    def get_new_variant(self) -> "StructMetadata":
+        if self._new_variant is None:
+            raise ValueError(
+                "The new variant has not been set for the struct "
+                f"{self.name} associated with the table {self.table_name}."
+            )
+
+        if not self.is_insertable():
+            raise ValueError(
+                f"The struct {self.name} does not contain an updator user ID attribute "
+                f"in the table {self.table_name}."
+            )
+
+        return self._new_variant
+
+    def set_update_variant(self, struct: "StructMetadata"):
+        assert struct.table_name == self.table_name
+        assert struct.is_update_variant()
+        self._update_variant = struct
+
+    def get_update_variant(self) -> "StructMetadata":
+        if self.get_new_variant().is_update_variant():
+            return self.get_new_variant()
+
+        if not self.is_updatable():
+            raise ValueError(
+                f"The struct {self.name} does not contain an updator "
+                f"user ID attribute in the table {self.table_name}."
+            )
+
+        if self._update_variant is None:
+            raise ValueError(
+                "The update variant has not been set for the struct "
+                f"{self.name} associated with the table {self.table_name}."
+            )
+
+        return self._update_variant
+
     def has_undefined_nested_dependencies(self) -> bool:
         """Returns whether the struct has undefined nested dependencies.
 
@@ -610,7 +658,7 @@ class StructMetadata:
         raise ValueError("The struct does not contain a creator user ID attribute.")
 
     def get_updator_user_id_attribute(self) -> AttributeMetadata:
-        if self.is_update_variant():
+        if self.is_update_variant() or self.is_new_variant():
             return self.get_flat_variant().get_updator_user_id_attribute()
         for attribute in self.attributes:
             if attribute.is_updater_user_id():
@@ -1905,7 +1953,7 @@ def write_update_method_for_gluesql(
             )
 
     if updator_user_id_attribute is not None:
-        conversion = update_types_and_methods[attribute.data_type()].format("user_id")
+        conversion = update_types_and_methods["i32"].format("user_id")
         writer.write(
             f'        \n.set("{updator_user_id_attribute.name}", {conversion})'
         )
@@ -2331,7 +2379,7 @@ def write_web_common_structs(
                     tables.write("            },\n")
             else:
                 raise NotImplementedError(
-                    f"Found an unsupported attribute type for the struct {struct_name}: {attribute.data_type()} "
+                    f"Found an unsupported attribute type for the struct {struct.name}: {attribute.data_type()} "
                     f"for the attribute {attribute.name}."
                 )
         tables.write("        }\n")
@@ -3221,13 +3269,17 @@ def write_webcommons_table_names_enumeration(
     # when it is available.
     for struct in new_model_structs:
         assert struct.table_name in tables, f"Table {struct.table_name} not found."
+        assert struct.is_new_variant()
         tables[struct.table_name].set_new_flat_struct(struct)
+        struct.set_richest_variant(tables[struct.table_name].get_richest_struct())
 
     # We set the update flat model struct variant for each of the tables,
     # when it is available.
     for struct in update_model_structs:
         assert struct.table_name in tables, f"Table {struct.table_name} not found."
+        assert struct.is_update_variant()
         tables[struct.table_name].set_update_flat_struct(struct)
+        struct.set_richest_variant(tables[struct.table_name].get_richest_struct())
 
     tables: List[TableStructMetadata] = sorted(
         list(tables.values()), key=lambda x: x.name
@@ -3516,8 +3568,8 @@ def write_webcommons_table_names_enumeration(
             )
             continue
 
-        primary_key_name, primary_key_type = tables_metadata.get_primary_key_name_and_type(
-            table.name
+        primary_key_name, primary_key_type = (
+            tables_metadata.get_primary_key_name_and_type(table.name)
         )
 
         document.write(
@@ -3630,7 +3682,7 @@ def write_diesel_table_names_enumeration(
         "use diesel::r2d2::PooledConnection;",
         "use diesel::r2d2::ConnectionManager;",
         "use crate::new_variants::InsertRow;",
-        "use crate::update_variants::UpdateRow;"
+        "use crate::update_variants::UpdateRow;",
     ]
 
     for import_statement in imports:
@@ -4285,103 +4337,109 @@ def derive_new_nested_models(
     return new_nested_model_structs
 
 
-def derive_new_model_builders(
-    new_struct_metadatas: List[StructMetadata],
-    tables: List[TableStructMetadata],
+def derive_model_builders(
+    new_or_update_struct_metadatas: List[StructMetadata],
 ) -> List[StructMetadata]:
-    """Returns list of the New{Model}Builder structs.
+    """Returns list of the {struct_name}Builder structs.
 
     Parameters
     ----------
-    new_struct_metadatas : List[StructMetadata]
+    new_or_update_struct_metadatas : List[StructMetadata]
         The list of the StructMetadata objects.
-    tables : List[TableStructMetadata]
-        The list of the TableStructMetadata objects.
+        This list includes both the New and Update variants.
 
     Implementation details
     ----------------------
-    The New{Model}Builder structs are used to build the New{Model} structs.
+    The {struct_name}Builder structs are used to build either the New{struct_name} or Update{stuct_name} structs.
     Since they are builders, they contain option variants of the attributes
-    of the New{Model} structs. When the original attribute is already optional (Option<T>)
-    the New{Model}Builder attribute is not doubly optional (Option<Option<T>>), but simply optional
+    of the {struct_name} structs. When the original attribute is already optional (Option<T>)
+    the {struct_name}Builder attribute is not doubly optional (Option<Option<T>>), but simply optional
     as the original attribute (Option<T>).
     """
-    new_struct_builders = []
+    builders = []
     table_metadata = find_foreign_keys()
 
     for struct in tqdm(
-        new_struct_metadatas,
-        desc="Deriving new structs",
+        new_or_update_struct_metadatas,
+        desc="Deriving builders",
         unit="struct",
         leave=False,
     ):
-        new_struct_builder = StructMetadata(
-            struct_name=f"{struct.name}Builder",
+        assert not struct.is_nested()
+        assert struct.is_new_variant() or struct.is_update_variant()
+
+        if struct.is_update_variant() and not struct.is_new_variant():
+            found = False
+            for builder in builders:
+                if builder.table_name == struct.table_name:
+                    found = True
+                    builder.set_update_variant(struct)
+                    break
+
+            if not found:
+                raise Exception(
+                    f"Update variant {struct.name} does not have a corresponding builder, "
+                    "which should have been created when deriving the new variant's builder."
+                )
+
+            continue
+
+        assert struct.is_new_variant()
+        flat_variant = struct.get_flat_variant()
+        richest_variant = struct.get_richest_variant()
+        
+        builder = StructMetadata(
+            struct_name=f"{flat_variant.name}Builder",
             table_name=struct.table_name,
         )
 
-        new_struct_builder.add_derive("Store")
+        builder.set_flat_variant(flat_variant)
+        builder.set_richest_variant(richest_variant)
+        builder.set_new_variant(struct)
+
+        builder.add_derive("Store")
         for derive in struct.derives():
-            new_struct_builder.add_derive(derive)
+            builder.add_derive(derive)
 
-        new_struct_builder.add_decorator('store(storage = "session")')
+        builder.add_decorator('store(storage = "session")')
 
-        for attribute in struct.attributes:
-            if attribute.name == "inner":
-                if struct.is_nested():
-                    continue
-                else:
-                    raise ValueError(
-                        f"Struct {struct.name} is not nested, but has an inner attribute."
-                    )
+        foreign_keys = table_metadata.get_foreign_keys(struct.table_name)
+        primary_key_name, _ = table_metadata.get_primary_key_name_and_type(
+            struct.table_name
+        )
 
-            # If this attribute is a struct, we make sure that it is
-            # the richest variant of the struct, as we want to expose
-            # the version for which we implement the APIs.
-            if isinstance(attribute.raw_data_type(), StructMetadata):
-                target_table_name = attribute.raw_data_type().table_name
-                table_struct = None
-                for table in tables:
-                    if table.name == target_table_name:
-                        table_struct = table
-                        break
+        for attribute in flat_variant.attributes:
+            if attribute.name in foreign_keys and attribute.name != primary_key_name:
+                continue
 
-                if table_struct is None:
-                    raise Exception(
-                        f"Table {target_table_name} not found in the tables list."
-                    )
-
-                richest_struct = table_struct.get_richest_struct()
-                attribute = AttributeMetadata(
-                    original_name=attribute.original_name,
-                    name=attribute.name,
-                    data_type=richest_struct,
-                    optional=attribute.optional,
-                )
+            if attribute.is_automatically_determined_column():
+                continue
 
             attribute = copy.deepcopy(attribute)
             attribute.optional = True
-            new_struct_builder.add_attribute(attribute)
+            builder.add_attribute(attribute)
 
-        # When a struct is nested, we also need to expose in
-        # the builder the attributes of the nested struct that
-        # are not exposed as foreign keys, so as to populate them
-        # with the builder pattern.
-        if struct.is_nested():
-            inner = struct.get_attribute_by_name("inner")
-            foreign_keys = table_metadata.get_foreign_keys(struct.table_name)
-            primary_key_name, _ = table_metadata.get_primary_key_name_and_type(
-                struct.table_name
-            )
+        if richest_variant.is_nested():
+            for attribute in richest_variant.attributes:
 
-            for attribute in inner.raw_data_type().attributes:
-                if attribute.name in foreign_keys:
+                if attribute.name == "inner":
                     continue
-                if attribute.name == primary_key_name:
+
+                if attribute.is_automatically_determined_column():
                     continue
+
+                if attribute.data_type() == flat_variant.name:
+                    builder.add_attribute(AttributeMetadata(
+                        original_name=attribute.original_name,
+                        name=attribute.name,
+                        data_type=richest_variant,
+                        optional=True,
+                    ))
+                    continue
+
                 attribute = copy.deepcopy(attribute)
                 attribute.optional = True
-                new_struct_builder.add_attribute(attribute)
+                builder.add_attribute(attribute)
 
         # For each attribute, for add new parameters that are vectors
         # for ApiError and collect the errors associated to the specific
@@ -4390,7 +4448,10 @@ def derive_new_model_builders(
         # easily distinguish these fields from the other fields and avoid
         # name clashes, we prefix the attribute name with `errors_`.
         new_attributes = []
-        for attribute in new_struct_builder.attributes:
+        for attribute in builder.attributes:
+            if attribute.name == primary_key_name:
+                continue
+
             new_attributes.append(
                 AttributeMetadata(
                     original_name=attribute.original_name,
@@ -4401,11 +4462,11 @@ def derive_new_model_builders(
             )
 
         for attribute in new_attributes:
-            new_struct_builder.add_attribute(attribute)
+            builder.add_attribute(attribute)
 
-        new_struct_builders.append(new_struct_builder)
+        builders.append(builder)
 
-    return new_struct_builders
+    return builders
 
 
 def write_web_common_new_structs(
@@ -4792,7 +4853,7 @@ def write_diesel_new_structs(
         # This value initially will be set to the same value as the creator user id, but it
         # will be updated when the row is updated.
 
-        if struct.is_update_variant():
+        if struct.is_updatable():
             updator_user_id_attribute: AttributeMetadata = (
                 struct.get_updator_user_id_attribute()
             )
@@ -4948,6 +5009,10 @@ def write_diesel_update_structs(
 
         intermediate_struct_name = f"Intermediate{struct.name}"
 
+        primary_key_name, _ = find_foreign_keys().get_primary_key_name_and_type(
+            struct.table_name
+        )
+
         # First, we write the intermediate struct that is used to update the row in the database.
         document.write(
             f"/// Intermediate representation of the update variant {struct.name}.\n"
@@ -4961,6 +5026,8 @@ def write_diesel_update_structs(
         ] + struct.attributes
 
         for attribute in all_attributes:
+            if attribute.name == primary_key_name:
+                continue
             document.write(f"    {attribute.name}: {attribute.format_data_type()},\n")
 
         document.write("}\n\n")
@@ -4975,6 +5042,8 @@ def write_diesel_update_structs(
         )
 
         for attribute in all_attributes:
+            if attribute.name == primary_key_name:
+                continue
             if attribute.name == updator_user_id_attribute.name:
                 document.write(f"            {attribute.name}: user_id,\n")
             else:
@@ -4992,6 +5061,9 @@ def write_diesel_update_structs(
             "    ) -> Result<Self::Flat, diesel::result::Error> {\n"
             f"        use crate::schema::{struct.table_name};\n"
             f"        diesel::update({struct.table_name}::dsl::{struct.table_name})\n"
+            "            .filter(\n"
+            f"                {struct.table_name}::dsl::{primary_key_name}.eq(self.{primary_key_name})\n"
+            "            )\n"
             "            .set(self.to_intermediate(user_id))\n"
             "            .get_result(connection)\n"
             "    }\n"
@@ -5071,12 +5143,26 @@ def write_frontend_builder_action_enumeration(
     This method writes the enumeration of the builder actions for the builder struct.
     """
 
+    table_metadata = find_foreign_keys()
+
+    primary_key_name, _primary_key_type = table_metadata.get_primary_key_name_and_type(
+        builder.table_name
+    )
+
+    flat_variant = builder.get_flat_variant()
+    rich_variant = builder.get_richest_variant()
+
+    action_enum_name = f"{flat_variant.name}Actions"
+
     document.write(
         f"#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]\n"
-        f"pub(super) enum {builder.name}Actions {{\n"
+        f"pub(super) enum {action_enum_name} {{\n"
     )
 
     for attribute in builder.attributes:
+        if attribute.name == primary_key_name:
+            continue
+
         # We do not want to include the errors attribute in the builder actions.
         if (
             attribute.name.startswith("errors_")
@@ -5090,36 +5176,17 @@ def write_frontend_builder_action_enumeration(
 
     document.write("}\n\n")
 
-
-def write_frontend_form_builder_reducer(
-    builder: StructMetadata,
-    build_target: StructMetadata,
-    document: "io.TextIO",
-):
-    """Writes the reducer for the builder struct.
-
-    Parameters
-    ----------
-    builder : StructMetadata
-        The builder struct for which to write the reducer.
-    build_target : StructMetadata
-        The struct that the builder builds.
-    document : io.TextIO
-        The document to write to.
-
-    Implementation details
-    ----------------------
-    This method writes the reducer for the builder struct.
-    """
-
     document.write(
-        f"impl Reducer<{builder.name}> for {builder.name}Actions {{\n"
+        f"impl Reducer<{builder.name}> for {action_enum_name} {{\n"
         f"    fn apply(self, mut state: std::rc::Rc<{builder.name}>) -> std::rc::Rc<{builder.name}> {{\n"
-        f"        let state_mut = Rc::make_mut(&mut state);\n"
-        f"        match self {{\n"
+        "        let state_mut = Rc::make_mut(&mut state);\n"
+        "        match self {\n"
     )
 
     for attribute in builder.attributes:
+        if attribute.name == primary_key_name:
+            continue
+
         # We do not want to include the errors attribute in the builder actions.
         if (
             attribute.name.startswith("errors_")
@@ -5127,30 +5194,21 @@ def write_frontend_form_builder_reducer(
         ):
             continue
 
-        struct_attribute = build_target.get_attribute_by_name(attribute.name)
-
-        # If the build target is a nested struct, it may not contain in the
-        # external level the attribute that is present in the builder. In this
-        # case, we need to go look for it inside the inner attribute.
-        if struct_attribute is None:
-            if not build_target.is_nested():
-                raise Exception(
-                    f"Attribute {attribute.name} not found in the build target struct {build_target.name}."
-                )
-
-            inner_attribute = build_target.get_attribute_by_name("inner")
-            struct_attribute = inner_attribute.raw_data_type().get_attribute_by_name(
-                attribute.name
-            )
+        struct_attribute = rich_variant.get_attribute_by_name(attribute.name)
 
         if struct_attribute is None:
-            raise Exception(
-                f"Attribute {attribute.name} not found in the build target struct {build_target.name}."
-            )
+            struct_attribute = flat_variant.get_attribute_by_name(attribute.name)
+
+        assert (
+            struct_attribute is not None
+        ), f"Attribute {attribute.name} not found in the struct {flat_variant.name}."
 
         document.write(
-            f"            {builder.name}Actions::Set{attribute.capitalized_name()}({attribute.name}) => {{\n"
+            f"            {action_enum_name}::Set{attribute.capitalized_name()}({attribute.name}) => {{\n"
         )
+
+        # First we clear out the existing errors associated with the attribute.
+        document.write(f"                state_mut.errors_{attribute.name}.clear();\n")
 
         # If the attribute is solely optional in the builder, we need to check
         # whether it is currently populated. If it is not, we return an error.
@@ -5173,7 +5231,6 @@ def write_frontend_form_builder_reducer(
 
 def write_frontend_form_builder_implementation(
     builder: StructMetadata,
-    flat_build_target: StructMetadata,
     document: "io.TextIO",
 ):
     """Writes the implementation of the FormBuilder trait for the builder struct.
@@ -5182,8 +5239,6 @@ def write_frontend_form_builder_implementation(
     ----------
     builder : StructMetadata
         The builder struct for which to write the implementation.
-    flat_build_target : StructMetadata
-        The struct that the builder builds.
     document : io.TextIO
         The document to write to.
 
@@ -5192,12 +5247,17 @@ def write_frontend_form_builder_implementation(
     This method implements the FormBuilder trait for the provided builder struct.
     """
 
-    assert not flat_build_target.is_nested()
+    flat_struct = builder.get_flat_variant()
+
+    table_metadata = find_foreign_keys()
+
+    primary_key_name, _primary_key_type = table_metadata.get_primary_key_name_and_type(
+        flat_struct.table_name
+    )
 
     document.write(
         f"impl FormBuilder for {builder.name} {{\n"
-        f"    type Data = {flat_build_target.name};\n"
-        f"    type Actions = {builder.name}Actions;\n\n"
+        f"    type Actions = {flat_struct.name}Actions;\n\n"
         f"    fn has_errors(&self) -> bool {{\n"
     )
 
@@ -5230,17 +5290,20 @@ def write_frontend_form_builder_implementation(
         if attribute.name.startswith("errors_"):
             continue
 
-        struct_attribute = flat_build_target.get_attribute_by_name(attribute.name)
+        if attribute.name == primary_key_name:
+            continue
+
+        struct_attribute = flat_struct.get_attribute_by_name(attribute.name)
 
         if struct_attribute is None:
             # We check whether the _id variant of the attribute is present.
-            struct_attribute = flat_build_target.get_attribute_by_name(
+            struct_attribute = flat_struct.get_attribute_by_name(
                 f"{attribute.name}_id"
             )
 
         if struct_attribute is None:
             raise Exception(
-                f"Attribute {attribute.name} not found in the build target struct {flat_build_target.name}."
+                f"Attribute {attribute.name} not found in the build target struct {flat_struct.name}."
             )
 
         if not struct_attribute.optional and attribute.optional:
@@ -5248,93 +5311,101 @@ def write_frontend_form_builder_implementation(
 
     document.write("    }\n\n")
 
-    # TODO! ADD FORM LEVEL ERRORS HERE!
-    document.write(
-        f"    fn form_level_errors(&self) -> Vec<String> {{\n"
-        f"        vec![]\n"
-        f"    }}\n\n"
-    )
-    document.write("}\n")
+    document.write("}\n\n")
 
-    # We implement the From method to convert the builder to the target struct.
-    document.write(
-        f"impl From<{builder.name}> for {flat_build_target.name} {{\n"
-        f"    fn from(builder: {builder.name}) -> Self {{\n"
-        f"        Self {{\n"
-    )
+    new_variant = builder.get_new_variant()
+    variants = [new_variant]
 
-    table_metadata = find_foreign_keys()
+    # If the new variant is not also used as an update
+    # variant, we add it to the list of variants.
+    if not new_variant.is_update_variant():
+        variants.append(builder.get_update_variant())
 
-    primary_key_name, _primary_key_type = table_metadata.get_primary_key_name_and_type(
-        flat_build_target.table_name
-    )
+    for variant in variants:
 
-    for attribute in flat_build_target.attributes:
+        # We implement the From method to convert the builder to the target struct.
+        document.write(
+            f"impl From<{builder.name}> for {variant.name} {{\n"
+            f"    fn from(builder: {builder.name}) -> Self {{\n"
+            "        Self {\n"
+        )
 
-        # There are 3 cases to consider:
-        # 1. The attribute is present in the builder, and is not a nested attribute.
-        # 2. The attribute is present in the builder, and is a nested attribute, so we need to recover the inner attribute.
-        # 3. The attribute is not present in the builder, so we need to check whether the normalized version, with the _id suffix, is present.
-
-        builder_attribute = builder.get_attribute_by_name(attribute.name)
-
-        if builder_attribute is None and attribute.name.endswith("_id"):
-            builder_attribute = builder.get_attribute_by_name(attribute.name[:-3])
-
-        if builder_attribute is None:
-
-            if attribute.name == primary_key_name and attribute.data_type() == "Uuid":
-                document.write("            id: Uuid::new_v4(),\n")
+        for attribute in flat_struct.attributes:
+            
+            if attribute.is_automatically_determined_column():
                 continue
 
-            raise Exception(
-                f"Attribute {attribute.name} not found in the builder struct {builder.name}."
-            )
+            if attribute.name == primary_key_name:
+                if variant.is_new_variant() and variant.is_update_variant():               
+                    assert attribute.data_type() == "Uuid"
+                    document.write(f"            {primary_key_name}: builder.{primary_key_name}.unwrap_or_else(Uuid::new_v4),\n")
+                elif variant.is_update_variant():
+                    assert attribute.data_type() != "Uuid"
+                    document.write(f"            {primary_key_name}: builder.{primary_key_name}.unwrap(),\n")
+                continue
+                
+            # There are 3 cases to consider:
+            # 1. The attribute is present in the builder, and is not a nested attribute.
+            # 2. The attribute is present in the builder, and is a nested attribute, so we need to recover the inner attribute.
+            # 3. The attribute is not present in the builder, so we need to check whether the normalized version, with the _id suffix, is present.
 
-        # At this point, we need to handle the case where the attribute is expected to be
-        # an option by the build target, and therefore we do not unwrap it, or alternatively
-        # the attribute is not expected to be an option by the build target, and therefore we
-        # unwrap it.
-        if attribute.optional:
-            if isinstance(builder_attribute.raw_data_type(), StructMetadata):
-                inner_primary_key_name, _primary_key_type = (
-                    table_metadata.get_primary_key_name_and_type(
-                        builder_attribute.raw_data_type().table_name
-                    )
-                )
-                if builder_attribute.raw_data_type().is_nested():
-                    document.write(
-                        f"            {attribute.name}: builder.{builder_attribute.name}.map(|{builder_attribute.name}| {builder_attribute.name}.inner.{inner_primary_key_name}),\n"
-                    )
-                else:
-                    document.write(
-                        f"            {attribute.name}: builder.{builder_attribute.name}.map(|{builder_attribute.name}| {builder_attribute.name}.{inner_primary_key_name}),\n"
-                    )
-            else:
-                document.write(
-                    f"            {attribute.name}: builder.{attribute.name},\n"
-                )
-        else:
-            if isinstance(builder_attribute.raw_data_type(), StructMetadata):
-                inner_primary_key_name, _primary_key_type = (
-                    table_metadata.get_primary_key_name_and_type(
-                        builder_attribute.raw_data_type().table_name
-                    )
-                )
-                if builder_attribute.raw_data_type().is_nested():
-                    document.write(
-                        f"            {attribute.name}: builder.{builder_attribute.name}.unwrap().inner.{inner_primary_key_name},\n"
-                    )
-                else:
-                    document.write(
-                        f"            {attribute.name}: builder.{builder_attribute.name}.unwrap().{inner_primary_key_name},\n"
-                    )
-            else:
-                document.write(
-                    f"            {attribute.name}: builder.{attribute.name}.unwrap(),\n"
+            builder_attribute = builder.get_attribute_by_name(attribute.name)
+
+            if builder_attribute is None and attribute.name.endswith("_id"):
+                builder_attribute = builder.get_attribute_by_name(attribute.name[:-3])
+
+            if builder_attribute is None:
+
+                raise Exception(
+                    f"It was impossible to find the attribute names {attribute.name} in "
+                    f"the builder struct {builder.name}. The attributes present in the struct "
+                    f"are {[attribute.name for attribute in builder.attributes]}."
                 )
 
-    document.write("        }\n" "    }\n" "}\n")
+            # At this point, we need to handle the case where the attribute is expected to be
+            # an option by the build target, and therefore we do not unwrap it, or alternatively
+            # the attribute is not expected to be an option by the build target, and therefore we
+            # unwrap it.
+            if attribute.optional:
+                if isinstance(builder_attribute.raw_data_type(), StructMetadata):
+                    inner_primary_key_name, _primary_key_type = (
+                        table_metadata.get_primary_key_name_and_type(
+                            builder_attribute.raw_data_type().table_name
+                        )
+                    )
+                    if builder_attribute.raw_data_type().is_nested():
+                        document.write(
+                            f"            {attribute.name}: builder.{builder_attribute.name}.map(|{builder_attribute.name}| {builder_attribute.name}.inner.{inner_primary_key_name}),\n"
+                        )
+                    else:
+                        document.write(
+                            f"            {attribute.name}: builder.{builder_attribute.name}.map(|{builder_attribute.name}| {builder_attribute.name}.{inner_primary_key_name}),\n"
+                        )
+                else:
+                    document.write(
+                        f"            {attribute.name}: builder.{attribute.name},\n"
+                    )
+            else:
+                if isinstance(builder_attribute.raw_data_type(), StructMetadata):
+                    inner_primary_key_name, _primary_key_type = (
+                        table_metadata.get_primary_key_name_and_type(
+                            builder_attribute.raw_data_type().table_name
+                        )
+                    )
+                    if builder_attribute.raw_data_type().is_nested():
+                        document.write(
+                            f"            {attribute.name}: builder.{builder_attribute.name}.unwrap().inner.{inner_primary_key_name},\n"
+                        )
+                    else:
+                        document.write(
+                            f"            {attribute.name}: builder.{builder_attribute.name}.unwrap().{inner_primary_key_name},\n"
+                        )
+                else:
+                    document.write(
+                        f"            {attribute.name}: builder.{attribute.name}.unwrap(),\n"
+                    )
+
+        document.write("        }\n" "    }\n" "}\n")
 
 
 def handle_missing_gin_index(
@@ -5830,7 +5901,6 @@ def handle_missing_row_to_badge_implementation(
 
 def write_frontend_yew_form(
     builder: StructMetadata,
-    build_target: StructMetadata,
     document: "io.TextIO",
 ):
     """Writes the Yew form for the builder struct.
@@ -5839,8 +5909,6 @@ def write_frontend_yew_form(
     ----------
     builder : StructMetadata
         The builder struct for which to write the form.
-    build_target : StructMetadata
-        The struct that the builder builds.
     document : io.TextIO
         The document to write to.
 
@@ -5849,103 +5917,149 @@ def write_frontend_yew_form(
     This method writes the Yew form for the provided builder struct.
     """
 
-    assert not build_target.is_nested()
-
     trigram_indices = find_pg_trgm_indices()
+    table_metadata = find_foreign_keys()
 
-    form_component_name = f"{build_target.name}Form"
-
-    if form_component_name.startswith("Nested"):
-        form_component_name = form_component_name[6:]
-
-    # We generate the lowercased name of the form component by splitting
-    # on the uppercased letters and joining the resulting list with an
-    # underscore.
-    form_method_name = "_".join(re.findall("[A-Z][^A-Z]*", form_component_name)).lower()
-
-    document.write(
-        f"#[function_component({form_component_name})]\n"
-        f"pub fn {form_method_name}() -> Html {{\n"
-        f"    let (builder_store, builder_dispatch) = use_store::<{builder.name}>();\n"
+    primary_key_name, _primary_key_type = table_metadata.get_primary_key_name_and_type(
+        builder.table_name
     )
 
-    for attribute in builder.attributes:
-        # We do not want to include the errors attribute in the builder actions.
-        if (
-            attribute.name.startswith("errors_")
-            and attribute.data_type() == "Vec<ApiError>"
-        ):
-            continue
+    flat_struct = builder.get_flat_variant()
+    new_variant = builder.get_new_variant()
+    update_variant = builder.get_update_variant()
 
-        if attribute.data_type() == "bool":
+    primary_key_attribute = flat_struct.get_attribute_by_name(primary_key_name)
+    assert primary_key_attribute is not None
+
+    variants = [
+        (new_variant, "POST"),
+        (update_variant, "PUT"),
+    ]
+
+    for (variant, method) in variants:
+
+        action_name = "Create" if method == "POST" else "Update"
+
+        form_component_name = f"{action_name}{flat_struct.name}Form"
+
+        # We generate the lowercased name of the form component by splitting
+        # on the uppercased letters and joining the resulting list with an
+        # underscore.
+        form_method_name = "_".join(re.findall("[A-Z][^A-Z]*", form_component_name)).lower()
+
+        # When we are creating an update variant, the form needs to receive the ID associated
+        # to the variant, so that the frontend can request the correct row from the backend,
+        # and upon submission, the frontend can send the correct ID to the backend. For this
+        # reason, we need to create a struct that derives the Properties trait, which will
+        # contain the ID of the row.
+
+        if method == "PUT":
             document.write(
-                f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: bool| {builder.name}Actions::Set{attribute.capitalized_name()}(Some({attribute.name})));\n"
+                f"#[derive(Clone, PartialEq, Properties)]\n"
+                f"pub struct {form_component_name}Prop {{\n"
+                f"    pub {primary_key_attribute.name}: {primary_key_attribute.format_data_type()},\n"
+                "}\n\n"
+            )
+
+        document.write(
+            f"#[function_component({form_component_name})]\n"
+        )
+
+        if method == "PUT":
+            # We need to generate the form method that will receive the ID of the row.
+            document.write(
+                f"pub fn {form_method_name}(props: &{form_component_name}Prop) -> Html {{\n"
             )
         else:
-            document.write(
-                f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: {attribute.format_data_type()}| {builder.name}Actions::Set{attribute.capitalized_name()}({attribute.name}));\n"
-            )
+            # We generate the form method that will not receive the ID of the row.
+            document.write(f"pub fn {form_method_name}() -> Html {{\n")
 
-    document.write(
-        f"    html! {{\n"
-        f"        <BasicForm<{build_target.name}> builder={{builder_store.deref().clone()}}>\n"
-    )
+        document.write(
+            f"    let (builder_store, builder_dispatch) = use_store::<{builder.name}>();\n"
+        )
 
-    for attribute in builder.attributes:
+        for attribute in builder.attributes:
+            # We do not want to include the errors attribute in the builder actions.
+            if (
+                attribute.name.startswith("errors_")
+                and attribute.data_type() == "Vec<ApiError>"
+            ):
+                continue
 
-        if (
-            attribute.name.startswith("errors_")
-            and attribute.data_type() == "Vec<ApiError>"
-        ):
-            continue
+            if attribute.name == primary_key_name:
+                continue
 
-        error_attribute = builder.get_attribute_by_name(f"errors_{attribute.name}")
-
-        if attribute.data_type() in ["String"]:
-            document.write(
-                f'            <BasicInput label="{attribute.capitalized_name()}" errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} value={{builder_store.{attribute.name}.clone()}} input_type={{InputType::Text}} />\n'
-            )
-            continue
-
-        if attribute.data_type() == "bool":
-            document.write(
-                f'            <Checkbox label="{attribute.capitalized_name()}" errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} value={{builder_store.{attribute.name}.unwrap_or(false)}} />\n'
-            )
-            continue
-
-        # If the attribute is a nested struct, we need to generate a Datalist
-        # that will allow the user to select the nested struct.
-        if isinstance(attribute.raw_data_type(), StructMetadata):
-            # We check that the table associated to the nested struct is searchable, otherwise
-            # we cannot generate the datalist for it and we need to raise an exception.
-            if not trigram_indices.has_table(attribute.raw_data_type().table_name):
-                handle_missing_gin_index(attribute)
-
-            # We check that the nested struct implements the RowToBadge trait, as we need to
-            # be able to convert the nested struct to a badge within the Datalist.
-            if not implements_row_to_badge(attribute.raw_data_type()):
-                handle_missing_row_to_badge_implementation(attribute.raw_data_type())
-                raise Exception(
-                    f"The struct {attribute.raw_data_type().name} does not implement the RowToBadge trait."
+            if attribute.data_type() == "bool":
+                document.write(
+                    f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: bool| {flat_struct.name}Actions::Set{attribute.capitalized_name()}(Some({attribute.name})));\n"
+                )
+            else:
+                document.write(
+                    f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: {attribute.format_data_type()}| {flat_struct.name}Actions::Set{attribute.capitalized_name()}({attribute.name}));\n"
                 )
 
-            document.write(
-                f'            <Datalist<{attribute.data_type()}> builder={{set_{attribute.name}}} errors={{builder_store.{error_attribute.name}.clone()}} value={{builder_store.{attribute.name}.clone()}} label="{attribute.capitalized_name()}" />\n'
-            )
-            continue
+        document.write(
+            "    html! {\n"
+            f"        <BasicForm<{variant.name}> method={{FormMethod::{method}}} builder={{builder_store.deref().clone()}}>\n"
+        )
 
-        # TODO! ADD MORE INPUT TYPES HERE!
+        for attribute in builder.attributes:
 
-        # raise Exception(
-        #     f"Attribute {attribute.name} of type {attribute.data_type()} not supported in the frontend form generation."
-        # )
+            if (
+                attribute.name.startswith("errors_")
+                and attribute.data_type() == "Vec<ApiError>"
+            ):
+                continue
 
-    document.write(f"        </BasicForm<{build_target.name}>>\n" f"    }}\n" f"}}\n")
+            if attribute.name == primary_key_name:
+                continue
+
+            error_attribute = builder.get_attribute_by_name(f"errors_{attribute.name}")
+
+            if attribute.data_type() in ["String"]:
+                document.write(
+                    f'            <BasicInput label="{attribute.capitalized_name()}" errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} value={{builder_store.{attribute.name}.clone()}} input_type={{InputType::Text}} />\n'
+                )
+                continue
+
+            if attribute.data_type() == "bool":
+                document.write(
+                    f'            <Checkbox label="{attribute.capitalized_name()}" errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} value={{builder_store.{attribute.name}.unwrap_or(false)}} />\n'
+                )
+                continue
+
+            # If the attribute is a nested struct, we need to generate a Datalist
+            # that will allow the user to select the nested struct.
+            if isinstance(attribute.raw_data_type(), StructMetadata):
+                # We check that the table associated to the nested struct is searchable, otherwise
+                # we cannot generate the datalist for it and we need to raise an exception.
+                if not trigram_indices.has_table(attribute.raw_data_type().table_name):
+                    handle_missing_gin_index(attribute)
+
+                # We check that the nested struct implements the RowToBadge trait, as we need to
+                # be able to convert the nested struct to a badge within the Datalist.
+                if not implements_row_to_badge(attribute.raw_data_type()):
+                    handle_missing_row_to_badge_implementation(attribute.raw_data_type())
+                    raise Exception(
+                        f"The struct {attribute.raw_data_type().name} does not implement the RowToBadge trait."
+                    )
+
+                document.write(
+                    f'            <Datalist<{attribute.data_type()}> builder={{set_{attribute.name}}} errors={{builder_store.{error_attribute.name}.clone()}} value={{builder_store.{attribute.name}.clone()}} label="{attribute.capitalized_name()}" />\n'
+                )
+                continue
+
+            # TODO! ADD MORE INPUT TYPES HERE!
+
+            # raise Exception(
+            #     f"Attribute {attribute.name} of type {attribute.data_type()} not supported in the frontend form generation."
+            # )
+
+        document.write(f"        </BasicForm<{variant.name}>>\n" f"    }}\n" f"}}\n")
 
 
 def write_frontend_form_buildable_implementation(
     builder: StructMetadata,
-    build_target: StructMetadata,
     document: "io.TextIO",
 ):
     """Writes the implementation of the Buildable trait for the target struct.
@@ -5954,8 +6068,6 @@ def write_frontend_form_buildable_implementation(
     ----------
     builder : StructMetadata
         The builder struct for which to write the implementation.
-    build_target : StructMetadata
-        The struct that the builder builds.
     document : io.TextIO
         The document to write to.
 
@@ -5965,42 +6077,44 @@ def write_frontend_form_buildable_implementation(
     """
 
     capitalized_table_name = "".join(
-        word.capitalize() for word in build_target.table_name.split("_")
+        word.capitalize() for word in builder.table_name.split("_")
     )
 
-    document.write(
-        f"impl FormBuildable for {build_target.name} {{\n"
-        f"    type Builder = {builder.name};\n"
-        f"    const TABLE: Table = Table::{capitalized_table_name};\n"
-        f"    const METHOD: FormMethod = FormMethod::POST;\n"  # Properly dispatch the method
-        f"    fn title() -> &'static str {{\n"
-        f'        "{build_target.name}"\n'  # TODO! Add the title
-        f"    }}\n"
-        f"    fn task_target() -> &'static str {{\n"
-        f'        "{build_target.name}"\n'  # TODO! Add the task target name
-        f"    }}\n"
-        f"    fn description() -> &'static str {{\n"
-        f'        concat!("Create a new {build_target.name}.",)\n'  # TODO! Add the description
-        f"    }}\n"
-        f"    fn requires_authentication() -> bool {{\n"
-        f"        {'true' if build_target.requires_authentication() else 'false'}\n"
-        f"    }}\n"
-        f"    fn can_operate_offline() -> bool {{\n"
-        f"        {'true' if build_target.has_uuid_primary_key() else 'false'}\n"
-        f"    }}\n"
-        f"}}\n"
-    )
+    new_variant = builder.get_new_variant()
+
+    variants = [new_variant,]
+
+    if not new_variant.is_update_variant():
+        variants.append(builder.get_update_variant())
+
+    for variant in variants:
+        document.write(
+            f"impl FormBuildable for {variant.name} {{\n"
+            f"    type Builder = {builder.name};\n"
+            f"    const TABLE: Table = Table::{capitalized_table_name};\n"
+            f"    fn title() -> &'static str {{\n"
+            f'        "{variant.name}"\n'  # TODO! Add the title
+            f"    }}\n"
+            f"    fn task_target() -> &'static str {{\n"
+            f'        "{variant.name}"\n'  # TODO! Add the task target name
+            f"    }}\n"
+            f"    fn description() -> &'static str {{\n"
+            f'        concat!("Create a new {variant.name}.",)\n'  # TODO! Add the description
+            f"    }}\n"
+            f"    fn requires_authentication() -> bool {{\n"
+            f"        {'true' if variant.requires_authentication() else 'false'}\n"
+            f"    }}\n"
+            f"    fn can_operate_offline() -> bool {{\n"
+            f"        {'true' if variant.has_uuid_primary_key() or variant.is_update_variant() else 'false'}\n"
+            f"    }}\n"
+            f"}}\n\n"
+        )
 
 
 def write_frontend_forms(
-    new_nested_struct_metadatas: List[StructMetadata],
-    new_struct_metadatas: List[StructMetadata],
-    new_model_builder_structs: List[StructMetadata],
+    builder_structs: List[StructMetadata],
 ):
     """Writes the frontend forms to the web_common crate."""
-
-    assert len(new_struct_metadatas) == len(new_model_builder_structs)
-    assert len(new_nested_struct_metadatas) == len(new_model_builder_structs)
 
     # For the time being, we simply write out the structs.
     # In the near future, we will also implement several
@@ -6040,26 +6154,17 @@ def write_frontend_forms(
 
     document.write("\n")
 
-    for builder, nested_target_struct, target_struct in tqdm(
-        zip(
-            new_model_builder_structs,
-            new_nested_struct_metadatas,
-            new_struct_metadatas,
-        ),
-        total=len(new_model_builder_structs),
+    for builder in tqdm(
+        builder_structs,
         desc="Writing new buiders",
         unit="struct",
         leave=False,
     ):
-        assert builder.table_name == target_struct.table_name
-
         builder.write_to(document)
-
         write_frontend_builder_action_enumeration(builder, document)
-        write_frontend_form_builder_implementation(builder, target_struct, document)
-        write_frontend_form_buildable_implementation(builder, target_struct, document)
-        write_frontend_form_builder_reducer(builder, nested_target_struct, document)
-        write_frontend_yew_form(builder, target_struct, document)
+        write_frontend_form_builder_implementation(builder, document)
+        write_frontend_form_buildable_implementation(builder, document)
+        write_frontend_yew_form(builder, document=document)
 
     document.flush()
     document.close()
@@ -6523,22 +6628,11 @@ if __name__ == "__main__":
     )
     print("Generated search trait implementations for web_common.")
 
-    # TODO: CHECK: Maybe we do not need nested new struct?
-    new_nested_model_structs = derive_new_nested_models(
-        new_model_structs, nested_structs
-    )
-    print(
-        f"Derived {len(new_nested_model_structs)} structs for the Nested New versions"
-    )
-
-    new_model_builder_structs = derive_new_model_builders(
-        new_nested_model_structs, tables
-    )
-    print(f"Derived {len(new_model_builder_structs)} builders for the New versions")
+    builder_structs = derive_model_builders(new_model_structs + update_model_structs)
+    print(f"Derived {len(builder_structs)} builders for the New & Update versions")
 
     write_web_common_new_structs(new_model_structs)
     write_web_common_update_structs(update_model_structs)
-    write_web_common_new_nested_structs(new_nested_model_structs)
     print("Generated new & update structs for web_common.")
 
     write_diesel_new_structs(new_model_structs)
@@ -6553,7 +6647,5 @@ if __name__ == "__main__":
     print("Generated new & update structs for diesel.")
 
     write_frontend_forms(
-        new_nested_model_structs,
-        new_model_structs,
-        new_model_builder_structs,
+        builder_structs,
     )

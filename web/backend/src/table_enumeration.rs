@@ -256,7 +256,7 @@ impl IdentifiableTable for web_common::database::Table {
             web_common::database::Table::SampleBioOttTaxonItems => bincode::serialize(&NestedSampleBioOttTaxonItem::get(primary_key.into(), connection)?)?,
             web_common::database::Table::SampleStates => bincode::serialize(&NestedSampleState::get(primary_key.into(), connection)?)?,
             web_common::database::Table::SampledIndividualBioOttTaxonItems => bincode::serialize(&NestedSampledIndividualBioOttTaxonItem::get(primary_key.into(), connection)?)?,
-            web_common::database::Table::SampledIndividuals => bincode::serialize(&SampledIndividual::get(primary_key.into(), connection)?)?,
+            web_common::database::Table::SampledIndividuals => bincode::serialize(&NestedSampledIndividual::get(primary_key.into(), connection)?)?,
             web_common::database::Table::Samples => bincode::serialize(&NestedSample::get(primary_key.into(), connection)?)?,
             web_common::database::Table::SamplingProcedures => bincode::serialize(&NestedSamplingProcedure::get(primary_key.into(), connection)?)?,
             web_common::database::Table::Spectra => bincode::serialize(&NestedSpectra::get(primary_key.into(), connection)?)?,
@@ -399,7 +399,7 @@ impl AllTable for web_common::database::Table {
             web_common::database::Table::SampleBioOttTaxonItems => NestedSampleBioOttTaxonItem::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SampleStates => NestedSampleState::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SampledIndividualBioOttTaxonItems => NestedSampledIndividualBioOttTaxonItem::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::SampledIndividuals => SampledIndividual::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::SampledIndividuals => NestedSampledIndividual::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::Samples => NestedSample::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SamplingProcedures => NestedSamplingProcedure::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::Spectra => NestedSpectra::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
@@ -502,7 +502,12 @@ impl InsertableTable for web_common::database::Table {
             web_common::database::Table::SampleBioOttTaxonItems => todo!("Insert not implemented for sample_bio_ott_taxon_items."),
             web_common::database::Table::SampleStates => unreachable!("Table `sample_states` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::SampledIndividualBioOttTaxonItems => todo!("Insert not implemented for sampled_individual_bio_ott_taxon_items."),
-            web_common::database::Table::SampledIndividuals => unreachable!("Table `sampled_individuals` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::SampledIndividuals => {
+                let row: web_common::database::NewSampledIndividual = bincode::deserialize::<web_common::database::NewSampledIndividual>(&row).map_err(web_common::api::ApiError::from)?;
+                let inserted_row: crate::models::SampledIndividual = <web_common::database::NewSampledIndividual as InsertRow>::insert(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedSampledIndividual::from_flat(inserted_row, connection)?;
+                 bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
+            },
             web_common::database::Table::Samples => {
                 let row: web_common::database::NewSample = bincode::deserialize::<web_common::database::NewSample>(&row).map_err(web_common::api::ApiError::from)?;
                 let inserted_row: crate::models::Sample = <web_common::database::NewSample as InsertRow>::insert(row, user_id, connection)?;
@@ -561,15 +566,30 @@ impl UpdatableTable for web_common::database::Table {
             web_common::database::Table::BioOttRanks => unreachable!("Table `bio_ott_ranks` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::BioOttTaxonItems => unreachable!("Table `bio_ott_taxon_items` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::Colors => unreachable!("Table `colors` is not updatable as it does not have a known column associated to an updater user id."),
-            web_common::database::Table::ContainerHorizontalRules => unreachable!("Table `container_horizontal_rules` is not updatable as it does not have a known column associated to an updater user id."),
-            web_common::database::Table::ContainerVerticalRules => unreachable!("Table `container_vertical_rules` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::ContainerHorizontalRules => {
+                let row: web_common::database::UpdateContainerHorizontalRule = bincode::deserialize::<web_common::database::UpdateContainerHorizontalRule>(&row).map_err(web_common::api::ApiError::from)?;
+                let updated_row: crate::models::ContainerHorizontalRule = <web_common::database::UpdateContainerHorizontalRule as UpdateRow>::update(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedContainerHorizontalRule::from_flat(updated_row, connection)?;
+                 bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::ContainerVerticalRules => {
+                let row: web_common::database::UpdateContainerVerticalRule = bincode::deserialize::<web_common::database::UpdateContainerVerticalRule>(&row).map_err(web_common::api::ApiError::from)?;
+                let updated_row: crate::models::ContainerVerticalRule = <web_common::database::UpdateContainerVerticalRule as UpdateRow>::update(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedContainerVerticalRule::from_flat(updated_row, connection)?;
+                 bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
+            },
             web_common::database::Table::ContinuousUnits => unreachable!("Table `continuous_units` is not updatable as it does not have a known column associated to an updater user id."),
-            web_common::database::Table::DerivedSamples => unreachable!("Table `derived_samples` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::DerivedSamples => todo!("Update not implemented for derived_samples."),
             web_common::database::Table::DiscreteUnits => unreachable!("Table `discrete_units` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::DocumentFormats => unreachable!("Table `document_formats` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::Documents => unreachable!("Table `documents` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::FontAwesomeIcons => unreachable!("Table `font_awesome_icons` is not updatable as it does not have a known column associated to an updater user id."),
-            web_common::database::Table::ItemCategories => unreachable!("Table `item_categories` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::ItemCategories => {
+                let row: web_common::database::UpdateItemCategory = bincode::deserialize::<web_common::database::UpdateItemCategory>(&row).map_err(web_common::api::ApiError::from)?;
+                let updated_row: crate::models::ItemCategory = <web_common::database::UpdateItemCategory as UpdateRow>::update(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedItemCategory::from_flat(updated_row, connection)?;
+                 bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
+            },
             web_common::database::Table::ItemCategoryRelationships => unreachable!("Table `item_category_relationships` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::ItemCategoryUnits => unreachable!("Table `item_category_units` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::ItemLocations => unreachable!("Table `item_locations` is not updatable as it does not have a known column associated to an updater user id."),
@@ -581,8 +601,18 @@ impl UpdatableTable for web_common::database::Table {
             web_common::database::Table::Notifications => unreachable!("Table `notifications` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::Organizations => unreachable!("Table `organizations` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::PrimaryUserEmails => unreachable!("Table `primary_user_emails` is not updatable as it does not have a known column associated to an updater user id."),
-            web_common::database::Table::Procedures => unreachable!("Table `procedures` is not updatable as it does not have a known column associated to an updater user id."),
-            web_common::database::Table::ProjectRequirements => unreachable!("Table `project_requirements` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::Procedures => {
+                let row: web_common::database::UpdateProcedure = bincode::deserialize::<web_common::database::UpdateProcedure>(&row).map_err(web_common::api::ApiError::from)?;
+                let updated_row: crate::models::Procedure = <web_common::database::UpdateProcedure as UpdateRow>::update(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedProcedure::from_flat(updated_row, connection)?;
+                 bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::ProjectRequirements => {
+                let row: web_common::database::UpdateProjectRequirement = bincode::deserialize::<web_common::database::UpdateProjectRequirement>(&row).map_err(web_common::api::ApiError::from)?;
+                let updated_row: crate::models::ProjectRequirement = <web_common::database::UpdateProjectRequirement as UpdateRow>::update(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedProjectRequirement::from_flat(updated_row, connection)?;
+                 bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
+            },
             web_common::database::Table::ProjectStates => unreachable!("Table `project_states` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::Projects => {
                 let row: web_common::database::UpdateProject = bincode::deserialize::<web_common::database::UpdateProject>(&row).map_err(web_common::api::ApiError::from)?;
@@ -595,13 +625,33 @@ impl UpdatableTable for web_common::database::Table {
             web_common::database::Table::SampleBioOttTaxonItems => unreachable!("Table `sample_bio_ott_taxon_items` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::SampleStates => unreachable!("Table `sample_states` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::SampledIndividualBioOttTaxonItems => unreachable!("Table `sampled_individual_bio_ott_taxon_items` is not updatable as it does not have a known column associated to an updater user id."),
-            web_common::database::Table::SampledIndividuals => unreachable!("Table `sampled_individuals` is not updatable as it does not have a known column associated to an updater user id."),
-            web_common::database::Table::Samples => unreachable!("Table `samples` is not updatable as it does not have a known column associated to an updater user id."),
-            web_common::database::Table::SamplingProcedures => unreachable!("Table `sampling_procedures` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::SampledIndividuals => {
+                let row: web_common::database::NewSampledIndividual = bincode::deserialize::<web_common::database::NewSampledIndividual>(&row).map_err(web_common::api::ApiError::from)?;
+                let updated_row: crate::models::SampledIndividual = <web_common::database::NewSampledIndividual as UpdateRow>::update(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedSampledIndividual::from_flat(updated_row, connection)?;
+                 bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::Samples => {
+                let row: web_common::database::NewSample = bincode::deserialize::<web_common::database::NewSample>(&row).map_err(web_common::api::ApiError::from)?;
+                let updated_row: crate::models::Sample = <web_common::database::NewSample as UpdateRow>::update(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedSample::from_flat(updated_row, connection)?;
+                 bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::SamplingProcedures => {
+                let row: web_common::database::NewSamplingProcedure = bincode::deserialize::<web_common::database::NewSamplingProcedure>(&row).map_err(web_common::api::ApiError::from)?;
+                let updated_row: crate::models::SamplingProcedure = <web_common::database::NewSamplingProcedure as UpdateRow>::update(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedSamplingProcedure::from_flat(updated_row, connection)?;
+                 bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
+            },
             web_common::database::Table::Spectra => unreachable!("Table `spectra` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::SpectraCollections => unreachable!("Table `spectra_collections` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::TeamStates => unreachable!("Table `team_states` is not updatable as it does not have a known column associated to an updater user id."),
-            web_common::database::Table::Teams => unreachable!("Table `teams` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::Teams => {
+                let row: web_common::database::UpdateTeam = bincode::deserialize::<web_common::database::UpdateTeam>(&row).map_err(web_common::api::ApiError::from)?;
+                let updated_row: crate::models::Team = <web_common::database::UpdateTeam as UpdateRow>::update(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedTeam::from_flat(updated_row, connection)?;
+                 bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
+            },
             web_common::database::Table::Units => unreachable!("Table `units` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::UserEmails => unreachable!("Table `user_emails` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::Users => unreachable!("Table `users` is not updatable as it does not have a known column associated to an updater user id."),

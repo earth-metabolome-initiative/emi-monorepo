@@ -44,6 +44,9 @@ diesel::table! {
     container_horizontal_rules (id) {
         id -> Int4,
         created_by -> Int4,
+        created_at -> Timestamp,
+        updated_by -> Int4,
+        updated_at -> Timestamp,
         name -> Text,
         item_type_id -> Int4,
         other_item_type_id -> Int4,
@@ -60,6 +63,9 @@ diesel::table! {
     container_vertical_rules (id) {
         id -> Int4,
         created_by -> Int4,
+        created_at -> Timestamp,
+        updated_by -> Int4,
+        updated_at -> Timestamp,
         name -> Text,
         container_item_type_id -> Int4,
         contained_item_type_id -> Int4,
@@ -82,6 +88,9 @@ diesel::table! {
     derived_samples (id) {
         id -> Int4,
         created_by -> Int4,
+        created_at -> Timestamp,
+        updated_by -> Int4,
+        updated_at -> Timestamp,
         parent_sample_id -> Uuid,
         child_sample_id -> Uuid,
     }
@@ -127,6 +136,9 @@ diesel::table! {
         name -> Text,
         description -> Text,
         created_by -> Int4,
+        created_at -> Timestamp,
+        updated_by -> Int4,
+        updated_at -> Timestamp,
     }
 }
 
@@ -251,6 +263,9 @@ diesel::table! {
         name -> Text,
         description -> Nullable<Text>,
         created_by -> Int4,
+        created_at -> Timestamp,
+        updated_by -> Int4,
+        updated_at -> Timestamp,
     }
 }
 
@@ -258,6 +273,9 @@ diesel::table! {
     project_requirements (id) {
         id -> Int4,
         created_by -> Int4,
+        created_at -> Timestamp,
+        updated_by -> Int4,
+        updated_at -> Timestamp,
         project_id -> Int4,
         item_category_id -> Int4,
         quantity -> Int4,
@@ -332,6 +350,12 @@ diesel::table! {
 diesel::table! {
     sampled_individuals (id) {
         id -> Uuid,
+        created_by -> Int4,
+        created_at -> Timestamp,
+        updated_by -> Int4,
+        updated_at -> Timestamp,
+        name -> Nullable<Text>,
+        tagged -> Bool,
     }
 }
 
@@ -340,6 +364,9 @@ diesel::table! {
         id -> Uuid,
         inserted_by -> Int4,
         sampled_by -> Int4,
+        created_at -> Timestamp,
+        updated_by -> Int4,
+        updated_at -> Timestamp,
         procedure_id -> Uuid,
         state -> Int4,
     }
@@ -351,6 +378,9 @@ diesel::table! {
         name -> Text,
         description -> Nullable<Text>,
         created_by -> Int4,
+        created_at -> Timestamp,
+        updated_by -> Int4,
+        updated_at -> Timestamp,
     }
 }
 
@@ -386,6 +416,9 @@ diesel::table! {
         description -> Text,
         parent_team_id -> Nullable<Int4>,
         created_by -> Int4,
+        created_at -> Timestamp,
+        updated_by -> Int4,
+        updated_at -> Timestamp,
     }
 }
 
@@ -423,14 +456,10 @@ diesel::joinable!(bio_ott_ranks -> font_awesome_icons (font_awesome_icon_id));
 diesel::joinable!(bio_ott_taxon_items -> bio_ott_ranks (ott_rank_id));
 diesel::joinable!(bio_ott_taxon_items -> colors (color_id));
 diesel::joinable!(bio_ott_taxon_items -> font_awesome_icons (font_awesome_icon_id));
-diesel::joinable!(container_horizontal_rules -> users (created_by));
-diesel::joinable!(container_vertical_rules -> users (created_by));
 diesel::joinable!(continuous_units -> units (id));
-diesel::joinable!(derived_samples -> users (created_by));
 diesel::joinable!(discrete_units -> units (id));
 diesel::joinable!(documents -> document_formats (format_id));
 diesel::joinable!(documents -> users (author_id));
-diesel::joinable!(item_categories -> users (created_by));
 diesel::joinable!(item_category_relationships -> users (added_by));
 diesel::joinable!(item_category_units -> item_categories (item_category_id));
 diesel::joinable!(item_category_units -> units (unit_id));
@@ -444,11 +473,9 @@ diesel::joinable!(login_providers -> font_awesome_icons (font_awesome_icon_id));
 diesel::joinable!(manufactured_item_categories -> organizations (manifacturer_id));
 diesel::joinable!(notifications -> users (user_id));
 diesel::joinable!(primary_user_emails -> user_emails (id));
-diesel::joinable!(procedures -> users (created_by));
 diesel::joinable!(project_requirements -> item_categories (item_category_id));
 diesel::joinable!(project_requirements -> projects (project_id));
 diesel::joinable!(project_requirements -> units (unit_id));
-diesel::joinable!(project_requirements -> users (created_by));
 diesel::joinable!(project_states -> colors (color_id));
 diesel::joinable!(project_states -> font_awesome_icons (font_awesome_icon_id));
 diesel::joinable!(projects -> project_states (state_id));
@@ -462,13 +489,11 @@ diesel::joinable!(sampled_individual_bio_ott_taxon_items -> sampled_individuals 
 diesel::joinable!(sampled_individual_bio_ott_taxon_items -> users (created_by));
 diesel::joinable!(samples -> sample_states (state));
 diesel::joinable!(samples -> sampling_procedures (procedure_id));
-diesel::joinable!(sampling_procedures -> users (created_by));
 diesel::joinable!(spectra -> spectra_collections (spectra_collection_id));
 diesel::joinable!(spectra_collections -> samples (sample_id));
 diesel::joinable!(spectra_collections -> users (created_by));
 diesel::joinable!(team_states -> colors (color_id));
 diesel::joinable!(team_states -> font_awesome_icons (font_awesome_icon_id));
-diesel::joinable!(teams -> users (created_by));
 diesel::joinable!(user_emails -> login_providers (login_provider_id));
 diesel::joinable!(user_emails -> users (user_id));
 

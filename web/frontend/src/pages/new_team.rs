@@ -1,6 +1,6 @@
 //! Page of the user profile, allowing the user to edit their profile.
 
-use crate::components::forms::automatic_forms::NewTeamForm;
+use crate::components::forms::automatic_forms::CreateTeamForm;
 use yew::prelude::*;
 
 #[function_component(NewTeamPage)]
@@ -10,7 +10,7 @@ pub fn new_team_page() -> Html {
     html! {
         // <div class="fullscreen_center_app">
             <div class="new_team">
-                <NewTeamForm />
+                <CreateTeamForm />
             </div>
         // </div>
     }

@@ -3,6 +3,11 @@ CREATE TABLE IF NOT EXISTS container_horizontal_rules (
     created_by INTEGER NOT NULL REFERENCES users(id) ON
     DELETE
         CASCADE,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_by INTEGER NOT NULL REFERENCES users(id) ON
+    DELETE
+        CASCADE,
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         name TEXT NOT NULL UNIQUE,
         item_type_id INTEGER REFERENCES item_categories(id) ON
     DELETE

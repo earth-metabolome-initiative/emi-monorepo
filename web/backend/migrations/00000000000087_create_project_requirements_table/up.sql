@@ -4,6 +4,11 @@ CREATE TABLE IF NOT EXISTS project_requirements (
     created_by INTEGER NOT NULL REFERENCES users(id) ON
     DELETE
         CASCADE,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_by INTEGER NOT NULL REFERENCES users(id) ON
+    DELETE
+        CASCADE,
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         project_id INTEGER NOT NULL REFERENCES projects(id) ON
     DELETE
         CASCADE,

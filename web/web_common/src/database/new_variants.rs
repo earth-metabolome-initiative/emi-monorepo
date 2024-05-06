@@ -66,6 +66,90 @@ pub struct NewProject {
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewSampledIndividual {
+    pub id: Uuid,
+    pub name: Option<String>,
+    pub tagged: bool,
+}
+
+#[cfg(feature = "frontend")]
+impl NewSampledIndividual {
+    pub fn into_row(self, created_by: i32) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::num(created_by),
+            gluesql::core::ast_builder::uuid(self.id.to_string()),
+            match self.name {
+                Some(name) => gluesql::core::ast_builder::text(name),
+                None => gluesql::core::ast_builder::null(),
+            },
+            (self.tagged.into()),
+        ]
+    }
+
+    /// Insert the NewSampledIndividual into the database.
+    ///
+    /// # Arguments
+    /// * `created_by` - The id of the user inserting the row.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows inserted in table NewSampledIndividual
+    pub async fn insert<C>(
+        self,
+        created_by: i32,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<super::SampledIndividual, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let id = self.id;
+        table("sampled_individuals")
+            .insert()
+            .columns("created_by,id,name,tagged")
+            .values(vec![self.into_row(created_by)])
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
+                 _ => unreachable!("Payload must be an Insert"),
+             })?;
+        super::SampledIndividual::get(id, connection).await.map(|maybe_row| maybe_row.unwrap())
+    }
+
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `user_id` - The ID of the user who is updating the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        user_id: i32,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("sampled_individuals")
+            .update()        
+.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
+.set("tagged", self.tagged)        
+.set("updated_by", gluesql::core::ast_builder::num(user_id));
+        if let Some(name) = self.name {
+            update_row = update_row.set("name", gluesql::core::ast_builder::text(name));
+        }
+            update_row.execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewSample {
     pub id: Uuid,
     pub sampled_by: i32,
@@ -113,6 +197,36 @@ impl NewSample {
                  _ => unreachable!("Payload must be an Insert"),
              })?;
         super::Sample::get(id, connection).await.map(|maybe_row| maybe_row.unwrap())
+    }
+
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `user_id` - The ID of the user who is updating the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        user_id: i32,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("samples")
+            .update()        
+.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
+.set("sampled_by", gluesql::core::ast_builder::num(self.sampled_by))        
+.set("procedure_id", gluesql::core::ast_builder::uuid(self.procedure_id.to_string()))        
+.set("state", gluesql::core::ast_builder::num(self.state))        
+.set("updated_by", gluesql::core::ast_builder::num(user_id))            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
     }
 
 }
@@ -165,6 +279,38 @@ impl NewSamplingProcedure {
                  _ => unreachable!("Payload must be an Insert"),
              })?;
         super::SamplingProcedure::get(id, connection).await.map(|maybe_row| maybe_row.unwrap())
+    }
+
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `user_id` - The ID of the user who is updating the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        user_id: i32,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("sampling_procedures")
+            .update()        
+.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
+.set("name", gluesql::core::ast_builder::text(self.name))        
+.set("updated_by", gluesql::core::ast_builder::num(user_id));
+        if let Some(description) = self.description {
+            update_row = update_row.set("description", gluesql::core::ast_builder::text(description));
+        }
+            update_row.execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
     }
 
 }

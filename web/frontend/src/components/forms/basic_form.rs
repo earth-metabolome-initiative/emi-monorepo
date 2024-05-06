@@ -7,10 +7,10 @@ use crate::workers::ws_worker::{ComponentMessage, WebsocketMessage};
 use crate::workers::WebsocketWorker;
 use gloo::timers::callback::Timeout;
 use serde::Serialize;
-use web_common::api::ApiError;
 use std::fmt::Debug;
 use std::rc::Rc;
 use web_common::api::form_traits::FormMethod;
+use web_common::api::ApiError;
 use web_common::database::Table;
 use yew::prelude::*;
 use yew_agent::prelude::WorkerBridgeHandle;
@@ -19,10 +19,7 @@ use yew_router::prelude::use_navigator;
 use yewdux::prelude::*;
 
 /// Trait defining something that can be used to build something else by a form.
-pub(super) trait FormBuilder:
-    Clone + Store + PartialEq + Serialize + Debug + Into<<Self as FormBuilder>::Data>
-{
-    type Data: FormBuildable<Builder = Self>;
+pub(super) trait FormBuilder: Clone + Store + PartialEq + Serialize + Debug {
     type Actions: Reducer<Self>;
 
     /// Returns whether the form contains errors.
@@ -30,23 +27,14 @@ pub(super) trait FormBuilder:
 
     /// Returns whether the can currently be submitted.
     fn can_submit(&self) -> bool;
-
-    /// Returns the form level errors.
-    ///
-    /// # Implementation details
-    /// These errors are NOT meant to be errors associated
-    /// to specific fields, but rather errors that are related
-    /// to form-level validation. For example, if the values in
-    /// two fields are incompatible, this is a form-level error.
-    fn form_level_errors(&self) -> Vec<String>;
 }
 
 /// Trait defining something that can be built by a form.
-pub trait FormBuildable: Clone + PartialEq + Serialize + 'static {
-    type Builder: FormBuilder<Data = Self>;
+pub trait FormBuildable:
+    Clone + PartialEq + Serialize + 'static + From<<Self as FormBuildable>::Builder>
+{
+    type Builder: FormBuilder;
     const TABLE: Table;
-
-    const METHOD: FormMethod;
 
     /// Returns the title to use for the Form.
     fn title() -> &'static str;
@@ -77,6 +65,7 @@ where
 {
     pub builder: Data::Builder,
     pub children: Html,
+    pub method: FormMethod,
     #[prop_or_default]
     pub navigator: Option<yew_router::navigator::Navigator>,
 }
@@ -131,7 +120,7 @@ where
                 self.errors = vec![error];
                 self.waiting_for_reply = false;
                 true
-            },
+            }
             FormMessage::Backend(WebsocketMessage::Completed) => {
                 self.waiting_for_reply = false;
                 self.errors.clear();
@@ -146,10 +135,10 @@ where
                 true
             }
             FormMessage::Submit => {
-                let data = ctx.props().builder.clone().into();
+                let data: Data = ctx.props().builder.clone().into();
 
                 // Then, we send the data to the backend
-                self.websocket.send(match Data::METHOD {
+                self.websocket.send(match ctx.props().method {
                     FormMethod::POST => ComponentMessage::insert(&data),
                     FormMethod::GET => {
                         unreachable!("GET is not supported for forms")
@@ -212,7 +201,7 @@ where
         };
 
         html! {
-            <form enctype={ "multipart/form-data" } disabled={self.waiting_for_reply} class={classes} onsubmit={on_submit} method={Data::METHOD.to_string()}>
+            <form enctype={ "multipart/form-data" } disabled={self.waiting_for_reply} class={classes} onsubmit={on_submit} method={ctx.props().method.to_string()}>
                 <h4>{ Data::title() }</h4>
                 <p class="instructions">{Data::description()}</p>
                 { ctx.props().children.clone() }
@@ -221,9 +210,9 @@ where
                     {if self.waiting_for_reply {
                         html! { <i class="fas fa-spinner fa-spin"></i> }
                     } else {
-                        html! { <i class={Data::METHOD.font_awesome_icon()}></i> }
+                        html! { <i class={ctx.props().method.font_awesome_icon()}></i> }
                     }}
-                    <span>{format!("{} {}", Data::METHOD.to_crud(), Data::task_target())}</span>
+                    <span>{format!("{} {}", ctx.props().method.to_crud(), Data::task_target())}</span>
                 </button>
                 <div class="clear"></div>
             </form>
@@ -238,7 +227,7 @@ where
 {
     let navigator = use_navigator().unwrap();
     html! {
-        <InnerBasicForm<Data> navigator={navigator} builder={props.builder.clone()}>
+        <InnerBasicForm<Data> navigator={navigator} method={props.method.clone()} builder={props.builder.clone()}>
             { props.children.clone() }
         </InnerBasicForm<Data>>
     }

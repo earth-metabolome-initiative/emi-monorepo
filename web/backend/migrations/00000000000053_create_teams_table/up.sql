@@ -11,5 +11,12 @@ CREATE TABLE IF NOT EXISTS teams (
         -- The user who created the team
         created_by INTEGER NOT NULL REFERENCES users(id) ON
     DELETE
-        CASCADE
+        CASCADE,
+    -- The date the team was created
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_by INTEGER NOT NULL REFERENCES users(id) ON
+    DELETE
+        CASCADE,
+    -- The date the team was last updated
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

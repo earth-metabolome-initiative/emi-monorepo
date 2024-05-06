@@ -198,6 +198,7 @@ impl NestedBioOttTaxonItem {
 pub struct NestedContainerHorizontalRule {
     pub inner: ContainerHorizontalRule,
     pub created_by: User,
+    pub updated_by: User,
     pub item_type: NestedItemCategory,
     pub other_item_type: NestedItemCategory,
 }
@@ -214,6 +215,7 @@ impl NestedContainerHorizontalRule {
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
             created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
+            updated_by: User::get(flat_struct.updated_by, connection).await?.unwrap(),
             item_type: NestedItemCategory::get(flat_struct.item_type_id, connection).await?.unwrap(),
             other_item_type: NestedItemCategory::get(flat_struct.other_item_type_id, connection).await?.unwrap(),
             inner: flat_struct,
@@ -267,6 +269,7 @@ impl NestedContainerHorizontalRule {
     {
         self.inner.update_or_insert(connection).await?;
         self.created_by.update_or_insert(connection).await?;
+        self.updated_by.update_or_insert(connection).await?;
         self.item_type.update_or_insert(connection).await?;
         self.other_item_type.update_or_insert(connection).await?;
         Ok(())
@@ -276,6 +279,7 @@ impl NestedContainerHorizontalRule {
 pub struct NestedContainerVerticalRule {
     pub inner: ContainerVerticalRule,
     pub created_by: User,
+    pub updated_by: User,
     pub container_item_type: NestedItemCategory,
     pub contained_item_type: NestedItemCategory,
 }
@@ -292,6 +296,7 @@ impl NestedContainerVerticalRule {
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
             created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
+            updated_by: User::get(flat_struct.updated_by, connection).await?.unwrap(),
             container_item_type: NestedItemCategory::get(flat_struct.container_item_type_id, connection).await?.unwrap(),
             contained_item_type: NestedItemCategory::get(flat_struct.contained_item_type_id, connection).await?.unwrap(),
             inner: flat_struct,
@@ -345,6 +350,7 @@ impl NestedContainerVerticalRule {
     {
         self.inner.update_or_insert(connection).await?;
         self.created_by.update_or_insert(connection).await?;
+        self.updated_by.update_or_insert(connection).await?;
         self.container_item_type.update_or_insert(connection).await?;
         self.contained_item_type.update_or_insert(connection).await?;
         Ok(())
@@ -354,6 +360,7 @@ impl NestedContainerVerticalRule {
 pub struct NestedDerivedSample {
     pub inner: DerivedSample,
     pub created_by: User,
+    pub updated_by: User,
     pub parent_sample: NestedSample,
     pub child_sample: NestedSample,
 }
@@ -370,6 +377,7 @@ impl NestedDerivedSample {
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
             created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
+            updated_by: User::get(flat_struct.updated_by, connection).await?.unwrap(),
             parent_sample: NestedSample::get(flat_struct.parent_sample_id, connection).await?.unwrap(),
             child_sample: NestedSample::get(flat_struct.child_sample_id, connection).await?.unwrap(),
             inner: flat_struct,
@@ -423,6 +431,7 @@ impl NestedDerivedSample {
     {
         self.inner.update_or_insert(connection).await?;
         self.created_by.update_or_insert(connection).await?;
+        self.updated_by.update_or_insert(connection).await?;
         self.parent_sample.update_or_insert(connection).await?;
         self.child_sample.update_or_insert(connection).await?;
         Ok(())
@@ -507,6 +516,7 @@ impl NestedDocument {
 pub struct NestedItemCategory {
     pub inner: ItemCategory,
     pub created_by: User,
+    pub updated_by: User,
 }
 #[cfg(feature = "frontend")]
 impl NestedItemCategory {
@@ -521,6 +531,7 @@ impl NestedItemCategory {
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
             created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
+            updated_by: User::get(flat_struct.updated_by, connection).await?.unwrap(),
             inner: flat_struct,
         })
     }
@@ -572,6 +583,7 @@ impl NestedItemCategory {
     {
         self.inner.update_or_insert(connection).await?;
         self.created_by.update_or_insert(connection).await?;
+        self.updated_by.update_or_insert(connection).await?;
         Ok(())
     }
 }
@@ -1342,6 +1354,7 @@ impl NestedOrganization {
 pub struct NestedProcedure {
     pub inner: Procedure,
     pub created_by: User,
+    pub updated_by: User,
 }
 #[cfg(feature = "frontend")]
 impl NestedProcedure {
@@ -1356,6 +1369,7 @@ impl NestedProcedure {
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
             created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
+            updated_by: User::get(flat_struct.updated_by, connection).await?.unwrap(),
             inner: flat_struct,
         })
     }
@@ -1407,6 +1421,7 @@ impl NestedProcedure {
     {
         self.inner.update_or_insert(connection).await?;
         self.created_by.update_or_insert(connection).await?;
+        self.updated_by.update_or_insert(connection).await?;
         Ok(())
     }
 }
@@ -1414,6 +1429,7 @@ impl NestedProcedure {
 pub struct NestedProjectRequirement {
     pub inner: ProjectRequirement,
     pub created_by: User,
+    pub updated_by: User,
     pub project: NestedProject,
     pub item_category: NestedItemCategory,
     pub unit: Option<Unit>,
@@ -1431,6 +1447,7 @@ impl NestedProjectRequirement {
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
             created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
+            updated_by: User::get(flat_struct.updated_by, connection).await?.unwrap(),
             project: NestedProject::get(flat_struct.project_id, connection).await?.unwrap(),
             item_category: NestedItemCategory::get(flat_struct.item_category_id, connection).await?.unwrap(),
             unit: if let Some(unit_id) = flat_struct.unit_id { Unit::get(unit_id, connection).await? } else { None },
@@ -1485,6 +1502,7 @@ impl NestedProjectRequirement {
     {
         self.inner.update_or_insert(connection).await?;
         self.created_by.update_or_insert(connection).await?;
+        self.updated_by.update_or_insert(connection).await?;
         self.project.update_or_insert(connection).await?;
         self.item_category.update_or_insert(connection).await?;
         if let Some(unit) = self.unit {
@@ -1808,7 +1826,7 @@ impl NestedSampleState {
 pub struct NestedSampledIndividualBioOttTaxonItem {
     pub inner: SampledIndividualBioOttTaxonItem,
     pub created_by: User,
-    pub sampled_individual: SampledIndividual,
+    pub sampled_individual: NestedSampledIndividual,
     pub taxon: NestedBioOttTaxonItem,
 }
 #[cfg(feature = "frontend")]
@@ -1824,7 +1842,7 @@ impl NestedSampledIndividualBioOttTaxonItem {
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
             created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            sampled_individual: SampledIndividual::get(flat_struct.sampled_individual_id, connection).await?.unwrap(),
+            sampled_individual: NestedSampledIndividual::get(flat_struct.sampled_individual_id, connection).await?.unwrap(),
             taxon: NestedBioOttTaxonItem::get(flat_struct.taxon_id, connection).await?.unwrap(),
             inner: flat_struct,
         })
@@ -1883,10 +1901,86 @@ impl NestedSampledIndividualBioOttTaxonItem {
     }
 }
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
+pub struct NestedSampledIndividual {
+    pub inner: SampledIndividual,
+    pub created_by: User,
+    pub updated_by: User,
+}
+#[cfg(feature = "frontend")]
+impl NestedSampledIndividual {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub async fn from_flat(
+        flat_struct: SampledIndividual,
+        connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
+    ) -> Result<Self, gluesql::prelude::Error> {
+        Ok(Self {
+            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
+            updated_by: User::get(flat_struct.updated_by, connection).await?.unwrap(),
+            inner: flat_struct,
+        })
+    }
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `id` - The primary key of the row.
+    /// * `connection` - The database connection.
+    pub async fn get<C>(
+        id: uuid::Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+       let flat_struct = SampledIndividual::get(id, connection).await?;        match flat_struct {
+            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+            None => Ok(None),
+        }
+    }
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
+    /// * `offset` - The number of rows to skip.
+    /// * `connection` - The database connection.
+    pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let flat_structs = SampledIndividual::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_structs.len());
+         for flat_struct in flat_structs {
+             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+         }
+         Ok(nested_structs)
+    }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.update_or_insert(connection).await?;
+        self.created_by.update_or_insert(connection).await?;
+        self.updated_by.update_or_insert(connection).await?;
+        Ok(())
+    }
+}
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedSample {
     pub inner: Sample,
     pub inserted_by: User,
     pub sampled_by: User,
+    pub updated_by: User,
     pub procedure: NestedSamplingProcedure,
     pub state: NestedSampleState,
 }
@@ -1904,6 +1998,7 @@ impl NestedSample {
         Ok(Self {
             inserted_by: User::get(flat_struct.inserted_by, connection).await?.unwrap(),
             sampled_by: User::get(flat_struct.sampled_by, connection).await?.unwrap(),
+            updated_by: User::get(flat_struct.updated_by, connection).await?.unwrap(),
             procedure: NestedSamplingProcedure::get(flat_struct.procedure_id, connection).await?.unwrap(),
             state: NestedSampleState::get(flat_struct.state, connection).await?.unwrap(),
             inner: flat_struct,
@@ -1958,6 +2053,7 @@ impl NestedSample {
         self.inner.update_or_insert(connection).await?;
         self.inserted_by.update_or_insert(connection).await?;
         self.sampled_by.update_or_insert(connection).await?;
+        self.updated_by.update_or_insert(connection).await?;
         self.procedure.update_or_insert(connection).await?;
         self.state.update_or_insert(connection).await?;
         Ok(())
@@ -1967,6 +2063,7 @@ impl NestedSample {
 pub struct NestedSamplingProcedure {
     pub inner: SamplingProcedure,
     pub created_by: User,
+    pub updated_by: User,
 }
 #[cfg(feature = "frontend")]
 impl NestedSamplingProcedure {
@@ -1981,6 +2078,7 @@ impl NestedSamplingProcedure {
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
             created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
+            updated_by: User::get(flat_struct.updated_by, connection).await?.unwrap(),
             inner: flat_struct,
         })
     }
@@ -2032,6 +2130,7 @@ impl NestedSamplingProcedure {
     {
         self.inner.update_or_insert(connection).await?;
         self.created_by.update_or_insert(connection).await?;
+        self.updated_by.update_or_insert(connection).await?;
         Ok(())
     }
 }
@@ -2262,6 +2361,7 @@ pub struct NestedTeam {
     pub inner: Team,
     pub parent_team: Option<Team>,
     pub created_by: User,
+    pub updated_by: User,
 }
 #[cfg(feature = "frontend")]
 impl NestedTeam {
@@ -2277,6 +2377,7 @@ impl NestedTeam {
         Ok(Self {
             parent_team: if let Some(parent_team_id) = flat_struct.parent_team_id { Team::get(parent_team_id, connection).await? } else { None },
             created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
+            updated_by: User::get(flat_struct.updated_by, connection).await?.unwrap(),
             inner: flat_struct,
         })
     }
@@ -2331,6 +2432,7 @@ impl NestedTeam {
             parent_team.update_or_insert(connection).await?;
         }
         self.created_by.update_or_insert(connection).await?;
+        self.updated_by.update_or_insert(connection).await?;
         Ok(())
     }
 }

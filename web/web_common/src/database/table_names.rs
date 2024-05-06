@@ -358,7 +358,7 @@ impl Table {
             Table::SampleBioOttTaxonItems => crate::database::NestedSampleBioOttTaxonItem::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::SampleStates => crate::database::NestedSampleState::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::SampledIndividualBioOttTaxonItems => crate::database::NestedSampledIndividualBioOttTaxonItem::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
-            Table::SampledIndividuals => crate::database::SampledIndividual::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::SampledIndividuals => crate::database::NestedSampledIndividual::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::Samples => crate::database::NestedSample::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::SamplingProcedures => crate::database::NestedSamplingProcedure::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::Spectra => crate::database::NestedSpectra::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
@@ -420,7 +420,7 @@ impl Table {
             Table::SampleBioOttTaxonItems => crate::database::NestedSampleBioOttTaxonItem::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::SampleStates => crate::database::NestedSampleState::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::SampledIndividualBioOttTaxonItems => crate::database::NestedSampledIndividualBioOttTaxonItem::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
-            Table::SampledIndividuals => crate::database::SampledIndividual::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::SampledIndividuals => crate::database::NestedSampledIndividual::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::Samples => crate::database::NestedSample::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::SamplingProcedures => crate::database::NestedSamplingProcedure::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::Spectra => crate::database::NestedSpectra::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
@@ -482,7 +482,12 @@ impl Table {
             Table::SampleBioOttTaxonItems => todo!("Insert not implemented for sample_bio_ott_taxon_items."),
             Table::SampleStates => unimplemented!("Insert not implemented for sample_states."),
             Table::SampledIndividualBioOttTaxonItems => todo!("Insert not implemented for sampled_individual_bio_ott_taxon_items."),
-            Table::SampledIndividuals => unimplemented!("Insert not implemented for sampled_individuals."),
+            Table::SampledIndividuals => {
+                let new_row: super::NewSampledIndividual = bincode::deserialize::<super::NewSampledIndividual>(&new_row).map_err(crate::api::ApiError::from)?;
+                let inserted_row: super::SampledIndividual = new_row.insert(user_id, connection).await?;
+                let nested_row = super::NestedSampledIndividual::from_flat(inserted_row, connection).await?;
+                 bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
+            },
             Table::Samples => {
                 let new_row: super::NewSample = bincode::deserialize::<super::NewSample>(&new_row).map_err(crate::api::ApiError::from)?;
                 let inserted_row: super::Sample = new_row.insert(user_id, connection).await?;
@@ -525,15 +530,36 @@ impl Table {
             Table::BioOttRanks => unimplemented!("Update not implemented for bio_ott_ranks."),
             Table::BioOttTaxonItems => unimplemented!("Update not implemented for bio_ott_taxon_items."),
             Table::Colors => unimplemented!("Update not implemented for colors."),
-            Table::ContainerHorizontalRules => unimplemented!("Update not implemented for container_horizontal_rules."),
-            Table::ContainerVerticalRules => unimplemented!("Update not implemented for container_vertical_rules."),
+            Table::ContainerHorizontalRules => {
+                let update_row: super::UpdateContainerHorizontalRule = bincode::deserialize::<super::UpdateContainerHorizontalRule>(&update_row).map_err(crate::api::ApiError::from)?;
+                let id = update_row.id;
+                update_row.update(user_id, connection).await?;
+                let updated_row: super::ContainerHorizontalRule = super::ContainerHorizontalRule::get(id, connection).await?.unwrap();
+                let nested_row = super::NestedContainerHorizontalRule::from_flat(updated_row, connection).await?;
+                 bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
+            },
+            Table::ContainerVerticalRules => {
+                let update_row: super::UpdateContainerVerticalRule = bincode::deserialize::<super::UpdateContainerVerticalRule>(&update_row).map_err(crate::api::ApiError::from)?;
+                let id = update_row.id;
+                update_row.update(user_id, connection).await?;
+                let updated_row: super::ContainerVerticalRule = super::ContainerVerticalRule::get(id, connection).await?.unwrap();
+                let nested_row = super::NestedContainerVerticalRule::from_flat(updated_row, connection).await?;
+                 bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
+            },
             Table::ContinuousUnits => unimplemented!("Update not implemented for continuous_units."),
-            Table::DerivedSamples => unimplemented!("Update not implemented for derived_samples."),
+            Table::DerivedSamples => todo!("Update not implemented for derived_samples."),
             Table::DiscreteUnits => unimplemented!("Update not implemented for discrete_units."),
             Table::DocumentFormats => unimplemented!("Update not implemented for document_formats."),
             Table::Documents => unimplemented!("Update not implemented for documents."),
             Table::FontAwesomeIcons => unimplemented!("Update not implemented for font_awesome_icons."),
-            Table::ItemCategories => unimplemented!("Update not implemented for item_categories."),
+            Table::ItemCategories => {
+                let update_row: super::UpdateItemCategory = bincode::deserialize::<super::UpdateItemCategory>(&update_row).map_err(crate::api::ApiError::from)?;
+                let id = update_row.id;
+                update_row.update(user_id, connection).await?;
+                let updated_row: super::ItemCategory = super::ItemCategory::get(id, connection).await?.unwrap();
+                let nested_row = super::NestedItemCategory::from_flat(updated_row, connection).await?;
+                 bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
+            },
             Table::ItemCategoryRelationships => unimplemented!("Update not implemented for item_category_relationships."),
             Table::ItemCategoryUnits => unimplemented!("Update not implemented for item_category_units."),
             Table::ItemLocations => unimplemented!("Update not implemented for item_locations."),
@@ -545,8 +571,22 @@ impl Table {
             Table::Notifications => unimplemented!("Update not implemented for notifications."),
             Table::Organizations => unimplemented!("Update not implemented for organizations."),
             Table::PrimaryUserEmails => unimplemented!("Update not implemented for primary_user_emails."),
-            Table::Procedures => unimplemented!("Update not implemented for procedures."),
-            Table::ProjectRequirements => unimplemented!("Update not implemented for project_requirements."),
+            Table::Procedures => {
+                let update_row: super::UpdateProcedure = bincode::deserialize::<super::UpdateProcedure>(&update_row).map_err(crate::api::ApiError::from)?;
+                let id = update_row.id;
+                update_row.update(user_id, connection).await?;
+                let updated_row: super::Procedure = super::Procedure::get(id, connection).await?.unwrap();
+                let nested_row = super::NestedProcedure::from_flat(updated_row, connection).await?;
+                 bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
+            },
+            Table::ProjectRequirements => {
+                let update_row: super::UpdateProjectRequirement = bincode::deserialize::<super::UpdateProjectRequirement>(&update_row).map_err(crate::api::ApiError::from)?;
+                let id = update_row.id;
+                update_row.update(user_id, connection).await?;
+                let updated_row: super::ProjectRequirement = super::ProjectRequirement::get(id, connection).await?.unwrap();
+                let nested_row = super::NestedProjectRequirement::from_flat(updated_row, connection).await?;
+                 bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
+            },
             Table::ProjectStates => unimplemented!("Update not implemented for project_states."),
             Table::Projects => {
                 let update_row: super::UpdateProject = bincode::deserialize::<super::UpdateProject>(&update_row).map_err(crate::api::ApiError::from)?;
@@ -561,13 +601,41 @@ impl Table {
             Table::SampleBioOttTaxonItems => unimplemented!("Update not implemented for sample_bio_ott_taxon_items."),
             Table::SampleStates => unimplemented!("Update not implemented for sample_states."),
             Table::SampledIndividualBioOttTaxonItems => unimplemented!("Update not implemented for sampled_individual_bio_ott_taxon_items."),
-            Table::SampledIndividuals => unimplemented!("Update not implemented for sampled_individuals."),
-            Table::Samples => unimplemented!("Update not implemented for samples."),
-            Table::SamplingProcedures => unimplemented!("Update not implemented for sampling_procedures."),
+            Table::SampledIndividuals => {
+                let update_row: super::NewSampledIndividual = bincode::deserialize::<super::NewSampledIndividual>(&update_row).map_err(crate::api::ApiError::from)?;
+                let id = update_row.id;
+                update_row.update(user_id, connection).await?;
+                let updated_row: super::SampledIndividual = super::SampledIndividual::get(id, connection).await?.unwrap();
+                let nested_row = super::NestedSampledIndividual::from_flat(updated_row, connection).await?;
+                 bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
+            },
+            Table::Samples => {
+                let update_row: super::NewSample = bincode::deserialize::<super::NewSample>(&update_row).map_err(crate::api::ApiError::from)?;
+                let id = update_row.id;
+                update_row.update(user_id, connection).await?;
+                let updated_row: super::Sample = super::Sample::get(id, connection).await?.unwrap();
+                let nested_row = super::NestedSample::from_flat(updated_row, connection).await?;
+                 bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
+            },
+            Table::SamplingProcedures => {
+                let update_row: super::NewSamplingProcedure = bincode::deserialize::<super::NewSamplingProcedure>(&update_row).map_err(crate::api::ApiError::from)?;
+                let id = update_row.id;
+                update_row.update(user_id, connection).await?;
+                let updated_row: super::SamplingProcedure = super::SamplingProcedure::get(id, connection).await?.unwrap();
+                let nested_row = super::NestedSamplingProcedure::from_flat(updated_row, connection).await?;
+                 bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
+            },
             Table::Spectra => unimplemented!("Update not implemented for spectra."),
             Table::SpectraCollections => unimplemented!("Update not implemented for spectra_collections."),
             Table::TeamStates => unimplemented!("Update not implemented for team_states."),
-            Table::Teams => unimplemented!("Update not implemented for teams."),
+            Table::Teams => {
+                let update_row: super::UpdateTeam = bincode::deserialize::<super::UpdateTeam>(&update_row).map_err(crate::api::ApiError::from)?;
+                let id = update_row.id;
+                update_row.update(user_id, connection).await?;
+                let updated_row: super::Team = super::Team::get(id, connection).await?.unwrap();
+                let nested_row = super::NestedTeam::from_flat(updated_row, connection).await?;
+                 bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
+            },
             Table::Units => unimplemented!("Update not implemented for units."),
             Table::UserEmails => unimplemented!("Update not implemented for user_emails."),
             Table::Users => unimplemented!("Update not implemented for users."),
@@ -782,7 +850,7 @@ impl Table {
             },
             Table::SampledIndividuals => {
                 for row in rows {
-                    let row: super::SampledIndividual = bincode::deserialize::<super::SampledIndividual>(&row).map_err(crate::api::ApiError::from)?;
+                    let row: super::NestedSampledIndividual = bincode::deserialize::<super::NestedSampledIndividual>(&row).map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             },
