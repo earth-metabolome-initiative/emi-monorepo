@@ -1,0 +1,4 @@
+-- Drop the `container_horizontal_rules_updated_at_trigger` trigger on the container_horizontal_rules table.
+
+DROP TRIGGER container_horizontal_rules_updated_at_trigger ON container_horizontal_rules;
+DROP FUNCTION container_horizontal_rules_updated_at_trigger;

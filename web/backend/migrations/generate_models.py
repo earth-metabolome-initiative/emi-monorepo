@@ -1391,6 +1391,40 @@ class TableMetadata:
         return [column[0] for column in columns]
 
     @cache
+    def has_trigger_by_name(self, table_name: str, trigger_name: str) -> bool:
+        """Returns whether the table has a trigger by name.
+
+        Parameters
+        ----------
+        table_name : str
+            The name of the table.
+        trigger_name : str
+            The name of the trigger.
+
+        Implementation details
+        ----------------------
+        This method returns whether the table metadata associated with
+        the table name has a non-null value in the `trigger_name` column.
+        """
+        _conn, cursor = get_cursor()
+        cursor.execute(
+            f"""
+            SELECT
+                trigger_name
+            FROM
+                information_schema.triggers
+            WHERE
+                event_object_table = '{table_name}'
+                AND trigger_name = '{trigger_name}';
+            """
+        )
+
+        has_trigger = cursor.fetchone() is not None
+        cursor.close()
+
+        return has_trigger
+
+    @cache
     def get_columns(self, table_name: str) -> List[str]:
         """Returns the columns of the table."""
         if self.is_view(table_name):
@@ -1412,6 +1446,38 @@ class TableMetadata:
         cursor.close()
 
         return [column[0] for column in columns]
+
+    @cache
+    def has_updated_at_trigger(self, table_name: str) -> bool:
+        """Returns whether the table has an `updated_at` trigger.
+
+        Parameters
+        ----------
+        table_name : str
+            The name of the table.
+
+        Implementation details
+        ----------------------
+        This method returns whether the table metadata associated with
+        the table name has a trigger named `updated_at`.
+        """
+        return self.has_trigger_by_name(table_name, f"{table_name}_updated_at_trigger")
+
+    @cache
+    def has_updated_at_column(self, table_name: str) -> bool:
+        """Returns whether the table has an `updated_at` column.
+
+        Parameters
+        ----------
+        table_name : str
+            The name of the table.
+
+        Implementation details
+        ----------------------
+        This method returns whether the table metadata associated with
+        the table name has a column named `updated_at`.
+        """
+        return "updated_at" in self.get_columns(table_name)
 
 
 def find_foreign_keys() -> TableMetadata:
@@ -4387,7 +4453,7 @@ def derive_model_builders(
         assert struct.is_new_variant()
         flat_variant = struct.get_flat_variant()
         richest_variant = struct.get_richest_variant()
-        
+
         builder = StructMetadata(
             struct_name=f"{flat_variant.name}Builder",
             table_name=struct.table_name,
@@ -4429,12 +4495,14 @@ def derive_model_builders(
                     continue
 
                 if attribute.data_type() == flat_variant.name:
-                    builder.add_attribute(AttributeMetadata(
-                        original_name=attribute.original_name,
-                        name=attribute.name,
-                        data_type=richest_variant,
-                        optional=True,
-                    ))
+                    builder.add_attribute(
+                        AttributeMetadata(
+                            original_name=attribute.original_name,
+                            name=attribute.name,
+                            data_type=richest_variant,
+                            optional=True,
+                        )
+                    )
                     continue
 
                 attribute = copy.deepcopy(attribute)
@@ -5297,9 +5365,7 @@ def write_frontend_form_builder_implementation(
 
         if struct_attribute is None:
             # We check whether the _id variant of the attribute is present.
-            struct_attribute = flat_struct.get_attribute_by_name(
-                f"{attribute.name}_id"
-            )
+            struct_attribute = flat_struct.get_attribute_by_name(f"{attribute.name}_id")
 
         if struct_attribute is None:
             raise Exception(
@@ -5331,19 +5397,23 @@ def write_frontend_form_builder_implementation(
         )
 
         for attribute in flat_struct.attributes:
-            
+
             if attribute.is_automatically_determined_column():
                 continue
 
             if attribute.name == primary_key_name:
-                if variant.is_new_variant() and variant.is_update_variant():               
+                if variant.is_new_variant() and variant.is_update_variant():
                     assert attribute.data_type() == "Uuid"
-                    document.write(f"            {primary_key_name}: builder.{primary_key_name}.unwrap_or_else(Uuid::new_v4),\n")
+                    document.write(
+                        f"            {primary_key_name}: builder.{primary_key_name}.unwrap_or_else(Uuid::new_v4),\n"
+                    )
                 elif variant.is_update_variant():
                     assert attribute.data_type() != "Uuid"
-                    document.write(f"            {primary_key_name}: builder.{primary_key_name}.unwrap(),\n")
+                    document.write(
+                        f"            {primary_key_name}: builder.{primary_key_name}.unwrap(),\n"
+                    )
                 continue
-                
+
             # There are 3 cases to consider:
             # 1. The attribute is present in the builder, and is not a nested attribute.
             # 2. The attribute is present in the builder, and is a nested attribute, so we need to recover the inner attribute.
@@ -5936,7 +6006,7 @@ def write_frontend_yew_form(
         (update_variant, "PUT"),
     ]
 
-    for (variant, method) in variants:
+    for variant, method in variants:
 
         action_name = "Create" if method == "POST" else "Update"
 
@@ -5945,7 +6015,9 @@ def write_frontend_yew_form(
         # We generate the lowercased name of the form component by splitting
         # on the uppercased letters and joining the resulting list with an
         # underscore.
-        form_method_name = "_".join(re.findall("[A-Z][^A-Z]*", form_component_name)).lower()
+        form_method_name = "_".join(
+            re.findall("[A-Z][^A-Z]*", form_component_name)
+        ).lower()
 
         # When we are creating an update variant, the form needs to receive the ID associated
         # to the variant, so that the frontend can request the correct row from the backend,
@@ -5961,9 +6033,7 @@ def write_frontend_yew_form(
                 "}\n\n"
             )
 
-        document.write(
-            f"#[function_component({form_component_name})]\n"
-        )
+        document.write(f"#[function_component({form_component_name})]\n")
 
         if method == "PUT":
             # We need to generate the form method that will receive the ID of the row.
@@ -6039,7 +6109,9 @@ def write_frontend_yew_form(
                 # We check that the nested struct implements the RowToBadge trait, as we need to
                 # be able to convert the nested struct to a badge within the Datalist.
                 if not implements_row_to_badge(attribute.raw_data_type()):
-                    handle_missing_row_to_badge_implementation(attribute.raw_data_type())
+                    handle_missing_row_to_badge_implementation(
+                        attribute.raw_data_type()
+                    )
                     raise Exception(
                         f"The struct {attribute.raw_data_type().name} does not implement the RowToBadge trait."
                     )
@@ -6082,7 +6154,9 @@ def write_frontend_form_buildable_implementation(
 
     new_variant = builder.get_new_variant()
 
-    variants = [new_variant,]
+    variants = [
+        new_variant,
+    ]
 
     if not new_variant.is_update_variant():
         variants.append(builder.get_update_variant())
@@ -6303,6 +6377,118 @@ def ensures_migrations_simmetry():
                 )
 
 
+def handle_update_at_trigger_creation(
+    table_name: str,
+):
+    trigger_name = f"{table_name}_updated_at_trigger"
+    print(
+        f"The table {table_name} has an `updated_at` column, but it does not have an `{trigger_name}` trigger. "
+        "We can create the trigger for you."
+    )
+    proceed = userinput(
+        name="Proceed with the creation of the trigger?",
+        default="no",
+        validator="human_bool",
+        sanitizer="human_bool",
+    )
+
+    if proceed:
+        # First, we identify the position of the migration that has created the current
+        # table by finding the one with desinence `_create_{table_name}_table`.
+        migrations = [
+            directory
+            for directory in os.listdir("migrations")
+            if os.path.isdir(f"migrations/{directory}")
+            and os.path.exists(f"migrations/{directory}/up.sql")
+        ]
+
+        migration_number = None
+
+        for migration in migrations:
+            number, desinence = migration.split("_", maxsplit=1)
+            if desinence == f"create_{table_name}_table":
+                migration_number = number
+                break
+
+        if migration_number is None:
+            raise Exception(
+                f"Could not find the migration that created the {table_name} table."
+            )
+
+        # We create the trigger migration.
+        trigger_migration_name = f"create_{trigger_name}"
+        migration_number = int(migration_number) + 1
+        padded_migration_number = str(migration_number).zfill(14)
+        full_migration_name = f"{padded_migration_number}_{trigger_migration_name}"
+
+        insert_migration(counter=migration_number, name=trigger_migration_name)
+
+        with open(
+            f"./migrations/{full_migration_name}/up.sql", "w", encoding="utf8"
+        ) as up_index_migration:
+            up_index_migration.write(
+                f"-- Create the `{trigger_name}` trigger on the {table_name} table.\n\n"
+                f"CREATE OR REPLACE FUNCTION {trigger_name}()\n"
+                "RETURNS TRIGGER AS $$\n"
+                "BEGIN\n"
+                "    NEW.updated_at = NOW();\n"
+                "    RETURN NEW;\n"
+                "END;\n"
+                "$$ LANGUAGE plpgsql;\n\n"
+                f"CREATE TRIGGER {trigger_name}\n"
+                f"BEFORE UPDATE ON {table_name}\n"
+                f"FOR EACH ROW\n"
+                f"EXECUTE FUNCTION {trigger_name}();\n"
+            )
+
+        with open(
+            f"./migrations/{full_migration_name}/down.sql", "w", encoding="utf8"
+        ) as down_index_migration:
+            down_index_migration.write(
+                f"-- Drop the `{trigger_name}` trigger on the {table_name} table.\n\n"
+                f"DROP TRIGGER {trigger_name} ON {table_name};\n"
+                f"DROP FUNCTION {trigger_name};\n"
+            )
+
+        print(
+            f"Created the `{trigger_name}` trigger for the {table_name} table in the {full_migration_name} migration."
+        )
+
+
+def ensures_all_update_at_trigger_exists():
+    """Check that for all tables that have an updated_at column, there exists an update_at trigger.
+
+    Implementation details
+    ----------------------
+    While in other database engine there are ways to specify that a column needs to be updated
+    upon each row update, in PostgreSQL, this is not possible. For this reason, we need to create
+    a trigger that updates the updated_at column upon each row update. This function checks that
+    for each table that has an updated_at column, there exists a trigger that updates the column
+    upon each row update. If it does not, the function guides the user to create the trigger and
+    afterwards raises an exception to stop the pipeline as it will need to be rerun.
+    """
+    tables_metadata = find_foreign_keys()
+
+    for table_name in tables_metadata.tables():
+        trigger_name = f"{table_name}_updated_at_trigger"
+        if tables_metadata.has_updated_at_column(table_name):
+            if not tables_metadata.has_updated_at_trigger(table_name):
+                handle_update_at_trigger_creation(table_name)
+                raise Exception(
+                    f"The table {table_name} has an `updated_at` column, but it does not have an `{trigger_name}` trigger. "
+                    "Please create the trigger and rerun the pipeline."
+                )
+        else:
+            # If the table does not have an updated_at column, we check
+            # that it DOES NOT have the trigger. If it does, this is most
+            # likely an error.
+            if tables_metadata.has_updated_at_trigger(table_name):
+                raise Exception(
+                    f"The table {table_name} does not have an `updated_at` column, but it has an `{trigger_name}` trigger. "
+                    "Please remove the trigger and rerun the pipeline."
+                )
+
+
 def enforce_migration_naming_convention():
     """Check that the migrations are named according to the convention."""
 
@@ -6324,6 +6510,7 @@ def enforce_migration_naming_convention():
     # {number_of_migration}_create_{table_name}_gin_index
     # {number_of_migration}_create_{table_name}_sequential_index
     # {number_of_migration}_create_{table_name}_notification_trigger
+    # {number_of_migration}_create_{table_name}_updated_at_trigger
 
     # We iterate over the migrations and check that the naming convention is respected.
     for migration in migrations:
@@ -6346,6 +6533,8 @@ def enforce_migration_naming_convention():
                 and migration_name.endswith("_sequential_index"),
                 migration_name.startswith("create_")
                 and migration_name.endswith("_notification_trigger"),
+                migration_name.startswith("create_")
+                and migration_name.endswith("_updated_at_trigger"),
             ]
         ):
             raise Exception(
@@ -6579,6 +6768,9 @@ if __name__ == "__main__":
 
     generate_table_schema()
     print("Generated models.")
+
+    ensures_all_update_at_trigger_exists()
+
     generate_view_schema()
     print("Generated view schema.")
     check_schema_completion()

@@ -1,0 +1,4 @@
+-- Drop the `container_vertical_rules_updated_at_trigger` trigger on the container_vertical_rules table.
+
+DROP TRIGGER container_vertical_rules_updated_at_trigger ON container_vertical_rules;
+DROP FUNCTION container_vertical_rules_updated_at_trigger;
