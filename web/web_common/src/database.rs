@@ -22,7 +22,5 @@ pub mod search_tables;
 pub use search_tables::*;
 pub mod new_variants;
 pub use new_variants::*;
-pub mod new_nested_variants;
-pub use new_nested_variants::*;
 pub mod update_variants;
 pub use update_variants::*;
