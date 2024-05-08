@@ -6007,7 +6007,7 @@ impl ProjectState {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Project {
     pub id: i32,
@@ -6016,8 +6016,8 @@ pub struct Project {
     pub public: bool,
     pub state_id: i32,
     pub parent_project_id: Option<i32>,
-    pub budget: Option<i64>,
-    pub expenses: Option<i64>,
+    pub budget: Option<f64>,
+    pub expenses: Option<f64>,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
     pub updated_by: i32,
@@ -6279,13 +6279,13 @@ impl Project {
             },
             budget: match row.get("budget").unwrap() {
                 gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::I64(budget) => Some(budget.clone()),
-                _ => unreachable!("Expected I64")
+                gluesql::prelude::Value::F64(budget) => Some(budget.clone()),
+                _ => unreachable!("Expected F64")
             },
             expenses: match row.get("expenses").unwrap() {
                 gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::I64(expenses) => Some(expenses.clone()),
-                _ => unreachable!("Expected I64")
+                gluesql::prelude::Value::F64(expenses) => Some(expenses.clone()),
+                _ => unreachable!("Expected F64")
             },
             created_by: match row.get("created_by").unwrap() {
                 gluesql::prelude::Value::I32(created_by) => created_by.clone(),

@@ -3379,7 +3379,7 @@ impl ProjectState {
             .load(connection)
 }
 }
-#[derive(Queryable, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default, Identifiable, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, PartialEq, Clone, Serialize, Deserialize, Default, Identifiable, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = projects)]
 pub struct Project {
     pub id: i32,
@@ -3388,8 +3388,8 @@ pub struct Project {
     pub public: bool,
     pub state_id: i32,
     pub parent_project_id: Option<i32>,
-    pub budget: Option<i64>,
-    pub expenses: Option<i64>,
+    pub budget: Option<f64>,
+    pub expenses: Option<f64>,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
     pub updated_by: i32,

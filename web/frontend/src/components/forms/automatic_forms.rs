@@ -2,19 +2,19 @@
 //!
 //! This module is automatically generated. Do not write anything here.
 
+use crate::components::forms::*;
+use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
+use std::ops::Deref;
+use std::rc::Rc;
+use uuid::Uuid;
+use web_common::api::form_traits::FormMethod;
+use web_common::api::ApiError;
 use web_common::database::*;
 use yew::prelude::*;
 use yewdux::{use_store, Reducer, Store};
-use crate::components::forms::*;
-use web_common::api::form_traits::FormMethod;
-use std::rc::Rc;
-use uuid::Uuid;
-use std::ops::Deref;
-use chrono::NaiveDateTime;
-use web_common::api::ApiError;
 
-#[derive(Store, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 #[store(storage = "session")]
 pub struct ContainerHorizontalRuleBuilder {
     pub id: Option<i32>,
@@ -36,74 +36,227 @@ pub struct ContainerHorizontalRuleBuilder {
     pub errors_maximum_pressure: Vec<ApiError>,
     pub errors_item_type: Vec<ApiError>,
     pub errors_other_item_type: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub(super) enum ContainerHorizontalRuleActions {
     SetName(Option<String>),
-    SetMinimumTemperature(Option<i32>),
-    SetMaximumTemperature(Option<i32>),
-    SetMinimumHumidity(Option<i32>),
-    SetMaximumHumidity(Option<i32>),
-    SetMinimumPressure(Option<i32>),
-    SetMaximumPressure(Option<i32>),
+    SetMinimumTemperature(Option<String>),
+    SetMaximumTemperature(Option<String>),
+    SetMinimumHumidity(Option<String>),
+    SetMaximumHumidity(Option<String>),
+    SetMinimumPressure(Option<String>),
+    SetMaximumPressure(Option<String>),
     SetItemType(Option<NestedItemCategory>),
     SetOtherItemType(Option<NestedItemCategory>),
 }
 
 impl Reducer<ContainerHorizontalRuleBuilder> for ContainerHorizontalRuleActions {
-    fn apply(self, mut state: std::rc::Rc<ContainerHorizontalRuleBuilder>) -> std::rc::Rc<ContainerHorizontalRuleBuilder> {
+    fn apply(
+        self,
+        mut state: std::rc::Rc<ContainerHorizontalRuleBuilder>,
+    ) -> std::rc::Rc<ContainerHorizontalRuleBuilder> {
         let state_mut = Rc::make_mut(&mut state);
+        state_mut.form_updated_at = chrono::Utc::now().naive_utc();
         match self {
             ContainerHorizontalRuleActions::SetName(name) => {
                 state_mut.errors_name.clear();
-        if name.is_none() {
-            state_mut.errors_name.push(ApiError::BadRequest(vec![
-                "The Name field is required.".to_string()
-             ]));
-        }
+                if name.is_none() {
+                    state_mut.errors_name.push(ApiError::BadRequest(vec![
+                        "The Name field is required.".to_string(),
+                    ]));
+                }
                 state_mut.name = name;
             }
             ContainerHorizontalRuleActions::SetMinimumTemperature(minimum_temperature) => {
                 state_mut.errors_minimum_temperature.clear();
-                state_mut.minimum_temperature = minimum_temperature;
+                match minimum_temperature {
+                    Some(value) => match value.parse::<i128>() {
+                        Ok(value) => {
+                            if value < i32::MIN as i128 || value > i32::MAX as i128 {
+                                state_mut
+                                    .errors_minimum_temperature
+                                    .push(ApiError::BadRequest(vec![format!(
+                                        "The minimum_temperature field must be between {} and {}.",
+                                        i32::MIN,
+                                        i32::MAX
+                                    )]));
+                            } else {
+                                state_mut.minimum_temperature = Some(value as i32);
+                            }
+                        }
+                        Err(_) => {
+                            state_mut
+                                .errors_minimum_temperature
+                                .push(ApiError::BadRequest(vec![
+                                    "The minimum_temperature field must be a valid i32."
+                                        .to_string(),
+                                ]));
+                        }
+                    },
+                    None => state_mut.minimum_temperature = None,
+                }
             }
             ContainerHorizontalRuleActions::SetMaximumTemperature(maximum_temperature) => {
                 state_mut.errors_maximum_temperature.clear();
-                state_mut.maximum_temperature = maximum_temperature;
+                match maximum_temperature {
+                    Some(value) => match value.parse::<i128>() {
+                        Ok(value) => {
+                            if value < i32::MIN as i128 || value > i32::MAX as i128 {
+                                state_mut
+                                    .errors_maximum_temperature
+                                    .push(ApiError::BadRequest(vec![format!(
+                                        "The maximum_temperature field must be between {} and {}.",
+                                        i32::MIN,
+                                        i32::MAX
+                                    )]));
+                            } else {
+                                state_mut.maximum_temperature = Some(value as i32);
+                            }
+                        }
+                        Err(_) => {
+                            state_mut
+                                .errors_maximum_temperature
+                                .push(ApiError::BadRequest(vec![
+                                    "The maximum_temperature field must be a valid i32."
+                                        .to_string(),
+                                ]));
+                        }
+                    },
+                    None => state_mut.maximum_temperature = None,
+                }
             }
             ContainerHorizontalRuleActions::SetMinimumHumidity(minimum_humidity) => {
                 state_mut.errors_minimum_humidity.clear();
-                state_mut.minimum_humidity = minimum_humidity;
+                match minimum_humidity {
+                    Some(value) => match value.parse::<i128>() {
+                        Ok(value) => {
+                            if value < i32::MIN as i128 || value > i32::MAX as i128 {
+                                state_mut
+                                    .errors_minimum_humidity
+                                    .push(ApiError::BadRequest(vec![format!(
+                                        "The minimum_humidity field must be between {} and {}.",
+                                        i32::MIN,
+                                        i32::MAX
+                                    )]));
+                            } else {
+                                state_mut.minimum_humidity = Some(value as i32);
+                            }
+                        }
+                        Err(_) => {
+                            state_mut
+                                .errors_minimum_humidity
+                                .push(ApiError::BadRequest(vec![
+                                    "The minimum_humidity field must be a valid i32.".to_string(),
+                                ]));
+                        }
+                    },
+                    None => state_mut.minimum_humidity = None,
+                }
             }
             ContainerHorizontalRuleActions::SetMaximumHumidity(maximum_humidity) => {
                 state_mut.errors_maximum_humidity.clear();
-                state_mut.maximum_humidity = maximum_humidity;
+                match maximum_humidity {
+                    Some(value) => match value.parse::<i128>() {
+                        Ok(value) => {
+                            if value < i32::MIN as i128 || value > i32::MAX as i128 {
+                                state_mut
+                                    .errors_maximum_humidity
+                                    .push(ApiError::BadRequest(vec![format!(
+                                        "The maximum_humidity field must be between {} and {}.",
+                                        i32::MIN,
+                                        i32::MAX
+                                    )]));
+                            } else {
+                                state_mut.maximum_humidity = Some(value as i32);
+                            }
+                        }
+                        Err(_) => {
+                            state_mut
+                                .errors_maximum_humidity
+                                .push(ApiError::BadRequest(vec![
+                                    "The maximum_humidity field must be a valid i32.".to_string(),
+                                ]));
+                        }
+                    },
+                    None => state_mut.maximum_humidity = None,
+                }
             }
             ContainerHorizontalRuleActions::SetMinimumPressure(minimum_pressure) => {
                 state_mut.errors_minimum_pressure.clear();
-                state_mut.minimum_pressure = minimum_pressure;
+                match minimum_pressure {
+                    Some(value) => match value.parse::<i128>() {
+                        Ok(value) => {
+                            if value < i32::MIN as i128 || value > i32::MAX as i128 {
+                                state_mut
+                                    .errors_minimum_pressure
+                                    .push(ApiError::BadRequest(vec![format!(
+                                        "The minimum_pressure field must be between {} and {}.",
+                                        i32::MIN,
+                                        i32::MAX
+                                    )]));
+                            } else {
+                                state_mut.minimum_pressure = Some(value as i32);
+                            }
+                        }
+                        Err(_) => {
+                            state_mut
+                                .errors_minimum_pressure
+                                .push(ApiError::BadRequest(vec![
+                                    "The minimum_pressure field must be a valid i32.".to_string(),
+                                ]));
+                        }
+                    },
+                    None => state_mut.minimum_pressure = None,
+                }
             }
             ContainerHorizontalRuleActions::SetMaximumPressure(maximum_pressure) => {
                 state_mut.errors_maximum_pressure.clear();
-                state_mut.maximum_pressure = maximum_pressure;
+                match maximum_pressure {
+                    Some(value) => match value.parse::<i128>() {
+                        Ok(value) => {
+                            if value < i32::MIN as i128 || value > i32::MAX as i128 {
+                                state_mut
+                                    .errors_maximum_pressure
+                                    .push(ApiError::BadRequest(vec![format!(
+                                        "The maximum_pressure field must be between {} and {}.",
+                                        i32::MIN,
+                                        i32::MAX
+                                    )]));
+                            } else {
+                                state_mut.maximum_pressure = Some(value as i32);
+                            }
+                        }
+                        Err(_) => {
+                            state_mut
+                                .errors_maximum_pressure
+                                .push(ApiError::BadRequest(vec![
+                                    "The maximum_pressure field must be a valid i32.".to_string(),
+                                ]));
+                        }
+                    },
+                    None => state_mut.maximum_pressure = None,
+                }
             }
             ContainerHorizontalRuleActions::SetItemType(item_type) => {
                 state_mut.errors_item_type.clear();
-        if item_type.is_none() {
-            state_mut.errors_item_type.push(ApiError::BadRequest(vec![
-                "The ItemType field is required.".to_string()
-             ]));
-        }
+                if item_type.is_none() {
+                    state_mut.errors_item_type.push(ApiError::BadRequest(vec![
+                        "The ItemType field is required.".to_string(),
+                    ]));
+                }
                 state_mut.item_type = item_type;
             }
             ContainerHorizontalRuleActions::SetOtherItemType(other_item_type) => {
                 state_mut.errors_other_item_type.clear();
-        if other_item_type.is_none() {
-            state_mut.errors_other_item_type.push(ApiError::BadRequest(vec![
-                "The OtherItemType field is required.".to_string()
-             ]));
-        }
+                if other_item_type.is_none() {
+                    state_mut
+                        .errors_other_item_type
+                        .push(ApiError::BadRequest(vec![
+                            "The OtherItemType field is required.".to_string(),
+                        ]));
+                }
                 state_mut.other_item_type = other_item_type;
             }
         }
@@ -114,16 +267,23 @@ impl FormBuilder for ContainerHorizontalRuleBuilder {
     type Actions = ContainerHorizontalRuleActions;
 
     fn has_errors(&self) -> bool {
-!self.errors_name.is_empty() || !self.errors_minimum_temperature.is_empty() || !self.errors_maximum_temperature.is_empty() || !self.errors_minimum_humidity.is_empty() || !self.errors_maximum_humidity.is_empty() || !self.errors_minimum_pressure.is_empty() || !self.errors_maximum_pressure.is_empty() || !self.errors_item_type.is_empty() || !self.errors_other_item_type.is_empty()
+        !self.errors_name.is_empty()
+            || !self.errors_minimum_temperature.is_empty()
+            || !self.errors_maximum_temperature.is_empty()
+            || !self.errors_minimum_humidity.is_empty()
+            || !self.errors_maximum_humidity.is_empty()
+            || !self.errors_minimum_pressure.is_empty()
+            || !self.errors_maximum_pressure.is_empty()
+            || !self.errors_item_type.is_empty()
+            || !self.errors_other_item_type.is_empty()
     }
 
     fn can_submit(&self) -> bool {
         !self.has_errors()
-        && self.name.is_some()
-        && self.item_type.is_some()
-        && self.other_item_type.is_some()
+            && self.name.is_some()
+            && self.item_type.is_some()
+            && self.other_item_type.is_some()
     }
-
 }
 
 impl From<ContainerHorizontalRuleBuilder> for NewContainerHorizontalRule {
@@ -200,18 +360,48 @@ impl FormBuildable for UpdateContainerHorizontalRule {
 #[function_component(CreateContainerHorizontalRuleForm)]
 pub fn create_container_horizontal_rule_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<ContainerHorizontalRuleBuilder>();
-    let set_name = builder_dispatch.apply_callback(|name: Option<String>| ContainerHorizontalRuleActions::SetName(name));
-    let set_minimum_temperature = builder_dispatch.apply_callback(|minimum_temperature: Option<i32>| ContainerHorizontalRuleActions::SetMinimumTemperature(minimum_temperature));
-    let set_maximum_temperature = builder_dispatch.apply_callback(|maximum_temperature: Option<i32>| ContainerHorizontalRuleActions::SetMaximumTemperature(maximum_temperature));
-    let set_minimum_humidity = builder_dispatch.apply_callback(|minimum_humidity: Option<i32>| ContainerHorizontalRuleActions::SetMinimumHumidity(minimum_humidity));
-    let set_maximum_humidity = builder_dispatch.apply_callback(|maximum_humidity: Option<i32>| ContainerHorizontalRuleActions::SetMaximumHumidity(maximum_humidity));
-    let set_minimum_pressure = builder_dispatch.apply_callback(|minimum_pressure: Option<i32>| ContainerHorizontalRuleActions::SetMinimumPressure(minimum_pressure));
-    let set_maximum_pressure = builder_dispatch.apply_callback(|maximum_pressure: Option<i32>| ContainerHorizontalRuleActions::SetMaximumPressure(maximum_pressure));
-    let set_item_type = builder_dispatch.apply_callback(|item_type: Option<NestedItemCategory>| ContainerHorizontalRuleActions::SetItemType(item_type));
-    let set_other_item_type = builder_dispatch.apply_callback(|other_item_type: Option<NestedItemCategory>| ContainerHorizontalRuleActions::SetOtherItemType(other_item_type));
+    let set_name = builder_dispatch
+        .apply_callback(|name: Option<String>| ContainerHorizontalRuleActions::SetName(name));
+    let set_minimum_temperature =
+        builder_dispatch.apply_callback(|minimum_temperature: Option<String>| {
+            ContainerHorizontalRuleActions::SetMinimumTemperature(minimum_temperature)
+        });
+    let set_maximum_temperature =
+        builder_dispatch.apply_callback(|maximum_temperature: Option<String>| {
+            ContainerHorizontalRuleActions::SetMaximumTemperature(maximum_temperature)
+        });
+    let set_minimum_humidity =
+        builder_dispatch.apply_callback(|minimum_humidity: Option<String>| {
+            ContainerHorizontalRuleActions::SetMinimumHumidity(minimum_humidity)
+        });
+    let set_maximum_humidity =
+        builder_dispatch.apply_callback(|maximum_humidity: Option<String>| {
+            ContainerHorizontalRuleActions::SetMaximumHumidity(maximum_humidity)
+        });
+    let set_minimum_pressure =
+        builder_dispatch.apply_callback(|minimum_pressure: Option<String>| {
+            ContainerHorizontalRuleActions::SetMinimumPressure(minimum_pressure)
+        });
+    let set_maximum_pressure =
+        builder_dispatch.apply_callback(|maximum_pressure: Option<String>| {
+            ContainerHorizontalRuleActions::SetMaximumPressure(maximum_pressure)
+        });
+    let set_item_type = builder_dispatch.apply_callback(|item_type: Option<NestedItemCategory>| {
+        ContainerHorizontalRuleActions::SetItemType(item_type)
+    });
+    let set_other_item_type =
+        builder_dispatch.apply_callback(|other_item_type: Option<NestedItemCategory>| {
+            ContainerHorizontalRuleActions::SetOtherItemType(other_item_type)
+        });
     html! {
         <BasicForm<NewContainerHorizontalRule> method={FormMethod::POST} builder={builder_store.deref().clone()}>
-            <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
+            <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
+            <BasicInput<i32> label="MinimumTemperature" errors={builder_store.errors_minimum_temperature.clone()} builder={set_minimum_temperature} value={builder_store.minimum_temperature.clone()} />
+            <BasicInput<i32> label="MaximumTemperature" errors={builder_store.errors_maximum_temperature.clone()} builder={set_maximum_temperature} value={builder_store.maximum_temperature.clone()} />
+            <BasicInput<i32> label="MinimumHumidity" errors={builder_store.errors_minimum_humidity.clone()} builder={set_minimum_humidity} value={builder_store.minimum_humidity.clone()} />
+            <BasicInput<i32> label="MaximumHumidity" errors={builder_store.errors_maximum_humidity.clone()} builder={set_maximum_humidity} value={builder_store.maximum_humidity.clone()} />
+            <BasicInput<i32> label="MinimumPressure" errors={builder_store.errors_minimum_pressure.clone()} builder={set_minimum_pressure} value={builder_store.minimum_pressure.clone()} />
+            <BasicInput<i32> label="MaximumPressure" errors={builder_store.errors_maximum_pressure.clone()} builder={set_maximum_pressure} value={builder_store.maximum_pressure.clone()} />
             <Datalist<NestedItemCategory> builder={set_item_type} errors={builder_store.errors_item_type.clone()} value={builder_store.item_type.clone()} label="ItemType" />
             <Datalist<NestedItemCategory> builder={set_other_item_type} errors={builder_store.errors_other_item_type.clone()} value={builder_store.other_item_type.clone()} label="OtherItemType" />
         </BasicForm<NewContainerHorizontalRule>>
@@ -223,26 +413,58 @@ pub struct UpdateContainerHorizontalRuleFormProp {
 }
 
 #[function_component(UpdateContainerHorizontalRuleForm)]
-pub fn update_container_horizontal_rule_form(props: &UpdateContainerHorizontalRuleFormProp) -> Html {
+pub fn update_container_horizontal_rule_form(
+    props: &UpdateContainerHorizontalRuleFormProp,
+) -> Html {
     let (builder_store, builder_dispatch) = use_store::<ContainerHorizontalRuleBuilder>();
-    let set_name = builder_dispatch.apply_callback(|name: Option<String>| ContainerHorizontalRuleActions::SetName(name));
-    let set_minimum_temperature = builder_dispatch.apply_callback(|minimum_temperature: Option<i32>| ContainerHorizontalRuleActions::SetMinimumTemperature(minimum_temperature));
-    let set_maximum_temperature = builder_dispatch.apply_callback(|maximum_temperature: Option<i32>| ContainerHorizontalRuleActions::SetMaximumTemperature(maximum_temperature));
-    let set_minimum_humidity = builder_dispatch.apply_callback(|minimum_humidity: Option<i32>| ContainerHorizontalRuleActions::SetMinimumHumidity(minimum_humidity));
-    let set_maximum_humidity = builder_dispatch.apply_callback(|maximum_humidity: Option<i32>| ContainerHorizontalRuleActions::SetMaximumHumidity(maximum_humidity));
-    let set_minimum_pressure = builder_dispatch.apply_callback(|minimum_pressure: Option<i32>| ContainerHorizontalRuleActions::SetMinimumPressure(minimum_pressure));
-    let set_maximum_pressure = builder_dispatch.apply_callback(|maximum_pressure: Option<i32>| ContainerHorizontalRuleActions::SetMaximumPressure(maximum_pressure));
-    let set_item_type = builder_dispatch.apply_callback(|item_type: Option<NestedItemCategory>| ContainerHorizontalRuleActions::SetItemType(item_type));
-    let set_other_item_type = builder_dispatch.apply_callback(|other_item_type: Option<NestedItemCategory>| ContainerHorizontalRuleActions::SetOtherItemType(other_item_type));
+    let set_name = builder_dispatch
+        .apply_callback(|name: Option<String>| ContainerHorizontalRuleActions::SetName(name));
+    let set_minimum_temperature =
+        builder_dispatch.apply_callback(|minimum_temperature: Option<String>| {
+            ContainerHorizontalRuleActions::SetMinimumTemperature(minimum_temperature)
+        });
+    let set_maximum_temperature =
+        builder_dispatch.apply_callback(|maximum_temperature: Option<String>| {
+            ContainerHorizontalRuleActions::SetMaximumTemperature(maximum_temperature)
+        });
+    let set_minimum_humidity =
+        builder_dispatch.apply_callback(|minimum_humidity: Option<String>| {
+            ContainerHorizontalRuleActions::SetMinimumHumidity(minimum_humidity)
+        });
+    let set_maximum_humidity =
+        builder_dispatch.apply_callback(|maximum_humidity: Option<String>| {
+            ContainerHorizontalRuleActions::SetMaximumHumidity(maximum_humidity)
+        });
+    let set_minimum_pressure =
+        builder_dispatch.apply_callback(|minimum_pressure: Option<String>| {
+            ContainerHorizontalRuleActions::SetMinimumPressure(minimum_pressure)
+        });
+    let set_maximum_pressure =
+        builder_dispatch.apply_callback(|maximum_pressure: Option<String>| {
+            ContainerHorizontalRuleActions::SetMaximumPressure(maximum_pressure)
+        });
+    let set_item_type = builder_dispatch.apply_callback(|item_type: Option<NestedItemCategory>| {
+        ContainerHorizontalRuleActions::SetItemType(item_type)
+    });
+    let set_other_item_type =
+        builder_dispatch.apply_callback(|other_item_type: Option<NestedItemCategory>| {
+            ContainerHorizontalRuleActions::SetOtherItemType(other_item_type)
+        });
     html! {
         <BasicForm<UpdateContainerHorizontalRule> method={FormMethod::PUT} builder={builder_store.deref().clone()}>
-            <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
+            <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
+            <BasicInput<i32> label="MinimumTemperature" errors={builder_store.errors_minimum_temperature.clone()} builder={set_minimum_temperature} value={builder_store.minimum_temperature.clone()} />
+            <BasicInput<i32> label="MaximumTemperature" errors={builder_store.errors_maximum_temperature.clone()} builder={set_maximum_temperature} value={builder_store.maximum_temperature.clone()} />
+            <BasicInput<i32> label="MinimumHumidity" errors={builder_store.errors_minimum_humidity.clone()} builder={set_minimum_humidity} value={builder_store.minimum_humidity.clone()} />
+            <BasicInput<i32> label="MaximumHumidity" errors={builder_store.errors_maximum_humidity.clone()} builder={set_maximum_humidity} value={builder_store.maximum_humidity.clone()} />
+            <BasicInput<i32> label="MinimumPressure" errors={builder_store.errors_minimum_pressure.clone()} builder={set_minimum_pressure} value={builder_store.minimum_pressure.clone()} />
+            <BasicInput<i32> label="MaximumPressure" errors={builder_store.errors_maximum_pressure.clone()} builder={set_maximum_pressure} value={builder_store.maximum_pressure.clone()} />
             <Datalist<NestedItemCategory> builder={set_item_type} errors={builder_store.errors_item_type.clone()} value={builder_store.item_type.clone()} label="ItemType" />
             <Datalist<NestedItemCategory> builder={set_other_item_type} errors={builder_store.errors_other_item_type.clone()} value={builder_store.other_item_type.clone()} label="OtherItemType" />
         </BasicForm<UpdateContainerHorizontalRule>>
     }
 }
-#[derive(Store, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 #[store(storage = "session")]
 pub struct ContainerVerticalRuleBuilder {
     pub id: Option<i32>,
@@ -264,74 +486,229 @@ pub struct ContainerVerticalRuleBuilder {
     pub errors_maximum_pressure: Vec<ApiError>,
     pub errors_container_item_type: Vec<ApiError>,
     pub errors_contained_item_type: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub(super) enum ContainerVerticalRuleActions {
     SetName(Option<String>),
-    SetMinimumTemperature(Option<i32>),
-    SetMaximumTemperature(Option<i32>),
-    SetMinimumHumidity(Option<i32>),
-    SetMaximumHumidity(Option<i32>),
-    SetMinimumPressure(Option<i32>),
-    SetMaximumPressure(Option<i32>),
+    SetMinimumTemperature(Option<String>),
+    SetMaximumTemperature(Option<String>),
+    SetMinimumHumidity(Option<String>),
+    SetMaximumHumidity(Option<String>),
+    SetMinimumPressure(Option<String>),
+    SetMaximumPressure(Option<String>),
     SetContainerItemType(Option<NestedItemCategory>),
     SetContainedItemType(Option<NestedItemCategory>),
 }
 
 impl Reducer<ContainerVerticalRuleBuilder> for ContainerVerticalRuleActions {
-    fn apply(self, mut state: std::rc::Rc<ContainerVerticalRuleBuilder>) -> std::rc::Rc<ContainerVerticalRuleBuilder> {
+    fn apply(
+        self,
+        mut state: std::rc::Rc<ContainerVerticalRuleBuilder>,
+    ) -> std::rc::Rc<ContainerVerticalRuleBuilder> {
         let state_mut = Rc::make_mut(&mut state);
+        state_mut.form_updated_at = chrono::Utc::now().naive_utc();
         match self {
             ContainerVerticalRuleActions::SetName(name) => {
                 state_mut.errors_name.clear();
-        if name.is_none() {
-            state_mut.errors_name.push(ApiError::BadRequest(vec![
-                "The Name field is required.".to_string()
-             ]));
-        }
+                if name.is_none() {
+                    state_mut.errors_name.push(ApiError::BadRequest(vec![
+                        "The Name field is required.".to_string(),
+                    ]));
+                }
                 state_mut.name = name;
             }
             ContainerVerticalRuleActions::SetMinimumTemperature(minimum_temperature) => {
                 state_mut.errors_minimum_temperature.clear();
-                state_mut.minimum_temperature = minimum_temperature;
+                match minimum_temperature {
+                    Some(value) => match value.parse::<i128>() {
+                        Ok(value) => {
+                            if value < i32::MIN as i128 || value > i32::MAX as i128 {
+                                state_mut
+                                    .errors_minimum_temperature
+                                    .push(ApiError::BadRequest(vec![format!(
+                                        "The minimum_temperature field must be between {} and {}.",
+                                        i32::MIN,
+                                        i32::MAX
+                                    )]));
+                            } else {
+                                state_mut.minimum_temperature = Some(value as i32);
+                            }
+                        }
+                        Err(_) => {
+                            state_mut
+                                .errors_minimum_temperature
+                                .push(ApiError::BadRequest(vec![
+                                    "The minimum_temperature field must be a valid i32."
+                                        .to_string(),
+                                ]));
+                        }
+                    },
+                    None => state_mut.minimum_temperature = None,
+                }
             }
             ContainerVerticalRuleActions::SetMaximumTemperature(maximum_temperature) => {
                 state_mut.errors_maximum_temperature.clear();
-                state_mut.maximum_temperature = maximum_temperature;
+                match maximum_temperature {
+                    Some(value) => match value.parse::<i128>() {
+                        Ok(value) => {
+                            if value < i32::MIN as i128 || value > i32::MAX as i128 {
+                                state_mut
+                                    .errors_maximum_temperature
+                                    .push(ApiError::BadRequest(vec![format!(
+                                        "The maximum_temperature field must be between {} and {}.",
+                                        i32::MIN,
+                                        i32::MAX
+                                    )]));
+                            } else {
+                                state_mut.maximum_temperature = Some(value as i32);
+                            }
+                        }
+                        Err(_) => {
+                            state_mut
+                                .errors_maximum_temperature
+                                .push(ApiError::BadRequest(vec![
+                                    "The maximum_temperature field must be a valid i32."
+                                        .to_string(),
+                                ]));
+                        }
+                    },
+                    None => state_mut.maximum_temperature = None,
+                }
             }
             ContainerVerticalRuleActions::SetMinimumHumidity(minimum_humidity) => {
                 state_mut.errors_minimum_humidity.clear();
-                state_mut.minimum_humidity = minimum_humidity;
+                match minimum_humidity {
+                    Some(value) => match value.parse::<i128>() {
+                        Ok(value) => {
+                            if value < i32::MIN as i128 || value > i32::MAX as i128 {
+                                state_mut
+                                    .errors_minimum_humidity
+                                    .push(ApiError::BadRequest(vec![format!(
+                                        "The minimum_humidity field must be between {} and {}.",
+                                        i32::MIN,
+                                        i32::MAX
+                                    )]));
+                            } else {
+                                state_mut.minimum_humidity = Some(value as i32);
+                            }
+                        }
+                        Err(_) => {
+                            state_mut
+                                .errors_minimum_humidity
+                                .push(ApiError::BadRequest(vec![
+                                    "The minimum_humidity field must be a valid i32.".to_string(),
+                                ]));
+                        }
+                    },
+                    None => state_mut.minimum_humidity = None,
+                }
             }
             ContainerVerticalRuleActions::SetMaximumHumidity(maximum_humidity) => {
                 state_mut.errors_maximum_humidity.clear();
-                state_mut.maximum_humidity = maximum_humidity;
+                match maximum_humidity {
+                    Some(value) => match value.parse::<i128>() {
+                        Ok(value) => {
+                            if value < i32::MIN as i128 || value > i32::MAX as i128 {
+                                state_mut
+                                    .errors_maximum_humidity
+                                    .push(ApiError::BadRequest(vec![format!(
+                                        "The maximum_humidity field must be between {} and {}.",
+                                        i32::MIN,
+                                        i32::MAX
+                                    )]));
+                            } else {
+                                state_mut.maximum_humidity = Some(value as i32);
+                            }
+                        }
+                        Err(_) => {
+                            state_mut
+                                .errors_maximum_humidity
+                                .push(ApiError::BadRequest(vec![
+                                    "The maximum_humidity field must be a valid i32.".to_string(),
+                                ]));
+                        }
+                    },
+                    None => state_mut.maximum_humidity = None,
+                }
             }
             ContainerVerticalRuleActions::SetMinimumPressure(minimum_pressure) => {
                 state_mut.errors_minimum_pressure.clear();
-                state_mut.minimum_pressure = minimum_pressure;
+                match minimum_pressure {
+                    Some(value) => match value.parse::<i128>() {
+                        Ok(value) => {
+                            if value < i32::MIN as i128 || value > i32::MAX as i128 {
+                                state_mut
+                                    .errors_minimum_pressure
+                                    .push(ApiError::BadRequest(vec![format!(
+                                        "The minimum_pressure field must be between {} and {}.",
+                                        i32::MIN,
+                                        i32::MAX
+                                    )]));
+                            } else {
+                                state_mut.minimum_pressure = Some(value as i32);
+                            }
+                        }
+                        Err(_) => {
+                            state_mut
+                                .errors_minimum_pressure
+                                .push(ApiError::BadRequest(vec![
+                                    "The minimum_pressure field must be a valid i32.".to_string(),
+                                ]));
+                        }
+                    },
+                    None => state_mut.minimum_pressure = None,
+                }
             }
             ContainerVerticalRuleActions::SetMaximumPressure(maximum_pressure) => {
                 state_mut.errors_maximum_pressure.clear();
-                state_mut.maximum_pressure = maximum_pressure;
+                match maximum_pressure {
+                    Some(value) => match value.parse::<i128>() {
+                        Ok(value) => {
+                            if value < i32::MIN as i128 || value > i32::MAX as i128 {
+                                state_mut
+                                    .errors_maximum_pressure
+                                    .push(ApiError::BadRequest(vec![format!(
+                                        "The maximum_pressure field must be between {} and {}.",
+                                        i32::MIN,
+                                        i32::MAX
+                                    )]));
+                            } else {
+                                state_mut.maximum_pressure = Some(value as i32);
+                            }
+                        }
+                        Err(_) => {
+                            state_mut
+                                .errors_maximum_pressure
+                                .push(ApiError::BadRequest(vec![
+                                    "The maximum_pressure field must be a valid i32.".to_string(),
+                                ]));
+                        }
+                    },
+                    None => state_mut.maximum_pressure = None,
+                }
             }
             ContainerVerticalRuleActions::SetContainerItemType(container_item_type) => {
                 state_mut.errors_container_item_type.clear();
-        if container_item_type.is_none() {
-            state_mut.errors_container_item_type.push(ApiError::BadRequest(vec![
-                "The ContainerItemType field is required.".to_string()
-             ]));
-        }
+                if container_item_type.is_none() {
+                    state_mut
+                        .errors_container_item_type
+                        .push(ApiError::BadRequest(vec![
+                            "The ContainerItemType field is required.".to_string(),
+                        ]));
+                }
                 state_mut.container_item_type = container_item_type;
             }
             ContainerVerticalRuleActions::SetContainedItemType(contained_item_type) => {
                 state_mut.errors_contained_item_type.clear();
-        if contained_item_type.is_none() {
-            state_mut.errors_contained_item_type.push(ApiError::BadRequest(vec![
-                "The ContainedItemType field is required.".to_string()
-             ]));
-        }
+                if contained_item_type.is_none() {
+                    state_mut
+                        .errors_contained_item_type
+                        .push(ApiError::BadRequest(vec![
+                            "The ContainedItemType field is required.".to_string(),
+                        ]));
+                }
                 state_mut.contained_item_type = contained_item_type;
             }
         }
@@ -342,16 +719,23 @@ impl FormBuilder for ContainerVerticalRuleBuilder {
     type Actions = ContainerVerticalRuleActions;
 
     fn has_errors(&self) -> bool {
-!self.errors_name.is_empty() || !self.errors_minimum_temperature.is_empty() || !self.errors_maximum_temperature.is_empty() || !self.errors_minimum_humidity.is_empty() || !self.errors_maximum_humidity.is_empty() || !self.errors_minimum_pressure.is_empty() || !self.errors_maximum_pressure.is_empty() || !self.errors_container_item_type.is_empty() || !self.errors_contained_item_type.is_empty()
+        !self.errors_name.is_empty()
+            || !self.errors_minimum_temperature.is_empty()
+            || !self.errors_maximum_temperature.is_empty()
+            || !self.errors_minimum_humidity.is_empty()
+            || !self.errors_maximum_humidity.is_empty()
+            || !self.errors_minimum_pressure.is_empty()
+            || !self.errors_maximum_pressure.is_empty()
+            || !self.errors_container_item_type.is_empty()
+            || !self.errors_contained_item_type.is_empty()
     }
 
     fn can_submit(&self) -> bool {
         !self.has_errors()
-        && self.name.is_some()
-        && self.container_item_type.is_some()
-        && self.contained_item_type.is_some()
+            && self.name.is_some()
+            && self.container_item_type.is_some()
+            && self.contained_item_type.is_some()
     }
-
 }
 
 impl From<ContainerVerticalRuleBuilder> for NewContainerVerticalRule {
@@ -428,18 +812,49 @@ impl FormBuildable for UpdateContainerVerticalRule {
 #[function_component(CreateContainerVerticalRuleForm)]
 pub fn create_container_vertical_rule_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<ContainerVerticalRuleBuilder>();
-    let set_name = builder_dispatch.apply_callback(|name: Option<String>| ContainerVerticalRuleActions::SetName(name));
-    let set_minimum_temperature = builder_dispatch.apply_callback(|minimum_temperature: Option<i32>| ContainerVerticalRuleActions::SetMinimumTemperature(minimum_temperature));
-    let set_maximum_temperature = builder_dispatch.apply_callback(|maximum_temperature: Option<i32>| ContainerVerticalRuleActions::SetMaximumTemperature(maximum_temperature));
-    let set_minimum_humidity = builder_dispatch.apply_callback(|minimum_humidity: Option<i32>| ContainerVerticalRuleActions::SetMinimumHumidity(minimum_humidity));
-    let set_maximum_humidity = builder_dispatch.apply_callback(|maximum_humidity: Option<i32>| ContainerVerticalRuleActions::SetMaximumHumidity(maximum_humidity));
-    let set_minimum_pressure = builder_dispatch.apply_callback(|minimum_pressure: Option<i32>| ContainerVerticalRuleActions::SetMinimumPressure(minimum_pressure));
-    let set_maximum_pressure = builder_dispatch.apply_callback(|maximum_pressure: Option<i32>| ContainerVerticalRuleActions::SetMaximumPressure(maximum_pressure));
-    let set_container_item_type = builder_dispatch.apply_callback(|container_item_type: Option<NestedItemCategory>| ContainerVerticalRuleActions::SetContainerItemType(container_item_type));
-    let set_contained_item_type = builder_dispatch.apply_callback(|contained_item_type: Option<NestedItemCategory>| ContainerVerticalRuleActions::SetContainedItemType(contained_item_type));
+    let set_name = builder_dispatch
+        .apply_callback(|name: Option<String>| ContainerVerticalRuleActions::SetName(name));
+    let set_minimum_temperature =
+        builder_dispatch.apply_callback(|minimum_temperature: Option<String>| {
+            ContainerVerticalRuleActions::SetMinimumTemperature(minimum_temperature)
+        });
+    let set_maximum_temperature =
+        builder_dispatch.apply_callback(|maximum_temperature: Option<String>| {
+            ContainerVerticalRuleActions::SetMaximumTemperature(maximum_temperature)
+        });
+    let set_minimum_humidity =
+        builder_dispatch.apply_callback(|minimum_humidity: Option<String>| {
+            ContainerVerticalRuleActions::SetMinimumHumidity(minimum_humidity)
+        });
+    let set_maximum_humidity =
+        builder_dispatch.apply_callback(|maximum_humidity: Option<String>| {
+            ContainerVerticalRuleActions::SetMaximumHumidity(maximum_humidity)
+        });
+    let set_minimum_pressure =
+        builder_dispatch.apply_callback(|minimum_pressure: Option<String>| {
+            ContainerVerticalRuleActions::SetMinimumPressure(minimum_pressure)
+        });
+    let set_maximum_pressure =
+        builder_dispatch.apply_callback(|maximum_pressure: Option<String>| {
+            ContainerVerticalRuleActions::SetMaximumPressure(maximum_pressure)
+        });
+    let set_container_item_type =
+        builder_dispatch.apply_callback(|container_item_type: Option<NestedItemCategory>| {
+            ContainerVerticalRuleActions::SetContainerItemType(container_item_type)
+        });
+    let set_contained_item_type =
+        builder_dispatch.apply_callback(|contained_item_type: Option<NestedItemCategory>| {
+            ContainerVerticalRuleActions::SetContainedItemType(contained_item_type)
+        });
     html! {
         <BasicForm<NewContainerVerticalRule> method={FormMethod::POST} builder={builder_store.deref().clone()}>
-            <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
+            <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
+            <BasicInput<i32> label="MinimumTemperature" errors={builder_store.errors_minimum_temperature.clone()} builder={set_minimum_temperature} value={builder_store.minimum_temperature.clone()} />
+            <BasicInput<i32> label="MaximumTemperature" errors={builder_store.errors_maximum_temperature.clone()} builder={set_maximum_temperature} value={builder_store.maximum_temperature.clone()} />
+            <BasicInput<i32> label="MinimumHumidity" errors={builder_store.errors_minimum_humidity.clone()} builder={set_minimum_humidity} value={builder_store.minimum_humidity.clone()} />
+            <BasicInput<i32> label="MaximumHumidity" errors={builder_store.errors_maximum_humidity.clone()} builder={set_maximum_humidity} value={builder_store.maximum_humidity.clone()} />
+            <BasicInput<i32> label="MinimumPressure" errors={builder_store.errors_minimum_pressure.clone()} builder={set_minimum_pressure} value={builder_store.minimum_pressure.clone()} />
+            <BasicInput<i32> label="MaximumPressure" errors={builder_store.errors_maximum_pressure.clone()} builder={set_maximum_pressure} value={builder_store.maximum_pressure.clone()} />
             <Datalist<NestedItemCategory> builder={set_container_item_type} errors={builder_store.errors_container_item_type.clone()} value={builder_store.container_item_type.clone()} label="ContainerItemType" />
             <Datalist<NestedItemCategory> builder={set_contained_item_type} errors={builder_store.errors_contained_item_type.clone()} value={builder_store.contained_item_type.clone()} label="ContainedItemType" />
         </BasicForm<NewContainerVerticalRule>>
@@ -453,24 +868,55 @@ pub struct UpdateContainerVerticalRuleFormProp {
 #[function_component(UpdateContainerVerticalRuleForm)]
 pub fn update_container_vertical_rule_form(props: &UpdateContainerVerticalRuleFormProp) -> Html {
     let (builder_store, builder_dispatch) = use_store::<ContainerVerticalRuleBuilder>();
-    let set_name = builder_dispatch.apply_callback(|name: Option<String>| ContainerVerticalRuleActions::SetName(name));
-    let set_minimum_temperature = builder_dispatch.apply_callback(|minimum_temperature: Option<i32>| ContainerVerticalRuleActions::SetMinimumTemperature(minimum_temperature));
-    let set_maximum_temperature = builder_dispatch.apply_callback(|maximum_temperature: Option<i32>| ContainerVerticalRuleActions::SetMaximumTemperature(maximum_temperature));
-    let set_minimum_humidity = builder_dispatch.apply_callback(|minimum_humidity: Option<i32>| ContainerVerticalRuleActions::SetMinimumHumidity(minimum_humidity));
-    let set_maximum_humidity = builder_dispatch.apply_callback(|maximum_humidity: Option<i32>| ContainerVerticalRuleActions::SetMaximumHumidity(maximum_humidity));
-    let set_minimum_pressure = builder_dispatch.apply_callback(|minimum_pressure: Option<i32>| ContainerVerticalRuleActions::SetMinimumPressure(minimum_pressure));
-    let set_maximum_pressure = builder_dispatch.apply_callback(|maximum_pressure: Option<i32>| ContainerVerticalRuleActions::SetMaximumPressure(maximum_pressure));
-    let set_container_item_type = builder_dispatch.apply_callback(|container_item_type: Option<NestedItemCategory>| ContainerVerticalRuleActions::SetContainerItemType(container_item_type));
-    let set_contained_item_type = builder_dispatch.apply_callback(|contained_item_type: Option<NestedItemCategory>| ContainerVerticalRuleActions::SetContainedItemType(contained_item_type));
+    let set_name = builder_dispatch
+        .apply_callback(|name: Option<String>| ContainerVerticalRuleActions::SetName(name));
+    let set_minimum_temperature =
+        builder_dispatch.apply_callback(|minimum_temperature: Option<String>| {
+            ContainerVerticalRuleActions::SetMinimumTemperature(minimum_temperature)
+        });
+    let set_maximum_temperature =
+        builder_dispatch.apply_callback(|maximum_temperature: Option<String>| {
+            ContainerVerticalRuleActions::SetMaximumTemperature(maximum_temperature)
+        });
+    let set_minimum_humidity =
+        builder_dispatch.apply_callback(|minimum_humidity: Option<String>| {
+            ContainerVerticalRuleActions::SetMinimumHumidity(minimum_humidity)
+        });
+    let set_maximum_humidity =
+        builder_dispatch.apply_callback(|maximum_humidity: Option<String>| {
+            ContainerVerticalRuleActions::SetMaximumHumidity(maximum_humidity)
+        });
+    let set_minimum_pressure =
+        builder_dispatch.apply_callback(|minimum_pressure: Option<String>| {
+            ContainerVerticalRuleActions::SetMinimumPressure(minimum_pressure)
+        });
+    let set_maximum_pressure =
+        builder_dispatch.apply_callback(|maximum_pressure: Option<String>| {
+            ContainerVerticalRuleActions::SetMaximumPressure(maximum_pressure)
+        });
+    let set_container_item_type =
+        builder_dispatch.apply_callback(|container_item_type: Option<NestedItemCategory>| {
+            ContainerVerticalRuleActions::SetContainerItemType(container_item_type)
+        });
+    let set_contained_item_type =
+        builder_dispatch.apply_callback(|contained_item_type: Option<NestedItemCategory>| {
+            ContainerVerticalRuleActions::SetContainedItemType(contained_item_type)
+        });
     html! {
         <BasicForm<UpdateContainerVerticalRule> method={FormMethod::PUT} builder={builder_store.deref().clone()}>
-            <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
+            <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
+            <BasicInput<i32> label="MinimumTemperature" errors={builder_store.errors_minimum_temperature.clone()} builder={set_minimum_temperature} value={builder_store.minimum_temperature.clone()} />
+            <BasicInput<i32> label="MaximumTemperature" errors={builder_store.errors_maximum_temperature.clone()} builder={set_maximum_temperature} value={builder_store.maximum_temperature.clone()} />
+            <BasicInput<i32> label="MinimumHumidity" errors={builder_store.errors_minimum_humidity.clone()} builder={set_minimum_humidity} value={builder_store.minimum_humidity.clone()} />
+            <BasicInput<i32> label="MaximumHumidity" errors={builder_store.errors_maximum_humidity.clone()} builder={set_maximum_humidity} value={builder_store.maximum_humidity.clone()} />
+            <BasicInput<i32> label="MinimumPressure" errors={builder_store.errors_minimum_pressure.clone()} builder={set_minimum_pressure} value={builder_store.minimum_pressure.clone()} />
+            <BasicInput<i32> label="MaximumPressure" errors={builder_store.errors_maximum_pressure.clone()} builder={set_maximum_pressure} value={builder_store.maximum_pressure.clone()} />
             <Datalist<NestedItemCategory> builder={set_container_item_type} errors={builder_store.errors_container_item_type.clone()} value={builder_store.container_item_type.clone()} label="ContainerItemType" />
             <Datalist<NestedItemCategory> builder={set_contained_item_type} errors={builder_store.errors_contained_item_type.clone()} value={builder_store.contained_item_type.clone()} label="ContainedItemType" />
         </BasicForm<UpdateContainerVerticalRule>>
     }
 }
-#[derive(Store, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 #[store(storage = "session")]
 pub struct ItemCategoryBuilder {
     pub id: Option<i32>,
@@ -478,6 +924,7 @@ pub struct ItemCategoryBuilder {
     pub description: Option<String>,
     pub errors_name: Vec<ApiError>,
     pub errors_description: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -487,25 +934,29 @@ pub(super) enum ItemCategoryActions {
 }
 
 impl Reducer<ItemCategoryBuilder> for ItemCategoryActions {
-    fn apply(self, mut state: std::rc::Rc<ItemCategoryBuilder>) -> std::rc::Rc<ItemCategoryBuilder> {
+    fn apply(
+        self,
+        mut state: std::rc::Rc<ItemCategoryBuilder>,
+    ) -> std::rc::Rc<ItemCategoryBuilder> {
         let state_mut = Rc::make_mut(&mut state);
+        state_mut.form_updated_at = chrono::Utc::now().naive_utc();
         match self {
             ItemCategoryActions::SetName(name) => {
                 state_mut.errors_name.clear();
-        if name.is_none() {
-            state_mut.errors_name.push(ApiError::BadRequest(vec![
-                "The Name field is required.".to_string()
-             ]));
-        }
+                if name.is_none() {
+                    state_mut.errors_name.push(ApiError::BadRequest(vec![
+                        "The Name field is required.".to_string(),
+                    ]));
+                }
                 state_mut.name = name;
             }
             ItemCategoryActions::SetDescription(description) => {
                 state_mut.errors_description.clear();
-        if description.is_none() {
-            state_mut.errors_description.push(ApiError::BadRequest(vec![
-                "The Description field is required.".to_string()
-             ]));
-        }
+                if description.is_none() {
+                    state_mut.errors_description.push(ApiError::BadRequest(vec![
+                        "The Description field is required.".to_string(),
+                    ]));
+                }
                 state_mut.description = description;
             }
         }
@@ -516,15 +967,12 @@ impl FormBuilder for ItemCategoryBuilder {
     type Actions = ItemCategoryActions;
 
     fn has_errors(&self) -> bool {
-!self.errors_name.is_empty() || !self.errors_description.is_empty()
+        !self.errors_name.is_empty() || !self.errors_description.is_empty()
     }
 
     fn can_submit(&self) -> bool {
-        !self.has_errors()
-        && self.name.is_some()
-        && self.description.is_some()
+        !self.has_errors() && self.name.is_some() && self.description.is_some()
     }
-
 }
 
 impl From<ItemCategoryBuilder> for NewItemCategory {
@@ -587,12 +1035,15 @@ impl FormBuildable for UpdateItemCategory {
 #[function_component(CreateItemCategoryForm)]
 pub fn create_item_category_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<ItemCategoryBuilder>();
-    let set_name = builder_dispatch.apply_callback(|name: Option<String>| ItemCategoryActions::SetName(name));
-    let set_description = builder_dispatch.apply_callback(|description: Option<String>| ItemCategoryActions::SetDescription(description));
+    let set_name =
+        builder_dispatch.apply_callback(|name: Option<String>| ItemCategoryActions::SetName(name));
+    let set_description = builder_dispatch.apply_callback(|description: Option<String>| {
+        ItemCategoryActions::SetDescription(description)
+    });
     html! {
         <BasicForm<NewItemCategory> method={FormMethod::POST} builder={builder_store.deref().clone()}>
-            <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
-            <BasicInput label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} input_type={InputType::Text} />
+            <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
+            <BasicInput<String> label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
         </BasicForm<NewItemCategory>>
     }
 }
@@ -604,16 +1055,19 @@ pub struct UpdateItemCategoryFormProp {
 #[function_component(UpdateItemCategoryForm)]
 pub fn update_item_category_form(props: &UpdateItemCategoryFormProp) -> Html {
     let (builder_store, builder_dispatch) = use_store::<ItemCategoryBuilder>();
-    let set_name = builder_dispatch.apply_callback(|name: Option<String>| ItemCategoryActions::SetName(name));
-    let set_description = builder_dispatch.apply_callback(|description: Option<String>| ItemCategoryActions::SetDescription(description));
+    let set_name =
+        builder_dispatch.apply_callback(|name: Option<String>| ItemCategoryActions::SetName(name));
+    let set_description = builder_dispatch.apply_callback(|description: Option<String>| {
+        ItemCategoryActions::SetDescription(description)
+    });
     html! {
         <BasicForm<UpdateItemCategory> method={FormMethod::PUT} builder={builder_store.deref().clone()}>
-            <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
-            <BasicInput label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} input_type={InputType::Text} />
+            <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
+            <BasicInput<String> label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
         </BasicForm<UpdateItemCategory>>
     }
 }
-#[derive(Store, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 #[store(storage = "session")]
 pub struct ProcedureBuilder {
     pub id: Option<i32>,
@@ -621,6 +1075,7 @@ pub struct ProcedureBuilder {
     pub description: Option<String>,
     pub errors_name: Vec<ApiError>,
     pub errors_description: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -632,14 +1087,15 @@ pub(super) enum ProcedureActions {
 impl Reducer<ProcedureBuilder> for ProcedureActions {
     fn apply(self, mut state: std::rc::Rc<ProcedureBuilder>) -> std::rc::Rc<ProcedureBuilder> {
         let state_mut = Rc::make_mut(&mut state);
+        state_mut.form_updated_at = chrono::Utc::now().naive_utc();
         match self {
             ProcedureActions::SetName(name) => {
                 state_mut.errors_name.clear();
-        if name.is_none() {
-            state_mut.errors_name.push(ApiError::BadRequest(vec![
-                "The Name field is required.".to_string()
-             ]));
-        }
+                if name.is_none() {
+                    state_mut.errors_name.push(ApiError::BadRequest(vec![
+                        "The Name field is required.".to_string(),
+                    ]));
+                }
                 state_mut.name = name;
             }
             ProcedureActions::SetDescription(description) => {
@@ -654,14 +1110,12 @@ impl FormBuilder for ProcedureBuilder {
     type Actions = ProcedureActions;
 
     fn has_errors(&self) -> bool {
-!self.errors_name.is_empty() || !self.errors_description.is_empty()
+        !self.errors_name.is_empty() || !self.errors_description.is_empty()
     }
 
     fn can_submit(&self) -> bool {
-        !self.has_errors()
-        && self.name.is_some()
+        !self.has_errors() && self.name.is_some()
     }
-
 }
 
 impl From<ProcedureBuilder> for NewProcedure {
@@ -724,12 +1178,15 @@ impl FormBuildable for UpdateProcedure {
 #[function_component(CreateProcedureForm)]
 pub fn create_procedure_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<ProcedureBuilder>();
-    let set_name = builder_dispatch.apply_callback(|name: Option<String>| ProcedureActions::SetName(name));
-    let set_description = builder_dispatch.apply_callback(|description: Option<String>| ProcedureActions::SetDescription(description));
+    let set_name =
+        builder_dispatch.apply_callback(|name: Option<String>| ProcedureActions::SetName(name));
+    let set_description = builder_dispatch.apply_callback(|description: Option<String>| {
+        ProcedureActions::SetDescription(description)
+    });
     html! {
         <BasicForm<NewProcedure> method={FormMethod::POST} builder={builder_store.deref().clone()}>
-            <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
-            <BasicInput label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} input_type={InputType::Text} />
+            <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
+            <BasicInput<String> label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
         </BasicForm<NewProcedure>>
     }
 }
@@ -741,16 +1198,19 @@ pub struct UpdateProcedureFormProp {
 #[function_component(UpdateProcedureForm)]
 pub fn update_procedure_form(props: &UpdateProcedureFormProp) -> Html {
     let (builder_store, builder_dispatch) = use_store::<ProcedureBuilder>();
-    let set_name = builder_dispatch.apply_callback(|name: Option<String>| ProcedureActions::SetName(name));
-    let set_description = builder_dispatch.apply_callback(|description: Option<String>| ProcedureActions::SetDescription(description));
+    let set_name =
+        builder_dispatch.apply_callback(|name: Option<String>| ProcedureActions::SetName(name));
+    let set_description = builder_dispatch.apply_callback(|description: Option<String>| {
+        ProcedureActions::SetDescription(description)
+    });
     html! {
         <BasicForm<UpdateProcedure> method={FormMethod::PUT} builder={builder_store.deref().clone()}>
-            <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
-            <BasicInput label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} input_type={InputType::Text} />
+            <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
+            <BasicInput<String> label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
         </BasicForm<UpdateProcedure>>
     }
 }
-#[derive(Store, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 #[store(storage = "session")]
 pub struct ProjectRequirementBuilder {
     pub id: Option<i32>,
@@ -762,45 +1222,74 @@ pub struct ProjectRequirementBuilder {
     pub errors_project: Vec<ApiError>,
     pub errors_item_category: Vec<ApiError>,
     pub errors_unit: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub(super) enum ProjectRequirementActions {
-    SetQuantity(Option<i32>),
+    SetQuantity(Option<String>),
     SetProject(Option<NestedProject>),
     SetItemCategory(Option<NestedItemCategory>),
     SetUnit(Option<Unit>),
 }
 
 impl Reducer<ProjectRequirementBuilder> for ProjectRequirementActions {
-    fn apply(self, mut state: std::rc::Rc<ProjectRequirementBuilder>) -> std::rc::Rc<ProjectRequirementBuilder> {
+    fn apply(
+        self,
+        mut state: std::rc::Rc<ProjectRequirementBuilder>,
+    ) -> std::rc::Rc<ProjectRequirementBuilder> {
         let state_mut = Rc::make_mut(&mut state);
+        state_mut.form_updated_at = chrono::Utc::now().naive_utc();
         match self {
             ProjectRequirementActions::SetQuantity(quantity) => {
                 state_mut.errors_quantity.clear();
-        if quantity.is_none() {
-            state_mut.errors_quantity.push(ApiError::BadRequest(vec![
-                "The Quantity field is required.".to_string()
-             ]));
-        }
-                state_mut.quantity = quantity;
+                if quantity.is_none() {
+                    state_mut.errors_quantity.push(ApiError::BadRequest(vec![
+                        "The Quantity field is required.".to_string(),
+                    ]));
+                }
+                match quantity {
+                    Some(value) => match value.parse::<i128>() {
+                        Ok(value) => {
+                            if value < i32::MIN as i128 || value > i32::MAX as i128 {
+                                state_mut.errors_quantity.push(ApiError::BadRequest(vec![
+                                    format!(
+                                        "The quantity field must be between {} and {}.",
+                                        i32::MIN,
+                                        i32::MAX
+                                    ),
+                                ]));
+                            } else {
+                                state_mut.quantity = Some(value as i32);
+                            }
+                        }
+                        Err(_) => {
+                            state_mut.errors_quantity.push(ApiError::BadRequest(vec![
+                                "The quantity field must be a valid i32.".to_string(),
+                            ]));
+                        }
+                    },
+                    None => state_mut.quantity = None,
+                }
             }
             ProjectRequirementActions::SetProject(project) => {
                 state_mut.errors_project.clear();
-        if project.is_none() {
-            state_mut.errors_project.push(ApiError::BadRequest(vec![
-                "The Project field is required.".to_string()
-             ]));
-        }
+                if project.is_none() {
+                    state_mut.errors_project.push(ApiError::BadRequest(vec![
+                        "The Project field is required.".to_string(),
+                    ]));
+                }
                 state_mut.project = project;
             }
             ProjectRequirementActions::SetItemCategory(item_category) => {
                 state_mut.errors_item_category.clear();
-        if item_category.is_none() {
-            state_mut.errors_item_category.push(ApiError::BadRequest(vec![
-                "The ItemCategory field is required.".to_string()
-             ]));
-        }
+                if item_category.is_none() {
+                    state_mut
+                        .errors_item_category
+                        .push(ApiError::BadRequest(vec![
+                            "The ItemCategory field is required.".to_string(),
+                        ]));
+                }
                 state_mut.item_category = item_category;
             }
             ProjectRequirementActions::SetUnit(unit) => {
@@ -815,16 +1304,18 @@ impl FormBuilder for ProjectRequirementBuilder {
     type Actions = ProjectRequirementActions;
 
     fn has_errors(&self) -> bool {
-!self.errors_quantity.is_empty() || !self.errors_project.is_empty() || !self.errors_item_category.is_empty() || !self.errors_unit.is_empty()
+        !self.errors_quantity.is_empty()
+            || !self.errors_project.is_empty()
+            || !self.errors_item_category.is_empty()
+            || !self.errors_unit.is_empty()
     }
 
     fn can_submit(&self) -> bool {
         !self.has_errors()
-        && self.quantity.is_some()
-        && self.project.is_some()
-        && self.item_category.is_some()
+            && self.quantity.is_some()
+            && self.project.is_some()
+            && self.item_category.is_some()
     }
-
 }
 
 impl From<ProjectRequirementBuilder> for NewProjectRequirement {
@@ -891,12 +1382,21 @@ impl FormBuildable for UpdateProjectRequirement {
 #[function_component(CreateProjectRequirementForm)]
 pub fn create_project_requirement_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<ProjectRequirementBuilder>();
-    let set_quantity = builder_dispatch.apply_callback(|quantity: Option<i32>| ProjectRequirementActions::SetQuantity(quantity));
-    let set_project = builder_dispatch.apply_callback(|project: Option<NestedProject>| ProjectRequirementActions::SetProject(project));
-    let set_item_category = builder_dispatch.apply_callback(|item_category: Option<NestedItemCategory>| ProjectRequirementActions::SetItemCategory(item_category));
-    let set_unit = builder_dispatch.apply_callback(|unit: Option<Unit>| ProjectRequirementActions::SetUnit(unit));
+    let set_quantity = builder_dispatch.apply_callback(|quantity: Option<String>| {
+        ProjectRequirementActions::SetQuantity(quantity)
+    });
+    let set_project = builder_dispatch.apply_callback(|project: Option<NestedProject>| {
+        ProjectRequirementActions::SetProject(project)
+    });
+    let set_item_category =
+        builder_dispatch.apply_callback(|item_category: Option<NestedItemCategory>| {
+            ProjectRequirementActions::SetItemCategory(item_category)
+        });
+    let set_unit = builder_dispatch
+        .apply_callback(|unit: Option<Unit>| ProjectRequirementActions::SetUnit(unit));
     html! {
         <BasicForm<NewProjectRequirement> method={FormMethod::POST} builder={builder_store.deref().clone()}>
+            <BasicInput<i32> label="Quantity" errors={builder_store.errors_quantity.clone()} builder={set_quantity} value={builder_store.quantity.clone()} />
             <Datalist<NestedProject> builder={set_project} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" />
             <Datalist<NestedItemCategory> builder={set_item_category} errors={builder_store.errors_item_category.clone()} value={builder_store.item_category.clone()} label="ItemCategory" />
             <Datalist<Unit> builder={set_unit} errors={builder_store.errors_unit.clone()} value={builder_store.unit.clone()} label="Unit" />
@@ -911,27 +1411,36 @@ pub struct UpdateProjectRequirementFormProp {
 #[function_component(UpdateProjectRequirementForm)]
 pub fn update_project_requirement_form(props: &UpdateProjectRequirementFormProp) -> Html {
     let (builder_store, builder_dispatch) = use_store::<ProjectRequirementBuilder>();
-    let set_quantity = builder_dispatch.apply_callback(|quantity: Option<i32>| ProjectRequirementActions::SetQuantity(quantity));
-    let set_project = builder_dispatch.apply_callback(|project: Option<NestedProject>| ProjectRequirementActions::SetProject(project));
-    let set_item_category = builder_dispatch.apply_callback(|item_category: Option<NestedItemCategory>| ProjectRequirementActions::SetItemCategory(item_category));
-    let set_unit = builder_dispatch.apply_callback(|unit: Option<Unit>| ProjectRequirementActions::SetUnit(unit));
+    let set_quantity = builder_dispatch.apply_callback(|quantity: Option<String>| {
+        ProjectRequirementActions::SetQuantity(quantity)
+    });
+    let set_project = builder_dispatch.apply_callback(|project: Option<NestedProject>| {
+        ProjectRequirementActions::SetProject(project)
+    });
+    let set_item_category =
+        builder_dispatch.apply_callback(|item_category: Option<NestedItemCategory>| {
+            ProjectRequirementActions::SetItemCategory(item_category)
+        });
+    let set_unit = builder_dispatch
+        .apply_callback(|unit: Option<Unit>| ProjectRequirementActions::SetUnit(unit));
     html! {
         <BasicForm<UpdateProjectRequirement> method={FormMethod::PUT} builder={builder_store.deref().clone()}>
+            <BasicInput<i32> label="Quantity" errors={builder_store.errors_quantity.clone()} builder={set_quantity} value={builder_store.quantity.clone()} />
             <Datalist<NestedProject> builder={set_project} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" />
             <Datalist<NestedItemCategory> builder={set_item_category} errors={builder_store.errors_item_category.clone()} value={builder_store.item_category.clone()} label="ItemCategory" />
             <Datalist<Unit> builder={set_unit} errors={builder_store.errors_unit.clone()} value={builder_store.unit.clone()} label="Unit" />
         </BasicForm<UpdateProjectRequirement>>
     }
 }
-#[derive(Store, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 #[store(storage = "session")]
 pub struct ProjectBuilder {
     pub id: Option<i32>,
     pub name: Option<String>,
     pub description: Option<String>,
     pub public: Option<bool>,
-    pub budget: Option<i64>,
-    pub expenses: Option<i64>,
+    pub budget: Option<f64>,
+    pub expenses: Option<f64>,
     pub expected_end_date: Option<NaiveDateTime>,
     pub end_date: Option<NaiveDateTime>,
     pub state: Option<NestedProjectState>,
@@ -945,6 +1454,7 @@ pub struct ProjectBuilder {
     pub errors_end_date: Vec<ApiError>,
     pub errors_state: Vec<ApiError>,
     pub errors_parent_project: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -952,8 +1462,8 @@ pub(super) enum ProjectActions {
     SetName(Option<String>),
     SetDescription(Option<String>),
     SetPublic(Option<bool>),
-    SetBudget(Option<i64>),
-    SetExpenses(Option<i64>),
+    SetBudget(Option<String>),
+    SetExpenses(Option<String>),
     SetExpectedEndDate(Option<NaiveDateTime>),
     SetEndDate(Option<NaiveDateTime>),
     SetState(Option<NestedProjectState>),
@@ -963,41 +1473,94 @@ pub(super) enum ProjectActions {
 impl Reducer<ProjectBuilder> for ProjectActions {
     fn apply(self, mut state: std::rc::Rc<ProjectBuilder>) -> std::rc::Rc<ProjectBuilder> {
         let state_mut = Rc::make_mut(&mut state);
+        state_mut.form_updated_at = chrono::Utc::now().naive_utc();
         match self {
             ProjectActions::SetName(name) => {
                 state_mut.errors_name.clear();
-        if name.is_none() {
-            state_mut.errors_name.push(ApiError::BadRequest(vec![
-                "The Name field is required.".to_string()
-             ]));
-        }
+                if name.is_none() {
+                    state_mut.errors_name.push(ApiError::BadRequest(vec![
+                        "The Name field is required.".to_string(),
+                    ]));
+                }
                 state_mut.name = name;
             }
             ProjectActions::SetDescription(description) => {
                 state_mut.errors_description.clear();
-        if description.is_none() {
-            state_mut.errors_description.push(ApiError::BadRequest(vec![
-                "The Description field is required.".to_string()
-             ]));
-        }
+                if description.is_none() {
+                    state_mut.errors_description.push(ApiError::BadRequest(vec![
+                        "The Description field is required.".to_string(),
+                    ]));
+                }
                 state_mut.description = description;
             }
             ProjectActions::SetPublic(public) => {
                 state_mut.errors_public.clear();
-        if public.is_none() {
-            state_mut.errors_public.push(ApiError::BadRequest(vec![
-                "The Public field is required.".to_string()
-             ]));
-        }
+                if public.is_none() {
+                    state_mut.errors_public.push(ApiError::BadRequest(vec![
+                        "The Public field is required.".to_string(),
+                    ]));
+                }
                 state_mut.public = public;
             }
             ProjectActions::SetBudget(budget) => {
                 state_mut.errors_budget.clear();
-                state_mut.budget = budget;
+                match budget {
+                    Some(value) => match value.parse::<f64>() {
+                        Ok(value) => {
+                            if value.is_nan() || value.is_infinite() {
+                                state_mut.errors_budget.push(ApiError::BadRequest(vec![
+                                    "The budget field must be a valid f64.".to_string(),
+                                ]));
+                            } else if value < f64::MIN as f64 || value > f64::MAX as f64 {
+                                state_mut
+                                    .errors_budget
+                                    .push(ApiError::BadRequest(vec![format!(
+                                        "The budget field must be between {} and {}.",
+                                        f64::MIN,
+                                        f64::MAX
+                                    )]));
+                            } else {
+                                state_mut.budget = Some(value as f64);
+                            }
+                        }
+                        Err(_) => {
+                            state_mut.errors_budget.push(ApiError::BadRequest(vec![
+                                "The budget field must be a valid f64.".to_string(),
+                            ]));
+                        }
+                    },
+                    None => state_mut.budget = None,
+                }
             }
             ProjectActions::SetExpenses(expenses) => {
                 state_mut.errors_expenses.clear();
-                state_mut.expenses = expenses;
+                match expenses {
+                    Some(value) => match value.parse::<f64>() {
+                        Ok(value) => {
+                            if value.is_nan() || value.is_infinite() {
+                                state_mut.errors_expenses.push(ApiError::BadRequest(vec![
+                                    "The expenses field must be a valid f64.".to_string(),
+                                ]));
+                            } else if value < f64::MIN as f64 || value > f64::MAX as f64 {
+                                state_mut.errors_expenses.push(ApiError::BadRequest(vec![
+                                    format!(
+                                        "The expenses field must be between {} and {}.",
+                                        f64::MIN,
+                                        f64::MAX
+                                    ),
+                                ]));
+                            } else {
+                                state_mut.expenses = Some(value as f64);
+                            }
+                        }
+                        Err(_) => {
+                            state_mut.errors_expenses.push(ApiError::BadRequest(vec![
+                                "The expenses field must be a valid f64.".to_string(),
+                            ]));
+                        }
+                    },
+                    None => state_mut.expenses = None,
+                }
             }
             ProjectActions::SetExpectedEndDate(expected_end_date) => {
                 state_mut.errors_expected_end_date.clear();
@@ -1009,11 +1572,11 @@ impl Reducer<ProjectBuilder> for ProjectActions {
             }
             ProjectActions::SetState(state) => {
                 state_mut.errors_state.clear();
-        if state.is_none() {
-            state_mut.errors_state.push(ApiError::BadRequest(vec![
-                "The State field is required.".to_string()
-             ]));
-        }
+                if state.is_none() {
+                    state_mut.errors_state.push(ApiError::BadRequest(vec![
+                        "The State field is required.".to_string(),
+                    ]));
+                }
                 state_mut.state = state;
             }
             ProjectActions::SetParentProject(parent_project) => {
@@ -1028,17 +1591,24 @@ impl FormBuilder for ProjectBuilder {
     type Actions = ProjectActions;
 
     fn has_errors(&self) -> bool {
-!self.errors_name.is_empty() || !self.errors_description.is_empty() || !self.errors_public.is_empty() || !self.errors_budget.is_empty() || !self.errors_expenses.is_empty() || !self.errors_expected_end_date.is_empty() || !self.errors_end_date.is_empty() || !self.errors_state.is_empty() || !self.errors_parent_project.is_empty()
+        !self.errors_name.is_empty()
+            || !self.errors_description.is_empty()
+            || !self.errors_public.is_empty()
+            || !self.errors_budget.is_empty()
+            || !self.errors_expenses.is_empty()
+            || !self.errors_expected_end_date.is_empty()
+            || !self.errors_end_date.is_empty()
+            || !self.errors_state.is_empty()
+            || !self.errors_parent_project.is_empty()
     }
 
     fn can_submit(&self) -> bool {
         !self.has_errors()
-        && self.name.is_some()
-        && self.description.is_some()
-        && self.public.is_some()
-        && self.state.is_some()
+            && self.name.is_some()
+            && self.description.is_some()
+            && self.public.is_some()
+            && self.state.is_some()
     }
-
 }
 
 impl From<ProjectBuilder> for NewProject {
@@ -1048,7 +1618,9 @@ impl From<ProjectBuilder> for NewProject {
             description: builder.description.unwrap(),
             public: builder.public.unwrap(),
             state_id: builder.state.unwrap().inner.id,
-            parent_project_id: builder.parent_project.map(|parent_project| parent_project.inner.id),
+            parent_project_id: builder
+                .parent_project
+                .map(|parent_project| parent_project.inner.id),
             budget: builder.budget,
             expenses: builder.expenses,
             expected_end_date: builder.expected_end_date,
@@ -1064,7 +1636,9 @@ impl From<ProjectBuilder> for UpdateProject {
             description: builder.description.unwrap(),
             public: builder.public.unwrap(),
             state_id: builder.state.unwrap().inner.id,
-            parent_project_id: builder.parent_project.map(|parent_project| parent_project.inner.id),
+            parent_project_id: builder
+                .parent_project
+                .map(|parent_project| parent_project.inner.id),
             budget: builder.budget,
             expenses: builder.expenses,
             expected_end_date: builder.expected_end_date,
@@ -1115,20 +1689,35 @@ impl FormBuildable for UpdateProject {
 #[function_component(CreateProjectForm)]
 pub fn create_project_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<ProjectBuilder>();
-    let set_name = builder_dispatch.apply_callback(|name: Option<String>| ProjectActions::SetName(name));
-    let set_description = builder_dispatch.apply_callback(|description: Option<String>| ProjectActions::SetDescription(description));
-    let set_public = builder_dispatch.apply_callback(|public: bool| ProjectActions::SetPublic(Some(public)));
-    let set_budget = builder_dispatch.apply_callback(|budget: Option<i64>| ProjectActions::SetBudget(budget));
-    let set_expenses = builder_dispatch.apply_callback(|expenses: Option<i64>| ProjectActions::SetExpenses(expenses));
-    let set_expected_end_date = builder_dispatch.apply_callback(|expected_end_date: Option<NaiveDateTime>| ProjectActions::SetExpectedEndDate(expected_end_date));
-    let set_end_date = builder_dispatch.apply_callback(|end_date: Option<NaiveDateTime>| ProjectActions::SetEndDate(end_date));
-    let set_state = builder_dispatch.apply_callback(|state: Option<NestedProjectState>| ProjectActions::SetState(state));
-    let set_parent_project = builder_dispatch.apply_callback(|parent_project: Option<NestedProject>| ProjectActions::SetParentProject(parent_project));
+    let set_name =
+        builder_dispatch.apply_callback(|name: Option<String>| ProjectActions::SetName(name));
+    let set_description = builder_dispatch
+        .apply_callback(|description: Option<String>| ProjectActions::SetDescription(description));
+    let set_public =
+        builder_dispatch.apply_callback(|public: bool| ProjectActions::SetPublic(Some(public)));
+    let set_budget =
+        builder_dispatch.apply_callback(|budget: Option<String>| ProjectActions::SetBudget(budget));
+    let set_expenses = builder_dispatch
+        .apply_callback(|expenses: Option<String>| ProjectActions::SetExpenses(expenses));
+    let set_expected_end_date =
+        builder_dispatch.apply_callback(|expected_end_date: Option<NaiveDateTime>| {
+            ProjectActions::SetExpectedEndDate(expected_end_date)
+        });
+    let set_end_date = builder_dispatch
+        .apply_callback(|end_date: Option<NaiveDateTime>| ProjectActions::SetEndDate(end_date));
+    let set_state = builder_dispatch
+        .apply_callback(|state: Option<NestedProjectState>| ProjectActions::SetState(state));
+    let set_parent_project =
+        builder_dispatch.apply_callback(|parent_project: Option<NestedProject>| {
+            ProjectActions::SetParentProject(parent_project)
+        });
     html! {
         <BasicForm<NewProject> method={FormMethod::POST} builder={builder_store.deref().clone()}>
-            <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
-            <BasicInput label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} input_type={InputType::Text} />
+            <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
+            <BasicInput<String> label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
             <Checkbox label="Public" errors={builder_store.errors_public.clone()} builder={set_public} value={builder_store.public.unwrap_or(false)} />
+            <BasicInput<f64> label="Budget" errors={builder_store.errors_budget.clone()} builder={set_budget} value={builder_store.budget.clone()} />
+            <BasicInput<f64> label="Expenses" errors={builder_store.errors_expenses.clone()} builder={set_expenses} value={builder_store.expenses.clone()} />
             <Datalist<NestedProjectState> builder={set_state} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" />
             <Datalist<NestedProject> builder={set_parent_project} errors={builder_store.errors_parent_project.clone()} value={builder_store.parent_project.clone()} label="ParentProject" />
         </BasicForm<NewProject>>
@@ -1142,26 +1731,41 @@ pub struct UpdateProjectFormProp {
 #[function_component(UpdateProjectForm)]
 pub fn update_project_form(props: &UpdateProjectFormProp) -> Html {
     let (builder_store, builder_dispatch) = use_store::<ProjectBuilder>();
-    let set_name = builder_dispatch.apply_callback(|name: Option<String>| ProjectActions::SetName(name));
-    let set_description = builder_dispatch.apply_callback(|description: Option<String>| ProjectActions::SetDescription(description));
-    let set_public = builder_dispatch.apply_callback(|public: bool| ProjectActions::SetPublic(Some(public)));
-    let set_budget = builder_dispatch.apply_callback(|budget: Option<i64>| ProjectActions::SetBudget(budget));
-    let set_expenses = builder_dispatch.apply_callback(|expenses: Option<i64>| ProjectActions::SetExpenses(expenses));
-    let set_expected_end_date = builder_dispatch.apply_callback(|expected_end_date: Option<NaiveDateTime>| ProjectActions::SetExpectedEndDate(expected_end_date));
-    let set_end_date = builder_dispatch.apply_callback(|end_date: Option<NaiveDateTime>| ProjectActions::SetEndDate(end_date));
-    let set_state = builder_dispatch.apply_callback(|state: Option<NestedProjectState>| ProjectActions::SetState(state));
-    let set_parent_project = builder_dispatch.apply_callback(|parent_project: Option<NestedProject>| ProjectActions::SetParentProject(parent_project));
+    let set_name =
+        builder_dispatch.apply_callback(|name: Option<String>| ProjectActions::SetName(name));
+    let set_description = builder_dispatch
+        .apply_callback(|description: Option<String>| ProjectActions::SetDescription(description));
+    let set_public =
+        builder_dispatch.apply_callback(|public: bool| ProjectActions::SetPublic(Some(public)));
+    let set_budget =
+        builder_dispatch.apply_callback(|budget: Option<String>| ProjectActions::SetBudget(budget));
+    let set_expenses = builder_dispatch
+        .apply_callback(|expenses: Option<String>| ProjectActions::SetExpenses(expenses));
+    let set_expected_end_date =
+        builder_dispatch.apply_callback(|expected_end_date: Option<NaiveDateTime>| {
+            ProjectActions::SetExpectedEndDate(expected_end_date)
+        });
+    let set_end_date = builder_dispatch
+        .apply_callback(|end_date: Option<NaiveDateTime>| ProjectActions::SetEndDate(end_date));
+    let set_state = builder_dispatch
+        .apply_callback(|state: Option<NestedProjectState>| ProjectActions::SetState(state));
+    let set_parent_project =
+        builder_dispatch.apply_callback(|parent_project: Option<NestedProject>| {
+            ProjectActions::SetParentProject(parent_project)
+        });
     html! {
         <BasicForm<UpdateProject> method={FormMethod::PUT} builder={builder_store.deref().clone()}>
-            <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
-            <BasicInput label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} input_type={InputType::Text} />
+            <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
+            <BasicInput<String> label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
             <Checkbox label="Public" errors={builder_store.errors_public.clone()} builder={set_public} value={builder_store.public.unwrap_or(false)} />
+            <BasicInput<f64> label="Budget" errors={builder_store.errors_budget.clone()} builder={set_budget} value={builder_store.budget.clone()} />
+            <BasicInput<f64> label="Expenses" errors={builder_store.errors_expenses.clone()} builder={set_expenses} value={builder_store.expenses.clone()} />
             <Datalist<NestedProjectState> builder={set_state} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" />
             <Datalist<NestedProject> builder={set_parent_project} errors={builder_store.errors_parent_project.clone()} value={builder_store.parent_project.clone()} label="ParentProject" />
         </BasicForm<UpdateProject>>
     }
 }
-#[derive(Store, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 #[store(storage = "session")]
 pub struct SampledIndividualBuilder {
     pub id: Option<Uuid>,
@@ -1169,6 +1773,7 @@ pub struct SampledIndividualBuilder {
     pub tagged: Option<bool>,
     pub errors_name: Vec<ApiError>,
     pub errors_tagged: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -1178,8 +1783,12 @@ pub(super) enum SampledIndividualActions {
 }
 
 impl Reducer<SampledIndividualBuilder> for SampledIndividualActions {
-    fn apply(self, mut state: std::rc::Rc<SampledIndividualBuilder>) -> std::rc::Rc<SampledIndividualBuilder> {
+    fn apply(
+        self,
+        mut state: std::rc::Rc<SampledIndividualBuilder>,
+    ) -> std::rc::Rc<SampledIndividualBuilder> {
         let state_mut = Rc::make_mut(&mut state);
+        state_mut.form_updated_at = chrono::Utc::now().naive_utc();
         match self {
             SampledIndividualActions::SetName(name) => {
                 state_mut.errors_name.clear();
@@ -1187,11 +1796,11 @@ impl Reducer<SampledIndividualBuilder> for SampledIndividualActions {
             }
             SampledIndividualActions::SetTagged(tagged) => {
                 state_mut.errors_tagged.clear();
-        if tagged.is_none() {
-            state_mut.errors_tagged.push(ApiError::BadRequest(vec![
-                "The Tagged field is required.".to_string()
-             ]));
-        }
+                if tagged.is_none() {
+                    state_mut.errors_tagged.push(ApiError::BadRequest(vec![
+                        "The Tagged field is required.".to_string(),
+                    ]));
+                }
                 state_mut.tagged = tagged;
             }
         }
@@ -1202,14 +1811,12 @@ impl FormBuilder for SampledIndividualBuilder {
     type Actions = SampledIndividualActions;
 
     fn has_errors(&self) -> bool {
-!self.errors_name.is_empty() || !self.errors_tagged.is_empty()
+        !self.errors_name.is_empty() || !self.errors_tagged.is_empty()
     }
 
     fn can_submit(&self) -> bool {
-        !self.has_errors()
-        && self.tagged.is_some()
+        !self.has_errors() && self.tagged.is_some()
     }
-
 }
 
 impl From<SampledIndividualBuilder> for NewSampledIndividual {
@@ -1244,11 +1851,13 @@ impl FormBuildable for NewSampledIndividual {
 #[function_component(CreateSampledIndividualForm)]
 pub fn create_sampled_individual_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<SampledIndividualBuilder>();
-    let set_name = builder_dispatch.apply_callback(|name: Option<String>| SampledIndividualActions::SetName(name));
-    let set_tagged = builder_dispatch.apply_callback(|tagged: bool| SampledIndividualActions::SetTagged(Some(tagged)));
+    let set_name = builder_dispatch
+        .apply_callback(|name: Option<String>| SampledIndividualActions::SetName(name));
+    let set_tagged = builder_dispatch
+        .apply_callback(|tagged: bool| SampledIndividualActions::SetTagged(Some(tagged)));
     html! {
         <BasicForm<NewSampledIndividual> method={FormMethod::POST} builder={builder_store.deref().clone()}>
-            <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
+            <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
             <Checkbox label="Tagged" errors={builder_store.errors_tagged.clone()} builder={set_tagged} value={builder_store.tagged.unwrap_or(false)} />
         </BasicForm<NewSampledIndividual>>
     }
@@ -1261,16 +1870,18 @@ pub struct UpdateSampledIndividualFormProp {
 #[function_component(UpdateSampledIndividualForm)]
 pub fn update_sampled_individual_form(props: &UpdateSampledIndividualFormProp) -> Html {
     let (builder_store, builder_dispatch) = use_store::<SampledIndividualBuilder>();
-    let set_name = builder_dispatch.apply_callback(|name: Option<String>| SampledIndividualActions::SetName(name));
-    let set_tagged = builder_dispatch.apply_callback(|tagged: bool| SampledIndividualActions::SetTagged(Some(tagged)));
+    let set_name = builder_dispatch
+        .apply_callback(|name: Option<String>| SampledIndividualActions::SetName(name));
+    let set_tagged = builder_dispatch
+        .apply_callback(|tagged: bool| SampledIndividualActions::SetTagged(Some(tagged)));
     html! {
         <BasicForm<NewSampledIndividual> method={FormMethod::PUT} builder={builder_store.deref().clone()}>
-            <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
+            <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
             <Checkbox label="Tagged" errors={builder_store.errors_tagged.clone()} builder={set_tagged} value={builder_store.tagged.unwrap_or(false)} />
         </BasicForm<NewSampledIndividual>>
     }
 }
-#[derive(Store, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 #[store(storage = "session")]
 pub struct SampleBuilder {
     pub id: Option<Uuid>,
@@ -1280,6 +1891,7 @@ pub struct SampleBuilder {
     pub errors_sampled_by: Vec<ApiError>,
     pub errors_procedure: Vec<ApiError>,
     pub errors_state: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -1292,32 +1904,33 @@ pub(super) enum SampleActions {
 impl Reducer<SampleBuilder> for SampleActions {
     fn apply(self, mut state: std::rc::Rc<SampleBuilder>) -> std::rc::Rc<SampleBuilder> {
         let state_mut = Rc::make_mut(&mut state);
+        state_mut.form_updated_at = chrono::Utc::now().naive_utc();
         match self {
             SampleActions::SetSampledBy(sampled_by) => {
                 state_mut.errors_sampled_by.clear();
-        if sampled_by.is_none() {
-            state_mut.errors_sampled_by.push(ApiError::BadRequest(vec![
-                "The SampledBy field is required.".to_string()
-             ]));
-        }
+                if sampled_by.is_none() {
+                    state_mut.errors_sampled_by.push(ApiError::BadRequest(vec![
+                        "The SampledBy field is required.".to_string(),
+                    ]));
+                }
                 state_mut.sampled_by = sampled_by;
             }
             SampleActions::SetProcedure(procedure) => {
                 state_mut.errors_procedure.clear();
-        if procedure.is_none() {
-            state_mut.errors_procedure.push(ApiError::BadRequest(vec![
-                "The Procedure field is required.".to_string()
-             ]));
-        }
+                if procedure.is_none() {
+                    state_mut.errors_procedure.push(ApiError::BadRequest(vec![
+                        "The Procedure field is required.".to_string(),
+                    ]));
+                }
                 state_mut.procedure = procedure;
             }
             SampleActions::SetState(state) => {
                 state_mut.errors_state.clear();
-        if state.is_none() {
-            state_mut.errors_state.push(ApiError::BadRequest(vec![
-                "The State field is required.".to_string()
-             ]));
-        }
+                if state.is_none() {
+                    state_mut.errors_state.push(ApiError::BadRequest(vec![
+                        "The State field is required.".to_string(),
+                    ]));
+                }
                 state_mut.state = state;
             }
         }
@@ -1328,16 +1941,17 @@ impl FormBuilder for SampleBuilder {
     type Actions = SampleActions;
 
     fn has_errors(&self) -> bool {
-!self.errors_sampled_by.is_empty() || !self.errors_procedure.is_empty() || !self.errors_state.is_empty()
+        !self.errors_sampled_by.is_empty()
+            || !self.errors_procedure.is_empty()
+            || !self.errors_state.is_empty()
     }
 
     fn can_submit(&self) -> bool {
         !self.has_errors()
-        && self.sampled_by.is_some()
-        && self.procedure.is_some()
-        && self.state.is_some()
+            && self.sampled_by.is_some()
+            && self.procedure.is_some()
+            && self.state.is_some()
     }
-
 }
 
 impl From<SampleBuilder> for NewSample {
@@ -1373,9 +1987,14 @@ impl FormBuildable for NewSample {
 #[function_component(CreateSampleForm)]
 pub fn create_sample_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<SampleBuilder>();
-    let set_sampled_by = builder_dispatch.apply_callback(|sampled_by: Option<User>| SampleActions::SetSampledBy(sampled_by));
-    let set_procedure = builder_dispatch.apply_callback(|procedure: Option<NestedSamplingProcedure>| SampleActions::SetProcedure(procedure));
-    let set_state = builder_dispatch.apply_callback(|state: Option<NestedSampleState>| SampleActions::SetState(state));
+    let set_sampled_by = builder_dispatch
+        .apply_callback(|sampled_by: Option<User>| SampleActions::SetSampledBy(sampled_by));
+    let set_procedure =
+        builder_dispatch.apply_callback(|procedure: Option<NestedSamplingProcedure>| {
+            SampleActions::SetProcedure(procedure)
+        });
+    let set_state = builder_dispatch
+        .apply_callback(|state: Option<NestedSampleState>| SampleActions::SetState(state));
     html! {
         <BasicForm<NewSample> method={FormMethod::POST} builder={builder_store.deref().clone()}>
             <Datalist<User> builder={set_sampled_by} errors={builder_store.errors_sampled_by.clone()} value={builder_store.sampled_by.clone()} label="SampledBy" />
@@ -1392,9 +2011,14 @@ pub struct UpdateSampleFormProp {
 #[function_component(UpdateSampleForm)]
 pub fn update_sample_form(props: &UpdateSampleFormProp) -> Html {
     let (builder_store, builder_dispatch) = use_store::<SampleBuilder>();
-    let set_sampled_by = builder_dispatch.apply_callback(|sampled_by: Option<User>| SampleActions::SetSampledBy(sampled_by));
-    let set_procedure = builder_dispatch.apply_callback(|procedure: Option<NestedSamplingProcedure>| SampleActions::SetProcedure(procedure));
-    let set_state = builder_dispatch.apply_callback(|state: Option<NestedSampleState>| SampleActions::SetState(state));
+    let set_sampled_by = builder_dispatch
+        .apply_callback(|sampled_by: Option<User>| SampleActions::SetSampledBy(sampled_by));
+    let set_procedure =
+        builder_dispatch.apply_callback(|procedure: Option<NestedSamplingProcedure>| {
+            SampleActions::SetProcedure(procedure)
+        });
+    let set_state = builder_dispatch
+        .apply_callback(|state: Option<NestedSampleState>| SampleActions::SetState(state));
     html! {
         <BasicForm<NewSample> method={FormMethod::PUT} builder={builder_store.deref().clone()}>
             <Datalist<User> builder={set_sampled_by} errors={builder_store.errors_sampled_by.clone()} value={builder_store.sampled_by.clone()} label="SampledBy" />
@@ -1403,7 +2027,7 @@ pub fn update_sample_form(props: &UpdateSampleFormProp) -> Html {
         </BasicForm<NewSample>>
     }
 }
-#[derive(Store, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 #[store(storage = "session")]
 pub struct SamplingProcedureBuilder {
     pub id: Option<Uuid>,
@@ -1411,6 +2035,7 @@ pub struct SamplingProcedureBuilder {
     pub description: Option<String>,
     pub errors_name: Vec<ApiError>,
     pub errors_description: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -1420,16 +2045,20 @@ pub(super) enum SamplingProcedureActions {
 }
 
 impl Reducer<SamplingProcedureBuilder> for SamplingProcedureActions {
-    fn apply(self, mut state: std::rc::Rc<SamplingProcedureBuilder>) -> std::rc::Rc<SamplingProcedureBuilder> {
+    fn apply(
+        self,
+        mut state: std::rc::Rc<SamplingProcedureBuilder>,
+    ) -> std::rc::Rc<SamplingProcedureBuilder> {
         let state_mut = Rc::make_mut(&mut state);
+        state_mut.form_updated_at = chrono::Utc::now().naive_utc();
         match self {
             SamplingProcedureActions::SetName(name) => {
                 state_mut.errors_name.clear();
-        if name.is_none() {
-            state_mut.errors_name.push(ApiError::BadRequest(vec![
-                "The Name field is required.".to_string()
-             ]));
-        }
+                if name.is_none() {
+                    state_mut.errors_name.push(ApiError::BadRequest(vec![
+                        "The Name field is required.".to_string(),
+                    ]));
+                }
                 state_mut.name = name;
             }
             SamplingProcedureActions::SetDescription(description) => {
@@ -1444,14 +2073,12 @@ impl FormBuilder for SamplingProcedureBuilder {
     type Actions = SamplingProcedureActions;
 
     fn has_errors(&self) -> bool {
-!self.errors_name.is_empty() || !self.errors_description.is_empty()
+        !self.errors_name.is_empty() || !self.errors_description.is_empty()
     }
 
     fn can_submit(&self) -> bool {
-        !self.has_errors()
-        && self.name.is_some()
+        !self.has_errors() && self.name.is_some()
     }
-
 }
 
 impl From<SamplingProcedureBuilder> for NewSamplingProcedure {
@@ -1486,12 +2113,15 @@ impl FormBuildable for NewSamplingProcedure {
 #[function_component(CreateSamplingProcedureForm)]
 pub fn create_sampling_procedure_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<SamplingProcedureBuilder>();
-    let set_name = builder_dispatch.apply_callback(|name: Option<String>| SamplingProcedureActions::SetName(name));
-    let set_description = builder_dispatch.apply_callback(|description: Option<String>| SamplingProcedureActions::SetDescription(description));
+    let set_name = builder_dispatch
+        .apply_callback(|name: Option<String>| SamplingProcedureActions::SetName(name));
+    let set_description = builder_dispatch.apply_callback(|description: Option<String>| {
+        SamplingProcedureActions::SetDescription(description)
+    });
     html! {
         <BasicForm<NewSamplingProcedure> method={FormMethod::POST} builder={builder_store.deref().clone()}>
-            <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
-            <BasicInput label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} input_type={InputType::Text} />
+            <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
+            <BasicInput<String> label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
         </BasicForm<NewSamplingProcedure>>
     }
 }
@@ -1503,16 +2133,19 @@ pub struct UpdateSamplingProcedureFormProp {
 #[function_component(UpdateSamplingProcedureForm)]
 pub fn update_sampling_procedure_form(props: &UpdateSamplingProcedureFormProp) -> Html {
     let (builder_store, builder_dispatch) = use_store::<SamplingProcedureBuilder>();
-    let set_name = builder_dispatch.apply_callback(|name: Option<String>| SamplingProcedureActions::SetName(name));
-    let set_description = builder_dispatch.apply_callback(|description: Option<String>| SamplingProcedureActions::SetDescription(description));
+    let set_name = builder_dispatch
+        .apply_callback(|name: Option<String>| SamplingProcedureActions::SetName(name));
+    let set_description = builder_dispatch.apply_callback(|description: Option<String>| {
+        SamplingProcedureActions::SetDescription(description)
+    });
     html! {
         <BasicForm<NewSamplingProcedure> method={FormMethod::PUT} builder={builder_store.deref().clone()}>
-            <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
-            <BasicInput label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} input_type={InputType::Text} />
+            <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
+            <BasicInput<String> label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
         </BasicForm<NewSamplingProcedure>>
     }
 }
-#[derive(Store, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 #[store(storage = "session")]
 pub struct TeamBuilder {
     pub id: Option<i32>,
@@ -1522,6 +2155,7 @@ pub struct TeamBuilder {
     pub errors_name: Vec<ApiError>,
     pub errors_description: Vec<ApiError>,
     pub errors_parent_team: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -1534,23 +2168,24 @@ pub(super) enum TeamActions {
 impl Reducer<TeamBuilder> for TeamActions {
     fn apply(self, mut state: std::rc::Rc<TeamBuilder>) -> std::rc::Rc<TeamBuilder> {
         let state_mut = Rc::make_mut(&mut state);
+        state_mut.form_updated_at = chrono::Utc::now().naive_utc();
         match self {
             TeamActions::SetName(name) => {
                 state_mut.errors_name.clear();
-        if name.is_none() {
-            state_mut.errors_name.push(ApiError::BadRequest(vec![
-                "The Name field is required.".to_string()
-             ]));
-        }
+                if name.is_none() {
+                    state_mut.errors_name.push(ApiError::BadRequest(vec![
+                        "The Name field is required.".to_string(),
+                    ]));
+                }
                 state_mut.name = name;
             }
             TeamActions::SetDescription(description) => {
                 state_mut.errors_description.clear();
-        if description.is_none() {
-            state_mut.errors_description.push(ApiError::BadRequest(vec![
-                "The Description field is required.".to_string()
-             ]));
-        }
+                if description.is_none() {
+                    state_mut.errors_description.push(ApiError::BadRequest(vec![
+                        "The Description field is required.".to_string(),
+                    ]));
+                }
                 state_mut.description = description;
             }
             TeamActions::SetParentTeam(parent_team) => {
@@ -1565,15 +2200,14 @@ impl FormBuilder for TeamBuilder {
     type Actions = TeamActions;
 
     fn has_errors(&self) -> bool {
-!self.errors_name.is_empty() || !self.errors_description.is_empty() || !self.errors_parent_team.is_empty()
+        !self.errors_name.is_empty()
+            || !self.errors_description.is_empty()
+            || !self.errors_parent_team.is_empty()
     }
 
     fn can_submit(&self) -> bool {
-        !self.has_errors()
-        && self.name.is_some()
-        && self.description.is_some()
+        !self.has_errors() && self.name.is_some() && self.description.is_some()
     }
-
 }
 
 impl From<TeamBuilder> for NewTeam {
@@ -1638,13 +2272,16 @@ impl FormBuildable for UpdateTeam {
 #[function_component(CreateTeamForm)]
 pub fn create_team_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<TeamBuilder>();
-    let set_name = builder_dispatch.apply_callback(|name: Option<String>| TeamActions::SetName(name));
-    let set_description = builder_dispatch.apply_callback(|description: Option<String>| TeamActions::SetDescription(description));
-    let set_parent_team = builder_dispatch.apply_callback(|parent_team: Option<NestedTeam>| TeamActions::SetParentTeam(parent_team));
+    let set_name =
+        builder_dispatch.apply_callback(|name: Option<String>| TeamActions::SetName(name));
+    let set_description = builder_dispatch
+        .apply_callback(|description: Option<String>| TeamActions::SetDescription(description));
+    let set_parent_team = builder_dispatch
+        .apply_callback(|parent_team: Option<NestedTeam>| TeamActions::SetParentTeam(parent_team));
     html! {
         <BasicForm<NewTeam> method={FormMethod::POST} builder={builder_store.deref().clone()}>
-            <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
-            <BasicInput label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} input_type={InputType::Text} />
+            <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
+            <BasicInput<String> label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
             <Datalist<NestedTeam> builder={set_parent_team} errors={builder_store.errors_parent_team.clone()} value={builder_store.parent_team.clone()} label="ParentTeam" />
         </BasicForm<NewTeam>>
     }
@@ -1657,13 +2294,16 @@ pub struct UpdateTeamFormProp {
 #[function_component(UpdateTeamForm)]
 pub fn update_team_form(props: &UpdateTeamFormProp) -> Html {
     let (builder_store, builder_dispatch) = use_store::<TeamBuilder>();
-    let set_name = builder_dispatch.apply_callback(|name: Option<String>| TeamActions::SetName(name));
-    let set_description = builder_dispatch.apply_callback(|description: Option<String>| TeamActions::SetDescription(description));
-    let set_parent_team = builder_dispatch.apply_callback(|parent_team: Option<NestedTeam>| TeamActions::SetParentTeam(parent_team));
+    let set_name =
+        builder_dispatch.apply_callback(|name: Option<String>| TeamActions::SetName(name));
+    let set_description = builder_dispatch
+        .apply_callback(|description: Option<String>| TeamActions::SetDescription(description));
+    let set_parent_team = builder_dispatch
+        .apply_callback(|parent_team: Option<NestedTeam>| TeamActions::SetParentTeam(parent_team));
     html! {
         <BasicForm<UpdateTeam> method={FormMethod::PUT} builder={builder_store.deref().clone()}>
-            <BasicInput label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} input_type={InputType::Text} />
-            <BasicInput label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} input_type={InputType::Text} />
+            <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
+            <BasicInput<String> label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
             <Datalist<NestedTeam> builder={set_parent_team} errors={builder_store.errors_parent_team.clone()} value={builder_store.parent_team.clone()} label="ParentTeam" />
         </BasicForm<UpdateTeam>>
     }

@@ -74,7 +74,13 @@ from tqdm.auto import tqdm
 from insert_migration import insert_migration
 from functools import cache
 import glob
-from constraint_checkers import find_foreign_keys, ensures_all_update_at_trigger_exists, TableMetadata, ViewColumn, get_cursor
+from constraint_checkers import (
+    find_foreign_keys,
+    ensures_all_update_at_trigger_exists,
+    TableMetadata,
+    ViewColumn,
+    get_cursor,
+)
 from constraint_checkers import ensure_created_at_columns, ensure_updated_at_columns
 from constraint_checkers import handle_minimal_revertion
 
@@ -99,6 +105,22 @@ GLUESQL_TYPES_MAPPING = {
     "bool": "({}.into())",
     "NaiveDateTime": "gluesql::core::ast_builder::timestamp({}.to_string())",
     "DateTime<Utc>": "gluesql::core::ast_builder::timestamp({}.to_string())",
+}
+
+INPUT_TYPE_MAP = {
+    "String": "Text",
+    "f32": "Numeric",
+    "f64": "Numeric",
+    "i8": "Numeric",
+    "i16": "Numeric",
+    "i32": "Numeric",
+    "i64": "Numeric",
+    "i128": "Numeric",
+    "u8": "Numeric",
+    "u16": "Numeric",
+    "u32": "Numeric",
+    "u64": "Numeric",
+    "u128": "Numeric",
 }
 
 TEMPORARELY_IGNORED_TABLES = [
@@ -241,9 +263,10 @@ class AttributeMetadata:
 
     def implements_eq(self) -> bool:
         return (
-            self._data_type not in ["f32", "f64"]
-            or isinstance(self._data_type, StructMetadata)
+            isinstance(self._data_type, StructMetadata)
             and self._data_type.can_implement_eq()
+            or isinstance(self._data_type, str)
+            and self._data_type not in ["f32", "f64"]
         )
 
     def is_creator_user_id(self) -> bool:
@@ -759,6 +782,7 @@ class StructMetadata:
             isinstance(attribute._data_type, StructMetadata)
             for attribute in self.attributes
         )
+
 
 def find_pg_trgm_indices() -> PGIndices:
     """Returns the list of indices that are of type `pg_trgm`."""
@@ -2128,19 +2152,9 @@ def generate_nested_structs(
         if primary_key_attribute not in foreign_keys:
             foreign_keys.append(primary_key_attribute)
 
-        nested_struct_name = f"Nested{struct.name}"
-        new_struct_metadata = StructMetadata(nested_struct_name, struct.table_name)
+        new_struct_metadata = StructMetadata(f"Nested{struct.name}", struct.table_name)
+        new_struct_metadata.set_flat_variant(struct)
 
-        # We write the Nested{struct_name} struct
-        tables.write("#[derive(")
-        new_struct_metadata.add_derive("Debug")
-        new_struct_metadata.add_derive("Serialize")
-        new_struct_metadata.add_derive("Deserialize")
-        new_struct_metadata.add_derive("PartialEq")
-        tables.write(", ".join(new_struct_metadata.derives()))
-        tables.write(")]\n")
-
-        tables.write(f"pub struct {nested_struct_name} {{\n")
         for attribute in struct.attributes:
 
             # If the current attribute is among the foreign keys, we replace it
@@ -2185,9 +2199,6 @@ def generate_nested_structs(
                             data_type=f"Nested{foreign_struct.name}",
                             optional=attribute.optional,
                         )
-                    tables.write(
-                        f"    pub {new_attribute.name}: {new_attribute.format_data_type()},\n"
-                    )
                     new_struct_metadata.add_attribute(new_attribute)
                 else:
                     new_attribute = AttributeMetadata(
@@ -2196,186 +2207,11 @@ def generate_nested_structs(
                         data_type=foreign_struct,
                         optional=attribute.optional,
                     )
-                    tables.write(
-                        f"    pub {new_attribute.name}: {new_attribute.format_data_type()},\n"
-                    )
                     new_struct_metadata.add_attribute(new_attribute)
             else:
                 continue
-        tables.write("}\n\n")
-
-        # We implement the all for the nested structs
-
-        # First, we implement a method that will be reused by several of the following methods,
-        # including the all, get and search ones: a method that given the flat struct and a connection
-        # to the database returns a result containing the nested struct.
-        tables.write(
-            f"impl {nested_struct_name} {{\n"
-            "    /// Convert the flat struct to the nested struct.\n"
-            "    ///\n"
-            "    /// # Arguments\n"
-            "    /// * `flat_struct` - The flat struct.\n"
-            "    /// * `connection` - The database connection.\n"
-            "    pub fn from_flat(\n"
-            f"        flat_struct: {struct.name},\n"
-            "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
-            "    ) -> Result<Self, diesel::result::Error> {\n"
-            "        Ok(Self {\n"
-        )
-        for attribute in new_struct_metadata.attributes:
-            if attribute.name == "inner":
-                continue
-            if (
-                attribute.data_type() == new_struct_metadata.name
-                or struct.has_attribute(attribute)
-            ):
-                tables.write(
-                    f"            {attribute.name}: flat_struct.{attribute.name},\n"
-                )
-                continue
-            if attribute.optional:
-                tables.write(
-                    f"            {attribute.name}: flat_struct.{attribute.original_name}.map(|flat_struct| {attribute.data_type()}::get(flat_struct, connection)).transpose()?,\n"
-                )
-            else:
-                tables.write(
-                    f"            {attribute.name}: {attribute.data_type()}::get(flat_struct.{attribute.original_name}, connection)?,\n"
-                )
-        if any(
-            attribute.name == primary_key_attribute for attribute in struct.attributes
-        ):
-            tables.write(f"                inner: flat_struct,\n")
-        tables.write("        })\n" "    }\n" "}\n")
-
-        # Then we implement the all query.
-
-        tables.write(
-            f"impl {nested_struct_name} {{\n"
-            "    /// Get all the nested structs from the database.\n"
-            "    ///\n"
-            "    /// # Arguments\n"
-            "    /// * `limit` - The maximum number of rows to return. By default `10`.\n"
-            "    /// * `offset` - The offset of the rows to return. By default `0`.\n"
-            "    /// * `connection` - The database connection.\n"
-            "    pub fn all(\n"
-            "        limit: Option<i64>,\n"
-            "        offset: Option<i64>,\n"
-            "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
-            "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
-            f"        {struct.name}::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()\n"
-            "    }\n"
-            "}\n"
-        )
-
-        tables.write(
-            f"impl {new_struct_metadata.name} {{\n"
-            "    /// Get the nested struct from the provided primary key.\n"
-            "    ///\n"
-            "    /// # Arguments\n"
-            f"    /// * `{primary_key_attribute}` - The primary key of the row.\n"
-            "    /// * `connection` - The database connection.\n"
-            "    pub fn get(\n"
-            f"        {primary_key_attribute}: {rust_primary_key_type},\n"
-            "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
-            "    ) -> Result<Self, diesel::result::Error>\n"
-            "    {\n"
-            f"       {struct.name}::get({primary_key_attribute}, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))\n"
-            "    }\n"
-            "}\n"
-        )
-
-        # For each of the columns in the struct that have a UNIQUE constraint,
-        # we implement the methods `from_{column_name}` by employing the method
-        # of the same name available for the main struct associated to this struct
-        for unique_column in tables_metadata.get_unique_constraint_columns(
-            struct.table_name
-        ):
-            if isinstance(unique_column, ViewColumn):
-                unique_column = unique_column.alias_name
-
-            attribute = struct.get_attribute_by_name(unique_column)
-            attribute_data_type = attribute.data_type()
-            if attribute_data_type == "String":
-                attribute_data_type = "&str"
-
-            tables.write(
-                f"impl {nested_struct_name} {{\n"
-                f"    /// Get the nested struct from the provided {unique_column}.\n"
-                "    ///\n"
-                f"    /// # Arguments\n"
-                f"    /// * `{attribute.name}` - The {attribute.name} of the row.\n"
-                "    /// * `connection` - The database connection.\n"
-                f"    pub fn from_{attribute.name}(\n"
-                f"        {attribute.name}: {attribute_data_type},\n"
-                "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
-                "    ) -> Result<Self, diesel::result::Error>\n"
-                "    {\n"
-                f"        {struct.name}::from_{attribute.name}({attribute.name}, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))\n"
-                "    }\n"
-                "}\n"
-            )
-
-        # If there is an index on the table, we implement the search method that
-        # calls search on the flat version of the struct and then iterates on the
-        # primary keys of the results and constructs the nested structs by calling
-        # the `get` method several times.
-        if similarity_indices.has_table(struct.table_name):
-            for method_name, _, _ in PGIndices.SIMILARITY_METHODS:
-                tables.write(
-                    f"impl Nested{struct.name} {{\n"
-                    "    /// Search the table by the query.\n"
-                    "    ///\n"
-                    "    /// # Arguments\n"
-                    "    /// * `query` - The string to search for.\n"
-                    "    /// * `limit` - The maximum number of results, by default `10`.\n"
-                    f"    pub fn {method_name}_search(\n"
-                    "        query: &str,\n"
-                    "        limit: Option<i32>,\n"
-                    "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
-                    "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
-                    f"       {struct.name}::{method_name}_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()\n"
-                    "    }\n"
-                    "}\n"
-                )
-
-        # We implement the bidirectional From methods for the nested struct
-        # present in the web_common crate, which does not use Diesel or its
-        # structs, but the web_common version of the structs.
-        tables.write(
-            f"impl From<web_common::database::nested_models::Nested{struct.name}> for Nested{struct.name} {{\n"
-            f"    fn from(item: web_common::database::nested_models::Nested{struct.name}) -> Self {{\n"
-            "        Self {\n"
-        )
-        for attribute in new_struct_metadata.attributes:
-            if attribute.optional:
-                tables.write(
-                    f"            {attribute.name}: item.{attribute.name}.map(|item| item.into()),\n"
-                )
-            else:
-                tables.write(
-                    f"            {attribute.name}: item.{attribute.name}.into(),\n"
-                )
-        tables.write("        }\n" "    }\n" "}\n")
-
-        tables.write(
-            f"impl From<Nested{struct.name}> for web_common::database::nested_models::Nested{struct.name} {{\n"
-            f"    fn from(item: Nested{struct.name}) -> Self {{\n"
-            "        Self {\n"
-        )
-        for attribute in new_struct_metadata.attributes:
-            if attribute.optional:
-                tables.write(
-                    f"            {attribute.name}: item.{attribute.name}.map(|item| item.into()),\n"
-                )
-            else:
-                tables.write(
-                    f"            {attribute.name}: item.{attribute.name}.into(),\n"
-                )
-        tables.write("        }\n" "    }\n" "}\n")
 
         new_struct_metadatas.append(new_struct_metadata)
-
-    tables.close()
 
     # We replace until convergence the data type of the structs with the structs themselves.
     # This is necessary as the nested structs may contain references to other structs, which
@@ -2415,6 +2251,187 @@ def generate_nested_structs(
                 new_struct.attributes = new_attributes
             updated_struct_metadatas.append(new_struct)
         new_struct_metadatas = updated_struct_metadatas
+
+    struct = None
+
+    for nested_struct in new_struct_metadatas:
+        nested_struct.write_to(tables)
+        flat_struct = nested_struct.get_flat_variant()
+
+        # We implement the all for the nested structs
+
+        # First, we implement a method that will be reused by several of the following methods,
+        # including the all, get and search ones: a method that given the flat struct and a connection
+        # to the database returns a result containing the nested struct.
+        tables.write(
+            f"impl {nested_struct.name} {{\n"
+            "    /// Convert the flat struct to the nested struct.\n"
+            "    ///\n"
+            "    /// # Arguments\n"
+            "    /// * `flat_struct` - The flat struct.\n"
+            "    /// * `connection` - The database connection.\n"
+            "    pub fn from_flat(\n"
+            f"        flat_struct: {flat_struct.name},\n"
+            "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
+            "    ) -> Result<Self, diesel::result::Error> {\n"
+            "        Ok(Self {\n"
+        )
+        for attribute in nested_struct.attributes:
+            if attribute.name == "inner":
+                continue
+            if attribute.data_type() == nested_struct.name or flat_struct.has_attribute(
+                attribute
+            ):
+                tables.write(
+                    f"            {attribute.name}: flat_struct.{attribute.name},\n"
+                )
+                continue
+            if attribute.optional:
+                tables.write(
+                    f"            {attribute.name}: flat_struct.{attribute.original_name}.map(|flat_struct| {attribute.data_type()}::get(flat_struct, connection)).transpose()?,\n"
+                )
+            else:
+                tables.write(
+                    f"            {attribute.name}: {attribute.data_type()}::get(flat_struct.{attribute.original_name}, connection)?,\n"
+                )
+
+        tables.write(f"                inner: flat_struct,\n")
+        tables.write("        })\n" "    }\n" "}\n")
+
+        # Then we implement the all query.
+
+        tables.write(
+            f"impl {nested_struct.name} {{\n"
+            "    /// Get all the nested structs from the database.\n"
+            "    ///\n"
+            "    /// # Arguments\n"
+            "    /// * `limit` - The maximum number of rows to return. By default `10`.\n"
+            "    /// * `offset` - The offset of the rows to return. By default `0`.\n"
+            "    /// * `connection` - The database connection.\n"
+            "    pub fn all(\n"
+            "        limit: Option<i64>,\n"
+            "        offset: Option<i64>,\n"
+            "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
+            "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
+            f"        {flat_struct.name}::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()\n"
+            "    }\n"
+            "}\n"
+        )
+
+        # We implement the `get` method, which returns the nested struct
+        # from a provided row primary key.
+        primary_key_attribute, primary_key_type = (
+            tables_metadata.get_primary_key_name_and_type(nested_struct.table_name)
+        )
+        rust_primary_key_type = sql_type_to_rust_type(primary_key_type)
+
+        tables.write(
+            f"impl {nested_struct.name} {{\n"
+            "    /// Get the nested struct from the provided primary key.\n"
+            "    ///\n"
+            "    /// # Arguments\n"
+            f"    /// * `{primary_key_attribute}` - The primary key of the row.\n"
+            "    /// * `connection` - The database connection.\n"
+            "    pub fn get(\n"
+            f"        {primary_key_attribute}: {rust_primary_key_type},\n"
+            "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
+            "    ) -> Result<Self, diesel::result::Error>\n"
+            "    {\n"
+            f"       {flat_struct.name}::get({primary_key_attribute}, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))\n"
+            "    }\n"
+            "}\n"
+        )
+
+        # For each of the columns in the struct that have a UNIQUE constraint,
+        # we implement the methods `from_{column_name}` by employing the method
+        # of the same name available for the main struct associated to this struct
+        for unique_column in tables_metadata.get_unique_constraint_columns(
+            flat_struct.table_name
+        ):
+            if isinstance(unique_column, ViewColumn):
+                unique_column = unique_column.alias_name
+
+            attribute = flat_struct.get_attribute_by_name(unique_column)
+            attribute_data_type = attribute.data_type()
+            if attribute_data_type == "String":
+                attribute_data_type = "&str"
+
+            tables.write(
+                f"impl {nested_struct.name} {{\n"
+                f"    /// Get the nested struct from the provided {unique_column}.\n"
+                "    ///\n"
+                f"    /// # Arguments\n"
+                f"    /// * `{attribute.name}` - The {attribute.name} of the row.\n"
+                "    /// * `connection` - The database connection.\n"
+                f"    pub fn from_{attribute.name}(\n"
+                f"        {attribute.name}: {attribute_data_type},\n"
+                "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
+                "    ) -> Result<Self, diesel::result::Error>\n"
+                "    {\n"
+                f"        {flat_struct.name}::from_{attribute.name}({attribute.name}, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))\n"
+                "    }\n"
+                "}\n"
+            )
+
+        # If there is an index on the table, we implement the search method that
+        # calls search on the flat version of the struct and then iterates on the
+        # primary keys of the results and constructs the nested structs by calling
+        # the `get` method several times.
+        if similarity_indices.has_table(flat_struct.table_name):
+            for method_name, _, _ in PGIndices.SIMILARITY_METHODS:
+                tables.write(
+                    f"impl {nested_struct.name} {{\n"
+                    "    /// Search the table by the query.\n"
+                    "    ///\n"
+                    "    /// # Arguments\n"
+                    "    /// * `query` - The string to search for.\n"
+                    "    /// * `limit` - The maximum number of results, by default `10`.\n"
+                    f"    pub fn {method_name}_search(\n"
+                    "        query: &str,\n"
+                    "        limit: Option<i32>,\n"
+                    "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
+                    "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
+                    f"       {flat_struct.name}::{method_name}_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()\n"
+                    "    }\n"
+                    "}\n"
+                )
+
+        # We implement the bidirectional From methods for the nested struct
+        # present in the web_common crate, which does not use Diesel or its
+        # structs, but the web_common version of the structs.
+        tables.write(
+            f"impl From<web_common::database::nested_models::{nested_struct.name}> for {nested_struct.name} {{\n"
+            f"    fn from(item: web_common::database::nested_models::{nested_struct.name}) -> Self {{\n"
+            "        Self {\n"
+        )
+        for attribute in nested_struct.attributes:
+            if attribute.optional:
+                tables.write(
+                    f"            {attribute.name}: item.{attribute.name}.map(|item| item.into()),\n"
+                )
+            else:
+                tables.write(
+                    f"            {attribute.name}: item.{attribute.name}.into(),\n"
+                )
+        tables.write("        }\n" "    }\n" "}\n")
+
+        tables.write(
+            f"impl From<{nested_struct.name}> for web_common::database::nested_models::{nested_struct.name} {{\n"
+            f"    fn from(item: {nested_struct.name}) -> Self {{\n"
+            "        Self {\n"
+        )
+        for attribute in nested_struct.attributes:
+            if attribute.optional:
+                tables.write(
+                    f"            {attribute.name}: item.{attribute.name}.map(|item| item.into()),\n"
+                )
+            else:
+                tables.write(
+                    f"            {attribute.name}: item.{attribute.name}.into(),\n"
+                )
+        tables.write("        }\n" "    }\n" "}\n")
+
+    tables.close()
 
     return new_struct_metadatas
 
@@ -3621,103 +3638,6 @@ def derive_update_models(
     return update_structs
 
 
-def derive_new_nested_models(
-    new_flat_model_structs: List[StructMetadata],
-    nested_structs: List[StructMetadata],
-) -> List[StructMetadata]:
-    """Returns New Nested variant of the new model struct provided.
-
-    Parameters
-    ----------
-    new_flat_model_structs : List[StructMetadata]
-        The list of the Flat New{Model} structs.
-    nested_structs : List[StructMetadata]
-        The list of the existing nested variants.
-
-    Implementation details
-    ----------------------
-    The New Nested variants are used to insert data in the database
-    when the data is nested. The New Nested variants are used to
-    insert data in the database when the data is nested. The primary
-    difference between the New Nested variant and the original variant
-    is that the New Nested variant does not have a normal Flat variant
-    of the struct as the inner attribute, but has the New variant of the
-    Flat variant as the inner attribute, with the exception of when the
-    primary key is an Uuid, in which case the New Nested variant is for
-    all intents and purposes identical to the original variant, and as
-    such there is no need to derive a New Nested variant.
-    """
-
-    new_nested_model_structs = []
-
-    for flat_new_struct in tqdm(
-        new_flat_model_structs,
-        desc="Deriving new nested structs",
-        unit="struct",
-        leave=False,
-    ):
-        # We retrieve the Nested struct associated to the
-        # current flat new struct, which we can easily retrieve
-        # by searching for a struct associated with the same table.
-        #
-        # When there is no such struct, it means that there is no
-        # need to derive a Nested variant, as the current struct is
-        # a flat struct.
-
-        current_nested_struct = None
-        for nested_struct in nested_structs:
-            if nested_struct.table_name == flat_new_struct.table_name:
-                current_nested_struct = nested_struct
-                break
-
-        if current_nested_struct is None:
-            new_nested_model_structs.append(flat_new_struct)
-            continue
-
-        if not flat_new_struct.name.startswith("New"):
-            new_nested_model_structs.append(current_nested_struct)
-            continue
-
-        new_nested_struct = StructMetadata(
-            struct_name=f"Nested{flat_new_struct.name}",
-            table_name=flat_new_struct.table_name,
-        )
-
-        for derive in current_nested_struct.derives():
-            new_nested_struct.add_derive(derive)
-
-        for attribute in current_nested_struct.attributes:
-            if attribute.name == "inner":
-                new_nested_struct.add_attribute(
-                    AttributeMetadata(
-                        original_name="inner",
-                        name="inner",
-                        data_type=flat_new_struct,
-                        optional=False,
-                    )
-                )
-            else:
-                # We need to make sure that the current attribute
-                # in its normalized form appears in the flat version
-                # of the new struct. If it does not, we skip it, as
-                # we handle in the creation of the new struct the
-                # stripping of attributes that we do not want to be
-                # settable by the user, such as the created_at and
-                # updated_at attributes.
-                if (
-                    flat_new_struct.get_attribute_by_name(attribute.name) is None
-                    and flat_new_struct.get_attribute_by_name(f"{attribute.name}_id")
-                    is None
-                ):
-                    continue
-
-                new_nested_struct.add_attribute(attribute)
-
-        new_nested_model_structs.append(new_nested_struct)
-
-    return new_nested_model_structs
-
-
 def derive_model_builders(
     new_or_update_struct_metadatas: List[StructMetadata],
 ) -> List[StructMetadata]:
@@ -3779,7 +3699,7 @@ def derive_model_builders(
         builder.set_new_variant(struct)
 
         builder.add_derive("Store")
-        for derive in struct.derives():
+        for derive in richest_variant.derives():
             builder.add_derive(derive)
 
         builder.add_decorator('store(storage = "session")')
@@ -3846,6 +3766,21 @@ def derive_model_builders(
 
         for attribute in new_attributes:
             builder.add_attribute(attribute)
+
+        # Finally, we add an attribute to the builder to be used primarily
+        # by yew to detect when the object has been updated. This is needed
+        # for cases when the attempted update is invalid, and the data inserted
+        # in the form needs to be resetted to the original values. In this attribute
+        # we store the datetime of the last update of the object.
+        builder.add_attribute(
+            AttributeMetadata(
+                original_name="form_updated_at",
+                name="form_updated_at",
+                data_type="NaiveDateTime",
+                optional=False,
+            )
+        )
+
 
         builders.append(builder)
 
@@ -3931,10 +3866,16 @@ def write_web_common_new_structs(
         )
 
         document.write("        vec![\n")
-        for attribute in [creator_user_id_attribute, updator_user_id_attribute] + struct.attributes:
+        for attribute in [
+            creator_user_id_attribute,
+            updator_user_id_attribute,
+        ] + struct.attributes:
             columns.append(attribute.name)
 
-            if attribute.name in (creator_user_id_attribute.name, updator_user_id_attribute.name):
+            if attribute.name in (
+                creator_user_id_attribute.name,
+                updator_user_id_attribute.name,
+            ):
                 self_attribute_name = creator_user_id_attribute.name
             else:
                 self_attribute_name = f"self.{attribute.name}"
@@ -4461,57 +4402,6 @@ def write_diesel_update_structs(
     document.close()
 
 
-def write_web_common_new_nested_structs(
-    new_nested_struct_metadatas: List[StructMetadata],
-):
-    """Writes the new nested structs to the web_common crate."""
-
-    # For the time being, we simply write out the structs.
-    # In the near future, we will also implement several
-    # traits for these structs.
-
-    path = "../web_common/src/database/new_nested_variants.rs"
-
-    document = open(path, "w", encoding="utf8")
-
-    # Preliminarly, we write a docstring at the very head
-    # of this submodule to explain what it does and warn the
-    # reader not to write anything in this file as it is
-    # automatically generated.
-
-    document.write(
-        "//! This module contains the new nested variants of the database models.\n"
-        "//!\n"
-        "//! This module is automatically generated. Do not write anything here.\n\n"
-    )
-
-    imports = ["use serde::{Deserialize, Serialize};", "use super::*;"]
-
-    for import_statement in imports:
-        document.write(f"{import_statement}\n")
-
-    document.write("\n")
-
-    for struct in tqdm(
-        new_nested_struct_metadatas,
-        desc="Writing new nested structs",
-        unit="struct",
-        leave=False,
-    ):
-        # For simplicity, we included in this list
-        # all the new structs and also the structs for
-        # which we do not need to derive a new struct.
-        # We do not want to print the structs that are
-        # not new structs, so we filter them out.
-        if not struct.name.startswith("NestedNew"):
-            continue
-
-        struct.write_to(document)
-
-    document.flush()
-    document.close()
-
-
 def write_frontend_builder_action_enumeration(
     builder: StructMetadata,
     document: "io.TextIO",
@@ -4557,9 +4447,15 @@ def write_frontend_builder_action_enumeration(
         ):
             continue
 
-        document.write(
-            f"    Set{attribute.capitalized_name()}({attribute.format_data_type()}),\n"
-        )
+        if attribute.name == "form_updated_at":
+            continue
+
+        if attribute.data_type() in INPUT_TYPE_MAP:
+            document.write(f"    Set{attribute.capitalized_name()}(Option<String>),\n")
+        else:
+            document.write(
+                f"    Set{attribute.capitalized_name()}({attribute.format_data_type()}),\n"
+            )
 
     document.write("}\n\n")
 
@@ -4567,8 +4463,24 @@ def write_frontend_builder_action_enumeration(
         f"impl Reducer<{builder.name}> for {action_enum_name} {{\n"
         f"    fn apply(self, mut state: std::rc::Rc<{builder.name}>) -> std::rc::Rc<{builder.name}> {{\n"
         "        let state_mut = Rc::make_mut(&mut state);\n"
+        "        state_mut.form_updated_at = chrono::Utc::now().naive_utc();\n"
         "        match self {\n"
     )
+
+    largest_type_variants = {
+        "i8": "i128",
+        "i16": "i128",
+        "i32": "i128",
+        "i64": "i128",
+        "i128": "i128",
+        "u8": "u128",
+        "u16": "u128",
+        "u32": "u128",
+        "u64": "u128",
+        "u128": "u128",
+        "f32": "f64",
+        "f64": "f64",
+    }
 
     for attribute in builder.attributes:
         if attribute.name == primary_key_name:
@@ -4579,6 +4491,9 @@ def write_frontend_builder_action_enumeration(
             attribute.name.startswith("errors_")
             and attribute.data_type() == "Vec<ApiError>"
         ):
+            continue
+
+        if attribute.name == "form_updated_at":
             continue
 
         struct_attribute = rich_variant.get_attribute_by_name(attribute.name)
@@ -4608,10 +4523,60 @@ def write_frontend_builder_action_enumeration(
                 f"        }}\n"
             )
 
-        document.write(
-            f"                state_mut.{attribute.name} = {attribute.name};\n"
-            "            }\n"
-        )
+        if (
+            attribute.data_type() in INPUT_TYPE_MAP
+            and attribute.data_type() != "String"
+        ):
+            # We try to convert the values to the largest possible type.
+            # If the conversion fails, we add an error to the errors vector. Subsequently, we
+            # verify whether the value is within the expected range. If it is not, we add an error to the
+            # errors vector. Finally, we set the attribute to the provided value.
+            largest_type_variant = largest_type_variants[attribute.data_type()]
+
+            document.write(
+                f"                match {attribute.name} {{\n"
+                f"                    Some(value) => match value.parse::<{largest_type_variant}>() {{\n"
+                "                        Ok(value) => {\n"
+            )
+
+            # In the case of floats, we also check for NaN and Infinity.
+            if attribute.data_type() in ("f32", "f64"):
+                document.write(
+                    f"                            if value.is_nan() || value.is_infinite() {{\n"
+                    f"                                state_mut.errors_{attribute.name}.push(ApiError::BadRequest(vec![\n"
+                    f'                                    "The {attribute.name} field must be a valid {attribute.data_type()}.".to_string()\n'
+                    "                                ]));\n"
+                    "                            } else "
+                )
+
+            document.write(
+                f"                            if value < {attribute.data_type()}::MIN as {largest_type_variant} || value > {attribute.data_type()}::MAX as {largest_type_variant} {{\n"
+                f"                                state_mut.errors_{attribute.name}.push(ApiError::BadRequest(vec![\n"
+                f"                                    format!("
+                f'                                            "The {attribute.name} field must be between {{}} and {{}}.",\n'
+                f"                                            {attribute.data_type()}::MIN,\n"
+                f"                                            {attribute.data_type()}::MAX\n"
+                "                                    )\n"
+                "                                ]));\n"
+                "                            } else {\n"
+                f"                                state_mut.{attribute.name} = Some(value as {attribute.data_type()});\n"
+                "                            }\n"
+                "                        }\n"
+                "                        Err(_) => {\n"
+                f"                            state_mut.errors_{attribute.name}.push(ApiError::BadRequest(vec![\n"
+                f'                                "The {attribute.name} field must be a valid {attribute.data_type()}.".to_string()\n'
+                "                            ]));\n"
+                "                        }\n"
+                "                    },\n"
+                f"                    None => state_mut.{attribute.name} = None,\n"
+                "                }\n"
+            )
+        else:
+            document.write(
+                f"                state_mut.{attribute.name} = {attribute.name};\n"
+            )
+
+        document.write("            }\n")
 
     document.write("        }\n" "        state\n" "    }\n" "}\n")
 
@@ -4678,6 +4643,9 @@ def write_frontend_form_builder_implementation(
             continue
 
         if attribute.name == primary_key_name:
+            continue
+
+        if attribute.name == "form_updated_at":
             continue
 
         struct_attribute = flat_struct.get_attribute_by_name(attribute.name)
@@ -5378,9 +5346,16 @@ def write_frontend_yew_form(
             if attribute.name == primary_key_name:
                 continue
 
+            if attribute.name == "form_updated_at":
+                continue
+
             if attribute.data_type() == "bool":
                 document.write(
                     f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: bool| {flat_struct.name}Actions::Set{attribute.capitalized_name()}(Some({attribute.name})));\n"
+                )
+            elif attribute.data_type() in INPUT_TYPE_MAP:
+                document.write(
+                    f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: Option<String>| {flat_struct.name}Actions::Set{attribute.capitalized_name()}({attribute.name}));"
                 )
             else:
                 document.write(
@@ -5405,9 +5380,9 @@ def write_frontend_yew_form(
 
             error_attribute = builder.get_attribute_by_name(f"errors_{attribute.name}")
 
-            if attribute.data_type() in ["String"]:
+            if attribute.data_type() in INPUT_TYPE_MAP:
                 document.write(
-                    f'            <BasicInput label="{attribute.capitalized_name()}" errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} value={{builder_store.{attribute.name}.clone()}} input_type={{InputType::Text}} />\n'
+                    f'            <BasicInput<{attribute.data_type()}> label="{attribute.capitalized_name()}" errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} value={{builder_store.{attribute.name}.clone()}} />\n'
                 )
                 continue
 
@@ -5694,7 +5669,6 @@ def ensures_migrations_simmetry():
                 raise Exception(
                     f"Migration {directory} is not symmetric: down.sql contains `{down_key}` but up.sql does not contain `{up_key}`."
                 )
-
 
 
 def enforce_migration_naming_convention():

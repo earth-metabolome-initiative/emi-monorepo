@@ -5,9 +5,11 @@ use std::fmt::Display;
 use super::InputErrors;
 use wasm_bindgen::JsCast;
 use web_common::api::ApiError;
+use web_common::custom_validators::validation_errors::TryFromString;
+use yew::html::IntoPropValue;
 use yew::prelude::*;
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Copy, Eq, Debug)]
 pub enum InputType {
     Text,
     Number,
@@ -24,25 +26,44 @@ impl Display for InputType {
     }
 }
 
+impl IntoPropValue<std::option::Option<implicit_clone::unsync::IString>> for InputType {
+    fn into_prop_value(self) -> std::option::Option<implicit_clone::unsync::IString> {
+        Some(self.to_string().into())
+    }
+}
+
+pub trait Inputtable:
+    Clone + TryFromString + ToString + PartialEq
+{
+    const INPUT_TYPE: InputType;
+}
+
+impl Inputtable for String {
+    const INPUT_TYPE: InputType = InputType::Text;
+}
+
+impl Inputtable for i32 {
+    const INPUT_TYPE: InputType = InputType::Number;
+}
+
+impl Inputtable for f64 {
+    const INPUT_TYPE: InputType = InputType::Number;
+}
+
 #[derive(Clone, PartialEq, Properties)]
-pub struct InputProp {
+pub struct InputProp<Data: Inputtable> {
     pub label: String,
     pub builder: Callback<Option<String>>,
     pub errors: Vec<ApiError>,
-    #[prop_or(true)]
-    pub show_label: bool,
     #[prop_or_default]
     pub placeholder: Option<String>,
     #[prop_or_default]
-    pub value: Option<String>,
-    pub input_type: InputType,
-    #[prop_or_default]
-    pub step: Option<f64>,
+    pub value: Option<Data>,
     #[prop_or(false)]
     pub optional: bool,
 }
 
-impl InputProp {
+impl<Data: Inputtable> InputProp<Data> {
     pub fn label(&self) -> String {
         self.label.clone()
     }
@@ -51,13 +72,14 @@ impl InputProp {
         self.label.replace(" ", "_").to_lowercase()
     }
 
-    pub fn input_type(&self) -> InputType {
-        self.input_type.clone()
+    pub fn value(&self) -> Option<Data> {
+        self.value.clone()
     }
 }
 
 #[function_component(BasicInput)]
-pub fn basic_input(props: &InputProp) -> Html {
+pub fn basic_input<Data: Inputtable>(props: &InputProp<Data>) -> Html
+{
     let extra_classes: Option<&str> = if props.errors.is_empty() {
         if props.value.is_some() {
             Some("input-group-valid")
@@ -70,7 +92,7 @@ pub fn basic_input(props: &InputProp) -> Html {
 
     let classes = format!(
         "input-group {}{}",
-        props.input_type(),
+        Data::INPUT_TYPE,
         extra_classes.map_or("".to_string(), |classes| format!(" {}", classes))
     );
 
@@ -83,7 +105,7 @@ pub fn basic_input(props: &InputProp) -> Html {
             input_event.prevent_default();
 
             // We extract the current value of the input field
-            let value = match props.input_type() {
+            let value = match Data::INPUT_TYPE {
                 InputType::Textarea => input_event
                     .target()
                     .unwrap()
@@ -105,41 +127,32 @@ pub fn basic_input(props: &InputProp) -> Html {
         })
     };
 
-    let input_value = props
-        .value
-        .as_ref()
-        .map_or_else(|| "".to_string(), |value| value.to_string());
+    let value = props.value().map_or_else(|| "".to_string(), |value| value.to_string());
+
     let input_field = html! {
         <>
-            {if props.show_label {
-                html! {
-                    <label for={props.normalized_label()} class={"input-label"}>
-                        {props.label()}
-                    </label>
-                }
-            } else {
-                html! {}
-            }}
-            {match props.input_type() {
+            <label for={props.normalized_label()} class={"input-label"}>
+                {props.label()}
+            </label>
+            {match Data::INPUT_TYPE {
                 InputType::Textarea => html! {
                     <textarea
                         class="input-control"
                         name={props.normalized_label()}
                         id={props.normalized_label()}
-                        value={input_value}
+                        value={value}
                         placeholder={props.placeholder.clone().unwrap_or_else(|| props.label())}
                         oninput={on_input}
                     ></textarea>
                 },
                 InputType::Number | InputType::Text => html! {
                     <input
-                        type={props.input_type().to_string()}
+                        type={InputType::Text}
                         class="input-control"
                         name={props.normalized_label()}
                         id={props.normalized_label()}
-                        value={input_value}
+                        value={value}
                         placeholder={props.placeholder.clone().unwrap_or_else(|| props.label())}
-                        step={props.step.map_or_else(|| "".to_string(), |step| step.to_string())}
                         oninput={on_input}
                     />
                 }
@@ -149,15 +162,9 @@ pub fn basic_input(props: &InputProp) -> Html {
 
     html! {
         <div class={classes}>
-            {if props.show_label {
-                html! {
-                    <div class="input-container">
-                        {input_field}
-                    </div>
-                }
-            } else {
-                input_field
-            }}
+            <div class="input-container">
+                {input_field}
+            </div>
             <InputErrors errors={props.errors.clone()} />
         </div>
     }

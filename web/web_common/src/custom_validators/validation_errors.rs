@@ -45,3 +45,27 @@ impl TryFromString for String {
         Ok(value)
     }
 }
+
+impl TryFromString for i32 {
+    fn try_from_string(value: String) -> Result<Self, ApiError> {
+        value
+            .parse::<i32>()
+            .map_err(|_| ApiError::BadRequest(vec!["The provided value is not a valid signed 32-bit integer.".to_string()]))
+    }
+}
+
+impl TryFromString for i64 {
+    fn try_from_string(value: String) -> Result<Self, ApiError> {
+        value
+            .parse::<i64>()
+            .map_err(|_| ApiError::BadRequest(vec!["The provided value is not a valid signed 64-bit integer.".to_string()]))
+    }
+}
+
+impl TryFromString for f64 {
+    fn try_from_string(value: String) -> Result<Self, ApiError> {
+        value
+            .parse::<f64>()
+            .map_err(|_| ApiError::BadRequest(vec!["The provided value is not a valid floating point number.".to_string()]))
+    }
+}

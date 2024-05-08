@@ -608,7 +608,7 @@ form.standard-form {
             min-width: 100px;
         }
 
-        &.text .input-container, &.datalist .input-container {
+        &.text .input-container, &.number .input-container, &.datalist .input-container {
             display: grid;
             grid-template-columns: auto 1fr;
             align-items: center;

@@ -8,8 +8,8 @@ CREATE TABLE IF NOT EXISTS projects (
     parent_project_id INTEGER REFERENCES projects(id) ON
     DELETE
         CASCADE,
-        budget BIGINT DEFAULT NULL,
-        expenses BIGINT DEFAULT NULL,
+        budget FLOAT DEFAULT NULL,
+        expenses FLOAT DEFAULT NULL,
         created_by INTEGER NOT NULL REFERENCES users(id),
         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_by INTEGER NOT NULL REFERENCES users(id),

@@ -251,8 +251,8 @@ pub(super) struct IntermediateUpdateProject {
     public: bool,
     state_id: i32,
     parent_project_id: Option<i32>,
-    budget: Option<i64>,
-    expenses: Option<i64>,
+    budget: Option<f64>,
+    expenses: Option<f64>,
     expected_end_date: Option<NaiveDateTime>,
     end_date: Option<NaiveDateTime>,
 }

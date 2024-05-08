@@ -368,7 +368,7 @@ impl UpdateProjectRequirement {
     }
 
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct UpdateProject {
     pub id: i32,
     pub name: String,
@@ -376,8 +376,8 @@ pub struct UpdateProject {
     pub public: bool,
     pub state_id: i32,
     pub parent_project_id: Option<i32>,
-    pub budget: Option<i64>,
-    pub expenses: Option<i64>,
+    pub budget: Option<f64>,
+    pub expenses: Option<f64>,
     pub expected_end_date: Option<NaiveDateTime>,
     pub end_date: Option<NaiveDateTime>,
 }
