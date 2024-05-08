@@ -3702,7 +3702,7 @@ def derive_model_builders(
         for derive in richest_variant.derives():
             builder.add_derive(derive)
 
-        builder.add_decorator('store(storage = "session")')
+        builder.add_decorator('store(storage = "local", storage_tab_sync)')
 
         foreign_keys = table_metadata.get_foreign_keys(struct.table_name)
         primary_key_name, _ = table_metadata.get_primary_key_name_and_type(
