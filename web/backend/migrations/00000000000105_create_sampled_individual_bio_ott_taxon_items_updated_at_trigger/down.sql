@@ -1,0 +1,4 @@
+-- Drop the `sampled_individual_bio_ott_taxon_items_updated_at_trigger` trigger on the sampled_individual_bio_ott_taxon_items table.
+
+DROP TRIGGER sampled_individual_bio_ott_taxon_items_updated_at_trigger ON sampled_individual_bio_ott_taxon_items;
+DROP FUNCTION sampled_individual_bio_ott_taxon_items_updated_at_trigger;

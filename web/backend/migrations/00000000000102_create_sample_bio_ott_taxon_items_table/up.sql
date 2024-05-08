@@ -8,6 +8,11 @@ CREATE TABLE IF NOT EXISTS sample_bio_ott_taxon_items (
     created_by INTEGER NOT NULL REFERENCES users(id) ON
     DELETE
         CASCADE,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_by INTEGER NOT NULL REFERENCES users(id) ON
+    DELETE
+        CASCADE,
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         sample_id UUID NOT NULL REFERENCES samples(id) ON
     DELETE
         CASCADE,

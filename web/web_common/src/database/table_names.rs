@@ -598,9 +598,9 @@ impl Table {
             },
             Table::PublicUsers => unimplemented!("Update not implemented for public_users."),
             Table::Roles => unimplemented!("Update not implemented for roles."),
-            Table::SampleBioOttTaxonItems => unimplemented!("Update not implemented for sample_bio_ott_taxon_items."),
+            Table::SampleBioOttTaxonItems => todo!("Update not implemented for sample_bio_ott_taxon_items."),
             Table::SampleStates => unimplemented!("Update not implemented for sample_states."),
-            Table::SampledIndividualBioOttTaxonItems => unimplemented!("Update not implemented for sampled_individual_bio_ott_taxon_items."),
+            Table::SampledIndividualBioOttTaxonItems => todo!("Update not implemented for sampled_individual_bio_ott_taxon_items."),
             Table::SampledIndividuals => {
                 let update_row: super::NewSampledIndividual = bincode::deserialize::<super::NewSampledIndividual>(&update_row).map_err(crate::api::ApiError::from)?;
                 let id = update_row.id;
@@ -626,7 +626,7 @@ impl Table {
                  bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
             },
             Table::Spectra => unimplemented!("Update not implemented for spectra."),
-            Table::SpectraCollections => unimplemented!("Update not implemented for spectra_collections."),
+            Table::SpectraCollections => todo!("Update not implemented for spectra_collections."),
             Table::TeamStates => unimplemented!("Update not implemented for team_states."),
             Table::Teams => {
                 let update_row: super::UpdateTeam = bincode::deserialize::<super::UpdateTeam>(&update_row).map_err(crate::api::ApiError::from)?;

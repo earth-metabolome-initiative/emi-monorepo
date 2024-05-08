@@ -622,9 +622,9 @@ impl UpdatableTable for web_common::database::Table {
             },
             web_common::database::Table::PublicUsers => unreachable!("Table `public_users` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::Roles => unreachable!("Table `roles` is not updatable as it does not have a known column associated to an updater user id."),
-            web_common::database::Table::SampleBioOttTaxonItems => unreachable!("Table `sample_bio_ott_taxon_items` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::SampleBioOttTaxonItems => todo!("Update not implemented for sample_bio_ott_taxon_items."),
             web_common::database::Table::SampleStates => unreachable!("Table `sample_states` is not updatable as it does not have a known column associated to an updater user id."),
-            web_common::database::Table::SampledIndividualBioOttTaxonItems => unreachable!("Table `sampled_individual_bio_ott_taxon_items` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::SampledIndividualBioOttTaxonItems => todo!("Update not implemented for sampled_individual_bio_ott_taxon_items."),
             web_common::database::Table::SampledIndividuals => {
                 let row: web_common::database::NewSampledIndividual = bincode::deserialize::<web_common::database::NewSampledIndividual>(&row).map_err(web_common::api::ApiError::from)?;
                 let updated_row: crate::models::SampledIndividual = <web_common::database::NewSampledIndividual as UpdateRow>::update(row, user_id, connection)?;
@@ -644,7 +644,7 @@ impl UpdatableTable for web_common::database::Table {
                  bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
             },
             web_common::database::Table::Spectra => unreachable!("Table `spectra` is not updatable as it does not have a known column associated to an updater user id."),
-            web_common::database::Table::SpectraCollections => unreachable!("Table `spectra_collections` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::SpectraCollections => todo!("Update not implemented for spectra_collections."),
             web_common::database::Table::TeamStates => unreachable!("Table `team_states` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::Teams => {
                 let row: web_common::database::UpdateTeam = bincode::deserialize::<web_common::database::UpdateTeam>(&row).map_err(web_common::api::ApiError::from)?;

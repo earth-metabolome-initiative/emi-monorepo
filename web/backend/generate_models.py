@@ -75,6 +75,9 @@ from insert_migration import insert_migration
 from functools import cache
 import glob
 from constraint_checkers import find_foreign_keys, ensures_all_update_at_trigger_exists, TableMetadata, ViewColumn, get_cursor
+from constraint_checkers import ensure_created_at_columns, ensure_updated_at_columns
+from constraint_checkers import handle_minimal_revertion
+
 
 TEXTUAL_DATA_TYPES = ["String"]
 
@@ -5967,10 +5970,13 @@ if __name__ == "__main__":
     ensures_gluesql_compliance()
     print("Ensured migrations simmetry & GlueSQL compliance.")
 
+    handle_minimal_revertion()
     generate_table_schema()
     print("Generated models.")
 
     ensures_all_update_at_trigger_exists()
+    ensure_created_at_columns()
+    ensure_updated_at_columns()
 
     generate_view_schema()
     print("Generated view schema.")

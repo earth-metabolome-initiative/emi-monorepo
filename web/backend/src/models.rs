@@ -3707,6 +3707,9 @@ impl Role {
 pub struct SampleBioOttTaxonItem {
     pub id: Uuid,
     pub created_by: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
     pub sample_id: Uuid,
     pub taxon_id: i32,
 }
@@ -3716,6 +3719,9 @@ impl From<SampleBioOttTaxonItem> for web_common::database::tables::SampleBioOttT
         Self {
             id: item.id,
             created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
             sample_id: item.sample_id,
             taxon_id: item.taxon_id,
         }
@@ -3727,6 +3733,9 @@ impl From<web_common::database::tables::SampleBioOttTaxonItem> for SampleBioOttT
         Self {
             id: item.id,
             created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
             sample_id: item.sample_id,
             taxon_id: item.taxon_id,
         }
@@ -3979,6 +3988,9 @@ impl SampleState {
 pub struct SampledIndividualBioOttTaxonItem {
     pub id: Uuid,
     pub created_by: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
     pub sampled_individual_id: Uuid,
     pub taxon_id: i32,
 }
@@ -3988,6 +4000,9 @@ impl From<SampledIndividualBioOttTaxonItem> for web_common::database::tables::Sa
         Self {
             id: item.id,
             created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
             sampled_individual_id: item.sampled_individual_id,
             taxon_id: item.taxon_id,
         }
@@ -3999,6 +4014,9 @@ impl From<web_common::database::tables::SampledIndividualBioOttTaxonItem> for Sa
         Self {
             id: item.id,
             created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
             sampled_individual_id: item.sampled_individual_id,
             taxon_id: item.taxon_id,
         }
@@ -4169,7 +4187,7 @@ impl SampledIndividual {
 #[diesel(table_name = samples)]
 pub struct Sample {
     pub id: Uuid,
-    pub inserted_by: i32,
+    pub created_by: i32,
     pub sampled_by: i32,
     pub created_at: NaiveDateTime,
     pub updated_by: i32,
@@ -4182,7 +4200,7 @@ impl From<Sample> for web_common::database::tables::Sample {
     fn from(item: Sample) -> Self {
         Self {
             id: item.id,
-            inserted_by: item.inserted_by,
+            created_by: item.created_by,
             sampled_by: item.sampled_by,
             created_at: item.created_at,
             updated_by: item.updated_by,
@@ -4197,7 +4215,7 @@ impl From<web_common::database::tables::Sample> for Sample {
     fn from(item: web_common::database::tables::Sample) -> Self {
         Self {
             id: item.id,
-            inserted_by: item.inserted_by,
+            created_by: item.created_by,
             sampled_by: item.sampled_by,
             created_at: item.created_at,
             updated_by: item.updated_by,
@@ -4546,6 +4564,9 @@ pub struct SpectraCollection {
     pub id: i32,
     pub sample_id: Uuid,
     pub created_by: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
 }
 
 impl From<SpectraCollection> for web_common::database::tables::SpectraCollection {
@@ -4554,6 +4575,9 @@ impl From<SpectraCollection> for web_common::database::tables::SpectraCollection
             id: item.id,
             sample_id: item.sample_id,
             created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
         }
     }
 }
@@ -4564,6 +4588,9 @@ impl From<web_common::database::tables::SpectraCollection> for SpectraCollection
             id: item.id,
             sample_id: item.sample_id,
             created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
         }
     }
 }

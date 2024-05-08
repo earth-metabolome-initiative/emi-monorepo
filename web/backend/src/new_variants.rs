@@ -326,7 +326,7 @@ impl InsertRow for web_common::database::NewSampledIndividual {
 #[derive(Insertable)]
 #[diesel(table_name = samples)]
 pub(super) struct IntermediateNewSample {
-    inserted_by: i32,
+    created_by: i32,
     id: Uuid,
     sampled_by: i32,
     procedure_id: Uuid,
@@ -340,7 +340,7 @@ impl InsertRow for web_common::database::NewSample {
 
     fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
         IntermediateNewSample {
-            inserted_by: user_id,
+            created_by: user_id,
             id: self.id,
             sampled_by: self.sampled_by,
             procedure_id: self.procedure_id,

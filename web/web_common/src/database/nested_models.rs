@@ -1673,6 +1673,7 @@ impl NestedProject {
 pub struct NestedSampleBioOttTaxonItem {
     pub inner: SampleBioOttTaxonItem,
     pub created_by: User,
+    pub updated_by: User,
     pub sample: NestedSample,
     pub taxon: NestedBioOttTaxonItem,
 }
@@ -1689,6 +1690,7 @@ impl NestedSampleBioOttTaxonItem {
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
             created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
+            updated_by: User::get(flat_struct.updated_by, connection).await?.unwrap(),
             sample: NestedSample::get(flat_struct.sample_id, connection).await?.unwrap(),
             taxon: NestedBioOttTaxonItem::get(flat_struct.taxon_id, connection).await?.unwrap(),
             inner: flat_struct,
@@ -1742,6 +1744,7 @@ impl NestedSampleBioOttTaxonItem {
     {
         self.inner.update_or_insert(connection).await?;
         self.created_by.update_or_insert(connection).await?;
+        self.updated_by.update_or_insert(connection).await?;
         self.sample.update_or_insert(connection).await?;
         self.taxon.update_or_insert(connection).await?;
         Ok(())
@@ -1826,6 +1829,7 @@ impl NestedSampleState {
 pub struct NestedSampledIndividualBioOttTaxonItem {
     pub inner: SampledIndividualBioOttTaxonItem,
     pub created_by: User,
+    pub updated_by: User,
     pub sampled_individual: NestedSampledIndividual,
     pub taxon: NestedBioOttTaxonItem,
 }
@@ -1842,6 +1846,7 @@ impl NestedSampledIndividualBioOttTaxonItem {
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
             created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
+            updated_by: User::get(flat_struct.updated_by, connection).await?.unwrap(),
             sampled_individual: NestedSampledIndividual::get(flat_struct.sampled_individual_id, connection).await?.unwrap(),
             taxon: NestedBioOttTaxonItem::get(flat_struct.taxon_id, connection).await?.unwrap(),
             inner: flat_struct,
@@ -1895,6 +1900,7 @@ impl NestedSampledIndividualBioOttTaxonItem {
     {
         self.inner.update_or_insert(connection).await?;
         self.created_by.update_or_insert(connection).await?;
+        self.updated_by.update_or_insert(connection).await?;
         self.sampled_individual.update_or_insert(connection).await?;
         self.taxon.update_or_insert(connection).await?;
         Ok(())
@@ -1978,7 +1984,7 @@ impl NestedSampledIndividual {
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedSample {
     pub inner: Sample,
-    pub inserted_by: User,
+    pub created_by: User,
     pub sampled_by: User,
     pub updated_by: User,
     pub procedure: NestedSamplingProcedure,
@@ -1996,7 +2002,7 @@ impl NestedSample {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            inserted_by: User::get(flat_struct.inserted_by, connection).await?.unwrap(),
+            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
             sampled_by: User::get(flat_struct.sampled_by, connection).await?.unwrap(),
             updated_by: User::get(flat_struct.updated_by, connection).await?.unwrap(),
             procedure: NestedSamplingProcedure::get(flat_struct.procedure_id, connection).await?.unwrap(),
@@ -2051,7 +2057,7 @@ impl NestedSample {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         self.inner.update_or_insert(connection).await?;
-        self.inserted_by.update_or_insert(connection).await?;
+        self.created_by.update_or_insert(connection).await?;
         self.sampled_by.update_or_insert(connection).await?;
         self.updated_by.update_or_insert(connection).await?;
         self.procedure.update_or_insert(connection).await?;
@@ -2211,6 +2217,7 @@ pub struct NestedSpectraCollection {
     pub inner: SpectraCollection,
     pub sample: NestedSample,
     pub created_by: User,
+    pub updated_by: User,
 }
 #[cfg(feature = "frontend")]
 impl NestedSpectraCollection {
@@ -2226,6 +2233,7 @@ impl NestedSpectraCollection {
         Ok(Self {
             sample: NestedSample::get(flat_struct.sample_id, connection).await?.unwrap(),
             created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
+            updated_by: User::get(flat_struct.updated_by, connection).await?.unwrap(),
             inner: flat_struct,
         })
     }
@@ -2278,6 +2286,7 @@ impl NestedSpectraCollection {
         self.inner.update_or_insert(connection).await?;
         self.sample.update_or_insert(connection).await?;
         self.created_by.update_or_insert(connection).await?;
+        self.updated_by.update_or_insert(connection).await?;
         Ok(())
     }
 }

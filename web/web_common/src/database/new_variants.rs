@@ -159,9 +159,9 @@ pub struct NewSample {
 
 #[cfg(feature = "frontend")]
 impl NewSample {
-    pub fn into_row(self, inserted_by: i32) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+    pub fn into_row(self, created_by: i32) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
-            gluesql::core::ast_builder::num(inserted_by),
+            gluesql::core::ast_builder::num(created_by),
             gluesql::core::ast_builder::uuid(self.id.to_string()),
             gluesql::core::ast_builder::num(self.sampled_by),
             gluesql::core::ast_builder::uuid(self.procedure_id.to_string()),
@@ -172,14 +172,14 @@ impl NewSample {
     /// Insert the NewSample into the database.
     ///
     /// # Arguments
-    /// * `inserted_by` - The id of the user inserting the row.
+    /// * `created_by` - The id of the user inserting the row.
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
     /// The number of rows inserted in table NewSample
     pub async fn insert<C>(
         self,
-        inserted_by: i32,
+        created_by: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<super::Sample, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -188,8 +188,8 @@ impl NewSample {
         let id = self.id;
         table("samples")
             .insert()
-            .columns("inserted_by,id,sampled_by,procedure_id,state")
-            .values(vec![self.into_row(inserted_by)])
+            .columns("created_by,id,sampled_by,procedure_id,state")
+            .values(vec![self.into_row(created_by)])
             .execute(connection)
             .await
              .map(|payload| match payload {

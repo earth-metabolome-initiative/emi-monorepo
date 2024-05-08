@@ -6515,6 +6515,9 @@ impl Role {
 pub struct SampleBioOttTaxonItem {
     pub id: Uuid,
     pub created_by: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
     pub sample_id: Uuid,
     pub taxon_id: i32,
 }
@@ -6524,6 +6527,9 @@ impl SampleBioOttTaxonItem {
         vec![
             gluesql::core::ast_builder::uuid(self.id.to_string()),
             gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+            gluesql::core::ast_builder::num(self.updated_by),
+            gluesql::core::ast_builder::timestamp(self.updated_at.to_string()),
             gluesql::core::ast_builder::uuid(self.sample_id.to_string()),
             gluesql::core::ast_builder::num(self.taxon_id),
         ]
@@ -6545,7 +6551,7 @@ impl SampleBioOttTaxonItem {
         use gluesql::core::ast_builder::*;
         table("sample_bio_ott_taxon_items")
             .insert()
-            .columns("id, created_by, sample_id, taxon_id")
+            .columns("id, created_by, created_at, updated_by, updated_at, sample_id, taxon_id")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -6571,7 +6577,7 @@ impl SampleBioOttTaxonItem {
         let select_row = table("sample_bio_ott_taxon_items")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, created_by, sample_id, taxon_id")
+            .project("id, created_by, created_at, updated_by, updated_at, sample_id, taxon_id")
             .limit(1)
             .execute(connection)
             .await?;
@@ -6641,6 +6647,9 @@ impl SampleBioOttTaxonItem {
             .update()        
 .set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
 .set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
+.set("updated_by", gluesql::core::ast_builder::num(self.updated_by))        
+.set("updated_at", gluesql::core::ast_builder::timestamp(self.updated_at.to_string()))        
 .set("sample_id", gluesql::core::ast_builder::uuid(self.sample_id.to_string()))        
 .set("taxon_id", gluesql::core::ast_builder::num(self.taxon_id))            .execute(connection)
             .await
@@ -6687,7 +6696,7 @@ impl SampleBioOttTaxonItem {
         use gluesql::core::ast_builder::*;
         let select_row = table("sample_bio_ott_taxon_items")
             .select()
-            .project("id, created_by, sample_id, taxon_id")
+            .project("id, created_by, created_at, updated_by, updated_at, sample_id, taxon_id")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -6706,6 +6715,18 @@ impl SampleBioOttTaxonItem {
             created_by: match row.get("created_by").unwrap() {
                 gluesql::prelude::Value::I32(created_by) => created_by.clone(),
                 _ => unreachable!("Expected I32")
+            },
+            created_at: match row.get("created_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
+            updated_by: match row.get("updated_by").unwrap() {
+                gluesql::prelude::Value::I32(updated_by) => updated_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            updated_at: match row.get("updated_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(updated_at) => updated_at.clone(),
+                _ => unreachable!("Expected Timestamp")
             },
             sample_id: match row.get("sample_id").unwrap() {
                 gluesql::prelude::Value::Uuid(sample_id) => Uuid::from_u128(*sample_id),
@@ -6938,6 +6959,9 @@ impl SampleState {
 pub struct SampledIndividualBioOttTaxonItem {
     pub id: Uuid,
     pub created_by: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
     pub sampled_individual_id: Uuid,
     pub taxon_id: i32,
 }
@@ -6947,6 +6971,9 @@ impl SampledIndividualBioOttTaxonItem {
         vec![
             gluesql::core::ast_builder::uuid(self.id.to_string()),
             gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+            gluesql::core::ast_builder::num(self.updated_by),
+            gluesql::core::ast_builder::timestamp(self.updated_at.to_string()),
             gluesql::core::ast_builder::uuid(self.sampled_individual_id.to_string()),
             gluesql::core::ast_builder::num(self.taxon_id),
         ]
@@ -6968,7 +6995,7 @@ impl SampledIndividualBioOttTaxonItem {
         use gluesql::core::ast_builder::*;
         table("sampled_individual_bio_ott_taxon_items")
             .insert()
-            .columns("id, created_by, sampled_individual_id, taxon_id")
+            .columns("id, created_by, created_at, updated_by, updated_at, sampled_individual_id, taxon_id")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -6994,7 +7021,7 @@ impl SampledIndividualBioOttTaxonItem {
         let select_row = table("sampled_individual_bio_ott_taxon_items")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, created_by, sampled_individual_id, taxon_id")
+            .project("id, created_by, created_at, updated_by, updated_at, sampled_individual_id, taxon_id")
             .limit(1)
             .execute(connection)
             .await?;
@@ -7064,6 +7091,9 @@ impl SampledIndividualBioOttTaxonItem {
             .update()        
 .set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
 .set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
+.set("updated_by", gluesql::core::ast_builder::num(self.updated_by))        
+.set("updated_at", gluesql::core::ast_builder::timestamp(self.updated_at.to_string()))        
 .set("sampled_individual_id", gluesql::core::ast_builder::uuid(self.sampled_individual_id.to_string()))        
 .set("taxon_id", gluesql::core::ast_builder::num(self.taxon_id))            .execute(connection)
             .await
@@ -7110,7 +7140,7 @@ impl SampledIndividualBioOttTaxonItem {
         use gluesql::core::ast_builder::*;
         let select_row = table("sampled_individual_bio_ott_taxon_items")
             .select()
-            .project("id, created_by, sampled_individual_id, taxon_id")
+            .project("id, created_by, created_at, updated_by, updated_at, sampled_individual_id, taxon_id")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -7129,6 +7159,18 @@ impl SampledIndividualBioOttTaxonItem {
             created_by: match row.get("created_by").unwrap() {
                 gluesql::prelude::Value::I32(created_by) => created_by.clone(),
                 _ => unreachable!("Expected I32")
+            },
+            created_at: match row.get("created_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
+            updated_by: match row.get("updated_by").unwrap() {
+                gluesql::prelude::Value::I32(updated_by) => updated_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            updated_at: match row.get("updated_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(updated_at) => updated_at.clone(),
+                _ => unreachable!("Expected Timestamp")
             },
             sampled_individual_id: match row.get("sampled_individual_id").unwrap() {
                 gluesql::prelude::Value::Uuid(sampled_individual_id) => Uuid::from_u128(*sampled_individual_id),
@@ -7381,7 +7423,7 @@ impl SampledIndividual {
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Sample {
     pub id: Uuid,
-    pub inserted_by: i32,
+    pub created_by: i32,
     pub sampled_by: i32,
     pub created_at: NaiveDateTime,
     pub updated_by: i32,
@@ -7394,7 +7436,7 @@ impl Sample {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
             gluesql::core::ast_builder::uuid(self.id.to_string()),
-            gluesql::core::ast_builder::num(self.inserted_by),
+            gluesql::core::ast_builder::num(self.created_by),
             gluesql::core::ast_builder::num(self.sampled_by),
             gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
             gluesql::core::ast_builder::num(self.updated_by),
@@ -7420,7 +7462,7 @@ impl Sample {
         use gluesql::core::ast_builder::*;
         table("samples")
             .insert()
-            .columns("id, inserted_by, sampled_by, created_at, updated_by, updated_at, procedure_id, state")
+            .columns("id, created_by, sampled_by, created_at, updated_by, updated_at, procedure_id, state")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -7446,7 +7488,7 @@ impl Sample {
         let select_row = table("samples")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, inserted_by, sampled_by, created_at, updated_by, updated_at, procedure_id, state")
+            .project("id, created_by, sampled_by, created_at, updated_by, updated_at, procedure_id, state")
             .limit(1)
             .execute(connection)
             .await?;
@@ -7515,7 +7557,7 @@ impl Sample {
         table("samples")
             .update()        
 .set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
-.set("inserted_by", gluesql::core::ast_builder::num(self.inserted_by))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
 .set("sampled_by", gluesql::core::ast_builder::num(self.sampled_by))        
 .set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
 .set("updated_by", gluesql::core::ast_builder::num(self.updated_by))        
@@ -7566,7 +7608,7 @@ impl Sample {
         use gluesql::core::ast_builder::*;
         let select_row = table("samples")
             .select()
-            .project("id, inserted_by, sampled_by, created_at, updated_by, updated_at, procedure_id, state")
+            .project("id, created_by, sampled_by, created_at, updated_by, updated_at, procedure_id, state")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -7582,8 +7624,8 @@ impl Sample {
                 gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
                 _ => unreachable!("Expected Uuid"),
             },
-            inserted_by: match row.get("inserted_by").unwrap() {
-                gluesql::prelude::Value::I32(inserted_by) => inserted_by.clone(),
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
                 _ => unreachable!("Expected I32")
             },
             sampled_by: match row.get("sampled_by").unwrap() {
@@ -8049,6 +8091,9 @@ pub struct SpectraCollection {
     pub id: i32,
     pub sample_id: Uuid,
     pub created_by: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
 }
 #[cfg(feature = "frontend")]
 impl SpectraCollection {
@@ -8057,6 +8102,9 @@ impl SpectraCollection {
             gluesql::core::ast_builder::num(self.id),
             gluesql::core::ast_builder::uuid(self.sample_id.to_string()),
             gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+            gluesql::core::ast_builder::num(self.updated_by),
+            gluesql::core::ast_builder::timestamp(self.updated_at.to_string()),
         ]
     }
 
@@ -8076,7 +8124,7 @@ impl SpectraCollection {
         use gluesql::core::ast_builder::*;
         table("spectra_collections")
             .insert()
-            .columns("id, sample_id, created_by")
+            .columns("id, sample_id, created_by, created_at, updated_by, updated_at")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -8102,7 +8150,7 @@ impl SpectraCollection {
         let select_row = table("spectra_collections")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, sample_id, created_by")
+            .project("id, sample_id, created_by, created_at, updated_by, updated_at")
             .limit(1)
             .execute(connection)
             .await?;
@@ -8172,7 +8220,10 @@ impl SpectraCollection {
             .update()        
 .set("id", gluesql::core::ast_builder::num(self.id))        
 .set("sample_id", gluesql::core::ast_builder::uuid(self.sample_id.to_string()))        
-.set("created_by", gluesql::core::ast_builder::num(self.created_by))            .execute(connection)
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
+.set("updated_by", gluesql::core::ast_builder::num(self.updated_by))        
+.set("updated_at", gluesql::core::ast_builder::timestamp(self.updated_at.to_string()))            .execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -8217,7 +8268,7 @@ impl SpectraCollection {
         use gluesql::core::ast_builder::*;
         let select_row = table("spectra_collections")
             .select()
-            .project("id, sample_id, created_by")
+            .project("id, sample_id, created_by, created_at, updated_by, updated_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -8240,6 +8291,18 @@ impl SpectraCollection {
             created_by: match row.get("created_by").unwrap() {
                 gluesql::prelude::Value::I32(created_by) => created_by.clone(),
                 _ => unreachable!("Expected I32")
+            },
+            created_at: match row.get("created_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
+            updated_by: match row.get("updated_by").unwrap() {
+                gluesql::prelude::Value::I32(updated_by) => updated_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            updated_at: match row.get("updated_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(updated_at) => updated_at.clone(),
+                _ => unreachable!("Expected Timestamp")
             },
         }
     }

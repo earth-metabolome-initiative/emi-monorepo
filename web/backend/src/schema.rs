@@ -323,6 +323,9 @@ diesel::table! {
     sample_bio_ott_taxon_items (id) {
         id -> Uuid,
         created_by -> Int4,
+        created_at -> Timestamp,
+        updated_by -> Int4,
+        updated_at -> Timestamp,
         sample_id -> Uuid,
         taxon_id -> Int4,
     }
@@ -342,6 +345,9 @@ diesel::table! {
     sampled_individual_bio_ott_taxon_items (id) {
         id -> Uuid,
         created_by -> Int4,
+        created_at -> Timestamp,
+        updated_by -> Int4,
+        updated_at -> Timestamp,
         sampled_individual_id -> Uuid,
         taxon_id -> Int4,
     }
@@ -362,7 +368,7 @@ diesel::table! {
 diesel::table! {
     samples (id) {
         id -> Uuid,
-        inserted_by -> Int4,
+        created_by -> Int4,
         sampled_by -> Int4,
         created_at -> Timestamp,
         updated_by -> Int4,
@@ -396,6 +402,9 @@ diesel::table! {
         id -> Int4,
         sample_id -> Uuid,
         created_by -> Int4,
+        created_at -> Timestamp,
+        updated_by -> Int4,
+        updated_at -> Timestamp,
     }
 }
 
@@ -481,17 +490,14 @@ diesel::joinable!(project_states -> font_awesome_icons (font_awesome_icon_id));
 diesel::joinable!(projects -> project_states (state_id));
 diesel::joinable!(sample_bio_ott_taxon_items -> bio_ott_taxon_items (taxon_id));
 diesel::joinable!(sample_bio_ott_taxon_items -> samples (sample_id));
-diesel::joinable!(sample_bio_ott_taxon_items -> users (created_by));
 diesel::joinable!(sample_states -> colors (color_id));
 diesel::joinable!(sample_states -> font_awesome_icons (font_awesome_icon_id));
 diesel::joinable!(sampled_individual_bio_ott_taxon_items -> bio_ott_taxon_items (taxon_id));
 diesel::joinable!(sampled_individual_bio_ott_taxon_items -> sampled_individuals (sampled_individual_id));
-diesel::joinable!(sampled_individual_bio_ott_taxon_items -> users (created_by));
 diesel::joinable!(samples -> sample_states (state));
 diesel::joinable!(samples -> sampling_procedures (procedure_id));
 diesel::joinable!(spectra -> spectra_collections (spectra_collection_id));
 diesel::joinable!(spectra_collections -> samples (sample_id));
-diesel::joinable!(spectra_collections -> users (created_by));
 diesel::joinable!(team_states -> colors (color_id));
 diesel::joinable!(team_states -> font_awesome_icons (font_awesome_icon_id));
 diesel::joinable!(user_emails -> login_providers (login_provider_id));

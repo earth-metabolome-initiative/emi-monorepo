@@ -1953,6 +1953,7 @@ impl From<NestedProject> for web_common::database::nested_models::NestedProject 
 pub struct NestedSampleBioOttTaxonItem {
     pub inner: SampleBioOttTaxonItem,
     pub created_by: User,
+    pub updated_by: User,
     pub sample: NestedSample,
     pub taxon: NestedBioOttTaxonItem,
 }
@@ -1969,6 +1970,7 @@ impl NestedSampleBioOttTaxonItem {
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
             created_by: User::get(flat_struct.created_by, connection)?,
+            updated_by: User::get(flat_struct.updated_by, connection)?,
             sample: NestedSample::get(flat_struct.sample_id, connection)?,
             taxon: NestedBioOttTaxonItem::get(flat_struct.taxon_id, connection)?,
                 inner: flat_struct,
@@ -2009,6 +2011,7 @@ impl From<web_common::database::nested_models::NestedSampleBioOttTaxonItem> for 
         Self {
             inner: item.inner.into(),
             created_by: item.created_by.into(),
+            updated_by: item.updated_by.into(),
             sample: item.sample.into(),
             taxon: item.taxon.into(),
         }
@@ -2019,6 +2022,7 @@ impl From<NestedSampleBioOttTaxonItem> for web_common::database::nested_models::
         Self {
             inner: item.inner.into(),
             created_by: item.created_by.into(),
+            updated_by: item.updated_by.into(),
             sample: item.sample.into(),
             taxon: item.taxon.into(),
         }
@@ -2141,6 +2145,7 @@ impl From<NestedSampleState> for web_common::database::nested_models::NestedSamp
 pub struct NestedSampledIndividualBioOttTaxonItem {
     pub inner: SampledIndividualBioOttTaxonItem,
     pub created_by: User,
+    pub updated_by: User,
     pub sampled_individual: NestedSampledIndividual,
     pub taxon: NestedBioOttTaxonItem,
 }
@@ -2157,6 +2162,7 @@ impl NestedSampledIndividualBioOttTaxonItem {
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
             created_by: User::get(flat_struct.created_by, connection)?,
+            updated_by: User::get(flat_struct.updated_by, connection)?,
             sampled_individual: NestedSampledIndividual::get(flat_struct.sampled_individual_id, connection)?,
             taxon: NestedBioOttTaxonItem::get(flat_struct.taxon_id, connection)?,
                 inner: flat_struct,
@@ -2197,6 +2203,7 @@ impl From<web_common::database::nested_models::NestedSampledIndividualBioOttTaxo
         Self {
             inner: item.inner.into(),
             created_by: item.created_by.into(),
+            updated_by: item.updated_by.into(),
             sampled_individual: item.sampled_individual.into(),
             taxon: item.taxon.into(),
         }
@@ -2207,6 +2214,7 @@ impl From<NestedSampledIndividualBioOttTaxonItem> for web_common::database::nest
         Self {
             inner: item.inner.into(),
             created_by: item.created_by.into(),
+            updated_by: item.updated_by.into(),
             sampled_individual: item.sampled_individual.into(),
             taxon: item.taxon.into(),
         }
@@ -2286,7 +2294,7 @@ impl From<NestedSampledIndividual> for web_common::database::nested_models::Nest
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct NestedSample {
     pub inner: Sample,
-    pub inserted_by: User,
+    pub created_by: User,
     pub sampled_by: User,
     pub updated_by: User,
     pub procedure: NestedSamplingProcedure,
@@ -2304,7 +2312,7 @@ impl NestedSample {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            inserted_by: User::get(flat_struct.inserted_by, connection)?,
+            created_by: User::get(flat_struct.created_by, connection)?,
             sampled_by: User::get(flat_struct.sampled_by, connection)?,
             updated_by: User::get(flat_struct.updated_by, connection)?,
             procedure: NestedSamplingProcedure::get(flat_struct.procedure_id, connection)?,
@@ -2346,7 +2354,7 @@ impl From<web_common::database::nested_models::NestedSample> for NestedSample {
     fn from(item: web_common::database::nested_models::NestedSample) -> Self {
         Self {
             inner: item.inner.into(),
-            inserted_by: item.inserted_by.into(),
+            created_by: item.created_by.into(),
             sampled_by: item.sampled_by.into(),
             updated_by: item.updated_by.into(),
             procedure: item.procedure.into(),
@@ -2358,7 +2366,7 @@ impl From<NestedSample> for web_common::database::nested_models::NestedSample {
     fn from(item: NestedSample) -> Self {
         Self {
             inner: item.inner.into(),
-            inserted_by: item.inserted_by.into(),
+            created_by: item.created_by.into(),
             sampled_by: item.sampled_by.into(),
             updated_by: item.updated_by.into(),
             procedure: item.procedure.into(),
@@ -2551,6 +2559,7 @@ pub struct NestedSpectraCollection {
     pub inner: SpectraCollection,
     pub sample: NestedSample,
     pub created_by: User,
+    pub updated_by: User,
 }
 
 impl NestedSpectraCollection {
@@ -2566,6 +2575,7 @@ impl NestedSpectraCollection {
         Ok(Self {
             sample: NestedSample::get(flat_struct.sample_id, connection)?,
             created_by: User::get(flat_struct.created_by, connection)?,
+            updated_by: User::get(flat_struct.updated_by, connection)?,
                 inner: flat_struct,
         })
     }
@@ -2605,6 +2615,7 @@ impl From<web_common::database::nested_models::NestedSpectraCollection> for Nest
             inner: item.inner.into(),
             sample: item.sample.into(),
             created_by: item.created_by.into(),
+            updated_by: item.updated_by.into(),
         }
     }
 }
@@ -2614,6 +2625,7 @@ impl From<NestedSpectraCollection> for web_common::database::nested_models::Nest
             inner: item.inner.into(),
             sample: item.sample.into(),
             created_by: item.created_by.into(),
+            updated_by: item.updated_by.into(),
         }
     }
 }

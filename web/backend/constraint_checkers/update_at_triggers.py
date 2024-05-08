@@ -4,7 +4,7 @@ have a trigger that updates the column upon each row update.
 import os
 from constraint_checkers.find_foreign_keys import find_foreign_keys
 from userinput import userinput
-
+from insert_migration import insert_migration
 
 def handle_update_at_trigger_creation(
     table_name: str,
