@@ -3914,6 +3914,10 @@ def write_web_common_new_structs(
             struct.get_creator_user_id_attribute()
         )
 
+        updator_user_id_attribute: AttributeMetadata = (
+            struct.get_updator_user_id_attribute()
+        )
+
         primary_key_name, primary_key_type = (
             table_metadatas.get_primary_key_name_and_type(struct.table_name)
         )
@@ -3927,11 +3931,11 @@ def write_web_common_new_structs(
         )
 
         document.write("        vec![\n")
-        for attribute in [creator_user_id_attribute] + struct.attributes:
+        for attribute in [creator_user_id_attribute, updator_user_id_attribute] + struct.attributes:
             columns.append(attribute.name)
 
-            if attribute.name == creator_user_id_attribute.name:
-                self_attribute_name = attribute.name
+            if attribute.name in (creator_user_id_attribute.name, updator_user_id_attribute.name):
+                self_attribute_name = creator_user_id_attribute.name
             else:
                 self_attribute_name = f"self.{attribute.name}"
 

@@ -2,9 +2,9 @@
 //!
 //! This module is automatically generated. Do not write anything here.
 
-use uuid::Uuid;
-use serde::{Deserialize, Serialize};
 use chrono::NaiveDateTime;
+use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewContainerHorizontalRule {
@@ -77,6 +77,7 @@ impl NewSampledIndividual {
     pub fn into_row(self, created_by: i32) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
             gluesql::core::ast_builder::num(created_by),
+            gluesql::core::ast_builder::num(created_by),
             gluesql::core::ast_builder::uuid(self.id.to_string()),
             match self.name {
                 Some(name) => gluesql::core::ast_builder::text(name),
@@ -98,22 +99,27 @@ impl NewSampledIndividual {
         self,
         created_by: i32,
         connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<super::SampledIndividual, gluesql::prelude::Error> where
+    ) -> Result<super::SampledIndividual, gluesql::prelude::Error>
+    where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
         let id = self.id;
         table("sampled_individuals")
             .insert()
-            .columns("created_by,id,name,tagged")
+            .columns("created_by,updated_by,id,name,tagged")
             .values(vec![self.into_row(created_by)])
             .execute(connection)
             .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
-                 _ => unreachable!("Payload must be an Insert"),
-             })?;
-        super::SampledIndividual::get(id, connection).await.map(|maybe_row| maybe_row.unwrap())
+            .map(|payload| match payload {
+                gluesql::prelude::Payload::Insert(number_of_inserted_rows) => {
+                    number_of_inserted_rows
+                }
+                _ => unreachable!("Payload must be an Insert"),
+            })?;
+        super::SampledIndividual::get(id, connection)
+            .await
+            .map(|maybe_row| maybe_row.unwrap())
     }
 
     /// Update the struct in the database.
@@ -128,26 +134,27 @@ impl NewSampledIndividual {
         self,
         user_id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
+    ) -> Result<usize, gluesql::prelude::Error>
+    where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
         let mut update_row = table("sampled_individuals")
-            .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
-.set("tagged", self.tagged)        
-.set("updated_by", gluesql::core::ast_builder::num(user_id));
+            .update()
+            .set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))
+            .set("tagged", self.tagged)
+            .set("updated_by", gluesql::core::ast_builder::num(user_id));
         if let Some(name) = self.name {
             update_row = update_row.set("name", gluesql::core::ast_builder::text(name));
         }
-            update_row.execute(connection)
+        update_row
+            .execute(connection)
             .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
-                 _ => unreachable!("Expected Payload::Update")
-})
+            .map(|payload| match payload {
+                gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                _ => unreachable!("Expected Payload::Update"),
+            })
     }
-
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewSample {
@@ -161,6 +168,7 @@ pub struct NewSample {
 impl NewSample {
     pub fn into_row(self, created_by: i32) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
+            gluesql::core::ast_builder::num(created_by),
             gluesql::core::ast_builder::num(created_by),
             gluesql::core::ast_builder::uuid(self.id.to_string()),
             gluesql::core::ast_builder::num(self.sampled_by),
@@ -181,22 +189,27 @@ impl NewSample {
         self,
         created_by: i32,
         connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<super::Sample, gluesql::prelude::Error> where
+    ) -> Result<super::Sample, gluesql::prelude::Error>
+    where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
         let id = self.id;
         table("samples")
             .insert()
-            .columns("created_by,id,sampled_by,procedure_id,state")
+            .columns("created_by,updated_by,id,sampled_by,procedure_id,state")
             .values(vec![self.into_row(created_by)])
             .execute(connection)
             .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
-                 _ => unreachable!("Payload must be an Insert"),
-             })?;
-        super::Sample::get(id, connection).await.map(|maybe_row| maybe_row.unwrap())
+            .map(|payload| match payload {
+                gluesql::prelude::Payload::Insert(number_of_inserted_rows) => {
+                    number_of_inserted_rows
+                }
+                _ => unreachable!("Payload must be an Insert"),
+            })?;
+        super::Sample::get(id, connection)
+            .await
+            .map(|maybe_row| maybe_row.unwrap())
     }
 
     /// Update the struct in the database.
@@ -211,24 +224,31 @@ impl NewSample {
         self,
         user_id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
+    ) -> Result<usize, gluesql::prelude::Error>
+    where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
         table("samples")
-            .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
-.set("sampled_by", gluesql::core::ast_builder::num(self.sampled_by))        
-.set("procedure_id", gluesql::core::ast_builder::uuid(self.procedure_id.to_string()))        
-.set("state", gluesql::core::ast_builder::num(self.state))        
-.set("updated_by", gluesql::core::ast_builder::num(user_id))            .execute(connection)
+            .update()
+            .set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))
+            .set(
+                "sampled_by",
+                gluesql::core::ast_builder::num(self.sampled_by),
+            )
+            .set(
+                "procedure_id",
+                gluesql::core::ast_builder::uuid(self.procedure_id.to_string()),
+            )
+            .set("state", gluesql::core::ast_builder::num(self.state))
+            .set("updated_by", gluesql::core::ast_builder::num(user_id))
+            .execute(connection)
             .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
-                 _ => unreachable!("Expected Payload::Update")
-})
+            .map(|payload| match payload {
+                gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                _ => unreachable!("Expected Payload::Update"),
+            })
     }
-
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewSamplingProcedure {
@@ -241,6 +261,7 @@ pub struct NewSamplingProcedure {
 impl NewSamplingProcedure {
     pub fn into_row(self, created_by: i32) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
+            gluesql::core::ast_builder::num(created_by),
             gluesql::core::ast_builder::num(created_by),
             gluesql::core::ast_builder::uuid(self.id.to_string()),
             gluesql::core::ast_builder::text(self.name),
@@ -263,22 +284,27 @@ impl NewSamplingProcedure {
         self,
         created_by: i32,
         connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<super::SamplingProcedure, gluesql::prelude::Error> where
+    ) -> Result<super::SamplingProcedure, gluesql::prelude::Error>
+    where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
         let id = self.id;
         table("sampling_procedures")
             .insert()
-            .columns("created_by,id,name,description")
+            .columns("created_by,updated_by,id,name,description")
             .values(vec![self.into_row(created_by)])
             .execute(connection)
             .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
-                 _ => unreachable!("Payload must be an Insert"),
-             })?;
-        super::SamplingProcedure::get(id, connection).await.map(|maybe_row| maybe_row.unwrap())
+            .map(|payload| match payload {
+                gluesql::prelude::Payload::Insert(number_of_inserted_rows) => {
+                    number_of_inserted_rows
+                }
+                _ => unreachable!("Payload must be an Insert"),
+            })?;
+        super::SamplingProcedure::get(id, connection)
+            .await
+            .map(|maybe_row| maybe_row.unwrap())
     }
 
     /// Update the struct in the database.
@@ -293,26 +319,28 @@ impl NewSamplingProcedure {
         self,
         user_id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
+    ) -> Result<usize, gluesql::prelude::Error>
+    where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
         let mut update_row = table("sampling_procedures")
-            .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
-.set("name", gluesql::core::ast_builder::text(self.name))        
-.set("updated_by", gluesql::core::ast_builder::num(user_id));
+            .update()
+            .set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))
+            .set("name", gluesql::core::ast_builder::text(self.name))
+            .set("updated_by", gluesql::core::ast_builder::num(user_id));
         if let Some(description) = self.description {
-            update_row = update_row.set("description", gluesql::core::ast_builder::text(description));
+            update_row =
+                update_row.set("description", gluesql::core::ast_builder::text(description));
         }
-            update_row.execute(connection)
+        update_row
+            .execute(connection)
             .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
-                 _ => unreachable!("Expected Payload::Update")
-})
+            .map(|payload| match payload {
+                gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                _ => unreachable!("Expected Payload::Update"),
+            })
     }
-
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewTeam {
@@ -320,4 +348,3 @@ pub struct NewTeam {
     pub description: String,
     pub parent_team_id: Option<i32>,
 }
-
