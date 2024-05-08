@@ -3781,7 +3781,6 @@ def derive_model_builders(
             )
         )
 
-
         builders.append(builder)
 
     return builders
@@ -4450,7 +4449,10 @@ def write_frontend_builder_action_enumeration(
         if attribute.name == "form_updated_at":
             continue
 
-        if attribute.data_type() in INPUT_TYPE_MAP:
+        if (
+            attribute.data_type() in INPUT_TYPE_MAP
+            or attribute.data_type() == "NaiveDateTime"
+        ):
             document.write(f"    Set{attribute.capitalized_name()}(Option<String>),\n")
         else:
             document.write(
@@ -4463,7 +4465,6 @@ def write_frontend_builder_action_enumeration(
         f"impl Reducer<{builder.name}> for {action_enum_name} {{\n"
         f"    fn apply(self, mut state: std::rc::Rc<{builder.name}>) -> std::rc::Rc<{builder.name}> {{\n"
         "        let state_mut = Rc::make_mut(&mut state);\n"
-        "        state_mut.form_updated_at = chrono::Utc::now().naive_utc();\n"
         "        match self {\n"
     )
 
@@ -4523,7 +4524,27 @@ def write_frontend_builder_action_enumeration(
                 f"        }}\n"
             )
 
-        if (
+        if attribute.data_type() == "NaiveDateTime":
+            # We convert the dates provided from the date picker to the NaiveDateTime format.
+            # The dates from a date picker have the format "YYYY-MM-DD", while the NaiveDateTime
+            # format is "YYYY-MM-DDTHH:MM:SS". We append the time "00:00:00" to the date.
+            document.write(
+                f"                match {attribute.name} {{\n"
+                f'                    Some(value) => match NaiveDate::parse_from_str(&value, "%Y-%m-%d") {{\n'
+                "                        Ok(date) => {\n"
+                "                            state_mut.form_updated_at = chrono::Utc::now().naive_utc();\n"
+                f"                            state_mut.{attribute.name} = Some(date.and_hms(0, 0, 0));\n"
+                "                        }\n"
+                "                        Err(_) => {\n"
+                f"                            state_mut.errors_{attribute.name}.push(ApiError::BadRequest(vec![\n"
+                f'                                "The {attribute.name} field must be a valid date.".to_string()\n'
+                "                            ]));\n"
+                "                        }\n"
+                "                    },\n"
+                f"                    None => state_mut.{attribute.name} = None,\n"
+                "                }\n"
+            )
+        elif (
             attribute.data_type() in INPUT_TYPE_MAP
             and attribute.data_type() != "String"
         ):
@@ -4534,6 +4555,7 @@ def write_frontend_builder_action_enumeration(
             largest_type_variant = largest_type_variants[attribute.data_type()]
 
             document.write(
+                f"                state_mut.form_updated_at = chrono::Utc::now().naive_utc();\n"
                 f"                match {attribute.name} {{\n"
                 f"                    Some(value) => match value.parse::<{largest_type_variant}>() {{\n"
                 "                        Ok(value) => {\n"
@@ -5353,7 +5375,10 @@ def write_frontend_yew_form(
                 document.write(
                     f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: bool| {flat_struct.name}Actions::Set{attribute.capitalized_name()}(Some({attribute.name})));\n"
                 )
-            elif attribute.data_type() in INPUT_TYPE_MAP:
+            elif (
+                attribute.data_type() in INPUT_TYPE_MAP
+                or attribute.data_type() == "NaiveDateTime"
+            ):
                 document.write(
                     f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: Option<String>| {flat_struct.name}Actions::Set{attribute.capitalized_name()}({attribute.name}));"
                 )
@@ -5378,9 +5403,19 @@ def write_frontend_yew_form(
             if attribute.name == primary_key_name:
                 continue
 
+            if attribute.name == "form_updated_at":
+                continue
+
             error_attribute = builder.get_attribute_by_name(f"errors_{attribute.name}")
 
-            if attribute.data_type() in INPUT_TYPE_MAP:
+            assert (
+                error_attribute is not None
+            ), f"Error attribute not found for {attribute.name} in {builder.name}."
+
+            if (
+                attribute.data_type() in INPUT_TYPE_MAP
+                or attribute.data_type() == "NaiveDateTime"
+            ):
                 document.write(
                     f'            <BasicInput<{attribute.data_type()}> label="{attribute.capitalized_name()}" errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} value={{builder_store.{attribute.name}.clone()}} />\n'
                 )
@@ -5514,6 +5549,7 @@ def write_frontend_forms(
         "use uuid::Uuid;",
         "use std::ops::Deref;",
         "use chrono::NaiveDateTime;",
+        "use chrono::NaiveDate;",
         "use web_common::api::ApiError;",
     ]
 

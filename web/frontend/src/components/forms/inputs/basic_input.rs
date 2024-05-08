@@ -3,9 +3,9 @@
 use std::fmt::Display;
 
 use super::InputErrors;
+use chrono::NaiveDateTime;
 use wasm_bindgen::JsCast;
 use web_common::api::ApiError;
-use web_common::custom_validators::validation_errors::TryFromString;
 use yew::html::IntoPropValue;
 use yew::prelude::*;
 
@@ -14,6 +14,7 @@ pub enum InputType {
     Text,
     Number,
     Textarea,
+    DateTime,
 }
 
 impl Display for InputType {
@@ -22,6 +23,7 @@ impl Display for InputType {
             InputType::Text => write!(f, "text"),
             InputType::Number => write!(f, "number"),
             InputType::Textarea => write!(f, "textarea"),
+            InputType::DateTime => write!(f, "datetime-local"),
         }
     }
 }
@@ -32,9 +34,7 @@ impl IntoPropValue<std::option::Option<implicit_clone::unsync::IString>> for Inp
     }
 }
 
-pub trait Inputtable:
-    Clone + TryFromString + ToString + PartialEq
-{
+pub trait Inputtable: Clone + ToString + PartialEq {
     const INPUT_TYPE: InputType;
 }
 
@@ -48,6 +48,10 @@ impl Inputtable for i32 {
 
 impl Inputtable for f64 {
     const INPUT_TYPE: InputType = InputType::Number;
+}
+
+impl Inputtable for NaiveDateTime {
+    const INPUT_TYPE: InputType = InputType::DateTime;
 }
 
 #[derive(Clone, PartialEq, Properties)]
@@ -78,8 +82,7 @@ impl<Data: Inputtable> InputProp<Data> {
 }
 
 #[function_component(BasicInput)]
-pub fn basic_input<Data: Inputtable>(props: &InputProp<Data>) -> Html
-{
+pub fn basic_input<Data: Inputtable>(props: &InputProp<Data>) -> Html {
     let extra_classes: Option<&str> = if props.errors.is_empty() {
         if props.value.is_some() {
             Some("input-group-valid")
@@ -127,7 +130,9 @@ pub fn basic_input<Data: Inputtable>(props: &InputProp<Data>) -> Html
         })
     };
 
-    let value = props.value().map_or_else(|| "".to_string(), |value| value.to_string());
+    let value = props
+        .value()
+        .map_or_else(|| "".to_string(), |value| value.to_string());
 
     let input_field = html! {
         <>
@@ -148,6 +153,17 @@ pub fn basic_input<Data: Inputtable>(props: &InputProp<Data>) -> Html
                 InputType::Number | InputType::Text => html! {
                     <input
                         type={InputType::Text}
+                        class="input-control"
+                        name={props.normalized_label()}
+                        id={props.normalized_label()}
+                        value={value}
+                        placeholder={props.placeholder.clone().unwrap_or_else(|| props.label())}
+                        oninput={on_input}
+                    />
+                },
+                InputType::DateTime => html! {
+                    <input
+                        type={InputType::DateTime}
                         class="input-control"
                         name={props.normalized_label()}
                         id={props.normalized_label()}

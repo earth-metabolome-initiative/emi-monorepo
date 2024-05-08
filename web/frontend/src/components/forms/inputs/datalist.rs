@@ -245,7 +245,6 @@ where
 
         let on_input: Callback<InputEvent> = {
             let link = ctx.link().clone();
-            let props = ctx.props().clone();
             Callback::from(move |input_event: InputEvent| {
                 input_event.prevent_default();
 
