@@ -50,6 +50,7 @@ form.standard-form {
 
                 input[type="number"],
                 input[type="search"],
+                input[type="datetime-local"],
                 input[type="text"] {
                     width: 100%;
                 }
@@ -109,6 +110,7 @@ form.standard-form {
 
             input[type="text"],
             input[type="search"],
+            input[type="datetime-local"],
             textarea,
             input[type="number"] {
                 border-color: $error;
@@ -608,10 +610,12 @@ form.standard-form {
             min-width: 100px;
         }
 
-        &.text .input-container, &.number .input-container, &.datalist .input-container {
-            display: grid;
-            grid-template-columns: auto 1fr;
-            align-items: center;
+        &.text, &.number, &.datalist, &.datetime-local {
+            .input-container {
+                display: grid;
+                grid-template-columns: auto 1fr;
+                align-items: center;
+            }
         }
 
         &.textarea {
@@ -620,6 +624,7 @@ form.standard-form {
 
         input[type="text"],
         input[type="search"],
+        input[type="datetime-local"],
         textarea,
         input[type="number"] {
             padding: 0.5em;

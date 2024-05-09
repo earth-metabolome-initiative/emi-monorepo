@@ -4526,20 +4526,14 @@ def write_frontend_builder_action_enumeration(
 
         if attribute.data_type() == "NaiveDateTime":
             # We convert the dates provided from the date picker to the NaiveDateTime format.
-            # The dates from a date picker have the format "YYYY-MM-DD", while the NaiveDateTime
-            # format is "YYYY-MM-DDTHH:MM:SS". We append the time "00:00:00" to the date.
+            # The dates from a datetime-local input are in the format "YYYY-MM-DDTHH:MM".
             document.write(
                 f"                match {attribute.name} {{\n"
-                f'                    Some(value) => match NaiveDate::parse_from_str(&value, "%Y-%m-%d") {{\n'
-                "                        Ok(date) => {\n"
-                "                            state_mut.form_updated_at = chrono::Utc::now().naive_utc();\n"
-                f"                            state_mut.{attribute.name} = Some(date.and_hms(0, 0, 0));\n"
-                "                        }\n"
-                "                        Err(_) => {\n"
-                f"                            state_mut.errors_{attribute.name}.push(ApiError::BadRequest(vec![\n"
-                f'                                "The {attribute.name} field must be a valid date.".to_string()\n'
-                "                            ]));\n"
-                "                        }\n"
+                f'                    Some(value) => match NaiveDateTime::parse_from_str(&value, "%Y-%m-%dT%H:%M") {{\n'
+                f"                        Ok({attribute.name}) => state_mut.{attribute.name} = Some({attribute.name}),\n"
+                f"                        Err(_) => state_mut.errors_{attribute.name}.push(ApiError::BadRequest(vec![\n"
+                f'                            "The {attribute.name} field must be a valid date and time.".to_string()\n'
+                "                        ])),\n"
                 "                    },\n"
                 f"                    None => state_mut.{attribute.name} = None,\n"
                 "                }\n"

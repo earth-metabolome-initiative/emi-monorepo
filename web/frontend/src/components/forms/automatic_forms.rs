@@ -3,6 +3,7 @@
 //! This module is automatically generated. Do not write anything here.
 
 use crate::components::forms::*;
+use chrono::NaiveDate;
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 use std::ops::Deref;
@@ -10,7 +11,6 @@ use std::rc::Rc;
 use uuid::Uuid;
 use web_common::api::form_traits::FormMethod;
 use web_common::api::ApiError;
-use chrono::NaiveDate;
 use web_common::database::*;
 use yew::prelude::*;
 use yewdux::{use_store, Reducer, Store};
@@ -1575,18 +1575,16 @@ impl Reducer<ProjectBuilder> for ProjectActions {
             ProjectActions::SetExpectedEndDate(expected_end_date) => {
                 state_mut.errors_expected_end_date.clear();
                 match expected_end_date {
-                    Some(value) => match NaiveDate::parse_from_str(&value, "%Y-%m-%d") {
-                        Ok(date) => {
-                            state_mut.form_updated_at = chrono::Utc::now().naive_utc();
-                            state_mut.expected_end_date = Some(date.and_hms(0, 0, 0));
+                    Some(value) => match NaiveDateTime::parse_from_str(&value, "%Y-%m-%dT%H:%M") {
+                        Ok(expected_end_date) => {
+                            state_mut.expected_end_date = Some(expected_end_date)
                         }
-                        Err(_) => {
-                            state_mut
-                                .errors_expected_end_date
-                                .push(ApiError::BadRequest(vec![
-                                    "The expected_end_date field must be a valid date.".to_string(),
-                                ]));
-                        }
+                        Err(_) => state_mut
+                            .errors_expected_end_date
+                            .push(ApiError::BadRequest(vec![
+                                "The expected_end_date field must be a valid date and time."
+                                    .to_string(),
+                            ])),
                     },
                     None => state_mut.expected_end_date = None,
                 }
@@ -1594,16 +1592,11 @@ impl Reducer<ProjectBuilder> for ProjectActions {
             ProjectActions::SetEndDate(end_date) => {
                 state_mut.errors_end_date.clear();
                 match end_date {
-                    Some(value) => match NaiveDate::parse_from_str(&value, "%Y-%m-%d") {
-                        Ok(date) => {
-                            state_mut.form_updated_at = chrono::Utc::now().naive_utc();
-                            state_mut.end_date = Some(date.and_hms(0, 0, 0));
-                        }
-                        Err(_) => {
-                            state_mut.errors_end_date.push(ApiError::BadRequest(vec![
-                                "The end_date field must be a valid date.".to_string(),
-                            ]));
-                        }
+                    Some(value) => match NaiveDateTime::parse_from_str(&value, "%Y-%m-%dT%H:%M") {
+                        Ok(end_date) => state_mut.end_date = Some(end_date),
+                        Err(_) => state_mut.errors_end_date.push(ApiError::BadRequest(vec![
+                            "The end_date field must be a valid date and time.".to_string(),
+                        ])),
                     },
                     None => state_mut.end_date = None,
                 }
