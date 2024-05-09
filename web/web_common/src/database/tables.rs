@@ -4696,6 +4696,7 @@ pub struct Notification {
     pub user_id: i32,
     pub operation: String,
     pub table_name: String,
+    pub record: String,
     pub read: bool,
 }
 #[cfg(feature = "frontend")]
@@ -4706,6 +4707,7 @@ impl Notification {
             gluesql::core::ast_builder::num(self.user_id),
             gluesql::core::ast_builder::text(self.operation),
             gluesql::core::ast_builder::text(self.table_name),
+            gluesql::core::ast_builder::text(self.record),
             (self.read.into()),
         ]
     }
@@ -4726,7 +4728,7 @@ impl Notification {
         use gluesql::core::ast_builder::*;
         table("notifications")
             .insert()
-            .columns("id, user_id, operation, table_name, read")
+            .columns("id, user_id, operation, table_name, record, read")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -4752,7 +4754,7 @@ impl Notification {
         let select_row = table("notifications")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, user_id, operation, table_name, read")
+            .project("id, user_id, operation, table_name, record, read")
             .limit(1)
             .execute(connection)
             .await?;
@@ -4824,6 +4826,7 @@ impl Notification {
 .set("user_id", gluesql::core::ast_builder::num(self.user_id))        
 .set("operation", gluesql::core::ast_builder::text(self.operation))        
 .set("table_name", gluesql::core::ast_builder::text(self.table_name))        
+.set("record", gluesql::core::ast_builder::text(self.record))        
 .set("read", self.read)            .execute(connection)
             .await
              .map(|payload| match payload {
@@ -4869,7 +4872,7 @@ impl Notification {
         use gluesql::core::ast_builder::*;
         let select_row = table("notifications")
             .select()
-            .project("id, user_id, operation, table_name, read")
+            .project("id, user_id, operation, table_name, record, read")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -4895,6 +4898,10 @@ impl Notification {
             },
             table_name: match row.get("table_name").unwrap() {
                 gluesql::prelude::Value::Str(table_name) => table_name.clone(),
+                _ => unreachable!("Expected Str")
+            },
+            record: match row.get("record").unwrap() {
+                gluesql::prelude::Value::Str(record) => record.clone(),
                 _ => unreachable!("Expected Str")
             },
             read: match row.get("read").unwrap() {
@@ -9188,6 +9195,7 @@ pub struct User {
     pub first_name: String,
     pub middle_name: Option<String>,
     pub last_name: String,
+    pub profile_picture: Option<Vec<u8>>,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }
@@ -9202,6 +9210,10 @@ impl User {
                 None => gluesql::core::ast_builder::null(),
             },
             gluesql::core::ast_builder::text(self.last_name),
+            match self.profile_picture {
+                Some(profile_picture) => gluesql::core::ast_builder::bytea(profile_picture),
+                None => gluesql::core::ast_builder::null(),
+            },
             gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
             gluesql::core::ast_builder::timestamp(self.updated_at.to_string()),
         ]
@@ -9223,7 +9235,7 @@ impl User {
         use gluesql::core::ast_builder::*;
         table("users")
             .insert()
-            .columns("id, first_name, middle_name, last_name, created_at, updated_at")
+            .columns("id, first_name, middle_name, last_name, profile_picture, created_at, updated_at")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -9249,7 +9261,7 @@ impl User {
         let select_row = table("users")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, first_name, middle_name, last_name, created_at, updated_at")
+            .project("id, first_name, middle_name, last_name, profile_picture, created_at, updated_at")
             .limit(1)
             .execute(connection)
             .await?;
@@ -9325,6 +9337,9 @@ impl User {
         if let Some(middle_name) = self.middle_name {
             update_row = update_row.set("middle_name", gluesql::core::ast_builder::text(middle_name));
         }
+        if let Some(profile_picture) = self.profile_picture {
+            update_row = update_row.set("profile_picture", gluesql::core::ast_builder::bytea(profile_picture));
+        }
             update_row.execute(connection)
             .await
              .map(|payload| match payload {
@@ -9370,7 +9385,7 @@ impl User {
         use gluesql::core::ast_builder::*;
         let select_row = table("users")
             .select()
-            .project("id, first_name, middle_name, last_name, created_at, updated_at")
+            .project("id, first_name, middle_name, last_name, profile_picture, created_at, updated_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -9398,6 +9413,11 @@ impl User {
             last_name: match row.get("last_name").unwrap() {
                 gluesql::prelude::Value::Str(last_name) => last_name.clone(),
                 _ => unreachable!("Expected Str")
+            },
+            profile_picture: match row.get("profile_picture").unwrap() {
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::Bytea(profile_picture) => Some(profile_picture.clone()),
+                _ => unreachable!("Expected Bytea")
             },
             created_at: match row.get("created_at").unwrap() {
                 gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),

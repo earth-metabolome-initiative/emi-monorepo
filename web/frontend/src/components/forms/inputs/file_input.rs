@@ -38,6 +38,7 @@ where
 {
     pub label: String,
     pub builder: Callback<Vec<Data>>,
+    pub errors: Vec<ApiError>,
     #[prop_or(false)]
     pub optional: bool,
     #[prop_or(false)]

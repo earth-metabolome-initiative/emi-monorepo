@@ -33,7 +33,6 @@ pub enum Table {
     ProjectRequirements,
     ProjectStates,
     Projects,
-    PublicUsers,
     Roles,
     SampleBioOttTaxonItems,
     SampleStates,
@@ -80,7 +79,6 @@ impl AsRef<str> for Table {
             Table::ProjectRequirements => "project_requirements",
             Table::ProjectStates => "project_states",
             Table::Projects => "projects",
-            Table::PublicUsers => "public_users",
             Table::Roles => "roles",
             Table::SampleBioOttTaxonItems => "sample_bio_ott_taxon_items",
             Table::SampleStates => "sample_states",
@@ -139,7 +137,6 @@ impl std::convert::TryFrom<&str> for Table {
             "project_requirements" => Ok(Table::ProjectRequirements),
             "project_states" => Ok(Table::ProjectStates),
             "projects" => Ok(Table::Projects),
-            "public_users" => Ok(Table::PublicUsers),
             "roles" => Ok(Table::Roles),
             "sample_bio_ott_taxon_items" => Ok(Table::SampleBioOttTaxonItems),
             "sample_states" => Ok(Table::SampleStates),
@@ -263,9 +260,6 @@ impl Table {
             Table::Projects => {
                 crate::database::Project::delete_from_id(primary_key.into(), connection).await
             },
-            Table::PublicUsers => {
-                crate::database::PublicUser::delete_from_id(primary_key.into(), connection).await
-            },
             Table::Roles => {
                 crate::database::Role::delete_from_id(primary_key.into(), connection).await
             },
@@ -353,7 +347,6 @@ impl Table {
             Table::ProjectRequirements => crate::database::NestedProjectRequirement::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::ProjectStates => crate::database::NestedProjectState::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::Projects => crate::database::NestedProject::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
-            Table::PublicUsers => crate::database::NestedPublicUser::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::Roles => crate::database::Role::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::SampleBioOttTaxonItems => crate::database::NestedSampleBioOttTaxonItem::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::SampleStates => crate::database::NestedSampleState::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
@@ -415,7 +408,6 @@ impl Table {
             Table::ProjectRequirements => crate::database::NestedProjectRequirement::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::ProjectStates => crate::database::NestedProjectState::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::Projects => crate::database::NestedProject::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
-            Table::PublicUsers => crate::database::NestedPublicUser::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::Roles => crate::database::Role::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::SampleBioOttTaxonItems => crate::database::NestedSampleBioOttTaxonItem::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::SampleStates => crate::database::NestedSampleState::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
@@ -477,7 +469,6 @@ impl Table {
             Table::ProjectRequirements => unimplemented!("Insert not implemented for project_requirements in frontend as it does not have a UUID primary key."),
             Table::ProjectStates => unimplemented!("Insert not implemented for project_states."),
             Table::Projects => unimplemented!("Insert not implemented for projects in frontend as it does not have a UUID primary key."),
-            Table::PublicUsers => unimplemented!("Insert not implemented for public_users."),
             Table::Roles => unimplemented!("Insert not implemented for roles."),
             Table::SampleBioOttTaxonItems => todo!("Insert not implemented for sample_bio_ott_taxon_items."),
             Table::SampleStates => unimplemented!("Insert not implemented for sample_states."),
@@ -596,7 +587,6 @@ impl Table {
                 let nested_row = super::NestedProject::from_flat(updated_row, connection).await?;
                  bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
             },
-            Table::PublicUsers => unimplemented!("Update not implemented for public_users."),
             Table::Roles => unimplemented!("Update not implemented for roles."),
             Table::SampleBioOttTaxonItems => todo!("Update not implemented for sample_bio_ott_taxon_items."),
             Table::SampleStates => unimplemented!("Update not implemented for sample_states."),
@@ -638,7 +628,13 @@ impl Table {
             },
             Table::Units => unimplemented!("Update not implemented for units."),
             Table::UserEmails => unimplemented!("Update not implemented for user_emails."),
-            Table::Users => unimplemented!("Update not implemented for users."),
+            Table::Users => {
+                let update_row: super::UpdateUser = bincode::deserialize::<super::UpdateUser>(&update_row).map_err(crate::api::ApiError::from)?;
+                let id = update_row.id;
+                update_row.update(connection).await?;
+                let updated_row: super::User = super::User::get(id, connection).await?.unwrap();
+                bincode::serialize(&updated_row).map_err(crate::api::ApiError::from)?
+            },
 })
     }
     /// Update or insert a row into the table.
@@ -815,12 +811,6 @@ impl Table {
             Table::Projects => {
                 for row in rows {
                     let row: super::NestedProject = bincode::deserialize::<super::NestedProject>(&row).map_err(crate::api::ApiError::from)?;
-                    row.update_or_insert(connection).await?;
-                }
-            },
-            Table::PublicUsers => {
-                for row in rows {
-                    let row: super::NestedPublicUser = bincode::deserialize::<super::NestedPublicUser>(&row).map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             },

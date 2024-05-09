@@ -3,7 +3,6 @@
 pub mod project_states;
 pub mod sample_states;
 pub mod projects;
-pub mod public_users;
 pub mod sampling_procedures;
 pub mod bio_ott_taxon_items;
 pub mod font_awesome_icons;

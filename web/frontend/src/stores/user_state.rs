@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use web_common::database::NestedPublicUser;
+use web_common::database::User;
 use yewdux::prelude::*;
 
 use super::app_state::AppState;
@@ -8,7 +8,7 @@ use super::app_state::AppState;
 /// The following macro will make sure that the store is saved across sessions.
 #[store(storage = "session", storage_tab_sync)]
 pub struct UserState {
-    user: Option<NestedPublicUser>,
+    user: Option<User>,
 }
 
 impl UserState {
@@ -16,12 +16,12 @@ impl UserState {
         self.user.is_some()
     }
 
-    pub fn user(&self) -> Option<&NestedPublicUser> {
+    pub fn user(&self) -> Option<&User> {
         self.user.as_ref()
     }
 
     /// Set the user to the provided value and returns whether any changes were made.
-    pub fn set_user(&mut self, user: NestedPublicUser) -> bool {
+    pub fn set_user(&mut self, user: User) -> bool {
         if self.user.as_ref() != Some(&user) {
             self.user = Some(user);
             true
@@ -33,7 +33,7 @@ impl UserState {
     pub fn has_incomplete_profile(&self) -> bool {
         self.user
             .as_ref()
-            .map_or(false, |user| user.has_incomplete_profile())
+            .map_or(false, |user| false)
     }
 }
 

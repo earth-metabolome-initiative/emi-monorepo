@@ -89,7 +89,6 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::ProjectRequirements => unimplemented!("Table `project_requirements` does not have a GIN similarity index."),
             web_common::database::Table::ProjectStates => NestedProjectState::similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::Projects => NestedProject::similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::PublicUsers => NestedPublicUser::similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::Roles => unimplemented!("Table `roles` does not have a GIN similarity index."),
             web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Table `sample_bio_ott_taxon_items` does not have a GIN similarity index."),
             web_common::database::Table::SampleStates => NestedSampleState::similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
@@ -135,7 +134,6 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::ProjectRequirements => unimplemented!("Table `project_requirements` does not have a GIN similarity index."),
             web_common::database::Table::ProjectStates => NestedProjectState::word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::Projects => NestedProject::word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::PublicUsers => NestedPublicUser::word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::Roles => unimplemented!("Table `roles` does not have a GIN similarity index."),
             web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Table `sample_bio_ott_taxon_items` does not have a GIN similarity index."),
             web_common::database::Table::SampleStates => NestedSampleState::word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
@@ -181,7 +179,6 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::ProjectRequirements => unimplemented!("Table `project_requirements` does not have a GIN similarity index."),
             web_common::database::Table::ProjectStates => NestedProjectState::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::Projects => NestedProject::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::PublicUsers => NestedPublicUser::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::Roles => unimplemented!("Table `roles` does not have a GIN similarity index."),
             web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Table `sample_bio_ott_taxon_items` does not have a GIN similarity index."),
             web_common::database::Table::SampleStates => NestedSampleState::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
@@ -251,7 +248,6 @@ impl IdentifiableTable for web_common::database::Table {
             web_common::database::Table::ProjectRequirements => bincode::serialize(&NestedProjectRequirement::get(primary_key.into(), connection)?)?,
             web_common::database::Table::ProjectStates => bincode::serialize(&NestedProjectState::get(primary_key.into(), connection)?)?,
             web_common::database::Table::Projects => bincode::serialize(&NestedProject::get(primary_key.into(), connection)?)?,
-            web_common::database::Table::PublicUsers => bincode::serialize(&NestedPublicUser::get(primary_key.into(), connection)?)?,
             web_common::database::Table::Roles => bincode::serialize(&Role::get(primary_key.into(), connection)?)?,
             web_common::database::Table::SampleBioOttTaxonItems => bincode::serialize(&NestedSampleBioOttTaxonItem::get(primary_key.into(), connection)?)?,
             web_common::database::Table::SampleStates => bincode::serialize(&NestedSampleState::get(primary_key.into(), connection)?)?,
@@ -321,7 +317,6 @@ impl DeletableTable for web_common::database::Table {
             web_common::database::Table::ProjectRequirements => ProjectRequirement::delete_by_id(primary_key.into(), connection)?,
             web_common::database::Table::ProjectStates => ProjectState::delete_by_id(primary_key.into(), connection)?,
             web_common::database::Table::Projects => Project::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::PublicUsers => PublicUser::delete_by_id(primary_key.into(), connection)?,
             web_common::database::Table::Roles => Role::delete_by_id(primary_key.into(), connection)?,
             web_common::database::Table::SampleBioOttTaxonItems => SampleBioOttTaxonItem::delete_by_id(primary_key.into(), connection)?,
             web_common::database::Table::SampleStates => SampleState::delete_by_id(primary_key.into(), connection)?,
@@ -394,7 +389,6 @@ impl AllTable for web_common::database::Table {
             web_common::database::Table::ProjectRequirements => NestedProjectRequirement::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::ProjectStates => NestedProjectState::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::Projects => NestedProject::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::PublicUsers => NestedPublicUser::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::Roles => Role::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SampleBioOttTaxonItems => NestedSampleBioOttTaxonItem::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SampleStates => NestedSampleState::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
@@ -497,7 +491,6 @@ impl InsertableTable for web_common::database::Table {
                 let nested_row = crate::nested_models::NestedProject::from_flat(inserted_row, connection)?;
                  bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
             },
-            web_common::database::Table::PublicUsers => unreachable!("Table `public_users` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::Roles => unreachable!("Table `roles` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::SampleBioOttTaxonItems => todo!("Insert not implemented for sample_bio_ott_taxon_items."),
             web_common::database::Table::SampleStates => unreachable!("Table `sample_states` is not insertable as it does not have a known column associated to a creator user id."),
@@ -620,7 +613,6 @@ impl UpdatableTable for web_common::database::Table {
                 let nested_row = crate::nested_models::NestedProject::from_flat(updated_row, connection)?;
                  bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
             },
-            web_common::database::Table::PublicUsers => unreachable!("Table `public_users` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::Roles => unreachable!("Table `roles` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::SampleBioOttTaxonItems => todo!("Update not implemented for sample_bio_ott_taxon_items."),
             web_common::database::Table::SampleStates => unreachable!("Table `sample_states` is not updatable as it does not have a known column associated to an updater user id."),
@@ -654,7 +646,208 @@ impl UpdatableTable for web_common::database::Table {
             },
             web_common::database::Table::Units => unreachable!("Table `units` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::UserEmails => unreachable!("Table `user_emails` is not updatable as it does not have a known column associated to an updater user id."),
-            web_common::database::Table::Users => unreachable!("Table `users` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::Users => {
+                let row: web_common::database::UpdateUser = bincode::deserialize::<web_common::database::UpdateUser>(&row).map_err(web_common::api::ApiError::from)?;
+                let updated_row: crate::models::User = <web_common::database::UpdateUser as UpdateRow>::update(row, user_id, connection)?;
+                 bincode::serialize(&updated_row).map_err(web_common::api::ApiError::from)?
+            },
 })
+    }
+}
+/// Trait providing the from_flat_str method for the Table enum.
+pub trait FromFlatStrTable {
+    /// Convert a JSON serialized row of the flat variant of the table to the richest struct.
+    ///
+    /// # Arguments
+    /// * `row` - The JSON serialized row of the table.
+    /// * `connection` - The database connection.
+    ///
+    /// # Returns
+    /// The bincode-serialized row of the table.
+    fn from_flat_str(
+         &self,
+         row: &str,
+         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+) -> Result<Vec<u8>, web_common::api::ApiError>;
+}
+
+impl FromFlatStrTable for web_common::database::Table {
+
+    fn from_flat_str(
+        &self,
+        row: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<u8>, web_common::api::ApiError> {
+        Ok(match self {
+            web_common::database::Table::BioOttRanks => {
+                let flat_row: crate::models::BioOttRank = serde_json::from_str::<crate::models::BioOttRank>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedBioOttRank::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::BioOttTaxonItems => {
+                let flat_row: crate::models::BioOttTaxonItem = serde_json::from_str::<crate::models::BioOttTaxonItem>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedBioOttTaxonItem::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::Colors => bincode::serialize(&serde_json::from_str::<crate::models::Color>(row).map_err(web_common::api::ApiError::from)?).map_err(web_common::api::ApiError::from)?,
+            web_common::database::Table::ContainerHorizontalRules => {
+                let flat_row: crate::models::ContainerHorizontalRule = serde_json::from_str::<crate::models::ContainerHorizontalRule>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedContainerHorizontalRule::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::ContainerVerticalRules => {
+                let flat_row: crate::models::ContainerVerticalRule = serde_json::from_str::<crate::models::ContainerVerticalRule>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedContainerVerticalRule::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::ContinuousUnits => bincode::serialize(&serde_json::from_str::<crate::models::ContinuousUnit>(row).map_err(web_common::api::ApiError::from)?).map_err(web_common::api::ApiError::from)?,
+            web_common::database::Table::DerivedSamples => {
+                let flat_row: crate::models::DerivedSample = serde_json::from_str::<crate::models::DerivedSample>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedDerivedSample::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::DiscreteUnits => bincode::serialize(&serde_json::from_str::<crate::models::DiscreteUnit>(row).map_err(web_common::api::ApiError::from)?).map_err(web_common::api::ApiError::from)?,
+            web_common::database::Table::DocumentFormats => bincode::serialize(&serde_json::from_str::<crate::models::DocumentFormat>(row).map_err(web_common::api::ApiError::from)?).map_err(web_common::api::ApiError::from)?,
+            web_common::database::Table::Documents => {
+                let flat_row: crate::models::Document = serde_json::from_str::<crate::models::Document>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedDocument::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::FontAwesomeIcons => bincode::serialize(&serde_json::from_str::<crate::models::FontAwesomeIcon>(row).map_err(web_common::api::ApiError::from)?).map_err(web_common::api::ApiError::from)?,
+            web_common::database::Table::ItemCategories => {
+                let flat_row: crate::models::ItemCategory = serde_json::from_str::<crate::models::ItemCategory>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedItemCategory::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::ItemCategoryRelationships => {
+                let flat_row: crate::models::ItemCategoryRelationship = serde_json::from_str::<crate::models::ItemCategoryRelationship>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedItemCategoryRelationship::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::ItemCategoryUnits => {
+                let flat_row: crate::models::ItemCategoryUnit = serde_json::from_str::<crate::models::ItemCategoryUnit>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedItemCategoryUnit::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::ItemLocations => {
+                let flat_row: crate::models::ItemLocation = serde_json::from_str::<crate::models::ItemLocation>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedItemLocation::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::ItemUnits => {
+                let flat_row: crate::models::ItemUnit = serde_json::from_str::<crate::models::ItemUnit>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedItemUnit::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::Items => {
+                let flat_row: crate::models::Item = serde_json::from_str::<crate::models::Item>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedItem::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::Locations => {
+                let flat_row: crate::models::Location = serde_json::from_str::<crate::models::Location>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedLocation::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::LoginProviders => {
+                let flat_row: crate::models::LoginProvider = serde_json::from_str::<crate::models::LoginProvider>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedLoginProvider::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::ManufacturedItemCategories => {
+                let flat_row: crate::models::ManufacturedItemCategory = serde_json::from_str::<crate::models::ManufacturedItemCategory>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedManufacturedItemCategory::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::Notifications => {
+                let flat_row: crate::models::Notification = serde_json::from_str::<crate::models::Notification>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedNotification::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::Organizations => {
+                let flat_row: crate::models::Organization = serde_json::from_str::<crate::models::Organization>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedOrganization::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::PrimaryUserEmails => bincode::serialize(&serde_json::from_str::<crate::models::PrimaryUserEmail>(row).map_err(web_common::api::ApiError::from)?).map_err(web_common::api::ApiError::from)?,
+            web_common::database::Table::Procedures => {
+                let flat_row: crate::models::Procedure = serde_json::from_str::<crate::models::Procedure>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedProcedure::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::ProjectRequirements => {
+                let flat_row: crate::models::ProjectRequirement = serde_json::from_str::<crate::models::ProjectRequirement>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedProjectRequirement::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::ProjectStates => {
+                let flat_row: crate::models::ProjectState = serde_json::from_str::<crate::models::ProjectState>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedProjectState::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::Projects => {
+                let flat_row: crate::models::Project = serde_json::from_str::<crate::models::Project>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedProject::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::Roles => bincode::serialize(&serde_json::from_str::<crate::models::Role>(row).map_err(web_common::api::ApiError::from)?).map_err(web_common::api::ApiError::from)?,
+            web_common::database::Table::SampleBioOttTaxonItems => {
+                let flat_row: crate::models::SampleBioOttTaxonItem = serde_json::from_str::<crate::models::SampleBioOttTaxonItem>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedSampleBioOttTaxonItem::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::SampleStates => {
+                let flat_row: crate::models::SampleState = serde_json::from_str::<crate::models::SampleState>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedSampleState::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::SampledIndividualBioOttTaxonItems => {
+                let flat_row: crate::models::SampledIndividualBioOttTaxonItem = serde_json::from_str::<crate::models::SampledIndividualBioOttTaxonItem>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedSampledIndividualBioOttTaxonItem::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::SampledIndividuals => {
+                let flat_row: crate::models::SampledIndividual = serde_json::from_str::<crate::models::SampledIndividual>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedSampledIndividual::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::Samples => {
+                let flat_row: crate::models::Sample = serde_json::from_str::<crate::models::Sample>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedSample::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::SamplingProcedures => {
+                let flat_row: crate::models::SamplingProcedure = serde_json::from_str::<crate::models::SamplingProcedure>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedSamplingProcedure::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::Spectra => {
+                let flat_row: crate::models::Spectra = serde_json::from_str::<crate::models::Spectra>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedSpectra::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::SpectraCollections => {
+                let flat_row: crate::models::SpectraCollection = serde_json::from_str::<crate::models::SpectraCollection>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedSpectraCollection::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::TeamStates => {
+                let flat_row: crate::models::TeamState = serde_json::from_str::<crate::models::TeamState>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedTeamState::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::Teams => {
+                let flat_row: crate::models::Team = serde_json::from_str::<crate::models::Team>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedTeam::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::Units => bincode::serialize(&serde_json::from_str::<crate::models::Unit>(row).map_err(web_common::api::ApiError::from)?).map_err(web_common::api::ApiError::from)?,
+            web_common::database::Table::UserEmails => {
+                let flat_row: crate::models::UserEmail = serde_json::from_str::<crate::models::UserEmail>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedUserEmail::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::Users => bincode::serialize(&serde_json::from_str::<crate::models::User>(row).map_err(web_common::api::ApiError::from)?).map_err(web_common::api::ApiError::from)?,
+        })
     }
 }

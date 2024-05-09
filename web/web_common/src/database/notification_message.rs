@@ -6,31 +6,22 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 /// Struct representing a notification message.
 pub struct NotificationMessage {
-    notification: Notification,
-    /// The bytes composing the row that was inserted, updated, or deleted.
-    row: Option<Vec<u8>>,
+    pub id: i32,
+    pub operation: String,
+    pub table_name: String,
+    pub record: Vec<u8>,
+    pub read: bool,
 }
 
 impl NotificationMessage {
     /// Create a new notification message.
     pub fn new(notification: Notification, row: Vec<u8>) -> Self {
-        Self { notification, row: Some(row) }
-    }
-
-    pub fn without_row(notification: Notification) -> Self {
-        Self {
-            notification,
-            row: None,
+        Self { 
+            id: notification.id,
+            operation: notification.operation,
+            table_name: notification.table_name,
+            record: row,
+            read: false,
         }
-    }
-
-    /// Get the notification.
-    pub fn notification(&self) -> &Notification {
-        &self.notification
-    }
-
-    /// Get the row.
-    pub fn row(&self) -> Option<&[u8]> {
-        self.row.as_deref()
     }
 }

@@ -65,13 +65,6 @@ def insert_migration(counter: int, name: str):
     # the padded version of the counter. If there is not, we raise an error.
     padded_counter = str(counter).zfill(14)
 
-    if not any(
-        directory.startswith(f"{padded_counter}_")
-        for directory in os.listdir(os.path.join(os.getcwd(), "migrations"))
-    ):
-        print(f"No migration with counter {counter} exists")
-        sys.exit(1)
-
     # We revert all migrations with a counter greater than or equal to the
     # specified counter using diesel.
     print("Reverting migrations")

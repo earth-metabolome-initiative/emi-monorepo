@@ -520,3 +520,64 @@ impl UpdateTeam {
     }
 
 }
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct UpdateUser {
+    pub id: i32,
+    pub first_name: String,
+    pub middle_name: Option<String>,
+    pub last_name: String,
+    pub profile_picture: Option<Vec<u8>>,
+}
+
+#[cfg(feature = "frontend")]
+impl UpdateUser {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::num(self.id),
+            gluesql::core::ast_builder::text(self.first_name),
+            match self.middle_name {
+                Some(middle_name) => gluesql::core::ast_builder::text(middle_name),
+                None => gluesql::core::ast_builder::null(),
+            },
+            gluesql::core::ast_builder::text(self.last_name),
+            match self.profile_picture {
+                Some(profile_picture) => gluesql::core::ast_builder::bytea(profile_picture),
+                None => gluesql::core::ast_builder::null(),
+            },
+        ]
+    }
+
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("users")
+            .update()        
+.set("id", gluesql::core::ast_builder::num(self.id))        
+.set("first_name", gluesql::core::ast_builder::text(self.first_name))        
+.set("last_name", gluesql::core::ast_builder::text(self.last_name));
+        if let Some(middle_name) = self.middle_name {
+            update_row = update_row.set("middle_name", gluesql::core::ast_builder::text(middle_name));
+        }
+        if let Some(profile_picture) = self.profile_picture {
+            update_row = update_row.set("profile_picture", gluesql::core::ast_builder::bytea(profile_picture));
+        }
+            update_row.execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+}

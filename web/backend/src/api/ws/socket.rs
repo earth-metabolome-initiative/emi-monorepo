@@ -4,7 +4,6 @@ use std::mem::swap;
 
 use crate::models::Notification;
 use crate::models::User;
-use crate::nested_models::NestedPublicUser;
 use crate::table_enumeration::*;
 use crate::DBPool;
 use crate::DieselConn;
@@ -15,8 +14,6 @@ use actix::WrapFuture;
 use actix::{Actor, StreamHandler};
 use actix_web::web::Bytes;
 use actix_web_actors::ws;
-use serde::Deserialize;
-use serde::Serialize;
 use sqlx::postgres::PgListener;
 use sqlx::{Pool as SQLxPool, Postgres};
 use web_common::api::oauth::jwt_cookies::AccessToken;
@@ -24,15 +21,6 @@ use web_common::api::ws::messages::{BackendMessage, FrontendMessage};
 use web_common::api::ApiError;
 use web_common::database::NotificationMessage;
 use web_common::database::Table;
-
-#[derive(Debug, Deserialize, Serialize)]
-struct NotificationRecord {
-    /// The notification's metadata.
-    notification: Notification,
-    /// The unserialized record, which we cannot de-serialize
-    /// a priori before deserializing the notification above.
-    record: String,
-}
 
 pub struct WebSocket {
     notifications_handler: Option<SpawnHandle>,
@@ -111,51 +99,19 @@ impl WebSocket {
                                 {
                                     let notification_payload: String =
                                         postgres_notification.payload().to_owned();
-                                    let payload: NotificationRecord =
+                                    let notification: Notification =
                                         serde_json::from_str(&notification_payload).unwrap();
 
-                                    let table: Table = payload
-                                        .notification
-                                        .table_name
-                                        .as_str()
-                                        .try_into()
-                                        .unwrap();
+                                    let table: Table =
+                                        notification.table_name.as_str().try_into().unwrap();
 
-                                    let serialized_record: Vec<u8> = match table {
-                                        Table::Users => {
-                                            let record: User =
-                                                serde_json::from_str(&payload.record)
-                                                    .expect("Error deserializing User");
-                                            bincode::serialize(
-                                                &NestedPublicUser::get(
-                                                    record.id,
-                                                    &mut diesel_connection,
-                                                )
-                                                .unwrap(),
-                                            )
-                                            .unwrap()
-                                        }
-                                        Table::Projects => {
-                                            let flat_struct: crate::models::Project =
-                                                serde_json::from_str(&payload.record)
-                                                    .expect("Error deserializing Project");
-                                            let frontend_variant: web_common::database::NestedProject = crate::nested_models::NestedProject::from_flat(
-                                                flat_struct,
-                                                &mut diesel_connection,
-                                            ).unwrap().into();
-                                            bincode::serialize(
-                                                &frontend_variant,
-                                            )
-                                            .unwrap()
-                                        }
-                                        _ => {
-                                            unimplemented!("Table not implemented: {:?}", table)
-                                        }
-                                    };
+                                    let serialized_record: Vec<u8> = table
+                                        .from_flat_str(&notification.record, &mut diesel_connection)
+                                        .unwrap();
 
                                     address.do_send(BackendMessage::Notification(
                                         NotificationMessage::new(
-                                            payload.notification.into(),
+                                            notification.into(),
                                             serialized_record,
                                         ),
                                     ));
@@ -176,17 +132,9 @@ impl Actor for WebSocket {
     fn started(&mut self, ctx: &mut Self::Context) {
         self.listen_for_notifications(ctx);
         if self.is_authenticated() {
-            log::info!("Sending refresh token message");
-            match NestedPublicUser::get(self.user().unwrap().id, &mut self.diesel_connection) {
-                Ok(user) => {
-                    ctx.address()
-                        .do_send(BackendMessage::RefreshUser(user.into()));
-                }
-                Err(err) => {
-                    log::error!("Error getting user: {:?}", err);
-                    ctx.close(Some(ws::CloseCode::Error.into()));
-                }
-            }
+            ctx.address().do_send(BackendMessage::RefreshUser(
+                self.user().unwrap().clone().into(),
+            ));
         }
     }
 }

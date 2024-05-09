@@ -2615,6 +2615,7 @@ pub struct Notification {
     pub user_id: i32,
     pub operation: String,
     pub table_name: String,
+    pub record: String,
     pub read: bool,
 }
 
@@ -2625,6 +2626,7 @@ impl From<Notification> for web_common::database::tables::Notification {
             user_id: item.user_id,
             operation: item.operation,
             table_name: item.table_name,
+            record: item.record,
             read: item.read,
         }
     }
@@ -2637,6 +2639,7 @@ impl From<web_common::database::tables::Notification> for Notification {
             user_id: item.user_id,
             operation: item.operation,
             table_name: item.table_name,
+            record: item.record,
             read: item.read,
         }
     }
@@ -5332,6 +5335,7 @@ pub struct User {
     pub first_name: String,
     pub middle_name: Option<String>,
     pub last_name: String,
+    pub profile_picture: Option<Vec<u8>>,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }
@@ -5343,6 +5347,7 @@ impl From<User> for web_common::database::tables::User {
             first_name: item.first_name,
             middle_name: item.middle_name,
             last_name: item.last_name,
+            profile_picture: item.profile_picture,
             created_at: item.created_at,
             updated_at: item.updated_at,
         }
@@ -5356,6 +5361,7 @@ impl From<web_common::database::tables::User> for User {
             first_name: item.first_name,
             middle_name: item.middle_name,
             last_name: item.last_name,
+            profile_picture: item.profile_picture,
             created_at: item.created_at,
             updated_at: item.updated_at,
         }
@@ -5441,7 +5447,7 @@ impl User {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, first_name, middle_name, last_name, created_at, updated_at FROM users ",
+            "SELECT id, first_name, middle_name, last_name, profile_picture, created_at, updated_at FROM users ",
             "WHERE $1 % f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text) ",
             "ORDER BY similarity($1, f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text)) DESC LIMIT $2",
         );
@@ -5470,7 +5476,7 @@ impl User {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, first_name, middle_name, last_name, created_at, updated_at FROM users ",
+            "SELECT id, first_name, middle_name, last_name, profile_picture, created_at, updated_at FROM users ",
             "WHERE $1 <% f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text) ",
             "ORDER BY word_similarity($1, f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text)) DESC LIMIT $2",
         );
@@ -5499,7 +5505,7 @@ impl User {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, first_name, middle_name, last_name, created_at, updated_at FROM users ",
+            "SELECT id, first_name, middle_name, last_name, profile_picture, created_at, updated_at FROM users ",
             "WHERE $1 <<% f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text) ",
             "ORDER BY strict_word_similarity($1, f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text)) DESC LIMIT $2",
         );

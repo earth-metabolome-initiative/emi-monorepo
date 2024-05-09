@@ -1,6 +1,6 @@
 //! Page of the user profile, allowing the user to edit their profile.
 
-use crate::components::forms::profile::CompleteProfileForm;
+use crate::components::forms::automatic_forms::UpdateUserForm;
 use yew::prelude::*;
 
 #[function_component(Profile)]
@@ -10,7 +10,7 @@ pub fn profile() -> Html {
     html! {
         <div class="profile">
             <h2>{ "Profile" }</h2>
-            <CompleteProfileForm />
+            <UpdateUserForm id=0 />
         </div>
     }
 }

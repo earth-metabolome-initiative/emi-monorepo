@@ -238,6 +238,7 @@ diesel::table! {
         operation -> Varchar,
         #[max_length = 255]
         table_name -> Varchar,
+        record -> Text,
         read -> Bool,
     }
 }
@@ -456,6 +457,7 @@ diesel::table! {
         first_name -> Varchar,
         middle_name -> Nullable<Varchar>,
         last_name -> Varchar,
+        profile_picture -> Nullable<Bytea>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }

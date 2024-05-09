@@ -5,7 +5,7 @@ use futures::{SinkExt, StreamExt};
 use gloo::timers::callback::Timeout;
 use gloo_net::websocket::futures::WebSocket;
 use gluesql::prelude::*;
-use web_common::database::NestedPublicUser;
+use web_common::database::User;
 // use sql_minifier::macros::load_sql;
 use serde::Deserialize;
 use serde::Serialize;
@@ -33,7 +33,7 @@ type DatabaseMessage = (Uuid, Option<UserId>, Operation);
 pub struct WebsocketWorker {
     subscribers: HashSet<HandlerId>,
     tasks: HashMap<Uuid, HandlerId>,
-    user: Option<NestedPublicUser>,
+    user: Option<User>,
     database_sender: futures::channel::mpsc::Sender<DatabaseMessage>,
     websocket_sender: Option<futures::channel::mpsc::Sender<FrontendMessage>>,
     reconnection_attempt: u32,
@@ -63,7 +63,7 @@ pub enum WebsocketMessage {
     AllTable(Vec<Vec<u8>>),
     Completed,
     Error(ApiError),
-    RefreshUser(NestedPublicUser),
+    RefreshUser(User),
 }
 
 pub enum InternalMessage {
@@ -91,15 +91,7 @@ impl WebsocketWorker {
                     Operation::Delete(table_name, primary_key) => {
                         let table: Table = table_name.try_into().unwrap();
                         match table.delete(primary_key, &mut database).await {
-                            Ok(row) => BackendMessage::Notification(
-                                NotificationMessage::without_row(Notification {
-                                    id: 0,
-                                    user_id: user_id.unwrap(),
-                                    operation: "DELETE".to_string(),
-                                    table_name: table.to_string(),
-                                    read: false,
-                                }),
-                            ),
+                            Ok(row) => {todo!()},
                             Err(err) => BackendMessage::Error(task_id, ApiError::from(err)),
                         }
                     }
@@ -109,16 +101,7 @@ impl WebsocketWorker {
                             .insert(serialized_row, user_id.unwrap(), &mut database)
                             .await
                         {
-                            Ok(row) => BackendMessage::Notification(NotificationMessage::new(
-                                Notification {
-                                    id: 0,
-                                    user_id: user_id.unwrap(),
-                                    operation: "INSERT".to_string(),
-                                    table_name: table.to_string(),
-                                    read: false,
-                                },
-                                row,
-                            )),
+                            Ok(row) => {todo!()},
                             Err(err) => BackendMessage::Error(task_id, ApiError::from(err)),
                         }
                     }
@@ -178,16 +161,9 @@ impl WebsocketWorker {
                             .update(serialized_row, user_id.unwrap(), &mut database)
                             .await
                         {
-                            Ok(row) => BackendMessage::Notification(NotificationMessage::new(
-                                Notification {
-                                    id: 0,
-                                    user_id: user_id.unwrap(),
-                                    operation: "UPDATE".to_string(),
-                                    table_name: table.to_string(),
-                                    read: false,
-                                },
-                                row,
-                            )),
+                            Ok(row) => {
+                                todo!()
+                            },
                             Err(err) => BackendMessage::Error(task_id, ApiError::from(err)),
                         }
                     }
@@ -361,7 +337,7 @@ impl Worker for WebsocketWorker {
                             self.database_sender
                                 .try_send((
                                     task_id,
-                                    self.user.as_ref().map(|user| user.inner.id),
+                                    self.user.as_ref().map(|user| user.id),
                                     operation,
                                 ))
                                 .unwrap();

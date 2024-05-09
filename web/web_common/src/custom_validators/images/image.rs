@@ -20,6 +20,12 @@ pub struct Image {
     data: Vec<u8>,
 }
 
+impl Into<Vec<u8>> for Image {
+    fn into(self) -> Vec<u8> {
+        self.data
+    }
+}
+
 #[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
 pub enum ImageSize {
     #[serde(rename = "thumbnail")]

@@ -329,6 +329,44 @@ impl UpdateRow for web_common::database::UpdateTeam {
     }
 }
 
+/// Intermediate representation of the update variant UpdateUser.
+#[derive(AsChangeset)]
+#[diesel(table_name = users)]
+pub(super) struct IntermediateUpdateUser {
+    first_name: String,
+    middle_name: Option<String>,
+    last_name: String,
+    profile_picture: Option<Vec<u8>>,
+}
+
+impl UpdateRow for web_common::database::UpdateUser {
+    type Intermediate = IntermediateUpdateUser;
+    type Flat = User;
+
+    fn to_intermediate(self, _user_id: i32) -> Self::Intermediate {
+        IntermediateUpdateUser {
+            first_name: self.first_name,
+            middle_name: self.middle_name,
+            last_name: self.last_name,
+            profile_picture: self.profile_picture,
+        }
+    }
+
+    fn update(
+        self,
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::users;
+        diesel::update(users::dsl::users)
+            .filter(
+                users::dsl::id.eq(self.id)
+            )
+            .set(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
 /// Intermediate representation of the update variant NewSampledIndividual.
 #[derive(AsChangeset)]
 #[diesel(table_name = sampled_individuals)]

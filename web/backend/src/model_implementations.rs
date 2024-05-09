@@ -210,16 +210,16 @@ impl User {
         // })
     }
 
-    pub fn thumbnail_path(&self) -> String {
-        web_common::database::views::PublicUser::profile_picture_path(
-            self.id,
-            &ImageSize::Thumbnail,
-        )
-    }
+    // pub fn thumbnail_path(&self) -> String {
+    //     web_common::database::views::PublicUser::profile_picture_path(
+    //         self.id,
+    //         &ImageSize::Thumbnail,
+    //     )
+    // }
 
-    pub fn standard_profile_picture_path(&self) -> String {
-        web_common::database::views::PublicUser::profile_picture_path(self.id, &ImageSize::Standard)
-    }
+    // pub fn standard_profile_picture_path(&self) -> String {
+    //     web_common::database::views::PublicUser::profile_picture_path(self.id, &ImageSize::Standard)
+    // }
 
     // Method to update a user's name.
     //

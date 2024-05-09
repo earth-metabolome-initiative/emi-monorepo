@@ -1,10 +1,10 @@
 -- Your SQL goes here
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY,
     first_name VARCHAR NOT NULL DEFAULT '',
     middle_name VARCHAR,
     last_name VARCHAR NOT NULL DEFAULT '',
+    profile_picture BYTEA,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

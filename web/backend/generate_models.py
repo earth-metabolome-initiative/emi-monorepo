@@ -105,6 +105,7 @@ GLUESQL_TYPES_MAPPING = {
     "bool": "({}.into())",
     "NaiveDateTime": "gluesql::core::ast_builder::timestamp({}.to_string())",
     "DateTime<Utc>": "gluesql::core::ast_builder::timestamp({}.to_string())",
+    "Vec<u8>": "gluesql::core::ast_builder::bytea({})",
 }
 
 INPUT_TYPE_MAP = {
@@ -326,6 +327,7 @@ class AttributeMetadata:
                 "Uuid",
                 "String",
                 "Vec<ApiError>",
+                "Vec<u8>",
                 "ApiError",
                 "NaiveDateTime",
             ]
@@ -365,9 +367,7 @@ class TableStructMetadata:
         A table is updatable if the associated struct has at least a
         field containing the updater user ID.
         """
-        return any(
-            attribute.is_updater_user_id() for attribute in self.flat_struct.attributes
-        )
+        return self.flat_struct.is_updatable()
 
     def is_insertable(self) -> bool:
         """Returns whether the table is insertable.
@@ -377,9 +377,7 @@ class TableStructMetadata:
         A table is insertable if the associated struct has at least a
         field containing the creator user ID.
         """
-        return any(
-            attribute.is_creator_user_id() for attribute in self.flat_struct.attributes
-        )
+        return self.flat_struct.is_insertable()
 
     def has_uuid_primary_key(self) -> bool:
         """Returns whether the table has a UUID primary key.
@@ -461,6 +459,13 @@ class TableStructMetadata:
             )
         self.flat_struct = struct
 
+    def get_flat_struct(self) -> "StructMetadata":
+        if self.flat_struct is None:
+            raise ValueError(
+                f"The flat struct has not been set for the table {self.name}."
+            )
+        return self.flat_struct
+
     def flat_struct_name(self) -> str:
         return self.flat_struct.name
 
@@ -513,7 +518,9 @@ class StructMetadata:
         """
         if self._flat_variant is not None:
             return self._flat_variant.is_updatable()
-        return any(attribute.is_updater_user_id() for attribute in self.attributes)
+        return any(attribute.is_updater_user_id() for attribute in self.attributes) or (
+            self.table_name == "users"
+        )
 
     def is_insertable(self) -> bool:
         """Returns whether the struct is insertable.
@@ -604,7 +611,7 @@ class StructMetadata:
         self._update_variant = struct
 
     def get_update_variant(self) -> "StructMetadata":
-        if self.get_new_variant().is_update_variant():
+        if self._new_variant is not None and self.get_new_variant().is_update_variant():
             return self.get_new_variant()
 
         if not self.is_updatable():
@@ -1284,7 +1291,7 @@ def write_update_method_for_gluesql(
 ):
     """Write the `update` method for the struct in the GlueSQL database."""
 
-    if struct.is_update_variant():
+    if struct.is_update_variant() and struct.table_name != "users":
         updator_user_id_attribute: AttributeMetadata = (
             struct.get_updator_user_id_attribute()
         )
@@ -1734,18 +1741,17 @@ def write_web_common_structs(
             "f64": "F64",
             "String": "Str",
             "NaiveDateTime": "Timestamp",
+            "Vec<u8>": "Bytea",
         }
 
         for attribute in struct.attributes:
             if attribute.format_data_type() == "Uuid":
                 tables.write(
                     f'            {attribute.name}: match row.get("{attribute.name}").unwrap() {{\n'
-                )
-                tables.write(
                     f"                gluesql::prelude::Value::Uuid({attribute.name}) => Uuid::from_u128(*{attribute.name}),\n"
+                    '                _ => unreachable!("Expected Uuid"),\n'
+                    "            },\n"
                 )
-                tables.write('                _ => unreachable!("Expected Uuid"),\n')
-                tables.write("            },\n")
             elif attribute.format_data_type() == "Option<Uuid>":
                 tables.write(
                     f'            {attribute.name}: match row.get("{attribute.name}").unwrap() {{\n'
@@ -2667,7 +2673,11 @@ def write_webcommons_table_names_enumeration(
     # when it is available.
     for struct in new_model_structs:
         assert struct.table_name in tables, f"Table {struct.table_name} not found."
-        assert struct.is_new_variant()
+        assert struct.is_new_variant(), (
+            f"Struct {struct.name} is not a new variant. "
+            f"Expected a new variant for table {struct.table_name}. "
+            f"Its flat variant is {struct.get_flat_variant().name}."
+        )
         tables[struct.table_name].set_new_flat_struct(struct)
         struct.set_richest_variant(tables[struct.table_name].get_richest_struct())
 
@@ -2974,7 +2984,15 @@ def write_webcommons_table_names_enumeration(
             f"            Table::{table.camel_cased()} => {{\n"
             f"                let update_row: super::{table.update_flat_struct_name()} = bincode::deserialize::<super::{table.update_flat_struct_name()}>(&update_row).map_err(crate::api::ApiError::from)?;\n"
             f"                let {primary_key_name} = update_row.{primary_key_name};\n"
-            f"                update_row.update(user_id, connection).await?;\n"
+            f"                update_row.update("
+        )
+
+        if table.name != "users":
+            document.write("user_id, ")
+
+        document.write("connection).await?;\n")
+
+        document.write(
             f"                let updated_row: super::{table.flat_struct_name()} = super::{table.flat_struct_name()}::get({primary_key_name}, connection).await?.unwrap();\n"
         )
 
@@ -3435,6 +3453,63 @@ def write_diesel_table_names_enumeration(
 
     document.write("}\n")
 
+    # Next, we define a trait providing the from_flat_str method for the Table enum. The method receives
+    # a &str containing the json serialized row of the flat variant of the table and a connection to the
+    # database. The method returns a Result, where the Ok variant is the bincode-serialized version of the
+    # richest struct of the table variant, associated with the newly inserted row, while the Err variant
+    # contains an ApiError. The from_flat_str method is available for all tables. Where the table does not
+    # have a richer variant than the flat one, the flat one is deserialized from json and reserialized to
+    # bincode. This method is primarily used in the context of notifications.
+
+    document.write(
+        "/// Trait providing the from_flat_str method for the Table enum.\n"
+        "pub trait FromFlatStrTable {\n"
+        "    /// Convert a JSON serialized row of the flat variant of the table to the richest struct.\n"
+        "    ///\n"
+        "    /// # Arguments\n"
+        "    /// * `row` - The JSON serialized row of the table.\n"
+        "    /// * `connection` - The database connection.\n"
+        "    ///\n"
+        "    /// # Returns\n"
+        "    /// The bincode-serialized row of the table.\n"
+        "    fn from_flat_str(\n"
+        "         &self,\n"
+        "         row: &str,\n"
+        "         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+        ") -> Result<Vec<u8>, web_common::api::ApiError>;\n"
+        "}\n\n"
+    )
+
+    document.write(
+        "impl FromFlatStrTable for web_common::database::Table {\n\n"
+        "    fn from_flat_str(\n"
+        "        &self,\n"
+        "        row: &str,\n"
+        "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+        "    ) -> Result<Vec<u8>, web_common::api::ApiError> {\n"
+        "        Ok(match self {\n"
+    )
+
+    for table in tables:
+        flat_variant = table.get_flat_struct()
+        richest_variant = table.get_richest_struct()
+
+        if not richest_variant.is_nested():
+            document.write(
+                f"            web_common::database::Table::{table.camel_cased()} => bincode::serialize(&serde_json::from_str::<crate::models::{table.flat_struct_name()}>(row).map_err(web_common::api::ApiError::from)?).map_err(web_common::api::ApiError::from)?,\n"
+            )
+            continue
+
+        document.write(
+            f"            web_common::database::Table::{table.camel_cased()} => {{\n"
+            f"                let flat_row: crate::models::{flat_variant.name} = serde_json::from_str::<crate::models::{flat_variant.name}>(row).map_err(web_common::api::ApiError::from)?;\n"
+            f"                let richest_row = crate::nested_models::{richest_variant.name}::from_flat(flat_row, connection)?;\n"
+            "                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?\n"
+            "            },\n"
+        )
+
+    document.write("        })\n" "    }\n" "}\n")
+
     document.flush()
     document.close()
 
@@ -3677,15 +3752,9 @@ def derive_model_builders(
                     builder.set_update_variant(struct)
                     break
 
-            if not found:
-                raise Exception(
-                    f"Update variant {struct.name} does not have a corresponding builder, "
-                    "which should have been created when deriving the new variant's builder."
-                )
+            if found:
+                continue
 
-            continue
-
-        assert struct.is_new_variant()
         flat_variant = struct.get_flat_variant()
         richest_variant = struct.get_richest_variant()
 
@@ -3696,7 +3765,12 @@ def derive_model_builders(
 
         builder.set_flat_variant(flat_variant)
         builder.set_richest_variant(richest_variant)
-        builder.set_new_variant(struct)
+
+        if struct.is_new_variant():
+            builder.set_new_variant(struct)
+
+        if struct.is_update_variant():
+            builder.set_update_variant(struct)
 
         builder.add_derive("Store")
         for derive in richest_variant.derives():
@@ -3782,6 +3856,14 @@ def derive_model_builders(
         )
 
         builders.append(builder)
+
+    # We run a simple self-consistency check to ensure that the
+    # builders have been correctly derived.
+    for builder, struct in zip(builders, new_or_update_struct_metadatas):
+        if struct.is_new_variant():
+            assert builder.get_new_variant() is not None
+        if struct.is_update_variant():
+            assert builder.get_update_variant() is not None
 
     return builders
 
@@ -4004,9 +4086,16 @@ def write_web_common_update_structs(
         # First thing, we determine the name of the attribute that contains the user id. This is not directly
         # an attribute of the new variant, as it is not set by the user, but it is available as part of the
         # associated flat variant.
-        updator_user_id_attribute: AttributeMetadata = (
-            struct.get_updator_user_id_attribute()
-        )
+
+        attributes = struct.attributes
+
+        if struct.table_name != "users":
+            updator_user_id_attribute: AttributeMetadata = (
+                struct.get_updator_user_id_attribute()
+            )
+            attributes = [updator_user_id_attribute] + attributes
+        else:
+            updator_user_id_attribute = None
 
         primary_key_name, primary_key_type = (
             table_metadatas.get_primary_key_name_and_type(struct.table_name)
@@ -4016,17 +4105,23 @@ def write_web_common_update_structs(
 
         document.write(f'#[cfg(feature = "frontend")]\n' f"impl {struct.name} {{\n")
 
-        document.write(
-            f"    pub fn into_row(self, {updator_user_id_attribute.name}: {updator_user_id_attribute.format_data_type()}) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {{\n"
-        )
+        if struct.table_name != "users":
+            document.write(
+                f"    pub fn into_row(self, {updator_user_id_attribute.name}: {updator_user_id_attribute.format_data_type()}) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {{\n"
+            )
+        else:
+            document.write(
+                "    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {\n"
+            )
 
         document.write("        vec![\n")
-        for attribute in [updator_user_id_attribute] + struct.attributes:
 
-            if attribute.name == updator_user_id_attribute.name:
-                self_attribute_name = attribute.name
-            else:
+        for attribute in attributes:
+
+            if struct.get_attribute_by_name(attribute.name) is not None:
                 self_attribute_name = f"self.{attribute.name}"
+            else:
+                self_attribute_name = attribute.name
 
             if attribute.optional:
                 if attribute.data_type() in GLUESQL_TYPES_MAPPING:
@@ -4322,17 +4417,20 @@ def write_diesel_update_structs(
             f"It is associated to the table {struct.table_name}."
         )
 
-        updator_user_id_attribute: AttributeMetadata = (
-            struct.get_updator_user_id_attribute()
-        )
+        if struct.table_name == "users":
+            updator_user_id_attribute = None
+        else:
+            updator_user_id_attribute: AttributeMetadata = (
+                struct.get_updator_user_id_attribute()
+            )
 
-        assert not updator_user_id_attribute.optional, (
-            f"The attribute {updator_user_id_attribute.name} of the struct {struct.name} "
-            "is optional, but it should not be. Most likely, you forgot to add NOT NULL "
-            f"to the attribute in the database im the table {struct.table_name}."
-        )
+            assert not updator_user_id_attribute.optional, (
+                f"The attribute {updator_user_id_attribute.name} of the struct {struct.name} "
+                "is optional, but it should not be. Most likely, you forgot to add NOT NULL "
+                f"to the attribute in the database im the table {struct.table_name}."
+            )
 
-        assert not isinstance(updator_user_id_attribute, StructMetadata)
+            assert not isinstance(updator_user_id_attribute, StructMetadata)
 
         intermediate_struct_name = f"Intermediate{struct.name}"
 
@@ -4348,9 +4446,10 @@ def write_diesel_update_structs(
             f"pub(super) struct {intermediate_struct_name} {{\n"
         )
 
-        all_attributes: List[AttributeMetadata] = [
-            updator_user_id_attribute
-        ] + struct.attributes
+        all_attributes: List[AttributeMetadata] = struct.attributes
+
+        if struct.table_name != "users":
+            all_attributes = [updator_user_id_attribute] + all_attributes
 
         for attribute in all_attributes:
             if attribute.name == primary_key_name:
@@ -4364,19 +4463,26 @@ def write_diesel_update_structs(
             f"impl UpdateRow for web_common::database::{struct.name} {{\n"
             f"    type Intermediate = {intermediate_struct_name};\n"
             f"    type Flat = {struct.get_flat_variant().name};\n\n"
-            f"    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {{\n"
-            f"        {intermediate_struct_name} {{\n"
         )
+        if struct.table_name != "users":
+            document.write(
+                "    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {\n"
+            )
+        else:
+            document.write(
+                "    fn to_intermediate(self, _user_id: i32) -> Self::Intermediate {\n"
+            )
+        document.write(f"        {intermediate_struct_name} {{\n")
 
         for attribute in all_attributes:
             if attribute.name == primary_key_name:
                 continue
-            if attribute.name == updator_user_id_attribute.name:
-                document.write(f"            {attribute.name}: user_id,\n")
-            else:
+            if struct.get_attribute_by_name(attribute.name) is not None:
                 document.write(
                     f"            {attribute.name}: self.{attribute.name},\n"
                 )
+            else:
+                document.write(f"            {attribute.name}: user_id,\n")
 
         document.write("        }\n    }\n\n")
 
@@ -4682,12 +4788,16 @@ def write_frontend_form_builder_implementation(
 
     document.write("}\n\n")
 
-    new_variant = builder.get_new_variant()
-    variants = [new_variant]
+    variants = []
+
+    flat_struct = builder.get_flat_variant()
+
+    if flat_struct.is_insertable():
+        variants.append(builder.get_new_variant())
 
     # If the new variant is not also used as an update
     # variant, we add it to the list of variants.
-    if not new_variant.is_update_variant():
+    if flat_struct.is_updatable() and not flat_struct.is_insertable():
         variants.append(builder.get_update_variant())
 
     for variant in variants:
@@ -5298,16 +5408,16 @@ def write_frontend_yew_form(
     )
 
     flat_struct = builder.get_flat_variant()
-    new_variant = builder.get_new_variant()
-    update_variant = builder.get_update_variant()
-
     primary_key_attribute = flat_struct.get_attribute_by_name(primary_key_name)
     assert primary_key_attribute is not None
 
-    variants = [
-        (new_variant, "POST"),
-        (update_variant, "PUT"),
-    ]
+    variants = []
+
+    if flat_struct.is_insertable():
+        variants.append((builder.get_new_variant(), "POST"))
+
+    if flat_struct.is_updatable() and not flat_struct.is_insertable():
+        variants.append((builder.get_update_variant(), "PUT"))
 
     for variant, method in variants:
 
@@ -5374,8 +5484,17 @@ def write_frontend_yew_form(
                 or attribute.data_type() == "NaiveDateTime"
             ):
                 document.write(
-                    f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: Option<String>| {flat_struct.name}Actions::Set{attribute.capitalized_name()}({attribute.name}));"
+                    f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: Option<String>| {flat_struct.name}Actions::Set{attribute.capitalized_name()}({attribute.name}));\n"
                 )
+            elif attribute.data_type() == "Vec<u8>":
+                if "picture" in attribute.name:
+                    document.write(
+                        f"    let set_{attribute.name} = builder_dispatch.apply_callback(|mut {attribute.name}: Vec<Image>| {flat_struct.name}Actions::Set{attribute.capitalized_name()}({attribute.name}.pop().map(|{attribute.name}| {attribute.name}.into())));\n"
+                    )
+                else:
+                    raise Exception(
+                        f"Attribute {attribute.name} of type {attribute.data_type()} not supported in the frontend form generation."
+                    )
             else:
                 document.write(
                     f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: {attribute.format_data_type()}| {flat_struct.name}Actions::Set{attribute.capitalized_name()}({attribute.name}));\n"
@@ -5419,6 +5538,20 @@ def write_frontend_yew_form(
                 document.write(
                     f'            <Checkbox label="{attribute.capitalized_name()}" errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} value={{builder_store.{attribute.name}.unwrap_or(false)}} />\n'
                 )
+                continue
+
+            if attribute.data_type() == "Vec<u8>":
+                if "picture" in attribute.name:
+                    allowed_formats = ["GenericFileFormat::Image"]
+
+                    document.write(
+                        f'            <FileInput<Image> label="{attribute.capitalized_name()}" errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} allowed_formats={{vec![{", ".join(allowed_formats)}]}} />\n'
+                    )
+                else:
+                    raise Exception(
+                        f"Attribute {attribute.name} of type {attribute.data_type()} not supported in the frontend form generation."
+                    )
+
                 continue
 
             # If the attribute is a nested struct, we need to generate a Datalist
@@ -5475,13 +5608,14 @@ def write_frontend_form_buildable_implementation(
         word.capitalize() for word in builder.table_name.split("_")
     )
 
-    new_variant = builder.get_new_variant()
+    flat_struct = builder.get_flat_variant()
 
-    variants = [
-        new_variant,
-    ]
+    variants = []
 
-    if not new_variant.is_update_variant():
+    if flat_struct.is_insertable():
+        variants.append(builder.get_new_variant())
+
+    if flat_struct.is_updatable() and not flat_struct.is_insertable():
         variants.append(builder.get_update_variant())
 
     for variant in variants:
@@ -5543,8 +5677,9 @@ def write_frontend_forms(
         "use uuid::Uuid;",
         "use std::ops::Deref;",
         "use chrono::NaiveDateTime;",
-        "use chrono::NaiveDate;",
         "use web_common::api::ApiError;",
+        "use web_common::custom_validators::Image;",
+        "use web_common::file_formats::GenericFileFormat;"
     ]
 
     for import_statement in imports:
@@ -5723,6 +5858,7 @@ def enforce_migration_naming_convention():
     # {number_of_migration}_create_{table_name}_sequential_index
     # {number_of_migration}_create_{table_name}_notification_trigger
     # {number_of_migration}_create_{table_name}_updated_at_trigger
+    # {number_of_migration}_enable_{extension_name}_extension
 
     # We iterate over the migrations and check that the naming convention is respected.
     for migration in migrations:
@@ -5747,6 +5883,8 @@ def enforce_migration_naming_convention():
                 and migration_name.endswith("_notification_trigger"),
                 migration_name.startswith("create_")
                 and migration_name.endswith("_updated_at_trigger"),
+                migration_name.startswith("enable_")
+                and migration_name.endswith("_extension"),
             ]
         ):
             raise Exception(

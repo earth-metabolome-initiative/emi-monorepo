@@ -96,15 +96,6 @@ impl Searchable for NestedTeam {
         )
     }
 }
-impl Searchable for NestedPublicUser {
-    fn search_task(query: String, limit: u32) -> super::Select {
-        super::Select::search(
-             Table::PublicUsers,
-              query,
-              limit,
-        )
-    }
-}
 impl Searchable for BioOttRank {
     fn search_task(query: String, limit: u32) -> super::Select {
         super::Select::search(
@@ -235,15 +226,6 @@ impl Searchable for User {
     fn search_task(query: String, limit: u32) -> super::Select {
         super::Select::search(
              Table::Users,
-              query,
-              limit,
-        )
-    }
-}
-impl Searchable for PublicUser {
-    fn search_task(query: String, limit: u32) -> super::Select {
-        super::Select::search(
-             Table::PublicUsers,
               query,
               limit,
         )

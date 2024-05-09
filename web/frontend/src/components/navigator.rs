@@ -24,7 +24,7 @@ use crate::stores::app_state::AppState;
 use crate::stores::user_state::UserState;
 use crate::workers::ws_worker::WebsocketMessage;
 
-use web_common::database::NestedPublicUser;
+use web_common::database::User;
 use yew::prelude::*;
 use yew_agent::scope_ext::AgentScopeExt;
 use yew_router::prelude::*;
@@ -50,7 +50,7 @@ impl Navigator {
         self.app_state.sidebar_open()
     }
 
-    fn user(&self) -> Option<&NestedPublicUser> {
+    fn user(&self) -> Option<&User> {
         self.user_state.user()
     }
 }
@@ -152,23 +152,24 @@ impl Component for Navigator {
                     </h1>
                     <SearchBar />
                     if let Some(user) = self.user() {
-                        if user.has_complete_profile() {
-                            <div class="user">
-                                if let Some(thumbnail) = &user.thumbnail {
-                                    <img src={thumbnail.inner.path.clone()} alt={format!("{}'s avatar", user.inner.full_name())} />
-                                }
-                                <span>{user.inner.full_name()}</span>
-                                // {if store.is_offline() {
-                                //     html! {
-                                //         <span class="badge offline">{"Offline"}</span>
-                                //     }
-                                // } else {
-                                //     html! {}
-                                // }}
-                            </div>
-                        } else {
-                            <Link<AppRoute> classes="right_nav_button" to={AppRoute::Home}>{"Complete profile"}</Link<AppRoute>>
-                        }
+                        // if user.has_complete_profile() {
+                        //     <div class="user">
+                        //         if let Some(thumbnail) = &user.thumbnail {
+                        //             <img src={thumbnail.inner.path.clone()} alt={format!("{}'s avatar", user.inner.full_name())} />
+                        //         }
+                        //         <span>{user.inner.full_name()}</span>
+                        //         // {if store.is_offline() {
+                        //         //     html! {
+                        //         //         <span class="badge offline">{"Offline"}</span>
+                        //         //     }
+                        //         // } else {
+                        //         //     html! {}
+                        //         // }}
+                        //     </div>
+                        // } else {
+                        //     
+                        // }
+                        <Link<AppRoute> classes="right_nav_button" to={AppRoute::Profile}>{"Complete profile"}</Link<AppRoute>>
                     } else {
                         <Link<AppRoute> classes="right_nav_button" to={AppRoute::Login}>{"Login"}</Link<AppRoute>>
                     }
