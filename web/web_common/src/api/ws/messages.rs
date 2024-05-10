@@ -33,7 +33,7 @@ pub enum BackendMessage {
     RefreshUser(User),
     Notification(NotificationMessage),
     SearchTable(uuid::Uuid, Vec<Vec<u8>>),
-    GetTable(uuid::Uuid, Vec<u8>),
+    GetTable(uuid::Uuid, Option<String>, Vec<u8>),
     AllTable(uuid::Uuid, Vec<Vec<u8>>),
     Completed(uuid::Uuid),
     Error(uuid::Uuid, ApiError),

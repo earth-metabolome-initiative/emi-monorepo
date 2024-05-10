@@ -6,6 +6,7 @@ use crate::stores::user_state::UserState;
 use crate::workers::ws_worker::{ComponentMessage, WebsocketMessage};
 use crate::workers::WebsocketWorker;
 use gloo::timers::callback::Timeout;
+use serde::de::DeserializeOwned;
 use serde::Serialize;
 use std::fmt::Debug;
 use std::rc::Rc;
@@ -18,9 +19,16 @@ use yew_agent::scope_ext::AgentScopeExt;
 use yew_router::prelude::use_navigator;
 use yewdux::prelude::*;
 
+/// Trait defining something that can be built from a named get operation.
+pub(super) trait FromOperation {
+    /// Creates a new instance of the implementing type from the provided operation name and row.
+    fn from_operation<S: AsRef<str>>(operation_name: S, row: Vec<u8>) -> Self;
+}
+
 /// Trait defining something that can be used to build something else by a form.
 pub(super) trait FormBuilder: Clone + Store + PartialEq + Serialize + Debug {
-    type Actions: Reducer<Self>;
+    type Actions: Reducer<Self> + FromOperation;
+    type RichVariant: DeserializeOwned;
 
     /// Returns whether the form contains errors.
     fn has_errors(&self) -> bool;
@@ -28,8 +36,18 @@ pub(super) trait FormBuilder: Clone + Store + PartialEq + Serialize + Debug {
     /// Returns whether the can currently be submitted.
     fn can_submit(&self) -> bool;
 
+    /// Updates the state of the form builder with the provided data and returns the operations
+    /// necessary to complete the update.
+    ///
+    /// # Arguments
+    /// * `rich_variant` - The data to use to update the form builder.
+    fn update(
+        &mut self,
+        rich_variant: Self::RichVariant,
+    ) -> Vec<ComponentMessage>;
+
     /// Returns the (optional) id of the object being built.
-    /// 
+    ///
     /// # Implementative details
     /// The ID is optional because it is only present when the form is being used to update an existing object.
     /// If the form is being used to insert a new object, the ID is not present, i.e. it is `None`.
@@ -126,8 +144,26 @@ where
                 self.waiting_for_reply = false;
                 true
             }
-            FormMessage::Backend(WebsocketMessage::GetTable(row)) => {
-                log::info!("Retrieved user!");
+            FormMessage::Backend(WebsocketMessage::GetTable(operation_name, row)) => {
+                if let Some(operation_name) = operation_name {
+                    log::info!(
+                        "Received a row from the backend for operation: {}",
+                        operation_name
+                    );
+                    ctx.props().builder_dispatch.apply(
+                        <<Data as FormBuildable>::Builder as FormBuilder>::Actions::from_operation(
+                            operation_name,
+                            row,
+                        ),
+                    )
+                } else {
+                    let rich_variant: <<Data as FormBuildable>::Builder as FormBuilder>::RichVariant = bincode::deserialize(&row).unwrap();
+                    ctx.props().builder_dispatch.reduce_mut(|state| {
+                        for message in state.update(rich_variant) {
+                            self.websocket.send(message);
+                        }
+                    });
+                }
                 true
             }
             FormMessage::Backend(WebsocketMessage::Completed) => {

@@ -13,6 +13,7 @@ use uuid::Uuid;
 use std::ops::Deref;
 use chrono::NaiveDateTime;
 use web_common::api::ApiError;
+use crate::workers::ws_worker::ComponentMessage;
 use web_common::custom_validators::Image;
 use web_common::file_formats::GenericFileFormat;
 
@@ -41,7 +42,7 @@ pub struct ContainerHorizontalRuleBuilder {
     pub form_updated_at: NaiveDateTime,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum ContainerHorizontalRuleActions {
     SetName(Option<String>),
     SetMinimumTemperature(Option<String>),
@@ -52,6 +53,12 @@ pub(super) enum ContainerHorizontalRuleActions {
     SetMaximumPressure(Option<String>),
     SetItemType(Option<NestedItemCategory>),
     SetOtherItemType(Option<NestedItemCategory>),
+}
+
+impl FromOperation for ContainerHorizontalRuleActions {
+    fn from_operation<S: AsRef<str>>(_operation: S, _row: Vec<u8>) -> Self {
+        unreachable!("No operations are expected to be needed for the builder ContainerHorizontalRuleBuilder.")
+    }
 }
 
 impl Reducer<ContainerHorizontalRuleBuilder> for ContainerHorizontalRuleActions {
@@ -248,12 +255,30 @@ impl Reducer<ContainerHorizontalRuleBuilder> for ContainerHorizontalRuleActions 
 impl FormBuilder for ContainerHorizontalRuleBuilder {
     type Actions = ContainerHorizontalRuleActions;
 
+    type RichVariant = NestedContainerHorizontalRule;
+
     fn has_errors(&self) -> bool {
 !self.errors_name.is_empty() || !self.errors_minimum_temperature.is_empty() || !self.errors_maximum_temperature.is_empty() || !self.errors_minimum_humidity.is_empty() || !self.errors_maximum_humidity.is_empty() || !self.errors_minimum_pressure.is_empty() || !self.errors_maximum_pressure.is_empty() || !self.errors_item_type.is_empty() || !self.errors_other_item_type.is_empty()
     }
 
     fn id(&self) -> Option<PrimaryKey> {
         self.id.map(|id| id.into())
+    }
+
+    fn update(&mut self, rich_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+          // We check that the current struct does have an ID.
+          assert!(self.id().is_some());
+        assert_eq!(self.id.unwrap(), rich_variant.inner.id);
+        self.name = Some(rich_variant.inner.name);
+        self.minimum_temperature = rich_variant.inner.minimum_temperature;
+        self.maximum_temperature = rich_variant.inner.maximum_temperature;
+        self.minimum_humidity = rich_variant.inner.minimum_humidity;
+        self.maximum_humidity = rich_variant.inner.maximum_humidity;
+        self.minimum_pressure = rich_variant.inner.minimum_pressure;
+        self.maximum_pressure = rich_variant.inner.maximum_pressure;
+        self.item_type = Some(rich_variant.item_type);
+        self.other_item_type = Some(rich_variant.other_item_type);
+        Vec::new()
     }
 
     fn can_submit(&self) -> bool {
@@ -415,7 +440,7 @@ pub struct ContainerVerticalRuleBuilder {
     pub form_updated_at: NaiveDateTime,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum ContainerVerticalRuleActions {
     SetName(Option<String>),
     SetMinimumTemperature(Option<String>),
@@ -426,6 +451,12 @@ pub(super) enum ContainerVerticalRuleActions {
     SetMaximumPressure(Option<String>),
     SetContainerItemType(Option<NestedItemCategory>),
     SetContainedItemType(Option<NestedItemCategory>),
+}
+
+impl FromOperation for ContainerVerticalRuleActions {
+    fn from_operation<S: AsRef<str>>(_operation: S, _row: Vec<u8>) -> Self {
+        unreachable!("No operations are expected to be needed for the builder ContainerVerticalRuleBuilder.")
+    }
 }
 
 impl Reducer<ContainerVerticalRuleBuilder> for ContainerVerticalRuleActions {
@@ -622,12 +653,30 @@ impl Reducer<ContainerVerticalRuleBuilder> for ContainerVerticalRuleActions {
 impl FormBuilder for ContainerVerticalRuleBuilder {
     type Actions = ContainerVerticalRuleActions;
 
+    type RichVariant = NestedContainerVerticalRule;
+
     fn has_errors(&self) -> bool {
 !self.errors_name.is_empty() || !self.errors_minimum_temperature.is_empty() || !self.errors_maximum_temperature.is_empty() || !self.errors_minimum_humidity.is_empty() || !self.errors_maximum_humidity.is_empty() || !self.errors_minimum_pressure.is_empty() || !self.errors_maximum_pressure.is_empty() || !self.errors_container_item_type.is_empty() || !self.errors_contained_item_type.is_empty()
     }
 
     fn id(&self) -> Option<PrimaryKey> {
         self.id.map(|id| id.into())
+    }
+
+    fn update(&mut self, rich_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+          // We check that the current struct does have an ID.
+          assert!(self.id().is_some());
+        assert_eq!(self.id.unwrap(), rich_variant.inner.id);
+        self.name = Some(rich_variant.inner.name);
+        self.minimum_temperature = rich_variant.inner.minimum_temperature;
+        self.maximum_temperature = rich_variant.inner.maximum_temperature;
+        self.minimum_humidity = rich_variant.inner.minimum_humidity;
+        self.maximum_humidity = rich_variant.inner.maximum_humidity;
+        self.minimum_pressure = rich_variant.inner.minimum_pressure;
+        self.maximum_pressure = rich_variant.inner.maximum_pressure;
+        self.container_item_type = Some(rich_variant.container_item_type);
+        self.contained_item_type = Some(rich_variant.contained_item_type);
+        Vec::new()
     }
 
     fn can_submit(&self) -> bool {
@@ -775,10 +824,16 @@ pub struct ItemCategoryBuilder {
     pub form_updated_at: NaiveDateTime,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum ItemCategoryActions {
     SetName(Option<String>),
     SetDescription(Option<String>),
+}
+
+impl FromOperation for ItemCategoryActions {
+    fn from_operation<S: AsRef<str>>(_operation: S, _row: Vec<u8>) -> Self {
+        unreachable!("No operations are expected to be needed for the builder ItemCategoryBuilder.")
+    }
 }
 
 impl Reducer<ItemCategoryBuilder> for ItemCategoryActions {
@@ -810,12 +865,23 @@ impl Reducer<ItemCategoryBuilder> for ItemCategoryActions {
 impl FormBuilder for ItemCategoryBuilder {
     type Actions = ItemCategoryActions;
 
+    type RichVariant = NestedItemCategory;
+
     fn has_errors(&self) -> bool {
 !self.errors_name.is_empty() || !self.errors_description.is_empty()
     }
 
     fn id(&self) -> Option<PrimaryKey> {
         self.id.map(|id| id.into())
+    }
+
+    fn update(&mut self, rich_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+          // We check that the current struct does have an ID.
+          assert!(self.id().is_some());
+        assert_eq!(self.id.unwrap(), rich_variant.inner.id);
+        self.name = Some(rich_variant.inner.name);
+        self.description = Some(rich_variant.inner.description);
+        Vec::new()
     }
 
     fn can_submit(&self) -> bool {
@@ -920,10 +986,16 @@ pub struct ProcedureBuilder {
     pub form_updated_at: NaiveDateTime,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum ProcedureActions {
     SetName(Option<String>),
     SetDescription(Option<String>),
+}
+
+impl FromOperation for ProcedureActions {
+    fn from_operation<S: AsRef<str>>(_operation: S, _row: Vec<u8>) -> Self {
+        unreachable!("No operations are expected to be needed for the builder ProcedureBuilder.")
+    }
 }
 
 impl Reducer<ProcedureBuilder> for ProcedureActions {
@@ -950,12 +1022,23 @@ impl Reducer<ProcedureBuilder> for ProcedureActions {
 impl FormBuilder for ProcedureBuilder {
     type Actions = ProcedureActions;
 
+    type RichVariant = NestedProcedure;
+
     fn has_errors(&self) -> bool {
 !self.errors_name.is_empty() || !self.errors_description.is_empty()
     }
 
     fn id(&self) -> Option<PrimaryKey> {
         self.id.map(|id| id.into())
+    }
+
+    fn update(&mut self, rich_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+          // We check that the current struct does have an ID.
+          assert!(self.id().is_some());
+        assert_eq!(self.id.unwrap(), rich_variant.inner.id);
+        self.name = Some(rich_variant.inner.name);
+        self.description = rich_variant.inner.description;
+        Vec::new()
     }
 
     fn can_submit(&self) -> bool {
@@ -1063,12 +1146,18 @@ pub struct ProjectRequirementBuilder {
     pub form_updated_at: NaiveDateTime,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum ProjectRequirementActions {
     SetQuantity(Option<String>),
     SetProject(Option<NestedProject>),
     SetItemCategory(Option<NestedItemCategory>),
     SetUnit(Option<Unit>),
+}
+
+impl FromOperation for ProjectRequirementActions {
+    fn from_operation<S: AsRef<str>>(_operation: S, _row: Vec<u8>) -> Self {
+        unreachable!("No operations are expected to be needed for the builder ProjectRequirementBuilder.")
+    }
 }
 
 impl Reducer<ProjectRequirementBuilder> for ProjectRequirementActions {
@@ -1135,12 +1224,25 @@ impl Reducer<ProjectRequirementBuilder> for ProjectRequirementActions {
 impl FormBuilder for ProjectRequirementBuilder {
     type Actions = ProjectRequirementActions;
 
+    type RichVariant = NestedProjectRequirement;
+
     fn has_errors(&self) -> bool {
 !self.errors_quantity.is_empty() || !self.errors_project.is_empty() || !self.errors_item_category.is_empty() || !self.errors_unit.is_empty()
     }
 
     fn id(&self) -> Option<PrimaryKey> {
         self.id.map(|id| id.into())
+    }
+
+    fn update(&mut self, rich_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+          // We check that the current struct does have an ID.
+          assert!(self.id().is_some());
+        assert_eq!(self.id.unwrap(), rich_variant.inner.id);
+        self.quantity = Some(rich_variant.inner.quantity);
+        self.project = Some(rich_variant.project);
+        self.item_category = Some(rich_variant.item_category);
+        self.unit = rich_variant.unit;
+        Vec::new()
     }
 
     fn can_submit(&self) -> bool {
@@ -1272,7 +1374,7 @@ pub struct ProjectBuilder {
     pub form_updated_at: NaiveDateTime,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum ProjectActions {
     SetName(Option<String>),
     SetDescription(Option<String>),
@@ -1283,6 +1385,15 @@ pub(super) enum ProjectActions {
     SetEndDate(Option<String>),
     SetState(Option<NestedProjectState>),
     SetParentProject(Option<NestedProject>),
+}
+
+impl FromOperation for ProjectActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "parent_project" => ProjectActions::SetParentProject(bincode::deserialize(&row).unwrap()),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
 }
 
 impl Reducer<ProjectBuilder> for ProjectActions {
@@ -1420,12 +1531,29 @@ impl Reducer<ProjectBuilder> for ProjectActions {
 impl FormBuilder for ProjectBuilder {
     type Actions = ProjectActions;
 
+    type RichVariant = NestedProject;
+
     fn has_errors(&self) -> bool {
 !self.errors_name.is_empty() || !self.errors_description.is_empty() || !self.errors_public.is_empty() || !self.errors_budget.is_empty() || !self.errors_expenses.is_empty() || !self.errors_expected_end_date.is_empty() || !self.errors_end_date.is_empty() || !self.errors_state.is_empty() || !self.errors_parent_project.is_empty()
     }
 
     fn id(&self) -> Option<PrimaryKey> {
         self.id.map(|id| id.into())
+    }
+
+    fn update(&mut self, rich_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+          // We check that the current struct does have an ID.
+          assert!(self.id().is_some());
+        assert_eq!(self.id.unwrap(), rich_variant.inner.id);
+        self.name = Some(rich_variant.inner.name);
+        self.description = Some(rich_variant.inner.description);
+        self.public = Some(rich_variant.inner.public);
+        self.budget = rich_variant.inner.budget;
+        self.expenses = rich_variant.inner.expenses;
+        self.expected_end_date = rich_variant.inner.expected_end_date;
+        self.end_date = rich_variant.inner.end_date;
+        self.state = Some(rich_variant.state);
+        vec![ComponentMessage::get_named::<&str, NewProject>("parent_project", rich_variant.inner.id.into())]
     }
 
     fn can_submit(&self) -> bool {
@@ -1574,10 +1702,16 @@ pub struct SampledIndividualBuilder {
     pub form_updated_at: NaiveDateTime,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum SampledIndividualActions {
     SetName(Option<String>),
     SetTagged(Option<bool>),
+}
+
+impl FromOperation for SampledIndividualActions {
+    fn from_operation<S: AsRef<str>>(_operation: S, _row: Vec<u8>) -> Self {
+        unreachable!("No operations are expected to be needed for the builder SampledIndividualBuilder.")
+    }
 }
 
 impl Reducer<SampledIndividualBuilder> for SampledIndividualActions {
@@ -1604,12 +1738,23 @@ impl Reducer<SampledIndividualBuilder> for SampledIndividualActions {
 impl FormBuilder for SampledIndividualBuilder {
     type Actions = SampledIndividualActions;
 
+    type RichVariant = NestedSampledIndividual;
+
     fn has_errors(&self) -> bool {
 !self.errors_name.is_empty() || !self.errors_tagged.is_empty()
     }
 
     fn id(&self) -> Option<PrimaryKey> {
         self.id.map(|id| id.into())
+    }
+
+    fn update(&mut self, rich_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+          // We check that the current struct does have an ID.
+          assert!(self.id().is_some());
+        assert_eq!(self.id.unwrap(), rich_variant.inner.id);
+        self.name = rich_variant.inner.name;
+        self.tagged = Some(rich_variant.inner.tagged);
+        Vec::new()
     }
 
     fn can_submit(&self) -> bool {
@@ -1670,11 +1815,17 @@ pub struct SampleBuilder {
     pub form_updated_at: NaiveDateTime,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum SampleActions {
     SetSampledBy(Option<User>),
     SetProcedure(Option<NestedSamplingProcedure>),
     SetState(Option<NestedSampleState>),
+}
+
+impl FromOperation for SampleActions {
+    fn from_operation<S: AsRef<str>>(_operation: S, _row: Vec<u8>) -> Self {
+        unreachable!("No operations are expected to be needed for the builder SampleBuilder.")
+    }
 }
 
 impl Reducer<SampleBuilder> for SampleActions {
@@ -1715,12 +1866,24 @@ impl Reducer<SampleBuilder> for SampleActions {
 impl FormBuilder for SampleBuilder {
     type Actions = SampleActions;
 
+    type RichVariant = NestedSample;
+
     fn has_errors(&self) -> bool {
 !self.errors_sampled_by.is_empty() || !self.errors_procedure.is_empty() || !self.errors_state.is_empty()
     }
 
     fn id(&self) -> Option<PrimaryKey> {
         self.id.map(|id| id.into())
+    }
+
+    fn update(&mut self, rich_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+          // We check that the current struct does have an ID.
+          assert!(self.id().is_some());
+        assert_eq!(self.id.unwrap(), rich_variant.inner.id);
+        self.sampled_by = Some(rich_variant.sampled_by);
+        self.procedure = Some(rich_variant.procedure);
+        self.state = Some(rich_variant.state);
+        Vec::new()
     }
 
     fn can_submit(&self) -> bool {
@@ -1784,10 +1947,16 @@ pub struct SamplingProcedureBuilder {
     pub form_updated_at: NaiveDateTime,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum SamplingProcedureActions {
     SetName(Option<String>),
     SetDescription(Option<String>),
+}
+
+impl FromOperation for SamplingProcedureActions {
+    fn from_operation<S: AsRef<str>>(_operation: S, _row: Vec<u8>) -> Self {
+        unreachable!("No operations are expected to be needed for the builder SamplingProcedureBuilder.")
+    }
 }
 
 impl Reducer<SamplingProcedureBuilder> for SamplingProcedureActions {
@@ -1814,12 +1983,23 @@ impl Reducer<SamplingProcedureBuilder> for SamplingProcedureActions {
 impl FormBuilder for SamplingProcedureBuilder {
     type Actions = SamplingProcedureActions;
 
+    type RichVariant = NestedSamplingProcedure;
+
     fn has_errors(&self) -> bool {
 !self.errors_name.is_empty() || !self.errors_description.is_empty()
     }
 
     fn id(&self) -> Option<PrimaryKey> {
         self.id.map(|id| id.into())
+    }
+
+    fn update(&mut self, rich_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+          // We check that the current struct does have an ID.
+          assert!(self.id().is_some());
+        assert_eq!(self.id.unwrap(), rich_variant.inner.id);
+        self.name = Some(rich_variant.inner.name);
+        self.description = rich_variant.inner.description;
+        Vec::new()
     }
 
     fn can_submit(&self) -> bool {
@@ -1880,11 +2060,20 @@ pub struct TeamBuilder {
     pub form_updated_at: NaiveDateTime,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum TeamActions {
     SetName(Option<String>),
     SetDescription(Option<String>),
     SetParentTeam(Option<NestedTeam>),
+}
+
+impl FromOperation for TeamActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "parent_team" => TeamActions::SetParentTeam(bincode::deserialize(&row).unwrap()),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
 }
 
 impl Reducer<TeamBuilder> for TeamActions {
@@ -1920,12 +2109,23 @@ impl Reducer<TeamBuilder> for TeamActions {
 impl FormBuilder for TeamBuilder {
     type Actions = TeamActions;
 
+    type RichVariant = NestedTeam;
+
     fn has_errors(&self) -> bool {
 !self.errors_name.is_empty() || !self.errors_description.is_empty() || !self.errors_parent_team.is_empty()
     }
 
     fn id(&self) -> Option<PrimaryKey> {
         self.id.map(|id| id.into())
+    }
+
+    fn update(&mut self, rich_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+          // We check that the current struct does have an ID.
+          assert!(self.id().is_some());
+        assert_eq!(self.id.unwrap(), rich_variant.inner.id);
+        self.name = Some(rich_variant.inner.name);
+        self.description = Some(rich_variant.inner.description);
+        vec![ComponentMessage::get_named::<&str, NewTeam>("parent_team", rich_variant.inner.id.into())]
     }
 
     fn can_submit(&self) -> bool {
@@ -2040,12 +2240,18 @@ pub struct UserBuilder {
     pub form_updated_at: NaiveDateTime,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
 pub(super) enum UserActions {
     SetFirstName(Option<String>),
     SetMiddleName(Option<String>),
     SetLastName(Option<String>),
     SetProfilePicture(Option<Vec<u8>>),
+}
+
+impl FromOperation for UserActions {
+    fn from_operation<S: AsRef<str>>(_operation: S, _row: Vec<u8>) -> Self {
+        unreachable!("No operations are expected to be needed for the builder UserBuilder.")
+    }
 }
 
 impl Reducer<UserBuilder> for UserActions {
@@ -2085,12 +2291,25 @@ impl Reducer<UserBuilder> for UserActions {
 impl FormBuilder for UserBuilder {
     type Actions = UserActions;
 
+    type RichVariant = User;
+
     fn has_errors(&self) -> bool {
 !self.errors_first_name.is_empty() || !self.errors_middle_name.is_empty() || !self.errors_last_name.is_empty() || !self.errors_profile_picture.is_empty()
     }
 
     fn id(&self) -> Option<PrimaryKey> {
         self.id.map(|id| id.into())
+    }
+
+    fn update(&mut self, rich_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+          // We check that the current struct does have an ID.
+          assert!(self.id().is_some());
+        assert_eq!(self.id.unwrap(), rich_variant.id);
+        self.first_name = Some(rich_variant.first_name);
+        self.middle_name = rich_variant.middle_name;
+        self.last_name = Some(rich_variant.last_name);
+        self.profile_picture = rich_variant.profile_picture;
+        Vec::new()
     }
 
     fn can_submit(&self) -> bool {

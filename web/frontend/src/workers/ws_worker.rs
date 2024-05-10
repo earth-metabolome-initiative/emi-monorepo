@@ -57,6 +57,14 @@ impl ComponentMessage {
     pub(crate) fn get<R: FormBuildable>(primary_key: PrimaryKey) -> Self {
         Self::Operation(Operation::Select(Select::id(R::TABLE, primary_key)))
     }
+
+    pub(crate) fn get_named<S: ToString, R: FormBuildable>(operation_name: S, primary_key: PrimaryKey) -> Self {
+        Self::Operation(Operation::Select(Select::id_with_operation_name(
+            R::TABLE,
+            operation_name.to_string(),
+            primary_key,
+        )))
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -64,7 +72,7 @@ impl ComponentMessage {
 pub enum WebsocketMessage {
     Notification(NotificationMessage),
     SearchTable(Vec<Vec<u8>>),
-    GetTable(Vec<u8>),
+    GetTable(Option<String>, Vec<u8>),
     AllTable(Vec<Vec<u8>>),
     Completed,
     Error(ApiError),
@@ -114,12 +122,13 @@ impl WebsocketWorker {
                         match select {
                             Select::Id {
                                 table_name,
+                                operation_name,
                                 primary_key,
                             } => {
                                 let table: Table = table_name.try_into().unwrap();
 
                                 match table.get(primary_key, &mut database).await {
-                                    Ok(Some(row)) => BackendMessage::GetTable(task_id, row),
+                                    Ok(Some(row)) => BackendMessage::GetTable(task_id, operation_name, row),
                                     Ok(None) => BackendMessage::Error(
                                         task_id,
                                         ApiError::BadRequest(vec![
@@ -287,11 +296,11 @@ impl Worker for WebsocketWorker {
                         // We need to close the websocket connection.
                         scope.send_message(InternalMessage::Disconnect(close_reason));
                     }
-                    BackendMessage::GetTable(task_id, row) => {
+                    BackendMessage::GetTable(task_id, task_name, row) => {
                         // We save locally the table data (maybe?)
                         // We can remove this task from the queue.
                         if let Some(subscriber_id) = self.tasks.remove(&task_id) {
-                            scope.respond(subscriber_id, WebsocketMessage::GetTable(row));
+                            scope.respond(subscriber_id, WebsocketMessage::GetTable(task_name, row));
                         }
                     }
                     BackendMessage::AllTable(task_id, rows) => {

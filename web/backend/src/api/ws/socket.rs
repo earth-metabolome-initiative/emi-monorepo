@@ -272,6 +272,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                 }
                                 web_common::database::Select::Id {
                                     table_name,
+                                    operation_name,
                                     primary_key,
                                 } => {
                                     let table: web_common::database::Table =
@@ -292,7 +293,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                     ) {
                                         Ok(record) => {
                                             ctx.address()
-                                                .do_send(BackendMessage::GetTable(task_id, record));
+                                                .do_send(BackendMessage::GetTable(task_id, operation_name, record));
                                         }
                                         Err(err) => {
                                             ctx.address()

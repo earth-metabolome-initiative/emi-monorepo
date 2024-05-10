@@ -8,6 +8,7 @@ use super::PrimaryKey;
 pub enum Select {
     Id {
         table_name: String,
+        operation_name: Option<String>,
         primary_key: PrimaryKey,
     },
     All {
@@ -29,20 +30,38 @@ impl Select {
     }
 
     /// Create a new `Id` query for a given `Table` and `PrimaryKey`.
-    /// 
+    ///
     /// # Arguments
     /// * `table` - The table to select from.
     /// * `primary_key` - The primary key to search for.
-    /// 
     pub fn id(table: super::Table, primary_key: PrimaryKey) -> Self {
         Self::Id {
             table_name: table.into(),
+            operation_name: None,
+            primary_key,
+        }
+    }
+
+    /// Create a new `Id` query for a given `Table`, `PrimaryKey`, and operation name.
+    ///
+    /// # Arguments
+    /// * `table` - The table to select from.
+    /// * `operation_name` - The name of the operation.
+    /// * `primary_key` - The primary key to search for.
+    pub fn id_with_operation_name(
+        table: super::Table,
+        operation_name: String,
+        primary_key: PrimaryKey,
+    ) -> Self {
+        Self::Id {
+            table_name: table.into(),
+            operation_name: Some(operation_name),
             primary_key,
         }
     }
 
     /// Create a new `Select` query for a given `Table`, query, and number of results.
-    /// 
+    ///
     /// # Arguments
     /// * `table` - The table to select from.
     /// * `query` - The query to search for.
@@ -56,7 +75,7 @@ impl Select {
     }
 
     /// Create a new `Select::All` query for a given `Table`.
-    /// 
+    ///
     /// # Arguments
     /// * `table` - The table to select from.
     /// * `limit` - The maximum number of results to return.

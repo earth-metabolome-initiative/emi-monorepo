@@ -500,7 +500,7 @@ class StructMetadata:
 
     def human_readable_name(self) -> str:
         """Returns the human readable name of the struct.
-        
+
         Implementation details
         -----------------------
         The structs are camel cased, and this method returns the name
@@ -657,6 +657,10 @@ class StructMetadata:
         )
 
     def get_attribute_by_name(self, attribute_name: str) -> Optional[AttributeMetadata]:
+        assert isinstance(attribute_name, str), (
+            "The attribute name must be a string. "
+            f"The provided attribute name is a {type(attribute_name)}."
+        )
         for attribute in self.attributes:
             if attribute.name == attribute_name:
                 return attribute
@@ -794,7 +798,7 @@ class StructMetadata:
         return all(attribute.implements_default() for attribute in self.attributes)
 
     def has_attribute(self, attribute: AttributeMetadata) -> bool:
-        """Returns the type of the attribute"""
+        """Returns whether the struct has the attribute."""
         return any(
             attribute == existing_attribute for existing_attribute in self.attributes
         )
@@ -3884,13 +3888,11 @@ def derive_model_builders(
                 break
 
         if not found:
-            raise Exception(
-                f"Could not find the builder for the struct {struct.name}."
-            )
+            raise Exception(f"Could not find the builder for the struct {struct.name}.")
 
         if struct.is_new_variant():
             assert builder.get_new_variant() == struct
-        
+
         if struct.is_update_variant():
             assert builder.get_update_variant() == struct
 
@@ -4565,10 +4567,12 @@ def write_frontend_builder_action_enumeration(
 
     action_enum_name = f"{flat_variant.name}Actions"
 
-    document.write(
-        f"#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]\n"
-        f"pub(super) enum {action_enum_name} {{\n"
+    derives = ", ".join(
+        [derive for derive in builder.derives() if derive not in ("Store", "Default")]
     )
+    document.write(f"#[derive({derives})]\n" f"pub(super) enum {action_enum_name} {{\n")
+
+    attributes_requiring_operations: List[AttributeMetadata] = []
 
     for attribute in builder.attributes:
         if attribute.name == primary_key_name:
@@ -4584,6 +4588,10 @@ def write_frontend_builder_action_enumeration(
         if attribute.name == "form_updated_at":
             continue
 
+        if attribute.data_type() == rich_variant.name:
+            assert rich_variant.is_nested()
+            attributes_requiring_operations.append(attribute)
+
         if (
             attribute.data_type() in INPUT_TYPE_MAP
             or attribute.data_type() == "NaiveDateTime"
@@ -4595,6 +4603,43 @@ def write_frontend_builder_action_enumeration(
             )
 
     document.write("}\n\n")
+
+    # We implement the FromOperation trait for the action enum. This trait
+    # is used to convert a named get operation into an action to apply to
+    # the current builder object. The trait only implements a single method,
+    # namely from_operation, which receives a generic S that implements AsRef<str>
+    # and a vector of bytes which contains the struct corresponding the action
+    # that needs to be built. The method panics if none of the expected operation
+    # names are supported. The operation name are equal to the attribute names
+    # of types that are equal to the richest variant associated to the builder,
+    # i.e. the variants for which we must run additional requests to the backend.
+    # If the builder in question does not contain any attributes of the richest
+    # variant, the method solely contains an unreachable!() macro.
+
+    document.write(f"impl FromOperation for {action_enum_name} {{\n")
+
+    if len(attributes_requiring_operations) == 0:
+        document.write(
+            "    fn from_operation<S: AsRef<str>>(_operation: S, _row: Vec<u8>) -> Self {\n"
+            f'        unreachable!("No operations are expected to be needed for the builder {builder.name}.")\n'
+        )
+    else:
+        document.write(
+            "    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {\n"
+            "        match operation.as_ref() {\n"
+        )
+
+        for attribute in attributes_requiring_operations:
+            document.write(
+                f'            "{attribute.name}" => {action_enum_name}::Set{attribute.capitalized_name()}(bincode::deserialize(&row).unwrap()),\n'
+            )
+
+        document.write(
+            "            operation_name => unreachable!(\"The operation name '{}' is not supported.\", operation_name),\n"
+            "        }\n"
+        )
+
+    document.write("    }\n}\n\n")
 
     document.write(
         f"impl Reducer<{builder.name}> for {action_enum_name} {{\n"
@@ -4751,6 +4796,23 @@ def write_frontend_form_builder_implementation(
     """
 
     flat_struct = builder.get_flat_variant()
+    rich_struct = builder.get_richest_variant()
+
+    variants = []
+
+    flat_struct = builder.get_flat_variant()
+
+    if flat_struct.is_insertable():
+        variants.append(builder.get_new_variant())
+
+    # If the new variant is not also used as an update
+    # variant, we add it to the list of variants.
+    if flat_struct.is_updatable():
+        update_variant = builder.get_update_variant()
+        if not update_variant.is_new_variant():
+            variants.append(update_variant)
+
+    assert len(variants) > 0
 
     table_metadata = find_foreign_keys()
 
@@ -4761,6 +4823,7 @@ def write_frontend_form_builder_implementation(
     document.write(
         f"impl FormBuilder for {builder.name} {{\n"
         f"    type Actions = {flat_struct.name}Actions;\n\n"
+        f"    type RichVariant = {rich_struct.name};\n\n"
         f"    fn has_errors(&self) -> bool {{\n"
     )
 
@@ -4788,6 +4851,101 @@ def write_frontend_form_builder_implementation(
         f"        self.{primary_key_name}.map(|{primary_key_name}| {primary_key_name}.into())\n"
         "    }\n\n"
     )
+
+    # We implement the update method, which operated on a mutable reference of the builder
+    # and receives a Rich Variant type, the type associated with the FormBuilder trait,
+    # which is the richest variant of the flat struct. The method updates the builder with the
+    # values of the rich variant, which do not require validation as they are already validated,
+    # being the result of a successful query to the database. This also means that the error
+    # vectors are cleared when the method is called.
+    #
+    # Some of the structs composing the builder may appear Nested in the builder while flat
+    # in the rich variant that has been provided when they have the same type of the rich variant.
+    # For instance, a NestedProject containts a Project, which is flat in the rich variant so as
+    # to avoid an infinitely-sized struct. In this case, we need to run some additional requests
+    # to the backend to obtain the nested versions of the object that are not present in the rich
+    # variant. These additional request are named get requests.
+    document.write(
+        "    fn update(&mut self, rich_variant: Self::RichVariant) -> Vec<ComponentMessage> {\n"
+        "          // We check that the current struct does have an ID.\n"
+        "          assert!(self.id().is_some());\n"
+    )
+
+    named_requests: List[str] = []
+
+    for attribute in builder.attributes:
+        if (
+            attribute.name.startswith("errors_")
+            and attribute.data_type() == "Vec<ApiError>"
+        ):
+            continue
+
+        if attribute.name == "form_updated_at":
+            # TODO: maybe use the updated_at column to set this value?
+            # There is the issue of the timezone to pick though.
+            continue
+
+        # We need to check whether is will be necessary to make a request to the backend
+        # to obtain the nested version of the attribute. The request name is always equal
+        # to the name of the attribute.
+        if attribute.data_type() == rich_struct.name:
+            assert rich_struct.is_nested()
+            named_requests.append(
+                f'ComponentMessage::get_named::<&str, {variants[0].name}>("{attribute.name}", rich_variant.inner.{primary_key_name}.into())'
+            )
+            continue
+
+        if attribute.name == primary_key_name:
+            # In this case we only assert that the primary key is the same.
+            if rich_struct.is_nested():
+                # We access the primary key attribute in the inner struct.
+                document.write(
+                    f"        assert_eq!(self.{primary_key_name}.unwrap(), rich_variant.inner.{primary_key_name});\n"
+                )
+            else:
+                document.write(
+                    f"        assert_eq!(self.{primary_key_name}.unwrap(), rich_variant.{primary_key_name});\n"
+                )
+            continue
+
+        struct_attribute = rich_struct.get_attribute_by_name(attribute.name)
+
+        if struct_attribute is not None:
+            if struct_attribute.optional:
+                document.write(
+                    f"        self.{attribute.name} = rich_variant.{attribute.name};\n"
+                )
+            else:
+                document.write(
+                    f"        self.{attribute.name} = Some(rich_variant.{attribute.name});\n"
+                )
+        else:
+            struct_attribute = flat_struct.get_attribute_by_name(attribute.name)
+
+            if struct_attribute is not None:
+                if struct_attribute.optional:
+                    document.write(
+                        f"        self.{attribute.name} = rich_variant.inner.{attribute.name};\n"
+                    )
+                else:
+                    document.write(
+                        f"        self.{attribute.name} = Some(rich_variant.inner.{attribute.name});\n"
+                    )
+            else:
+                raise Exception(
+                    f"Attribute {attribute.name} present in builder struct {builder.name} "
+                    f"not found in neither the rich variant {rich_struct.name} nor the flat variant {flat_struct.name}."
+                )
+
+    # We returns the names requests. When the list
+    # is empty, the method returns an empty vector,
+    # otherwise it returns the list of requests.
+    if len(named_requests) == 0:
+        document.write("        Vec::new()\n")
+    else:
+        document.write(f"        vec![{', '.join(named_requests)}]\n")
+
+    document.write("    }\n\n")
 
     # We implement the can submit method, which checks whether the form
     # contains errors as specified by the has_errors method, plus checks
@@ -4823,20 +4981,6 @@ def write_frontend_form_builder_implementation(
     document.write("    }\n\n")
 
     document.write("}\n\n")
-
-    variants = []
-
-    flat_struct = builder.get_flat_variant()
-
-    if flat_struct.is_insertable():
-        variants.append(builder.get_new_variant())
-
-    # If the new variant is not also used as an update
-    # variant, we add it to the list of variants.
-    if flat_struct.is_updatable():
-        update_variant = builder.get_update_variant()
-        if not update_variant.is_new_variant():
-            variants.append(update_variant)
 
     for variant in variants:
 
@@ -5724,8 +5868,9 @@ def write_frontend_forms(
         "use std::ops::Deref;",
         "use chrono::NaiveDateTime;",
         "use web_common::api::ApiError;",
+        "use crate::workers::ws_worker::ComponentMessage;",
         "use web_common::custom_validators::Image;",
-        "use web_common::file_formats::GenericFileFormat;"
+        "use web_common::file_formats::GenericFileFormat;",
     ]
 
     for import_statement in imports:
@@ -5754,17 +5899,23 @@ def write_frontend_forms(
 
     with open(path, "r", encoding="utf8") as document:
         content = document.read()
-    
+
     for builder in builder_structs:
-        assert builder.name in content, f"Builder {builder.name} not found in the generated file."
+        assert (
+            builder.name in content
+        ), f"Builder {builder.name} not found in the generated file."
 
         flat_variant = builder.get_flat_variant()
 
         if flat_variant.is_insertable():
-            assert builder.get_new_variant().name in content, f"New variant {builder.get_new_variant().name} not found in the generated file."
+            assert (
+                builder.get_new_variant().name in content
+            ), f"New variant {builder.get_new_variant().name} not found in the generated file."
 
         if flat_variant.is_updatable():
-            assert builder.get_update_variant().name in content, f"Update variant {builder.get_update_variant().name} not found in the generated file."
+            assert (
+                builder.get_update_variant().name in content
+            ), f"Update variant {builder.get_update_variant().name} not found in the generated file."
 
 
 def generate_table_schema():
