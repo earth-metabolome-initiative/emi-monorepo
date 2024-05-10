@@ -5447,8 +5447,10 @@ def write_frontend_yew_form(
     if flat_struct.is_insertable():
         variants.append((builder.get_new_variant(), "POST"))
 
-    if flat_struct.is_updatable() and not flat_struct.is_insertable():
-        variants.append((builder.get_update_variant(), "PUT"))
+    if flat_struct.is_updatable():
+        update_variant = builder.get_update_variant()
+        if not update_variant.is_new_variant():
+            variants.append((update_variant, "PUT"))
 
     for variant, method in variants:
 
@@ -5731,6 +5733,24 @@ def write_frontend_forms(
 
     document.flush()
     document.close()
+
+    # We verify that the forms generation has been successful by
+    # checking that all of the builder names and their relative new
+    # variants and update variants are present in the generated file.
+
+    with open(path, "r", encoding="utf8") as document:
+        content = document.read()
+    
+    for builder in builder_structs:
+        assert builder.name in content, f"Builder {builder.name} not found in the generated file."
+
+        flat_variant = builder.get_flat_variant()
+
+        if flat_variant.is_insertable():
+            assert builder.get_new_variant().name in content, f"New variant {builder.get_new_variant().name} not found in the generated file."
+
+        if flat_variant.is_updatable():
+            assert builder.get_update_variant().name in content, f"Update variant {builder.get_update_variant().name} not found in the generated file."
 
 
 def generate_table_schema():

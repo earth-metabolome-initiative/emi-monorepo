@@ -352,6 +352,37 @@ pub fn create_container_horizontal_rule_form() -> Html {
         </BasicForm<NewContainerHorizontalRule>>
     }
 }
+#[derive(Clone, PartialEq, Properties)]
+pub struct UpdateContainerHorizontalRuleFormProp {
+    pub id: i32,
+}
+
+#[function_component(UpdateContainerHorizontalRuleForm)]
+pub fn update_container_horizontal_rule_form(props: &UpdateContainerHorizontalRuleFormProp) -> Html {
+    let (builder_store, builder_dispatch) = use_store::<ContainerHorizontalRuleBuilder>();
+    let set_name = builder_dispatch.apply_callback(|name: Option<String>| ContainerHorizontalRuleActions::SetName(name));
+    let set_minimum_temperature = builder_dispatch.apply_callback(|minimum_temperature: Option<String>| ContainerHorizontalRuleActions::SetMinimumTemperature(minimum_temperature));
+    let set_maximum_temperature = builder_dispatch.apply_callback(|maximum_temperature: Option<String>| ContainerHorizontalRuleActions::SetMaximumTemperature(maximum_temperature));
+    let set_minimum_humidity = builder_dispatch.apply_callback(|minimum_humidity: Option<String>| ContainerHorizontalRuleActions::SetMinimumHumidity(minimum_humidity));
+    let set_maximum_humidity = builder_dispatch.apply_callback(|maximum_humidity: Option<String>| ContainerHorizontalRuleActions::SetMaximumHumidity(maximum_humidity));
+    let set_minimum_pressure = builder_dispatch.apply_callback(|minimum_pressure: Option<String>| ContainerHorizontalRuleActions::SetMinimumPressure(minimum_pressure));
+    let set_maximum_pressure = builder_dispatch.apply_callback(|maximum_pressure: Option<String>| ContainerHorizontalRuleActions::SetMaximumPressure(maximum_pressure));
+    let set_item_type = builder_dispatch.apply_callback(|item_type: Option<NestedItemCategory>| ContainerHorizontalRuleActions::SetItemType(item_type));
+    let set_other_item_type = builder_dispatch.apply_callback(|other_item_type: Option<NestedItemCategory>| ContainerHorizontalRuleActions::SetOtherItemType(other_item_type));
+    html! {
+        <BasicForm<UpdateContainerHorizontalRule> method={FormMethod::PUT} builder={builder_store.deref().clone()}>
+            <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
+            <BasicInput<i32> label="Minimum temperature" errors={builder_store.errors_minimum_temperature.clone()} builder={set_minimum_temperature} value={builder_store.minimum_temperature.clone()} />
+            <BasicInput<i32> label="Maximum temperature" errors={builder_store.errors_maximum_temperature.clone()} builder={set_maximum_temperature} value={builder_store.maximum_temperature.clone()} />
+            <BasicInput<i32> label="Minimum humidity" errors={builder_store.errors_minimum_humidity.clone()} builder={set_minimum_humidity} value={builder_store.minimum_humidity.clone()} />
+            <BasicInput<i32> label="Maximum humidity" errors={builder_store.errors_maximum_humidity.clone()} builder={set_maximum_humidity} value={builder_store.maximum_humidity.clone()} />
+            <BasicInput<i32> label="Minimum pressure" errors={builder_store.errors_minimum_pressure.clone()} builder={set_minimum_pressure} value={builder_store.minimum_pressure.clone()} />
+            <BasicInput<i32> label="Maximum pressure" errors={builder_store.errors_maximum_pressure.clone()} builder={set_maximum_pressure} value={builder_store.maximum_pressure.clone()} />
+            <Datalist<NestedItemCategory> builder={set_item_type} errors={builder_store.errors_item_type.clone()} value={builder_store.item_type.clone()} label="Item type" />
+            <Datalist<NestedItemCategory> builder={set_other_item_type} errors={builder_store.errors_other_item_type.clone()} value={builder_store.other_item_type.clone()} label="Other item type" />
+        </BasicForm<UpdateContainerHorizontalRule>>
+    }
+}
 #[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct ContainerVerticalRuleBuilder {
@@ -688,6 +719,37 @@ pub fn create_container_vertical_rule_form() -> Html {
         </BasicForm<NewContainerVerticalRule>>
     }
 }
+#[derive(Clone, PartialEq, Properties)]
+pub struct UpdateContainerVerticalRuleFormProp {
+    pub id: i32,
+}
+
+#[function_component(UpdateContainerVerticalRuleForm)]
+pub fn update_container_vertical_rule_form(props: &UpdateContainerVerticalRuleFormProp) -> Html {
+    let (builder_store, builder_dispatch) = use_store::<ContainerVerticalRuleBuilder>();
+    let set_name = builder_dispatch.apply_callback(|name: Option<String>| ContainerVerticalRuleActions::SetName(name));
+    let set_minimum_temperature = builder_dispatch.apply_callback(|minimum_temperature: Option<String>| ContainerVerticalRuleActions::SetMinimumTemperature(minimum_temperature));
+    let set_maximum_temperature = builder_dispatch.apply_callback(|maximum_temperature: Option<String>| ContainerVerticalRuleActions::SetMaximumTemperature(maximum_temperature));
+    let set_minimum_humidity = builder_dispatch.apply_callback(|minimum_humidity: Option<String>| ContainerVerticalRuleActions::SetMinimumHumidity(minimum_humidity));
+    let set_maximum_humidity = builder_dispatch.apply_callback(|maximum_humidity: Option<String>| ContainerVerticalRuleActions::SetMaximumHumidity(maximum_humidity));
+    let set_minimum_pressure = builder_dispatch.apply_callback(|minimum_pressure: Option<String>| ContainerVerticalRuleActions::SetMinimumPressure(minimum_pressure));
+    let set_maximum_pressure = builder_dispatch.apply_callback(|maximum_pressure: Option<String>| ContainerVerticalRuleActions::SetMaximumPressure(maximum_pressure));
+    let set_container_item_type = builder_dispatch.apply_callback(|container_item_type: Option<NestedItemCategory>| ContainerVerticalRuleActions::SetContainerItemType(container_item_type));
+    let set_contained_item_type = builder_dispatch.apply_callback(|contained_item_type: Option<NestedItemCategory>| ContainerVerticalRuleActions::SetContainedItemType(contained_item_type));
+    html! {
+        <BasicForm<UpdateContainerVerticalRule> method={FormMethod::PUT} builder={builder_store.deref().clone()}>
+            <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
+            <BasicInput<i32> label="Minimum temperature" errors={builder_store.errors_minimum_temperature.clone()} builder={set_minimum_temperature} value={builder_store.minimum_temperature.clone()} />
+            <BasicInput<i32> label="Maximum temperature" errors={builder_store.errors_maximum_temperature.clone()} builder={set_maximum_temperature} value={builder_store.maximum_temperature.clone()} />
+            <BasicInput<i32> label="Minimum humidity" errors={builder_store.errors_minimum_humidity.clone()} builder={set_minimum_humidity} value={builder_store.minimum_humidity.clone()} />
+            <BasicInput<i32> label="Maximum humidity" errors={builder_store.errors_maximum_humidity.clone()} builder={set_maximum_humidity} value={builder_store.maximum_humidity.clone()} />
+            <BasicInput<i32> label="Minimum pressure" errors={builder_store.errors_minimum_pressure.clone()} builder={set_minimum_pressure} value={builder_store.minimum_pressure.clone()} />
+            <BasicInput<i32> label="Maximum pressure" errors={builder_store.errors_maximum_pressure.clone()} builder={set_maximum_pressure} value={builder_store.maximum_pressure.clone()} />
+            <Datalist<NestedItemCategory> builder={set_container_item_type} errors={builder_store.errors_container_item_type.clone()} value={builder_store.container_item_type.clone()} label="Container item type" />
+            <Datalist<NestedItemCategory> builder={set_contained_item_type} errors={builder_store.errors_contained_item_type.clone()} value={builder_store.contained_item_type.clone()} label="Contained item type" />
+        </BasicForm<UpdateContainerVerticalRule>>
+    }
+}
 #[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct ItemCategoryBuilder {
@@ -809,6 +871,23 @@ pub fn create_item_category_form() -> Html {
         </BasicForm<NewItemCategory>>
     }
 }
+#[derive(Clone, PartialEq, Properties)]
+pub struct UpdateItemCategoryFormProp {
+    pub id: i32,
+}
+
+#[function_component(UpdateItemCategoryForm)]
+pub fn update_item_category_form(props: &UpdateItemCategoryFormProp) -> Html {
+    let (builder_store, builder_dispatch) = use_store::<ItemCategoryBuilder>();
+    let set_name = builder_dispatch.apply_callback(|name: Option<String>| ItemCategoryActions::SetName(name));
+    let set_description = builder_dispatch.apply_callback(|description: Option<String>| ItemCategoryActions::SetDescription(description));
+    html! {
+        <BasicForm<UpdateItemCategory> method={FormMethod::PUT} builder={builder_store.deref().clone()}>
+            <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
+            <BasicInput<String> label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
+        </BasicForm<UpdateItemCategory>>
+    }
+}
 #[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct ProcedureBuilder {
@@ -922,6 +1001,23 @@ pub fn create_procedure_form() -> Html {
             <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
             <BasicInput<String> label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
         </BasicForm<NewProcedure>>
+    }
+}
+#[derive(Clone, PartialEq, Properties)]
+pub struct UpdateProcedureFormProp {
+    pub id: i32,
+}
+
+#[function_component(UpdateProcedureForm)]
+pub fn update_procedure_form(props: &UpdateProcedureFormProp) -> Html {
+    let (builder_store, builder_dispatch) = use_store::<ProcedureBuilder>();
+    let set_name = builder_dispatch.apply_callback(|name: Option<String>| ProcedureActions::SetName(name));
+    let set_description = builder_dispatch.apply_callback(|description: Option<String>| ProcedureActions::SetDescription(description));
+    html! {
+        <BasicForm<UpdateProcedure> method={FormMethod::PUT} builder={builder_store.deref().clone()}>
+            <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
+            <BasicInput<String> label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
+        </BasicForm<UpdateProcedure>>
     }
 }
 #[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
@@ -1093,6 +1189,27 @@ pub fn create_project_requirement_form() -> Html {
             <Datalist<NestedItemCategory> builder={set_item_category} errors={builder_store.errors_item_category.clone()} value={builder_store.item_category.clone()} label="Item category" />
             <Datalist<Unit> builder={set_unit} errors={builder_store.errors_unit.clone()} value={builder_store.unit.clone()} label="Unit" />
         </BasicForm<NewProjectRequirement>>
+    }
+}
+#[derive(Clone, PartialEq, Properties)]
+pub struct UpdateProjectRequirementFormProp {
+    pub id: i32,
+}
+
+#[function_component(UpdateProjectRequirementForm)]
+pub fn update_project_requirement_form(props: &UpdateProjectRequirementFormProp) -> Html {
+    let (builder_store, builder_dispatch) = use_store::<ProjectRequirementBuilder>();
+    let set_quantity = builder_dispatch.apply_callback(|quantity: Option<String>| ProjectRequirementActions::SetQuantity(quantity));
+    let set_project = builder_dispatch.apply_callback(|project: Option<NestedProject>| ProjectRequirementActions::SetProject(project));
+    let set_item_category = builder_dispatch.apply_callback(|item_category: Option<NestedItemCategory>| ProjectRequirementActions::SetItemCategory(item_category));
+    let set_unit = builder_dispatch.apply_callback(|unit: Option<Unit>| ProjectRequirementActions::SetUnit(unit));
+    html! {
+        <BasicForm<UpdateProjectRequirement> method={FormMethod::PUT} builder={builder_store.deref().clone()}>
+            <BasicInput<i32> label="Quantity" errors={builder_store.errors_quantity.clone()} builder={set_quantity} value={builder_store.quantity.clone()} />
+            <Datalist<NestedProject> builder={set_project} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" />
+            <Datalist<NestedItemCategory> builder={set_item_category} errors={builder_store.errors_item_category.clone()} value={builder_store.item_category.clone()} label="Item category" />
+            <Datalist<Unit> builder={set_unit} errors={builder_store.errors_unit.clone()} value={builder_store.unit.clone()} label="Unit" />
+        </BasicForm<UpdateProjectRequirement>>
     }
 }
 #[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
@@ -1371,6 +1488,37 @@ pub fn create_project_form() -> Html {
             <Datalist<NestedProjectState> builder={set_state} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" />
             <Datalist<NestedProject> builder={set_parent_project} errors={builder_store.errors_parent_project.clone()} value={builder_store.parent_project.clone()} label="Parent project" />
         </BasicForm<NewProject>>
+    }
+}
+#[derive(Clone, PartialEq, Properties)]
+pub struct UpdateProjectFormProp {
+    pub id: i32,
+}
+
+#[function_component(UpdateProjectForm)]
+pub fn update_project_form(props: &UpdateProjectFormProp) -> Html {
+    let (builder_store, builder_dispatch) = use_store::<ProjectBuilder>();
+    let set_name = builder_dispatch.apply_callback(|name: Option<String>| ProjectActions::SetName(name));
+    let set_description = builder_dispatch.apply_callback(|description: Option<String>| ProjectActions::SetDescription(description));
+    let set_public = builder_dispatch.apply_callback(|public: bool| ProjectActions::SetPublic(Some(public)));
+    let set_budget = builder_dispatch.apply_callback(|budget: Option<String>| ProjectActions::SetBudget(budget));
+    let set_expenses = builder_dispatch.apply_callback(|expenses: Option<String>| ProjectActions::SetExpenses(expenses));
+    let set_expected_end_date = builder_dispatch.apply_callback(|expected_end_date: Option<String>| ProjectActions::SetExpectedEndDate(expected_end_date));
+    let set_end_date = builder_dispatch.apply_callback(|end_date: Option<String>| ProjectActions::SetEndDate(end_date));
+    let set_state = builder_dispatch.apply_callback(|state: Option<NestedProjectState>| ProjectActions::SetState(state));
+    let set_parent_project = builder_dispatch.apply_callback(|parent_project: Option<NestedProject>| ProjectActions::SetParentProject(parent_project));
+    html! {
+        <BasicForm<UpdateProject> method={FormMethod::PUT} builder={builder_store.deref().clone()}>
+            <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
+            <BasicInput<String> label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
+            <Checkbox label="Public" errors={builder_store.errors_public.clone()} builder={set_public} value={builder_store.public.unwrap_or(false)} />
+            <BasicInput<f64> label="Budget" errors={builder_store.errors_budget.clone()} builder={set_budget} value={builder_store.budget.clone()} />
+            <BasicInput<f64> label="Expenses" errors={builder_store.errors_expenses.clone()} builder={set_expenses} value={builder_store.expenses.clone()} />
+            <BasicInput<NaiveDateTime> label="Expected end date" errors={builder_store.errors_expected_end_date.clone()} builder={set_expected_end_date} value={builder_store.expected_end_date.clone()} />
+            <BasicInput<NaiveDateTime> label="End date" errors={builder_store.errors_end_date.clone()} builder={set_end_date} value={builder_store.end_date.clone()} />
+            <Datalist<NestedProjectState> builder={set_state} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" />
+            <Datalist<NestedProject> builder={set_parent_project} errors={builder_store.errors_parent_project.clone()} value={builder_store.parent_project.clone()} label="Parent project" />
+        </BasicForm<UpdateProject>>
     }
 }
 #[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
@@ -1795,6 +1943,25 @@ pub fn create_team_form() -> Html {
             <BasicInput<String> label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
             <Datalist<NestedTeam> builder={set_parent_team} errors={builder_store.errors_parent_team.clone()} value={builder_store.parent_team.clone()} label="Parent team" />
         </BasicForm<NewTeam>>
+    }
+}
+#[derive(Clone, PartialEq, Properties)]
+pub struct UpdateTeamFormProp {
+    pub id: i32,
+}
+
+#[function_component(UpdateTeamForm)]
+pub fn update_team_form(props: &UpdateTeamFormProp) -> Html {
+    let (builder_store, builder_dispatch) = use_store::<TeamBuilder>();
+    let set_name = builder_dispatch.apply_callback(|name: Option<String>| TeamActions::SetName(name));
+    let set_description = builder_dispatch.apply_callback(|description: Option<String>| TeamActions::SetDescription(description));
+    let set_parent_team = builder_dispatch.apply_callback(|parent_team: Option<NestedTeam>| TeamActions::SetParentTeam(parent_team));
+    html! {
+        <BasicForm<UpdateTeam> method={FormMethod::PUT} builder={builder_store.deref().clone()}>
+            <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
+            <BasicInput<String> label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
+            <Datalist<NestedTeam> builder={set_parent_team} errors={builder_store.errors_parent_team.clone()} value={builder_store.parent_team.clone()} label="Parent team" />
+        </BasicForm<UpdateTeam>>
     }
 }
 #[derive(Store, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
