@@ -88,6 +88,9 @@ impl Reducer<ContainerHorizontalRuleBuilder> for ContainerHorizontalRuleActions 
                     }
                 }
                 state_mut.name = name;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'name;
             }
             ContainerHorizontalRuleActions::SetMinimumTemperature(
                 minimum_temperature,
@@ -120,6 +123,9 @@ impl Reducer<ContainerHorizontalRuleBuilder> for ContainerHorizontalRuleActions 
                     },
                     None => state_mut.minimum_temperature = None,
                 }
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'minimum_temperature;
             }
             ContainerHorizontalRuleActions::SetMaximumTemperature(
                 maximum_temperature,
@@ -152,6 +158,9 @@ impl Reducer<ContainerHorizontalRuleBuilder> for ContainerHorizontalRuleActions 
                     },
                     None => state_mut.maximum_temperature = None,
                 }
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'maximum_temperature;
             }
             ContainerHorizontalRuleActions::SetMinimumHumidity(
                 minimum_humidity,
@@ -183,6 +192,9 @@ impl Reducer<ContainerHorizontalRuleBuilder> for ContainerHorizontalRuleActions 
                     },
                     None => state_mut.minimum_humidity = None,
                 }
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'minimum_humidity;
             }
             ContainerHorizontalRuleActions::SetMaximumHumidity(
                 maximum_humidity,
@@ -214,6 +226,9 @@ impl Reducer<ContainerHorizontalRuleBuilder> for ContainerHorizontalRuleActions 
                     },
                     None => state_mut.maximum_humidity = None,
                 }
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'maximum_humidity;
             }
             ContainerHorizontalRuleActions::SetMinimumPressure(
                 minimum_pressure,
@@ -245,6 +260,9 @@ impl Reducer<ContainerHorizontalRuleBuilder> for ContainerHorizontalRuleActions 
                     },
                     None => state_mut.minimum_pressure = None,
                 }
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'minimum_pressure;
             }
             ContainerHorizontalRuleActions::SetMaximumPressure(
                 maximum_pressure,
@@ -276,6 +294,9 @@ impl Reducer<ContainerHorizontalRuleBuilder> for ContainerHorizontalRuleActions 
                     },
                     None => state_mut.maximum_pressure = None,
                 }
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'maximum_pressure;
             }
             ContainerHorizontalRuleActions::SetItemType(item_type) => 'item_type: {
                 state_mut.errors_item_type.clear();
@@ -287,6 +308,9 @@ impl Reducer<ContainerHorizontalRuleBuilder> for ContainerHorizontalRuleActions 
                     break 'item_type;
                 }
                 state_mut.item_type = item_type;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'item_type;
             }
             ContainerHorizontalRuleActions::SetOtherItemType(other_item_type) => 'other_item_type: {
                 state_mut.errors_other_item_type.clear();
@@ -300,6 +324,9 @@ impl Reducer<ContainerHorizontalRuleBuilder> for ContainerHorizontalRuleActions 
                     break 'other_item_type;
                 }
                 state_mut.other_item_type = other_item_type;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'other_item_type;
             }
         }
         state
@@ -633,6 +660,9 @@ impl Reducer<ContainerVerticalRuleBuilder> for ContainerVerticalRuleActions {
                     }
                 }
                 state_mut.name = name;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'name;
             }
             ContainerVerticalRuleActions::SetMinimumTemperature(
                 minimum_temperature,
@@ -665,6 +695,9 @@ impl Reducer<ContainerVerticalRuleBuilder> for ContainerVerticalRuleActions {
                     },
                     None => state_mut.minimum_temperature = None,
                 }
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'minimum_temperature;
             }
             ContainerVerticalRuleActions::SetMaximumTemperature(
                 maximum_temperature,
@@ -697,6 +730,9 @@ impl Reducer<ContainerVerticalRuleBuilder> for ContainerVerticalRuleActions {
                     },
                     None => state_mut.maximum_temperature = None,
                 }
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'maximum_temperature;
             }
             ContainerVerticalRuleActions::SetMinimumHumidity(
                 minimum_humidity,
@@ -728,6 +764,9 @@ impl Reducer<ContainerVerticalRuleBuilder> for ContainerVerticalRuleActions {
                     },
                     None => state_mut.minimum_humidity = None,
                 }
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'minimum_humidity;
             }
             ContainerVerticalRuleActions::SetMaximumHumidity(
                 maximum_humidity,
@@ -759,6 +798,9 @@ impl Reducer<ContainerVerticalRuleBuilder> for ContainerVerticalRuleActions {
                     },
                     None => state_mut.maximum_humidity = None,
                 }
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'maximum_humidity;
             }
             ContainerVerticalRuleActions::SetMinimumPressure(
                 minimum_pressure,
@@ -790,6 +832,9 @@ impl Reducer<ContainerVerticalRuleBuilder> for ContainerVerticalRuleActions {
                     },
                     None => state_mut.minimum_pressure = None,
                 }
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'minimum_pressure;
             }
             ContainerVerticalRuleActions::SetMaximumPressure(
                 maximum_pressure,
@@ -821,6 +866,9 @@ impl Reducer<ContainerVerticalRuleBuilder> for ContainerVerticalRuleActions {
                     },
                     None => state_mut.maximum_pressure = None,
                 }
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'maximum_pressure;
             }
             ContainerVerticalRuleActions::SetContainerItemType(
                 container_item_type,
@@ -836,6 +884,9 @@ impl Reducer<ContainerVerticalRuleBuilder> for ContainerVerticalRuleActions {
                     break 'container_item_type;
                 }
                 state_mut.container_item_type = container_item_type;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'container_item_type;
             }
             ContainerVerticalRuleActions::SetContainedItemType(
                 contained_item_type,
@@ -851,6 +902,9 @@ impl Reducer<ContainerVerticalRuleBuilder> for ContainerVerticalRuleActions {
                     break 'contained_item_type;
                 }
                 state_mut.contained_item_type = contained_item_type;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'contained_item_type;
             }
         }
         state
@@ -1161,6 +1215,9 @@ impl Reducer<ItemCategoryBuilder> for ItemCategoryActions {
                     }
                 }
                 state_mut.name = name;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'name;
             }
             ItemCategoryActions::SetDescription(description) => 'description: {
                 state_mut.errors_description.clear();
@@ -1181,6 +1238,9 @@ impl Reducer<ItemCategoryBuilder> for ItemCategoryActions {
                     }
                 }
                 state_mut.description = description;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'description;
             }
         }
         state
@@ -1352,6 +1412,9 @@ impl Reducer<ProcedureBuilder> for ProcedureActions {
                     }
                 }
                 state_mut.name = name;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'name;
             }
             ProcedureActions::SetDescription(description) => 'description: {
                 state_mut.errors_description.clear();
@@ -1365,6 +1428,9 @@ impl Reducer<ProcedureBuilder> for ProcedureActions {
                     }
                 }
                 state_mut.description = description;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'description;
             }
         }
         state
@@ -1564,6 +1630,9 @@ impl Reducer<ProjectRequirementBuilder> for ProjectRequirementActions {
                     },
                     None => state_mut.quantity = None,
                 }
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'quantity;
             }
             ProjectRequirementActions::SetProject(project) => 'project: {
                 state_mut.errors_project.clear();
@@ -1575,6 +1644,9 @@ impl Reducer<ProjectRequirementBuilder> for ProjectRequirementActions {
                     break 'project;
                 }
                 state_mut.project = project;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'project;
             }
             ProjectRequirementActions::SetItemCategory(item_category) => 'item_category: {
                 state_mut.errors_item_category.clear();
@@ -1588,10 +1660,16 @@ impl Reducer<ProjectRequirementBuilder> for ProjectRequirementActions {
                     break 'item_category;
                 }
                 state_mut.item_category = item_category;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'item_category;
             }
             ProjectRequirementActions::SetUnit(unit) => 'unit: {
                 state_mut.errors_unit.clear();
                 state_mut.unit = unit;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'unit;
             }
         }
         state
@@ -1823,6 +1901,9 @@ impl Reducer<ProjectBuilder> for ProjectActions {
                     }
                 }
                 state_mut.name = name;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'name;
             }
             ProjectActions::SetDescription(description) => 'description: {
                 state_mut.errors_description.clear();
@@ -1843,6 +1924,9 @@ impl Reducer<ProjectBuilder> for ProjectActions {
                     }
                 }
                 state_mut.description = description;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'description;
             }
             ProjectActions::SetPublic(public) => 'public: {
                 state_mut.errors_public.clear();
@@ -1854,6 +1938,9 @@ impl Reducer<ProjectBuilder> for ProjectActions {
                     break 'public;
                 }
                 state_mut.public = public;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'public;
             }
             ProjectActions::SetBudget(budget) => 'budget: {
                 state_mut.errors_budget.clear();
@@ -1885,6 +1972,9 @@ impl Reducer<ProjectBuilder> for ProjectActions {
                     },
                     None => state_mut.budget = None,
                 }
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'budget;
             }
             ProjectActions::SetExpenses(expenses) => 'expenses: {
                 state_mut.errors_expenses.clear();
@@ -1916,6 +2006,9 @@ impl Reducer<ProjectBuilder> for ProjectActions {
                     },
                     None => state_mut.expenses = None,
                 }
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'expenses;
             }
             ProjectActions::SetExpectedEndDate(expected_end_date) => 'expected_end_date: {
                 state_mut.errors_expected_end_date.clear();
@@ -1933,6 +2026,9 @@ impl Reducer<ProjectBuilder> for ProjectActions {
                     },
                     None => state_mut.expected_end_date = None,
                 }
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'expected_end_date;
             }
             ProjectActions::SetEndDate(end_date) => 'end_date: {
                 state_mut.errors_end_date.clear();
@@ -1945,6 +2041,9 @@ impl Reducer<ProjectBuilder> for ProjectActions {
                     },
                     None => state_mut.end_date = None,
                 }
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'end_date;
             }
             ProjectActions::SetState(state) => 'state: {
                 state_mut.errors_state.clear();
@@ -1956,10 +2055,16 @@ impl Reducer<ProjectBuilder> for ProjectActions {
                     break 'state;
                 }
                 state_mut.state = state;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'state;
             }
             ProjectActions::SetParentProject(parent_project) => 'parent_project: {
                 state_mut.errors_parent_project.clear();
                 state_mut.parent_project = parent_project;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'parent_project;
             }
         }
         state
@@ -2233,6 +2338,9 @@ impl Reducer<SampledIndividualBuilder> for SampledIndividualActions {
                     }
                 }
                 state_mut.name = name;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'name;
             }
             SampledIndividualActions::SetTagged(tagged) => 'tagged: {
                 state_mut.errors_tagged.clear();
@@ -2244,6 +2352,9 @@ impl Reducer<SampledIndividualBuilder> for SampledIndividualActions {
                     break 'tagged;
                 }
                 state_mut.tagged = tagged;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'tagged;
             }
         }
         state
@@ -2360,6 +2471,9 @@ impl Reducer<SampleBuilder> for SampleActions {
                     break 'sampled_by;
                 }
                 state_mut.sampled_by = sampled_by;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'sampled_by;
             }
             SampleActions::SetProcedure(procedure) => 'procedure: {
                 state_mut.errors_procedure.clear();
@@ -2371,6 +2485,9 @@ impl Reducer<SampleBuilder> for SampleActions {
                     break 'procedure;
                 }
                 state_mut.procedure = procedure;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'procedure;
             }
             SampleActions::SetState(state) => 'state: {
                 state_mut.errors_state.clear();
@@ -2382,6 +2499,9 @@ impl Reducer<SampleBuilder> for SampleActions {
                     break 'state;
                 }
                 state_mut.state = state;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'state;
             }
         }
         state
@@ -2517,6 +2637,9 @@ impl Reducer<SamplingProcedureBuilder> for SamplingProcedureActions {
                     }
                 }
                 state_mut.name = name;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'name;
             }
             SamplingProcedureActions::SetDescription(description) => 'description: {
                 state_mut.errors_description.clear();
@@ -2530,6 +2653,9 @@ impl Reducer<SamplingProcedureBuilder> for SamplingProcedureActions {
                     }
                 }
                 state_mut.description = description;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'description;
             }
         }
         state
@@ -2664,6 +2790,9 @@ impl Reducer<TeamBuilder> for TeamActions {
                     }
                 }
                 state_mut.name = name;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'name;
             }
             TeamActions::SetDescription(description) => 'description: {
                 state_mut.errors_description.clear();
@@ -2684,10 +2813,16 @@ impl Reducer<TeamBuilder> for TeamActions {
                     }
                 }
                 state_mut.description = description;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'description;
             }
             TeamActions::SetParentTeam(parent_team) => 'parent_team: {
                 state_mut.errors_parent_team.clear();
                 state_mut.parent_team = parent_team;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'parent_team;
             }
         }
         state
@@ -2876,6 +3011,9 @@ impl Reducer<UserBuilder> for UserActions {
                     }
                 }
                 state_mut.first_name = first_name;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'first_name;
             }
             UserActions::SetMiddleName(middle_name) => 'middle_name: {
                 state_mut.errors_middle_name.clear();
@@ -2889,6 +3027,9 @@ impl Reducer<UserBuilder> for UserActions {
                     }
                 }
                 state_mut.middle_name = middle_name;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'middle_name;
             }
             UserActions::SetLastName(last_name) => 'last_name: {
                 state_mut.errors_last_name.clear();
@@ -2909,10 +3050,16 @@ impl Reducer<UserBuilder> for UserActions {
                     }
                 }
                 state_mut.last_name = last_name;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'last_name;
             }
             UserActions::SetProfilePicture(profile_picture) => 'profile_picture: {
                 state_mut.errors_profile_picture.clear();
                 state_mut.profile_picture = profile_picture;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'profile_picture;
             }
         }
         state

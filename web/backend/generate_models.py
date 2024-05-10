@@ -4789,7 +4789,12 @@ def write_frontend_builder_action_enumeration(
                 f"                state_mut.{attribute.name} = {attribute.name};\n"
             )
 
-        document.write("            }\n")
+        document.write(
+            f"                // To avoid having a codesmell relative to the cases where we are not\n"
+            f"                // yet handling more corner cases, we always use the break here.\n"
+            f"                break '{attribute.name};\n"
+            "            }\n"
+        )
 
     document.write("        }\n" "        state\n" "    }\n" "}\n")
 
