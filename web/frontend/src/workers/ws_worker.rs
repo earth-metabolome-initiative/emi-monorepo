@@ -54,6 +54,13 @@ impl ComponentMessage {
         ))
     }
 
+    pub(crate) fn update<R: Serialize + FormBuildable>(row: &R) -> Self {
+        Self::Operation(Operation::Update(
+            R::TABLE.to_string(),
+            bincode::serialize(row).unwrap(),
+        ))
+    }
+
     pub(crate) fn get<R: FormBuildable>(primary_key: PrimaryKey) -> Self {
         Self::Operation(Operation::Select(Select::id(R::TABLE, primary_key)))
     }

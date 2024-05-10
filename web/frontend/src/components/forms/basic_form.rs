@@ -191,7 +191,7 @@ where
                         unreachable!("GET is not supported for forms")
                     }
                     FormMethod::PUT => {
-                        todo!("PUT is not yet implemented for forms")
+                        ComponentMessage::update(&data)
                     }
                     FormMethod::DELETE => {
                         todo!("DELETE is not yet implemented for forms")
