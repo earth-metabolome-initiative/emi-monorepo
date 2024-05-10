@@ -28,6 +28,19 @@ impl Select {
         Vec::new()
     }
 
+    /// Create a new `Id` query for a given `Table` and `PrimaryKey`.
+    /// 
+    /// # Arguments
+    /// * `table` - The table to select from.
+    /// * `primary_key` - The primary key to search for.
+    /// 
+    pub fn id(table: super::Table, primary_key: PrimaryKey) -> Self {
+        Self::Id {
+            table_name: table.into(),
+            primary_key,
+        }
+    }
+
     /// Create a new `Select` query for a given `Table`, query, and number of results.
     /// 
     /// # Arguments

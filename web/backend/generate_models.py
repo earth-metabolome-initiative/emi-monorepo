@@ -4782,6 +4782,13 @@ def write_frontend_form_builder_implementation(
 
     document.write("    }\n\n")
 
+    # We implement the id method, which returns the primary key of the struct.
+    document.write(
+        "    fn id(&self) -> Option<PrimaryKey> {\n"
+        f"        self.{primary_key_name}.map(|{primary_key_name}| {primary_key_name}.into())\n"
+        "    }\n\n"
+    )
+
     # We implement the can submit method, which checks whether the form
     # contains errors as specified by the has_errors method, plus checks
     # that all non-optional fields are populated.
@@ -5494,6 +5501,13 @@ def write_frontend_yew_form(
             f"    let (builder_store, builder_dispatch) = use_store::<{builder.name}>();\n"
         )
 
+        if method == "PUT":
+            document.write(
+                "     builder_dispatch.reduce_mut(|builder| {\n"
+                f"         builder.{primary_key_attribute.name} = Some(props.{primary_key_attribute.name});\n"
+                "     });\n"
+            )
+
         for attribute in builder.attributes:
             # We do not want to include the errors attribute in the builder actions.
             if (
@@ -5535,7 +5549,7 @@ def write_frontend_yew_form(
 
         document.write(
             "    html! {\n"
-            f"        <BasicForm<{variant.name}> method={{FormMethod::{method}}} builder={{builder_store.deref().clone()}}>\n"
+            f"        <BasicForm<{variant.name}> method={{FormMethod::{method}}} builder={{builder_store.deref().clone()}} builder_dispatch={{builder_dispatch}}>\n"
         )
 
         for attribute in builder.attributes:

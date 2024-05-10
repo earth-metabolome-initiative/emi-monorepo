@@ -252,6 +252,10 @@ impl FormBuilder for ContainerHorizontalRuleBuilder {
 !self.errors_name.is_empty() || !self.errors_minimum_temperature.is_empty() || !self.errors_maximum_temperature.is_empty() || !self.errors_minimum_humidity.is_empty() || !self.errors_maximum_humidity.is_empty() || !self.errors_minimum_pressure.is_empty() || !self.errors_maximum_pressure.is_empty() || !self.errors_item_type.is_empty() || !self.errors_other_item_type.is_empty()
     }
 
+    fn id(&self) -> Option<PrimaryKey> {
+        self.id.map(|id| id.into())
+    }
+
     fn can_submit(&self) -> bool {
         !self.has_errors()
         && self.name.is_some()
@@ -339,7 +343,7 @@ pub fn create_container_horizontal_rule_form() -> Html {
     let set_item_type = builder_dispatch.apply_callback(|item_type: Option<NestedItemCategory>| ContainerHorizontalRuleActions::SetItemType(item_type));
     let set_other_item_type = builder_dispatch.apply_callback(|other_item_type: Option<NestedItemCategory>| ContainerHorizontalRuleActions::SetOtherItemType(other_item_type));
     html! {
-        <BasicForm<NewContainerHorizontalRule> method={FormMethod::POST} builder={builder_store.deref().clone()}>
+        <BasicForm<NewContainerHorizontalRule> method={FormMethod::POST} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
             <BasicInput<i32> label="Minimum temperature" errors={builder_store.errors_minimum_temperature.clone()} builder={set_minimum_temperature} value={builder_store.minimum_temperature.clone()} />
             <BasicInput<i32> label="Maximum temperature" errors={builder_store.errors_maximum_temperature.clone()} builder={set_maximum_temperature} value={builder_store.maximum_temperature.clone()} />
@@ -360,6 +364,9 @@ pub struct UpdateContainerHorizontalRuleFormProp {
 #[function_component(UpdateContainerHorizontalRuleForm)]
 pub fn update_container_horizontal_rule_form(props: &UpdateContainerHorizontalRuleFormProp) -> Html {
     let (builder_store, builder_dispatch) = use_store::<ContainerHorizontalRuleBuilder>();
+     builder_dispatch.reduce_mut(|builder| {
+         builder.id = Some(props.id);
+     });
     let set_name = builder_dispatch.apply_callback(|name: Option<String>| ContainerHorizontalRuleActions::SetName(name));
     let set_minimum_temperature = builder_dispatch.apply_callback(|minimum_temperature: Option<String>| ContainerHorizontalRuleActions::SetMinimumTemperature(minimum_temperature));
     let set_maximum_temperature = builder_dispatch.apply_callback(|maximum_temperature: Option<String>| ContainerHorizontalRuleActions::SetMaximumTemperature(maximum_temperature));
@@ -370,7 +377,7 @@ pub fn update_container_horizontal_rule_form(props: &UpdateContainerHorizontalRu
     let set_item_type = builder_dispatch.apply_callback(|item_type: Option<NestedItemCategory>| ContainerHorizontalRuleActions::SetItemType(item_type));
     let set_other_item_type = builder_dispatch.apply_callback(|other_item_type: Option<NestedItemCategory>| ContainerHorizontalRuleActions::SetOtherItemType(other_item_type));
     html! {
-        <BasicForm<UpdateContainerHorizontalRule> method={FormMethod::PUT} builder={builder_store.deref().clone()}>
+        <BasicForm<UpdateContainerHorizontalRule> method={FormMethod::PUT} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
             <BasicInput<i32> label="Minimum temperature" errors={builder_store.errors_minimum_temperature.clone()} builder={set_minimum_temperature} value={builder_store.minimum_temperature.clone()} />
             <BasicInput<i32> label="Maximum temperature" errors={builder_store.errors_maximum_temperature.clone()} builder={set_maximum_temperature} value={builder_store.maximum_temperature.clone()} />
@@ -619,6 +626,10 @@ impl FormBuilder for ContainerVerticalRuleBuilder {
 !self.errors_name.is_empty() || !self.errors_minimum_temperature.is_empty() || !self.errors_maximum_temperature.is_empty() || !self.errors_minimum_humidity.is_empty() || !self.errors_maximum_humidity.is_empty() || !self.errors_minimum_pressure.is_empty() || !self.errors_maximum_pressure.is_empty() || !self.errors_container_item_type.is_empty() || !self.errors_contained_item_type.is_empty()
     }
 
+    fn id(&self) -> Option<PrimaryKey> {
+        self.id.map(|id| id.into())
+    }
+
     fn can_submit(&self) -> bool {
         !self.has_errors()
         && self.name.is_some()
@@ -706,7 +717,7 @@ pub fn create_container_vertical_rule_form() -> Html {
     let set_container_item_type = builder_dispatch.apply_callback(|container_item_type: Option<NestedItemCategory>| ContainerVerticalRuleActions::SetContainerItemType(container_item_type));
     let set_contained_item_type = builder_dispatch.apply_callback(|contained_item_type: Option<NestedItemCategory>| ContainerVerticalRuleActions::SetContainedItemType(contained_item_type));
     html! {
-        <BasicForm<NewContainerVerticalRule> method={FormMethod::POST} builder={builder_store.deref().clone()}>
+        <BasicForm<NewContainerVerticalRule> method={FormMethod::POST} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
             <BasicInput<i32> label="Minimum temperature" errors={builder_store.errors_minimum_temperature.clone()} builder={set_minimum_temperature} value={builder_store.minimum_temperature.clone()} />
             <BasicInput<i32> label="Maximum temperature" errors={builder_store.errors_maximum_temperature.clone()} builder={set_maximum_temperature} value={builder_store.maximum_temperature.clone()} />
@@ -727,6 +738,9 @@ pub struct UpdateContainerVerticalRuleFormProp {
 #[function_component(UpdateContainerVerticalRuleForm)]
 pub fn update_container_vertical_rule_form(props: &UpdateContainerVerticalRuleFormProp) -> Html {
     let (builder_store, builder_dispatch) = use_store::<ContainerVerticalRuleBuilder>();
+     builder_dispatch.reduce_mut(|builder| {
+         builder.id = Some(props.id);
+     });
     let set_name = builder_dispatch.apply_callback(|name: Option<String>| ContainerVerticalRuleActions::SetName(name));
     let set_minimum_temperature = builder_dispatch.apply_callback(|minimum_temperature: Option<String>| ContainerVerticalRuleActions::SetMinimumTemperature(minimum_temperature));
     let set_maximum_temperature = builder_dispatch.apply_callback(|maximum_temperature: Option<String>| ContainerVerticalRuleActions::SetMaximumTemperature(maximum_temperature));
@@ -737,7 +751,7 @@ pub fn update_container_vertical_rule_form(props: &UpdateContainerVerticalRuleFo
     let set_container_item_type = builder_dispatch.apply_callback(|container_item_type: Option<NestedItemCategory>| ContainerVerticalRuleActions::SetContainerItemType(container_item_type));
     let set_contained_item_type = builder_dispatch.apply_callback(|contained_item_type: Option<NestedItemCategory>| ContainerVerticalRuleActions::SetContainedItemType(contained_item_type));
     html! {
-        <BasicForm<UpdateContainerVerticalRule> method={FormMethod::PUT} builder={builder_store.deref().clone()}>
+        <BasicForm<UpdateContainerVerticalRule> method={FormMethod::PUT} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
             <BasicInput<i32> label="Minimum temperature" errors={builder_store.errors_minimum_temperature.clone()} builder={set_minimum_temperature} value={builder_store.minimum_temperature.clone()} />
             <BasicInput<i32> label="Maximum temperature" errors={builder_store.errors_maximum_temperature.clone()} builder={set_maximum_temperature} value={builder_store.maximum_temperature.clone()} />
@@ -798,6 +812,10 @@ impl FormBuilder for ItemCategoryBuilder {
 
     fn has_errors(&self) -> bool {
 !self.errors_name.is_empty() || !self.errors_description.is_empty()
+    }
+
+    fn id(&self) -> Option<PrimaryKey> {
+        self.id.map(|id| id.into())
     }
 
     fn can_submit(&self) -> bool {
@@ -865,7 +883,7 @@ pub fn create_item_category_form() -> Html {
     let set_name = builder_dispatch.apply_callback(|name: Option<String>| ItemCategoryActions::SetName(name));
     let set_description = builder_dispatch.apply_callback(|description: Option<String>| ItemCategoryActions::SetDescription(description));
     html! {
-        <BasicForm<NewItemCategory> method={FormMethod::POST} builder={builder_store.deref().clone()}>
+        <BasicForm<NewItemCategory> method={FormMethod::POST} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
             <BasicInput<String> label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
         </BasicForm<NewItemCategory>>
@@ -879,10 +897,13 @@ pub struct UpdateItemCategoryFormProp {
 #[function_component(UpdateItemCategoryForm)]
 pub fn update_item_category_form(props: &UpdateItemCategoryFormProp) -> Html {
     let (builder_store, builder_dispatch) = use_store::<ItemCategoryBuilder>();
+     builder_dispatch.reduce_mut(|builder| {
+         builder.id = Some(props.id);
+     });
     let set_name = builder_dispatch.apply_callback(|name: Option<String>| ItemCategoryActions::SetName(name));
     let set_description = builder_dispatch.apply_callback(|description: Option<String>| ItemCategoryActions::SetDescription(description));
     html! {
-        <BasicForm<UpdateItemCategory> method={FormMethod::PUT} builder={builder_store.deref().clone()}>
+        <BasicForm<UpdateItemCategory> method={FormMethod::PUT} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
             <BasicInput<String> label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
         </BasicForm<UpdateItemCategory>>
@@ -931,6 +952,10 @@ impl FormBuilder for ProcedureBuilder {
 
     fn has_errors(&self) -> bool {
 !self.errors_name.is_empty() || !self.errors_description.is_empty()
+    }
+
+    fn id(&self) -> Option<PrimaryKey> {
+        self.id.map(|id| id.into())
     }
 
     fn can_submit(&self) -> bool {
@@ -997,7 +1022,7 @@ pub fn create_procedure_form() -> Html {
     let set_name = builder_dispatch.apply_callback(|name: Option<String>| ProcedureActions::SetName(name));
     let set_description = builder_dispatch.apply_callback(|description: Option<String>| ProcedureActions::SetDescription(description));
     html! {
-        <BasicForm<NewProcedure> method={FormMethod::POST} builder={builder_store.deref().clone()}>
+        <BasicForm<NewProcedure> method={FormMethod::POST} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
             <BasicInput<String> label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
         </BasicForm<NewProcedure>>
@@ -1011,10 +1036,13 @@ pub struct UpdateProcedureFormProp {
 #[function_component(UpdateProcedureForm)]
 pub fn update_procedure_form(props: &UpdateProcedureFormProp) -> Html {
     let (builder_store, builder_dispatch) = use_store::<ProcedureBuilder>();
+     builder_dispatch.reduce_mut(|builder| {
+         builder.id = Some(props.id);
+     });
     let set_name = builder_dispatch.apply_callback(|name: Option<String>| ProcedureActions::SetName(name));
     let set_description = builder_dispatch.apply_callback(|description: Option<String>| ProcedureActions::SetDescription(description));
     html! {
-        <BasicForm<UpdateProcedure> method={FormMethod::PUT} builder={builder_store.deref().clone()}>
+        <BasicForm<UpdateProcedure> method={FormMethod::PUT} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
             <BasicInput<String> label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
         </BasicForm<UpdateProcedure>>
@@ -1111,6 +1139,10 @@ impl FormBuilder for ProjectRequirementBuilder {
 !self.errors_quantity.is_empty() || !self.errors_project.is_empty() || !self.errors_item_category.is_empty() || !self.errors_unit.is_empty()
     }
 
+    fn id(&self) -> Option<PrimaryKey> {
+        self.id.map(|id| id.into())
+    }
+
     fn can_submit(&self) -> bool {
         !self.has_errors()
         && self.quantity.is_some()
@@ -1183,7 +1215,7 @@ pub fn create_project_requirement_form() -> Html {
     let set_item_category = builder_dispatch.apply_callback(|item_category: Option<NestedItemCategory>| ProjectRequirementActions::SetItemCategory(item_category));
     let set_unit = builder_dispatch.apply_callback(|unit: Option<Unit>| ProjectRequirementActions::SetUnit(unit));
     html! {
-        <BasicForm<NewProjectRequirement> method={FormMethod::POST} builder={builder_store.deref().clone()}>
+        <BasicForm<NewProjectRequirement> method={FormMethod::POST} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<i32> label="Quantity" errors={builder_store.errors_quantity.clone()} builder={set_quantity} value={builder_store.quantity.clone()} />
             <Datalist<NestedProject> builder={set_project} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" />
             <Datalist<NestedItemCategory> builder={set_item_category} errors={builder_store.errors_item_category.clone()} value={builder_store.item_category.clone()} label="Item category" />
@@ -1199,12 +1231,15 @@ pub struct UpdateProjectRequirementFormProp {
 #[function_component(UpdateProjectRequirementForm)]
 pub fn update_project_requirement_form(props: &UpdateProjectRequirementFormProp) -> Html {
     let (builder_store, builder_dispatch) = use_store::<ProjectRequirementBuilder>();
+     builder_dispatch.reduce_mut(|builder| {
+         builder.id = Some(props.id);
+     });
     let set_quantity = builder_dispatch.apply_callback(|quantity: Option<String>| ProjectRequirementActions::SetQuantity(quantity));
     let set_project = builder_dispatch.apply_callback(|project: Option<NestedProject>| ProjectRequirementActions::SetProject(project));
     let set_item_category = builder_dispatch.apply_callback(|item_category: Option<NestedItemCategory>| ProjectRequirementActions::SetItemCategory(item_category));
     let set_unit = builder_dispatch.apply_callback(|unit: Option<Unit>| ProjectRequirementActions::SetUnit(unit));
     html! {
-        <BasicForm<UpdateProjectRequirement> method={FormMethod::PUT} builder={builder_store.deref().clone()}>
+        <BasicForm<UpdateProjectRequirement> method={FormMethod::PUT} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<i32> label="Quantity" errors={builder_store.errors_quantity.clone()} builder={set_quantity} value={builder_store.quantity.clone()} />
             <Datalist<NestedProject> builder={set_project} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" />
             <Datalist<NestedItemCategory> builder={set_item_category} errors={builder_store.errors_item_category.clone()} value={builder_store.item_category.clone()} label="Item category" />
@@ -1389,6 +1424,10 @@ impl FormBuilder for ProjectBuilder {
 !self.errors_name.is_empty() || !self.errors_description.is_empty() || !self.errors_public.is_empty() || !self.errors_budget.is_empty() || !self.errors_expenses.is_empty() || !self.errors_expected_end_date.is_empty() || !self.errors_end_date.is_empty() || !self.errors_state.is_empty() || !self.errors_parent_project.is_empty()
     }
 
+    fn id(&self) -> Option<PrimaryKey> {
+        self.id.map(|id| id.into())
+    }
+
     fn can_submit(&self) -> bool {
         !self.has_errors()
         && self.name.is_some()
@@ -1477,7 +1516,7 @@ pub fn create_project_form() -> Html {
     let set_state = builder_dispatch.apply_callback(|state: Option<NestedProjectState>| ProjectActions::SetState(state));
     let set_parent_project = builder_dispatch.apply_callback(|parent_project: Option<NestedProject>| ProjectActions::SetParentProject(parent_project));
     html! {
-        <BasicForm<NewProject> method={FormMethod::POST} builder={builder_store.deref().clone()}>
+        <BasicForm<NewProject> method={FormMethod::POST} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
             <BasicInput<String> label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
             <Checkbox label="Public" errors={builder_store.errors_public.clone()} builder={set_public} value={builder_store.public.unwrap_or(false)} />
@@ -1498,6 +1537,9 @@ pub struct UpdateProjectFormProp {
 #[function_component(UpdateProjectForm)]
 pub fn update_project_form(props: &UpdateProjectFormProp) -> Html {
     let (builder_store, builder_dispatch) = use_store::<ProjectBuilder>();
+     builder_dispatch.reduce_mut(|builder| {
+         builder.id = Some(props.id);
+     });
     let set_name = builder_dispatch.apply_callback(|name: Option<String>| ProjectActions::SetName(name));
     let set_description = builder_dispatch.apply_callback(|description: Option<String>| ProjectActions::SetDescription(description));
     let set_public = builder_dispatch.apply_callback(|public: bool| ProjectActions::SetPublic(Some(public)));
@@ -1508,7 +1550,7 @@ pub fn update_project_form(props: &UpdateProjectFormProp) -> Html {
     let set_state = builder_dispatch.apply_callback(|state: Option<NestedProjectState>| ProjectActions::SetState(state));
     let set_parent_project = builder_dispatch.apply_callback(|parent_project: Option<NestedProject>| ProjectActions::SetParentProject(parent_project));
     html! {
-        <BasicForm<UpdateProject> method={FormMethod::PUT} builder={builder_store.deref().clone()}>
+        <BasicForm<UpdateProject> method={FormMethod::PUT} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
             <BasicInput<String> label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
             <Checkbox label="Public" errors={builder_store.errors_public.clone()} builder={set_public} value={builder_store.public.unwrap_or(false)} />
@@ -1566,6 +1608,10 @@ impl FormBuilder for SampledIndividualBuilder {
 !self.errors_name.is_empty() || !self.errors_tagged.is_empty()
     }
 
+    fn id(&self) -> Option<PrimaryKey> {
+        self.id.map(|id| id.into())
+    }
+
     fn can_submit(&self) -> bool {
         !self.has_errors()
         && self.tagged.is_some()
@@ -1605,7 +1651,7 @@ pub fn create_sampled_individual_form() -> Html {
     let set_name = builder_dispatch.apply_callback(|name: Option<String>| SampledIndividualActions::SetName(name));
     let set_tagged = builder_dispatch.apply_callback(|tagged: bool| SampledIndividualActions::SetTagged(Some(tagged)));
     html! {
-        <BasicForm<NewSampledIndividual> method={FormMethod::POST} builder={builder_store.deref().clone()}>
+        <BasicForm<NewSampledIndividual> method={FormMethod::POST} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
             <Checkbox label="Tagged" errors={builder_store.errors_tagged.clone()} builder={set_tagged} value={builder_store.tagged.unwrap_or(false)} />
         </BasicForm<NewSampledIndividual>>
@@ -1673,6 +1719,10 @@ impl FormBuilder for SampleBuilder {
 !self.errors_sampled_by.is_empty() || !self.errors_procedure.is_empty() || !self.errors_state.is_empty()
     }
 
+    fn id(&self) -> Option<PrimaryKey> {
+        self.id.map(|id| id.into())
+    }
+
     fn can_submit(&self) -> bool {
         !self.has_errors()
         && self.sampled_by.is_some()
@@ -1716,7 +1766,7 @@ pub fn create_sample_form() -> Html {
     let set_procedure = builder_dispatch.apply_callback(|procedure: Option<NestedSamplingProcedure>| SampleActions::SetProcedure(procedure));
     let set_state = builder_dispatch.apply_callback(|state: Option<NestedSampleState>| SampleActions::SetState(state));
     html! {
-        <BasicForm<NewSample> method={FormMethod::POST} builder={builder_store.deref().clone()}>
+        <BasicForm<NewSample> method={FormMethod::POST} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <Datalist<User> builder={set_sampled_by} errors={builder_store.errors_sampled_by.clone()} value={builder_store.sampled_by.clone()} label="Sampled by" />
             <Datalist<NestedSamplingProcedure> builder={set_procedure} errors={builder_store.errors_procedure.clone()} value={builder_store.procedure.clone()} label="Procedure" />
             <Datalist<NestedSampleState> builder={set_state} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" />
@@ -1768,6 +1818,10 @@ impl FormBuilder for SamplingProcedureBuilder {
 !self.errors_name.is_empty() || !self.errors_description.is_empty()
     }
 
+    fn id(&self) -> Option<PrimaryKey> {
+        self.id.map(|id| id.into())
+    }
+
     fn can_submit(&self) -> bool {
         !self.has_errors()
         && self.name.is_some()
@@ -1807,7 +1861,7 @@ pub fn create_sampling_procedure_form() -> Html {
     let set_name = builder_dispatch.apply_callback(|name: Option<String>| SamplingProcedureActions::SetName(name));
     let set_description = builder_dispatch.apply_callback(|description: Option<String>| SamplingProcedureActions::SetDescription(description));
     html! {
-        <BasicForm<NewSamplingProcedure> method={FormMethod::POST} builder={builder_store.deref().clone()}>
+        <BasicForm<NewSamplingProcedure> method={FormMethod::POST} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
             <BasicInput<String> label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
         </BasicForm<NewSamplingProcedure>>
@@ -1868,6 +1922,10 @@ impl FormBuilder for TeamBuilder {
 
     fn has_errors(&self) -> bool {
 !self.errors_name.is_empty() || !self.errors_description.is_empty() || !self.errors_parent_team.is_empty()
+    }
+
+    fn id(&self) -> Option<PrimaryKey> {
+        self.id.map(|id| id.into())
     }
 
     fn can_submit(&self) -> bool {
@@ -1938,7 +1996,7 @@ pub fn create_team_form() -> Html {
     let set_description = builder_dispatch.apply_callback(|description: Option<String>| TeamActions::SetDescription(description));
     let set_parent_team = builder_dispatch.apply_callback(|parent_team: Option<NestedTeam>| TeamActions::SetParentTeam(parent_team));
     html! {
-        <BasicForm<NewTeam> method={FormMethod::POST} builder={builder_store.deref().clone()}>
+        <BasicForm<NewTeam> method={FormMethod::POST} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
             <BasicInput<String> label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
             <Datalist<NestedTeam> builder={set_parent_team} errors={builder_store.errors_parent_team.clone()} value={builder_store.parent_team.clone()} label="Parent team" />
@@ -1953,11 +2011,14 @@ pub struct UpdateTeamFormProp {
 #[function_component(UpdateTeamForm)]
 pub fn update_team_form(props: &UpdateTeamFormProp) -> Html {
     let (builder_store, builder_dispatch) = use_store::<TeamBuilder>();
+     builder_dispatch.reduce_mut(|builder| {
+         builder.id = Some(props.id);
+     });
     let set_name = builder_dispatch.apply_callback(|name: Option<String>| TeamActions::SetName(name));
     let set_description = builder_dispatch.apply_callback(|description: Option<String>| TeamActions::SetDescription(description));
     let set_parent_team = builder_dispatch.apply_callback(|parent_team: Option<NestedTeam>| TeamActions::SetParentTeam(parent_team));
     html! {
-        <BasicForm<UpdateTeam> method={FormMethod::PUT} builder={builder_store.deref().clone()}>
+        <BasicForm<UpdateTeam> method={FormMethod::PUT} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
             <BasicInput<String> label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
             <Datalist<NestedTeam> builder={set_parent_team} errors={builder_store.errors_parent_team.clone()} value={builder_store.parent_team.clone()} label="Parent team" />
@@ -2028,6 +2089,10 @@ impl FormBuilder for UserBuilder {
 !self.errors_first_name.is_empty() || !self.errors_middle_name.is_empty() || !self.errors_last_name.is_empty() || !self.errors_profile_picture.is_empty()
     }
 
+    fn id(&self) -> Option<PrimaryKey> {
+        self.id.map(|id| id.into())
+    }
+
     fn can_submit(&self) -> bool {
         !self.has_errors()
         && self.first_name.is_some()
@@ -2072,12 +2137,15 @@ pub struct UpdateUserFormProp {
 #[function_component(UpdateUserForm)]
 pub fn update_user_form(props: &UpdateUserFormProp) -> Html {
     let (builder_store, builder_dispatch) = use_store::<UserBuilder>();
+     builder_dispatch.reduce_mut(|builder| {
+         builder.id = Some(props.id);
+     });
     let set_first_name = builder_dispatch.apply_callback(|first_name: Option<String>| UserActions::SetFirstName(first_name));
     let set_middle_name = builder_dispatch.apply_callback(|middle_name: Option<String>| UserActions::SetMiddleName(middle_name));
     let set_last_name = builder_dispatch.apply_callback(|last_name: Option<String>| UserActions::SetLastName(last_name));
     let set_profile_picture = builder_dispatch.apply_callback(|mut profile_picture: Vec<Image>| UserActions::SetProfilePicture(profile_picture.pop().map(|profile_picture| profile_picture.into())));
     html! {
-        <BasicForm<UpdateUser> method={FormMethod::PUT} builder={builder_store.deref().clone()}>
+        <BasicForm<UpdateUser> method={FormMethod::PUT} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="First name" errors={builder_store.errors_first_name.clone()} builder={set_first_name} value={builder_store.first_name.clone()} />
             <BasicInput<String> label="Middle name" errors={builder_store.errors_middle_name.clone()} builder={set_middle_name} value={builder_store.middle_name.clone()} />
             <BasicInput<String> label="Last name" errors={builder_store.errors_last_name.clone()} builder={set_last_name} value={builder_store.last_name.clone()} />

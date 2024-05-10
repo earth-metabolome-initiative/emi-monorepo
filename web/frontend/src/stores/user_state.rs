@@ -20,6 +20,10 @@ impl UserState {
         self.user.as_ref()
     }
 
+    pub fn id(&self) -> Option<i32> {
+        self.user.as_ref().map(|user| user.id)
+    }
+
     /// Set the user to the provided value and returns whether any changes were made.
     pub fn set_user(&mut self, user: User) -> bool {
         if self.user.as_ref() != Some(&user) {

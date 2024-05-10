@@ -11,7 +11,7 @@ use std::fmt::Debug;
 use std::rc::Rc;
 use web_common::api::form_traits::FormMethod;
 use web_common::api::ApiError;
-use web_common::database::Table;
+use web_common::database::{PrimaryKey, Table};
 use yew::prelude::*;
 use yew_agent::prelude::WorkerBridgeHandle;
 use yew_agent::scope_ext::AgentScopeExt;
@@ -27,6 +27,13 @@ pub(super) trait FormBuilder: Clone + Store + PartialEq + Serialize + Debug {
 
     /// Returns whether the can currently be submitted.
     fn can_submit(&self) -> bool;
+
+    /// Returns the (optional) id of the object being built.
+    /// 
+    /// # Implementative details
+    /// The ID is optional because it is only present when the form is being used to update an existing object.
+    /// If the form is being used to insert a new object, the ID is not present, i.e. it is `None`.
+    fn id(&self) -> Option<PrimaryKey>;
 }
 
 /// Trait defining something that can be built by a form.
@@ -61,6 +68,7 @@ where
     Data: FormBuildable,
 {
     pub builder: Data::Builder,
+    pub builder_dispatch: Dispatch<Data::Builder>,
     pub children: Html,
     pub method: FormMethod,
     #[prop_or_default]
@@ -118,6 +126,10 @@ where
                 self.waiting_for_reply = false;
                 true
             }
+            FormMessage::Backend(WebsocketMessage::GetTable(row)) => {
+                log::info!("Retrieved user!");
+                true
+            }
             FormMessage::Backend(WebsocketMessage::Completed) => {
                 self.waiting_for_reply = false;
                 self.errors.clear();
@@ -150,6 +162,18 @@ where
 
                 self.waiting_for_reply = true;
                 true
+            }
+        }
+    }
+
+    fn rendered(&mut self, ctx: &Context<Self>, first_render: bool) {
+        if first_render {
+            // If it is the first time that we are rendering this component,
+            // we check whether the provided builder has an ID. If it does,
+            // we retrieve from the backend the most up to date version of the
+            // data that we are editing.
+            if let Some(id) = ctx.props().builder.id() {
+                self.websocket.send(ComponentMessage::get::<Data>(id));
             }
         }
     }
@@ -224,7 +248,7 @@ where
 {
     let navigator = use_navigator().unwrap();
     html! {
-        <InnerBasicForm<Data> navigator={navigator} method={props.method.clone()} builder={props.builder.clone()}>
+        <InnerBasicForm<Data> navigator={navigator} method={props.method.clone()} builder={props.builder.clone()} builder_dispatch={props.builder_dispatch.clone()}>
             { props.children.clone() }
         </InnerBasicForm<Data>>
     }

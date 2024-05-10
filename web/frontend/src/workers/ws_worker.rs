@@ -5,6 +5,7 @@ use futures::{SinkExt, StreamExt};
 use gloo::timers::callback::Timeout;
 use gloo_net::websocket::futures::WebSocket;
 use gluesql::prelude::*;
+use web_common::database::PrimaryKey;
 use web_common::database::User;
 // use sql_minifier::macros::load_sql;
 use serde::Deserialize;
@@ -51,6 +52,10 @@ impl ComponentMessage {
             R::TABLE.to_string(),
             bincode::serialize(row).unwrap(),
         ))
+    }
+
+    pub(crate) fn get<R: FormBuildable>(primary_key: PrimaryKey) -> Self {
+        Self::Operation(Operation::Select(Select::id(R::TABLE, primary_key)))
     }
 }
 
