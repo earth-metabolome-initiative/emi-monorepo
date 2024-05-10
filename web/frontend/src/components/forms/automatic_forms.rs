@@ -227,7 +227,7 @@ impl Reducer<ContainerHorizontalRuleBuilder> for ContainerHorizontalRuleActions 
                 state_mut.errors_item_type.clear();
         if item_type.is_none() {
             state_mut.errors_item_type.push(ApiError::BadRequest(vec![
-                "The ItemType field is required.".to_string()
+                "The Item type field is required.".to_string()
              ]));
         }
                 state_mut.item_type = item_type;
@@ -236,7 +236,7 @@ impl Reducer<ContainerHorizontalRuleBuilder> for ContainerHorizontalRuleActions 
                 state_mut.errors_other_item_type.clear();
         if other_item_type.is_none() {
             state_mut.errors_other_item_type.push(ApiError::BadRequest(vec![
-                "The OtherItemType field is required.".to_string()
+                "The Other item type field is required.".to_string()
              ]));
         }
                 state_mut.other_item_type = other_item_type;
@@ -276,23 +276,53 @@ impl From<ContainerHorizontalRuleBuilder> for NewContainerHorizontalRule {
         }
     }
 }
+impl From<ContainerHorizontalRuleBuilder> for UpdateContainerHorizontalRule {
+    fn from(builder: ContainerHorizontalRuleBuilder) -> Self {
+        Self {
+            id: builder.id.unwrap(),
+            name: builder.name.unwrap(),
+            item_type_id: builder.item_type.unwrap().inner.id,
+            other_item_type_id: builder.other_item_type.unwrap().inner.id,
+            minimum_temperature: builder.minimum_temperature,
+            maximum_temperature: builder.maximum_temperature,
+            minimum_humidity: builder.minimum_humidity,
+            maximum_humidity: builder.maximum_humidity,
+            minimum_pressure: builder.minimum_pressure,
+            maximum_pressure: builder.maximum_pressure,
+        }
+    }
+}
 impl FormBuildable for NewContainerHorizontalRule {
     type Builder = ContainerHorizontalRuleBuilder;
     const TABLE: Table = Table::ContainerHorizontalRules;
     fn title() -> &'static str {
-        "NewContainerHorizontalRule"
+        "Container horizontal rule"
     }
     fn task_target() -> &'static str {
-        "NewContainerHorizontalRule"
-    }
-    fn description() -> &'static str {
-        concat!("Create a new NewContainerHorizontalRule.",)
+        "Container horizontal rule"
     }
     fn requires_authentication() -> bool {
         true
     }
     fn can_operate_offline() -> bool {
         false
+    }
+}
+
+impl FormBuildable for UpdateContainerHorizontalRule {
+    type Builder = ContainerHorizontalRuleBuilder;
+    const TABLE: Table = Table::ContainerHorizontalRules;
+    fn title() -> &'static str {
+        "Container horizontal rule"
+    }
+    fn task_target() -> &'static str {
+        "Container horizontal rule"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        true
     }
 }
 
@@ -311,14 +341,14 @@ pub fn create_container_horizontal_rule_form() -> Html {
     html! {
         <BasicForm<NewContainerHorizontalRule> method={FormMethod::POST} builder={builder_store.deref().clone()}>
             <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
-            <BasicInput<i32> label="MinimumTemperature" errors={builder_store.errors_minimum_temperature.clone()} builder={set_minimum_temperature} value={builder_store.minimum_temperature.clone()} />
-            <BasicInput<i32> label="MaximumTemperature" errors={builder_store.errors_maximum_temperature.clone()} builder={set_maximum_temperature} value={builder_store.maximum_temperature.clone()} />
-            <BasicInput<i32> label="MinimumHumidity" errors={builder_store.errors_minimum_humidity.clone()} builder={set_minimum_humidity} value={builder_store.minimum_humidity.clone()} />
-            <BasicInput<i32> label="MaximumHumidity" errors={builder_store.errors_maximum_humidity.clone()} builder={set_maximum_humidity} value={builder_store.maximum_humidity.clone()} />
-            <BasicInput<i32> label="MinimumPressure" errors={builder_store.errors_minimum_pressure.clone()} builder={set_minimum_pressure} value={builder_store.minimum_pressure.clone()} />
-            <BasicInput<i32> label="MaximumPressure" errors={builder_store.errors_maximum_pressure.clone()} builder={set_maximum_pressure} value={builder_store.maximum_pressure.clone()} />
-            <Datalist<NestedItemCategory> builder={set_item_type} errors={builder_store.errors_item_type.clone()} value={builder_store.item_type.clone()} label="ItemType" />
-            <Datalist<NestedItemCategory> builder={set_other_item_type} errors={builder_store.errors_other_item_type.clone()} value={builder_store.other_item_type.clone()} label="OtherItemType" />
+            <BasicInput<i32> label="Minimum temperature" errors={builder_store.errors_minimum_temperature.clone()} builder={set_minimum_temperature} value={builder_store.minimum_temperature.clone()} />
+            <BasicInput<i32> label="Maximum temperature" errors={builder_store.errors_maximum_temperature.clone()} builder={set_maximum_temperature} value={builder_store.maximum_temperature.clone()} />
+            <BasicInput<i32> label="Minimum humidity" errors={builder_store.errors_minimum_humidity.clone()} builder={set_minimum_humidity} value={builder_store.minimum_humidity.clone()} />
+            <BasicInput<i32> label="Maximum humidity" errors={builder_store.errors_maximum_humidity.clone()} builder={set_maximum_humidity} value={builder_store.maximum_humidity.clone()} />
+            <BasicInput<i32> label="Minimum pressure" errors={builder_store.errors_minimum_pressure.clone()} builder={set_minimum_pressure} value={builder_store.minimum_pressure.clone()} />
+            <BasicInput<i32> label="Maximum pressure" errors={builder_store.errors_maximum_pressure.clone()} builder={set_maximum_pressure} value={builder_store.maximum_pressure.clone()} />
+            <Datalist<NestedItemCategory> builder={set_item_type} errors={builder_store.errors_item_type.clone()} value={builder_store.item_type.clone()} label="Item type" />
+            <Datalist<NestedItemCategory> builder={set_other_item_type} errors={builder_store.errors_other_item_type.clone()} value={builder_store.other_item_type.clone()} label="Other item type" />
         </BasicForm<NewContainerHorizontalRule>>
     }
 }
@@ -533,7 +563,7 @@ impl Reducer<ContainerVerticalRuleBuilder> for ContainerVerticalRuleActions {
                 state_mut.errors_container_item_type.clear();
         if container_item_type.is_none() {
             state_mut.errors_container_item_type.push(ApiError::BadRequest(vec![
-                "The ContainerItemType field is required.".to_string()
+                "The Container item type field is required.".to_string()
              ]));
         }
                 state_mut.container_item_type = container_item_type;
@@ -542,7 +572,7 @@ impl Reducer<ContainerVerticalRuleBuilder> for ContainerVerticalRuleActions {
                 state_mut.errors_contained_item_type.clear();
         if contained_item_type.is_none() {
             state_mut.errors_contained_item_type.push(ApiError::BadRequest(vec![
-                "The ContainedItemType field is required.".to_string()
+                "The Contained item type field is required.".to_string()
              ]));
         }
                 state_mut.contained_item_type = contained_item_type;
@@ -582,23 +612,53 @@ impl From<ContainerVerticalRuleBuilder> for NewContainerVerticalRule {
         }
     }
 }
+impl From<ContainerVerticalRuleBuilder> for UpdateContainerVerticalRule {
+    fn from(builder: ContainerVerticalRuleBuilder) -> Self {
+        Self {
+            id: builder.id.unwrap(),
+            name: builder.name.unwrap(),
+            container_item_type_id: builder.container_item_type.unwrap().inner.id,
+            contained_item_type_id: builder.contained_item_type.unwrap().inner.id,
+            minimum_temperature: builder.minimum_temperature,
+            maximum_temperature: builder.maximum_temperature,
+            minimum_humidity: builder.minimum_humidity,
+            maximum_humidity: builder.maximum_humidity,
+            minimum_pressure: builder.minimum_pressure,
+            maximum_pressure: builder.maximum_pressure,
+        }
+    }
+}
 impl FormBuildable for NewContainerVerticalRule {
     type Builder = ContainerVerticalRuleBuilder;
     const TABLE: Table = Table::ContainerVerticalRules;
     fn title() -> &'static str {
-        "NewContainerVerticalRule"
+        "Container vertical rule"
     }
     fn task_target() -> &'static str {
-        "NewContainerVerticalRule"
-    }
-    fn description() -> &'static str {
-        concat!("Create a new NewContainerVerticalRule.",)
+        "Container vertical rule"
     }
     fn requires_authentication() -> bool {
         true
     }
     fn can_operate_offline() -> bool {
         false
+    }
+}
+
+impl FormBuildable for UpdateContainerVerticalRule {
+    type Builder = ContainerVerticalRuleBuilder;
+    const TABLE: Table = Table::ContainerVerticalRules;
+    fn title() -> &'static str {
+        "Container vertical rule"
+    }
+    fn task_target() -> &'static str {
+        "Container vertical rule"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        true
     }
 }
 
@@ -617,14 +677,14 @@ pub fn create_container_vertical_rule_form() -> Html {
     html! {
         <BasicForm<NewContainerVerticalRule> method={FormMethod::POST} builder={builder_store.deref().clone()}>
             <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
-            <BasicInput<i32> label="MinimumTemperature" errors={builder_store.errors_minimum_temperature.clone()} builder={set_minimum_temperature} value={builder_store.minimum_temperature.clone()} />
-            <BasicInput<i32> label="MaximumTemperature" errors={builder_store.errors_maximum_temperature.clone()} builder={set_maximum_temperature} value={builder_store.maximum_temperature.clone()} />
-            <BasicInput<i32> label="MinimumHumidity" errors={builder_store.errors_minimum_humidity.clone()} builder={set_minimum_humidity} value={builder_store.minimum_humidity.clone()} />
-            <BasicInput<i32> label="MaximumHumidity" errors={builder_store.errors_maximum_humidity.clone()} builder={set_maximum_humidity} value={builder_store.maximum_humidity.clone()} />
-            <BasicInput<i32> label="MinimumPressure" errors={builder_store.errors_minimum_pressure.clone()} builder={set_minimum_pressure} value={builder_store.minimum_pressure.clone()} />
-            <BasicInput<i32> label="MaximumPressure" errors={builder_store.errors_maximum_pressure.clone()} builder={set_maximum_pressure} value={builder_store.maximum_pressure.clone()} />
-            <Datalist<NestedItemCategory> builder={set_container_item_type} errors={builder_store.errors_container_item_type.clone()} value={builder_store.container_item_type.clone()} label="ContainerItemType" />
-            <Datalist<NestedItemCategory> builder={set_contained_item_type} errors={builder_store.errors_contained_item_type.clone()} value={builder_store.contained_item_type.clone()} label="ContainedItemType" />
+            <BasicInput<i32> label="Minimum temperature" errors={builder_store.errors_minimum_temperature.clone()} builder={set_minimum_temperature} value={builder_store.minimum_temperature.clone()} />
+            <BasicInput<i32> label="Maximum temperature" errors={builder_store.errors_maximum_temperature.clone()} builder={set_maximum_temperature} value={builder_store.maximum_temperature.clone()} />
+            <BasicInput<i32> label="Minimum humidity" errors={builder_store.errors_minimum_humidity.clone()} builder={set_minimum_humidity} value={builder_store.minimum_humidity.clone()} />
+            <BasicInput<i32> label="Maximum humidity" errors={builder_store.errors_maximum_humidity.clone()} builder={set_maximum_humidity} value={builder_store.maximum_humidity.clone()} />
+            <BasicInput<i32> label="Minimum pressure" errors={builder_store.errors_minimum_pressure.clone()} builder={set_minimum_pressure} value={builder_store.minimum_pressure.clone()} />
+            <BasicInput<i32> label="Maximum pressure" errors={builder_store.errors_maximum_pressure.clone()} builder={set_maximum_pressure} value={builder_store.maximum_pressure.clone()} />
+            <Datalist<NestedItemCategory> builder={set_container_item_type} errors={builder_store.errors_container_item_type.clone()} value={builder_store.container_item_type.clone()} label="Container item type" />
+            <Datalist<NestedItemCategory> builder={set_contained_item_type} errors={builder_store.errors_contained_item_type.clone()} value={builder_store.contained_item_type.clone()} label="Contained item type" />
         </BasicForm<NewContainerVerticalRule>>
     }
 }
@@ -694,23 +754,46 @@ impl From<ItemCategoryBuilder> for NewItemCategory {
         }
     }
 }
+impl From<ItemCategoryBuilder> for UpdateItemCategory {
+    fn from(builder: ItemCategoryBuilder) -> Self {
+        Self {
+            id: builder.id.unwrap(),
+            name: builder.name.unwrap(),
+            description: builder.description.unwrap(),
+        }
+    }
+}
 impl FormBuildable for NewItemCategory {
     type Builder = ItemCategoryBuilder;
     const TABLE: Table = Table::ItemCategories;
     fn title() -> &'static str {
-        "NewItemCategory"
+        "Item category"
     }
     fn task_target() -> &'static str {
-        "NewItemCategory"
-    }
-    fn description() -> &'static str {
-        concat!("Create a new NewItemCategory.",)
+        "Item category"
     }
     fn requires_authentication() -> bool {
         true
     }
     fn can_operate_offline() -> bool {
         false
+    }
+}
+
+impl FormBuildable for UpdateItemCategory {
+    type Builder = ItemCategoryBuilder;
+    const TABLE: Table = Table::ItemCategories;
+    fn title() -> &'static str {
+        "Item category"
+    }
+    fn task_target() -> &'static str {
+        "Item category"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        true
     }
 }
 
@@ -786,23 +869,46 @@ impl From<ProcedureBuilder> for NewProcedure {
         }
     }
 }
+impl From<ProcedureBuilder> for UpdateProcedure {
+    fn from(builder: ProcedureBuilder) -> Self {
+        Self {
+            id: builder.id.unwrap(),
+            name: builder.name.unwrap(),
+            description: builder.description,
+        }
+    }
+}
 impl FormBuildable for NewProcedure {
     type Builder = ProcedureBuilder;
     const TABLE: Table = Table::Procedures;
     fn title() -> &'static str {
-        "NewProcedure"
+        "Procedure"
     }
     fn task_target() -> &'static str {
-        "NewProcedure"
-    }
-    fn description() -> &'static str {
-        concat!("Create a new NewProcedure.",)
+        "Procedure"
     }
     fn requires_authentication() -> bool {
         true
     }
     fn can_operate_offline() -> bool {
         false
+    }
+}
+
+impl FormBuildable for UpdateProcedure {
+    type Builder = ProcedureBuilder;
+    const TABLE: Table = Table::Procedures;
+    fn title() -> &'static str {
+        "Procedure"
+    }
+    fn task_target() -> &'static str {
+        "Procedure"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        true
     }
 }
 
@@ -889,7 +995,7 @@ impl Reducer<ProjectRequirementBuilder> for ProjectRequirementActions {
                 state_mut.errors_item_category.clear();
         if item_category.is_none() {
             state_mut.errors_item_category.push(ApiError::BadRequest(vec![
-                "The ItemCategory field is required.".to_string()
+                "The Item category field is required.".to_string()
              ]));
         }
                 state_mut.item_category = item_category;
@@ -928,23 +1034,48 @@ impl From<ProjectRequirementBuilder> for NewProjectRequirement {
         }
     }
 }
+impl From<ProjectRequirementBuilder> for UpdateProjectRequirement {
+    fn from(builder: ProjectRequirementBuilder) -> Self {
+        Self {
+            id: builder.id.unwrap(),
+            project_id: builder.project.unwrap().inner.id,
+            item_category_id: builder.item_category.unwrap().inner.id,
+            quantity: builder.quantity.unwrap(),
+            unit_id: builder.unit.map(|unit| unit.id),
+        }
+    }
+}
 impl FormBuildable for NewProjectRequirement {
     type Builder = ProjectRequirementBuilder;
     const TABLE: Table = Table::ProjectRequirements;
     fn title() -> &'static str {
-        "NewProjectRequirement"
+        "Project requirement"
     }
     fn task_target() -> &'static str {
-        "NewProjectRequirement"
-    }
-    fn description() -> &'static str {
-        concat!("Create a new NewProjectRequirement.",)
+        "Project requirement"
     }
     fn requires_authentication() -> bool {
         true
     }
     fn can_operate_offline() -> bool {
         false
+    }
+}
+
+impl FormBuildable for UpdateProjectRequirement {
+    type Builder = ProjectRequirementBuilder;
+    const TABLE: Table = Table::ProjectRequirements;
+    fn title() -> &'static str {
+        "Project requirement"
+    }
+    fn task_target() -> &'static str {
+        "Project requirement"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        true
     }
 }
 
@@ -959,7 +1090,7 @@ pub fn create_project_requirement_form() -> Html {
         <BasicForm<NewProjectRequirement> method={FormMethod::POST} builder={builder_store.deref().clone()}>
             <BasicInput<i32> label="Quantity" errors={builder_store.errors_quantity.clone()} builder={set_quantity} value={builder_store.quantity.clone()} />
             <Datalist<NestedProject> builder={set_project} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" />
-            <Datalist<NestedItemCategory> builder={set_item_category} errors={builder_store.errors_item_category.clone()} value={builder_store.item_category.clone()} label="ItemCategory" />
+            <Datalist<NestedItemCategory> builder={set_item_category} errors={builder_store.errors_item_category.clone()} value={builder_store.item_category.clone()} label="Item category" />
             <Datalist<Unit> builder={set_unit} errors={builder_store.errors_unit.clone()} value={builder_store.unit.clone()} label="Unit" />
         </BasicForm<NewProjectRequirement>>
     }
@@ -1166,23 +1297,53 @@ impl From<ProjectBuilder> for NewProject {
         }
     }
 }
+impl From<ProjectBuilder> for UpdateProject {
+    fn from(builder: ProjectBuilder) -> Self {
+        Self {
+            id: builder.id.unwrap(),
+            name: builder.name.unwrap(),
+            description: builder.description.unwrap(),
+            public: builder.public.unwrap(),
+            state_id: builder.state.unwrap().inner.id,
+            parent_project_id: builder.parent_project.map(|parent_project| parent_project.inner.id),
+            budget: builder.budget,
+            expenses: builder.expenses,
+            expected_end_date: builder.expected_end_date,
+            end_date: builder.end_date,
+        }
+    }
+}
 impl FormBuildable for NewProject {
     type Builder = ProjectBuilder;
     const TABLE: Table = Table::Projects;
     fn title() -> &'static str {
-        "NewProject"
+        "Project"
     }
     fn task_target() -> &'static str {
-        "NewProject"
-    }
-    fn description() -> &'static str {
-        concat!("Create a new NewProject.",)
+        "Project"
     }
     fn requires_authentication() -> bool {
         true
     }
     fn can_operate_offline() -> bool {
         false
+    }
+}
+
+impl FormBuildable for UpdateProject {
+    type Builder = ProjectBuilder;
+    const TABLE: Table = Table::Projects;
+    fn title() -> &'static str {
+        "Project"
+    }
+    fn task_target() -> &'static str {
+        "Project"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        true
     }
 }
 
@@ -1205,10 +1366,10 @@ pub fn create_project_form() -> Html {
             <Checkbox label="Public" errors={builder_store.errors_public.clone()} builder={set_public} value={builder_store.public.unwrap_or(false)} />
             <BasicInput<f64> label="Budget" errors={builder_store.errors_budget.clone()} builder={set_budget} value={builder_store.budget.clone()} />
             <BasicInput<f64> label="Expenses" errors={builder_store.errors_expenses.clone()} builder={set_expenses} value={builder_store.expenses.clone()} />
-            <BasicInput<NaiveDateTime> label="ExpectedEndDate" errors={builder_store.errors_expected_end_date.clone()} builder={set_expected_end_date} value={builder_store.expected_end_date.clone()} />
-            <BasicInput<NaiveDateTime> label="EndDate" errors={builder_store.errors_end_date.clone()} builder={set_end_date} value={builder_store.end_date.clone()} />
+            <BasicInput<NaiveDateTime> label="Expected end date" errors={builder_store.errors_expected_end_date.clone()} builder={set_expected_end_date} value={builder_store.expected_end_date.clone()} />
+            <BasicInput<NaiveDateTime> label="End date" errors={builder_store.errors_end_date.clone()} builder={set_end_date} value={builder_store.end_date.clone()} />
             <Datalist<NestedProjectState> builder={set_state} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" />
-            <Datalist<NestedProject> builder={set_parent_project} errors={builder_store.errors_parent_project.clone()} value={builder_store.parent_project.clone()} label="ParentProject" />
+            <Datalist<NestedProject> builder={set_parent_project} errors={builder_store.errors_parent_project.clone()} value={builder_store.parent_project.clone()} label="Parent project" />
         </BasicForm<NewProject>>
     }
 }
@@ -1277,13 +1438,10 @@ impl FormBuildable for NewSampledIndividual {
     type Builder = SampledIndividualBuilder;
     const TABLE: Table = Table::SampledIndividuals;
     fn title() -> &'static str {
-        "NewSampledIndividual"
+        "Sampled individual"
     }
     fn task_target() -> &'static str {
-        "NewSampledIndividual"
-    }
-    fn description() -> &'static str {
-        concat!("Create a new NewSampledIndividual.",)
+        "Sampled individual"
     }
     fn requires_authentication() -> bool {
         true
@@ -1333,7 +1491,7 @@ impl Reducer<SampleBuilder> for SampleActions {
                 state_mut.errors_sampled_by.clear();
         if sampled_by.is_none() {
             state_mut.errors_sampled_by.push(ApiError::BadRequest(vec![
-                "The SampledBy field is required.".to_string()
+                "The Sampled by field is required.".to_string()
              ]));
         }
                 state_mut.sampled_by = sampled_by;
@@ -1390,13 +1548,10 @@ impl FormBuildable for NewSample {
     type Builder = SampleBuilder;
     const TABLE: Table = Table::Samples;
     fn title() -> &'static str {
-        "NewSample"
+        "Sample"
     }
     fn task_target() -> &'static str {
-        "NewSample"
-    }
-    fn description() -> &'static str {
-        concat!("Create a new NewSample.",)
+        "Sample"
     }
     fn requires_authentication() -> bool {
         true
@@ -1414,7 +1569,7 @@ pub fn create_sample_form() -> Html {
     let set_state = builder_dispatch.apply_callback(|state: Option<NestedSampleState>| SampleActions::SetState(state));
     html! {
         <BasicForm<NewSample> method={FormMethod::POST} builder={builder_store.deref().clone()}>
-            <Datalist<User> builder={set_sampled_by} errors={builder_store.errors_sampled_by.clone()} value={builder_store.sampled_by.clone()} label="SampledBy" />
+            <Datalist<User> builder={set_sampled_by} errors={builder_store.errors_sampled_by.clone()} value={builder_store.sampled_by.clone()} label="Sampled by" />
             <Datalist<NestedSamplingProcedure> builder={set_procedure} errors={builder_store.errors_procedure.clone()} value={builder_store.procedure.clone()} label="Procedure" />
             <Datalist<NestedSampleState> builder={set_state} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" />
         </BasicForm<NewSample>>
@@ -1485,13 +1640,10 @@ impl FormBuildable for NewSamplingProcedure {
     type Builder = SamplingProcedureBuilder;
     const TABLE: Table = Table::SamplingProcedures;
     fn title() -> &'static str {
-        "NewSamplingProcedure"
+        "Sampling procedure"
     }
     fn task_target() -> &'static str {
-        "NewSamplingProcedure"
-    }
-    fn description() -> &'static str {
-        concat!("Create a new NewSamplingProcedure.",)
+        "Sampling procedure"
     }
     fn requires_authentication() -> bool {
         true
@@ -1587,23 +1739,47 @@ impl From<TeamBuilder> for NewTeam {
         }
     }
 }
+impl From<TeamBuilder> for UpdateTeam {
+    fn from(builder: TeamBuilder) -> Self {
+        Self {
+            id: builder.id.unwrap(),
+            name: builder.name.unwrap(),
+            description: builder.description.unwrap(),
+            parent_team_id: builder.parent_team.map(|parent_team| parent_team.inner.id),
+        }
+    }
+}
 impl FormBuildable for NewTeam {
     type Builder = TeamBuilder;
     const TABLE: Table = Table::Teams;
     fn title() -> &'static str {
-        "NewTeam"
+        "Team"
     }
     fn task_target() -> &'static str {
-        "NewTeam"
-    }
-    fn description() -> &'static str {
-        concat!("Create a new NewTeam.",)
+        "Team"
     }
     fn requires_authentication() -> bool {
         true
     }
     fn can_operate_offline() -> bool {
         false
+    }
+}
+
+impl FormBuildable for UpdateTeam {
+    type Builder = TeamBuilder;
+    const TABLE: Table = Table::Teams;
+    fn title() -> &'static str {
+        "Team"
+    }
+    fn task_target() -> &'static str {
+        "Team"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        true
     }
 }
 
@@ -1617,7 +1793,7 @@ pub fn create_team_form() -> Html {
         <BasicForm<NewTeam> method={FormMethod::POST} builder={builder_store.deref().clone()}>
             <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
             <BasicInput<String> label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
-            <Datalist<NestedTeam> builder={set_parent_team} errors={builder_store.errors_parent_team.clone()} value={builder_store.parent_team.clone()} label="ParentTeam" />
+            <Datalist<NestedTeam> builder={set_parent_team} errors={builder_store.errors_parent_team.clone()} value={builder_store.parent_team.clone()} label="Parent team" />
         </BasicForm<NewTeam>>
     }
 }
@@ -1652,7 +1828,7 @@ impl Reducer<UserBuilder> for UserActions {
                 state_mut.errors_first_name.clear();
         if first_name.is_none() {
             state_mut.errors_first_name.push(ApiError::BadRequest(vec![
-                "The FirstName field is required.".to_string()
+                "The First name field is required.".to_string()
              ]));
         }
                 state_mut.first_name = first_name;
@@ -1665,7 +1841,7 @@ impl Reducer<UserBuilder> for UserActions {
                 state_mut.errors_last_name.clear();
         if last_name.is_none() {
             state_mut.errors_last_name.push(ApiError::BadRequest(vec![
-                "The LastName field is required.".to_string()
+                "The Last name field is required.".to_string()
              ]));
         }
                 state_mut.last_name = last_name;
@@ -1708,13 +1884,10 @@ impl FormBuildable for UpdateUser {
     type Builder = UserBuilder;
     const TABLE: Table = Table::Users;
     fn title() -> &'static str {
-        "UpdateUser"
+        "User"
     }
     fn task_target() -> &'static str {
-        "UpdateUser"
-    }
-    fn description() -> &'static str {
-        concat!("Create a new UpdateUser.",)
+        "User"
     }
     fn requires_authentication() -> bool {
         false
@@ -1738,10 +1911,10 @@ pub fn update_user_form(props: &UpdateUserFormProp) -> Html {
     let set_profile_picture = builder_dispatch.apply_callback(|mut profile_picture: Vec<Image>| UserActions::SetProfilePicture(profile_picture.pop().map(|profile_picture| profile_picture.into())));
     html! {
         <BasicForm<UpdateUser> method={FormMethod::PUT} builder={builder_store.deref().clone()}>
-            <BasicInput<String> label="FirstName" errors={builder_store.errors_first_name.clone()} builder={set_first_name} value={builder_store.first_name.clone()} />
-            <BasicInput<String> label="MiddleName" errors={builder_store.errors_middle_name.clone()} builder={set_middle_name} value={builder_store.middle_name.clone()} />
-            <BasicInput<String> label="LastName" errors={builder_store.errors_last_name.clone()} builder={set_last_name} value={builder_store.last_name.clone()} />
-            <FileInput<Image> label="ProfilePicture" errors={builder_store.errors_profile_picture.clone()} builder={set_profile_picture} allowed_formats={vec![GenericFileFormat::Image]} />
+            <BasicInput<String> label="First name" errors={builder_store.errors_first_name.clone()} builder={set_first_name} value={builder_store.first_name.clone()} />
+            <BasicInput<String> label="Middle name" errors={builder_store.errors_middle_name.clone()} builder={set_middle_name} value={builder_store.middle_name.clone()} />
+            <BasicInput<String> label="Last name" errors={builder_store.errors_last_name.clone()} builder={set_last_name} value={builder_store.last_name.clone()} />
+            <FileInput<Image> label="Profile picture" errors={builder_store.errors_profile_picture.clone()} builder={set_profile_picture} allowed_formats={vec![GenericFileFormat::Image]} />
         </BasicForm<UpdateUser>>
     }
 }

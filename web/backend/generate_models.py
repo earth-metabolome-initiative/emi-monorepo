@@ -241,6 +241,9 @@ class AttributeMetadata:
 
         raise ValueError("The data type must be either a string or a StructMetadata.")
 
+    def human_readable_name(self) -> str:
+        return " ".join(self.name.split("_")).lower().capitalize()
+
     def capitalized_name(self) -> str:
         return "".join(word.capitalize() for word in self.name.split("_"))
 
@@ -494,6 +497,18 @@ class StructMetadata:
         self._richest_variant: Optional[StructMetadata] = None
         self._new_variant: Optional[StructMetadata] = None
         self._update_variant: Optional[StructMetadata] = None
+
+    def human_readable_name(self) -> str:
+        """Returns the human readable name of the struct.
+        
+        Implementation details
+        -----------------------
+        The structs are camel cased, and this method returns the name
+        splitting on the capital letters and joining the words with spaces.
+        """
+        if self._flat_variant is not None:
+            return self._flat_variant.human_readable_name()
+        return " ".join(re.findall(r"[A-Z][a-z]*", self.name)).lower().capitalize()
 
     def requires_authentication(self) -> bool:
         """Returns whether the struct requires authentication.
@@ -3859,11 +3874,25 @@ def derive_model_builders(
 
     # We run a simple self-consistency check to ensure that the
     # builders have been correctly derived.
-    for builder, struct in zip(builders, new_or_update_struct_metadatas):
+    for struct in new_or_update_struct_metadatas:
+
+        # We identify the curresponding builder by the matching table name.
+        found = False
+        for builder in builders:
+            if builder.table_name == struct.table_name:
+                found = True
+                break
+
+        if not found:
+            raise Exception(
+                f"Could not find the builder for the struct {struct.name}."
+            )
+
         if struct.is_new_variant():
-            assert builder.get_new_variant() is not None
+            assert builder.get_new_variant() == struct
+        
         if struct.is_update_variant():
-            assert builder.get_update_variant() is not None
+            assert builder.get_update_variant() == struct
 
     return builders
 
@@ -4625,7 +4654,7 @@ def write_frontend_builder_action_enumeration(
             document.write(
                 f"        if {attribute.name}.is_none() {{\n"
                 f"            state_mut.errors_{attribute.name}.push(ApiError::BadRequest(vec![\n"
-                f'                "The {attribute.capitalized_name()} field is required.".to_string()\n'
+                f'                "The {attribute.human_readable_name()} field is required.".to_string()\n'
                 "             ]));\n"
                 f"        }}\n"
             )
@@ -4797,8 +4826,10 @@ def write_frontend_form_builder_implementation(
 
     # If the new variant is not also used as an update
     # variant, we add it to the list of variants.
-    if flat_struct.is_updatable() and not flat_struct.is_insertable():
-        variants.append(builder.get_update_variant())
+    if flat_struct.is_updatable():
+        update_variant = builder.get_update_variant()
+        if not update_variant.is_new_variant():
+            variants.append(update_variant)
 
     for variant in variants:
 
@@ -5530,13 +5561,13 @@ def write_frontend_yew_form(
                 or attribute.data_type() == "NaiveDateTime"
             ):
                 document.write(
-                    f'            <BasicInput<{attribute.data_type()}> label="{attribute.capitalized_name()}" errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} value={{builder_store.{attribute.name}.clone()}} />\n'
+                    f'            <BasicInput<{attribute.data_type()}> label="{attribute.human_readable_name()}" errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} value={{builder_store.{attribute.name}.clone()}} />\n'
                 )
                 continue
 
             if attribute.data_type() == "bool":
                 document.write(
-                    f'            <Checkbox label="{attribute.capitalized_name()}" errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} value={{builder_store.{attribute.name}.unwrap_or(false)}} />\n'
+                    f'            <Checkbox label="{attribute.human_readable_name()}" errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} value={{builder_store.{attribute.name}.unwrap_or(false)}} />\n'
                 )
                 continue
 
@@ -5545,7 +5576,7 @@ def write_frontend_yew_form(
                     allowed_formats = ["GenericFileFormat::Image"]
 
                     document.write(
-                        f'            <FileInput<Image> label="{attribute.capitalized_name()}" errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} allowed_formats={{vec![{", ".join(allowed_formats)}]}} />\n'
+                        f'            <FileInput<Image> label="{attribute.human_readable_name()}" errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} allowed_formats={{vec![{", ".join(allowed_formats)}]}} />\n'
                     )
                 else:
                     raise Exception(
@@ -5573,7 +5604,7 @@ def write_frontend_yew_form(
                     )
 
                 document.write(
-                    f'            <Datalist<{attribute.data_type()}> builder={{set_{attribute.name}}} errors={{builder_store.{error_attribute.name}.clone()}} value={{builder_store.{attribute.name}.clone()}} label="{attribute.capitalized_name()}" />\n'
+                    f'            <Datalist<{attribute.data_type()}> builder={{set_{attribute.name}}} errors={{builder_store.{error_attribute.name}.clone()}} value={{builder_store.{attribute.name}.clone()}} label="{attribute.human_readable_name()}" />\n'
                 )
                 continue
 
@@ -5610,35 +5641,34 @@ def write_frontend_form_buildable_implementation(
 
     flat_struct = builder.get_flat_variant()
 
-    variants = []
+    variants: List[StructMetadata] = []
 
     if flat_struct.is_insertable():
         variants.append(builder.get_new_variant())
 
-    if flat_struct.is_updatable() and not flat_struct.is_insertable():
-        variants.append(builder.get_update_variant())
+    if flat_struct.is_updatable():
+        update_variant = builder.get_update_variant()
+        if not update_variant.is_new_variant():
+            variants.append(update_variant)
 
     for variant in variants:
         document.write(
             f"impl FormBuildable for {variant.name} {{\n"
             f"    type Builder = {builder.name};\n"
             f"    const TABLE: Table = Table::{capitalized_table_name};\n"
-            f"    fn title() -> &'static str {{\n"
-            f'        "{variant.name}"\n'  # TODO! Add the title
-            f"    }}\n"
-            f"    fn task_target() -> &'static str {{\n"
-            f'        "{variant.name}"\n'  # TODO! Add the task target name
-            f"    }}\n"
-            f"    fn description() -> &'static str {{\n"
-            f'        concat!("Create a new {variant.name}.",)\n'  # TODO! Add the description
-            f"    }}\n"
-            f"    fn requires_authentication() -> bool {{\n"
+            "    fn title() -> &'static str {\n"
+            f'        "{variant.human_readable_name()}"\n'  # TODO! Add the title
+            "    }\n"
+            "    fn task_target() -> &'static str {\n"
+            f'        "{variant.human_readable_name()}"\n'  # TODO! Add the task target name
+            "    }\n"
+            "    fn requires_authentication() -> bool {\n"
             f"        {'true' if variant.requires_authentication() else 'false'}\n"
-            f"    }}\n"
-            f"    fn can_operate_offline() -> bool {{\n"
+            "    }\n"
+            "    fn can_operate_offline() -> bool {\n"
             f"        {'true' if variant.has_uuid_primary_key() or variant.is_update_variant() else 'false'}\n"
-            f"    }}\n"
-            f"}}\n\n"
+            "    }\n"
+            "}\n\n"
         )
 
 

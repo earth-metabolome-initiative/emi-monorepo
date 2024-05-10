@@ -48,9 +48,6 @@ pub trait FormBuildable:
     /// If you are creating a form to delete a Taxon, the task target is "Taxon".
     fn task_target() -> &'static str;
 
-    /// Returns the description to use for the Form.
-    fn description() -> &'static str;
-
     /// Returns whether this form requires authentication.
     fn requires_authentication() -> bool;
 
@@ -203,7 +200,7 @@ where
         html! {
             <form enctype={ "multipart/form-data" } disabled={self.waiting_for_reply} class={classes} onsubmit={on_submit} method={ctx.props().method.to_string()}>
                 <h4>{ Data::title() }</h4>
-                <p class="instructions">{Data::description()}</p>
+                <p class="instructions">{format!("{} {}", ctx.props().method.to_crud(), Data::task_target())}</p>
                 { ctx.props().children.clone() }
                 <InputErrors errors={self.errors.clone()} />
                 <button type="submit" title={title_message} class={button_classes} disabled={submit_button_disabled || self.waiting_for_reply}>

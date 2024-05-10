@@ -167,9 +167,8 @@ impl Component for Navigator {
                         //         // }}
                         //     </div>
                         // } else {
-                        //     
+                            <Link<AppRoute> classes="right_nav_button" to={AppRoute::Profile}>{"Complete profile"}</Link<AppRoute>>
                         // }
-                        <Link<AppRoute> classes="right_nav_button" to={AppRoute::Profile}>{"Complete profile"}</Link<AppRoute>>
                     } else {
                         <Link<AppRoute> classes="right_nav_button" to={AppRoute::Login}>{"Login"}</Link<AppRoute>>
                     }
