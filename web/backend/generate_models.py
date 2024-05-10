@@ -521,7 +521,7 @@ class StructMetadata:
         """
         if self._flat_variant is not None:
             return self._flat_variant.requires_authentication()
-        return any(attribute.requires_authentication() for attribute in self.attributes)
+        return any(attribute.requires_authentication() for attribute in self.attributes) or self.table_name == "users"
 
     def is_updatable(self) -> bool:
         """Returns whether the struct is updatable.
@@ -4687,7 +4687,7 @@ def write_frontend_builder_action_enumeration(
         ), f"Attribute {attribute.name} not found in the struct {flat_variant.name}."
 
         document.write(
-            f"            {action_enum_name}::Set{attribute.capitalized_name()}({attribute.name}) => {{\n"
+            f"            {action_enum_name}::Set{attribute.capitalized_name()}({attribute.name}) => '{attribute.name}: {{\n"
         )
 
         # First we clear out the existing errors associated with the attribute.
@@ -4701,7 +4701,24 @@ def write_frontend_builder_action_enumeration(
                 f"            state_mut.errors_{attribute.name}.push(ApiError::BadRequest(vec![\n"
                 f'                "The {attribute.human_readable_name()} field is required.".to_string()\n'
                 "             ]));\n"
+                f"            state_mut.{attribute.name} = None;\n"
+                f"             break '{attribute.name};\n"
                 f"        }}\n"
+            )
+
+        # If the provided value is a String, we need to check whether it is empty.
+        # If it is, we add an error to the errors vector.
+        if attribute.data_type() == "String":
+            document.write(
+                f"                if let Some(value) = {attribute.name}.as_ref() {{\n"
+                "                    if value.is_empty() {\n"
+                f"                        state_mut.errors_{attribute.name}.push(ApiError::BadRequest(vec![\n"
+                f'                            "The {attribute.human_readable_name()} field cannot be left empty.".to_string()\n'
+                "                        ]));\n"
+                f"                         state_mut.{attribute.name} = None;\n"
+                f"                          break '{attribute.name};\n"
+                "                    }\n"
+                "                }\n"
             )
 
         if attribute.data_type() == "NaiveDateTime":
@@ -4866,9 +4883,7 @@ def write_frontend_form_builder_implementation(
     # to the backend to obtain the nested versions of the object that are not present in the rich
     # variant. These additional request are named get requests.
     document.write(
-        "    fn update(&mut self, rich_variant: Self::RichVariant) -> Vec<ComponentMessage> {\n"
-        "          // We check that the current struct does have an ID.\n"
-        "          assert!(self.id().is_some());\n"
+        "    fn update(dispatcher: &Dispatch<Self>, rich_variant: Self::RichVariant) -> Vec<ComponentMessage> {\n"
     )
 
     named_requests: List[str] = []
@@ -4885,6 +4900,10 @@ def write_frontend_form_builder_implementation(
             # There is the issue of the timezone to pick though.
             continue
 
+        if attribute.name == primary_key_name:
+            # TODO: maybe check that the primary key is equal?
+            continue
+
         # We need to check whether is will be necessary to make a request to the backend
         # to obtain the nested version of the attribute. The request name is always equal
         # to the name of the attribute.
@@ -4895,41 +4914,40 @@ def write_frontend_form_builder_implementation(
             )
             continue
 
-        if attribute.name == primary_key_name:
-            # In this case we only assert that the primary key is the same.
-            if rich_struct.is_nested():
-                # We access the primary key attribute in the inner struct.
-                document.write(
-                    f"        assert_eq!(self.{primary_key_name}.unwrap(), rich_variant.inner.{primary_key_name});\n"
-                )
-            else:
-                document.write(
-                    f"        assert_eq!(self.{primary_key_name}.unwrap(), rich_variant.{primary_key_name});\n"
-                )
-            continue
-
         struct_attribute = rich_struct.get_attribute_by_name(attribute.name)
 
         if struct_attribute is not None:
             if struct_attribute.optional:
                 document.write(
-                    f"        self.{attribute.name} = rich_variant.{attribute.name};\n"
+                    f"        dispatcher.apply({flat_struct.name}Actions::Set{attribute.capitalized_name()}(rich_variant.{attribute.name}));\n"
                 )
             else:
                 document.write(
-                    f"        self.{attribute.name} = Some(rich_variant.{attribute.name});\n"
+                    f"        dispatcher.apply({flat_struct.name}Actions::Set{attribute.capitalized_name()}(Some(rich_variant.{attribute.name})));\n"
                 )
         else:
             struct_attribute = flat_struct.get_attribute_by_name(attribute.name)
 
             if struct_attribute is not None:
-                if struct_attribute.optional:
+                if (
+                    attribute.data_type() in INPUT_TYPE_MAP
+                    or attribute.data_type() == "NaiveDateTime"
+                ):
+                    if struct_attribute.optional:
+                        document.write(
+                            f"    dispatcher.apply({flat_struct.name}Actions::Set{attribute.capitalized_name()}(rich_variant.inner.{attribute.name}.map(|{attribute.name}| {attribute.name}.to_string())));\n"
+                        )
+                    else:
+                        document.write(
+                            f"    dispatcher.apply({flat_struct.name}Actions::Set{attribute.capitalized_name()}(Some(rich_variant.inner.{attribute.name}.to_string())));\n"
+                        )
+                elif struct_attribute.optional:
                     document.write(
-                        f"        self.{attribute.name} = rich_variant.inner.{attribute.name};\n"
+                        f"        dispatcher.apply({flat_struct.name}Actions::Set{attribute.capitalized_name()}(rich_variant.inner.{attribute.name}));\n"
                     )
                 else:
                     document.write(
-                        f"        self.{attribute.name} = Some(rich_variant.inner.{attribute.name});\n"
+                        f"        dispatcher.apply({flat_struct.name}Actions::Set{attribute.capitalized_name()}(Some(rich_variant.inner.{attribute.name})));"
                     )
             else:
                 raise Exception(
@@ -5866,6 +5884,7 @@ def write_frontend_forms(
         "use std::rc::Rc;",
         "use uuid::Uuid;",
         "use std::ops::Deref;",
+        "use yewdux::Dispatch;",
         "use chrono::NaiveDateTime;",
         "use web_common::api::ApiError;",
         "use crate::workers::ws_worker::ComponentMessage;",

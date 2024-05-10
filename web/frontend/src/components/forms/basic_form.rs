@@ -42,7 +42,7 @@ pub(super) trait FormBuilder: Clone + Store + PartialEq + Serialize + Debug {
     /// # Arguments
     /// * `rich_variant` - The data to use to update the form builder.
     fn update(
-        &mut self,
+        dispatcher: &Dispatch<Self>,
         rich_variant: Self::RichVariant,
     ) -> Vec<ComponentMessage>;
 
@@ -158,11 +158,13 @@ where
                     )
                 } else {
                     let rich_variant: <<Data as FormBuildable>::Builder as FormBuilder>::RichVariant = bincode::deserialize(&row).unwrap();
-                    ctx.props().builder_dispatch.reduce_mut(|state| {
-                        for message in state.update(rich_variant) {
-                            self.websocket.send(message);
-                        }
-                    });
+
+                    <<Data as FormBuildable>::Builder as FormBuilder>::update(
+                        &ctx.props().builder_dispatch,
+                        rich_variant,
+                    )
+                    .into_iter()
+                    .for_each(|message| self.websocket.send(message))
                 }
                 true
             }
