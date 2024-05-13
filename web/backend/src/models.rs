@@ -981,6 +981,187 @@ impl ContinuousUnit {
     }
 }
 #[derive(Queryable, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default, Identifiable, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[diesel(table_name = countries)]
+pub struct Country {
+    pub id: i32,
+    pub iso: String,
+    pub emoji: String,
+    pub unicode: String,
+    pub name: String,
+}
+
+impl From<Country> for web_common::database::tables::Country {
+    fn from(item: Country) -> Self {
+        Self {
+            id: item.id,
+            iso: item.iso,
+            emoji: item.emoji,
+            unicode: item.unicode,
+            name: item.name,
+        }
+    }
+}
+
+impl From<web_common::database::tables::Country> for Country {
+    fn from(item: web_common::database::tables::Country) -> Self {
+        Self {
+            id: item.id,
+            iso: item.iso,
+            emoji: item.emoji,
+            unicode: item.unicode,
+            name: item.name,
+        }
+    }
+}
+
+impl Country {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::countries;
+       countries::dsl::countries
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Delete the struct from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete(
+        &self,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<usize, diesel::result::Error> {
+        Self::delete_by_id(self.id, connection)
+    }
+    /// Delete the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete_by_id(
+        id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<usize, diesel::result::Error> {
+        diesel::delete(countries::dsl::countries
+            .filter(countries::dsl::id.eq(id))
+        ).execute(connection)
+    }
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn get(
+        id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::countries;
+        countries::dsl::countries
+            .filter(countries::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+    /// Search for the struct by a given string by Postgres's `similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, iso, emoji, unicode, name FROM countries ",
+            "WHERE $1 % name ",
+            "ORDER BY similarity($1, name) DESC LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, iso, emoji, unicode, name FROM countries ",
+            "WHERE $1 <% name ",
+            "ORDER BY word_similarity($1, name) DESC LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all(Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, iso, emoji, unicode, name FROM countries ",
+            "WHERE $1 <<% name ",
+            "ORDER BY strict_word_similarity($1, name) DESC LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+}
+#[derive(Queryable, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default, Identifiable, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = derived_samples)]
 pub struct DerivedSample {
     pub id: i32,
@@ -2710,8 +2891,11 @@ impl Notification {
 pub struct Organization {
     pub id: i32,
     pub name: String,
-    pub description: String,
-    pub parent_organization_id: Option<i32>,
+    pub url: String,
+    pub country: String,
+    pub alpha_two_code: String,
+    pub state_province: Option<String>,
+    pub domain: String,
 }
 
 impl From<Organization> for web_common::database::tables::Organization {
@@ -2719,8 +2903,11 @@ impl From<Organization> for web_common::database::tables::Organization {
         Self {
             id: item.id,
             name: item.name,
-            description: item.description,
-            parent_organization_id: item.parent_organization_id,
+            url: item.url,
+            country: item.country,
+            alpha_two_code: item.alpha_two_code,
+            state_province: item.state_province,
+            domain: item.domain,
         }
     }
 }
@@ -2730,8 +2917,11 @@ impl From<web_common::database::tables::Organization> for Organization {
         Self {
             id: item.id,
             name: item.name,
-            description: item.description,
-            parent_organization_id: item.parent_organization_id,
+            url: item.url,
+            country: item.country,
+            alpha_two_code: item.alpha_two_code,
+            state_province: item.state_province,
+            domain: item.domain,
         }
     }
 }
@@ -2830,7 +3020,7 @@ impl Organization {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, parent_organization_id FROM organizations ",
+            "SELECT id, name, url, country, alpha_two_code, state_province, domain FROM organizations ",
             "WHERE $1 % name ",
             "ORDER BY similarity($1, name) DESC LIMIT $2",
         );
@@ -2859,7 +3049,7 @@ impl Organization {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, parent_organization_id FROM organizations ",
+            "SELECT id, name, url, country, alpha_two_code, state_province, domain FROM organizations ",
             "WHERE $1 <% name ",
             "ORDER BY word_similarity($1, name) DESC LIMIT $2",
         );
@@ -2888,7 +3078,7 @@ impl Organization {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, parent_organization_id FROM organizations ",
+            "SELECT id, name, url, country, alpha_two_code, state_province, domain FROM organizations ",
             "WHERE $1 <<% name ",
             "ORDER BY strict_word_similarity($1, name) DESC LIMIT $2",
         );

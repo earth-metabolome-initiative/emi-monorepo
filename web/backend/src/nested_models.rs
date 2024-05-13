@@ -1279,7 +1279,7 @@ impl From<NestedLoginProvider> for web_common::database::nested_models::NestedLo
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedManufacturedItemCategory {
     pub inner: ManufacturedItemCategory,
-    pub manifacturer: NestedOrganization,
+    pub manifacturer: Organization,
 }
 
 impl NestedManufacturedItemCategory {
@@ -1293,7 +1293,7 @@ impl NestedManufacturedItemCategory {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            manifacturer: NestedOrganization::get(flat_struct.manifacturer_id, connection)?,
+            manifacturer: Organization::get(flat_struct.manifacturer_id, connection)?,
                 inner: flat_struct,
         })
     }
@@ -1407,129 +1407,6 @@ impl From<NestedNotification> for web_common::database::nested_models::NestedNot
         Self {
             inner: item.inner.into(),
             user: item.user.into(),
-        }
-    }
-}
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
-pub struct NestedOrganization {
-    pub inner: Organization,
-    pub parent_organization: Option<Organization>,
-}
-
-impl NestedOrganization {
-    /// Convert the flat struct to the nested struct.
-    ///
-    /// # Arguments
-    /// * `flat_struct` - The flat struct.
-    /// * `connection` - The database connection.
-    pub fn from_flat(
-        flat_struct: Organization,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
-        Ok(Self {
-            parent_organization: flat_struct.parent_organization_id.map(|flat_struct| Organization::get(flat_struct, connection)).transpose()?,
-                inner: flat_struct,
-        })
-    }
-}
-impl NestedOrganization {
-    /// Get all the nested structs from the database.
-    ///
-    /// # Arguments
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        Organization::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
-    }
-}
-impl NestedOrganization {
-    /// Get the nested struct from the provided primary key.
-    ///
-    /// # Arguments
-    /// * `id` - The primary key of the row.
-    /// * `connection` - The database connection.
-    pub fn get(
-        id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       Organization::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
-    }
-}
-impl NestedOrganization {
-    /// Get the nested struct from the provided name.
-    ///
-    /// # Arguments
-    /// * `name` - The name of the row.
-    /// * `connection` - The database connection.
-    pub fn from_name(
-        name: &str,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-        Organization::from_name(name, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
-    }
-}
-impl NestedOrganization {
-    /// Search the table by the query.
-    ///
-    /// # Arguments
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       Organization::similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
-    }
-}
-impl NestedOrganization {
-    /// Search the table by the query.
-    ///
-    /// # Arguments
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn word_similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       Organization::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
-    }
-}
-impl NestedOrganization {
-    /// Search the table by the query.
-    ///
-    /// # Arguments
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn strict_word_similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       Organization::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
-    }
-}
-impl From<web_common::database::nested_models::NestedOrganization> for NestedOrganization {
-    fn from(item: web_common::database::nested_models::NestedOrganization) -> Self {
-        Self {
-            inner: item.inner.into(),
-            parent_organization: item.parent_organization.map(|item| item.into()),
-        }
-    }
-}
-impl From<NestedOrganization> for web_common::database::nested_models::NestedOrganization {
-    fn from(item: NestedOrganization) -> Self {
-        Self {
-            inner: item.inner.into(),
-            parent_organization: item.parent_organization.map(|item| item.into()),
         }
     }
 }

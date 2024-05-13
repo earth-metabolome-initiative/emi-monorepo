@@ -9,3 +9,4 @@ git+https://github.com/LucaCappelletti94/pyinaturalist.git#egg=pyinaturalist
 polars
 pyarrow
 userinput
+lxml

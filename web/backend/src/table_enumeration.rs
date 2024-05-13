@@ -68,6 +68,7 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::ContainerHorizontalRules => unimplemented!("Table `container_horizontal_rules` does not have a GIN similarity index."),
             web_common::database::Table::ContainerVerticalRules => unimplemented!("Table `container_vertical_rules` does not have a GIN similarity index."),
             web_common::database::Table::ContinuousUnits => unimplemented!("Table `continuous_units` does not have a GIN similarity index."),
+            web_common::database::Table::Countries => Country::similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::DerivedSamples => unimplemented!("Table `derived_samples` does not have a GIN similarity index."),
             web_common::database::Table::DiscreteUnits => unimplemented!("Table `discrete_units` does not have a GIN similarity index."),
             web_common::database::Table::DocumentFormats => DocumentFormat::similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
@@ -83,7 +84,7 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::LoginProviders => unimplemented!("Table `login_providers` does not have a GIN similarity index."),
             web_common::database::Table::ManufacturedItemCategories => unimplemented!("Table `manufactured_item_categories` does not have a GIN similarity index."),
             web_common::database::Table::Notifications => unimplemented!("Table `notifications` does not have a GIN similarity index."),
-            web_common::database::Table::Organizations => NestedOrganization::similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::Organizations => Organization::similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::PrimaryUserEmails => unimplemented!("Table `primary_user_emails` does not have a GIN similarity index."),
             web_common::database::Table::Procedures => unimplemented!("Table `procedures` does not have a GIN similarity index."),
             web_common::database::Table::ProjectRequirements => unimplemented!("Table `project_requirements` does not have a GIN similarity index."),
@@ -113,6 +114,7 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::ContainerHorizontalRules => unimplemented!("Table `container_horizontal_rules` does not have a GIN similarity index."),
             web_common::database::Table::ContainerVerticalRules => unimplemented!("Table `container_vertical_rules` does not have a GIN similarity index."),
             web_common::database::Table::ContinuousUnits => unimplemented!("Table `continuous_units` does not have a GIN similarity index."),
+            web_common::database::Table::Countries => Country::word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::DerivedSamples => unimplemented!("Table `derived_samples` does not have a GIN similarity index."),
             web_common::database::Table::DiscreteUnits => unimplemented!("Table `discrete_units` does not have a GIN similarity index."),
             web_common::database::Table::DocumentFormats => DocumentFormat::word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
@@ -128,7 +130,7 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::LoginProviders => unimplemented!("Table `login_providers` does not have a GIN similarity index."),
             web_common::database::Table::ManufacturedItemCategories => unimplemented!("Table `manufactured_item_categories` does not have a GIN similarity index."),
             web_common::database::Table::Notifications => unimplemented!("Table `notifications` does not have a GIN similarity index."),
-            web_common::database::Table::Organizations => NestedOrganization::word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::Organizations => Organization::word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::PrimaryUserEmails => unimplemented!("Table `primary_user_emails` does not have a GIN similarity index."),
             web_common::database::Table::Procedures => unimplemented!("Table `procedures` does not have a GIN similarity index."),
             web_common::database::Table::ProjectRequirements => unimplemented!("Table `project_requirements` does not have a GIN similarity index."),
@@ -158,6 +160,7 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::ContainerHorizontalRules => unimplemented!("Table `container_horizontal_rules` does not have a GIN similarity index."),
             web_common::database::Table::ContainerVerticalRules => unimplemented!("Table `container_vertical_rules` does not have a GIN similarity index."),
             web_common::database::Table::ContinuousUnits => unimplemented!("Table `continuous_units` does not have a GIN similarity index."),
+            web_common::database::Table::Countries => Country::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::DerivedSamples => unimplemented!("Table `derived_samples` does not have a GIN similarity index."),
             web_common::database::Table::DiscreteUnits => unimplemented!("Table `discrete_units` does not have a GIN similarity index."),
             web_common::database::Table::DocumentFormats => DocumentFormat::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
@@ -173,7 +176,7 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::LoginProviders => unimplemented!("Table `login_providers` does not have a GIN similarity index."),
             web_common::database::Table::ManufacturedItemCategories => unimplemented!("Table `manufactured_item_categories` does not have a GIN similarity index."),
             web_common::database::Table::Notifications => unimplemented!("Table `notifications` does not have a GIN similarity index."),
-            web_common::database::Table::Organizations => NestedOrganization::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::Organizations => Organization::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::PrimaryUserEmails => unimplemented!("Table `primary_user_emails` does not have a GIN similarity index."),
             web_common::database::Table::Procedures => unimplemented!("Table `procedures` does not have a GIN similarity index."),
             web_common::database::Table::ProjectRequirements => unimplemented!("Table `project_requirements` does not have a GIN similarity index."),
@@ -227,6 +230,7 @@ impl IdentifiableTable for web_common::database::Table {
             web_common::database::Table::ContainerHorizontalRules => bincode::serialize(&NestedContainerHorizontalRule::get(primary_key.into(), connection)?)?,
             web_common::database::Table::ContainerVerticalRules => bincode::serialize(&NestedContainerVerticalRule::get(primary_key.into(), connection)?)?,
             web_common::database::Table::ContinuousUnits => bincode::serialize(&ContinuousUnit::get(primary_key.into(), connection)?)?,
+            web_common::database::Table::Countries => bincode::serialize(&Country::get(primary_key.into(), connection)?)?,
             web_common::database::Table::DerivedSamples => bincode::serialize(&NestedDerivedSample::get(primary_key.into(), connection)?)?,
             web_common::database::Table::DiscreteUnits => bincode::serialize(&DiscreteUnit::get(primary_key.into(), connection)?)?,
             web_common::database::Table::DocumentFormats => bincode::serialize(&DocumentFormat::get(primary_key.into(), connection)?)?,
@@ -242,7 +246,7 @@ impl IdentifiableTable for web_common::database::Table {
             web_common::database::Table::LoginProviders => bincode::serialize(&NestedLoginProvider::get(primary_key.into(), connection)?)?,
             web_common::database::Table::ManufacturedItemCategories => bincode::serialize(&NestedManufacturedItemCategory::get(primary_key.into(), connection)?)?,
             web_common::database::Table::Notifications => bincode::serialize(&NestedNotification::get(primary_key.into(), connection)?)?,
-            web_common::database::Table::Organizations => bincode::serialize(&NestedOrganization::get(primary_key.into(), connection)?)?,
+            web_common::database::Table::Organizations => bincode::serialize(&Organization::get(primary_key.into(), connection)?)?,
             web_common::database::Table::PrimaryUserEmails => bincode::serialize(&PrimaryUserEmail::get(primary_key.into(), connection)?)?,
             web_common::database::Table::Procedures => bincode::serialize(&NestedProcedure::get(primary_key.into(), connection)?)?,
             web_common::database::Table::ProjectRequirements => bincode::serialize(&NestedProjectRequirement::get(primary_key.into(), connection)?)?,
@@ -296,6 +300,7 @@ impl DeletableTable for web_common::database::Table {
             web_common::database::Table::ContainerHorizontalRules => ContainerHorizontalRule::delete_by_id(primary_key.into(), connection)?,
             web_common::database::Table::ContainerVerticalRules => ContainerVerticalRule::delete_by_id(primary_key.into(), connection)?,
             web_common::database::Table::ContinuousUnits => ContinuousUnit::delete_by_id(primary_key.into(), connection)?,
+            web_common::database::Table::Countries => Country::delete_by_id(primary_key.into(), connection)?,
             web_common::database::Table::DerivedSamples => DerivedSample::delete_by_id(primary_key.into(), connection)?,
             web_common::database::Table::DiscreteUnits => DiscreteUnit::delete_by_id(primary_key.into(), connection)?,
             web_common::database::Table::DocumentFormats => DocumentFormat::delete_by_id(primary_key.into(), connection)?,
@@ -368,6 +373,7 @@ impl AllTable for web_common::database::Table {
             web_common::database::Table::ContainerHorizontalRules => NestedContainerHorizontalRule::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::ContainerVerticalRules => NestedContainerVerticalRule::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::ContinuousUnits => ContinuousUnit::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::Countries => Country::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::DerivedSamples => NestedDerivedSample::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::DiscreteUnits => DiscreteUnit::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::DocumentFormats => DocumentFormat::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
@@ -383,7 +389,7 @@ impl AllTable for web_common::database::Table {
             web_common::database::Table::LoginProviders => NestedLoginProvider::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::ManufacturedItemCategories => NestedManufacturedItemCategory::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::Notifications => NestedNotification::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::Organizations => NestedOrganization::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::Organizations => Organization::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::PrimaryUserEmails => PrimaryUserEmail::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::Procedures => NestedProcedure::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::ProjectRequirements => NestedProjectRequirement::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
@@ -450,6 +456,7 @@ impl InsertableTable for web_common::database::Table {
                  bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
             },
             web_common::database::Table::ContinuousUnits => unreachable!("Table `continuous_units` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::Countries => unreachable!("Table `countries` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::DerivedSamples => todo!("Insert not implemented for derived_samples."),
             web_common::database::Table::DiscreteUnits => unreachable!("Table `discrete_units` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::DocumentFormats => unreachable!("Table `document_formats` is not insertable as it does not have a known column associated to a creator user id."),
@@ -572,6 +579,7 @@ impl UpdatableTable for web_common::database::Table {
                  bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
             },
             web_common::database::Table::ContinuousUnits => unreachable!("Table `continuous_units` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::Countries => unreachable!("Table `countries` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::DerivedSamples => todo!("Update not implemented for derived_samples."),
             web_common::database::Table::DiscreteUnits => unreachable!("Table `discrete_units` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::DocumentFormats => unreachable!("Table `document_formats` is not updatable as it does not have a known column associated to an updater user id."),
@@ -701,6 +709,7 @@ impl FromFlatStrTable for web_common::database::Table {
                  bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
             },
             web_common::database::Table::ContinuousUnits => bincode::serialize(&serde_json::from_str::<crate::models::ContinuousUnit>(row).map_err(web_common::api::ApiError::from)?).map_err(web_common::api::ApiError::from)?,
+            web_common::database::Table::Countries => bincode::serialize(&serde_json::from_str::<crate::models::Country>(row).map_err(web_common::api::ApiError::from)?).map_err(web_common::api::ApiError::from)?,
             web_common::database::Table::DerivedSamples => {
                 let flat_row: crate::models::DerivedSample = serde_json::from_str::<crate::models::DerivedSample>(row).map_err(web_common::api::ApiError::from)?;
                 let richest_row = crate::nested_models::NestedDerivedSample::from_flat(flat_row, connection)?;
@@ -764,11 +773,7 @@ impl FromFlatStrTable for web_common::database::Table {
                 let richest_row = crate::nested_models::NestedNotification::from_flat(flat_row, connection)?;
                  bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
             },
-            web_common::database::Table::Organizations => {
-                let flat_row: crate::models::Organization = serde_json::from_str::<crate::models::Organization>(row).map_err(web_common::api::ApiError::from)?;
-                let richest_row = crate::nested_models::NestedOrganization::from_flat(flat_row, connection)?;
-                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
-            },
+            web_common::database::Table::Organizations => bincode::serialize(&serde_json::from_str::<crate::models::Organization>(row).map_err(web_common::api::ApiError::from)?).map_err(web_common::api::ApiError::from)?,
             web_common::database::Table::PrimaryUserEmails => bincode::serialize(&serde_json::from_str::<crate::models::PrimaryUserEmail>(row).map_err(web_common::api::ApiError::from)?).map_err(web_common::api::ApiError::from)?,
             web_common::database::Table::Procedures => {
                 let flat_row: crate::models::Procedure = serde_json::from_str::<crate::models::Procedure>(row).map_err(web_common::api::ApiError::from)?;
