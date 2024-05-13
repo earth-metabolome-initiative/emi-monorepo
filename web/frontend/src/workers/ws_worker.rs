@@ -46,6 +46,12 @@ pub enum ComponentMessage {
     Operation(Operation),
 }
 
+
+/// Trait defining a struct that is associated to a Table.
+pub trait Tabular {
+    const TABLE: Table;
+}
+
 impl ComponentMessage {
     pub(crate) fn insert<R: Serialize + FormBuildable>(row: &R) -> Self {
         Self::Operation(Operation::Insert(
@@ -61,11 +67,11 @@ impl ComponentMessage {
         ))
     }
 
-    pub(crate) fn get<R: FormBuildable>(primary_key: PrimaryKey) -> Self {
+    pub(crate) fn get<R: Tabular>(primary_key: PrimaryKey) -> Self {
         Self::Operation(Operation::Select(Select::id(R::TABLE, primary_key)))
     }
 
-    pub(crate) fn get_named<S: ToString, R: FormBuildable>(operation_name: S, primary_key: PrimaryKey) -> Self {
+    pub(crate) fn get_named<S: ToString, R: Tabular>(operation_name: S, primary_key: PrimaryKey) -> Self {
         Self::Operation(Operation::Select(Select::id_with_operation_name(
             R::TABLE,
             operation_name.to_string(),

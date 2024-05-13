@@ -11,6 +11,9 @@ pub mod navigator;
 mod search_bar;
 pub mod sidebar;
 
+pub mod basic_page;
+pub use basic_page::BasicPage;
+
 pub use app::App;
 pub use error_page::ErrorPage;
 pub use footer::Footer;

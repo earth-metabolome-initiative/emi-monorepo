@@ -11,12 +11,14 @@ use web_common::api::form_traits::FormMethod;
 use std::rc::Rc;
 use uuid::Uuid;
 use std::ops::Deref;
+use crate::workers::ws_worker::Tabular;
 use yewdux::Dispatch;
 use chrono::NaiveDateTime;
 use web_common::api::ApiError;
 use crate::workers::ws_worker::ComponentMessage;
 use web_common::custom_validators::Image;
 use web_common::file_formats::GenericFileFormat;
+use yew_router::prelude::*;
 
 #[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 #[store(storage = "local", storage_tab_sync)]
@@ -361,9 +363,12 @@ impl From<ContainerHorizontalRuleBuilder> for UpdateContainerHorizontalRule {
         }
     }
 }
+impl Tabular for NewContainerHorizontalRule {
+    const TABLE: Table = Table::ContainerHorizontalRules;
+}
+
 impl FormBuildable for NewContainerHorizontalRule {
     type Builder = ContainerHorizontalRuleBuilder;
-    const TABLE: Table = Table::ContainerHorizontalRules;
     fn title() -> &'static str {
         "Container horizontal rule"
     }
@@ -378,9 +383,12 @@ impl FormBuildable for NewContainerHorizontalRule {
     }
 }
 
+impl Tabular for UpdateContainerHorizontalRule {
+    const TABLE: Table = Table::ContainerHorizontalRules;
+}
+
 impl FormBuildable for UpdateContainerHorizontalRule {
     type Builder = ContainerHorizontalRuleBuilder;
-    const TABLE: Table = Table::ContainerHorizontalRules;
     fn title() -> &'static str {
         "Container horizontal rule"
     }
@@ -798,9 +806,12 @@ impl From<ContainerVerticalRuleBuilder> for UpdateContainerVerticalRule {
         }
     }
 }
+impl Tabular for NewContainerVerticalRule {
+    const TABLE: Table = Table::ContainerVerticalRules;
+}
+
 impl FormBuildable for NewContainerVerticalRule {
     type Builder = ContainerVerticalRuleBuilder;
-    const TABLE: Table = Table::ContainerVerticalRules;
     fn title() -> &'static str {
         "Container vertical rule"
     }
@@ -815,9 +826,12 @@ impl FormBuildable for NewContainerVerticalRule {
     }
 }
 
+impl Tabular for UpdateContainerVerticalRule {
+    const TABLE: Table = Table::ContainerVerticalRules;
+}
+
 impl FormBuildable for UpdateContainerVerticalRule {
     type Builder = ContainerVerticalRuleBuilder;
-    const TABLE: Table = Table::ContainerVerticalRules;
     fn title() -> &'static str {
         "Container vertical rule"
     }
@@ -1013,9 +1027,12 @@ impl From<ItemCategoryBuilder> for UpdateItemCategory {
         }
     }
 }
+impl Tabular for NewItemCategory {
+    const TABLE: Table = Table::ItemCategories;
+}
+
 impl FormBuildable for NewItemCategory {
     type Builder = ItemCategoryBuilder;
-    const TABLE: Table = Table::ItemCategories;
     fn title() -> &'static str {
         "Item category"
     }
@@ -1030,9 +1047,12 @@ impl FormBuildable for NewItemCategory {
     }
 }
 
+impl Tabular for UpdateItemCategory {
+    const TABLE: Table = Table::ItemCategories;
+}
+
 impl FormBuildable for UpdateItemCategory {
     type Builder = ItemCategoryBuilder;
-    const TABLE: Table = Table::ItemCategories;
     fn title() -> &'static str {
         "Item category"
     }
@@ -1192,9 +1212,12 @@ impl From<ProcedureBuilder> for UpdateProcedure {
         }
     }
 }
+impl Tabular for NewProcedure {
+    const TABLE: Table = Table::Procedures;
+}
+
 impl FormBuildable for NewProcedure {
     type Builder = ProcedureBuilder;
-    const TABLE: Table = Table::Procedures;
     fn title() -> &'static str {
         "Procedure"
     }
@@ -1209,9 +1232,12 @@ impl FormBuildable for NewProcedure {
     }
 }
 
+impl Tabular for UpdateProcedure {
+    const TABLE: Table = Table::Procedures;
+}
+
 impl FormBuildable for UpdateProcedure {
     type Builder = ProcedureBuilder;
-    const TABLE: Table = Table::Procedures;
     fn title() -> &'static str {
         "Procedure"
     }
@@ -1417,9 +1443,12 @@ impl From<ProjectRequirementBuilder> for UpdateProjectRequirement {
         }
     }
 }
+impl Tabular for NewProjectRequirement {
+    const TABLE: Table = Table::ProjectRequirements;
+}
+
 impl FormBuildable for NewProjectRequirement {
     type Builder = ProjectRequirementBuilder;
-    const TABLE: Table = Table::ProjectRequirements;
     fn title() -> &'static str {
         "Project requirement"
     }
@@ -1434,9 +1463,12 @@ impl FormBuildable for NewProjectRequirement {
     }
 }
 
+impl Tabular for UpdateProjectRequirement {
+    const TABLE: Table = Table::ProjectRequirements;
+}
+
 impl FormBuildable for UpdateProjectRequirement {
     type Builder = ProjectRequirementBuilder;
-    const TABLE: Table = Table::ProjectRequirements;
     fn title() -> &'static str {
         "Project requirement"
     }
@@ -1788,9 +1820,12 @@ impl From<ProjectBuilder> for UpdateProject {
         }
     }
 }
+impl Tabular for NewProject {
+    const TABLE: Table = Table::Projects;
+}
+
 impl FormBuildable for NewProject {
     type Builder = ProjectBuilder;
-    const TABLE: Table = Table::Projects;
     fn title() -> &'static str {
         "Project"
     }
@@ -1805,9 +1840,12 @@ impl FormBuildable for NewProject {
     }
 }
 
+impl Tabular for UpdateProject {
+    const TABLE: Table = Table::Projects;
+}
+
 impl FormBuildable for UpdateProject {
     type Builder = ProjectBuilder;
-    const TABLE: Table = Table::Projects;
     fn title() -> &'static str {
         "Project"
     }
@@ -1977,9 +2015,12 @@ impl From<SampledIndividualBuilder> for NewSampledIndividual {
         }
     }
 }
+impl Tabular for NewSampledIndividual {
+    const TABLE: Table = Table::SampledIndividuals;
+}
+
 impl FormBuildable for NewSampledIndividual {
     type Builder = SampledIndividualBuilder;
-    const TABLE: Table = Table::SampledIndividuals;
     fn title() -> &'static str {
         "Sampled individual"
     }
@@ -2001,6 +2042,26 @@ pub fn create_sampled_individual_form() -> Html {
     let set_tagged = builder_dispatch.apply_callback(|tagged: bool| SampledIndividualActions::SetTagged(Some(tagged)));
     html! {
         <BasicForm<NewSampledIndividual> method={FormMethod::POST} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+            <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
+            <Checkbox label="Tagged" errors={builder_store.errors_tagged.clone()} builder={set_tagged} value={builder_store.tagged.unwrap_or(false)} />
+        </BasicForm<NewSampledIndividual>>
+    }
+}
+#[derive(Clone, PartialEq, Properties)]
+pub struct UpdateSampledIndividualFormProp {
+    pub id: Uuid,
+}
+
+#[function_component(UpdateSampledIndividualForm)]
+pub fn update_sampled_individual_form(props: &UpdateSampledIndividualFormProp) -> Html {
+    let (builder_store, builder_dispatch) = use_store::<SampledIndividualBuilder>();
+     builder_dispatch.reduce_mut(|builder| {
+         builder.id = Some(props.id);
+     });
+    let set_name = builder_dispatch.apply_callback(|name: Option<String>| SampledIndividualActions::SetName(name));
+    let set_tagged = builder_dispatch.apply_callback(|tagged: bool| SampledIndividualActions::SetTagged(Some(tagged)));
+    html! {
+        <BasicForm<NewSampledIndividual> method={FormMethod::PUT} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
             <Checkbox label="Tagged" errors={builder_store.errors_tagged.clone()} builder={set_tagged} value={builder_store.tagged.unwrap_or(false)} />
         </BasicForm<NewSampledIndividual>>
@@ -2121,9 +2182,12 @@ impl From<SampleBuilder> for NewSample {
         }
     }
 }
+impl Tabular for NewSample {
+    const TABLE: Table = Table::Samples;
+}
+
 impl FormBuildable for NewSample {
     type Builder = SampleBuilder;
-    const TABLE: Table = Table::Samples;
     fn title() -> &'static str {
         "Sample"
     }
@@ -2146,6 +2210,28 @@ pub fn create_sample_form() -> Html {
     let set_state = builder_dispatch.apply_callback(|state: Option<NestedSampleState>| SampleActions::SetState(state));
     html! {
         <BasicForm<NewSample> method={FormMethod::POST} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+            <Datalist<User> builder={set_sampled_by} errors={builder_store.errors_sampled_by.clone()} value={builder_store.sampled_by.clone()} label="Sampled by" />
+            <Datalist<NestedSamplingProcedure> builder={set_procedure} errors={builder_store.errors_procedure.clone()} value={builder_store.procedure.clone()} label="Procedure" />
+            <Datalist<NestedSampleState> builder={set_state} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" />
+        </BasicForm<NewSample>>
+    }
+}
+#[derive(Clone, PartialEq, Properties)]
+pub struct UpdateSampleFormProp {
+    pub id: Uuid,
+}
+
+#[function_component(UpdateSampleForm)]
+pub fn update_sample_form(props: &UpdateSampleFormProp) -> Html {
+    let (builder_store, builder_dispatch) = use_store::<SampleBuilder>();
+     builder_dispatch.reduce_mut(|builder| {
+         builder.id = Some(props.id);
+     });
+    let set_sampled_by = builder_dispatch.apply_callback(|sampled_by: Option<User>| SampleActions::SetSampledBy(sampled_by));
+    let set_procedure = builder_dispatch.apply_callback(|procedure: Option<NestedSamplingProcedure>| SampleActions::SetProcedure(procedure));
+    let set_state = builder_dispatch.apply_callback(|state: Option<NestedSampleState>| SampleActions::SetState(state));
+    html! {
+        <BasicForm<NewSample> method={FormMethod::PUT} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <Datalist<User> builder={set_sampled_by} errors={builder_store.errors_sampled_by.clone()} value={builder_store.sampled_by.clone()} label="Sampled by" />
             <Datalist<NestedSamplingProcedure> builder={set_procedure} errors={builder_store.errors_procedure.clone()} value={builder_store.procedure.clone()} label="Procedure" />
             <Datalist<NestedSampleState> builder={set_state} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" />
@@ -2257,9 +2343,12 @@ impl From<SamplingProcedureBuilder> for NewSamplingProcedure {
         }
     }
 }
+impl Tabular for NewSamplingProcedure {
+    const TABLE: Table = Table::SamplingProcedures;
+}
+
 impl FormBuildable for NewSamplingProcedure {
     type Builder = SamplingProcedureBuilder;
-    const TABLE: Table = Table::SamplingProcedures;
     fn title() -> &'static str {
         "Sampling procedure"
     }
@@ -2281,6 +2370,26 @@ pub fn create_sampling_procedure_form() -> Html {
     let set_description = builder_dispatch.apply_callback(|description: Option<String>| SamplingProcedureActions::SetDescription(description));
     html! {
         <BasicForm<NewSamplingProcedure> method={FormMethod::POST} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+            <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
+            <BasicInput<String> label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
+        </BasicForm<NewSamplingProcedure>>
+    }
+}
+#[derive(Clone, PartialEq, Properties)]
+pub struct UpdateSamplingProcedureFormProp {
+    pub id: Uuid,
+}
+
+#[function_component(UpdateSamplingProcedureForm)]
+pub fn update_sampling_procedure_form(props: &UpdateSamplingProcedureFormProp) -> Html {
+    let (builder_store, builder_dispatch) = use_store::<SamplingProcedureBuilder>();
+     builder_dispatch.reduce_mut(|builder| {
+         builder.id = Some(props.id);
+     });
+    let set_name = builder_dispatch.apply_callback(|name: Option<String>| SamplingProcedureActions::SetName(name));
+    let set_description = builder_dispatch.apply_callback(|description: Option<String>| SamplingProcedureActions::SetDescription(description));
+    html! {
+        <BasicForm<NewSamplingProcedure> method={FormMethod::PUT} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
             <BasicInput<String> label="Description" errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
         </BasicForm<NewSamplingProcedure>>
@@ -2422,9 +2531,12 @@ impl From<TeamBuilder> for UpdateTeam {
         }
     }
 }
+impl Tabular for NewTeam {
+    const TABLE: Table = Table::Teams;
+}
+
 impl FormBuildable for NewTeam {
     type Builder = TeamBuilder;
-    const TABLE: Table = Table::Teams;
     fn title() -> &'static str {
         "Team"
     }
@@ -2439,9 +2551,12 @@ impl FormBuildable for NewTeam {
     }
 }
 
+impl Tabular for UpdateTeam {
+    const TABLE: Table = Table::Teams;
+}
+
 impl FormBuildable for UpdateTeam {
     type Builder = TeamBuilder;
-    const TABLE: Table = Table::Teams;
     fn title() -> &'static str {
         "Team"
     }
@@ -2638,9 +2753,12 @@ impl From<UserBuilder> for UpdateUser {
         }
     }
 }
+impl Tabular for UpdateUser {
+    const TABLE: Table = Table::Users;
+}
+
 impl FormBuildable for UpdateUser {
     type Builder = UserBuilder;
-    const TABLE: Table = Table::Users;
     fn title() -> &'static str {
         "User"
     }
