@@ -1,23 +1,59 @@
 //! Submodule providing the file input component for the frontend.
 
-use std::hash::DefaultHasher;
-use std::hash::Hash;
-use std::hash::Hasher;
-
 use super::InputErrors;
 use crate::workers::ws_worker::WebsocketMessage;
 use crate::workers::WebsocketWorker;
+use base64::engine::general_purpose;
+use base64::Engine;
 use gloo::timers::callback::Timeout;
+use image::ImageFormat;
 use validator::Validate;
 use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
-use wasm_bindgen::JsValue;
 use web_common::api::form_traits::TryFromCallback;
 use web_common::api::ApiError;
+use web_common::custom_validators::Image;
 use web_common::file_formats::GenericFileFormat;
 use yew::prelude::*;
 use yew_agent::prelude::WorkerBridgeHandle;
 use yew_agent::scope_ext::AgentScopeExt;
+
+/// Trait defining the preview of a file.
+pub trait HTMLPreview {
+    fn preview(&self) -> Html;
+}
+
+impl HTMLPreview for Image {
+    fn preview(&self) -> Html {
+        let data: &[u8] = self.as_ref();
+
+        match Image::is_image(data).unwrap() {
+            ImageFormat::Png => {
+                let url = format!(
+                    "data:image/png;base64,{}",
+                    general_purpose::STANDARD.encode(data)
+                );
+                html! {
+                    <img src={url} class="preview" />
+                }
+            }
+            ImageFormat::Jpeg => {
+                let url = format!(
+                    "data:image/jpeg;base64,{}",
+                    general_purpose::STANDARD.encode(data)
+                );
+                html! {
+                    <img src={url} class="preview" />
+                }
+            }
+            _ => {
+                html! {
+                    <div class="preview">{"Unsupported image format"}</div>
+                }
+            }
+        }
+    }
+}
 
 pub fn human_readable_size(size: u64) -> String {
     if size < 1024 {
@@ -32,13 +68,14 @@ pub fn human_readable_size(size: u64) -> String {
 }
 
 #[derive(Clone, PartialEq, Properties)]
-pub struct FileInputProp<Data>
+pub struct MultiFileInputProp<Data>
 where
     Data: 'static + Clone + PartialEq,
 {
     pub label: String,
     pub builder: Callback<Vec<Data>>,
     pub errors: Vec<ApiError>,
+    pub values: Vec<Data>,
     #[prop_or(false)]
     pub optional: bool,
     #[prop_or(false)]
@@ -46,12 +83,10 @@ where
     #[prop_or_default]
     pub allowed_formats: Vec<GenericFileFormat>,
     #[prop_or_default]
-    pub urls: Vec<String>,
-    #[prop_or_default]
     pub maximal_size: Option<u64>,
 }
 
-impl<Data> FileInputProp<Data>
+impl<Data> MultiFileInputProp<Data>
 where
     Data: 'static + Clone + PartialEq,
 {
@@ -83,20 +118,19 @@ where
     }
 }
 
-pub struct FileInput<Data> {
+pub struct MultiFileInput<Data> {
     _websocket: WorkerBridgeHandle<WebsocketWorker>,
     errors: Vec<ApiError>,
     is_valid: Option<bool>,
     validation_timeout: Option<Timeout>,
-    files: Vec<web_sys::File>,
-    parsed_files: Vec<Data>,
     show_drop_area: bool,
     show_drop_area_timeout: Option<Timeout>,
     hide_drop_area_timeout: Option<Timeout>,
     dragging: bool,
+    _phantom: std::marker::PhantomData<Data>,
 }
 
-pub enum FileInputMessage<Data> {
+pub enum MultiFileInputMessage<Data> {
     Backend(WebsocketMessage),
     Validate(Result<(web_sys::File, Data), ApiError>),
     Files(web_sys::FileList),
@@ -106,12 +140,12 @@ pub enum FileInputMessage<Data> {
     SetDragging(bool),
 }
 
-impl<Data> Component for FileInput<Data>
+impl<Data> Component for MultiFileInput<Data>
 where
-    Data: 'static + Clone + Validate + TryFromCallback<web_sys::File> + PartialEq,
+    Data: 'static + Clone + Validate + TryFromCallback<web_sys::File> + PartialEq + HTMLPreview,
 {
-    type Message = FileInputMessage<Data>;
-    type Properties = FileInputProp<Data>;
+    type Message = MultiFileInputMessage<Data>;
+    type Properties = MultiFileInputProp<Data>;
 
     fn create(ctx: &Context<Self>) -> Self {
         let document = web_sys::window().unwrap().document().unwrap();
@@ -121,7 +155,7 @@ where
             // Handle the dragover event here
             // For example, prevent the default behavior to allow dropping elements
             event.prevent_default();
-            link.send_message(FileInputMessage::SetDragging(true));
+            link.send_message(MultiFileInputMessage::SetDragging(true));
         }) as Box<dyn FnMut(_)>);
         document
             .add_event_listener_with_callback("dragover", closure.as_ref().unchecked_ref())
@@ -133,7 +167,7 @@ where
             // Handle the dragend event here
             // For example, prevent the default behavior to allow dropping elements
             event.prevent_default();
-            link.send_message(FileInputMessage::SetDragging(false));
+            link.send_message(MultiFileInputMessage::SetDragging(false));
         }) as Box<dyn FnMut(_)>);
         document
             .add_event_listener_with_callback("dragend", closure.as_ref().unchecked_ref())
@@ -150,25 +184,40 @@ where
             _websocket: ctx.link().bridge_worker(Callback::from({
                 let link = ctx.link().clone();
                 move |message: WebsocketMessage| {
-                    link.send_message(FileInputMessage::Backend(message));
+                    link.send_message(MultiFileInputMessage::Backend(message));
                 }
             })),
             errors: Vec::new(),
             is_valid: None,
             validation_timeout: None,
-            files: Vec::new(),
-            parsed_files: Vec::new(),
-            show_drop_area: ctx.props().urls.is_empty(),
+            show_drop_area: ctx.props().values.is_empty(),
             show_drop_area_timeout: None,
             hide_drop_area_timeout: None,
             dragging: false,
+            _phantom: std::marker::PhantomData,
         }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+        if !self.show_drop_area
+            && self.show_drop_area_timeout.is_none()
+            && ctx.props().values.is_empty()
+        {
+            ctx.link()
+                .send_message(MultiFileInputMessage::SetTimeoutDropAreaVisibility(true));
+        }
+
+        if self.show_drop_area
+            && self.hide_drop_area_timeout.is_none()
+            && !ctx.props().values.is_empty()
+        {
+            ctx.link()
+                .send_message(MultiFileInputMessage::SetTimeoutDropAreaVisibility(false));
+        }
+
         match msg {
-            FileInputMessage::Backend(_bm) => false,
-            FileInputMessage::SetDragging(dragging) => {
+            MultiFileInputMessage::Backend(_bm) => false,
+            MultiFileInputMessage::SetDragging(dragging) => {
                 if self.dragging != dragging {
                     self.dragging = dragging;
                     true
@@ -176,7 +225,7 @@ where
                     false
                 }
             }
-            FileInputMessage::Files(files) => {
+            MultiFileInputMessage::Files(files) => {
                 if files.length() == 0 {
                     return false;
                 }
@@ -190,10 +239,6 @@ where
 
                 // If the properties require the file to be singular, we only keep the first file
                 // and replace eventual previous files.
-                if !ctx.props().multiple {
-                    self.files.clear();
-                    change = true;
-                }
 
                 let number_of_files = if ctx.props().multiple {
                     files.length()
@@ -243,34 +288,34 @@ where
                         }
                     }
 
-                    if !self.files.iter().any(|f| {
-                        f.name() == file.name()
-                            && f.size() == file.size()
-                            && f.last_modified() == file.last_modified()
+                    let link = ctx.link().clone();
+                    if let Err(error) = Data::try_from_callback(file.clone(), move |result| {
+                        link.send_message(MultiFileInputMessage::Validate(
+                            result.map(|data| (file, data)),
+                        ));
                     }) {
-                        let link = ctx.link().clone();
-                        if let Err(error) = Data::try_from_callback(file.clone(), move |result| {
-                            link.send_message(FileInputMessage::Validate(result.map(|data| (file, data))));
-                        }) {
-                            ctx.link()
-                                .send_message(FileInputMessage::Validate(Err(error)));
-                        }
+                        ctx.link()
+                            .send_message(MultiFileInputMessage::Validate(Err(error)));
                     }
                 }
 
                 change
             }
-            FileInputMessage::Validate(data) => {
+            MultiFileInputMessage::Validate(data) => {
                 if let Some(timeout) = self.validation_timeout.take() {
                     timeout.cancel();
                 }
 
                 match data {
                     Ok((file, data)) => {
-                        self.files.push(file);
-                        self.parsed_files.push(data);
                         self.is_valid = Some(true);
-                        ctx.props().builder.emit(self.parsed_files.clone());
+                        ctx.props().builder.emit(if ctx.props().multiple {
+                            let mut files = ctx.props().values.clone();
+                            files.push(data);
+                            files
+                        } else {
+                            vec![data]
+                        });
                     }
                     Err(error) => {
                         self.errors.push(error);
@@ -278,22 +323,18 @@ where
                     }
                 }
 
-                ctx.link()
-                    .send_message(FileInputMessage::SetTimeoutDropAreaVisibility(
-                        self.files.is_empty() && ctx.props().urls.is_empty(),
-                    ));
+                true
+            }
+            MultiFileInputMessage::FilesRemoved(index) => {
+                ctx.props().builder.emit({
+                    let mut files = ctx.props().values.clone();
+                    files.remove(index);
+                    files
+                });
 
                 true
             }
-            FileInputMessage::FilesRemoved(index) => {
-                self.files.remove(index);
-                ctx.link()
-                    .send_message(FileInputMessage::SetTimeoutDropAreaVisibility(
-                        self.files.is_empty() && ctx.props().urls.is_empty(),
-                    ));
-                true
-            }
-            FileInputMessage::SetDropAreaVisibility(visibility) => {
+            MultiFileInputMessage::SetDropAreaVisibility(visibility) => {
                 if let Some(timeout) = self.hide_drop_area_timeout.take() {
                     timeout.cancel();
                 }
@@ -307,7 +348,7 @@ where
                     false
                 }
             }
-            FileInputMessage::SetTimeoutDropAreaVisibility(visibility) => {
+            MultiFileInputMessage::SetTimeoutDropAreaVisibility(visibility) => {
                 if let Some(timeout) = self.hide_drop_area_timeout.take() {
                     timeout.cancel();
                 }
@@ -324,11 +365,11 @@ where
 
                 if visibility {
                     self.show_drop_area_timeout = Some(Timeout::new(200, move || {
-                        link.send_message(FileInputMessage::SetDropAreaVisibility(true));
+                        link.send_message(MultiFileInputMessage::SetDropAreaVisibility(true));
                     }));
                 } else {
                     self.hide_drop_area_timeout = Some(Timeout::new(200, move || {
-                        link.send_message(FileInputMessage::SetDropAreaVisibility(false));
+                        link.send_message(MultiFileInputMessage::SetDropAreaVisibility(false));
                     }));
                 }
                 false
@@ -378,7 +419,7 @@ where
                     .files()
                     .unwrap();
 
-                link.send_message(FileInputMessage::Files(files));
+                link.send_message(MultiFileInputMessage::Files(files));
             })
         };
 
@@ -387,24 +428,24 @@ where
             Callback::from(move |drop_event: DragEvent| {
                 drop_event.prevent_default();
                 let files = drop_event.data_transfer().unwrap().files().unwrap();
-                link.send_message(FileInputMessage::Files(files));
+                link.send_message(MultiFileInputMessage::Files(files));
             })
         };
 
         let on_file_delete = {
             let link = ctx.link().clone();
             Callback::from(move |index: usize| {
-                link.send_message(FileInputMessage::FilesRemoved(index));
+                link.send_message(MultiFileInputMessage::FilesRemoved(index));
             })
         };
 
-        let no_files = self.files.is_empty() && ctx.props().urls.is_empty();
+        let no_files = ctx.props().values.is_empty();
 
         let ondragover = {
             let link = ctx.link().clone();
             Callback::from(move |event: DragEvent| {
                 event.prevent_default();
-                link.send_message(FileInputMessage::SetTimeoutDropAreaVisibility(true));
+                link.send_message(MultiFileInputMessage::SetTimeoutDropAreaVisibility(true));
             })
         };
 
@@ -412,7 +453,9 @@ where
             let link = ctx.link().clone();
             Callback::from(move |event: DragEvent| {
                 event.prevent_default();
-                link.send_message(FileInputMessage::SetTimeoutDropAreaVisibility(no_files));
+                link.send_message(MultiFileInputMessage::SetTimeoutDropAreaVisibility(
+                    no_files,
+                ));
             })
         };
 
@@ -448,11 +491,10 @@ where
                     }
                 } else {
                     html! {
-                        <FilePreview
+                        <FilePreview<Data>
                             hiding={self.show_drop_area_timeout.is_some()}
-                            files={self.files.clone()}
+                            values={ctx.props().values.clone()}
                             on_delete={on_file_delete}
-                            urls={if props.multiple || self.files.is_empty() {props.urls.clone()} else {vec![]}}
                         />
                     }
                 }}
@@ -463,47 +505,38 @@ where
 }
 
 #[derive(Clone, PartialEq, Properties)]
-pub struct FilePreviewProp {
-    pub files: Vec<web_sys::File>,
+pub struct FilePreviewProp<Data>
+where
+    Data: 'static + Clone + PartialEq,
+{
+    pub values: Vec<Data>,
     pub on_delete: Callback<usize>,
     #[prop_or_default]
     pub hiding: bool,
-    #[prop_or_default]
-    pub urls: Vec<String>,
 }
 
-#[derive(Clone, PartialEq)]
-pub enum FileLike {
-    File(web_sys::File),
-    Url(String),
-}
-
-impl FilePreviewProp {
+impl<Data> FilePreviewProp<Data>
+where
+    Data: 'static + Clone + PartialEq,
+{
     pub fn number_of_files(&self) -> usize {
-        self.files.len() + self.urls.len()
+        self.values.len()
     }
 
     pub fn is_empty(&self) -> bool {
-        self.files.is_empty() && self.urls.is_empty()
+        self.values.is_empty()
     }
 
-    pub fn one_file(&self) -> Option<FileLike> {
+    pub fn one_file(&self) -> Option<&Data> {
         if self.number_of_files() == 1 {
-            if let Some(file) = self.files.first() {
-                return Some(FileLike::File(file.clone()));
-            }
-            if let Some(url) = self.urls.first() {
-                return Some(FileLike::Url(url.clone()));
-            }
+            self.values.first()
+        } else {
+            None
         }
-        None
     }
 
-    pub fn iter(&self) -> impl Iterator<Item = FileLike> + '_ {
-        self.files
-            .iter()
-            .map(|f| FileLike::File(f.clone()))
-            .chain(self.urls.iter().map(|u| FileLike::Url(u.clone())))
+    pub fn iter(&self) -> impl Iterator<Item = &Data> {
+        self.values.iter()
     }
 }
 
@@ -522,47 +555,29 @@ impl FilePreviewProp {
 /// The component receives a list of web_sys::File objects, which it then displays. Since it
 /// also needs to be able to communicate with the parent component, it receives a callback to
 /// send messages to the parent component to delete the file from the list of selected files.
-pub fn file_preview(props: &FilePreviewProp) -> Html {
+pub fn file_preview<Data>(props: &FilePreviewProp<Data>) -> Html
+where
+    Data: 'static + Clone + PartialEq + HTMLPreview,
+{
     if props.is_empty() {
         return html! {
             <></>
         };
     }
 
-    if let Some(file_like) = props.one_file() {
-        match file_like {
-            FileLike::File(file) => {
-                let on_delete = {
-                    let props = props.clone();
-                    Callback::from(move |_| {
-                        let props = props.clone();
-                        let timeout = Timeout::new(200, move || {
-                            props.on_delete.emit(0);
-                        });
-                        timeout.forget();
-                    })
-                };
+    if let Some(data) = props.one_file() {
+        // let on_delete = {
+        //     let props = props.clone();
+        //     Callback::from(move |_| {
+        //         let props = props.clone();
+        //         let timeout = Timeout::new(200, move || {
+        //             props.on_delete.emit(0);
+        //         });
+        //         timeout.forget();
+        //     })
+        // };
 
-                return html! {
-                    <FilePreviewItem
-                        hiding={props.hiding}
-                        large={true}
-                        file={FileLike::File(file)}
-                        on_delete={on_delete}
-                    />
-                };
-            }
-            FileLike::Url(url) => {
-                return html! {
-                    <FilePreviewItem
-                        hiding={props.hiding}
-                        large={true}
-                        file={FileLike::Url(url)}
-                        on_delete={Callback::noop()}
-                    />
-                };
-            }
-        }
+        return data.preview();
     }
 
     let mut class = format!(
@@ -581,405 +596,457 @@ pub fn file_preview(props: &FilePreviewProp) -> Html {
     html! {
         <ul class={class}>
             { for props.iter().enumerate().map(|(i, file)|{
-                let props = props.clone();
-                let on_delete = Callback::from(move |_| {
-                    let props = props.clone();
-                    let timeout = Timeout::new(200, move || {
-                        props.on_delete.emit(i);
-                    });
-                    timeout.forget();
-                });
+                // let props = props.clone();
+                // let on_delete = Callback::from(move |_| {
+                //     let props = props.clone();
+                //     let timeout = Timeout::new(200, move || {
+                //         props.on_delete.emit(i);
+                //     });
+                //     timeout.forget();
+                // });
 
-                html! {
-                <FilePreviewItem large={false} file={file.clone()} on_delete={on_delete} />
-            }})}
+                file.preview()
+                })
+            }
         </ul>
     }
 }
 
+// #[derive(Clone, PartialEq, Properties)]
+// pub struct FilePreviewItemProp<Data>
+// where
+//     Data: 'static + Clone + PartialEq,
+// {
+//     pub file: Data,
+//     #[prop_or_default]
+//     pub on_delete: Callback<()>,
+//     pub large: bool,
+//     #[prop_or_default]
+//     pub hiding: bool,
+// }
+
+// impl<Data> FilePreviewItemProp<Data>
+// where
+//     Data: 'static + Clone + PartialEq,
+// {
+//     pub fn path(&self) -> Option<String> {
+//         match &self.file {
+//             FileLike::File(file) => Some(file.name()),
+//             FileLike::Url(_) => None,
+//         }
+//     }
+
+//     pub fn name(&self) -> Option<String> {
+//         match &self.file {
+//             FileLike::File(file) => Some(file.name().split('/').last().unwrap().to_string()),
+//             FileLike::Url(_) => None,
+//         }
+//     }
+
+//     pub fn extension(&self) -> Option<String> {
+//         match &self.file {
+//             FileLike::File(file) => {
+//                 let path = file.name();
+//                 let extension = path.split('.').last();
+//                 extension.map(|s| s.to_string())
+//             }
+//             FileLike::Url(url) => {
+//                 let extension = url.split('.').last();
+//                 extension.map(|s| s.to_string())
+//             }
+//         }
+//     }
+
+//     pub fn size(&self) -> Option<u64> {
+//         match &self.file {
+//             FileLike::File(file) => Some(file.size() as u64),
+//             FileLike::Url(_) => None,
+//         }
+//     }
+
+//     pub fn is_image(&self) -> bool {
+//         match &self.file {
+//             FileLike::File(file) => file.type_().starts_with("image"),
+//             FileLike::Url(url) => {
+//                 url.ends_with(".png")
+//                     || url.ends_with(".jpg")
+//                     || url.ends_with(".jpeg")
+//                     || url.ends_with(".gif")
+//                     || url.ends_with(".webp")
+//             }
+//         }
+//     }
+
+//     pub fn is_pdf(&self) -> bool {
+//         match &self.file {
+//             FileLike::File(file) => file.type_().starts_with("application/pdf"),
+//             FileLike::Url(url) => url.ends_with(".pdf"),
+//         }
+//     }
+
+//     pub fn last_modified(&self) -> Option<u64> {
+//         match &self.file {
+//             FileLike::File(file) => Some(file.last_modified() as u64),
+//             FileLike::Url(_) => None,
+//         }
+//     }
+
+//     pub fn metadata_hash(&self) -> u64 {
+//         let mut hasher = DefaultHasher::new();
+//         match &self.file {
+//             FileLike::File(file) => {
+//                 file.name().hash(&mut hasher);
+//             }
+//             FileLike::Url(url) => {
+//                 url.hash(&mut hasher);
+//             }
+//         }
+//         self.size().hash(&mut hasher);
+//         self.last_modified().hash(&mut hasher);
+//         hasher.finish()
+//     }
+
+//     pub fn human_readable_size(&self) -> Option<String> {
+//         self.size().map(human_readable_size)
+//     }
+
+//     pub fn last_modified_date(&self) -> Option<String> {
+//         self.last_modified().map(|last_modified| {
+//             let date = js_sys::Date::new(&JsValue::from_f64(last_modified as f64));
+//             let date = date.to_locale_string("en-US", &JsValue::undefined());
+//             date.as_string().unwrap()
+//         })
+//     }
+
+//     /// Returns a human-readable string representing the time elapsed since the file was last modified.
+//     pub fn human_readable_modified_delta(&self) -> Option<String> {
+//         let date = self.last_modified()?;
+//         let date = js_sys::Date::new(&JsValue::from_f64(date as f64));
+//         let now = js_sys::Date::new_0();
+//         let delta = now.get_time() - date.get_time();
+//         let delta = (delta as f64 / 1000.0) as u64;
+//         Some(if delta < 60 {
+//             format!("{} seconds ago", delta)
+//         } else if delta < 60 * 60 {
+//             format!("{} minutes ago", delta / 60)
+//         } else if delta < 60 * 60 * 24 {
+//             format!("{} hours ago", delta / (60 * 60))
+//         } else if delta < 60 * 60 * 24 * 30 {
+//             format!("{} days ago", delta / (60 * 60 * 24))
+//         } else if delta < 60 * 60 * 24 * 30 * 12 {
+//             format!("{} months ago", delta / (60 * 60 * 24 * 30))
+//         } else {
+//             format!("{} years ago", delta / (60 * 60 * 24 * 30 * 12))
+//         })
+//     }
+
+//     /// Returns the file metadata when the variant is a File.
+//     pub fn file_metadata(&self) -> Option<String> {
+//         match &self.file {
+//             FileLike::File(_) => Some(format!(
+//                 "{}, {}, from {}",
+//                 self.name()?,
+//                 self.human_readable_size()?,
+//                 self.human_readable_modified_delta()?
+//             )),
+//             FileLike::Url(_) => None,
+//         }
+//     }
+// }
+
+// pub struct ImagePreview {}
+
+// impl Component for ImagePreview {
+//     type Message = ();
+//     type Properties = FilePreviewItemProp;
+
+//     fn create(_ctx: &Context<Self>) -> Self {
+//         Self {}
+//     }
+
+//     fn update(&mut self, _ctx: &Context<Self>, _msg: Self::Message) -> bool {
+//         false
+//     }
+
+//     fn view(&self, ctx: &Context<Self>) -> Html {
+//         // We add an hash obtained from the file name and the associated informations, such
+//         // as the file size and the last modified date, to the URL to make sure that the URL
+//         // changes when the file changes, so that the image is reloaded when the file changes.
+
+//         let hash = ctx.props().metadata_hash();
+
+//         match &ctx.props().file {
+//             FileLike::File(file) => {
+//                 let url = web_sys::Url::create_object_url_with_blob(&file).unwrap();
+//                 let url = format!("{}#{}", url, hash);
+//                 html! {
+//                     <img src={url} class="preview" />
+//                 }
+//             }
+//             FileLike::Url(url) => {
+//                 let url = format!("{}#{}", url, hash);
+//                 html! {
+//                     <img src={url} class="preview" />
+//                 }
+//             }
+//         }
+//     }
+// }
+
+// pub struct PDFPreview {}
+
+// impl Component for PDFPreview {
+//     type Message = ();
+//     type Properties = FilePreviewItemProp;
+
+//     fn create(_ctx: &Context<Self>) -> Self {
+//         Self {}
+//     }
+
+//     fn update(&mut self, _ctx: &Context<Self>, _msg: Self::Message) -> bool {
+//         false
+//     }
+
+//     fn view(&self, ctx: &Context<Self>) -> Html {
+//         // We add an hash obtained from the file name and the associated informations, such
+//         // as the file size and the last modified date, to the URL to make sure that the URL
+//         // changes when the file changes, so that the image is reloaded when the file changes.
+
+//         let hash = ctx.props().metadata_hash();
+
+//         match &ctx.props().file {
+//             FileLike::File(file) => {
+//                 let url = web_sys::Url::create_object_url_with_blob(&file).unwrap();
+//                 let url = format!("{}#{}", url, hash);
+//                 html! {
+//                     <iframe src={url} class="preview"></iframe>
+//                 }
+//             }
+//             FileLike::Url(url) => {
+//                 let url = format!("{}#{}", url, hash);
+//                 html! {
+//                     <iframe src={url} class="preview"></iframe>
+//                 }
+//             }
+//         }
+//     }
+// }
+
+// pub struct TextualFilePreview {
+//     text: String,
+// }
+
+// #[derive(Clone, PartialEq, Properties)]
+// pub struct TextualFilePreviewProps {
+//     pub file_props: FilePreviewItemProp,
+//     #[prop_or(20)]
+//     pub number_of_lines: usize,
+// }
+
+// pub enum TextualFilePreviewMessage {
+//     Load(String),
+// }
+
+// impl Component for TextualFilePreview {
+//     type Message = TextualFilePreviewMessage;
+//     type Properties = TextualFilePreviewProps;
+
+//     fn create(ctx: &Context<Self>) -> Self {
+//         let file = match ctx.props().file_props.file.clone() {
+//             FileLike::File(file) => file,
+//             FileLike::Url(_) => {
+//                 unreachable!("TextualFilePreview should only be used with files, not URLs.")
+//             }
+//         };
+//         let reader = web_sys::FileReader::new().unwrap();
+//         let link = ctx.link().clone();
+//         // We read the first few lines of the file to display a preview of the file.
+
+//         const CHUNK_SIZE: usize = 1024; // Adjust the chunk size as needed
+
+//         let number_of_lines = ctx.props().number_of_lines;
+
+//         let on_load = Closure::wrap(Box::new(move |event: web_sys::ProgressEvent| {
+//             let mut lines_read = 0;
+//             let mut text = String::new();
+//             let reader = event
+//                 .target()
+//                 .unwrap()
+//                 .dyn_into::<web_sys::FileReader>()
+//                 .unwrap();
+//             let result = reader.result().unwrap();
+//             let data = js_sys::Uint8Array::new(&result);
+
+//             let mut chunk = Vec::with_capacity(CHUNK_SIZE);
+//             for i in 0..data.length() {
+//                 chunk.push(data.get_index(i));
+//                 if chunk.len() >= CHUNK_SIZE {
+//                     let chunk_text = String::from_utf8_lossy(&chunk);
+
+//                     for line in chunk_text.lines() {
+//                         text.push_str(line);
+//                         text.push('\n');
+//                         lines_read += 1;
+//                         if lines_read >= number_of_lines {
+//                             break;
+//                         }
+//                     }
+
+//                     if lines_read >= number_of_lines {
+//                         break;
+//                     }
+
+//                     chunk.clear();
+//                 }
+//             }
+
+//             if lines_read < number_of_lines {
+//                 let remaining_chunk_text = String::from_utf8_lossy(&chunk);
+//                 text.push_str(&remaining_chunk_text);
+//                 lines_read += remaining_chunk_text.lines().count();
+//             }
+
+//             link.send_message(TextualFilePreviewMessage::Load(text));
+//         }) as Box<dyn FnMut(_)>);
+
+//         reader.set_onload(Some(on_load.as_ref().unchecked_ref()));
+//         on_load.forget();
+
+//         reader.read_as_array_buffer(&file).unwrap();
+
+//         Self {
+//             text: String::new(),
+//         }
+//     }
+
+//     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
+//         match msg {
+//             TextualFilePreviewMessage::Load(text) => {
+//                 self.text = text;
+//                 true
+//             }
+//         }
+//     }
+
+//     fn view(&self, _ctx: &Context<Self>) -> Html {
+//         html! {
+//             <div class="file-preview-item-thumbnail">
+//                 <p>{&self.text}</p>
+//             </div>
+//         }
+//     }
+// }
+
+// #[function_component(FilePreviewItem)]
+// /// A component to display a preview of a single file of a list of files.
+// pub fn file_preview_item<Data>(props: &FilePreviewItemProp<Data>) -> Html
+// where
+//     Data: 'static + Clone + PartialEq,
+// {
+//     let on_delete = props.on_delete.clone();
+//     let hiding = use_state(|| false);
+
+//     let on_click = {
+//         let hiding = hiding.clone();
+//         Callback::from(move |click: MouseEvent| {
+//             click.stop_immediate_propagation();
+//             click.prevent_default();
+//             hiding.set(true);
+//             on_delete.emit(());
+//         })
+//     };
+
+//     let thumbnail: Html = {
+//         if props.is_image() {
+//             html! { <ImagePreview file={props.file.clone()} large={props.large} /> }
+//         } else if props.is_pdf() {
+//             html! { <PDFPreview file={props.file.clone()} large={props.large} /> }
+//         } else {
+//             html! { <TextualFilePreview file_props={props.clone()} /> }
+//         }
+//     };
+
+//     let class = format!(
+//         "file-preview-item{}",
+//         if props.hiding || *hiding {
+//             " hiding"
+//         } else {
+//             ""
+//         }
+//     );
+
+//     let wrapped = html! {
+//         <>
+//             {thumbnail}
+//             {if let Some(metadata) = props.file_metadata() {
+//                 html!{
+//                     <>
+//                     <button class="delete" onclick={on_click}><i class="fas fa-times"></i></button>
+//                     <p class="metadata">{metadata}</p>
+//                     </>
+//                 }
+//             } else {
+//                 html!{
+//                     <></>
+//                 }
+//             }}
+//         </>
+//     };
+
+//     if props.large {
+//         html! {
+//             <div class={class} title={props.path()}>
+//                 {wrapped}
+//             </div>
+//         }
+//     } else {
+//         html! {
+//             <li class={class} title={props.path()}>
+//                 {wrapped}
+//             </li>
+//         }
+//     }
+// }
+
 #[derive(Clone, PartialEq, Properties)]
-pub struct FilePreviewItemProp {
-    pub file: FileLike,
+pub struct FileInputProp<Data>
+where
+    Data: 'static + Clone + PartialEq,
+{
+    pub label: String,
+    pub builder: Callback<Option<Data>>,
+    pub errors: Vec<ApiError>,
+    pub value: Option<Data>,
+    #[prop_or(false)]
+    pub optional: bool,
     #[prop_or_default]
-    pub on_delete: Callback<()>,
-    pub large: bool,
+    pub allowed_formats: Vec<GenericFileFormat>,
     #[prop_or_default]
-    pub hiding: bool,
+    pub maximal_size: Option<u64>,
 }
 
-impl FilePreviewItemProp {
-    pub fn path(&self) -> Option<String> {
-        match &self.file {
-            FileLike::File(file) => Some(file.name()),
-            FileLike::Url(_) => None,
-        }
-    }
-
-    pub fn name(&self) -> Option<String> {
-        match &self.file {
-            FileLike::File(file) => Some(file.name().split('/').last().unwrap().to_string()),
-            FileLike::Url(_) => None,
-        }
-    }
-
-    pub fn extension(&self) -> Option<String> {
-        match &self.file {
-            FileLike::File(file) => {
-                let path = file.name();
-                let extension = path.split('.').last();
-                extension.map(|s| s.to_string())
-            }
-            FileLike::Url(url) => {
-                let extension = url.split('.').last();
-                extension.map(|s| s.to_string())
-            }
-        }
-    }
-
-    pub fn size(&self) -> Option<u64> {
-        match &self.file {
-            FileLike::File(file) => Some(file.size() as u64),
-            FileLike::Url(_) => None,
-        }
-    }
-
-    pub fn is_image(&self) -> bool {
-        match &self.file {
-            FileLike::File(file) => file.type_().starts_with("image"),
-            FileLike::Url(url) => {
-                url.ends_with(".png")
-                    || url.ends_with(".jpg")
-                    || url.ends_with(".jpeg")
-                    || url.ends_with(".gif")
-                    || url.ends_with(".webp")
-            }
-        }
-    }
-
-    pub fn is_pdf(&self) -> bool {
-        match &self.file {
-            FileLike::File(file) => file.type_().starts_with("application/pdf"),
-            FileLike::Url(url) => url.ends_with(".pdf"),
-        }
-    }
-
-    pub fn last_modified(&self) -> Option<u64> {
-        match &self.file {
-            FileLike::File(file) => Some(file.last_modified() as u64),
-            FileLike::Url(_) => None,
-        }
-    }
-
-    pub fn metadata_hash(&self) -> u64 {
-        let mut hasher = DefaultHasher::new();
-        match &self.file {
-            FileLike::File(file) => {
-                file.name().hash(&mut hasher);
-            }
-            FileLike::Url(url) => {
-                url.hash(&mut hasher);
-            }
-        }
-        self.size().hash(&mut hasher);
-        self.last_modified().hash(&mut hasher);
-        hasher.finish()
-    }
-
-    pub fn human_readable_size(&self) -> Option<String> {
-        self.size().map(human_readable_size)
-    }
-
-    pub fn last_modified_date(&self) -> Option<String> {
-        self.last_modified().map(|last_modified| {
-            let date = js_sys::Date::new(&JsValue::from_f64(last_modified as f64));
-            let date = date.to_locale_string("en-US", &JsValue::undefined());
-            date.as_string().unwrap()
-        })
-    }
-
-    /// Returns a human-readable string representing the time elapsed since the file was last modified.
-    pub fn human_readable_modified_delta(&self) -> Option<String> {
-        let date = self.last_modified()?;
-        let date = js_sys::Date::new(&JsValue::from_f64(date as f64));
-        let now = js_sys::Date::new_0();
-        let delta = now.get_time() - date.get_time();
-        let delta = (delta as f64 / 1000.0) as u64;
-        Some(if delta < 60 {
-            format!("{} seconds ago", delta)
-        } else if delta < 60 * 60 {
-            format!("{} minutes ago", delta / 60)
-        } else if delta < 60 * 60 * 24 {
-            format!("{} hours ago", delta / (60 * 60))
-        } else if delta < 60 * 60 * 24 * 30 {
-            format!("{} days ago", delta / (60 * 60 * 24))
-        } else if delta < 60 * 60 * 24 * 30 * 12 {
-            format!("{} months ago", delta / (60 * 60 * 24 * 30))
-        } else {
-            format!("{} years ago", delta / (60 * 60 * 24 * 30 * 12))
-        })
-    }
-
-    /// Returns the file metadata when the variant is a File.
-    pub fn file_metadata(&self) -> Option<String> {
-        match &self.file {
-            FileLike::File(_) => Some(format!(
-                "{}, {}, from {}",
-                self.name()?,
-                self.human_readable_size()?,
-                self.human_readable_modified_delta()?
-            )),
-            FileLike::Url(_) => None,
-        }
-    }
-}
-
-pub struct ImagePreview {}
-
-impl Component for ImagePreview {
-    type Message = ();
-    type Properties = FilePreviewItemProp;
-
-    fn create(_ctx: &Context<Self>) -> Self {
-        Self {}
-    }
-
-    fn update(&mut self, _ctx: &Context<Self>, _msg: Self::Message) -> bool {
-        false
-    }
-
-    fn view(&self, ctx: &Context<Self>) -> Html {
-        // We add an hash obtained from the file name and the associated informations, such
-        // as the file size and the last modified date, to the URL to make sure that the URL
-        // changes when the file changes, so that the image is reloaded when the file changes.
-
-        let hash = ctx.props().metadata_hash();
-
-        match &ctx.props().file {
-            FileLike::File(file) => {
-                let url = web_sys::Url::create_object_url_with_blob(&file).unwrap();
-                let url = format!("{}#{}", url, hash);
-                html! {
-                    <img src={url} class="preview" />
-                }
-            }
-            FileLike::Url(url) => {
-                let url = format!("{}#{}", url, hash);
-                html! {
-                    <img src={url} class="preview" />
-                }
-            }
-        }
-    }
-}
-
-pub struct PDFPreview {}
-
-impl Component for PDFPreview {
-    type Message = ();
-    type Properties = FilePreviewItemProp;
-
-    fn create(_ctx: &Context<Self>) -> Self {
-        Self {}
-    }
-
-    fn update(&mut self, _ctx: &Context<Self>, _msg: Self::Message) -> bool {
-        false
-    }
-
-    fn view(&self, ctx: &Context<Self>) -> Html {
-        // We add an hash obtained from the file name and the associated informations, such
-        // as the file size and the last modified date, to the URL to make sure that the URL
-        // changes when the file changes, so that the image is reloaded when the file changes.
-
-        let hash = ctx.props().metadata_hash();
-
-        match &ctx.props().file {
-            FileLike::File(file) => {
-                let url = web_sys::Url::create_object_url_with_blob(&file).unwrap();
-                let url = format!("{}#{}", url, hash);
-                html! {
-                    <iframe src={url} class="preview"></iframe>
-                }
-            }
-            FileLike::Url(url) => {
-                let url = format!("{}#{}", url, hash);
-                html! {
-                    <iframe src={url} class="preview"></iframe>
-                }
-            }
-        }
-    }
-}
-
-pub struct TextualFilePreview {
-    text: String,
-}
-
-#[derive(Clone, PartialEq, Properties)]
-pub struct TextualFilePreviewProps {
-    pub file_props: FilePreviewItemProp,
-    #[prop_or(20)]
-    pub number_of_lines: usize,
-}
-
-pub enum TextualFilePreviewMessage {
-    Load(String),
-}
-
-impl Component for TextualFilePreview {
-    type Message = TextualFilePreviewMessage;
-    type Properties = TextualFilePreviewProps;
-
-    fn create(ctx: &Context<Self>) -> Self {
-        let file = match ctx.props().file_props.file.clone() {
-            FileLike::File(file) => file,
-            FileLike::Url(_) => {
-                unreachable!("TextualFilePreview should only be used with files, not URLs.")
-            }
-        };
-        let reader = web_sys::FileReader::new().unwrap();
-        let link = ctx.link().clone();
-        // We read the first few lines of the file to display a preview of the file.
-
-        const CHUNK_SIZE: usize = 1024; // Adjust the chunk size as needed
-
-        let number_of_lines = ctx.props().number_of_lines;
-
-        let on_load = Closure::wrap(Box::new(move |event: web_sys::ProgressEvent| {
-            let mut lines_read = 0;
-            let mut text = String::new();
-            let reader = event
-                .target()
-                .unwrap()
-                .dyn_into::<web_sys::FileReader>()
-                .unwrap();
-            let result = reader.result().unwrap();
-            let data = js_sys::Uint8Array::new(&result);
-
-            let mut chunk = Vec::with_capacity(CHUNK_SIZE);
-            for i in 0..data.length() {
-                chunk.push(data.get_index(i));
-                if chunk.len() >= CHUNK_SIZE {
-                    let chunk_text = String::from_utf8_lossy(&chunk);
-
-                    for line in chunk_text.lines() {
-                        text.push_str(line);
-                        text.push('\n');
-                        lines_read += 1;
-                        if lines_read >= number_of_lines {
-                            break;
-                        }
-                    }
-
-                    if lines_read >= number_of_lines {
-                        break;
-                    }
-
-                    chunk.clear();
-                }
-            }
-
-            if lines_read < number_of_lines {
-                let remaining_chunk_text = String::from_utf8_lossy(&chunk);
-                text.push_str(&remaining_chunk_text);
-                lines_read += remaining_chunk_text.lines().count();
-            }
-
-            link.send_message(TextualFilePreviewMessage::Load(text));
-        }) as Box<dyn FnMut(_)>);
-
-        reader.set_onload(Some(on_load.as_ref().unchecked_ref()));
-        on_load.forget();
-
-        reader.read_as_array_buffer(&file).unwrap();
-
-        Self {
-            text: String::new(),
-        }
-    }
-
-    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
-        match msg {
-            TextualFilePreviewMessage::Load(text) => {
-                self.text = text;
-                true
-            }
-        }
-    }
-
-    fn view(&self, _ctx: &Context<Self>) -> Html {
-        html! {
-            <div class="file-preview-item-thumbnail">
-                <p>{&self.text}</p>
-            </div>
-        }
-    }
-}
-
-#[function_component(FilePreviewItem)]
-/// A component to display a preview of a single file of a list of files.
-pub fn file_preview_item(props: &FilePreviewItemProp) -> Html {
-    let on_delete = props.on_delete.clone();
-    let hiding = use_state(|| false);
-
-    let on_click = {
-        let hiding = hiding.clone();
-        Callback::from(move |click: MouseEvent| {
-            click.stop_immediate_propagation();
-            click.prevent_default();
-            hiding.set(true);
-            on_delete.emit(());
+#[function_component(FileInput)]
+pub fn file_input<Data>(props: &FileInputProp<Data>) -> Html
+where
+    Data: 'static + Clone + PartialEq + Validate + TryFromCallback<web_sys::File> + HTMLPreview,
+{
+    let builder_callback = {
+        let old_builder = props.builder.clone();
+        Callback::from(move |mut data: Vec<Data>| {
+            old_builder.emit(data.pop());
         })
     };
 
-    let thumbnail: Html = {
-        if props.is_image() {
-            html! { <ImagePreview file={props.file.clone()} large={props.large} /> }
-        } else if props.is_pdf() {
-            html! { <PDFPreview file={props.file.clone()} large={props.large} /> }
-        } else {
-            html! { <TextualFilePreview file_props={props.clone()} /> }
-        }
-    };
-
-    let class = format!(
-        "file-preview-item{}",
-        if props.hiding || *hiding {
-            " hiding"
-        } else {
-            ""
-        }
-    );
-
-    let wrapped = html! {
-        <>
-            {thumbnail}
-            {if let Some(metadata) = props.file_metadata() {
-                html!{
-                    <>
-                    <button class="delete" onclick={on_click}><i class="fas fa-times"></i></button>
-                    <p class="metadata">{metadata}</p>
-                    </>
-                }
-            } else {
-                html!{
-                    <></>
-                }
-            }}
-        </>
-    };
-
-    if props.large {
-        html! {
-            <div class={class} title={props.path()}>
-                {wrapped}
-            </div>
-        }
-    } else {
-        html! {
-            <li class={class} title={props.path()}>
-                {wrapped}
-            </li>
-        }
+    html! {
+        <MultiFileInput<Data>
+            label={props.label.clone()}
+            builder={builder_callback}
+            errors={props.errors.clone()}
+            optional={props.optional}
+            multiple={false}
+            allowed_formats={props.allowed_formats.clone()}
+            values={props.value.clone().map_or_else(|| Vec::new(), |value| vec![value])}
+            maximal_size={props.maximal_size}
+        />
     }
 }

@@ -5703,7 +5703,7 @@ def write_frontend_yew_form(
             elif attribute.data_type() == "Vec<u8>":
                 if "picture" in attribute.name:
                     document.write(
-                        f"    let set_{attribute.name} = builder_dispatch.apply_callback(|mut {attribute.name}: Vec<Image>| {flat_struct.name}Actions::Set{attribute.capitalized_name()}({attribute.name}.pop().map(|{attribute.name}| {attribute.name}.into())));\n"
+                        f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: Option<Image>| {flat_struct.name}Actions::Set{attribute.capitalized_name()}({attribute.name}.map(|{attribute.name}| {attribute.name}.into())));\n"
                     )
                 else:
                     raise Exception(
@@ -5759,7 +5759,7 @@ def write_frontend_yew_form(
                     allowed_formats = ["GenericFileFormat::Image"]
 
                     document.write(
-                        f'            <FileInput<Image> label="{attribute.human_readable_name()}" errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} allowed_formats={{vec![{", ".join(allowed_formats)}]}} />\n'
+                        f'            <FileInput<Image> label="{attribute.human_readable_name()}" errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} allowed_formats={{vec![{", ".join(allowed_formats)}]}} value={{builder_store.{attribute.name}.clone().map(|{attribute.name}| {attribute.name}.into())}} />\n'
                     )
                 else:
                     raise Exception(

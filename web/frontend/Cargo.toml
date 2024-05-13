@@ -42,6 +42,9 @@ sql_minifier = "0.1.4"
 chrono = "0.4.35"
 sublime_fuzzy = "0.7.0"
 implicit-clone = "0.4.9"
+v = "0.1.0"
+image = "0.25.1"
+base64 = "0.22.1"
 # syntect = "5.2.0"
 
 [dependencies.web-sys]

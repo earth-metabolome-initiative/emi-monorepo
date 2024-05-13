@@ -20,9 +20,23 @@ pub struct Image {
     data: Vec<u8>,
 }
 
-impl Into<Vec<u8>> for Image {
-    fn into(self) -> Vec<u8> {
-        self.data
+impl From<Vec<u8>> for Image {
+    fn from(value: Vec<u8>) -> Self {
+        Self { data: value }
+    }
+}
+
+impl From<&[u8]> for Image {
+    fn from(data: &[u8]) -> Self {
+        Self {
+            data: data.to_vec()
+        }
+    }
+}
+
+impl From<Image> for Vec<u8> {
+    fn from(image: Image) -> Vec<u8> {
+        image.data
     }
 }
 
@@ -116,7 +130,7 @@ impl crate::api::form_traits::TryFromCallback<web_sys::File> for Image {
 
                 match Image::try_from(data) {
                     Ok(image) => callback(Ok(image)),
-                    Err(errors) => callback(Err(ApiError::BadRequest(errors))),
+                    Err(_) => {} // callback(Err(ApiError::BadRequest(errors))),
                 };
             });
 
@@ -131,25 +145,25 @@ impl crate::api::form_traits::TryFromCallback<web_sys::File> for Image {
     }
 }
 
-impl TryFrom<Vec<u8>> for Image {
-    type Error = Vec<String>;
+// impl TryFrom<Vec<u8>> for Image {
+//     type Error = Vec<String>;
 
-    fn try_from(data: Vec<u8>) -> Result<Self, Self::Error> {
-        if data.is_empty() {
-            return Err(vec!["Image data is empty.".to_string()]);
-        }
+//     fn try_from(data: Vec<u8>) -> Result<Self, Self::Error> {
+//         if data.is_empty() {
+//             return Err(vec!["Image data is empty.".to_string()]);
+//         }
 
-        match Image::is_image(&data) {
-            Some(format) => match format {
-                ImageFormat::Png | ImageFormat::Jpeg | ImageFormat::Gif | ImageFormat::WebP => {
-                    Ok(Image { data })
-                }
-                _ => Err(vec![format!("Image format {:?} is not supported.", format)]),
-            },
-            None => Err(vec!["Data is not a valid image.".to_string()]),
-        }
-    }
-}
+//         match Image::is_image(&data) {
+//             Some(format) => match format {
+//                 ImageFormat::Png | ImageFormat::Jpeg | ImageFormat::Gif | ImageFormat::WebP => {
+//                     Ok(Image { data })
+//                 }
+//                 _ => Err(vec![format!("Image format {:?} is not supported.", format)]),
+//             },
+//             None => Err(vec!["Data is not a valid image.".to_string()]),
+//         }
+//     }
+// }
 
 impl TryFromImage for Image {
     fn try_from_image(image: Image) -> Result<Self, ApiError> {
@@ -158,7 +172,7 @@ impl TryFromImage for Image {
 }
 
 impl Image {
-    fn is_image(bytes: &[u8]) -> Option<ImageFormat> {
+    pub fn is_image(bytes: &[u8]) -> Option<ImageFormat> {
         Reader::new(std::io::Cursor::new(bytes))
             .with_guessed_format()
             .ok()
