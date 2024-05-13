@@ -7,12 +7,13 @@ use crate::workers::ws_worker::{ComponentMessage, WebsocketMessage};
 use crate::workers::WebsocketWorker;
 use gloo::timers::callback::Timeout;
 use serde::de::DeserializeOwned;
+use crate::workers::ws_worker::Tabular;
 use serde::Serialize;
 use std::fmt::Debug;
 use std::rc::Rc;
 use web_common::api::form_traits::FormMethod;
 use web_common::api::ApiError;
-use web_common::database::{PrimaryKey, Table};
+use web_common::database::PrimaryKey;
 use yew::prelude::*;
 use yew_agent::prelude::WorkerBridgeHandle;
 use yew_agent::scope_ext::AgentScopeExt;
@@ -56,10 +57,9 @@ pub(super) trait FormBuilder: Clone + Store + PartialEq + Serialize + Debug {
 
 /// Trait defining something that can be built by a form.
 pub trait FormBuildable:
-    Clone + PartialEq + Serialize + 'static + From<<Self as FormBuildable>::Builder>
+    Clone + PartialEq + Serialize + 'static + From<<Self as FormBuildable>::Builder> + Tabular
 {
     type Builder: FormBuilder;
-    const TABLE: Table;
 
     /// Returns the title to use for the Form.
     fn title() -> &'static str;
@@ -190,9 +190,7 @@ where
                     FormMethod::GET => {
                         unreachable!("GET is not supported for forms")
                     }
-                    FormMethod::PUT => {
-                        ComponentMessage::update(&data)
-                    }
+                    FormMethod::PUT => ComponentMessage::update(&data),
                     FormMethod::DELETE => {
                         todo!("DELETE is not yet implemented for forms")
                     }

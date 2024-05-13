@@ -5,6 +5,7 @@ use crate::router::AppRoute;
 use crate::stores::user_state::UserState;
 use yew::prelude::*;
 use yew_router::prelude::*;
+use crate::components::forms::automatic_forms::NewFormsRouter;
 use yewdux::use_store;
 
 #[derive(Properties, Clone, PartialEq, Debug)]
@@ -31,13 +32,13 @@ pub fn sidebar(props: &SidebarProps) -> Html {
                     </li>
                     if user.has_user() {
                         <li>
-                            <Link<AppRoute> to={AppRoute::NewProject}>{"New Project"}</Link<AppRoute>>
+                            <Link<NewFormsRouter> to={NewFormsRouter::Projects}>{"New Project"}</Link<NewFormsRouter>>
                         </li>
                         <li>
-                            <Link<AppRoute> to={AppRoute::NewSample}>{"New Sample"}</Link<AppRoute>>
+                            <Link<NewFormsRouter> to={NewFormsRouter::Samples}>{"New Sample"}</Link<NewFormsRouter>>
                         </li>
                         <li>
-                            <Link<AppRoute> to={AppRoute::NewTeam}>{"New Team"}</Link<AppRoute>>
+                            <Link<NewFormsRouter> to={NewFormsRouter::Teams}>{"New Team"}</Link<NewFormsRouter>>
                         </li>
                         <li><Logout /></li>
                     }

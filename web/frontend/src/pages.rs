@@ -15,4 +15,3 @@ pub use new_team::NewTeamPage;
 pub use not_found::NotFound;
 pub use profile::Profile;
 pub use server_error::ServerErrorPage;
-  

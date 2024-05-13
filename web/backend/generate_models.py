@@ -809,6 +809,9 @@ class StructMetadata:
             for attribute in self.attributes
         )
 
+    def get_capitalized_table_name(self) -> str:
+        return "".join(word.capitalize() for word in self.table_name.split("_"))
+
 
 def find_pg_trgm_indices() -> PGIndices:
     """Returns the list of indices that are of type `pg_trgm`."""
@@ -5622,9 +5625,7 @@ def write_frontend_yew_form(
         variants.append((builder.get_new_variant(), "POST"))
 
     if flat_struct.is_updatable():
-        update_variant = builder.get_update_variant()
-        if not update_variant.is_new_variant():
-            variants.append((update_variant, "PUT"))
+        variants.append((builder.get_update_variant(), "PUT"))
 
     for variant, method in variants:
 
@@ -5818,10 +5819,6 @@ def write_frontend_form_buildable_implementation(
     This method implements the Buildable trait for the provided struct.
     """
 
-    capitalized_table_name = "".join(
-        word.capitalize() for word in builder.table_name.split("_")
-    )
-
     flat_struct = builder.get_flat_variant()
 
     variants: List[StructMetadata] = []
@@ -5835,10 +5832,17 @@ def write_frontend_form_buildable_implementation(
             variants.append(update_variant)
 
     for variant in variants:
+        # We implement the Tabular trait for the struct.
+        document.write(
+            f"impl Tabular for {variant.name} {{\n"
+            f"    const TABLE: Table = Table::{flat_struct.get_capitalized_table_name()};\n"
+            "}\n\n"
+        )
+
+        # We implement the FormBuildable trait for the struct.
         document.write(
             f"impl FormBuildable for {variant.name} {{\n"
             f"    type Builder = {builder.name};\n"
-            f"    const TABLE: Table = Table::{capitalized_table_name};\n"
             "    fn title() -> &'static str {\n"
             f'        "{variant.human_readable_name()}"\n'  # TODO! Add the title
             "    }\n"
@@ -5889,16 +5893,20 @@ def write_frontend_forms(
         "use std::rc::Rc;",
         "use uuid::Uuid;",
         "use std::ops::Deref;",
+        "use crate::workers::ws_worker::Tabular;",
         "use yewdux::Dispatch;",
         "use chrono::NaiveDateTime;",
         "use web_common::api::ApiError;",
         "use crate::workers::ws_worker::ComponentMessage;",
         "use web_common::custom_validators::Image;",
         "use web_common::file_formats::GenericFileFormat;",
+        "use yew_router::prelude::*;"
     ]
 
     for import_statement in imports:
         document.write(f"{import_statement}\n")
+
+    table_metadata = find_foreign_keys()
 
     document.write("\n")
 
@@ -5913,6 +5921,96 @@ def write_frontend_forms(
         write_frontend_form_builder_implementation(builder, document)
         write_frontend_form_buildable_implementation(builder, document)
         write_frontend_yew_form(builder, document=document)
+
+    # Next, we write the NewFormsRouter struct, which will be used to
+    # route the forms to the correct form component. The routes will
+    # be of the form /new/{table_name}, with the enumeration variants
+    # being the capitalized table names.
+
+    document.write(
+        "#[derive(Debug, Clone, Copy, PartialEq, Routable)]\n"
+        "pub enum NewFormsRouter {\n"
+    )
+
+    for builder in builder_structs:
+        if builder.get_flat_variant().is_insertable():
+            document.write(
+                f"    #[at(\"/new/{builder.table_name}\")]\n"
+                f"    {builder.get_capitalized_table_name()},\n"
+            )
+
+    document.write("}\n")
+
+    # We write the switch function to map the NewFormsRouter to the
+    # correct form component.
+
+    document.write(
+        "pub fn new_forms_router_switch(router: NewFormsRouter) -> Html {\n"
+        "    match router {\n"
+    )
+
+    for builder in builder_structs:
+        flat_struct = builder.get_flat_variant()
+        if flat_struct.is_insertable():
+            form_component_name = f"Create{flat_struct.name}Form"
+
+            document.write(
+                f"        NewFormsRouter::{builder.get_capitalized_table_name()} => html!{{<{form_component_name} />}},\n"
+            )
+
+    document.write("    }\n}\n")
+
+
+    # Next, we write the UpdateFormsRouter struct, which will be used to
+    # route the forms to the correct form component. The routes will
+    # be of the form /update/{table_name}/:{id}. The enumeration variants
+    # will be the capitalized table names, containing an attribute with
+    # the same name of the primary key of the table.
+
+    document.write(
+        "#[derive(Debug, Clone, Copy, PartialEq, Routable)]\n"
+        "pub enum UpdateFormsRouter {\n"
+    )
+
+    for builder in builder_structs:
+        flat_struct = builder.get_flat_variant()
+        if flat_struct.is_insertable():
+            
+            primary_key_name, _primary_key_type = table_metadata.get_primary_key_name_and_type(
+                builder.table_name
+            )
+
+            rust_type = builder.get_flat_variant().get_attribute_by_name(primary_key_name).format_data_type()
+
+            document.write(
+                f"    #[at(\"/update/{builder.table_name}/:{primary_key_name}\")]\n"
+                f"    {builder.get_capitalized_table_name()} {{ {primary_key_name}: {rust_type} }},\n"
+            )
+
+    document.write("}\n")
+
+    # We write the switch function to map the UpdateFormsRouter to the
+    # correct form component.
+
+    document.write(
+        "pub fn update_forms_router_switch(router: UpdateFormsRouter) -> Html {\n"
+        "    match router {\n"
+    )
+
+    for builder in builder_structs:
+        flat_struct = builder.get_flat_variant()
+        if flat_struct.is_insertable():
+            primary_key_name, _primary_key_type = table_metadata.get_primary_key_name_and_type(
+                builder.table_name
+            )
+
+            form_component_name = f"Update{flat_struct.name}Form"
+
+            document.write(
+                f"        UpdateFormsRouter::{builder.get_capitalized_table_name()} {{ {primary_key_name} }} => html! {{<{form_component_name} {primary_key_name}={{ {primary_key_name} }} />}},\n"
+            )
+
+    document.write("    }\n}\n")
 
     document.flush()
     document.close()
@@ -6433,3 +6531,5 @@ if __name__ == "__main__":
     write_frontend_forms(
         builder_structs,
     )
+
+
