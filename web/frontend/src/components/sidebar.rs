@@ -228,7 +228,6 @@ pub fn sidebar(props: &SidebarProps) -> Html {
                     }}
                 </ul>
             </div>
-            <Logout />
         </div>
     }
 }

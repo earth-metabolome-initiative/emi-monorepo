@@ -112,7 +112,6 @@ def write_frontend_sidebar(builders: List[StructMetadata]):
         "                    }}\n"
         "                </ul>\n"
         "            </div>\n"
-        "            <Logout />\n"
         "        </div>\n"
         "    }\n"
         "}\n"
