@@ -212,12 +212,20 @@ class StructMetadata:
             return self._flat_variant.is_insertable()
         return any(attribute.is_creator_user_id() for attribute in self.attributes)
 
-    def write_to(self, file: "File", diesel: Optional[str] = None):
+    def write_to(self, file: "File", diesel: Optional[str] = None, derives_deny_list: Optional[List[str]] = None):
         if diesel is not None:
             if diesel not in ["tables", "views"]:
                 raise ValueError("The table type must be either 'tables' or 'views'.")
 
-        file.write(f"#[derive({', '.join(self.derives(diesel=diesel))})]\n")
+        if derives_deny_list is None:
+            derives_deny_list = []
+
+        joined_derives = ', '.join([
+            derive
+            for derive in self.derives(diesel=diesel)
+            if derive not in derives_deny_list
+        ])
+        file.write(f"#[derive({joined_derives})]\n")
         if diesel is not None:
             file.write(f"#[diesel(table_name = {self.table_name})]\n")
         for decorator in self._decorators:

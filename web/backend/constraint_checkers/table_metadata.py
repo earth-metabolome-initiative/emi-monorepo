@@ -144,3 +144,6 @@ class TableStructMetadata:
 
     def camel_cased(self) -> str:
         return "".join(word.capitalize() for word in self.name.split("_"))
+
+    def has_updated_at_column(self) -> bool:
+        return self.flat_struct.is_updatable()

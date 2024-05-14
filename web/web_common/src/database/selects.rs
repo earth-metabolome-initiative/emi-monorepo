@@ -16,6 +16,11 @@ pub enum Select {
         limit: i64,
         offset: i64,
     },
+    AllByUpdatedAt {
+        table_name: String,
+        limit: i64,
+        offset: i64,
+    },
     SearchTable {
         table_name: String,
         query: String,
@@ -82,6 +87,20 @@ impl Select {
     /// * `offset` - The number of results to skip.
     pub fn all(table: super::Table, limit: i64, offset: i64) -> Self {
         Self::All {
+            table_name: table.into(),
+            limit,
+            offset,
+        }
+    }
+
+    /// Create a new `Select::AllByUpdatedAt` query for a given `Table`.
+    /// 
+    /// # Arguments
+    /// * `table` - The table to select from.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    pub fn all_by_updated_at(table: super::Table, limit: i64, offset: i64) -> Self {
+        Self::AllByUpdatedAt {
             table_name: table.into(),
             limit,
             offset,

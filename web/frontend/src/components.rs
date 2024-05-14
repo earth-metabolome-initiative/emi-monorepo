@@ -12,7 +12,10 @@ mod search_bar;
 pub mod sidebar;
 
 pub mod basic_page;
-pub use basic_page::BasicPage;
+pub use basic_page::{BasicPage, PageLike};
+
+pub mod basic_pages;
+pub use basic_pages::BasicPages;
 
 pub use app::App;
 pub use error_page::ErrorPage;

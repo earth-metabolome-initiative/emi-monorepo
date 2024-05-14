@@ -5,6 +5,8 @@ use yew::prelude::*;
 use yew_router::prelude::*;
 use crate::pages::*;
 use uuid::Uuid;
+use crate::components::BasicPages;
+use web_common::database::*;
 use crate::components::forms::automatic_forms::*;
 
 #[derive(Debug, Clone, Copy, PartialEq, Routable)]
@@ -112,7 +114,7 @@ pub enum AppRoute {
 pub fn switch(route: AppRoute) -> Html {
     match route {
         AppRoute::ContainerHorizontalRules => {
-             html! { <span>{"ContainerHorizontalRules page"}</span> }
+            html! { <BasicPages<NestedContainerHorizontalRule> /> }
         }
         AppRoute::ContainerHorizontalRulesView{id} => {
              html! { <span>{"Specific Container horizontal rule page"}</span> }
@@ -124,7 +126,7 @@ pub fn switch(route: AppRoute) -> Html {
             html! { <UpdateContainerHorizontalRuleForm id={id} /> }
         }
         AppRoute::ContainerVerticalRules => {
-             html! { <span>{"ContainerVerticalRules page"}</span> }
+            html! { <BasicPages<NestedContainerVerticalRule> /> }
         }
         AppRoute::ContainerVerticalRulesView{id} => {
              html! { <span>{"Specific Container vertical rule page"}</span> }
@@ -136,7 +138,7 @@ pub fn switch(route: AppRoute) -> Html {
             html! { <UpdateContainerVerticalRuleForm id={id} /> }
         }
         AppRoute::ItemCategories => {
-             html! { <span>{"ItemCategories page"}</span> }
+            html! { <BasicPages<NestedItemCategory> /> }
         }
         AppRoute::ItemCategoriesView{id} => {
              html! { <span>{"Specific Item category page"}</span> }
@@ -148,7 +150,7 @@ pub fn switch(route: AppRoute) -> Html {
             html! { <UpdateItemCategoryForm id={id} /> }
         }
         AppRoute::Procedures => {
-             html! { <span>{"Procedures page"}</span> }
+            html! { <BasicPages<NestedProcedure> /> }
         }
         AppRoute::ProceduresView{id} => {
              html! { <span>{"Specific Procedure page"}</span> }
@@ -160,7 +162,7 @@ pub fn switch(route: AppRoute) -> Html {
             html! { <UpdateProcedureForm id={id} /> }
         }
         AppRoute::ProjectRequirements => {
-             html! { <span>{"ProjectRequirements page"}</span> }
+            html! { <BasicPages<NestedProjectRequirement> /> }
         }
         AppRoute::ProjectRequirementsView{id} => {
              html! { <span>{"Specific Project requirement page"}</span> }
@@ -172,7 +174,7 @@ pub fn switch(route: AppRoute) -> Html {
             html! { <UpdateProjectRequirementForm id={id} /> }
         }
         AppRoute::Projects => {
-             html! { <span>{"Projects page"}</span> }
+            html! { <BasicPages<NestedProject> /> }
         }
         AppRoute::ProjectsView{id} => {
              html! { <span>{"Specific Project page"}</span> }
@@ -184,7 +186,7 @@ pub fn switch(route: AppRoute) -> Html {
             html! { <UpdateProjectForm id={id} /> }
         }
         AppRoute::SampledIndividuals => {
-             html! { <span>{"SampledIndividuals page"}</span> }
+            html! { <BasicPages<NestedSampledIndividual> /> }
         }
         AppRoute::SampledIndividualsView{id} => {
              html! { <span>{"Specific Sampled individual page"}</span> }
@@ -196,7 +198,7 @@ pub fn switch(route: AppRoute) -> Html {
             html! { <UpdateSampledIndividualForm id={id} /> }
         }
         AppRoute::Samples => {
-             html! { <span>{"Samples page"}</span> }
+            html! { <BasicPages<NestedSample> /> }
         }
         AppRoute::SamplesView{id} => {
              html! { <span>{"Specific Sample page"}</span> }
@@ -208,7 +210,7 @@ pub fn switch(route: AppRoute) -> Html {
             html! { <UpdateSampleForm id={id} /> }
         }
         AppRoute::SamplingProcedures => {
-             html! { <span>{"SamplingProcedures page"}</span> }
+            html! { <BasicPages<NestedSamplingProcedure> /> }
         }
         AppRoute::SamplingProceduresView{id} => {
              html! { <span>{"Specific Sampling procedure page"}</span> }
@@ -220,7 +222,7 @@ pub fn switch(route: AppRoute) -> Html {
             html! { <UpdateSamplingProcedureForm id={id} /> }
         }
         AppRoute::Teams => {
-             html! { <span>{"Teams page"}</span> }
+            html! { <BasicPages<NestedTeam> /> }
         }
         AppRoute::TeamsView{id} => {
              html! { <span>{"Specific Team page"}</span> }
@@ -232,7 +234,7 @@ pub fn switch(route: AppRoute) -> Html {
             html! { <UpdateTeamForm id={id} /> }
         }
         AppRoute::Users => {
-             html! { <span>{"Users page"}</span> }
+            html! { <BasicPages<User> /> }
         }
         AppRoute::UsersView{id} => {
              html! { <span>{"Specific User page"}</span> }

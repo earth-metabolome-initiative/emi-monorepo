@@ -1038,6 +1038,34 @@ impl ContainerHorizontalRule {
             .map(Self::from_row)
             .collect::<Vec<_>>())
     }
+    /// Get all ContainerHorizontalRule from the database ordered by the `updated_at` column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all_by_updated_at<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("container_horizontal_rules")
+            .select()
+            .project("id, created_by, created_at, updated_by, updated_at, name, item_type_id, other_item_type_id, minimum_temperature, maximum_temperature, minimum_humidity, maximum_humidity, minimum_pressure, maximum_pressure")
+            .order_by("updated_at desc")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
@@ -1353,6 +1381,34 @@ impl ContainerVerticalRule {
             .map(Self::from_row)
             .collect::<Vec<_>>())
     }
+    /// Get all ContainerVerticalRule from the database ordered by the `updated_at` column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all_by_updated_at<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("container_vertical_rules")
+            .select()
+            .project("id, created_by, created_at, updated_by, updated_at, name, container_item_type_id, contained_item_type_id, minimum_temperature, maximum_temperature, minimum_humidity, maximum_humidity, minimum_pressure, maximum_pressure")
+            .order_by("updated_at desc")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
@@ -1609,6 +1665,221 @@ impl ContinuousUnit {
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
+pub struct Country {
+    pub id: i32,
+    pub iso: String,
+    pub emoji: String,
+    pub unicode: String,
+    pub name: String,
+}
+#[cfg(feature = "frontend")]
+impl Country {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::num(self.id),
+            gluesql::core::ast_builder::text(self.iso),
+            gluesql::core::ast_builder::text(self.emoji),
+            gluesql::core::ast_builder::text(self.unicode),
+            gluesql::core::ast_builder::text(self.name),
+        ]
+    }
+
+    /// Insert the Country into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows inserted in table Country
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("countries")
+            .insert()
+            .columns("id, iso, emoji, unicode, name")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
+                 _ => unreachable!("Payload must be an Insert"),
+             })
+    }
+
+    /// Get Country from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of Country to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn get<C>(
+        id: i32,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("countries")
+            .select()
+            .filter(col("id").eq(id.to_string()))
+            .project("id, iso, emoji, unicode, name")
+            .limit(1)
+            .execute(connection)
+            .await?;
+         Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>()
+            .pop())
+    }
+
+    /// Delete Country from the database.
+    ///
+    /// # Arguments
+    /// * `id` - The ID of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete_from_id<C>(
+        id: i32,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("countries")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
+                 _ => unreachable!("Payload must be a Delete"),
+             })
+    }
+
+    /// Delete the current instance of Country from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        Self::delete_from_id(self.id, connection).await
+    }
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("countries")
+            .update()        
+.set("id", gluesql::core::ast_builder::num(self.id))        
+.set("iso", gluesql::core::ast_builder::text(self.iso))        
+.set("emoji", gluesql::core::ast_builder::text(self.emoji))        
+.set("unicode", gluesql::core::ast_builder::text(self.unicode))        
+.set("name", gluesql::core::ast_builder::text(self.name))            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+    /// Update the struct in the database if it exists, otherwise insert it.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated or inserted.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let number_of_rows = self.clone().update(connection).await?;
+        if number_of_rows == 0 {
+            self.insert(connection).await
+        } else {
+            Ok(number_of_rows)
+        }
+    }
+    /// Get all Country from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("countries")
+            .select()
+            .project("id, iso, emoji, unicode, name")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
+        Self {
+            id: match row.get("id").unwrap() {
+                gluesql::prelude::Value::I32(id) => id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            iso: match row.get("iso").unwrap() {
+                gluesql::prelude::Value::Str(iso) => iso.clone(),
+                _ => unreachable!("Expected Str")
+            },
+            emoji: match row.get("emoji").unwrap() {
+                gluesql::prelude::Value::Str(emoji) => emoji.clone(),
+                _ => unreachable!("Expected Str")
+            },
+            unicode: match row.get("unicode").unwrap() {
+                gluesql::prelude::Value::Str(unicode) => unicode.clone(),
+                _ => unreachable!("Expected Str")
+            },
+            name: match row.get("name").unwrap() {
+                gluesql::prelude::Value::Str(name) => name.clone(),
+                _ => unreachable!("Expected Str")
+            },
+        }
+    }
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct DerivedSample {
     pub id: i32,
     pub created_by: i32,
@@ -1794,6 +2065,34 @@ impl DerivedSample {
         let select_row = table("derived_samples")
             .select()
             .project("id, created_by, created_at, updated_by, updated_at, parent_sample_id, child_sample_id")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    /// Get all DerivedSample from the database ordered by the `updated_at` column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all_by_updated_at<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("derived_samples")
+            .select()
+            .project("id, created_by, created_at, updated_by, updated_at, parent_sample_id, child_sample_id")
+            .order_by("updated_at desc")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -2820,6 +3119,34 @@ impl ItemCategory {
         let select_row = table("item_categories")
             .select()
             .project("id, name, description, created_by, created_at, updated_by, updated_at")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    /// Get all ItemCategory from the database ordered by the `updated_at` column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all_by_updated_at<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("item_categories")
+            .select()
+            .project("id, name, description, created_by, created_at, updated_by, updated_at")
+            .order_by("updated_at desc")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -4916,8 +5243,9 @@ impl Notification {
 pub struct Organization {
     pub id: i32,
     pub name: String,
-    pub description: String,
-    pub parent_organization_id: Option<i32>,
+    pub url: String,
+    pub country_id: i32,
+    pub domain: String,
 }
 #[cfg(feature = "frontend")]
 impl Organization {
@@ -4925,11 +5253,9 @@ impl Organization {
         vec![
             gluesql::core::ast_builder::num(self.id),
             gluesql::core::ast_builder::text(self.name),
-            gluesql::core::ast_builder::text(self.description),
-            match self.parent_organization_id {
-                Some(parent_organization_id) => gluesql::core::ast_builder::num(parent_organization_id),
-                None => gluesql::core::ast_builder::null(),
-            },
+            gluesql::core::ast_builder::text(self.url),
+            gluesql::core::ast_builder::num(self.country_id),
+            gluesql::core::ast_builder::text(self.domain),
         ]
     }
 
@@ -4949,7 +5275,7 @@ impl Organization {
         use gluesql::core::ast_builder::*;
         table("organizations")
             .insert()
-            .columns("id, name, description, parent_organization_id")
+            .columns("id, name, url, country_id, domain")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -4975,7 +5301,7 @@ impl Organization {
         let select_row = table("organizations")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, name, description, parent_organization_id")
+            .project("id, name, url, country_id, domain")
             .limit(1)
             .execute(connection)
             .await?;
@@ -5041,15 +5367,13 @@ impl Organization {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
-        let mut update_row = table("organizations")
+        table("organizations")
             .update()        
 .set("id", gluesql::core::ast_builder::num(self.id))        
 .set("name", gluesql::core::ast_builder::text(self.name))        
-.set("description", gluesql::core::ast_builder::text(self.description));
-        if let Some(parent_organization_id) = self.parent_organization_id {
-            update_row = update_row.set("parent_organization_id", gluesql::core::ast_builder::num(parent_organization_id));
-        }
-            update_row.execute(connection)
+.set("url", gluesql::core::ast_builder::text(self.url))        
+.set("country_id", gluesql::core::ast_builder::num(self.country_id))        
+.set("domain", gluesql::core::ast_builder::text(self.domain))            .execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -5094,7 +5418,7 @@ impl Organization {
         use gluesql::core::ast_builder::*;
         let select_row = table("organizations")
             .select()
-            .project("id, name, description, parent_organization_id")
+            .project("id, name, url, country_id, domain")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -5114,14 +5438,17 @@ impl Organization {
                 gluesql::prelude::Value::Str(name) => name.clone(),
                 _ => unreachable!("Expected Str")
             },
-            description: match row.get("description").unwrap() {
-                gluesql::prelude::Value::Str(description) => description.clone(),
+            url: match row.get("url").unwrap() {
+                gluesql::prelude::Value::Str(url) => url.clone(),
                 _ => unreachable!("Expected Str")
             },
-            parent_organization_id: match row.get("parent_organization_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::I32(parent_organization_id) => Some(parent_organization_id.clone()),
+            country_id: match row.get("country_id").unwrap() {
+                gluesql::prelude::Value::I32(country_id) => country_id.clone(),
                 _ => unreachable!("Expected I32")
+            },
+            domain: match row.get("domain").unwrap() {
+                gluesql::prelude::Value::Str(domain) => domain.clone(),
+                _ => unreachable!("Expected Str")
             },
         }
     }
@@ -5515,6 +5842,34 @@ impl Procedure {
             .map(Self::from_row)
             .collect::<Vec<_>>())
     }
+    /// Get all Procedure from the database ordered by the `updated_at` column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all_by_updated_at<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("procedures")
+            .select()
+            .project("id, name, description, created_by, created_at, updated_by, updated_at")
+            .order_by("updated_at desc")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
@@ -5748,6 +6103,34 @@ impl ProjectRequirement {
         let select_row = table("project_requirements")
             .select()
             .project("id, created_by, created_at, updated_by, updated_at, project_id, item_category_id, quantity, unit_id")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    /// Get all ProjectRequirement from the database ordered by the `updated_at` column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all_by_updated_at<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("project_requirements")
+            .select()
+            .project("id, created_by, created_at, updated_by, updated_at, project_id, item_category_id, quantity, unit_id")
+            .order_by("updated_at desc")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -6257,6 +6640,34 @@ impl Project {
             .map(Self::from_row)
             .collect::<Vec<_>>())
     }
+    /// Get all Project from the database ordered by the `updated_at` column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all_by_updated_at<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("projects")
+            .select()
+            .project("id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date")
+            .order_by("updated_at desc")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
@@ -6713,6 +7124,34 @@ impl SampleBioOttTaxonItem {
             .map(Self::from_row)
             .collect::<Vec<_>>())
     }
+    /// Get all SampleBioOttTaxonItem from the database ordered by the `updated_at` column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all_by_updated_at<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("sample_bio_ott_taxon_items")
+            .select()
+            .project("id, created_by, created_at, updated_by, updated_at, sample_id, taxon_id")
+            .order_by("updated_at desc")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
@@ -7157,6 +7596,34 @@ impl SampledIndividualBioOttTaxonItem {
             .map(Self::from_row)
             .collect::<Vec<_>>())
     }
+    /// Get all SampledIndividualBioOttTaxonItem from the database ordered by the `updated_at` column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all_by_updated_at<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("sampled_individual_bio_ott_taxon_items")
+            .select()
+            .project("id, created_by, created_at, updated_by, updated_at, sampled_individual_id, taxon_id")
+            .order_by("updated_at desc")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
@@ -7383,6 +7850,34 @@ impl SampledIndividual {
         let select_row = table("sampled_individuals")
             .select()
             .project("id, created_by, created_at, updated_by, updated_at, name, tagged")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    /// Get all SampledIndividual from the database ordered by the `updated_at` column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all_by_updated_at<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("sampled_individuals")
+            .select()
+            .project("id, created_by, created_at, updated_by, updated_at, name, tagged")
+            .order_by("updated_at desc")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -7625,6 +8120,34 @@ impl Sample {
             .map(Self::from_row)
             .collect::<Vec<_>>())
     }
+    /// Get all Sample from the database ordered by the `updated_at` column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all_by_updated_at<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("samples")
+            .select()
+            .project("id, created_by, sampled_by, created_at, updated_by, updated_at, procedure_id, state")
+            .order_by("updated_at desc")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
@@ -7855,6 +8378,34 @@ impl SamplingProcedure {
         let select_row = table("sampling_procedures")
             .select()
             .project("id, name, description, created_by, created_at, updated_by, updated_at")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    /// Get all SamplingProcedure from the database ordered by the `updated_at` column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all_by_updated_at<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("sampling_procedures")
+            .select()
+            .project("id, name, description, created_by, created_at, updated_by, updated_at")
+            .order_by("updated_at desc")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -8276,6 +8827,34 @@ impl SpectraCollection {
         let select_row = table("spectra_collections")
             .select()
             .project("id, sample_id, created_by, created_at, updated_by, updated_at")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    /// Get all SpectraCollection from the database ordered by the `updated_at` column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all_by_updated_at<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("spectra_collections")
+            .select()
+            .project("id, sample_id, created_by, created_at, updated_by, updated_at")
+            .order_by("updated_at desc")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -8725,6 +9304,34 @@ impl Team {
         let select_row = table("teams")
             .select()
             .project("id, name, description, parent_team_id, created_by, created_at, updated_by, updated_at")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    /// Get all Team from the database ordered by the `updated_at` column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all_by_updated_at<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("teams")
+            .select()
+            .project("id, name, description, parent_team_id, created_by, created_at, updated_by, updated_at")
+            .order_by("updated_at desc")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -9386,6 +9993,34 @@ impl User {
         let select_row = table("users")
             .select()
             .project("id, first_name, middle_name, last_name, profile_picture, created_at, updated_at")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    /// Get all User from the database ordered by the `updated_at` column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all_by_updated_at<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("users")
+            .select()
+            .project("id, first_name, middle_name, last_name, profile_picture, created_at, updated_at")
+            .order_by("updated_at desc")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)

@@ -12,6 +12,7 @@ pub enum Table {
     ContainerHorizontalRules,
     ContainerVerticalRules,
     ContinuousUnits,
+    Countries,
     DerivedSamples,
     DiscreteUnits,
     DocumentFormats,
@@ -58,6 +59,7 @@ impl AsRef<str> for Table {
             Table::ContainerHorizontalRules => "container_horizontal_rules",
             Table::ContainerVerticalRules => "container_vertical_rules",
             Table::ContinuousUnits => "continuous_units",
+            Table::Countries => "countries",
             Table::DerivedSamples => "derived_samples",
             Table::DiscreteUnits => "discrete_units",
             Table::DocumentFormats => "document_formats",
@@ -116,6 +118,7 @@ impl std::convert::TryFrom<&str> for Table {
             "container_horizontal_rules" => Ok(Table::ContainerHorizontalRules),
             "container_vertical_rules" => Ok(Table::ContainerVerticalRules),
             "continuous_units" => Ok(Table::ContinuousUnits),
+            "countries" => Ok(Table::Countries),
             "derived_samples" => Ok(Table::DerivedSamples),
             "discrete_units" => Ok(Table::DiscreteUnits),
             "document_formats" => Ok(Table::DocumentFormats),
@@ -196,6 +199,9 @@ impl Table {
             },
             Table::ContinuousUnits => {
                 crate::database::ContinuousUnit::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::Countries => {
+                crate::database::Country::delete_from_id(primary_key.into(), connection).await
             },
             Table::DerivedSamples => {
                 crate::database::DerivedSample::delete_from_id(primary_key.into(), connection).await
@@ -326,6 +332,7 @@ impl Table {
             Table::ContainerHorizontalRules => crate::database::NestedContainerHorizontalRule::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::ContainerVerticalRules => crate::database::NestedContainerVerticalRule::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::ContinuousUnits => crate::database::ContinuousUnit::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::Countries => crate::database::Country::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::DerivedSamples => crate::database::NestedDerivedSample::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::DiscreteUnits => crate::database::DiscreteUnit::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::DocumentFormats => crate::database::DocumentFormat::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
@@ -387,6 +394,7 @@ impl Table {
             Table::ContainerHorizontalRules => crate::database::NestedContainerHorizontalRule::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::ContainerVerticalRules => crate::database::NestedContainerVerticalRule::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::ContinuousUnits => crate::database::ContinuousUnit::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::Countries => crate::database::Country::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::DerivedSamples => crate::database::NestedDerivedSample::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::DiscreteUnits => crate::database::DiscreteUnit::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::DocumentFormats => crate::database::DocumentFormat::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
@@ -424,6 +432,68 @@ impl Table {
             Table::Users => crate::database::User::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
         }
     }
+    /// Get all the rows from the table ordered by the `updated_at` column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
+    /// * `offset` - The number of rows to skip. By default `0`.
+    /// * `connection` - The database connection.
+    ///
+    /// # Returns
+    /// A vector of the rows of the table.
+    pub async fn all_by_updated_at<C>(
+        &self,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Vec<u8>>, crate::api::ApiError> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        match self {
+            Table::BioOttRanks => unimplemented!("all_by_updated_at not implemented for bio_ott_ranks."),
+            Table::BioOttTaxonItems => unimplemented!("all_by_updated_at not implemented for bio_ott_taxon_items."),
+            Table::Colors => unimplemented!("all_by_updated_at not implemented for colors."),
+            Table::ContainerHorizontalRules => crate::database::NestedContainerHorizontalRule::all_by_updated_at(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::ContainerVerticalRules => crate::database::NestedContainerVerticalRule::all_by_updated_at(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::ContinuousUnits => unimplemented!("all_by_updated_at not implemented for continuous_units."),
+            Table::Countries => unimplemented!("all_by_updated_at not implemented for countries."),
+            Table::DerivedSamples => crate::database::NestedDerivedSample::all_by_updated_at(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::DiscreteUnits => unimplemented!("all_by_updated_at not implemented for discrete_units."),
+            Table::DocumentFormats => unimplemented!("all_by_updated_at not implemented for document_formats."),
+            Table::Documents => unimplemented!("all_by_updated_at not implemented for documents."),
+            Table::FontAwesomeIcons => unimplemented!("all_by_updated_at not implemented for font_awesome_icons."),
+            Table::ItemCategories => crate::database::NestedItemCategory::all_by_updated_at(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::ItemCategoryRelationships => unimplemented!("all_by_updated_at not implemented for item_category_relationships."),
+            Table::ItemCategoryUnits => unimplemented!("all_by_updated_at not implemented for item_category_units."),
+            Table::ItemLocations => unimplemented!("all_by_updated_at not implemented for item_locations."),
+            Table::ItemUnits => unimplemented!("all_by_updated_at not implemented for item_units."),
+            Table::Items => unimplemented!("all_by_updated_at not implemented for items."),
+            Table::Locations => unimplemented!("all_by_updated_at not implemented for locations."),
+            Table::LoginProviders => unimplemented!("all_by_updated_at not implemented for login_providers."),
+            Table::ManufacturedItemCategories => unimplemented!("all_by_updated_at not implemented for manufactured_item_categories."),
+            Table::Notifications => unimplemented!("all_by_updated_at not implemented for notifications."),
+            Table::Organizations => unimplemented!("all_by_updated_at not implemented for organizations."),
+            Table::PrimaryUserEmails => unimplemented!("all_by_updated_at not implemented for primary_user_emails."),
+            Table::Procedures => crate::database::NestedProcedure::all_by_updated_at(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::ProjectRequirements => crate::database::NestedProjectRequirement::all_by_updated_at(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::ProjectStates => unimplemented!("all_by_updated_at not implemented for project_states."),
+            Table::Projects => crate::database::NestedProject::all_by_updated_at(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::Roles => unimplemented!("all_by_updated_at not implemented for roles."),
+            Table::SampleBioOttTaxonItems => crate::database::NestedSampleBioOttTaxonItem::all_by_updated_at(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::SampleStates => unimplemented!("all_by_updated_at not implemented for sample_states."),
+            Table::SampledIndividualBioOttTaxonItems => crate::database::NestedSampledIndividualBioOttTaxonItem::all_by_updated_at(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::SampledIndividuals => crate::database::NestedSampledIndividual::all_by_updated_at(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::Samples => crate::database::NestedSample::all_by_updated_at(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::SamplingProcedures => crate::database::NestedSamplingProcedure::all_by_updated_at(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::Spectra => unimplemented!("all_by_updated_at not implemented for spectra."),
+            Table::SpectraCollections => crate::database::NestedSpectraCollection::all_by_updated_at(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::TeamStates => unimplemented!("all_by_updated_at not implemented for team_states."),
+            Table::Teams => crate::database::NestedTeam::all_by_updated_at(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::Units => unimplemented!("all_by_updated_at not implemented for units."),
+            Table::UserEmails => unimplemented!("all_by_updated_at not implemented for user_emails."),
+            Table::Users => crate::database::User::all_by_updated_at(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+        }
+    }
     /// Insert a new row into the table.
     ///
     /// # Arguments
@@ -448,6 +518,7 @@ impl Table {
             Table::ContainerHorizontalRules => unimplemented!("Insert not implemented for container_horizontal_rules in frontend as it does not have a UUID primary key."),
             Table::ContainerVerticalRules => unimplemented!("Insert not implemented for container_vertical_rules in frontend as it does not have a UUID primary key."),
             Table::ContinuousUnits => unimplemented!("Insert not implemented for continuous_units."),
+            Table::Countries => unimplemented!("Insert not implemented for countries."),
             Table::DerivedSamples => unimplemented!("Insert not implemented for derived_samples in frontend as it does not have a UUID primary key."),
             Table::DiscreteUnits => unimplemented!("Insert not implemented for discrete_units."),
             Table::DocumentFormats => unimplemented!("Insert not implemented for document_formats."),
@@ -538,6 +609,7 @@ impl Table {
                  bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
             },
             Table::ContinuousUnits => unimplemented!("Update not implemented for continuous_units."),
+            Table::Countries => unimplemented!("Update not implemented for countries."),
             Table::DerivedSamples => todo!("Update not implemented for derived_samples."),
             Table::DiscreteUnits => unimplemented!("Update not implemented for discrete_units."),
             Table::DocumentFormats => unimplemented!("Update not implemented for document_formats."),
@@ -685,6 +757,12 @@ impl Table {
             Table::ContinuousUnits => {
                 for row in rows {
                     let row: super::ContinuousUnit = bincode::deserialize::<super::ContinuousUnit>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::Countries => {
+                for row in rows {
+                    let row: super::Country = bincode::deserialize::<super::Country>(&row).map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             },

@@ -347,6 +347,48 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                         .unwrap(),
                                     ));
                                 }
+                                web_common::database::Select::AllByUpdatedAt { table_name, limit, offset } => {
+                                    let table: web_common::database::Table =
+                                        match table_name.as_str().try_into() {
+                                            Ok(table) => table,
+                                            Err(err) => {
+                                                ctx.address().do_send(BackendMessage::Error(
+                                                    task_id,
+                                                    ApiError::BadRequest(vec![err.to_string()]),
+                                                ));
+                                                return;
+                                            }
+                                        };
+
+                                    if !self.is_authenticated() && limit > 20 {
+                                        ctx.address().do_send(BackendMessage::Error(
+                                            task_id,
+                                            ApiError::Unauthorized,
+                                        ));
+                                        return;
+                                    }
+
+                                    if self.is_authenticated() && limit > 100 {
+                                        ctx.address().do_send(BackendMessage::Error(
+                                            task_id,
+                                            ApiError::BadRequest(vec![
+                                                "Limit cannot exceed 100".to_string()
+                                            ]),
+                                        ));
+                                        return;
+                                    }
+
+                                    ctx.address().do_send(BackendMessage::AllTable(
+                                        task_id,
+                                        <Table as AllByUpdatedAtTable>::all_by_updated_at(
+                                            &table,
+                                            Some(limit),
+                                            Some(offset),
+                                            &mut self.diesel_connection,
+                                        )
+                                        .unwrap(),
+                                    ));
+                                }
                             },
                             web_common::database::Operation::Delete(table_name, primary_key) => {
                                 let table: web_common::database::Table =

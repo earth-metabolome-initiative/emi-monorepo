@@ -83,6 +83,13 @@ impl FormMethod {
             _ => false,
         }
     }
+
+    pub fn is_post(&self) -> bool {
+        match self {
+            FormMethod::POST => true,
+            _ => false,
+        }
+    }
 }
 
 impl Display for FormMethod {

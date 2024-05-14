@@ -633,6 +633,46 @@ class TableMetadata:
         """
         return "updated_at" in self.get_columns(table_name)
 
+    @cache
+    def get_default_column_value(self, table_name: str, column_name: str) -> Optional[str]:
+        """Returns the default value of the column.
+
+        Parameters
+        ----------
+        table_name : str
+            The name of the table.
+        column_name : str
+            The name of the column.
+
+        Implementation details
+        ----------------------
+        This method returns the value in the `column_default` column in
+        the table metadata associated with the table name and column name.
+        This value is the default value of the column.
+        """
+        if self.is_view(table_name):
+            for view_column in self.extract_view_columns(table_name):
+                if view_column.alias_name == column_name:
+                    return self.get_default_value(view_column.table_name, column_name)
+
+        _conn, cursor = get_cursor()
+        cursor.execute(
+            f"""
+            SELECT
+                column_default
+            FROM
+                information_schema.columns
+            WHERE
+                table_name = '{table_name}'
+                AND column_name = '{column_name}';
+            """
+        )
+
+        default_value = cursor.fetchone()[0]
+        cursor.close()
+
+        return default_value
+
 def find_foreign_keys() -> TableMetadata:
     """Returns the list of indices that are of type `pg_trgm`."""
     conn, cursor = get_cursor()

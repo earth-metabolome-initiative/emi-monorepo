@@ -84,7 +84,7 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::LoginProviders => unimplemented!("Table `login_providers` does not have a GIN similarity index."),
             web_common::database::Table::ManufacturedItemCategories => unimplemented!("Table `manufactured_item_categories` does not have a GIN similarity index."),
             web_common::database::Table::Notifications => unimplemented!("Table `notifications` does not have a GIN similarity index."),
-            web_common::database::Table::Organizations => Organization::similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::Organizations => NestedOrganization::similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::PrimaryUserEmails => unimplemented!("Table `primary_user_emails` does not have a GIN similarity index."),
             web_common::database::Table::Procedures => unimplemented!("Table `procedures` does not have a GIN similarity index."),
             web_common::database::Table::ProjectRequirements => unimplemented!("Table `project_requirements` does not have a GIN similarity index."),
@@ -130,7 +130,7 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::LoginProviders => unimplemented!("Table `login_providers` does not have a GIN similarity index."),
             web_common::database::Table::ManufacturedItemCategories => unimplemented!("Table `manufactured_item_categories` does not have a GIN similarity index."),
             web_common::database::Table::Notifications => unimplemented!("Table `notifications` does not have a GIN similarity index."),
-            web_common::database::Table::Organizations => Organization::word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::Organizations => NestedOrganization::word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::PrimaryUserEmails => unimplemented!("Table `primary_user_emails` does not have a GIN similarity index."),
             web_common::database::Table::Procedures => unimplemented!("Table `procedures` does not have a GIN similarity index."),
             web_common::database::Table::ProjectRequirements => unimplemented!("Table `project_requirements` does not have a GIN similarity index."),
@@ -176,7 +176,7 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::LoginProviders => unimplemented!("Table `login_providers` does not have a GIN similarity index."),
             web_common::database::Table::ManufacturedItemCategories => unimplemented!("Table `manufactured_item_categories` does not have a GIN similarity index."),
             web_common::database::Table::Notifications => unimplemented!("Table `notifications` does not have a GIN similarity index."),
-            web_common::database::Table::Organizations => Organization::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::Organizations => NestedOrganization::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::PrimaryUserEmails => unimplemented!("Table `primary_user_emails` does not have a GIN similarity index."),
             web_common::database::Table::Procedures => unimplemented!("Table `procedures` does not have a GIN similarity index."),
             web_common::database::Table::ProjectRequirements => unimplemented!("Table `project_requirements` does not have a GIN similarity index."),
@@ -246,7 +246,7 @@ impl IdentifiableTable for web_common::database::Table {
             web_common::database::Table::LoginProviders => bincode::serialize(&NestedLoginProvider::get(primary_key.into(), connection)?)?,
             web_common::database::Table::ManufacturedItemCategories => bincode::serialize(&NestedManufacturedItemCategory::get(primary_key.into(), connection)?)?,
             web_common::database::Table::Notifications => bincode::serialize(&NestedNotification::get(primary_key.into(), connection)?)?,
-            web_common::database::Table::Organizations => bincode::serialize(&Organization::get(primary_key.into(), connection)?)?,
+            web_common::database::Table::Organizations => bincode::serialize(&NestedOrganization::get(primary_key.into(), connection)?)?,
             web_common::database::Table::PrimaryUserEmails => bincode::serialize(&PrimaryUserEmail::get(primary_key.into(), connection)?)?,
             web_common::database::Table::Procedures => bincode::serialize(&NestedProcedure::get(primary_key.into(), connection)?)?,
             web_common::database::Table::ProjectRequirements => bincode::serialize(&NestedProjectRequirement::get(primary_key.into(), connection)?)?,
@@ -389,7 +389,7 @@ impl AllTable for web_common::database::Table {
             web_common::database::Table::LoginProviders => NestedLoginProvider::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::ManufacturedItemCategories => NestedManufacturedItemCategory::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::Notifications => NestedNotification::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::Organizations => Organization::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::Organizations => NestedOrganization::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::PrimaryUserEmails => PrimaryUserEmail::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::Procedures => NestedProcedure::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::ProjectRequirements => NestedProjectRequirement::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
@@ -409,6 +409,79 @@ impl AllTable for web_common::database::Table {
             web_common::database::Table::Units => Unit::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::UserEmails => NestedUserEmail::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::Users => User::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+        }
+    }
+}
+/// Trait providing the all_by_updated_at method for the Table enum.
+pub trait AllByUpdatedAtTable {
+    /// Get all the rows from the table ordered by the `updated_at` column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
+    /// * `offset` - The number of rows to skip.
+    /// * `connection` - The database connection.
+    ///
+    /// # Returns
+    /// A vector of the rows of the table.
+    fn all_by_updated_at(
+         &self,
+         limit: Option<i64>,
+         offset: Option<i64>,
+         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+) -> Result<Vec<Vec<u8>>, web_common::api::ApiError>;
+}
+
+impl AllByUpdatedAtTable for web_common::database::Table {
+
+    fn all_by_updated_at(
+        &self,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Vec<u8>>, web_common::api::ApiError> {
+        match self {
+            web_common::database::Table::BioOttRanks => unimplemented!("all_by_updated_at not implemented for bio_ott_ranks."),
+            web_common::database::Table::BioOttTaxonItems => unimplemented!("all_by_updated_at not implemented for bio_ott_taxon_items."),
+            web_common::database::Table::Colors => unimplemented!("all_by_updated_at not implemented for colors."),
+            web_common::database::Table::ContainerHorizontalRules => NestedContainerHorizontalRule::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::ContainerVerticalRules => NestedContainerVerticalRule::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::ContinuousUnits => unimplemented!("all_by_updated_at not implemented for continuous_units."),
+            web_common::database::Table::Countries => unimplemented!("all_by_updated_at not implemented for countries."),
+            web_common::database::Table::DerivedSamples => NestedDerivedSample::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::DiscreteUnits => unimplemented!("all_by_updated_at not implemented for discrete_units."),
+            web_common::database::Table::DocumentFormats => unimplemented!("all_by_updated_at not implemented for document_formats."),
+            web_common::database::Table::Documents => unimplemented!("all_by_updated_at not implemented for documents."),
+            web_common::database::Table::FontAwesomeIcons => unimplemented!("all_by_updated_at not implemented for font_awesome_icons."),
+            web_common::database::Table::ItemCategories => NestedItemCategory::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::ItemCategoryRelationships => unimplemented!("all_by_updated_at not implemented for item_category_relationships."),
+            web_common::database::Table::ItemCategoryUnits => unimplemented!("all_by_updated_at not implemented for item_category_units."),
+            web_common::database::Table::ItemLocations => unimplemented!("all_by_updated_at not implemented for item_locations."),
+            web_common::database::Table::ItemUnits => unimplemented!("all_by_updated_at not implemented for item_units."),
+            web_common::database::Table::Items => unimplemented!("all_by_updated_at not implemented for items."),
+            web_common::database::Table::Locations => unimplemented!("all_by_updated_at not implemented for locations."),
+            web_common::database::Table::LoginProviders => unimplemented!("all_by_updated_at not implemented for login_providers."),
+            web_common::database::Table::ManufacturedItemCategories => unimplemented!("all_by_updated_at not implemented for manufactured_item_categories."),
+            web_common::database::Table::Notifications => unimplemented!("all_by_updated_at not implemented for notifications."),
+            web_common::database::Table::Organizations => unimplemented!("all_by_updated_at not implemented for organizations."),
+            web_common::database::Table::PrimaryUserEmails => unimplemented!("all_by_updated_at not implemented for primary_user_emails."),
+            web_common::database::Table::Procedures => NestedProcedure::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::ProjectRequirements => NestedProjectRequirement::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::ProjectStates => unimplemented!("all_by_updated_at not implemented for project_states."),
+            web_common::database::Table::Projects => NestedProject::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::Roles => unimplemented!("all_by_updated_at not implemented for roles."),
+            web_common::database::Table::SampleBioOttTaxonItems => NestedSampleBioOttTaxonItem::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::SampleStates => unimplemented!("all_by_updated_at not implemented for sample_states."),
+            web_common::database::Table::SampledIndividualBioOttTaxonItems => NestedSampledIndividualBioOttTaxonItem::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::SampledIndividuals => NestedSampledIndividual::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::Samples => NestedSample::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::SamplingProcedures => NestedSamplingProcedure::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::Spectra => unimplemented!("all_by_updated_at not implemented for spectra."),
+            web_common::database::Table::SpectraCollections => NestedSpectraCollection::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::TeamStates => unimplemented!("all_by_updated_at not implemented for team_states."),
+            web_common::database::Table::Teams => NestedTeam::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::Units => unimplemented!("all_by_updated_at not implemented for units."),
+            web_common::database::Table::UserEmails => unimplemented!("all_by_updated_at not implemented for user_emails."),
+            web_common::database::Table::Users => User::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
         }
     }
 }
@@ -773,7 +846,11 @@ impl FromFlatStrTable for web_common::database::Table {
                 let richest_row = crate::nested_models::NestedNotification::from_flat(flat_row, connection)?;
                  bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
             },
-            web_common::database::Table::Organizations => bincode::serialize(&serde_json::from_str::<crate::models::Organization>(row).map_err(web_common::api::ApiError::from)?).map_err(web_common::api::ApiError::from)?,
+            web_common::database::Table::Organizations => {
+                let flat_row: crate::models::Organization = serde_json::from_str::<crate::models::Organization>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedOrganization::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
             web_common::database::Table::PrimaryUserEmails => bincode::serialize(&serde_json::from_str::<crate::models::PrimaryUserEmail>(row).map_err(web_common::api::ApiError::from)?).map_err(web_common::api::ApiError::from)?,
             web_common::database::Table::Procedures => {
                 let flat_row: crate::models::Procedure = serde_json::from_str::<crate::models::Procedure>(row).map_err(web_common::api::ApiError::from)?;

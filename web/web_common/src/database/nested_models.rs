@@ -257,6 +257,26 @@ impl NestedContainerHorizontalRule {
          }
          Ok(nested_structs)
     }
+    /// Get all the nested structs from the database ordered by the `updated_at` column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
+    /// * `offset` - The number of rows to skip.
+    /// * `connection` - The database connection.
+    pub async fn all_by_updated_at<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let flat_structs = ContainerHorizontalRule::all_by_updated_at(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_structs.len());
+         for flat_struct in flat_structs {
+             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+         }
+         Ok(nested_structs)
+    }
     /// Update or insert the nested struct into the database.
     ///
     /// # Arguments
@@ -338,6 +358,26 @@ impl NestedContainerVerticalRule {
          }
          Ok(nested_structs)
     }
+    /// Get all the nested structs from the database ordered by the `updated_at` column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
+    /// * `offset` - The number of rows to skip.
+    /// * `connection` - The database connection.
+    pub async fn all_by_updated_at<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let flat_structs = ContainerVerticalRule::all_by_updated_at(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_structs.len());
+         for flat_struct in flat_structs {
+             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+         }
+         Ok(nested_structs)
+    }
     /// Update or insert the nested struct into the database.
     ///
     /// # Arguments
@@ -413,6 +453,26 @@ impl NestedDerivedSample {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         let flat_structs = DerivedSample::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_structs.len());
+         for flat_struct in flat_structs {
+             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+         }
+         Ok(nested_structs)
+    }
+    /// Get all the nested structs from the database ordered by the `updated_at` column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
+    /// * `offset` - The number of rows to skip.
+    /// * `connection` - The database connection.
+    pub async fn all_by_updated_at<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let flat_structs = DerivedSample::all_by_updated_at(limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_structs.len());
          for flat_struct in flat_structs {
              nested_structs.push(Self::from_flat(flat_struct, connection).await?);
@@ -565,6 +625,26 @@ impl NestedItemCategory {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         let flat_structs = ItemCategory::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_structs.len());
+         for flat_struct in flat_structs {
+             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+         }
+         Ok(nested_structs)
+    }
+    /// Get all the nested structs from the database ordered by the `updated_at` column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
+    /// * `offset` - The number of rows to skip.
+    /// * `connection` - The database connection.
+    pub async fn all_by_updated_at<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let flat_structs = ItemCategory::all_by_updated_at(limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_structs.len());
          for flat_struct in flat_structs {
              nested_structs.push(Self::from_flat(flat_struct, connection).await?);
@@ -1279,7 +1359,7 @@ impl NestedNotification {
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedOrganization {
     pub inner: Organization,
-    pub parent_organization: Option<Organization>,
+    pub country: Country,
 }
 #[cfg(feature = "frontend")]
 impl NestedOrganization {
@@ -1293,7 +1373,7 @@ impl NestedOrganization {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            parent_organization: if let Some(parent_organization_id) = flat_struct.parent_organization_id { Organization::get(parent_organization_id, connection).await? } else { None },
+            country: Country::get(flat_struct.country_id, connection).await?.unwrap(),
             inner: flat_struct,
         })
     }
@@ -1344,9 +1424,7 @@ impl NestedOrganization {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         self.inner.update_or_insert(connection).await?;
-        if let Some(parent_organization) = self.parent_organization {
-            parent_organization.update_or_insert(connection).await?;
-        }
+        self.country.update_or_insert(connection).await?;
         Ok(())
     }
 }
@@ -1403,6 +1481,26 @@ impl NestedProcedure {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         let flat_structs = Procedure::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_structs.len());
+         for flat_struct in flat_structs {
+             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+         }
+         Ok(nested_structs)
+    }
+    /// Get all the nested structs from the database ordered by the `updated_at` column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
+    /// * `offset` - The number of rows to skip.
+    /// * `connection` - The database connection.
+    pub async fn all_by_updated_at<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let flat_structs = Procedure::all_by_updated_at(limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_structs.len());
          for flat_struct in flat_structs {
              nested_structs.push(Self::from_flat(flat_struct, connection).await?);
@@ -1484,6 +1582,26 @@ impl NestedProjectRequirement {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         let flat_structs = ProjectRequirement::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_structs.len());
+         for flat_struct in flat_structs {
+             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+         }
+         Ok(nested_structs)
+    }
+    /// Get all the nested structs from the database ordered by the `updated_at` column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
+    /// * `offset` - The number of rows to skip.
+    /// * `connection` - The database connection.
+    pub async fn all_by_updated_at<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let flat_structs = ProjectRequirement::all_by_updated_at(limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_structs.len());
          for flat_struct in flat_structs {
              nested_structs.push(Self::from_flat(flat_struct, connection).await?);
@@ -1649,6 +1767,26 @@ impl NestedProject {
          }
          Ok(nested_structs)
     }
+    /// Get all the nested structs from the database ordered by the `updated_at` column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
+    /// * `offset` - The number of rows to skip.
+    /// * `connection` - The database connection.
+    pub async fn all_by_updated_at<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let flat_structs = Project::all_by_updated_at(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_structs.len());
+         for flat_struct in flat_structs {
+             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+         }
+         Ok(nested_structs)
+    }
     /// Update or insert the nested struct into the database.
     ///
     /// # Arguments
@@ -1726,6 +1864,26 @@ impl NestedSampleBioOttTaxonItem {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         let flat_structs = SampleBioOttTaxonItem::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_structs.len());
+         for flat_struct in flat_structs {
+             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+         }
+         Ok(nested_structs)
+    }
+    /// Get all the nested structs from the database ordered by the `updated_at` column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
+    /// * `offset` - The number of rows to skip.
+    /// * `connection` - The database connection.
+    pub async fn all_by_updated_at<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let flat_structs = SampleBioOttTaxonItem::all_by_updated_at(limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_structs.len());
          for flat_struct in flat_structs {
              nested_structs.push(Self::from_flat(flat_struct, connection).await?);
@@ -1888,6 +2046,26 @@ impl NestedSampledIndividualBioOttTaxonItem {
          }
          Ok(nested_structs)
     }
+    /// Get all the nested structs from the database ordered by the `updated_at` column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
+    /// * `offset` - The number of rows to skip.
+    /// * `connection` - The database connection.
+    pub async fn all_by_updated_at<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let flat_structs = SampledIndividualBioOttTaxonItem::all_by_updated_at(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_structs.len());
+         for flat_struct in flat_structs {
+             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+         }
+         Ok(nested_structs)
+    }
     /// Update or insert the nested struct into the database.
     ///
     /// # Arguments
@@ -1959,6 +2137,26 @@ impl NestedSampledIndividual {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         let flat_structs = SampledIndividual::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_structs.len());
+         for flat_struct in flat_structs {
+             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+         }
+         Ok(nested_structs)
+    }
+    /// Get all the nested structs from the database ordered by the `updated_at` column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
+    /// * `offset` - The number of rows to skip.
+    /// * `connection` - The database connection.
+    pub async fn all_by_updated_at<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let flat_structs = SampledIndividual::all_by_updated_at(limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_structs.len());
          for flat_struct in flat_structs {
              nested_structs.push(Self::from_flat(flat_struct, connection).await?);
@@ -2046,6 +2244,26 @@ impl NestedSample {
          }
          Ok(nested_structs)
     }
+    /// Get all the nested structs from the database ordered by the `updated_at` column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
+    /// * `offset` - The number of rows to skip.
+    /// * `connection` - The database connection.
+    pub async fn all_by_updated_at<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let flat_structs = Sample::all_by_updated_at(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_structs.len());
+         for flat_struct in flat_structs {
+             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+         }
+         Ok(nested_structs)
+    }
     /// Update or insert the nested struct into the database.
     ///
     /// # Arguments
@@ -2118,6 +2336,26 @@ impl NestedSamplingProcedure {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         let flat_structs = SamplingProcedure::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_structs.len());
+         for flat_struct in flat_structs {
+             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+         }
+         Ok(nested_structs)
+    }
+    /// Get all the nested structs from the database ordered by the `updated_at` column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
+    /// * `offset` - The number of rows to skip.
+    /// * `connection` - The database connection.
+    pub async fn all_by_updated_at<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let flat_structs = SamplingProcedure::all_by_updated_at(limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_structs.len());
          for flat_struct in flat_structs {
              nested_structs.push(Self::from_flat(flat_struct, connection).await?);
@@ -2273,6 +2511,26 @@ impl NestedSpectraCollection {
          }
          Ok(nested_structs)
     }
+    /// Get all the nested structs from the database ordered by the `updated_at` column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
+    /// * `offset` - The number of rows to skip.
+    /// * `connection` - The database connection.
+    pub async fn all_by_updated_at<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let flat_structs = SpectraCollection::all_by_updated_at(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_structs.len());
+         for flat_struct in flat_structs {
+             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+         }
+         Ok(nested_structs)
+    }
     /// Update or insert the nested struct into the database.
     ///
     /// # Arguments
@@ -2420,6 +2678,26 @@ impl NestedTeam {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         let flat_structs = Team::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_structs.len());
+         for flat_struct in flat_structs {
+             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+         }
+         Ok(nested_structs)
+    }
+    /// Get all the nested structs from the database ordered by the `updated_at` column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return.
+    /// * `offset` - The number of rows to skip.
+    /// * `connection` - The database connection.
+    pub async fn all_by_updated_at<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let flat_structs = Team::all_by_updated_at(limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_structs.len());
          for flat_struct in flat_structs {
              nested_structs.push(Self::from_flat(flat_struct, connection).await?);

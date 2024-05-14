@@ -123,6 +123,15 @@ impl Searchable for Color {
         )
     }
 }
+impl Searchable for Country {
+    fn search_task(query: String, limit: u32) -> super::Select {
+        super::Select::search(
+             Table::Countries,
+              query,
+              limit,
+        )
+    }
+}
 impl Searchable for DocumentFormat {
     fn search_task(query: String, limit: u32) -> super::Select {
         super::Select::search(

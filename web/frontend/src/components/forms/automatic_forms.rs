@@ -18,9 +18,8 @@ use web_common::api::ApiError;
 use crate::workers::ws_worker::ComponentMessage;
 use web_common::custom_validators::Image;
 use web_common::file_formats::GenericFileFormat;
-use yew_router::prelude::*;
 
-#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct ContainerHorizontalRuleBuilder {
     pub id: Option<i32>,
@@ -43,6 +42,33 @@ pub struct ContainerHorizontalRuleBuilder {
     pub errors_item_type: Vec<ApiError>,
     pub errors_other_item_type: Vec<ApiError>,
     pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for ContainerHorizontalRuleBuilder {
+    fn default() -> Self {
+        Self {
+            id: None,
+            name: None,
+            minimum_temperature: None,
+            maximum_temperature: None,
+            minimum_humidity: None,
+            maximum_humidity: None,
+            minimum_pressure: None,
+            maximum_pressure: None,
+            item_type: None,
+            other_item_type: None,
+            errors_name: Vec::new(),
+            errors_minimum_temperature: Vec::new(),
+            errors_maximum_temperature: Vec::new(),
+            errors_minimum_humidity: Vec::new(),
+            errors_maximum_humidity: Vec::new(),
+            errors_minimum_pressure: Vec::new(),
+            errors_maximum_pressure: Vec::new(),
+            errors_item_type: Vec::new(),
+            errors_other_item_type: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
 }
 
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
@@ -363,6 +389,10 @@ impl From<ContainerHorizontalRuleBuilder> for UpdateContainerHorizontalRule {
         }
     }
 }
+impl Tabular for NestedContainerHorizontalRule {
+    const TABLE: Table = Table::ContainerHorizontalRules;
+}
+
 impl Tabular for NewContainerHorizontalRule {
     const TABLE: Table = Table::ContainerHorizontalRules;
 }
@@ -463,7 +493,7 @@ pub fn update_container_horizontal_rule_form(props: &UpdateContainerHorizontalRu
         </BasicForm<UpdateContainerHorizontalRule>>
     }
 }
-#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct ContainerVerticalRuleBuilder {
     pub id: Option<i32>,
@@ -486,6 +516,33 @@ pub struct ContainerVerticalRuleBuilder {
     pub errors_container_item_type: Vec<ApiError>,
     pub errors_contained_item_type: Vec<ApiError>,
     pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for ContainerVerticalRuleBuilder {
+    fn default() -> Self {
+        Self {
+            id: None,
+            name: None,
+            minimum_temperature: None,
+            maximum_temperature: None,
+            minimum_humidity: None,
+            maximum_humidity: None,
+            minimum_pressure: None,
+            maximum_pressure: None,
+            container_item_type: None,
+            contained_item_type: None,
+            errors_name: Vec::new(),
+            errors_minimum_temperature: Vec::new(),
+            errors_maximum_temperature: Vec::new(),
+            errors_minimum_humidity: Vec::new(),
+            errors_maximum_humidity: Vec::new(),
+            errors_minimum_pressure: Vec::new(),
+            errors_maximum_pressure: Vec::new(),
+            errors_container_item_type: Vec::new(),
+            errors_contained_item_type: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
 }
 
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
@@ -806,6 +863,10 @@ impl From<ContainerVerticalRuleBuilder> for UpdateContainerVerticalRule {
         }
     }
 }
+impl Tabular for NestedContainerVerticalRule {
+    const TABLE: Table = Table::ContainerVerticalRules;
+}
+
 impl Tabular for NewContainerVerticalRule {
     const TABLE: Table = Table::ContainerVerticalRules;
 }
@@ -906,7 +967,7 @@ pub fn update_container_vertical_rule_form(props: &UpdateContainerVerticalRuleFo
         </BasicForm<UpdateContainerVerticalRule>>
     }
 }
-#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct ItemCategoryBuilder {
     pub id: Option<i32>,
@@ -915,6 +976,19 @@ pub struct ItemCategoryBuilder {
     pub errors_name: Vec<ApiError>,
     pub errors_description: Vec<ApiError>,
     pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for ItemCategoryBuilder {
+    fn default() -> Self {
+        Self {
+            id: None,
+            name: None,
+            description: None,
+            errors_name: Vec::new(),
+            errors_description: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
 }
 
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
@@ -1027,6 +1101,10 @@ impl From<ItemCategoryBuilder> for UpdateItemCategory {
         }
     }
 }
+impl Tabular for NestedItemCategory {
+    const TABLE: Table = Table::ItemCategories;
+}
+
 impl Tabular for NewItemCategory {
     const TABLE: Table = Table::ItemCategories;
 }
@@ -1099,7 +1177,7 @@ pub fn update_item_category_form(props: &UpdateItemCategoryFormProp) -> Html {
         </BasicForm<UpdateItemCategory>>
     }
 }
-#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct ProcedureBuilder {
     pub id: Option<i32>,
@@ -1108,6 +1186,19 @@ pub struct ProcedureBuilder {
     pub errors_name: Vec<ApiError>,
     pub errors_description: Vec<ApiError>,
     pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for ProcedureBuilder {
+    fn default() -> Self {
+        Self {
+            id: None,
+            name: None,
+            description: None,
+            errors_name: Vec::new(),
+            errors_description: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
 }
 
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
@@ -1212,6 +1303,10 @@ impl From<ProcedureBuilder> for UpdateProcedure {
         }
     }
 }
+impl Tabular for NestedProcedure {
+    const TABLE: Table = Table::Procedures;
+}
+
 impl Tabular for NewProcedure {
     const TABLE: Table = Table::Procedures;
 }
@@ -1284,7 +1379,7 @@ pub fn update_procedure_form(props: &UpdateProcedureFormProp) -> Html {
         </BasicForm<UpdateProcedure>>
     }
 }
-#[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct ProjectRequirementBuilder {
     pub id: Option<i32>,
@@ -1297,6 +1392,23 @@ pub struct ProjectRequirementBuilder {
     pub errors_item_category: Vec<ApiError>,
     pub errors_unit: Vec<ApiError>,
     pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for ProjectRequirementBuilder {
+    fn default() -> Self {
+        Self {
+            id: None,
+            quantity: None,
+            project: None,
+            item_category: None,
+            unit: None,
+            errors_quantity: Vec::new(),
+            errors_project: Vec::new(),
+            errors_item_category: Vec::new(),
+            errors_unit: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
 }
 
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
@@ -1443,6 +1555,10 @@ impl From<ProjectRequirementBuilder> for UpdateProjectRequirement {
         }
     }
 }
+impl Tabular for NestedProjectRequirement {
+    const TABLE: Table = Table::ProjectRequirements;
+}
+
 impl Tabular for NewProjectRequirement {
     const TABLE: Table = Table::ProjectRequirements;
 }
@@ -1523,7 +1639,7 @@ pub fn update_project_requirement_form(props: &UpdateProjectRequirementFormProp)
         </BasicForm<UpdateProjectRequirement>>
     }
 }
-#[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct ProjectBuilder {
     pub id: Option<i32>,
@@ -1546,6 +1662,33 @@ pub struct ProjectBuilder {
     pub errors_state: Vec<ApiError>,
     pub errors_parent_project: Vec<ApiError>,
     pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for ProjectBuilder {
+    fn default() -> Self {
+        Self {
+            id: None,
+            name: None,
+            description: None,
+            public: Some(true),
+            budget: None,
+            expenses: None,
+            expected_end_date: None,
+            end_date: None,
+            state: None,
+            parent_project: None,
+            errors_name: Vec::new(),
+            errors_description: Vec::new(),
+            errors_public: Vec::new(),
+            errors_budget: Vec::new(),
+            errors_expenses: Vec::new(),
+            errors_expected_end_date: Vec::new(),
+            errors_end_date: Vec::new(),
+            errors_state: Vec::new(),
+            errors_parent_project: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
 }
 
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
@@ -1820,6 +1963,10 @@ impl From<ProjectBuilder> for UpdateProject {
         }
     }
 }
+impl Tabular for NestedProject {
+    const TABLE: Table = Table::Projects;
+}
+
 impl Tabular for NewProject {
     const TABLE: Table = Table::Projects;
 }
@@ -1920,7 +2067,7 @@ pub fn update_project_form(props: &UpdateProjectFormProp) -> Html {
         </BasicForm<UpdateProject>>
     }
 }
-#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct SampledIndividualBuilder {
     pub id: Option<Uuid>,
@@ -1929,6 +2076,19 @@ pub struct SampledIndividualBuilder {
     pub errors_name: Vec<ApiError>,
     pub errors_tagged: Vec<ApiError>,
     pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for SampledIndividualBuilder {
+    fn default() -> Self {
+        Self {
+            id: None,
+            name: None,
+            tagged: Some(false),
+            errors_name: Vec::new(),
+            errors_tagged: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
 }
 
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
@@ -2015,6 +2175,10 @@ impl From<SampledIndividualBuilder> for NewSampledIndividual {
         }
     }
 }
+impl Tabular for NestedSampledIndividual {
+    const TABLE: Table = Table::SampledIndividuals;
+}
+
 impl Tabular for NewSampledIndividual {
     const TABLE: Table = Table::SampledIndividuals;
 }
@@ -2067,7 +2231,7 @@ pub fn update_sampled_individual_form(props: &UpdateSampledIndividualFormProp) -
         </BasicForm<NewSampledIndividual>>
     }
 }
-#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct SampleBuilder {
     pub id: Option<Uuid>,
@@ -2078,6 +2242,21 @@ pub struct SampleBuilder {
     pub errors_procedure: Vec<ApiError>,
     pub errors_state: Vec<ApiError>,
     pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for SampleBuilder {
+    fn default() -> Self {
+        Self {
+            id: None,
+            sampled_by: None,
+            procedure: None,
+            state: None,
+            errors_sampled_by: Vec::new(),
+            errors_procedure: Vec::new(),
+            errors_state: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
 }
 
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
@@ -2182,6 +2361,10 @@ impl From<SampleBuilder> for NewSample {
         }
     }
 }
+impl Tabular for NestedSample {
+    const TABLE: Table = Table::Samples;
+}
+
 impl Tabular for NewSample {
     const TABLE: Table = Table::Samples;
 }
@@ -2238,7 +2421,7 @@ pub fn update_sample_form(props: &UpdateSampleFormProp) -> Html {
         </BasicForm<NewSample>>
     }
 }
-#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct SamplingProcedureBuilder {
     pub id: Option<Uuid>,
@@ -2247,6 +2430,19 @@ pub struct SamplingProcedureBuilder {
     pub errors_name: Vec<ApiError>,
     pub errors_description: Vec<ApiError>,
     pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for SamplingProcedureBuilder {
+    fn default() -> Self {
+        Self {
+            id: None,
+            name: None,
+            description: None,
+            errors_name: Vec::new(),
+            errors_description: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
 }
 
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
@@ -2343,6 +2539,10 @@ impl From<SamplingProcedureBuilder> for NewSamplingProcedure {
         }
     }
 }
+impl Tabular for NestedSamplingProcedure {
+    const TABLE: Table = Table::SamplingProcedures;
+}
+
 impl Tabular for NewSamplingProcedure {
     const TABLE: Table = Table::SamplingProcedures;
 }
@@ -2395,7 +2595,7 @@ pub fn update_sampling_procedure_form(props: &UpdateSamplingProcedureFormProp) -
         </BasicForm<NewSamplingProcedure>>
     }
 }
-#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct TeamBuilder {
     pub id: Option<i32>,
@@ -2406,6 +2606,21 @@ pub struct TeamBuilder {
     pub errors_description: Vec<ApiError>,
     pub errors_parent_team: Vec<ApiError>,
     pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for TeamBuilder {
+    fn default() -> Self {
+        Self {
+            id: None,
+            name: None,
+            description: None,
+            parent_team: None,
+            errors_name: Vec::new(),
+            errors_description: Vec::new(),
+            errors_parent_team: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
 }
 
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
@@ -2531,6 +2746,10 @@ impl From<TeamBuilder> for UpdateTeam {
         }
     }
 }
+impl Tabular for NestedTeam {
+    const TABLE: Table = Table::Teams;
+}
+
 impl Tabular for NewTeam {
     const TABLE: Table = Table::Teams;
 }
@@ -2607,7 +2826,7 @@ pub fn update_team_form(props: &UpdateTeamFormProp) -> Html {
         </BasicForm<UpdateTeam>>
     }
 }
-#[derive(Store, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Store, Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct UserBuilder {
     pub id: Option<i32>,
@@ -2620,6 +2839,23 @@ pub struct UserBuilder {
     pub errors_last_name: Vec<ApiError>,
     pub errors_profile_picture: Vec<ApiError>,
     pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for UserBuilder {
+    fn default() -> Self {
+        Self {
+            id: None,
+            first_name: Some("".to_string()),
+            middle_name: None,
+            last_name: Some("".to_string()),
+            profile_picture: None,
+            errors_first_name: Vec::new(),
+            errors_middle_name: Vec::new(),
+            errors_last_name: Vec::new(),
+            errors_profile_picture: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
@@ -2753,6 +2989,10 @@ impl From<UserBuilder> for UpdateUser {
         }
     }
 }
+impl Tabular for User {
+    const TABLE: Table = Table::Users;
+}
+
 impl Tabular for UpdateUser {
     const TABLE: Table = Table::Users;
 }

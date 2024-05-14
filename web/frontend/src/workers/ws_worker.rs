@@ -46,7 +46,6 @@ pub enum ComponentMessage {
     Operation(Operation),
 }
 
-
 /// Trait defining a struct that is associated to a Table.
 pub trait Tabular {
     const TABLE: Table;
@@ -67,11 +66,22 @@ impl ComponentMessage {
         ))
     }
 
+    pub(crate) fn all_by_updated_at<R: Tabular>(limit: i64, offset: i64) -> Self {
+        Self::Operation(Operation::Select(Select::all_by_updated_at(
+            R::TABLE,
+            limit,
+            offset,
+        )))
+    }
+
     pub(crate) fn get<R: Tabular>(primary_key: PrimaryKey) -> Self {
         Self::Operation(Operation::Select(Select::id(R::TABLE, primary_key)))
     }
 
-    pub(crate) fn get_named<S: ToString, R: Tabular>(operation_name: S, primary_key: PrimaryKey) -> Self {
+    pub(crate) fn get_named<S: ToString, R: Tabular>(
+        operation_name: S,
+        primary_key: PrimaryKey,
+    ) -> Self {
         Self::Operation(Operation::Select(Select::id_with_operation_name(
             R::TABLE,
             operation_name.to_string(),
@@ -117,7 +127,9 @@ impl WebsocketWorker {
                     Operation::Delete(table_name, primary_key) => {
                         let table: Table = table_name.try_into().unwrap();
                         match table.delete(primary_key, &mut database).await {
-                            Ok(row) => {todo!()},
+                            Ok(row) => {
+                                todo!()
+                            }
                             Err(err) => BackendMessage::Error(task_id, ApiError::from(err)),
                         }
                     }
@@ -127,7 +139,9 @@ impl WebsocketWorker {
                             .insert(serialized_row, user_id.unwrap(), &mut database)
                             .await
                         {
-                            Ok(row) => {todo!()},
+                            Ok(row) => {
+                                todo!()
+                            }
                             Err(err) => BackendMessage::Error(task_id, ApiError::from(err)),
                         }
                     }
@@ -141,7 +155,9 @@ impl WebsocketWorker {
                                 let table: Table = table_name.try_into().unwrap();
 
                                 match table.get(primary_key, &mut database).await {
-                                    Ok(Some(row)) => BackendMessage::GetTable(task_id, operation_name, row),
+                                    Ok(Some(row)) => {
+                                        BackendMessage::GetTable(task_id, operation_name, row)
+                                    }
                                     Ok(None) => BackendMessage::Error(
                                         task_id,
                                         ApiError::BadRequest(vec![
@@ -159,6 +175,21 @@ impl WebsocketWorker {
                                 let table: Table = table_name.try_into().unwrap();
 
                                 match table.all(Some(limit), Some(offset), &mut database).await {
+                                    Ok(rows) => BackendMessage::AllTable(task_id, rows),
+                                    Err(err) => BackendMessage::Error(task_id, err),
+                                }
+                            }
+                            Select::AllByUpdatedAt {
+                                table_name,
+                                limit,
+                                offset,
+                            } => {
+                                let table: Table = table_name.try_into().unwrap();
+
+                                match table
+                                    .all_by_updated_at(Some(limit), Some(offset), &mut database)
+                                    .await
+                                {
                                     Ok(rows) => BackendMessage::AllTable(task_id, rows),
                                     Err(err) => BackendMessage::Error(task_id, err),
                                 }
@@ -190,7 +221,7 @@ impl WebsocketWorker {
                         {
                             Ok(row) => {
                                 todo!()
-                            },
+                            }
                             Err(err) => BackendMessage::Error(task_id, ApiError::from(err)),
                         }
                     }
@@ -286,6 +317,7 @@ impl Worker for WebsocketWorker {
     ) {
         match internal_message {
             InternalMessage::Backend(backend_message) => {
+                log::debug!("Received message from backend: {:?}", backend_message);
                 match backend_message {
                     BackendMessage::Notification(notification) => {
                         // TODO! HANDLE UPDATE OF THE DATABASE!
@@ -313,10 +345,12 @@ impl Worker for WebsocketWorker {
                         // We save locally the table data (maybe?)
                         // We can remove this task from the queue.
                         if let Some(subscriber_id) = self.tasks.remove(&task_id) {
-                            scope.respond(subscriber_id, WebsocketMessage::GetTable(task_name, row));
+                            scope
+                                .respond(subscriber_id, WebsocketMessage::GetTable(task_name, row));
                         }
                     }
                     BackendMessage::AllTable(task_id, rows) => {
+                        log::debug!("Received all table message");
                         // We save locally the table data (maybe?)
                         if let Some(subscriber_id) = self.tasks.remove(&task_id) {
                             scope.respond(subscriber_id, WebsocketMessage::AllTable(rows));
@@ -355,7 +389,7 @@ impl Worker for WebsocketWorker {
 
                         let task_id = Uuid::new_v4();
                         self.tasks.insert(task_id, subscriber_id);
-                        
+
                         if self.websocket_sender.as_mut().map_or(true, |sender| {
                             sender
                                 .try_send(FrontendMessage::Task(task_id, operation.clone()))

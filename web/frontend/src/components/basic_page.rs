@@ -1,6 +1,7 @@
 //! Module providing a yew component for a basic page with a websocket connection.
 use crate::workers::ws_worker::{ComponentMessage, Tabular, WebsocketMessage};
 use crate::workers::WebsocketWorker;
+use web_common::database::*;
 use serde::de::DeserializeOwned;
 use web_common::database::PrimaryKey;
 use yew::prelude::*;
@@ -9,6 +10,135 @@ use yew_agent::scope_ext::AgentScopeExt;
 
 pub trait PageLike: DeserializeOwned + PartialEq + Clone + Tabular + 'static {
     fn title(&self) -> String;
+
+    fn section() -> String {
+        let mut section = Self::TABLE.to_string().replace("_", " ");
+        if let Some(r) = section.get_mut(0..1) {
+            r.make_ascii_uppercase();
+        }
+        section
+    }
+
+    fn id(&self) -> PrimaryKey;
+}
+
+impl PageLike for NestedContainerHorizontalRule {
+    fn title(&self) -> String {
+        self.inner.name.clone()
+    }
+
+    fn id(&self) -> PrimaryKey {
+        self.inner.id.into()
+    }
+}
+
+impl PageLike for NestedContainerVerticalRule {
+    fn title(&self) -> String {
+        self.inner.name.clone()
+    }
+
+    fn id(&self) -> PrimaryKey {
+        self.inner.id.into()
+    }
+}
+
+impl PageLike for NestedItemCategory {
+    fn title(&self) -> String {
+        self.inner.name.clone()
+    }
+
+    fn id(&self) -> PrimaryKey {
+        self.inner.id.into()
+    }
+}
+
+impl PageLike for NestedProcedure {
+    fn title(&self) -> String {
+        self.inner.name.clone()
+    }
+
+    fn id(&self) -> PrimaryKey {
+        self.inner.id.into()
+    }
+}
+
+impl PageLike for NestedProjectRequirement {
+    fn title(&self) -> String {
+        format!(
+            "Requirement for project {}",
+            self.project.inner.name
+        )
+    }
+
+    fn id(&self) -> PrimaryKey {
+        self.inner.id.into()
+    }
+}
+
+impl PageLike for NestedProject {
+    fn title(&self) -> String {
+        self.inner.name.clone()
+    }
+
+    fn id(&self) -> PrimaryKey {
+        self.inner.id.into()
+    }
+}
+
+impl PageLike for NestedSamplingProcedure {
+    fn title(&self) -> String {
+        self.inner.name.clone()
+    }
+
+    fn id(&self) -> PrimaryKey {
+        self.inner.id.into()
+    }
+}
+
+impl PageLike for NestedSampledIndividual {
+    fn title(&self) -> String {
+        format!(
+            "Sampled individual {}",
+            self.inner.id
+        )
+    }
+
+    fn id(&self) -> PrimaryKey {
+        self.inner.id.into()
+    }
+}
+
+impl PageLike for NestedSample {
+    fn title(&self) -> String {
+        format!(
+            "Sample {}",
+            self.inner.id
+        )
+    }
+
+    fn id(&self) -> PrimaryKey {
+        self.inner.id.into()
+    }
+}
+
+impl PageLike for User {
+    fn title(&self) -> String {
+        self.full_name()
+    }
+
+    fn id(&self) -> PrimaryKey {
+        self.id.into()
+    }
+}
+
+impl PageLike for NestedTeam {
+    fn title(&self) -> String {
+        self.inner.name.clone()
+    }
+
+    fn id(&self) -> PrimaryKey {
+        self.inner.id.into()
+    }
 }
 
 #[derive(Properties, Clone, PartialEq)]

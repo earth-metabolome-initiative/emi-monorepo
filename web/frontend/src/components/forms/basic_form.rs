@@ -3,11 +3,11 @@
 use crate::components::forms::InputErrors;
 use crate::router::AppRoute;
 use crate::stores::user_state::UserState;
+use crate::workers::ws_worker::Tabular;
 use crate::workers::ws_worker::{ComponentMessage, WebsocketMessage};
 use crate::workers::WebsocketWorker;
 use gloo::timers::callback::Timeout;
 use serde::de::DeserializeOwned;
-use crate::workers::ws_worker::Tabular;
 use serde::Serialize;
 use std::fmt::Debug;
 use std::rc::Rc;
@@ -27,7 +27,9 @@ pub(super) trait FromOperation {
 }
 
 /// Trait defining something that can be used to build something else by a form.
-pub(super) trait FormBuilder: Clone + Store + PartialEq + Serialize + Debug {
+pub(super) trait FormBuilder:
+    Clone + Store + PartialEq + Serialize + Debug + Default
+{
     type Actions: Reducer<Self> + FromOperation;
     type RichVariant: DeserializeOwned;
 
@@ -36,6 +38,11 @@ pub(super) trait FormBuilder: Clone + Store + PartialEq + Serialize + Debug {
 
     /// Returns whether the can currently be submitted.
     fn can_submit(&self) -> bool;
+
+    /// Returns whether the form is currently equal to the default state.
+    fn is_default(&self) -> bool {
+        self == &Self::default()
+    }
 
     /// Updates the state of the form builder with the provided data and returns the operations
     /// necessary to complete the update.
@@ -234,6 +241,20 @@ where
             })
         };
 
+        let clear_form = {
+            let builder_dispatch = ctx.props().builder_dispatch.clone();
+            let waiting_for_reply = self.waiting_for_reply;
+            Callback::from(move |event: MouseEvent| {
+                event.prevent_default();
+                if waiting_for_reply {
+                    return;
+                }
+                builder_dispatch.reduce_mut(|state| {
+                    *state = Default::default();
+                });
+            })
+        };
+
         let submit_button_disabled = !ctx.props().builder.can_submit();
 
         let classes = format!(
@@ -241,13 +262,24 @@ where
             if self.errors.is_empty() { " error" } else { "" }
         );
 
-        let button_classes = if submit_button_disabled {
+        let submit_button_classes = if submit_button_disabled {
             ""
         } else if self.waiting_for_reply {
             "waiting"
         } else {
             "enabled"
         };
+
+        let clear_button_classes = format!(
+            "clear-button{}",
+            if ctx.props().builder.is_default() {
+                ""
+            } else if self.waiting_for_reply {
+                " waiting"
+            } else {
+                " enabled"
+            }
+        );
 
         let title_message = if self.waiting_for_reply {
             "You have already submitted the form, please wait for the reply."
@@ -257,20 +289,36 @@ where
             "Submit the form"
         };
 
+        let clear_button_title_message = if self.waiting_for_reply {
+            "You have already submitted the form, please wait for the reply."
+        } else if ctx.props().builder.is_default() {
+            "The form is already clear"
+        } else {
+            "Clear the form"
+        };
+
         html! {
             <form enctype={ "multipart/form-data" } disabled={self.waiting_for_reply} class={classes} onsubmit={on_submit} method={ctx.props().method.to_string()}>
                 <h4>{ Data::title() }</h4>
                 <p class="instructions">{format!("{} {}", ctx.props().method.to_crud(), Data::task_target())}</p>
                 { ctx.props().children.clone() }
                 <InputErrors errors={self.errors.clone()} />
-                <button type="submit" title={title_message} class={button_classes} disabled={submit_button_disabled || self.waiting_for_reply}>
+                <button type="submit" title={title_message} class={submit_button_classes} disabled={submit_button_disabled || self.waiting_for_reply}>
                     {if self.waiting_for_reply {
                         html! { <i class="fas fa-spinner fa-spin"></i> }
                     } else {
                         html! { <i class={ctx.props().method.font_awesome_icon()}></i> }
                     }}
-                    <span>{format!("{} {}", ctx.props().method.to_crud(), Data::task_target())}</span>
+                    <span>{format!("{} new {}", ctx.props().method.to_crud(), Data::task_target())}</span>
                 </button>
+                if ctx.props().method.is_post() {
+                    <button onclick={clear_form} title={clear_button_title_message} class={clear_button_classes} disabled={ctx.props().builder.is_default() || self.waiting_for_reply}>
+                        <i class="fas fa-hand-sparkles"></i>
+                        <span>{format!("Clear {}", Data::task_target())}</span>
+                    </button>
+                } else {
+                    <></>
+                }
                 <div class="clear"></div>
             </form>
         }

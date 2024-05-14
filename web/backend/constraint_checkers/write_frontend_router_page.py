@@ -155,6 +155,8 @@ def write_frontend_router_page(builders: List[StructMetadata]):
         "use yew_router::prelude::*;",
         "use crate::pages::*;",
         "use uuid::Uuid;",
+        "use crate::components::BasicPages;",
+        "use web_common::database::*;",
         "use crate::components::forms::automatic_forms::*;"
     ]
 
@@ -216,13 +218,13 @@ def write_frontend_router_page(builders: List[StructMetadata]):
 
     for builder in builders:
         flat_variant = builder.get_flat_variant()
+        richest_variant = builder.get_richest_variant()
 
         primary_key = flat_variant.get_primary_key()
 
         document.write(
             f"        AppRoute::{builder.get_capitalized_table_name()} => {{\n"
-            f"             html! {{ <span>{{\"{builder.get_capitalized_table_name()} page\"}}</span> }}\n"
-            #f"            html! {{ <{builder.get_capitalized_table_name()} /> }}\n"
+            f"            html! {{ <BasicPages<{richest_variant.name}> /> }}\n"
             f"        }}\n"
             f"        AppRoute::{builder.get_capitalized_table_name()}View{{{primary_key.name}}} => {{\n"
             f"             html! {{ <span>{{\"Specific {builder.human_readable_name()} page\"}}</span> }}\n"

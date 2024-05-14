@@ -83,7 +83,12 @@ from constraint_checkers import (
 )
 from constraint_checkers import ensure_created_at_columns, ensure_updated_at_columns
 from constraint_checkers import handle_minimal_revertion
-from constraint_checkers import replace_serial_indices, PGIndex, PGIndices, find_pg_trgm_indices
+from constraint_checkers import (
+    replace_serial_indices,
+    PGIndex,
+    PGIndices,
+    find_pg_trgm_indices,
+)
 from constraint_checkers import TableStructMetadata, StructMetadata, AttributeMetadata
 from constraint_checkers import write_frontend_pages, write_frontend_router_page
 
@@ -294,6 +299,41 @@ def write_backend_structs(
                 "            .load::<Self>(connection)\n"
                 "    }\n"
             )
+
+            # For the tables that have an updated_at column, we implement the
+            # `all_by_updated_at` method that retrieves all of the rows in the
+            # table structured as a vector of the struct ordered by the updated_at
+            # column in descending order.
+
+            if table_metadatas.has_updated_at_column(struct.table_name):
+                file.write(
+                    "    /// Get all of the structs from the database ordered by the updated_at column.\n"
+                    "    ///\n"
+                    "    /// # Arguments\n"
+                    "    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.\n"
+                    "    /// * `offset` - The number of structs to skip. By default, this is 0.\n"
+                    "    /// * `connection` - The connection to the database.\n"
+                    "    ///\n"
+                    f"    pub fn all_by_updated_at(\n"
+                    "        limit: Option<i64>,\n"
+                    "        offset: Option<i64>,\n"
+                    "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+                    "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
+                )
+                if table_type == "tables":
+                    file.write(f"        use crate::schema::{struct.table_name};\n")
+                else:
+                    file.write(
+                        f"        use crate::views::schema::{struct.table_name};\n"
+                    )
+                file.write(
+                    f"        {struct.table_name}::dsl::{struct.table_name}\n"
+                    f"            .order_by({struct.table_name}::dsl::updated_at.desc())\n"
+                    "            .offset(offset.unwrap_or(0))\n"
+                    "            .limit(limit.unwrap_or(10))\n"
+                    "            .load::<Self>(connection)\n"
+                    "    }\n"
+                )
 
             if table_metadatas.has_primary_key(struct.table_name):
                 primary_key_name, _ = table_metadatas.get_primary_key_name_and_type(
@@ -1010,6 +1050,41 @@ def write_web_common_structs(
             "    }\n"
         )
 
+        # We implement for all tables that implement the `updated_at` column
+        # the `all_by_updated_at` method. This method returns all of the structs
+        # in the GlueSQL database ordered by the `updated_at` column.
+        if table_metadatas.has_updated_at_column(struct.table_name):
+            tables.write(
+                f"    /// Get all {struct.name} from the database ordered by the `updated_at` column.\n"
+                "    ///\n"
+                "    /// # Arguments\n"
+                "    /// * `limit` - The maximum number of results, by default `10`.\n"
+                "    /// * `offset` - The offset of the results, by default `0`.\n"
+                "    /// * `connection` - The connection to the database.\n"
+                "    ///\n"
+                "    pub async fn all_by_updated_at<C>(\n"
+                "        limit: Option<i64>,\n"
+                "        offset: Option<i64>,\n"
+                "        connection: &mut gluesql::prelude::Glue<C>,\n"
+                "    ) -> Result<Vec<Self>, gluesql::prelude::Error> where\n"
+                "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
+                "    {\n"
+                "        use gluesql::core::ast_builder::*;\n"
+                f'        let select_row = table("{struct.table_name}")\n'
+                "            .select()\n"
+                f'            .project("{columns}")\n'
+                '            .order_by("updated_at desc")\n'
+                "            .offset(offset.unwrap_or(0))\n"
+                "            .limit(limit.unwrap_or(10))\n"
+                "            .execute(connection)\n"
+                "            .await?;\n"
+                "        Ok(select_row.select()\n"
+                "            .unwrap()\n"
+                "            .map(Self::from_row)\n"
+                "            .collect::<Vec<_>>())\n"
+                "    }\n"
+            )
+
         # We implement the `from_row` method for the struct. This method
         # receives a row from the GlueSQL database, which is a `HashMap<&str, &&Value>`.
         # The method returns the struct from the row.
@@ -1617,6 +1692,28 @@ def generate_nested_structs(
             "}\n"
         )
 
+        # Then, for all the tables that have an updated_at column, we implement the
+        # `all_by_updated_at` method, which returns all of the nested structs ordered
+        # by the `updated_at` column.
+        if tables_metadata.has_updated_at_column(flat_struct.table_name):
+            tables.write(
+                f"impl {nested_struct.name} {{\n"
+                "    /// Get all the nested structs from the database ordered by the `updated_at` column.\n"
+                "    ///\n"
+                "    /// # Arguments\n"
+                "    /// * `limit` - The maximum number of rows to return. By default `10`.\n"
+                "    /// * `offset` - The offset of the rows to return. By default `0`.\n"
+                "    /// * `connection` - The database connection.\n"
+                "    pub fn all_by_updated_at(\n"
+                "        limit: Option<i64>,\n"
+                "        offset: Option<i64>,\n"
+                "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
+                "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
+                f"        {flat_struct.name}::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()\n"
+                "    }\n"
+                "}\n"
+            )
+
         # We implement the `get` method, which returns the nested struct
         # from a provided row primary key.
         primary_key_attribute, primary_key_type = (
@@ -1879,6 +1976,34 @@ def write_web_common_nested_structs(path: str, nested_structs: List[StructMetada
             "         Ok(nested_structs)\n"
             "    }\n"
         )
+
+        # We implement the all_by_updated_at method for the struct when the frontend feature
+        # is enabled using GlueSQL. This method will be extremely similar to the `all_by_updated_at`
+        # method for the Diesel-based approach of the backend.
+
+        if table_metadatas.has_updated_at_column(flat_struct.table_name):
+            tables.write(
+                "    /// Get all the nested structs from the database ordered by the `updated_at` column.\n"
+                "    ///\n"
+                "    /// # Arguments\n"
+                "    /// * `limit` - The maximum number of rows to return.\n"
+                "    /// * `offset` - The number of rows to skip.\n"
+                "    /// * `connection` - The database connection.\n"
+                "    pub async fn all_by_updated_at<C>(\n"
+                "        limit: Option<i64>,\n"
+                "        offset: Option<i64>,\n"
+                "        connection: &mut gluesql::prelude::Glue<C>,\n"
+                "    ) -> Result<Vec<Self>, gluesql::prelude::Error> where\n"
+                "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
+                "    {\n"
+                f"        let flat_structs = {flat_struct.name}::all_by_updated_at(limit, offset, connection).await?;\n"
+                "         let mut nested_structs = Vec::with_capacity(flat_structs.len());\n"
+                "         for flat_struct in flat_structs {\n"
+                "             nested_structs.push(Self::from_flat(flat_struct, connection).await?);\n"
+                "         }\n"
+                "         Ok(nested_structs)\n"
+                "    }\n"
+            )
 
         # We implement the update_or_insert method for the struct when the frontend feature
         # is enabled using GlueSQL. This method will be extremely similar to the `update_or_insert`
@@ -2143,6 +2268,44 @@ def write_webcommons_table_names_enumeration(
         document.write(
             f"            Table::{table.camel_cased()} => crate::database::{table.richest_struct_name()}::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),\n"
         )
+
+    document.write("        }\n    }\n")
+
+    # Next, for all the tables that have an updated_at column, we implement the
+    # `all_by_updated_at` method, which returns all of the rows ordered by the
+    # `updated_at` column. When the table does not have an `updated_at` column,
+    # we panic with an unimplemented!() macro.
+
+    document.write(
+        "    /// Get all the rows from the table ordered by the `updated_at` column.\n"
+        "    ///\n"
+        "    /// # Arguments\n"
+        "    /// * `limit` - The maximum number of rows to return.\n"
+        "    /// * `offset` - The number of rows to skip. By default `0`.\n"
+        "    /// * `connection` - The database connection.\n"
+        "    ///\n"
+        "    /// # Returns\n"
+        "    /// A vector of the rows of the table.\n"
+        "    pub async fn all_by_updated_at<C>(\n"
+        "        &self,\n"
+        "        limit: Option<i64>,\n"
+        "        offset: Option<i64>,\n"
+        "        connection: &mut gluesql::prelude::Glue<C>,\n"
+        "    ) -> Result<Vec<Vec<u8>>, crate::api::ApiError> where\n"
+        "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
+        "    {\n"
+        "        match self {\n"
+    )
+
+    for table in tables:
+        if table.has_updated_at_column():
+            document.write(
+                f"            Table::{table.camel_cased()} => crate::database::{table.richest_struct_name()}::all_by_updated_at(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),\n"
+            )
+        else:
+            document.write(
+                f'            Table::{table.camel_cased()} => unimplemented!("all_by_updated_at not implemented for {table.name}."),\n'
+            )
 
     document.write("        }\n    }\n")
 
@@ -2583,6 +2746,62 @@ def write_diesel_table_names_enumeration(
         document.write(
             f"            web_common::database::Table::{table.camel_cased()} => {table.richest_struct_name()}::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),\n"
         )
+
+    document.write("        }\n    }\n}\n")
+
+    # We define a trait for the Table enum, which provides the all_by_updated_at method.
+    # The method receives a connection to the database and returns a Result, where the Ok
+    # variant is a bincode-serialized vector of the rows of the table variant, while the
+    # Err variant contains an ApiError. The all_by_updated_at method is available for all
+    # tables that have an updated_at column. For the tables that do not have an updated_at
+    # column, we panic with an unimplemented!() macro.
+
+    document.write(
+        "/// Trait providing the all_by_updated_at method for the Table enum.\n"
+        "pub trait AllByUpdatedAtTable {\n"
+        "    /// Get all the rows from the table ordered by the `updated_at` column.\n"
+        "    ///\n"
+        "    /// # Arguments\n"
+        "    /// * `limit` - The maximum number of rows to return.\n"
+        "    /// * `offset` - The number of rows to skip.\n"
+        "    /// * `connection` - The database connection.\n"
+        "    ///\n"
+        "    /// # Returns\n"
+        "    /// A vector of the rows of the table.\n"
+        "    fn all_by_updated_at(\n"
+        "         &self,\n"
+        "         limit: Option<i64>,\n"
+        "         offset: Option<i64>,\n"
+        "         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+        ") -> Result<Vec<Vec<u8>>, web_common::api::ApiError>;\n"
+        "}\n\n"
+    )
+
+    # Next, for all the tables that have an updated_at column, we implement the
+    # `all_by_updated_at` method, which returns all of the rows ordered by the
+    # `updated_at` column. When the table does not have an `updated_at` column,
+    # we panic with an unimplemented!() macro.
+
+    document.write(
+        "impl AllByUpdatedAtTable for web_common::database::Table {\n\n"
+        "    fn all_by_updated_at(\n"
+        "        &self,\n"
+        "        limit: Option<i64>,\n"
+        "        offset: Option<i64>,\n"
+        "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+        "    ) -> Result<Vec<Vec<u8>>, web_common::api::ApiError> {\n"
+        "        match self {\n"
+    )
+
+    for table in tables:
+        if table.has_updated_at_column():
+            document.write(
+                f"            web_common::database::Table::{table.camel_cased()} => {table.richest_struct_name()}::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),\n"
+            )
+        else:
+            document.write(
+                f'            web_common::database::Table::{table.camel_cased()} => unimplemented!("all_by_updated_at not implemented for {table.name}."),\n'
+            )
 
     document.write("        }\n    }\n}\n")
 
@@ -3812,8 +4031,91 @@ def write_diesel_update_structs(
     document.close()
 
 
+def write_frontend_builder_default_implementation(
+    builder: StructMetadata,
+    table_metadata: TableMetadata,
+    document: "io.TextIO",
+):
+    """Writes the implementation of the Default trait for the builder struct.
+
+    Parameters
+    ----------
+    builder : StructMetadata
+        The builder struct for which to write the implementation.
+    table_metadata : TableMetadata
+        The metadata of the table associated with the builder struct.
+    document : io.TextIO
+        The document to write to.
+
+    Implementation details
+    ----------------------
+    This method extracts from the database the default values set for the
+    attributes of the builder struct and writes the implementation of the
+    Default trait for the builder struct. If an attribute does not have a
+    default value, the attribute is set to None.
+    """
+
+    attributes = None
+    flat_struct = builder.get_flat_variant()
+
+    document.write(
+        f"impl Default for {builder.name} {{\n"
+        f"    fn default() -> Self {{\n"
+        f"        Self {{\n"
+    )
+
+    primary_key_name, _ = table_metadata.get_primary_key_name_and_type(
+        builder.table_name
+    )
+
+    for attribute in builder.attributes:
+        # If this is an error vector, we set it to
+        # an empty vector.
+
+        if attribute.name.startswith("errors_") and attribute.data_type() == "Vec<ApiError>":
+            document.write(f"            {attribute.name}: Vec::new(),\n")
+            continue
+
+        # If this is the primary key, we set it to None.
+        if attribute.name == primary_key_name:
+            document.write(f"            {attribute.name}: None,\n")
+            continue
+
+        # If the current attribute does not exist in the flat struct,
+        # we set it to None.
+        if flat_struct.get_attribute_by_name(attribute.name) is None:
+            if attribute.optional:
+                document.write(f"            {attribute.name}: None,\n")
+            else:
+                # Otherwise, we set it to the default value of the data type.
+                document.write(f"            {attribute.name}: <{attribute.data_type()}>::default(),\n")
+            continue
+
+        default_value = table_metadata.get_default_column_value(
+            builder.table_name, attribute.name
+        )
+
+        if default_value is not None:
+
+            default_value = default_value.replace("'", '"')
+
+            if default_value.endswith("::character varying"):
+                default_value = default_value.replace("::character varying", ".to_string()")
+
+            document.write(f"            {attribute.name}: Some({default_value}),\n")
+            continue
+
+        # If the current value is an option, we set it to None.
+        if attribute.optional:
+            document.write(f"            {attribute.name}: None,\n")
+            continue
+
+    document.write("        }\n" "    }\n" "}\n\n")
+
+
 def write_frontend_builder_action_enumeration(
     builder: StructMetadata,
+    table_metadata: TableMetadata,
     document: "io.TextIO",
 ):
     """Writes the enumeration of the builder actions for the builder struct.
@@ -3822,6 +4124,8 @@ def write_frontend_builder_action_enumeration(
     ----------
     builder : StructMetadata
         The builder struct for which to write the enumeration.
+    table_metadata : TableMetadata
+        The metadata of the table associated with the builder struct.
     document : io.TextIO
         The document to write to.
 
@@ -3829,8 +4133,6 @@ def write_frontend_builder_action_enumeration(
     ----------------------
     This method writes the enumeration of the builder actions for the builder struct.
     """
-
-    table_metadata = find_foreign_keys()
 
     primary_key_name, _primary_key_type = table_metadata.get_primary_key_name_and_type(
         builder.table_name
@@ -4075,6 +4377,7 @@ def write_frontend_builder_action_enumeration(
 
 def write_frontend_form_builder_implementation(
     builder: StructMetadata,
+    table_metadata: TableMetadata,
     document: "io.TextIO",
 ):
     """Writes the implementation of the FormBuilder trait for the builder struct.
@@ -4083,6 +4386,8 @@ def write_frontend_form_builder_implementation(
     ----------
     builder : StructMetadata
         The builder struct for which to write the implementation.
+    table_metadata : TableMetadata
+        The metadata of the table associated with the builder struct.
     document : io.TextIO
         The document to write to.
 
@@ -4109,8 +4414,6 @@ def write_frontend_form_builder_implementation(
             variants.append(update_variant)
 
     assert len(variants) > 0
-
-    table_metadata = find_foreign_keys()
 
     primary_key_name, _primary_key_type = table_metadata.get_primary_key_name_and_type(
         flat_struct.table_name
@@ -4863,6 +5166,7 @@ def handle_missing_row_to_badge_implementation(
 
 def write_frontend_yew_form(
     builder: StructMetadata,
+    table_metadata: TableMetadata,
     document: "io.TextIO",
 ):
     """Writes the Yew form for the builder struct.
@@ -4880,7 +5184,6 @@ def write_frontend_yew_form(
     """
 
     trigram_indices = find_pg_trgm_indices()
-    table_metadata = find_foreign_keys()
 
     primary_key_name, _primary_key_type = table_metadata.get_primary_key_name_and_type(
         builder.table_name
@@ -5091,6 +5394,7 @@ def write_frontend_form_buildable_implementation(
     """
 
     flat_struct = builder.get_flat_variant()
+    rich_struct = builder.get_richest_variant()
 
     variants: List[StructMetadata] = []
 
@@ -5101,6 +5405,13 @@ def write_frontend_form_buildable_implementation(
         update_variant = builder.get_update_variant()
         if not update_variant.is_new_variant():
             variants.append(update_variant)
+
+    # We implement the Tabular trait for the struct.
+    document.write(
+        f"impl Tabular for {rich_struct.name} {{\n"
+        f"    const TABLE: Table = Table::{rich_struct.get_capitalized_table_name()};\n"
+        "}\n\n"
+    )
 
     for variant in variants:
         # We implement the Tabular trait for the struct.
@@ -5171,7 +5482,6 @@ def write_frontend_forms(
         "use crate::workers::ws_worker::ComponentMessage;",
         "use web_common::custom_validators::Image;",
         "use web_common::file_formats::GenericFileFormat;",
-        "use yew_router::prelude::*;",
     ]
 
     for import_statement in imports:
@@ -5187,11 +5497,14 @@ def write_frontend_forms(
         unit="struct",
         leave=False,
     ):
-        builder.write_to(document)
-        write_frontend_builder_action_enumeration(builder, document)
-        write_frontend_form_builder_implementation(builder, document)
+        builder.write_to(document, derives_deny_list=["Default"])
+        write_frontend_builder_default_implementation(builder, table_metadata, document)
+        write_frontend_builder_action_enumeration(builder, table_metadata, document)
+        write_frontend_form_builder_implementation(builder, table_metadata, document)
         write_frontend_form_buildable_implementation(builder, document)
-        write_frontend_yew_form(builder, document=document)
+        write_frontend_yew_form(
+            builder, table_metadata=table_metadata, document=document
+        )
 
     document.flush()
     document.close()
@@ -5473,9 +5786,6 @@ def enforce_migration_naming_convention():
                 f"Migration {directory} does not conform to the naming convention. "
                 f"Expected name: {expected_name}."
             )
-
-
-
 
 
 if __name__ == "__main__":

@@ -22,3 +22,4 @@ pub mod new_variants;
 pub use new_variants::*;
 pub mod update_variants;
 pub use update_variants::*;
+pub mod model_impls;

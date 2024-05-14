@@ -14,9 +14,12 @@ pub mod document_formats;
 pub mod units;
 pub mod organizations;
 pub mod teams;
-
-
-
+pub mod container_horizontal_rules;
+pub mod container_vertical_rules;
+pub mod procedures;
+pub mod samples;
+pub mod sampled_individuals;
+pub mod project_requirements;
 
 /// Trait for types that can be converted to a badge.
 pub trait RowToBadge {

@@ -706,6 +706,25 @@ impl ContainerHorizontalRule {
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
+    /// Get all of the structs from the database ordered by the updated_at column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_by_updated_at(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::container_horizontal_rules;
+        container_horizontal_rules::dsl::container_horizontal_rules
+            .order_by(container_horizontal_rules::dsl::updated_at.desc())
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
     /// Delete the struct from the database.
     ///
     /// # Arguments
@@ -838,6 +857,25 @@ impl ContainerVerticalRule {
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::container_vertical_rules;
        container_vertical_rules::dsl::container_vertical_rules
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the structs from the database ordered by the updated_at column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_by_updated_at(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::container_vertical_rules;
+        container_vertical_rules::dsl::container_vertical_rules
+            .order_by(container_vertical_rules::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -1216,6 +1254,25 @@ impl DerivedSample {
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::derived_samples;
        derived_samples::dsl::derived_samples
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the structs from the database ordered by the updated_at column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_by_updated_at(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::derived_samples;
+        derived_samples::dsl::derived_samples
+            .order_by(derived_samples::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -1884,6 +1941,25 @@ impl ItemCategory {
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::item_categories;
        item_categories::dsl::item_categories
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the structs from the database ordered by the updated_at column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_by_updated_at(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::item_categories;
+        item_categories::dsl::item_categories
+            .order_by(item_categories::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -2892,9 +2968,7 @@ pub struct Organization {
     pub id: i32,
     pub name: String,
     pub url: String,
-    pub country: String,
-    pub alpha_two_code: String,
-    pub state_province: Option<String>,
+    pub country_id: i32,
     pub domain: String,
 }
 
@@ -2904,9 +2978,7 @@ impl From<Organization> for web_common::database::tables::Organization {
             id: item.id,
             name: item.name,
             url: item.url,
-            country: item.country,
-            alpha_two_code: item.alpha_two_code,
-            state_province: item.state_province,
+            country_id: item.country_id,
             domain: item.domain,
         }
     }
@@ -2918,9 +2990,7 @@ impl From<web_common::database::tables::Organization> for Organization {
             id: item.id,
             name: item.name,
             url: item.url,
-            country: item.country,
-            alpha_two_code: item.alpha_two_code,
-            state_province: item.state_province,
+            country_id: item.country_id,
             domain: item.domain,
         }
     }
@@ -2985,21 +3055,6 @@ impl Organization {
             .filter(organizations::dsl::id.eq(id))
             .first::<Self>(connection)
     }
-    /// Get the struct from the database by its name.
-    ///
-    /// # Arguments
-    /// * `name` - The name of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn from_name(
-        name: &str,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::organizations;
-        organizations::dsl::organizations
-            .filter(organizations::dsl::name.eq(name))
-            .first::<Self>(connection)
-    }
     /// Search for the struct by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
@@ -3020,7 +3075,7 @@ impl Organization {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, url, country, alpha_two_code, state_province, domain FROM organizations ",
+            "SELECT id, name, url, country_id, domain FROM organizations ",
             "WHERE $1 % name ",
             "ORDER BY similarity($1, name) DESC LIMIT $2",
         );
@@ -3049,7 +3104,7 @@ impl Organization {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, url, country, alpha_two_code, state_province, domain FROM organizations ",
+            "SELECT id, name, url, country_id, domain FROM organizations ",
             "WHERE $1 <% name ",
             "ORDER BY word_similarity($1, name) DESC LIMIT $2",
         );
@@ -3078,7 +3133,7 @@ impl Organization {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, url, country, alpha_two_code, state_province, domain FROM organizations ",
+            "SELECT id, name, url, country_id, domain FROM organizations ",
             "WHERE $1 <<% name ",
             "ORDER BY strict_word_similarity($1, name) DESC LIMIT $2",
         );
@@ -3229,6 +3284,25 @@ impl Procedure {
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
+    /// Get all of the structs from the database ordered by the updated_at column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_by_updated_at(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::procedures;
+        procedures::dsl::procedures
+            .order_by(procedures::dsl::updated_at.desc())
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
     /// Delete the struct from the database.
     ///
     /// # Arguments
@@ -3346,6 +3420,25 @@ impl ProjectRequirement {
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::project_requirements;
        project_requirements::dsl::project_requirements
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the structs from the database ordered by the updated_at column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_by_updated_at(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::project_requirements;
+        project_requirements::dsl::project_requirements
+            .order_by(project_requirements::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -3652,6 +3745,25 @@ impl Project {
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
+    /// Get all of the structs from the database ordered by the updated_at column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_by_updated_at(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::projects;
+        projects::dsl::projects
+            .order_by(projects::dsl::updated_at.desc())
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
     /// Delete the struct from the database.
     ///
     /// # Arguments
@@ -3954,6 +4066,25 @@ impl SampleBioOttTaxonItem {
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
+    /// Get all of the structs from the database ordered by the updated_at column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_by_updated_at(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::sample_bio_ott_taxon_items;
+        sample_bio_ott_taxon_items::dsl::sample_bio_ott_taxon_items
+            .order_by(sample_bio_ott_taxon_items::dsl::updated_at.desc())
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
     /// Delete the struct from the database.
     ///
     /// # Arguments
@@ -4235,6 +4366,25 @@ impl SampledIndividualBioOttTaxonItem {
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
+    /// Get all of the structs from the database ordered by the updated_at column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_by_updated_at(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::sampled_individual_bio_ott_taxon_items;
+        sampled_individual_bio_ott_taxon_items::dsl::sampled_individual_bio_ott_taxon_items
+            .order_by(sampled_individual_bio_ott_taxon_items::dsl::updated_at.desc())
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
     /// Delete the struct from the database.
     ///
     /// # Arguments
@@ -4331,6 +4481,25 @@ impl SampledIndividual {
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::sampled_individuals;
        sampled_individuals::dsl::sampled_individuals
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the structs from the database ordered by the updated_at column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_by_updated_at(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::sampled_individuals;
+        sampled_individuals::dsl::sampled_individuals
+            .order_by(sampled_individuals::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -4438,6 +4607,25 @@ impl Sample {
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
+    /// Get all of the structs from the database ordered by the updated_at column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_by_updated_at(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::samples;
+        samples::dsl::samples
+            .order_by(samples::dsl::updated_at.desc())
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
     /// Delete the struct from the database.
     ///
     /// # Arguments
@@ -4534,6 +4722,25 @@ impl SamplingProcedure {
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::sampling_procedures;
        sampling_procedures::dsl::sampling_procedures
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the structs from the database ordered by the updated_at column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_by_updated_at(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::sampling_procedures;
+        sampling_procedures::dsl::sampling_procedures
+            .order_by(sampling_procedures::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -4803,6 +5010,25 @@ impl SpectraCollection {
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::spectra_collections;
        spectra_collections::dsl::spectra_collections
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the structs from the database ordered by the updated_at column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_by_updated_at(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::spectra_collections;
+        spectra_collections::dsl::spectra_collections
+            .order_by(spectra_collections::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -5087,6 +5313,25 @@ impl Team {
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::teams;
        teams::dsl::teams
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the structs from the database ordered by the updated_at column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_by_updated_at(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::teams;
+        teams::dsl::teams
+            .order_by(teams::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -5573,6 +5818,25 @@ impl User {
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::users;
        users::dsl::users
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the structs from the database ordered by the updated_at column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_by_updated_at(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::users;
+        users::dsl::users
+            .order_by(users::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)

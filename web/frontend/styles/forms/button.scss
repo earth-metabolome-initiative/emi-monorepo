@@ -1,0 +1,53 @@
+button {
+    padding: 0.5em;
+    border: none;
+    cursor: pointer;
+    background-color: transparent;
+    border: 1px solid;
+    border-radius: 0.5em;
+    float: right;
+    font-size: 1em;
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        transition: background-color 0.2s;
+        background: linear-gradient(120deg,
+                transparent,
+                rgba($grey, 0.2),
+                transparent);
+        left: -100%;
+    }
+
+    i {
+        margin-right: 0.5em;
+    }
+
+    &.enabled::before {
+        animation: shine-in 3s ease-in-out;
+    }
+
+    &.waiting {
+        cursor: not-allowed;
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        border-color: $grey !important;
+        color: $grey !important;
+
+        &:hover {
+            background-color: rgba($grey, 0.2) !important;
+            color: $grey !important;
+            // We make the button visually say "no" when disabled
+            animation: small-shake 0.2s;
+        }
+    }
+}
