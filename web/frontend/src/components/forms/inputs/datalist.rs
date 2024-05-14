@@ -1,7 +1,7 @@
 //! Module providing a yew component that handles a basic input, which is meant to be used in combination with BasicForm.
 
 use super::InputErrors;
-use crate::components::database::row_to_badge::RowToBadge;
+use crate::components::database::row_to_searchable_badge::RowToSearchableBadge;
 use crate::workers::ws_worker::ComponentMessage;
 use crate::workers::ws_worker::WebsocketMessage;
 use crate::workers::WebsocketWorker;
@@ -90,7 +90,7 @@ pub enum DatalistMessage<Data> {
 
 impl<Data> Component for MultiDatalist<Data>
 where
-    Data: 'static + Clone + PartialEq + DeserializeOwned + Searchable + RowToBadge,
+    Data: 'static + Clone + PartialEq + DeserializeOwned + Searchable + RowToSearchableBadge,
 {
     type Message = DatalistMessage<Data>;
     type Properties = MultiDatalistProp<Data>;
@@ -445,7 +445,7 @@ where
 #[function_component(Datalist)]
 pub fn datalist<Data>(props: &DatalistProp<Data>) -> Html
 where
-    Data: 'static + Clone + PartialEq + DeserializeOwned + Searchable + RowToBadge,
+    Data: 'static + Clone + PartialEq + DeserializeOwned + Searchable + RowToSearchableBadge,
 {
     let builder_callback = {
         let old_builder = props.builder.clone();

@@ -1,18 +1,16 @@
-use super::RowToBadge;
+use super::RowToSearchableBadge;
 use crate::traits::format_match::FormatMatch;
-use web_common::database::NestedSamplingProcedure;
+use web_common::database::DocumentFormat;
 use yew::prelude::*;
 
-impl RowToBadge for NestedSamplingProcedure {
+impl RowToSearchableBadge for DocumentFormat {
     fn to_datalist_badge(&self, query: &str) -> Html {
         html! {
             <div>
                 <p>
                 <i class="fas fa-question grey"></i>
-                    <span>{self.inner.name.format_match(query)}</span>
-                if let Some(description) = self.inner.description.as_ref() {
-                    <span>{description.format_match(query)}</span>
-                }
+                    <span>{self.extension.format_match(query)}</span>
+                    <span>{self.mime_type.format_match(query)}</span>
                 </p>
             </div>
         }
@@ -23,21 +21,16 @@ impl RowToBadge for NestedSamplingProcedure {
             <div>
                 <p>
                 <i class="fas fa-question grey"></i>
-                    <span>{self.inner.name.clone()}</span>
+                    <span>{self.extension.clone()}</span>
                 </p>
             </div>
         }
     }
     fn matches(&self, query: &str) -> bool {
-        self.inner.name == query
+        self.extension == query
     }
     fn similarity_score(&self, query: &str) -> isize {
-        self.inner.name.similarity_score(query)
-            + self
-                .inner
-                .description
-                .as_ref()
-                .map_or(0, |column| column.similarity_score(query))
+        self.extension.similarity_score(query) + self.mime_type.similarity_score(query)
     }
     fn primary_color_class(&self) -> &str {
         "grey"

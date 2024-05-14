@@ -1,14 +1,14 @@
-use super::RowToBadge;
+use super::RowToSearchableBadge;
 use crate::traits::format_match::FormatMatch;
-use web_common::database::NestedSampledIndividual;
+use web_common::database::NestedSample;
 use yew::prelude::*;
 
-impl RowToBadge for NestedSampledIndividual {
+impl RowToSearchableBadge for NestedSample {
     fn to_datalist_badge(&self, query: &str) -> Html {
         html! {
             <div>
                 <p>
-                    <span>{self.inner.name.clone().unwrap_or_else(|| "Nested individual".to_string()).format_match(query)}</span>
+                    <span>{format!("Sample {}", self.inner.id)}</span>
                 </p>
             </div>
         }
@@ -18,7 +18,7 @@ impl RowToBadge for NestedSampledIndividual {
         html! {
             <div>
                 <p>
-                    <span>{self.inner.name.clone().unwrap_or_else(|| "Nested individual".to_string())}</span>
+                    <span>{format!("Sample {}", self.inner.id)}</span>
                 </p>
             </div>
         }

@@ -1,17 +1,15 @@
-use super::RowToBadge;
+use super::RowToSearchableBadge;
 use crate::traits::format_match::FormatMatch;
-use web_common::database::Unit;
+use web_common::database::NestedOrganization;
 use yew::prelude::*;
 
-impl RowToBadge for Unit {
+impl RowToSearchableBadge for NestedOrganization {
     fn to_datalist_badge(&self, query: &str) -> Html {
         html! {
             <div>
                 <p>
                 <i class="fas fa-question grey"></i>
-                    <span>{self.name.format_match(query)}</span>
-                    <span>{self.description.format_match(query)}</span>
-                    <span>{self.symbol.format_match(query)}</span>
+                    <span>{self.inner.name.format_match(query)}</span>
                 </p>
             </div>
         }
@@ -22,21 +20,21 @@ impl RowToBadge for Unit {
             <div>
                 <p>
                 <i class="fas fa-question grey"></i>
-                    <span>{self.name.clone()}</span>
+                    <span>{self.inner.name.clone()}</span>
                 </p>
             </div>
         }
     }
     fn matches(&self, query: &str) -> bool {
-        self.name == query
+        self.inner.name == query
     }
     fn similarity_score(&self, query: &str) -> isize {
-        self.name.similarity_score(query) + self.description.similarity_score(query) + self.symbol.similarity_score(query)
+        self.inner.name.similarity_score(query)
     }
 fn primary_color_class(&self) -> &str {
         "grey"
     }
 fn description(&self) -> &str {
-        &self.description
+        ""
     }
 }

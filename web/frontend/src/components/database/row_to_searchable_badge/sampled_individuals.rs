@@ -1,14 +1,14 @@
-use super::RowToBadge;
+use super::RowToSearchableBadge;
 use crate::traits::format_match::FormatMatch;
-use web_common::database::User;
+use web_common::database::NestedSampledIndividual;
 use yew::prelude::*;
 
-impl RowToBadge for User {
+impl RowToSearchableBadge for NestedSampledIndividual {
     fn to_datalist_badge(&self, query: &str) -> Html {
         html! {
             <div>
                 <p>
-                    <span>{self.first_name.format_match(query)}</span>
+                    <span>{self.inner.name.clone().unwrap_or_else(|| "Nested individual".to_string()).format_match(query)}</span>
                 </p>
             </div>
         }
@@ -16,25 +16,23 @@ impl RowToBadge for User {
 
     fn to_selected_datalist_badge(&self) -> Html {
         html! {
-            <p>
-                <span>{&self.first_name}</span>
-            </p>
+            <div>
+                <p>
+                    <span>{self.inner.name.clone().unwrap_or_else(|| "Nested individual".to_string())}</span>
+                </p>
+            </div>
         }
     }
-
     fn matches(&self, query: &str) -> bool {
-        self.first_name == query
+        false
     }
-
     fn similarity_score(&self, query: &str) -> isize {
-        self.first_name.similarity_score(query)
+        0
     }
-
     fn primary_color_class(&self) -> &str {
-        "grey"
+        "gray"
     }
-
     fn description(&self) -> &str {
-        "The user's full name."
+        ""
     }
 }

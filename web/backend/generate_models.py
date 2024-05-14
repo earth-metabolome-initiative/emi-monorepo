@@ -4845,10 +4845,10 @@ def handle_missing_gin_index(
     )
 
 
-def implements_row_to_badge(
+def implements_row_to_searchable_badge(
     struct: StructMetadata,
 ):
-    """Returns whether the struct implements the RowToBadge trait.
+    """Returns whether the struct implements the RowToSearchableBadge trait.
 
     Parameters
     ----------
@@ -4858,33 +4858,33 @@ def implements_row_to_badge(
     Returns
     -------
     bool
-        Whether the struct implements the RowToBadge trait.
+        Whether the struct implements the RowToSearchableBadge trait.
 
     Implementation details
     ----------------------
-    This method checks whether the provided struct implements the RowToBadge trait.
+    This method checks whether the provided struct implements the RowToSearchableBadge trait.
     """
-    # The standard position of the RowToBadge trait implementation is in the
-    # frontend crate, in the /src/components/row_to_badge/{table_name}.rs file.
+    # The standard position of the RowToSearchableBadge trait implementation is in the
+    # frontend crate, in the /src/components/row_to_searchable_badge/{table_name}.rs file.
     # We check whether the file exists, and if it does, we check whether the
     # struct implements the trait, meaning whether there appears therein the
-    # implementation of the RowToBadge trait for the struct:
+    # implementation of the RowToSearchableBadge trait for the struct:
     #
-    # impl RowToBadge for {struct_name} {
+    # impl RowToSearchableBadge for {struct_name} {
 
     # We check that this method is called at the correct position, in the
     # backend crate.
 
     assert os.getcwd().endswith("/backend")
 
-    path = f"../frontend/src/components/database/row_to_badge/{struct.table_name}.rs"
+    path = f"../frontend/src/components/database/row_to_searchable_badge/{struct.table_name}.rs"
 
     if not os.path.exists(path):
         return False
 
-    module_path = f"../frontend/src/components/database/row_to_badge.rs"
+    module_path = f"../frontend/src/components/database/row_to_searchable_badge.rs"
 
-    # We check that the module is imported in the row_to_badge.rs file.
+    # We check that the module is imported in the row_to_searchable_badge.rs file.
     with open(module_path, "r", encoding="utf8") as module:
         for line in module:
             if line.startswith(f"pub mod {struct.table_name};"):
@@ -4894,16 +4894,16 @@ def implements_row_to_badge(
 
     with open(path, "r", encoding="utf8") as document:
         for line in document:
-            if line.startswith(f"impl RowToBadge for {struct.name} {{"):
+            if line.startswith(f"impl RowToSearchableBadge for {struct.name} {{"):
                 return True
 
     return False
 
 
-def handle_missing_row_to_badge_implementation(
+def handle_missing_row_to_searchable_badge_implementation(
     struct: StructMetadata,
 ):
-    """Handles the missing implementation of the RowToBadge trait.
+    """Handles the missing implementation of the RowToSearchableBadge trait.
 
     Parameters
     ----------
@@ -4912,37 +4912,37 @@ def handle_missing_row_to_badge_implementation(
 
     Implementation details
     ----------------------
-    When the implementation of the RowToBadge trait is missing, this method
+    When the implementation of the RowToSearchableBadge trait is missing, this method
     asks to the user whether the implementation should be generated automatically.
     If so, we proceed to create the file at the expected location and write the
     implementation of the trait for the struct, using a very rough first draft.
     """
 
-    path = f"../frontend/src/components/database/row_to_badge/{struct.table_name}.rs"
+    path = f"../frontend/src/components/database/row_to_searchable_badge/{struct.table_name}.rs"
 
     # We check that the target implementation does not appear in some other file
     # with the mistaken name.
-    for file in os.listdir("../frontend/src/components/database/row_to_badge"):
-        target_string = f"impl RowToBadge for {struct.name} {{"
+    for file in os.listdir("../frontend/src/components/database/row_to_searchable_badge"):
+        target_string = f"impl RowToSearchableBadge for {struct.name} {{"
         with open(
-            f"../frontend/src/components/database/row_to_badge/{file}",
+            f"../frontend/src/components/database/row_to_searchable_badge/{file}",
             "r",
             encoding="utf8",
         ) as document:
             for line in document:
                 if target_string in line:
                     raise Exception(
-                        "We expected to find the RowToBadge implementation for the "
+                        "We expected to find the RowToSearchableBadge implementation for the "
                         f"{struct.name} struct in the {file} file, but it appears in the {path} file."
                     )
 
     print(
-        f"Should we create the RowToBadge implementation for the {struct.name} struct? "
+        f"Should we create the RowToSearchableBadge implementation for the {struct.name} struct? "
         f"It would be at the following location: {path}."
     )
 
     user_answer = userinput(
-        name="Create RowToBadge implementation?",
+        name="Create RowToSearchableBadge implementation?",
         default="no",
         validator="human_bool",
         sanitizer="human_bool",
@@ -4951,7 +4951,7 @@ def handle_missing_row_to_badge_implementation(
     if user_answer:
 
         # We retrieve the textual columns of the struct, as we will use them
-        # to generate the implementation of the RowToBadge trait.
+        # to generate the implementation of the RowToSearchableBadge trait.
         index: PGIndex = find_pg_trgm_indices().get_table(struct.table_name)
 
         # We retrieve the textual columns of the struct, and we check which of
@@ -4975,14 +4975,14 @@ def handle_missing_row_to_badge_implementation(
         with open(path, "w", encoding="utf8") as document:
 
             document.write(
-                "use super::RowToBadge;\n"
+                "use super::RowToSearchableBadge;\n"
                 "use crate::traits::format_match::FormatMatch;\n"
                 f"use web_common::database::{struct.name};\n"
                 "use yew::prelude::*;\n\n"
             )
 
             document.write(
-                f"impl RowToBadge for {struct.name} {{\n"
+                f"impl RowToSearchableBadge for {struct.name} {{\n"
                 f"    fn to_datalist_badge(&self, query: &str) -> Html {{\n"
                 f"        html! {{\n"
                 f"            <div>\n"
@@ -5149,17 +5149,17 @@ def handle_missing_row_to_badge_implementation(
             document.write("}\n")
 
         # We import the new module in the:
-        path = "../frontend/src/components/database/row_to_badge.rs"
+        path = "../frontend/src/components/database/row_to_searchable_badge.rs"
 
         with open(path, "a", encoding="utf8") as document:
             document.write(f"pub mod {struct.table_name};\n")
 
-        print(f"RowToBadge implementation for {struct.name} created.")
+        print(f"RowToSearchableBadge implementation for {struct.name} created.")
         print("Please refine it and re-run the pipeline.")
         sleep(2)
 
         raise Exception(
-            f"The RowToBadge implementation for the {struct.name} struct is missing. "
+            f"The RowToSearchableBadge implementation for the {struct.name} struct is missing. "
             "We have generated a rough first draft for you. Please refine it and re-run the pipeline."
         )
 
@@ -5351,14 +5351,14 @@ def write_frontend_yew_form(
                 if not trigram_indices.has_table(attribute.raw_data_type().table_name):
                     handle_missing_gin_index(attribute)
 
-                # We check that the nested struct implements the RowToBadge trait, as we need to
+                # We check that the nested struct implements the RowToSearchableBadge trait, as we need to
                 # be able to convert the nested struct to a badge within the Datalist.
-                if not implements_row_to_badge(attribute.raw_data_type()):
-                    handle_missing_row_to_badge_implementation(
+                if not implements_row_to_searchable_badge(attribute.raw_data_type()):
+                    handle_missing_row_to_searchable_badge_implementation(
                         attribute.raw_data_type()
                     )
                     raise Exception(
-                        f"The struct {attribute.raw_data_type().name} does not implement the RowToBadge trait."
+                        f"The struct {attribute.raw_data_type().name} does not implement the RowToSearchableBadge trait."
                     )
 
                 document.write(

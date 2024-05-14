@@ -1,15 +1,14 @@
-use super::RowToBadge;
+use super::RowToSearchableBadge;
 use crate::traits::format_match::FormatMatch;
-use web_common::database::Color;
+use web_common::database::NestedProjectRequirement;
 use yew::prelude::*;
 
-impl RowToBadge for Color {
+impl RowToSearchableBadge for NestedProjectRequirement {
     fn to_datalist_badge(&self, query: &str) -> Html {
         html! {
             <div>
                 <p>
-                    <i class={format!("fas fa-paint-roller {}", self.name)}></i>
-                    <span>{self.name.format_match(query)}</span>
+                    <span>{"Project Requirement"}</span>
                 </p>
             </div>
         }
@@ -19,20 +18,19 @@ impl RowToBadge for Color {
         html! {
             <div>
                 <p>
-                    <i class={format!("fas fa-paint-roller {}", self.name)}></i>
-                    <span>{self.name.clone()}</span>
+                <span>{"Project Requirement"}</span>
                 </p>
             </div>
         }
     }
     fn matches(&self, query: &str) -> bool {
-        self.name == query
+        false
     }
     fn similarity_score(&self, query: &str) -> isize {
-        self.name.similarity_score(query)
+        0
     }
     fn primary_color_class(&self) -> &str {
-        &self.name
+        "gray"
     }
     fn description(&self) -> &str {
         ""

@@ -6,7 +6,7 @@ use yew::prelude::*;
 use yew_agent::prelude::WorkerBridgeHandle;
 use yew_agent::scope_ext::AgentScopeExt;
 
-use super::database::row_to_badge::RowToBadge;
+use super::database::row_to_searchable_badge::RowToSearchableBadge;
 
 pub struct BasicPages<Page> {
     websocket: WorkerBridgeHandle<WebsocketWorker>,
@@ -20,7 +20,7 @@ pub enum PagesMessage {
     LoadMore,
 }
 
-impl<Page: PageLike + RowToBadge> Component for BasicPages<Page> {
+impl<Page: PageLike + RowToSearchableBadge> Component for BasicPages<Page> {
     type Message = PagesMessage;
     type Properties = ();
 

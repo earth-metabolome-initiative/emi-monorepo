@@ -1,9 +1,9 @@
-use super::RowToBadge;
+use super::RowToSearchableBadge;
 use crate::traits::format_match::FormatMatch;
 use web_common::database::NestedContainerVerticalRule;
 use yew::prelude::*;
 
-impl RowToBadge for NestedContainerVerticalRule {
+impl RowToSearchableBadge for NestedContainerVerticalRule {
     fn to_datalist_badge(&self, query: &str) -> Html {
         html! {
             <div>
