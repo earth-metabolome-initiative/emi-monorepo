@@ -1,7 +1,6 @@
 @import "./button.scss";
 
 form.standard-form {
-    border-radius: 0.5em;
     width: 600px;
     max-width: 100%;
     margin: 1em auto;
@@ -166,6 +165,7 @@ form.standard-form {
 
                         &:hover {
                             border-color: $blue;
+
                             i {
                                 color: $blue;
                             }
@@ -286,6 +286,7 @@ form.standard-form {
 
                         &:hover {
                             border-color: $red;
+
                             i {
                                 color: $red;
                             }
@@ -612,7 +613,10 @@ form.standard-form {
             min-width: 100px;
         }
 
-        &.text, &.number, &.datalist, &.datetime-local {
+        &.text,
+        &.number,
+        &.datalist,
+        &.datetime-local {
             .input-container {
                 display: grid;
                 grid-template-columns: auto 1fr;

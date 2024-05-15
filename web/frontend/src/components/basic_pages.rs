@@ -6,13 +6,13 @@ use yew::prelude::*;
 use yew_agent::prelude::WorkerBridgeHandle;
 use yew_agent::scope_ext::AgentScopeExt;
 
-use super::database::row_to_searchable_badge::RowToSearchableBadge;
+use super::database::row_to_badge::RowToBadge;
 
 pub struct BasicPages<Page> {
     websocket: WorkerBridgeHandle<WebsocketWorker>,
     pages: Vec<Page>,
     no_more_pages: bool,
-    request_is_ongoing: bool
+    request_is_ongoing: bool,
 }
 
 pub enum PagesMessage {
@@ -20,7 +20,7 @@ pub enum PagesMessage {
     LoadMore,
 }
 
-impl<Page: PageLike + RowToSearchableBadge> Component for BasicPages<Page> {
+impl<Page: PageLike + RowToBadge> Component for BasicPages<Page> {
     type Message = PagesMessage;
     type Properties = ();
 
@@ -85,7 +85,7 @@ impl<Page: PageLike + RowToSearchableBadge> Component for BasicPages<Page> {
             <div class="section_explorer">
                 <h2>{Page::section()}</h2>
                 <ul>
-                { for self.pages.iter().map(|page| html!{<li>{page.to_datalist_badge("")}</li>}) }
+                { for self.pages.iter().map(|page| html!{<li>{page.to_badge()}</li>}) }
                 if self.no_more_pages {
                     <li>{"There are no more entries to load"}</li>
                 } else {

@@ -5245,6 +5245,7 @@ pub struct Organization {
     pub name: String,
     pub url: String,
     pub country_id: i32,
+    pub state_province: Option<String>,
     pub domain: String,
 }
 #[cfg(feature = "frontend")]
@@ -5255,6 +5256,10 @@ impl Organization {
             gluesql::core::ast_builder::text(self.name),
             gluesql::core::ast_builder::text(self.url),
             gluesql::core::ast_builder::num(self.country_id),
+            match self.state_province {
+                Some(state_province) => gluesql::core::ast_builder::text(state_province),
+                None => gluesql::core::ast_builder::null(),
+            },
             gluesql::core::ast_builder::text(self.domain),
         ]
     }
@@ -5275,7 +5280,7 @@ impl Organization {
         use gluesql::core::ast_builder::*;
         table("organizations")
             .insert()
-            .columns("id, name, url, country_id, domain")
+            .columns("id, name, url, country_id, state_province, domain")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -5301,7 +5306,7 @@ impl Organization {
         let select_row = table("organizations")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, name, url, country_id, domain")
+            .project("id, name, url, country_id, state_province, domain")
             .limit(1)
             .execute(connection)
             .await?;
@@ -5367,13 +5372,17 @@ impl Organization {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
-        table("organizations")
+        let mut update_row = table("organizations")
             .update()        
 .set("id", gluesql::core::ast_builder::num(self.id))        
 .set("name", gluesql::core::ast_builder::text(self.name))        
 .set("url", gluesql::core::ast_builder::text(self.url))        
 .set("country_id", gluesql::core::ast_builder::num(self.country_id))        
-.set("domain", gluesql::core::ast_builder::text(self.domain))            .execute(connection)
+.set("domain", gluesql::core::ast_builder::text(self.domain));
+        if let Some(state_province) = self.state_province {
+            update_row = update_row.set("state_province", gluesql::core::ast_builder::text(state_province));
+        }
+            update_row.execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -5418,7 +5427,7 @@ impl Organization {
         use gluesql::core::ast_builder::*;
         let select_row = table("organizations")
             .select()
-            .project("id, name, url, country_id, domain")
+            .project("id, name, url, country_id, state_province, domain")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -5445,6 +5454,11 @@ impl Organization {
             country_id: match row.get("country_id").unwrap() {
                 gluesql::prelude::Value::I32(country_id) => country_id.clone(),
                 _ => unreachable!("Expected I32")
+            },
+            state_province: match row.get("state_province").unwrap() {
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::Str(state_province) => Some(state_province.clone()),
+                _ => unreachable!("Expected Str")
             },
             domain: match row.get("domain").unwrap() {
                 gluesql::prelude::Value::Str(domain) => domain.clone(),

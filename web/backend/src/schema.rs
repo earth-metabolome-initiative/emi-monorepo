@@ -259,6 +259,7 @@ diesel::table! {
         name -> Text,
         url -> Text,
         country_id -> Int4,
+        state_province -> Nullable<Text>,
         domain -> Text,
     }
 }

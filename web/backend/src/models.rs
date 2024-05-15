@@ -2969,6 +2969,7 @@ pub struct Organization {
     pub name: String,
     pub url: String,
     pub country_id: i32,
+    pub state_province: Option<String>,
     pub domain: String,
 }
 
@@ -2979,6 +2980,7 @@ impl From<Organization> for web_common::database::tables::Organization {
             name: item.name,
             url: item.url,
             country_id: item.country_id,
+            state_province: item.state_province,
             domain: item.domain,
         }
     }
@@ -2991,6 +2993,7 @@ impl From<web_common::database::tables::Organization> for Organization {
             name: item.name,
             url: item.url,
             country_id: item.country_id,
+            state_province: item.state_province,
             domain: item.domain,
         }
     }
@@ -3075,7 +3078,7 @@ impl Organization {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, url, country_id, domain FROM organizations ",
+            "SELECT id, name, url, country_id, state_province, domain FROM organizations ",
             "WHERE $1 % name ",
             "ORDER BY similarity($1, name) DESC LIMIT $2",
         );
@@ -3104,7 +3107,7 @@ impl Organization {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, url, country_id, domain FROM organizations ",
+            "SELECT id, name, url, country_id, state_province, domain FROM organizations ",
             "WHERE $1 <% name ",
             "ORDER BY word_similarity($1, name) DESC LIMIT $2",
         );
@@ -3133,7 +3136,7 @@ impl Organization {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, url, country_id, domain FROM organizations ",
+            "SELECT id, name, url, country_id, state_province, domain FROM organizations ",
             "WHERE $1 <<% name ",
             "ORDER BY strict_word_similarity($1, name) DESC LIMIT $2",
         );

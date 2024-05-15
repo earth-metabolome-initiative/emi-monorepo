@@ -1,9 +1,9 @@
 //! Module providing a yew component for a basic page with a websocket connection.
 use crate::workers::ws_worker::{ComponentMessage, Tabular, WebsocketMessage};
 use crate::workers::WebsocketWorker;
-use web_common::database::*;
 use serde::de::DeserializeOwned;
 use web_common::database::PrimaryKey;
+use web_common::database::*;
 use yew::prelude::*;
 use yew_agent::prelude::WorkerBridgeHandle;
 use yew_agent::scope_ext::AgentScopeExt;
@@ -64,10 +64,7 @@ impl PageLike for NestedProcedure {
 
 impl PageLike for NestedProjectRequirement {
     fn title(&self) -> String {
-        format!(
-            "Requirement for project {}",
-            self.project.inner.name
-        )
+        format!("Requirement for project {}", self.project.inner.name)
     }
 
     fn id(&self) -> PrimaryKey {
@@ -97,10 +94,7 @@ impl PageLike for NestedSamplingProcedure {
 
 impl PageLike for NestedSampledIndividual {
     fn title(&self) -> String {
-        format!(
-            "Sampled individual {}",
-            self.inner.id
-        )
+        format!("Sampled individual {}", self.inner.id)
     }
 
     fn id(&self) -> PrimaryKey {
@@ -110,10 +104,7 @@ impl PageLike for NestedSampledIndividual {
 
 impl PageLike for NestedSample {
     fn title(&self) -> String {
-        format!(
-            "Sample {}",
-            self.inner.id
-        )
+        format!("{}", self.inner.id)
     }
 
     fn id(&self) -> PrimaryKey {
@@ -203,7 +194,6 @@ impl<Page: PageLike> Component for BasicPage<Page> {
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         if let Some(page) = &self.page {
-
             // We set the title of the webpage to the title of the page.
             web_sys::window()
                 .unwrap()

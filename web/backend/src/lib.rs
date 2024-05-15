@@ -2,12 +2,12 @@ pub mod api;
 pub mod model_implementations;
 pub mod models;
 pub mod nested_models;
-pub mod schema;
-pub mod transactions;
-pub mod views;
-pub mod table_enumeration;
 pub mod new_variants;
+pub mod schema;
+pub mod table_enumeration;
+pub mod transactions;
 pub mod update_variants;
+pub mod views;
 
 use diesel::prelude::*;
 use diesel::r2d2::{self, ConnectionManager, Pool};

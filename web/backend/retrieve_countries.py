@@ -9,6 +9,11 @@ def main():
     # replace name of CD in iso for Democratic Republic of the Congo
     emoji.loc[emoji["ISO"] == "CD", "name"] = "Democratic Republic of the Congo"
     emoji.loc[emoji["ISO"] == "CG", "name"] = "Republic of the Congo"
+    kosovo = pd.DataFrame(
+        [["XK", "🇽🇰", "U+1F1FD U+1F1F0", "Kosovo"]],
+        columns=["ISO", "emoji", "unicode", "name"],
+    )
+    emoji = pd.concat([emoji, kosovo], ignore_index=True)
     emoji.to_csv("db_data/countries.csv", index=False)
 
 

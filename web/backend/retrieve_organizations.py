@@ -9,7 +9,9 @@ from tqdm import tqdm
 
 def download_organisation_json():
     """"""
-    url = "https://raw.githubusercontent.com/Hipo/university-domains-list/master/world_universities_and_domains.json"
+    # url = "https://raw.githubusercontent.com/Hipo/university-domains-list/master/world_universities_and_domains.json"
+    # for now we use my fork of the repo as it has a fix for the data errors
+    url = "https://raw.githubusercontent.com/mvisani/university-domains-list/master/world_universities_and_domains.json"
     BaseDownloader().download(url)
 
 
@@ -28,7 +30,7 @@ def url_ok(url):
             return True
         else:
             return False
-    except requests.ConnectionError as e:
+    except requests.ConnectionError:
         return False
     except TimeoutError:
         return False
