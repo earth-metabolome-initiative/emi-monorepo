@@ -1,11 +1,12 @@
 """Submodule ensuring that all tables with a created_by column also have an created_at column."""
 
-from constraint_checkers.find_foreign_keys import find_foreign_keys
+from constraint_checkers.find_foreign_keys import TableMetadata
 
 
-def ensure_created_at_columns():
+def ensure_created_at_columns(
+    table_metadata: TableMetadata
+):
     """Ensure that all tables with a created_by column also have an created_at column."""
-    table_metadata = find_foreign_keys()
 
     for table_name in table_metadata.tables():
         columns = table_metadata.get_columns(table_name)

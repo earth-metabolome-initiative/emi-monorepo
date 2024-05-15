@@ -1,12 +1,18 @@
 """Submodule ensuring that all tables with a updated_by column also have an updated_at column."""
 
-from constraint_checkers.find_foreign_keys import find_foreign_keys
+from constraint_checkers.find_foreign_keys import TableMetadata
 
 
-def ensure_updated_at_columns():
-    """Ensure that all tables with a updated_by column also have an updated_at column."""
-    table_metadata = find_foreign_keys()
-
+def ensure_updated_at_columns(
+    table_metadata: TableMetadata,
+):
+    """Ensure that all tables with a updated_by column also have an updated_at column.
+    
+    Parameters
+    ----------
+    table_metadata : TableMetadata
+        The table metadata.
+    """
     for table_name in table_metadata.tables():
         columns = table_metadata.get_columns(table_name)
 

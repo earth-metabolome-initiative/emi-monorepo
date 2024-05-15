@@ -236,9 +236,12 @@ class TableMetadata:
                     return True
             return False
 
-        primary_key_name, _ = self.get_primary_key_name_and_type(table_name)
+        primary_keys = self.get_primary_key_names_and_types(table_name)
+
+        primary_key_names = [primary_key[0] for primary_key in primary_keys]
+
         foreign_keys = self.get_foreign_keys(table_name)
-        return any(foreign_key != primary_key_name for foreign_key in foreign_keys)
+        return any(foreign_key not in primary_key_names for foreign_key in foreign_keys)
 
     @cache
     def get_foreign_keys(self, table_name: str) -> List[str]:
@@ -343,7 +346,7 @@ class TableMetadata:
         This method returns whether the table metadata associated with
         the table name has a non-null value in the `column_key` column.
         """
-        return self.get_primary_key_name_and_type(table_name) is not None
+        return self.get_primary_key_names_and_types(table_name) is not None
 
     def is_primary_key(self, table_name: str, candidate_key: str) -> bool:
         """Returns whether the candidate key is the primary key of the table.
@@ -360,8 +363,10 @@ class TableMetadata:
         This method returns whether the candidate key is the primary key
         of the table metadata associated with the table name.
         """
-        primary_key_name, _ = self.get_primary_key_name_and_type(table_name)
-        return primary_key_name == candidate_key
+        return any(
+            primary_key[0] == candidate_key
+            for primary_key in self.get_primary_key_names_and_types(table_name)
+        )
 
     @cache
     def get_column_data_type(self, table_name: str, column_name: str) -> str:
@@ -436,10 +441,10 @@ class TableMetadata:
         return is_nullable == "YES"
 
     @cache
-    def get_primary_key_name_and_type(
+    def get_primary_key_names_and_types(
         self, table_name: str
-    ) -> Optional[Tuple[str, str]]:
-        """Returns the name and type of the primary key of the table.
+    ) -> Optional[List[Tuple[str, str]]]:
+        """Returns the names and types of the components of the primary key of the table.
 
         Parameters
         ----------
@@ -451,7 +456,9 @@ class TableMetadata:
         This method returns the name and data type of the column in the
         table metadata associated with the table name that has the value
         `PRI` in the `column_key` column. This column is the primary key
-        of the table.
+        of the table. When the primary key is a composite key, this method
+        returns the names and data types of the components of the primary
+        key.
         """
         if self.is_view(table_name):
             # We check if the view has an "id" column and if it does,
@@ -485,7 +492,7 @@ class TableMetadata:
             """
         )
 
-        primary_key = cursor.fetchone()
+        primary_key = cursor.fetchall()
 
         cursor.close()
 
@@ -634,7 +641,9 @@ class TableMetadata:
         return "updated_at" in self.get_columns(table_name)
 
     @cache
-    def get_default_column_value(self, table_name: str, column_name: str) -> Optional[str]:
+    def get_default_column_value(
+        self, table_name: str, column_name: str
+    ) -> Optional[str]:
         """Returns the default value of the column.
 
         Parameters
@@ -672,6 +681,17 @@ class TableMetadata:
         cursor.close()
 
         return default_value
+
+    def is_edge_table(self) -> bool:
+        """Returns whether the table is an edge table.
+
+        Implementation details
+        -----------------------
+        An edge table is a table whose primary key is defined as a
+        tuple of two or more foreign keys.
+        """
+        return len(self.get_primary_key_name_and_type()) > 1
+
 
 def find_foreign_keys() -> TableMetadata:
     """Returns the list of indices that are of type `pg_trgm`."""

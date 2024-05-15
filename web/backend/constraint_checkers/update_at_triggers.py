@@ -2,7 +2,7 @@
 have a trigger that updates the column upon each row update.
 """
 import os
-from constraint_checkers.find_foreign_keys import find_foreign_keys
+from constraint_checkers.find_foreign_keys import TableMetadata
 from userinput import userinput
 from insert_migration import insert_migration
 
@@ -84,7 +84,9 @@ def handle_update_at_trigger_creation(
         )
 
 
-def ensures_all_update_at_trigger_exists():
+def ensures_all_update_at_trigger_exists(
+    tables_metadata: TableMetadata
+):
     """Check that for all tables that have an updated_at column, there exists an update_at trigger.
 
     Implementation details
@@ -96,8 +98,6 @@ def ensures_all_update_at_trigger_exists():
     upon each row update. If it does not, the function guides the user to create the trigger and
     afterwards raises an exception to stop the pipeline as it will need to be rerun.
     """
-    tables_metadata = find_foreign_keys()
-
     for table_name in tables_metadata.tables():
         trigger_name = f"{table_name}_updated_at_trigger"
         if tables_metadata.has_updated_at_column(table_name):

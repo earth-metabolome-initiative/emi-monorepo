@@ -1,6 +1,10 @@
 """This module contains the TableMetadata class."""
+from typing import List
+from constraint_checkers.struct_metadata import StructMetadata, AttributeMetadata
+
 
 class TableStructMetadata:
+    """Contains metadata about the struct associated to a table."""
 
     def __init__(self, table_name: str):
         self.name = table_name
@@ -53,7 +57,7 @@ class TableStructMetadata:
         """
         return self.richest_struct.has_uuid_primary_key()
 
-    def set_new_flat_struct(self, struct: "StructMetadata"):
+    def set_new_flat_struct(self, struct: StructMetadata):
         assert struct.table_name == self.name
         assert not struct.is_nested()
         assert struct.is_new_variant()
@@ -63,14 +67,14 @@ class TableStructMetadata:
             )
         self.new_flat_struct = struct
 
-    def get_new_flat_struct(self) -> "StructMetadata":
+    def get_new_flat_struct(self) -> StructMetadata:
         if self.new_flat_struct is None:
             raise ValueError(
                 f"The new flat struct has not been set for the table {self.name}."
             )
         return self.new_flat_struct
 
-    def set_update_flat_struct(self, struct: "StructMetadata"):
+    def set_update_flat_struct(self, struct: StructMetadata):
         assert struct.table_name == self.name
         assert not struct.is_nested()
         assert not struct.is_new_variant()
@@ -85,7 +89,7 @@ class TableStructMetadata:
             )
         self.update_flat_struct = struct
 
-    def get_update_flat_struct(self) -> "StructMetadata":
+    def get_update_flat_struct(self) -> StructMetadata:
         if self.has_uuid_primary_key():
             return self.get_new_flat_struct()
         if self.update_flat_struct is None:
@@ -94,7 +98,7 @@ class TableStructMetadata:
             )
         return self.update_flat_struct
 
-    def set_richest_struct(self, struct: "StructMetadata"):
+    def set_richest_struct(self, struct: StructMetadata):
         assert struct.table_name == self.name
         if self.richest_struct is not None:
             if self.richest_struct.is_nested() and not struct.is_nested():
@@ -108,10 +112,10 @@ class TableStructMetadata:
                 )
         self.richest_struct = struct
 
-    def get_richest_struct(self) -> "StructMetadata":
+    def get_richest_struct(self) -> StructMetadata:
         return self.richest_struct
 
-    def set_flat_struct(self, struct: "StructMetadata"):
+    def set_flat_struct(self, struct: StructMetadata):
         assert struct.table_name == self.name
         if struct.is_nested():
             raise ValueError(
@@ -123,7 +127,8 @@ class TableStructMetadata:
             )
         self.flat_struct = struct
 
-    def get_flat_struct(self) -> "StructMetadata":
+    def get_flat_struct(self) -> StructMetadata:
+        """Returns the flat struct of the table."""
         if self.flat_struct is None:
             raise ValueError(
                 f"The flat struct has not been set for the table {self.name}."
@@ -147,3 +152,16 @@ class TableStructMetadata:
 
     def has_updated_at_column(self) -> bool:
         return self.flat_struct.is_updatable()
+
+    def get_primary_keys(self) -> List[AttributeMetadata]:
+        return self.flat_struct.get_primary_keys()
+
+    def is_junktion_table(self) -> bool:
+        """Returns whether the table is a junktion table.
+        
+        Implementation details
+        -----------------------
+        A table is a junktion table if it has a primary key that is
+        a combination of foreign keys.
+        """
+        return self.flat_struct.is_junktion_table()

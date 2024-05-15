@@ -3,7 +3,7 @@
 from typing import List, Optional, Union
 import re
 from functools import cache
-from constraint_checkers.find_foreign_keys import find_foreign_keys
+from constraint_checkers.find_foreign_keys import TableMetadata
 
 
 class AttributeMetadata:
@@ -141,12 +141,18 @@ class AttributeMetadata:
             and self._data_type.can_implement_clone()
         )
 
+    def is_uuid(self) -> bool:
+        """Returns whether the attribute is a UUID."""
+        return self.data_type() == "Uuid"
+
 
 class StructMetadata:
+    """Class representing the metadata of a struct."""
 
-    def __init__(self, struct_name: str, table_name: str):
+    def __init__(self, struct_name: str, table_name: str, table_metadata: TableMetadata):
         self.name = struct_name
         self.table_name = table_name
+        self.table_metadata = table_metadata
         self.attributes: List[AttributeMetadata] = []
         self._derives: List[str] = []
         self._decorators: List[str] = []
@@ -361,16 +367,13 @@ class StructMetadata:
     def contains_only_optional_fields(self) -> bool:
         return all(attribute.optional for attribute in self.attributes)
 
+    @cache
     def only_primary_key(self) -> bool:
         """Returns whether the struct contains only the primary key."""
-        if len(self.attributes) != 1:
-            return False
+        primary_keys = self.get_primary_keys()
 
-        table_metadata = find_foreign_keys()
-        return (
-            self.attributes[0].name
-            == table_metadata.get_primary_key_name_and_type(self.table_name)[0]
-        )
+        return len(self.attributes) == len(primary_keys)
+
 
     def get_creator_user_id_attribute(self) -> AttributeMetadata:
         if self.is_new_variant():
@@ -392,18 +395,52 @@ class StructMetadata:
         )
 
     @cache
-    def get_primary_key(self) -> AttributeMetadata:
+    def get_foreign_keys(self) -> List[AttributeMetadata]:
+        """Returns the foreign keys of the struct.
+
+        Implementation details
+        -----------------------
+        This method returns the foreign keys of the struct.
+        """
+        foreign_key_names = (
+            self.table_metadata.get_foreign_keys(self.table_name)
+        )
+
+        return [
+            self.get_attribute_by_name(foreign_key_name)
+            for foreign_key_name in foreign_key_names
+        ]
+
+    @cache
+    def get_primary_keys(self) -> List[AttributeMetadata]:
         """Returns the primary key of the struct.
 
         Implementation details
         -----------------------
         This method returns the primary key of the struct.
         """
-        table_metadata = find_foreign_keys()
-        primary_key_name, _primary_key_type = (
-            table_metadata.get_primary_key_name_and_type(self.table_name)
+        if self._flat_variant is not None:
+            return self._flat_variant.get_primary_keys()
+
+        primary_keys = (
+            self.table_metadata.get_primary_key_names_and_types(self.table_name)
         )
-        return self.get_attribute_by_name(primary_key_name)
+
+        if len(primary_keys) == 0:
+            raise ValueError("The table does not have a primary key.")
+
+        primary_key_attributes = []
+
+        for primary_key in primary_keys:
+            attribute = self.get_attribute_by_name(primary_key[0])
+            if attribute is None:
+                raise ValueError(
+                    f"The attribute {primary_key[0]} is not in the struct {self.name} associated "
+                    f"with the table {self.table_name}."
+                )
+            primary_key_attributes.append(attribute)
+        
+        return primary_key_attributes
 
     @cache
     def has_uuid_primary_key(self) -> bool:
@@ -414,11 +451,10 @@ class StructMetadata:
         This method returns whether the primary key of the struct is
         a UUID.
         """
-        table_metadata = find_foreign_keys()
-        primary_key_name, primary_key_type = (
-            table_metadata.get_primary_key_name_and_type(self.table_name)
+        primary_keys = self.get_primary_keys()
+        return all(
+            attribute.data_type() == "Uuid" for attribute in primary_keys
         )
-        return primary_key_type == "uuid"
 
     def derives(self, diesel: Optional[str] = None) -> List[str]:
         """Returns the list of derives for the struct.
@@ -488,11 +524,49 @@ class StructMetadata:
             attribute == existing_attribute for existing_attribute in self.attributes
         )
 
-    def is_nested(self) -> bool:
-        return any(
-            isinstance(attribute._data_type, StructMetadata)
-            for attribute in self.attributes
-        )
-
     def get_capitalized_table_name(self) -> str:
         return "".join(word.capitalize() for word in self.table_name.split("_"))
+
+    def is_junktion_table(self) -> bool:
+        """Returns whether the table is a junktion table.
+        
+        Implementation details
+        -----------------------
+        A table is a junktion table if it has a primary key that is
+        a combination of foreign keys.
+        """
+        return len(self.get_primary_keys()) > 1
+
+    def get_formatted_primary_keys(self, include_prefix: bool, prefix: str = "self") -> str:
+        """Returns the formatted primary keys.
+        
+        Parameters
+        ----------
+        include_prefix : bool
+            Whether to include the prefix keyword in the formatted primary keys.
+        prefix : str
+            The prefix to use for the formatted primary keys.
+            By default, it is set to "self".
+        """
+        keys = self.get_primary_keys()
+
+        formatted_keys = ", ".join(
+            f"{prefix}.{attribute.name}" if include_prefix else attribute.name
+            for attribute in keys
+        )
+
+        if len(keys) > 1:
+            return f"( {formatted_keys} )"
+        return formatted_keys
+
+    def get_formatted_primary_key_data_types(self) -> str:
+        """Returns the formatted primary key data types."""
+        keys = self.get_primary_keys()
+
+        formatted_keys = ", ".join(
+            attribute.format_data_type() for attribute in keys
+        )
+
+        if len(keys) > 1:
+            return f"( {formatted_keys} )"
+        return formatted_keys
