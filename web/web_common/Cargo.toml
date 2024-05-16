@@ -46,6 +46,8 @@ wasm-bindgen = {version="0.2.92", optional = true}
 const_format = "0.2.32"
 chrono = {version="0.4.37", optional = false, features=["serde"]}
 yew = {version="0.21.0" , optional = true}
+r2d2 = {version="0.8.10", optional = true}
+reqwest = "0.12.4"
 
 [dependencies.web-sys]
 version = "0.3.69"
@@ -81,7 +83,7 @@ features = [
 [features]
 # The `backend` feature is used to enable the implementation of the From trait
 # for types defined in third party crates in the backend.
-backend = [ "actix-web", "actix-web-actors", "bytes", "actix", "rustface", "diesel" ]
+backend = [ "actix-web", "actix-web-actors", "bytes", "actix", "rustface", "diesel", "r2d2" ]
 
 # The `frontend` feature is used to enable the implementation of the From trait
 # for types defined in third party crates in the frontend.

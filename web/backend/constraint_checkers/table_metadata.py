@@ -127,7 +127,7 @@ class TableStructMetadata:
             )
         self.flat_struct = struct
 
-    def get_flat_struct(self) -> StructMetadata:
+    def get_flat_variant(self) -> StructMetadata:
         """Returns the flat struct of the table."""
         if self.flat_struct is None:
             raise ValueError(

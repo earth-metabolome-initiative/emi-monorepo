@@ -1,6 +1,6 @@
 """Submodule providing a class for struct metadata."""
 
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Tuple
 import re
 from functools import cache
 from constraint_checkers.find_foreign_keys import TableMetadata
@@ -14,11 +14,24 @@ class AttributeMetadata:
         name: str,
         data_type: Union[str, "StructMetadata"],
         optional: bool,
+        reference: bool = False
     ):
         self.original_name = original_name
         self.name = name
         self._data_type = data_type
         self.optional = optional
+        self.reference = reference
+
+    def as_ref(self) -> "AttributeMetadata":
+        """Returns the attribute as a reference."""
+        if self._data_type == "String":
+            return AttributeMetadata(
+                self.original_name, self.name, "str", self.optional, reference=True
+            )
+
+        return AttributeMetadata(
+            self.original_name, self.name, self._data_type, self.optional, reference=True
+        )
 
     def is_undefined_nested_dependencies(self) -> bool:
         return not self.has_struct_data_type() and self.data_type().startswith("Nested")
@@ -29,8 +42,12 @@ class AttributeMetadata:
     def format_data_type(self) -> str:
         data_type = self.data_type()
 
+        if self.reference:
+            data_type = f"&{data_type}"
+
         if self.optional:
-            return f"Option<{data_type}>"
+            data_type = f"Option<{data_type}>"
+
         return data_type
 
     def raw_data_type(self) -> Union[str, "StructMetadata"]:
@@ -107,11 +124,10 @@ class AttributeMetadata:
         )
 
     def __eq__(self, other: "AttributeMetadata") -> bool:
-        return (
-            self.name == other.name
-            and self._data_type == other._data_type
-            and self.optional == other.optional
-        )
+        if not isinstance(other, AttributeMetadata):
+            return False
+
+        return self.name == other.name and self._data_type == other._data_type
 
     def implements_clone(self) -> bool:
         return (
@@ -145,11 +161,16 @@ class AttributeMetadata:
         """Returns whether the attribute is a UUID."""
         return self.data_type() == "Uuid"
 
+    def __repr__(self) -> str:
+        return f"AttributeMetadata({self.name}, {self.data_type()}, {self.optional})"
+
 
 class StructMetadata:
     """Class representing the metadata of a struct."""
 
-    def __init__(self, struct_name: str, table_name: str, table_metadata: TableMetadata):
+    def __init__(
+        self, struct_name: str, table_name: str, table_metadata: TableMetadata
+    ):
         self.name = struct_name
         self.table_name = table_name
         self.table_metadata = table_metadata
@@ -216,9 +237,18 @@ class StructMetadata:
         """
         if self._flat_variant is not None:
             return self._flat_variant.is_insertable()
-        return any(attribute.is_creator_user_id() for attribute in self.attributes)
+        return (
+            any(attribute.is_creator_user_id() for attribute in self.attributes)
+            or self.table_name == "users"
+        )
 
-    def write_to(self, file: "File", diesel: Optional[str] = None, derives_deny_list: Optional[List[str]] = None):
+    def write_to(
+        self,
+        file: "File",
+        diesel: Optional[str] = None,
+        derives_deny_list: Optional[List[str]] = None,
+    ):
+        """Writes the struct to the file."""
         if diesel is not None:
             if diesel not in ["tables", "views"]:
                 raise ValueError("The table type must be either 'tables' or 'views'.")
@@ -226,14 +256,22 @@ class StructMetadata:
         if derives_deny_list is None:
             derives_deny_list = []
 
-        joined_derives = ', '.join([
-            derive
-            for derive in self.derives(diesel=diesel)
-            if derive not in derives_deny_list
-        ])
+        joined_derives = ", ".join(
+            [
+                derive
+                for derive in self.derives(diesel=diesel)
+                if derive not in derives_deny_list
+            ]
+        )
         file.write(f"#[derive({joined_derives})]\n")
         if diesel is not None:
             file.write(f"#[diesel(table_name = {self.table_name})]\n")
+
+        if diesel is not None:
+            file.write(
+                f"#[diesel(primary_key({self.get_formatted_primary_keys(include_prefix=False, include_parenthesis=False)}))]\n"
+            )
+
         for decorator in self._decorators:
             file.write(f"#[{decorator}]\n")
         file.write(f"pub struct {self.name} {{\n")
@@ -353,6 +391,25 @@ class StructMetadata:
         )
 
     def add_attribute(self, attribute_metadata: AttributeMetadata):
+        """Adds an attribute to the struct.
+        
+        Parameters
+        ----------
+        attribute_metadata : AttributeMetadata
+            The attribute metadata to add to the struct.
+
+        Raises
+        ------
+        ValueError
+            If the attribute is already in the struct.
+        """
+        # We check if the attribute is already in the struct.
+        # If it is, we raise an error.
+        if self.has_attribute(attribute_metadata):
+            raise ValueError(
+                f"The attribute {attribute_metadata.name} is already in the struct {self.name}."
+            )
+
         self.attributes.append(attribute_metadata)
 
     def add_derive(self, derive: str):
@@ -373,7 +430,6 @@ class StructMetadata:
         primary_keys = self.get_primary_keys()
 
         return len(self.attributes) == len(primary_keys)
-
 
     def get_creator_user_id_attribute(self) -> AttributeMetadata:
         if self.is_new_variant():
@@ -402,14 +458,27 @@ class StructMetadata:
         -----------------------
         This method returns the foreign keys of the struct.
         """
-        foreign_key_names = (
-            self.table_metadata.get_foreign_keys(self.table_name)
-        )
+        if self._flat_variant is not None:
+            return self._flat_variant.get_foreign_keys()
 
-        return [
-            self.get_attribute_by_name(foreign_key_name)
-            for foreign_key_name in foreign_key_names
-        ]
+        foreign_key_names = self.table_metadata.get_foreign_keys(self.table_name)
+
+        foreign_keys = []
+
+        for foreign_key_name in foreign_key_names:
+            attribute = self.get_attribute_by_name(foreign_key_name)
+            if attribute is None:
+                raise ValueError(
+                    f"The attribute {foreign_key_name} is not in the struct {self.name} associated "
+                    f"with the table {self.table_name}."
+                )
+            foreign_keys.append(attribute)
+
+        return foreign_keys
+
+    def has_foreign_keys(self) -> bool:
+        """Returns whether the struct has foreign keys."""
+        return len(self.get_foreign_keys()) > 0
 
     @cache
     def get_primary_keys(self) -> List[AttributeMetadata]:
@@ -422,8 +491,8 @@ class StructMetadata:
         if self._flat_variant is not None:
             return self._flat_variant.get_primary_keys()
 
-        primary_keys = (
-            self.table_metadata.get_primary_key_names_and_types(self.table_name)
+        primary_keys = self.table_metadata.get_primary_key_names_and_types(
+            self.table_name
         )
 
         if len(primary_keys) == 0:
@@ -439,7 +508,7 @@ class StructMetadata:
                     f"with the table {self.table_name}."
                 )
             primary_key_attributes.append(attribute)
-        
+
         return primary_key_attributes
 
     @cache
@@ -452,9 +521,7 @@ class StructMetadata:
         a UUID.
         """
         primary_keys = self.get_primary_keys()
-        return all(
-            attribute.data_type() == "Uuid" for attribute in primary_keys
-        )
+        return all(attribute.data_type() == "Uuid" for attribute in primary_keys)
 
     def derives(self, diesel: Optional[str] = None) -> List[str]:
         """Returns the list of derives for the struct.
@@ -529,7 +596,7 @@ class StructMetadata:
 
     def is_junktion_table(self) -> bool:
         """Returns whether the table is a junktion table.
-        
+
         Implementation details
         -----------------------
         A table is a junktion table if it has a primary key that is
@@ -537,9 +604,14 @@ class StructMetadata:
         """
         return len(self.get_primary_keys()) > 1
 
-    def get_formatted_primary_keys(self, include_prefix: bool, prefix: str = "self") -> str:
+    def get_formatted_primary_keys(
+        self,
+        include_prefix: bool,
+        prefix: str = "self",
+        include_parenthesis: bool = True,
+    ) -> str:
         """Returns the formatted primary keys.
-        
+
         Parameters
         ----------
         include_prefix : bool
@@ -547,6 +619,10 @@ class StructMetadata:
         prefix : str
             The prefix to use for the formatted primary keys.
             By default, it is set to "self".
+        include_parenthesis : bool
+            Whether to include the parenthesis in the formatted primary keys.
+            By default, it is set to True and applied only when there are
+            more than one primary keys.
         """
         keys = self.get_primary_keys()
 
@@ -555,7 +631,7 @@ class StructMetadata:
             for attribute in keys
         )
 
-        if len(keys) > 1:
+        if len(keys) > 1 and include_parenthesis:
             return f"( {formatted_keys} )"
         return formatted_keys
 
@@ -563,10 +639,44 @@ class StructMetadata:
         """Returns the formatted primary key data types."""
         keys = self.get_primary_keys()
 
-        formatted_keys = ", ".join(
-            attribute.format_data_type() for attribute in keys
-        )
+        formatted_keys = ", ".join(attribute.format_data_type() for attribute in keys)
 
         if len(keys) > 1:
             return f"( {formatted_keys} )"
         return formatted_keys
+
+    def has_only_foreign_keys(self) -> bool:
+        """Returns whether the struct has only foreign keys."""
+        foreign_keys = self.get_foreign_keys()
+
+        return len(self.attributes) == len(foreign_keys)
+
+    def get_unique_constraints(self) -> List[List[AttributeMetadata]]:
+        """Returns the unique constraints of the struct.
+
+        Implementation details
+        -----------------------
+        This method returns the unique constraints of the struct.
+        """
+        if self._flat_variant is not None:
+            return self._flat_variant.get_unique_constraints()
+
+        unique_constraints: List[Tuple[str]] = self.table_metadata.get_unique_constraint_columns(self.table_name)
+
+        unique_constraints_attributes: List[List[AttributeMetadata]] = []
+
+        for unique_constraint in unique_constraints:
+            unique_constraint_attributes: List[AttributeMetadata] = []
+
+            for attribute_name in unique_constraint:
+                attribute = self.get_attribute_by_name(attribute_name)
+                if attribute is None:
+                    raise ValueError(
+                        f"The attribute {attribute_name} is not in the struct {self.name} associated "
+                        f"with the table {self.table_name}."
+                    )
+                unique_constraint_attributes.append(attribute)
+
+            unique_constraints_attributes.append(unique_constraint_attributes)
+
+        return unique_constraints_attributes

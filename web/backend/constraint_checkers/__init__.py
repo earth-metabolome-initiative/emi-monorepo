@@ -22,6 +22,7 @@ from constraint_checkers.ensure_tables_have_creation_notification_trigger import
 from constraint_checkers.ensure_roles_tables import (
     ensure_updatable_tables_have_roles_tables
 )
+from constraint_checkers.regroup_tables import regroup_tables
 
 __all__ = [
     "ensures_all_update_at_trigger_exists",
@@ -33,5 +34,6 @@ __all__ = [
     "ensure_created_at_columns",
     "ensure_updated_at_columns",
     "handle_minimal_revertion",
-    "write_frontend_pages"
+    "write_frontend_pages",
+    "regroup_tables"
 ]

@@ -302,13 +302,19 @@ class TableMetadata:
                 f"The column {column_name} does not exist in the view {table_name}."
             )
 
-        if self.is_primary_key(table_name, column_name):
-            return table_name
-
         table_columns = self.table_metadata[
             (self.table_metadata["referencing_table"] == table_name)
             & (self.table_metadata["referencing_column"] == column_name)
         ]
+
+        if table_columns.empty:
+            if self.is_primary_key(table_name, column_name):
+                return table_name
+            else:
+                raise ValueError(
+                    f"The column {column_name} does not exist in the table {table_name}."
+                )
+
         return table_columns["referenced_table"].values[0]
 
     @cache
@@ -501,7 +507,7 @@ class TableMetadata:
     @cache
     def get_unique_constraint_columns(
         self, table_name: str
-    ) -> Union[List[str], List[ViewColumn]]:
+    ) -> Union[List[List[str]], List[ViewColumn]]:
         """Returns the columns of the unique constraint."""
         if self.is_view(table_name):
             # In a view, we return as set of unique columns the columns
@@ -536,20 +542,30 @@ class TableMetadata:
         _conn, cursor = get_cursor()
         cursor.execute(
             f"""
-            SELECT min(column_name)
-            FROM information_schema.table_constraints AS c
-            JOIN information_schema.constraint_column_usage AS cc
-                USING (table_schema, table_name, constraint_name)
-            WHERE c.constraint_type = 'UNIQUE' AND c.table_name = '{table_name}'
-            GROUP BY table_schema, table_name
-            HAVING count(*) = 1;
+            SELECT array_agg(attname ORDER BY attnum) AS columns
+            FROM pg_constraint
+            JOIN pg_attribute ON pg_constraint.conrelid = pg_attribute.attrelid
+            AND pg_attribute.attnum = ANY(pg_constraint.conkey)
+            JOIN pg_class ON pg_class.oid = pg_constraint.conrelid
+            JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+            WHERE contype = 'u' -- 'u' for unique constraint
+            AND pg_namespace.nspname = 'public'
+            AND pg_class.relname = '{table_name}'
+            GROUP BY conname, contype;
             """
         )
 
         columns = cursor.fetchall()
         cursor.close()
 
-        return [column[0] for column in columns]
+        # We flatten the list of lists of lists
+
+        unique_constraints = []
+
+        for column in columns:
+            unique_constraints.append(column[0])
+
+        return unique_constraints
 
     @cache
     def has_trigger_by_name(self, table_name: str, trigger_name: str) -> bool:

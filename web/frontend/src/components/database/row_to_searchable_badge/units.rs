@@ -27,9 +27,6 @@ impl RowToSearchableBadge for Unit {
             </div>
         }
     }
-    fn matches(&self, query: &str) -> bool {
-        self.name == query
-    }
     fn similarity_score(&self, query: &str) -> isize {
         self.name.similarity_score(query) + self.description.similarity_score(query) + self.symbol.similarity_score(query)
     }

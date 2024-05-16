@@ -24,15 +24,6 @@ impl Searchable for NestedBioOttTaxonItem {
         )
     }
 }
-impl Searchable for NestedItemCategory {
-    fn search_task(query: String, limit: u32) -> super::Select {
-        super::Select::search(
-             Table::ItemCategories,
-              query,
-              limit,
-        )
-    }
-}
 impl Searchable for NestedOrganization {
     fn search_task(query: String, limit: u32) -> super::Select {
         super::Select::search(
@@ -60,19 +51,19 @@ impl Searchable for NestedProject {
         )
     }
 }
-impl Searchable for NestedSampleState {
+impl Searchable for NestedRole {
     fn search_task(query: String, limit: u32) -> super::Select {
         super::Select::search(
-             Table::SampleStates,
+             Table::Roles,
               query,
               limit,
         )
     }
 }
-impl Searchable for NestedSamplingProcedure {
+impl Searchable for NestedSampleState {
     fn search_task(query: String, limit: u32) -> super::Select {
         super::Select::search(
-             Table::SamplingProcedures,
+             Table::SampleStates,
               query,
               limit,
         )
@@ -150,15 +141,6 @@ impl Searchable for FontAwesomeIcon {
         )
     }
 }
-impl Searchable for ItemCategory {
-    fn search_task(query: String, limit: u32) -> super::Select {
-        super::Select::search(
-             Table::ItemCategories,
-              query,
-              limit,
-        )
-    }
-}
 impl Searchable for Organization {
     fn search_task(query: String, limit: u32) -> super::Select {
         super::Select::search(
@@ -186,19 +168,19 @@ impl Searchable for Project {
         )
     }
 }
-impl Searchable for SampleState {
+impl Searchable for Role {
     fn search_task(query: String, limit: u32) -> super::Select {
         super::Select::search(
-             Table::SampleStates,
+             Table::Roles,
               query,
               limit,
         )
     }
 }
-impl Searchable for SamplingProcedure {
+impl Searchable for SampleState {
     fn search_task(query: String, limit: u32) -> super::Select {
         super::Select::search(
-             Table::SamplingProcedures,
+             Table::SampleStates,
               query,
               limit,
         )

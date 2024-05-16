@@ -25,9 +25,7 @@ impl RowToSearchableBadge for NestedBioOttRank {
             </div>
         }
     }
-    fn matches(&self, query: &str) -> bool {
-        self.inner.name == query
-    }
+    
     fn similarity_score(&self, query: &str) -> isize {
         self.inner.name.similarity_score(query)
     }

@@ -31,3 +31,4 @@ def ensure_tables_have_creation_notification_trigger(
     The name of this foreign trigger is of the form "notify_{foreign_table_name}_for_{table_name}_creation".
 
     """
+    

@@ -38,5 +38,4 @@ impl From<AccessToken> for actix_web::HttpResponse {
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub enum RefreshError {
     Unauthorized,
-    ExpiredAuthorization,
 }

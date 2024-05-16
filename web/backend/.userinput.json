@@ -4,5 +4,18 @@
     "Table container_horizontal_rules_users_roles is missing. Do you want to create it? (yes/no)": "yes",
     "Table derived_samples_users_roles is missing. Do you want to create it? (yes/no)": "yes",
     "Table projects_users_roles is missing. Do you want to create it? (yes/no)": "yes",
-    "Table projects_teams_roles is missing. Do you want to create it? (yes/no)": "yes"
+    "Table projects_teams_roles is missing. Do you want to create it? (yes/no)": "yes",
+    "Table sample_bio_ott_taxon_items_users_roles is missing. Do you want to create it? (yes/no)": "yes",
+    "Table sample_bio_ott_taxon_items_teams_roles is missing. Do you want to create it? (yes/no)": "yes",
+    "Table sampled_individual_bio_ott_taxon_items_users_roles is missing. Do you want to create it? (yes/no)": "yes",
+    "Table sampled_individual_bio_ott_taxon_items_teams_roles is missing. Do you want to create it? (yes/no)": "yes",
+    "Table sampled_individuals_users_roles is missing. Do you want to create it? (yes/no)": "yes",
+    "Table sampled_individuals_teams_roles is missing. Do you want to create it? (yes/no)": "yes",
+    "Table samples_users_roles is missing. Do you want to create it? (yes/no)": "yes",
+    "Table samples_teams_roles is missing. Do you want to create it? (yes/no)": "yes",
+    "Table spectra_collections_users_roles is missing. Do you want to create it? (yes/no)": "yes",
+    "Table spectra_collections_teams_roles is missing. Do you want to create it? (yes/no)": "yes",
+    "Table teams_users_roles is missing. Do you want to create it? (yes/no)": "yes",
+    "Table users_users_roles is missing. Do you want to create it? (yes/no)": "yes",
+    "Table users_teams_roles is missing. Do you want to create it? (yes/no)": "yes"
 }

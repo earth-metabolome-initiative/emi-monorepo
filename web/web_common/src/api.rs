@@ -18,7 +18,6 @@ pub const FULL_ENDPOINT: &str = ENDPOINT;
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq, PartialOrd, Eq, Ord)]
 pub enum ApiError {
     Unauthorized,
-    ExpiredAuthorization,
     BadGateway,
     BadRequest(Vec<String>),
     InternalServerError,
@@ -26,6 +25,16 @@ pub enum ApiError {
 }
 
 impl ApiError {
+    pub fn font_awesome_icon(&self) -> &'static str {
+        match self {
+            Self::Unauthorized => "fa-user-secret",
+            Self::BadGateway => "fa-dungeon",
+            Self::BadRequest(_) => "fa-circle-exclamation",
+            Self::InternalServerError => "fa-bomb",
+            Self::InvalidFileFormat(_) => "fa-file-circle-exclamation",
+        }
+    }
+
     pub fn unauthorized() -> Self {
         Self::Unauthorized
     }
@@ -43,6 +52,18 @@ impl ApiError {
         S: Into<String>,
     {
         Self::InvalidFileFormat(format.into())
+    }
+}
+
+impl From<String> for ApiError {
+    fn from(e: String) -> Self {
+        Self::BadRequest(vec![e])
+    }
+}
+
+impl From<&str> for ApiError {
+    fn from(e: &str) -> Self {
+        Self::BadRequest(vec![e.to_string()])
     }
 }
 
@@ -83,7 +104,6 @@ impl Into<Vec<String>> for ApiError {
         match self {
             ApiError::BadRequest(errors) => errors,
             ApiError::Unauthorized => vec!["Unauthorized".to_string()],
-            ApiError::ExpiredAuthorization => vec!["Expired Authorization".to_string()],
             ApiError::BadGateway => vec!["Bad Gateway".to_string()],
             ApiError::InternalServerError => vec!["Internal Server Error".to_string()],
             ApiError::InvalidFileFormat(format) => vec![format!("Invalid file format: {}", format)],
@@ -101,6 +121,13 @@ impl Into<HashSet<String>> for ApiError {
     fn into(self) -> HashSet<String> {
         let vector: Vec<String> = self.into();
         vector.into_iter().collect()
+    }
+}
+
+impl From<reqwest::Error> for ApiError {
+    fn from(e: reqwest::Error) -> Self {
+        log::error!("Reqwest error: {:?}", e);
+        Self::BadGateway
     }
 }
 
@@ -127,6 +154,22 @@ impl From<diesel::result::Error> for ApiError {
 }
 
 #[cfg(feature = "backend")]
+impl From<diesel::r2d2::Error> for ApiError {
+    fn from(e: diesel::r2d2::Error) -> Self {
+        log::error!("Database connection error: {:?}", e);
+        Self::InternalServerError
+    }
+}
+
+#[cfg(feature = "backend")]
+impl From<r2d2::Error> for ApiError {
+    fn from(e: r2d2::Error) -> Self {
+        log::error!("Database connection error: {:?}", e);
+        Self::InternalServerError
+    }
+}
+
+#[cfg(feature = "backend")]
 impl From<image::ImageError> for ApiError {
     fn from(e: image::ImageError) -> Self {
         log::error!("Image error: {:?}", e);
@@ -139,7 +182,6 @@ impl From<ApiError> for actix_web::HttpResponse {
     fn from(e: ApiError) -> Self {
         match e {
             ApiError::Unauthorized => actix_web::HttpResponse::Unauthorized().finish(),
-            ApiError::ExpiredAuthorization => actix_web::HttpResponse::Unauthorized().finish(),
             ApiError::BadGateway => actix_web::HttpResponse::BadGateway().finish(),
             ApiError::BadRequest(errors) => actix_web::HttpResponse::BadRequest().json(errors),
             ApiError::InternalServerError => {

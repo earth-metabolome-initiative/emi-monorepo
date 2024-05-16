@@ -25,6 +25,7 @@ use chrono::NaiveDateTime;
 
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = bio_ott_ranks)]
+#[diesel(primary_key(id))]
 pub struct BioOttRank {
     pub id: i32,
     pub name: String,
@@ -215,6 +216,7 @@ impl BioOttRank {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = bio_ott_taxon_items)]
+#[diesel(primary_key(id))]
 pub struct BioOttTaxonItem {
     pub id: i32,
     pub name: String,
@@ -355,7 +357,7 @@ impl BioOttTaxonItem {
     /// * `connection` - The connection to the database.
     ///
     pub fn from_ott_id(
-        ott_id: i32,
+        ott_id: &i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         use crate::schema::bio_ott_taxon_items;
@@ -453,6 +455,7 @@ impl BioOttTaxonItem {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = colors)]
+#[diesel(primary_key(id))]
 pub struct Color {
     pub id: i32,
     pub name: String,
@@ -536,6 +539,36 @@ impl Color {
         use crate::schema::colors;
         colors::dsl::colors
             .filter(colors::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+    /// Get the struct from the database by its hexadecimal_value.
+    ///
+    /// # Arguments
+    /// * `hexadecimal_value` - The hexadecimal_value of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_hexadecimal_value(
+        hexadecimal_value: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::colors;
+        colors::dsl::colors
+            .filter(colors::dsl::hexadecimal_value.eq(hexadecimal_value))
+            .first::<Self>(connection)
+    }
+    /// Get the struct from the database by its name.
+    ///
+    /// # Arguments
+    /// * `name` - The name of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_name(
+        name: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::colors;
+        colors::dsl::colors
+            .filter(colors::dsl::name.eq(name))
             .first::<Self>(connection)
     }
     /// Search for the struct by a given string by Postgres's `similarity`.
@@ -628,6 +661,7 @@ impl Color {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = countries)]
+#[diesel(primary_key(id))]
 pub struct Country {
     pub id: i32,
     pub iso: String,
@@ -717,6 +751,66 @@ impl Country {
         use crate::schema::countries;
         countries::dsl::countries
             .filter(countries::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+    /// Get the struct from the database by its emoji.
+    ///
+    /// # Arguments
+    /// * `emoji` - The emoji of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_emoji(
+        emoji: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::countries;
+        countries::dsl::countries
+            .filter(countries::dsl::emoji.eq(emoji))
+            .first::<Self>(connection)
+    }
+    /// Get the struct from the database by its iso.
+    ///
+    /// # Arguments
+    /// * `iso` - The iso of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_iso(
+        iso: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::countries;
+        countries::dsl::countries
+            .filter(countries::dsl::iso.eq(iso))
+            .first::<Self>(connection)
+    }
+    /// Get the struct from the database by its name.
+    ///
+    /// # Arguments
+    /// * `name` - The name of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_name(
+        name: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::countries;
+        countries::dsl::countries
+            .filter(countries::dsl::name.eq(name))
+            .first::<Self>(connection)
+    }
+    /// Get the struct from the database by its unicode.
+    ///
+    /// # Arguments
+    /// * `unicode` - The unicode of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_unicode(
+        unicode: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::countries;
+        countries::dsl::countries
+            .filter(countries::dsl::unicode.eq(unicode))
             .first::<Self>(connection)
     }
     /// Search for the struct by a given string by Postgres's `similarity`.
@@ -809,6 +903,7 @@ impl Country {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = derived_samples)]
+#[diesel(primary_key(parent_sample_id, child_sample_id))]
 pub struct DerivedSample {
     pub created_by: i32,
     pub created_at: NaiveDateTime,
@@ -927,6 +1022,7 @@ impl DerivedSample {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = document_formats)]
+#[diesel(primary_key(id))]
 pub struct DocumentFormat {
     pub id: i32,
     pub extension: String,
@@ -1117,6 +1213,7 @@ impl DocumentFormat {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = font_awesome_icons)]
+#[diesel(primary_key(id))]
 pub struct FontAwesomeIcon {
     pub id: i32,
     pub name: String,
@@ -1304,6 +1401,7 @@ impl FontAwesomeIcon {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = login_providers)]
+#[diesel(primary_key(id))]
 pub struct LoginProvider {
     pub id: i32,
     pub name: String,
@@ -1404,9 +1502,55 @@ impl LoginProvider {
             .filter(login_providers::dsl::id.eq(id))
             .first::<Self>(connection)
     }
+    /// Get the struct from the database by its color_id.
+    ///
+    /// # Arguments
+    /// * `color_id` - The color_id of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_color_id(
+        color_id: &i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::login_providers;
+        login_providers::dsl::login_providers
+            .filter(login_providers::dsl::color_id.eq(color_id))
+            .first::<Self>(connection)
+    }
+    /// Get the struct from the database by its font_awesome_icon_id.
+    ///
+    /// # Arguments
+    /// * `font_awesome_icon_id` - The font_awesome_icon_id of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_font_awesome_icon_id(
+        font_awesome_icon_id: &i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::login_providers;
+        login_providers::dsl::login_providers
+            .filter(login_providers::dsl::font_awesome_icon_id.eq(font_awesome_icon_id))
+            .first::<Self>(connection)
+    }
+    /// Get the struct from the database by its name.
+    ///
+    /// # Arguments
+    /// * `name` - The name of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_name(
+        name: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::login_providers;
+        login_providers::dsl::login_providers
+            .filter(login_providers::dsl::name.eq(name))
+            .first::<Self>(connection)
+    }
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = notifications)]
+#[diesel(primary_key(id))]
 pub struct Notification {
     pub id: i32,
     pub user_id: i32,
@@ -1504,6 +1648,7 @@ impl Notification {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = organizations)]
+#[diesel(primary_key(id))]
 pub struct Organization {
     pub id: i32,
     pub name: String,
@@ -1598,6 +1743,57 @@ impl Organization {
             .filter(organizations::dsl::id.eq(id))
             .first::<Self>(connection)
     }
+    /// Get the struct from the database by its domain.
+    ///
+    /// # Arguments
+    /// * `domain` - The domain of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_domain(
+        domain: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::organizations;
+        organizations::dsl::organizations
+            .filter(organizations::dsl::domain.eq(domain))
+            .first::<Self>(connection)
+    }
+    /// Get the struct from the database by its name, country_id and state_province.
+    ///
+    /// # Arguments
+    /// * `name` - The name of the struct to get.
+    /// * `country_id` - The country_id of the struct to get.
+    /// * `state_province` - The state_province of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_name_and_country_id_and_state_province(
+        name: &str,
+        country_id: &i32,
+        state_province: Option<&str>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::organizations;
+        organizations::dsl::organizations
+            .filter(organizations::dsl::name.eq(name))
+            .filter(organizations::dsl::country_id.eq(country_id))
+            .filter(organizations::dsl::state_province.eq(state_province))
+            .first::<Self>(connection)
+    }
+    /// Get the struct from the database by its url.
+    ///
+    /// # Arguments
+    /// * `url` - The url of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_url(
+        url: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::organizations;
+        organizations::dsl::organizations
+            .filter(organizations::dsl::url.eq(url))
+            .first::<Self>(connection)
+    }
     /// Search for the struct by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
@@ -1686,90 +1882,9 @@ impl Organization {
             .load(connection)
 }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable)]
-#[diesel(table_name = primary_user_emails)]
-pub struct PrimaryUserEmail {
-    pub id: i32,
-}
-
-impl From<PrimaryUserEmail> for web_common::database::tables::PrimaryUserEmail {
-    fn from(item: PrimaryUserEmail) -> Self {
-        Self {
-            id: item.id,
-        }
-    }
-}
-
-impl From<web_common::database::tables::PrimaryUserEmail> for PrimaryUserEmail {
-    fn from(item: web_common::database::tables::PrimaryUserEmail) -> Self {
-        Self {
-            id: item.id,
-        }
-    }
-}
-
-impl PrimaryUserEmail {
-    /// Get all of the structs from the database.
-    ///
-    /// # Arguments
-    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
-    /// * `offset` - The number of structs to skip. By default, this is 0.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn all(
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::primary_user_emails;
-       primary_user_emails::dsl::primary_user_emails
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(self.id, connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(primary_user_emails::dsl::primary_user_emails
-            .filter(primary_user_emails::dsl::id.eq(id))
-        ).execute(connection)
-    }
-    /// Get the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn get(
-       id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::primary_user_emails;
-        primary_user_emails::dsl::primary_user_emails
-            .filter(primary_user_emails::dsl::id.eq(id))
-            .first::<Self>(connection)
-    }
-}
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = project_states)]
+#[diesel(primary_key(id))]
 pub struct ProjectState {
     pub id: i32,
     pub name: String,
@@ -1859,6 +1974,51 @@ impl ProjectState {
         use crate::schema::project_states;
         project_states::dsl::project_states
             .filter(project_states::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+    /// Get the struct from the database by its color_id.
+    ///
+    /// # Arguments
+    /// * `color_id` - The color_id of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_color_id(
+        color_id: &i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::project_states;
+        project_states::dsl::project_states
+            .filter(project_states::dsl::color_id.eq(color_id))
+            .first::<Self>(connection)
+    }
+    /// Get the struct from the database by its font_awesome_icon_id.
+    ///
+    /// # Arguments
+    /// * `font_awesome_icon_id` - The font_awesome_icon_id of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_font_awesome_icon_id(
+        font_awesome_icon_id: &i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::project_states;
+        project_states::dsl::project_states
+            .filter(project_states::dsl::font_awesome_icon_id.eq(font_awesome_icon_id))
+            .first::<Self>(connection)
+    }
+    /// Get the struct from the database by its name.
+    ///
+    /// # Arguments
+    /// * `name` - The name of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_name(
+        name: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::project_states;
+        project_states::dsl::project_states
+            .filter(project_states::dsl::name.eq(name))
             .first::<Self>(connection)
     }
     /// Search for the struct by a given string by Postgres's `similarity`.
@@ -1951,6 +2111,7 @@ impl ProjectState {
 }
 #[derive(Queryable, Debug, Identifiable, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = projects)]
+#[diesel(primary_key(id))]
 pub struct Project {
     pub id: i32,
     pub name: String,
@@ -2192,7 +2353,132 @@ impl Project {
 }
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[diesel(table_name = projects_teams_roles)]
+#[diesel(primary_key(table_id, team_id, role_id))]
+pub struct ProjectsTeamsRole {
+    pub table_id: i32,
+    pub team_id: i32,
+    pub role_id: i32,
+    pub created_by: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
+}
+
+impl From<ProjectsTeamsRole> for web_common::database::tables::ProjectsTeamsRole {
+    fn from(item: ProjectsTeamsRole) -> Self {
+        Self {
+            table_id: item.table_id,
+            team_id: item.team_id,
+            role_id: item.role_id,
+            created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
+        }
+    }
+}
+
+impl From<web_common::database::tables::ProjectsTeamsRole> for ProjectsTeamsRole {
+    fn from(item: web_common::database::tables::ProjectsTeamsRole) -> Self {
+        Self {
+            table_id: item.table_id,
+            team_id: item.team_id,
+            role_id: item.role_id,
+            created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
+        }
+    }
+}
+
+impl ProjectsTeamsRole {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::projects_teams_roles;
+       projects_teams_roles::dsl::projects_teams_roles
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the structs from the database ordered by the updated_at column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_by_updated_at(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::projects_teams_roles;
+        projects_teams_roles::dsl::projects_teams_roles
+            .order_by(projects_teams_roles::dsl::updated_at.desc())
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Delete the struct from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete(
+        &self,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<usize, diesel::result::Error> {
+        Self::delete_by_id(( self.table_id, self.team_id, self.role_id ), connection)
+    }
+    /// Delete the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `( table_id, team_id, role_id )` - The primary key(s) of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete_by_id(
+       ( table_id, team_id, role_id ): ( i32, i32, i32 ),
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<usize, diesel::result::Error> {
+        diesel::delete(projects_teams_roles::dsl::projects_teams_roles
+            .filter(projects_teams_roles::dsl::table_id.eq(table_id))
+            .filter(projects_teams_roles::dsl::team_id.eq(team_id))
+            .filter(projects_teams_roles::dsl::role_id.eq(role_id))
+        ).execute(connection)
+    }
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `( table_id, team_id, role_id )` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn get(
+       ( table_id, team_id, role_id ): ( i32, i32, i32 ),
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::projects_teams_roles;
+        projects_teams_roles::dsl::projects_teams_roles
+            .filter(projects_teams_roles::dsl::table_id.eq(table_id))
+            .filter(projects_teams_roles::dsl::team_id.eq(team_id))
+            .filter(projects_teams_roles::dsl::role_id.eq(role_id))
+            .first::<Self>(connection)
+    }
+}
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = projects_users_roles)]
+#[diesel(primary_key(table_id, user_id, role_id))]
 pub struct ProjectsUsersRole {
     pub table_id: i32,
     pub user_id: i32,
@@ -2314,8 +2600,9 @@ impl ProjectsUsersRole {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default, Identifiable, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = roles)]
+#[diesel(primary_key(id))]
 pub struct Role {
     pub id: i32,
     pub name: String,
@@ -2407,6 +2694,66 @@ impl Role {
             .filter(roles::dsl::id.eq(id))
             .first::<Self>(connection)
     }
+    /// Get the struct from the database by its color_id.
+    ///
+    /// # Arguments
+    /// * `color_id` - The color_id of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_color_id(
+        color_id: &i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::roles;
+        roles::dsl::roles
+            .filter(roles::dsl::color_id.eq(color_id))
+            .first::<Self>(connection)
+    }
+    /// Get the struct from the database by its description.
+    ///
+    /// # Arguments
+    /// * `description` - The description of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_description(
+        description: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::roles;
+        roles::dsl::roles
+            .filter(roles::dsl::description.eq(description))
+            .first::<Self>(connection)
+    }
+    /// Get the struct from the database by its font_awesome_icon_id.
+    ///
+    /// # Arguments
+    /// * `font_awesome_icon_id` - The font_awesome_icon_id of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_font_awesome_icon_id(
+        font_awesome_icon_id: &i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::roles;
+        roles::dsl::roles
+            .filter(roles::dsl::font_awesome_icon_id.eq(font_awesome_icon_id))
+            .first::<Self>(connection)
+    }
+    /// Get the struct from the database by its name.
+    ///
+    /// # Arguments
+    /// * `name` - The name of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_name(
+        name: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::roles;
+        roles::dsl::roles
+            .filter(roles::dsl::name.eq(name))
+            .first::<Self>(connection)
+    }
     /// Search for the struct by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
@@ -2495,10 +2842,10 @@ impl Role {
             .load(connection)
 }
 }
-#[derive(Queryable, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default, Identifiable, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sample_bio_ott_taxon_items)]
+#[diesel(primary_key(sample_id, taxon_id))]
 pub struct SampleBioOttTaxonItem {
-    pub id: Uuid,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
     pub updated_by: i32,
@@ -2510,7 +2857,6 @@ pub struct SampleBioOttTaxonItem {
 impl From<SampleBioOttTaxonItem> for web_common::database::tables::SampleBioOttTaxonItem {
     fn from(item: SampleBioOttTaxonItem) -> Self {
         Self {
-            id: item.id,
             created_by: item.created_by,
             created_at: item.created_at,
             updated_by: item.updated_by,
@@ -2524,7 +2870,6 @@ impl From<SampleBioOttTaxonItem> for web_common::database::tables::SampleBioOttT
 impl From<web_common::database::tables::SampleBioOttTaxonItem> for SampleBioOttTaxonItem {
     fn from(item: web_common::database::tables::SampleBioOttTaxonItem) -> Self {
         Self {
-            id: item.id,
             created_by: item.created_by,
             created_at: item.created_at,
             updated_by: item.updated_by,
@@ -2582,40 +2927,43 @@ impl SampleBioOttTaxonItem {
         &self,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(self.id, connection)
+        Self::delete_by_id(( self.sample_id, self.taxon_id ), connection)
     }
     /// Delete the struct from the database by its ID.
     ///
     /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `( sample_id, taxon_id )` - The primary key(s) of the struct to delete.
     /// * `connection` - The connection to the database.
     ///
     pub fn delete_by_id(
-       id: Uuid,
+       ( sample_id, taxon_id ): ( Uuid, i32 ),
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<usize, diesel::result::Error> {
         diesel::delete(sample_bio_ott_taxon_items::dsl::sample_bio_ott_taxon_items
-            .filter(sample_bio_ott_taxon_items::dsl::id.eq(id))
+            .filter(sample_bio_ott_taxon_items::dsl::sample_id.eq(sample_id))
+            .filter(sample_bio_ott_taxon_items::dsl::taxon_id.eq(taxon_id))
         ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
-    /// * `id` - The primary key(s) of the struct to get.
+    /// * `( sample_id, taxon_id )` - The primary key(s) of the struct to get.
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-       id: Uuid,
+       ( sample_id, taxon_id ): ( Uuid, i32 ),
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         use crate::schema::sample_bio_ott_taxon_items;
         sample_bio_ott_taxon_items::dsl::sample_bio_ott_taxon_items
-            .filter(sample_bio_ott_taxon_items::dsl::id.eq(id))
+            .filter(sample_bio_ott_taxon_items::dsl::sample_id.eq(sample_id))
+            .filter(sample_bio_ott_taxon_items::dsl::taxon_id.eq(taxon_id))
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default, Identifiable, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sample_states)]
+#[diesel(primary_key(id))]
 pub struct SampleState {
     pub id: i32,
     pub name: String,
@@ -2707,6 +3055,36 @@ impl SampleState {
             .filter(sample_states::dsl::id.eq(id))
             .first::<Self>(connection)
     }
+    /// Get the struct from the database by its color_id.
+    ///
+    /// # Arguments
+    /// * `color_id` - The color_id of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_color_id(
+        color_id: &i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::sample_states;
+        sample_states::dsl::sample_states
+            .filter(sample_states::dsl::color_id.eq(color_id))
+            .first::<Self>(connection)
+    }
+    /// Get the struct from the database by its font_awesome_icon_id.
+    ///
+    /// # Arguments
+    /// * `font_awesome_icon_id` - The font_awesome_icon_id of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_font_awesome_icon_id(
+        font_awesome_icon_id: &i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::sample_states;
+        sample_states::dsl::sample_states
+            .filter(sample_states::dsl::font_awesome_icon_id.eq(font_awesome_icon_id))
+            .first::<Self>(connection)
+    }
     /// Search for the struct by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
@@ -2795,10 +3173,10 @@ impl SampleState {
             .load(connection)
 }
 }
-#[derive(Queryable, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default, Identifiable, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sampled_individual_bio_ott_taxon_items)]
+#[diesel(primary_key(sampled_individual_id, taxon_id))]
 pub struct SampledIndividualBioOttTaxonItem {
-    pub id: Uuid,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
     pub updated_by: i32,
@@ -2810,7 +3188,6 @@ pub struct SampledIndividualBioOttTaxonItem {
 impl From<SampledIndividualBioOttTaxonItem> for web_common::database::tables::SampledIndividualBioOttTaxonItem {
     fn from(item: SampledIndividualBioOttTaxonItem) -> Self {
         Self {
-            id: item.id,
             created_by: item.created_by,
             created_at: item.created_at,
             updated_by: item.updated_by,
@@ -2824,7 +3201,6 @@ impl From<SampledIndividualBioOttTaxonItem> for web_common::database::tables::Sa
 impl From<web_common::database::tables::SampledIndividualBioOttTaxonItem> for SampledIndividualBioOttTaxonItem {
     fn from(item: web_common::database::tables::SampledIndividualBioOttTaxonItem) -> Self {
         Self {
-            id: item.id,
             created_by: item.created_by,
             created_at: item.created_at,
             updated_by: item.updated_by,
@@ -2882,47 +3258,49 @@ impl SampledIndividualBioOttTaxonItem {
         &self,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(self.id, connection)
+        Self::delete_by_id(( self.sampled_individual_id, self.taxon_id ), connection)
     }
     /// Delete the struct from the database by its ID.
     ///
     /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `( sampled_individual_id, taxon_id )` - The primary key(s) of the struct to delete.
     /// * `connection` - The connection to the database.
     ///
     pub fn delete_by_id(
-       id: Uuid,
+       ( sampled_individual_id, taxon_id ): ( Uuid, i32 ),
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<usize, diesel::result::Error> {
         diesel::delete(sampled_individual_bio_ott_taxon_items::dsl::sampled_individual_bio_ott_taxon_items
-            .filter(sampled_individual_bio_ott_taxon_items::dsl::id.eq(id))
+            .filter(sampled_individual_bio_ott_taxon_items::dsl::sampled_individual_id.eq(sampled_individual_id))
+            .filter(sampled_individual_bio_ott_taxon_items::dsl::taxon_id.eq(taxon_id))
         ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
-    /// * `id` - The primary key(s) of the struct to get.
+    /// * `( sampled_individual_id, taxon_id )` - The primary key(s) of the struct to get.
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-       id: Uuid,
+       ( sampled_individual_id, taxon_id ): ( Uuid, i32 ),
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         use crate::schema::sampled_individual_bio_ott_taxon_items;
         sampled_individual_bio_ott_taxon_items::dsl::sampled_individual_bio_ott_taxon_items
-            .filter(sampled_individual_bio_ott_taxon_items::dsl::id.eq(id))
+            .filter(sampled_individual_bio_ott_taxon_items::dsl::sampled_individual_id.eq(sampled_individual_id))
+            .filter(sampled_individual_bio_ott_taxon_items::dsl::taxon_id.eq(taxon_id))
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default, Identifiable, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sampled_individuals)]
+#[diesel(primary_key(id))]
 pub struct SampledIndividual {
     pub id: Uuid,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
     pub updated_by: i32,
     pub updated_at: NaiveDateTime,
-    pub name: Option<String>,
     pub tagged: bool,
 }
 
@@ -2934,7 +3312,6 @@ impl From<SampledIndividual> for web_common::database::tables::SampledIndividual
             created_at: item.created_at,
             updated_by: item.updated_by,
             updated_at: item.updated_at,
-            name: item.name,
             tagged: item.tagged,
         }
     }
@@ -2948,7 +3325,6 @@ impl From<web_common::database::tables::SampledIndividual> for SampledIndividual
             created_at: item.created_at,
             updated_by: item.updated_by,
             updated_at: item.updated_at,
-            name: item.name,
             tagged: item.tagged,
         }
     }
@@ -3033,8 +3409,257 @@ impl SampledIndividual {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default, Identifiable, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[diesel(table_name = sampled_individuals_teams_roles)]
+#[diesel(primary_key(table_id, team_id, role_id))]
+pub struct SampledIndividualsTeamsRole {
+    pub table_id: Uuid,
+    pub team_id: i32,
+    pub role_id: i32,
+    pub created_by: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
+}
+
+impl From<SampledIndividualsTeamsRole> for web_common::database::tables::SampledIndividualsTeamsRole {
+    fn from(item: SampledIndividualsTeamsRole) -> Self {
+        Self {
+            table_id: item.table_id,
+            team_id: item.team_id,
+            role_id: item.role_id,
+            created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
+        }
+    }
+}
+
+impl From<web_common::database::tables::SampledIndividualsTeamsRole> for SampledIndividualsTeamsRole {
+    fn from(item: web_common::database::tables::SampledIndividualsTeamsRole) -> Self {
+        Self {
+            table_id: item.table_id,
+            team_id: item.team_id,
+            role_id: item.role_id,
+            created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
+        }
+    }
+}
+
+impl SampledIndividualsTeamsRole {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::sampled_individuals_teams_roles;
+       sampled_individuals_teams_roles::dsl::sampled_individuals_teams_roles
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the structs from the database ordered by the updated_at column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_by_updated_at(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::sampled_individuals_teams_roles;
+        sampled_individuals_teams_roles::dsl::sampled_individuals_teams_roles
+            .order_by(sampled_individuals_teams_roles::dsl::updated_at.desc())
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Delete the struct from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete(
+        &self,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<usize, diesel::result::Error> {
+        Self::delete_by_id(( self.table_id, self.team_id, self.role_id ), connection)
+    }
+    /// Delete the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `( table_id, team_id, role_id )` - The primary key(s) of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete_by_id(
+       ( table_id, team_id, role_id ): ( Uuid, i32, i32 ),
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<usize, diesel::result::Error> {
+        diesel::delete(sampled_individuals_teams_roles::dsl::sampled_individuals_teams_roles
+            .filter(sampled_individuals_teams_roles::dsl::table_id.eq(table_id))
+            .filter(sampled_individuals_teams_roles::dsl::team_id.eq(team_id))
+            .filter(sampled_individuals_teams_roles::dsl::role_id.eq(role_id))
+        ).execute(connection)
+    }
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `( table_id, team_id, role_id )` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn get(
+       ( table_id, team_id, role_id ): ( Uuid, i32, i32 ),
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::sampled_individuals_teams_roles;
+        sampled_individuals_teams_roles::dsl::sampled_individuals_teams_roles
+            .filter(sampled_individuals_teams_roles::dsl::table_id.eq(table_id))
+            .filter(sampled_individuals_teams_roles::dsl::team_id.eq(team_id))
+            .filter(sampled_individuals_teams_roles::dsl::role_id.eq(role_id))
+            .first::<Self>(connection)
+    }
+}
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[diesel(table_name = sampled_individuals_users_roles)]
+#[diesel(primary_key(table_id, user_id, role_id))]
+pub struct SampledIndividualsUsersRole {
+    pub table_id: Uuid,
+    pub user_id: i32,
+    pub role_id: i32,
+    pub created_by: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
+}
+
+impl From<SampledIndividualsUsersRole> for web_common::database::tables::SampledIndividualsUsersRole {
+    fn from(item: SampledIndividualsUsersRole) -> Self {
+        Self {
+            table_id: item.table_id,
+            user_id: item.user_id,
+            role_id: item.role_id,
+            created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
+        }
+    }
+}
+
+impl From<web_common::database::tables::SampledIndividualsUsersRole> for SampledIndividualsUsersRole {
+    fn from(item: web_common::database::tables::SampledIndividualsUsersRole) -> Self {
+        Self {
+            table_id: item.table_id,
+            user_id: item.user_id,
+            role_id: item.role_id,
+            created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
+        }
+    }
+}
+
+impl SampledIndividualsUsersRole {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::sampled_individuals_users_roles;
+       sampled_individuals_users_roles::dsl::sampled_individuals_users_roles
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the structs from the database ordered by the updated_at column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_by_updated_at(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::sampled_individuals_users_roles;
+        sampled_individuals_users_roles::dsl::sampled_individuals_users_roles
+            .order_by(sampled_individuals_users_roles::dsl::updated_at.desc())
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Delete the struct from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete(
+        &self,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<usize, diesel::result::Error> {
+        Self::delete_by_id(( self.table_id, self.user_id, self.role_id ), connection)
+    }
+    /// Delete the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id, role_id )` - The primary key(s) of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete_by_id(
+       ( table_id, user_id, role_id ): ( Uuid, i32, i32 ),
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<usize, diesel::result::Error> {
+        diesel::delete(sampled_individuals_users_roles::dsl::sampled_individuals_users_roles
+            .filter(sampled_individuals_users_roles::dsl::table_id.eq(table_id))
+            .filter(sampled_individuals_users_roles::dsl::user_id.eq(user_id))
+            .filter(sampled_individuals_users_roles::dsl::role_id.eq(role_id))
+        ).execute(connection)
+    }
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id, role_id )` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn get(
+       ( table_id, user_id, role_id ): ( Uuid, i32, i32 ),
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::sampled_individuals_users_roles;
+        sampled_individuals_users_roles::dsl::sampled_individuals_users_roles
+            .filter(sampled_individuals_users_roles::dsl::table_id.eq(table_id))
+            .filter(sampled_individuals_users_roles::dsl::user_id.eq(user_id))
+            .filter(sampled_individuals_users_roles::dsl::role_id.eq(role_id))
+            .first::<Self>(connection)
+    }
+}
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = samples)]
+#[diesel(primary_key(id))]
 pub struct Sample {
     pub id: Uuid,
     pub created_by: i32,
@@ -3042,7 +3667,6 @@ pub struct Sample {
     pub created_at: NaiveDateTime,
     pub updated_by: i32,
     pub updated_at: NaiveDateTime,
-    pub procedure_id: Uuid,
     pub state: i32,
 }
 
@@ -3055,7 +3679,6 @@ impl From<Sample> for web_common::database::tables::Sample {
             created_at: item.created_at,
             updated_by: item.updated_by,
             updated_at: item.updated_at,
-            procedure_id: item.procedure_id,
             state: item.state,
         }
     }
@@ -3070,7 +3693,6 @@ impl From<web_common::database::tables::Sample> for Sample {
             created_at: item.created_at,
             updated_by: item.updated_by,
             updated_at: item.updated_at,
-            procedure_id: item.procedure_id,
             state: item.state,
         }
     }
@@ -3155,24 +3777,25 @@ impl Sample {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default, Identifiable, QueryableByName, Insertable, Selectable, AsChangeset)]
-#[diesel(table_name = sampling_procedures)]
-pub struct SamplingProcedure {
-    pub id: Uuid,
-    pub name: String,
-    pub description: Option<String>,
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[diesel(table_name = samples_teams_roles)]
+#[diesel(primary_key(table_id, team_id, role_id))]
+pub struct SamplesTeamsRole {
+    pub table_id: Uuid,
+    pub team_id: i32,
+    pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
     pub updated_by: i32,
     pub updated_at: NaiveDateTime,
 }
 
-impl From<SamplingProcedure> for web_common::database::tables::SamplingProcedure {
-    fn from(item: SamplingProcedure) -> Self {
+impl From<SamplesTeamsRole> for web_common::database::tables::SamplesTeamsRole {
+    fn from(item: SamplesTeamsRole) -> Self {
         Self {
-            id: item.id,
-            name: item.name,
-            description: item.description,
+            table_id: item.table_id,
+            team_id: item.team_id,
+            role_id: item.role_id,
             created_by: item.created_by,
             created_at: item.created_at,
             updated_by: item.updated_by,
@@ -3181,12 +3804,12 @@ impl From<SamplingProcedure> for web_common::database::tables::SamplingProcedure
     }
 }
 
-impl From<web_common::database::tables::SamplingProcedure> for SamplingProcedure {
-    fn from(item: web_common::database::tables::SamplingProcedure) -> Self {
+impl From<web_common::database::tables::SamplesTeamsRole> for SamplesTeamsRole {
+    fn from(item: web_common::database::tables::SamplesTeamsRole) -> Self {
         Self {
-            id: item.id,
-            name: item.name,
-            description: item.description,
+            table_id: item.table_id,
+            team_id: item.team_id,
+            role_id: item.role_id,
             created_by: item.created_by,
             created_at: item.created_at,
             updated_by: item.updated_by,
@@ -3195,7 +3818,7 @@ impl From<web_common::database::tables::SamplingProcedure> for SamplingProcedure
     }
 }
 
-impl SamplingProcedure {
+impl SamplesTeamsRole {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
@@ -3208,8 +3831,8 @@ impl SamplingProcedure {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::sampling_procedures;
-       sampling_procedures::dsl::sampling_procedures
+        use crate::schema::samples_teams_roles;
+       samples_teams_roles::dsl::samples_teams_roles
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -3226,9 +3849,9 @@ impl SamplingProcedure {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::sampling_procedures;
-        sampling_procedures::dsl::sampling_procedures
-            .order_by(sampling_procedures::dsl::updated_at.desc())
+        use crate::schema::samples_teams_roles;
+        samples_teams_roles::dsl::samples_teams_roles
+            .order_by(samples_teams_roles::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -3242,127 +3865,169 @@ impl SamplingProcedure {
         &self,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(self.id, connection)
+        Self::delete_by_id(( self.table_id, self.team_id, self.role_id ), connection)
     }
     /// Delete the struct from the database by its ID.
     ///
     /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `( table_id, team_id, role_id )` - The primary key(s) of the struct to delete.
     /// * `connection` - The connection to the database.
     ///
     pub fn delete_by_id(
-       id: Uuid,
+       ( table_id, team_id, role_id ): ( Uuid, i32, i32 ),
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(sampling_procedures::dsl::sampling_procedures
-            .filter(sampling_procedures::dsl::id.eq(id))
+        diesel::delete(samples_teams_roles::dsl::samples_teams_roles
+            .filter(samples_teams_roles::dsl::table_id.eq(table_id))
+            .filter(samples_teams_roles::dsl::team_id.eq(team_id))
+            .filter(samples_teams_roles::dsl::role_id.eq(role_id))
         ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
-    /// * `id` - The primary key(s) of the struct to get.
+    /// * `( table_id, team_id, role_id )` - The primary key(s) of the struct to get.
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-       id: Uuid,
+       ( table_id, team_id, role_id ): ( Uuid, i32, i32 ),
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::sampling_procedures;
-        sampling_procedures::dsl::sampling_procedures
-            .filter(sampling_procedures::dsl::id.eq(id))
+        use crate::schema::samples_teams_roles;
+        samples_teams_roles::dsl::samples_teams_roles
+            .filter(samples_teams_roles::dsl::table_id.eq(table_id))
+            .filter(samples_teams_roles::dsl::team_id.eq(team_id))
+            .filter(samples_teams_roles::dsl::role_id.eq(role_id))
             .first::<Self>(connection)
     }
-    /// Search for the struct by a given string by Postgres's `similarity`.
+}
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[diesel(table_name = samples_users_roles)]
+#[diesel(primary_key(table_id, user_id, role_id))]
+pub struct SamplesUsersRole {
+    pub table_id: Uuid,
+    pub user_id: i32,
+    pub role_id: i32,
+    pub created_by: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
+}
+
+impl From<SamplesUsersRole> for web_common::database::tables::SamplesUsersRole {
+    fn from(item: SamplesUsersRole) -> Self {
+        Self {
+            table_id: item.table_id,
+            user_id: item.user_id,
+            role_id: item.role_id,
+            created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
+        }
+    }
+}
+
+impl From<web_common::database::tables::SamplesUsersRole> for SamplesUsersRole {
+    fn from(item: web_common::database::tables::SamplesUsersRole) -> Self {
+        Self {
+            table_id: item.table_id,
+            user_id: item.user_id,
+            role_id: item.role_id,
+            created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
+        }
+    }
+}
+
+impl SamplesUsersRole {
+    /// Get all of the structs from the database.
     ///
     /// # Arguments
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn similarity_search(
-        query: &str,
-        limit: Option<i32>,
+    pub fn all(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let limit = limit.unwrap_or(10);
-        // If the query string is empty, we run an all query with the
-        // limit parameter provided instead of a more complex similarity
-        // search.
-        if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
-        }
-        let similarity_query = concat!(
-            "SELECT id, name, description, created_by, created_at, updated_by, updated_at FROM sampling_procedures ",
-            "WHERE $1 % f_concat_sampling_procedures_name_description(name, description) ",
-            "ORDER BY similarity($1, f_concat_sampling_procedures_name_description(name, description)) DESC LIMIT $2",
-        );
-        diesel::sql_query(similarity_query)
-            .bind::<diesel::sql_types::Text, _>(query)
-            .bind::<diesel::sql_types::Integer, _>(limit)
-            .load(connection)
-}
-    /// Search for the struct by a given string by Postgres's `word_similarity`.
+        use crate::schema::samples_users_roles;
+       samples_users_roles::dsl::samples_users_roles
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the structs from the database ordered by the updated_at column.
     ///
     /// # Arguments
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn word_similarity_search(
-        query: &str,
-        limit: Option<i32>,
+    pub fn all_by_updated_at(
+        limit: Option<i64>,
+        offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        let limit = limit.unwrap_or(10);
-        // If the query string is empty, we run an all query with the
-        // limit parameter provided instead of a more complex similarity
-        // search.
-        if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
-        }
-        let similarity_query = concat!(
-            "SELECT id, name, description, created_by, created_at, updated_by, updated_at FROM sampling_procedures ",
-            "WHERE $1 <% f_concat_sampling_procedures_name_description(name, description) ",
-            "ORDER BY word_similarity($1, f_concat_sampling_procedures_name_description(name, description)) DESC LIMIT $2",
-        );
-        diesel::sql_query(similarity_query)
-            .bind::<diesel::sql_types::Text, _>(query)
-            .bind::<diesel::sql_types::Integer, _>(limit)
-            .load(connection)
-}
-    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+        use crate::schema::samples_users_roles;
+        samples_users_roles::dsl::samples_users_roles
+            .order_by(samples_users_roles::dsl::updated_at.desc())
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Delete the struct from the database.
     ///
     /// # Arguments
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn strict_word_similarity_search(
-        query: &str,
-        limit: Option<i32>,
+    pub fn delete(
+        &self,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        let limit = limit.unwrap_or(10);
-        // If the query string is empty, we run an all query with the
-        // limit parameter provided instead of a more complex similarity
-        // search.
-        if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
-        }
-        let similarity_query = concat!(
-            "SELECT id, name, description, created_by, created_at, updated_by, updated_at FROM sampling_procedures ",
-            "WHERE $1 <<% f_concat_sampling_procedures_name_description(name, description) ",
-            "ORDER BY strict_word_similarity($1, f_concat_sampling_procedures_name_description(name, description)) DESC LIMIT $2",
-        );
-        diesel::sql_query(similarity_query)
-            .bind::<diesel::sql_types::Text, _>(query)
-            .bind::<diesel::sql_types::Integer, _>(limit)
-            .load(connection)
+    ) -> Result<usize, diesel::result::Error> {
+        Self::delete_by_id(( self.table_id, self.user_id, self.role_id ), connection)
+    }
+    /// Delete the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id, role_id )` - The primary key(s) of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete_by_id(
+       ( table_id, user_id, role_id ): ( Uuid, i32, i32 ),
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<usize, diesel::result::Error> {
+        diesel::delete(samples_users_roles::dsl::samples_users_roles
+            .filter(samples_users_roles::dsl::table_id.eq(table_id))
+            .filter(samples_users_roles::dsl::user_id.eq(user_id))
+            .filter(samples_users_roles::dsl::role_id.eq(role_id))
+        ).execute(connection)
+    }
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id, role_id )` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn get(
+       ( table_id, user_id, role_id ): ( Uuid, i32, i32 ),
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::samples_users_roles;
+        samples_users_roles::dsl::samples_users_roles
+            .filter(samples_users_roles::dsl::table_id.eq(table_id))
+            .filter(samples_users_roles::dsl::user_id.eq(user_id))
+            .filter(samples_users_roles::dsl::role_id.eq(role_id))
+            .first::<Self>(connection)
+    }
 }
-}
-#[derive(Queryable, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default, Identifiable, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = spectra)]
+#[diesel(primary_key(id))]
 pub struct Spectra {
     pub id: i32,
     pub spectra_collection_id: i32,
@@ -3446,8 +4111,9 @@ impl Spectra {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default, Identifiable, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = spectra_collections)]
+#[diesel(primary_key(id))]
 pub struct SpectraCollection {
     pub id: i32,
     pub sample_id: Uuid,
@@ -3562,8 +4228,257 @@ impl SpectraCollection {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default, Identifiable, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[diesel(table_name = spectra_collections_teams_roles)]
+#[diesel(primary_key(table_id, team_id, role_id))]
+pub struct SpectraCollectionsTeamsRole {
+    pub table_id: i32,
+    pub team_id: i32,
+    pub role_id: i32,
+    pub created_by: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
+}
+
+impl From<SpectraCollectionsTeamsRole> for web_common::database::tables::SpectraCollectionsTeamsRole {
+    fn from(item: SpectraCollectionsTeamsRole) -> Self {
+        Self {
+            table_id: item.table_id,
+            team_id: item.team_id,
+            role_id: item.role_id,
+            created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
+        }
+    }
+}
+
+impl From<web_common::database::tables::SpectraCollectionsTeamsRole> for SpectraCollectionsTeamsRole {
+    fn from(item: web_common::database::tables::SpectraCollectionsTeamsRole) -> Self {
+        Self {
+            table_id: item.table_id,
+            team_id: item.team_id,
+            role_id: item.role_id,
+            created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
+        }
+    }
+}
+
+impl SpectraCollectionsTeamsRole {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::spectra_collections_teams_roles;
+       spectra_collections_teams_roles::dsl::spectra_collections_teams_roles
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the structs from the database ordered by the updated_at column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_by_updated_at(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::spectra_collections_teams_roles;
+        spectra_collections_teams_roles::dsl::spectra_collections_teams_roles
+            .order_by(spectra_collections_teams_roles::dsl::updated_at.desc())
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Delete the struct from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete(
+        &self,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<usize, diesel::result::Error> {
+        Self::delete_by_id(( self.table_id, self.team_id, self.role_id ), connection)
+    }
+    /// Delete the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `( table_id, team_id, role_id )` - The primary key(s) of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete_by_id(
+       ( table_id, team_id, role_id ): ( i32, i32, i32 ),
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<usize, diesel::result::Error> {
+        diesel::delete(spectra_collections_teams_roles::dsl::spectra_collections_teams_roles
+            .filter(spectra_collections_teams_roles::dsl::table_id.eq(table_id))
+            .filter(spectra_collections_teams_roles::dsl::team_id.eq(team_id))
+            .filter(spectra_collections_teams_roles::dsl::role_id.eq(role_id))
+        ).execute(connection)
+    }
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `( table_id, team_id, role_id )` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn get(
+       ( table_id, team_id, role_id ): ( i32, i32, i32 ),
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::spectra_collections_teams_roles;
+        spectra_collections_teams_roles::dsl::spectra_collections_teams_roles
+            .filter(spectra_collections_teams_roles::dsl::table_id.eq(table_id))
+            .filter(spectra_collections_teams_roles::dsl::team_id.eq(team_id))
+            .filter(spectra_collections_teams_roles::dsl::role_id.eq(role_id))
+            .first::<Self>(connection)
+    }
+}
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[diesel(table_name = spectra_collections_users_roles)]
+#[diesel(primary_key(table_id, user_id, role_id))]
+pub struct SpectraCollectionsUsersRole {
+    pub table_id: i32,
+    pub user_id: i32,
+    pub role_id: i32,
+    pub created_by: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
+}
+
+impl From<SpectraCollectionsUsersRole> for web_common::database::tables::SpectraCollectionsUsersRole {
+    fn from(item: SpectraCollectionsUsersRole) -> Self {
+        Self {
+            table_id: item.table_id,
+            user_id: item.user_id,
+            role_id: item.role_id,
+            created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
+        }
+    }
+}
+
+impl From<web_common::database::tables::SpectraCollectionsUsersRole> for SpectraCollectionsUsersRole {
+    fn from(item: web_common::database::tables::SpectraCollectionsUsersRole) -> Self {
+        Self {
+            table_id: item.table_id,
+            user_id: item.user_id,
+            role_id: item.role_id,
+            created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
+        }
+    }
+}
+
+impl SpectraCollectionsUsersRole {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::spectra_collections_users_roles;
+       spectra_collections_users_roles::dsl::spectra_collections_users_roles
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the structs from the database ordered by the updated_at column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_by_updated_at(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::spectra_collections_users_roles;
+        spectra_collections_users_roles::dsl::spectra_collections_users_roles
+            .order_by(spectra_collections_users_roles::dsl::updated_at.desc())
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Delete the struct from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete(
+        &self,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<usize, diesel::result::Error> {
+        Self::delete_by_id(( self.table_id, self.user_id, self.role_id ), connection)
+    }
+    /// Delete the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id, role_id )` - The primary key(s) of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete_by_id(
+       ( table_id, user_id, role_id ): ( i32, i32, i32 ),
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<usize, diesel::result::Error> {
+        diesel::delete(spectra_collections_users_roles::dsl::spectra_collections_users_roles
+            .filter(spectra_collections_users_roles::dsl::table_id.eq(table_id))
+            .filter(spectra_collections_users_roles::dsl::user_id.eq(user_id))
+            .filter(spectra_collections_users_roles::dsl::role_id.eq(role_id))
+        ).execute(connection)
+    }
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id, role_id )` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn get(
+       ( table_id, user_id, role_id ): ( i32, i32, i32 ),
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::spectra_collections_users_roles;
+        spectra_collections_users_roles::dsl::spectra_collections_users_roles
+            .filter(spectra_collections_users_roles::dsl::table_id.eq(table_id))
+            .filter(spectra_collections_users_roles::dsl::user_id.eq(user_id))
+            .filter(spectra_collections_users_roles::dsl::role_id.eq(role_id))
+            .first::<Self>(connection)
+    }
+}
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = team_states)]
+#[diesel(primary_key(id))]
 pub struct TeamState {
     pub id: i32,
     pub name: String,
@@ -3655,6 +4570,51 @@ impl TeamState {
             .filter(team_states::dsl::id.eq(id))
             .first::<Self>(connection)
     }
+    /// Get the struct from the database by its color_id.
+    ///
+    /// # Arguments
+    /// * `color_id` - The color_id of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_color_id(
+        color_id: &i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::team_states;
+        team_states::dsl::team_states
+            .filter(team_states::dsl::color_id.eq(color_id))
+            .first::<Self>(connection)
+    }
+    /// Get the struct from the database by its font_awesome_icon_id.
+    ///
+    /// # Arguments
+    /// * `font_awesome_icon_id` - The font_awesome_icon_id of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_font_awesome_icon_id(
+        font_awesome_icon_id: &i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::team_states;
+        team_states::dsl::team_states
+            .filter(team_states::dsl::font_awesome_icon_id.eq(font_awesome_icon_id))
+            .first::<Self>(connection)
+    }
+    /// Get the struct from the database by its name.
+    ///
+    /// # Arguments
+    /// * `name` - The name of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_name(
+        name: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::team_states;
+        team_states::dsl::team_states
+            .filter(team_states::dsl::name.eq(name))
+            .first::<Self>(connection)
+    }
     /// Search for the struct by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
@@ -3743,8 +4703,9 @@ impl TeamState {
             .load(connection)
 }
 }
-#[derive(Queryable, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default, Identifiable, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = teams)]
+#[diesel(primary_key(id))]
 pub struct Team {
     pub id: i32,
     pub name: String,
@@ -3967,8 +4928,133 @@ impl Team {
             .load(connection)
 }
 }
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[diesel(table_name = teams_users_roles)]
+#[diesel(primary_key(table_id, user_id, role_id))]
+pub struct TeamsUsersRole {
+    pub table_id: i32,
+    pub user_id: i32,
+    pub role_id: i32,
+    pub created_by: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
+}
+
+impl From<TeamsUsersRole> for web_common::database::tables::TeamsUsersRole {
+    fn from(item: TeamsUsersRole) -> Self {
+        Self {
+            table_id: item.table_id,
+            user_id: item.user_id,
+            role_id: item.role_id,
+            created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
+        }
+    }
+}
+
+impl From<web_common::database::tables::TeamsUsersRole> for TeamsUsersRole {
+    fn from(item: web_common::database::tables::TeamsUsersRole) -> Self {
+        Self {
+            table_id: item.table_id,
+            user_id: item.user_id,
+            role_id: item.role_id,
+            created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
+        }
+    }
+}
+
+impl TeamsUsersRole {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::teams_users_roles;
+       teams_users_roles::dsl::teams_users_roles
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the structs from the database ordered by the updated_at column.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_by_updated_at(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::teams_users_roles;
+        teams_users_roles::dsl::teams_users_roles
+            .order_by(teams_users_roles::dsl::updated_at.desc())
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Delete the struct from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete(
+        &self,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<usize, diesel::result::Error> {
+        Self::delete_by_id(( self.table_id, self.user_id, self.role_id ), connection)
+    }
+    /// Delete the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id, role_id )` - The primary key(s) of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete_by_id(
+       ( table_id, user_id, role_id ): ( i32, i32, i32 ),
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<usize, diesel::result::Error> {
+        diesel::delete(teams_users_roles::dsl::teams_users_roles
+            .filter(teams_users_roles::dsl::table_id.eq(table_id))
+            .filter(teams_users_roles::dsl::user_id.eq(user_id))
+            .filter(teams_users_roles::dsl::role_id.eq(role_id))
+        ).execute(connection)
+    }
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id, role_id )` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn get(
+       ( table_id, user_id, role_id ): ( i32, i32, i32 ),
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::teams_users_roles;
+        teams_users_roles::dsl::teams_users_roles
+            .filter(teams_users_roles::dsl::table_id.eq(table_id))
+            .filter(teams_users_roles::dsl::user_id.eq(user_id))
+            .filter(teams_users_roles::dsl::role_id.eq(role_id))
+            .first::<Self>(connection)
+    }
+}
 #[derive(Queryable, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default, Identifiable, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = units)]
+#[diesel(primary_key(id))]
 pub struct Unit {
     pub id: i32,
     pub name: String,
@@ -4162,11 +5248,14 @@ impl Unit {
 }
 #[derive(Queryable, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default, Identifiable, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = user_emails)]
+#[diesel(primary_key(id))]
 pub struct UserEmail {
     pub id: i32,
     pub email: String,
-    pub user_id: i32,
+    pub created_by: i32,
+    pub created_at: NaiveDateTime,
     pub login_provider_id: i32,
+    pub primary_email: bool,
 }
 
 impl From<UserEmail> for web_common::database::tables::UserEmail {
@@ -4174,8 +5263,10 @@ impl From<UserEmail> for web_common::database::tables::UserEmail {
         Self {
             id: item.id,
             email: item.email,
-            user_id: item.user_id,
+            created_by: item.created_by,
+            created_at: item.created_at,
             login_provider_id: item.login_provider_id,
+            primary_email: item.primary_email,
         }
     }
 }
@@ -4185,8 +5276,10 @@ impl From<web_common::database::tables::UserEmail> for UserEmail {
         Self {
             id: item.id,
             email: item.email,
-            user_id: item.user_id,
+            created_by: item.created_by,
+            created_at: item.created_at,
             login_provider_id: item.login_provider_id,
+            primary_email: item.primary_email,
         }
     }
 }
@@ -4250,15 +5343,34 @@ impl UserEmail {
             .filter(user_emails::dsl::id.eq(id))
             .first::<Self>(connection)
     }
+    /// Get the struct from the database by its email and login_provider_id.
+    ///
+    /// # Arguments
+    /// * `email` - The email of the struct to get.
+    /// * `login_provider_id` - The login_provider_id of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_email_and_login_provider_id(
+        email: &str,
+        login_provider_id: &i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::user_emails;
+        user_emails::dsl::user_emails
+            .filter(user_emails::dsl::email.eq(email))
+            .filter(user_emails::dsl::login_provider_id.eq(login_provider_id))
+            .first::<Self>(connection)
+    }
 }
 #[derive(Queryable, Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default, Identifiable, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = users)]
+#[diesel(primary_key(id))]
 pub struct User {
     pub id: i32,
     pub first_name: String,
     pub middle_name: Option<String>,
     pub last_name: String,
-    pub profile_picture: Option<Vec<u8>>,
+    pub profile_picture: Vec<u8>,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }

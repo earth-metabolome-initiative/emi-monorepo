@@ -28,96 +28,6 @@ pub fn sidebar(props: &SidebarProps) -> Html {
         <div class={sidebar_class}>
             <div class="sidebar-content">
                 <ul>
-                    <li class={if route == AppRoute::ContainerHorizontalRules { "active" } else { "" }}>
-                        <Link<AppRoute> to={AppRoute::ContainerHorizontalRules}>
-                            {"Container horizontal rules"}
-                        </Link<AppRoute>>
-                        {if route == AppRoute::ContainerHorizontalRules && user.has_user() {
-                            html! {
-                                <ul>
-                                    <li>
-                                        <Link<AppRoute> to={AppRoute::ContainerHorizontalRulesNew}>
-                                            {"New Container horizontal rule"}
-                                        </Link<AppRoute>>
-                                    </li>
-                                </ul>
-                            }
-                        } else {
-                            html! {<></>}
-                        }}
-                    </li>
-                    <li class={if route == AppRoute::ContainerVerticalRules { "active" } else { "" }}>
-                        <Link<AppRoute> to={AppRoute::ContainerVerticalRules}>
-                            {"Container vertical rules"}
-                        </Link<AppRoute>>
-                        {if route == AppRoute::ContainerVerticalRules && user.has_user() {
-                            html! {
-                                <ul>
-                                    <li>
-                                        <Link<AppRoute> to={AppRoute::ContainerVerticalRulesNew}>
-                                            {"New Container vertical rule"}
-                                        </Link<AppRoute>>
-                                    </li>
-                                </ul>
-                            }
-                        } else {
-                            html! {<></>}
-                        }}
-                    </li>
-                    <li class={if route == AppRoute::ItemCategories { "active" } else { "" }}>
-                        <Link<AppRoute> to={AppRoute::ItemCategories}>
-                            {"Item categories"}
-                        </Link<AppRoute>>
-                        {if route == AppRoute::ItemCategories && user.has_user() {
-                            html! {
-                                <ul>
-                                    <li>
-                                        <Link<AppRoute> to={AppRoute::ItemCategoriesNew}>
-                                            {"New Item category"}
-                                        </Link<AppRoute>>
-                                    </li>
-                                </ul>
-                            }
-                        } else {
-                            html! {<></>}
-                        }}
-                    </li>
-                    <li class={if route == AppRoute::Procedures { "active" } else { "" }}>
-                        <Link<AppRoute> to={AppRoute::Procedures}>
-                            {"Procedures"}
-                        </Link<AppRoute>>
-                        {if route == AppRoute::Procedures && user.has_user() {
-                            html! {
-                                <ul>
-                                    <li>
-                                        <Link<AppRoute> to={AppRoute::ProceduresNew}>
-                                            {"New Procedure"}
-                                        </Link<AppRoute>>
-                                    </li>
-                                </ul>
-                            }
-                        } else {
-                            html! {<></>}
-                        }}
-                    </li>
-                    <li class={if route == AppRoute::ProjectRequirements { "active" } else { "" }}>
-                        <Link<AppRoute> to={AppRoute::ProjectRequirements}>
-                            {"Project requirements"}
-                        </Link<AppRoute>>
-                        {if route == AppRoute::ProjectRequirements && user.has_user() {
-                            html! {
-                                <ul>
-                                    <li>
-                                        <Link<AppRoute> to={AppRoute::ProjectRequirementsNew}>
-                                            {"New Project requirement"}
-                                        </Link<AppRoute>>
-                                    </li>
-                                </ul>
-                            }
-                        } else {
-                            html! {<></>}
-                        }}
-                    </li>
                     <li class={if route == AppRoute::Projects { "active" } else { "" }}>
                         <Link<AppRoute> to={AppRoute::Projects}>
                             {"Projects"}
@@ -172,24 +82,6 @@ pub fn sidebar(props: &SidebarProps) -> Html {
                             html! {<></>}
                         }}
                     </li>
-                    <li class={if route == AppRoute::SamplingProcedures { "active" } else { "" }}>
-                        <Link<AppRoute> to={AppRoute::SamplingProcedures}>
-                            {"Sampling procedures"}
-                        </Link<AppRoute>>
-                        {if route == AppRoute::SamplingProcedures && user.has_user() {
-                            html! {
-                                <ul>
-                                    <li>
-                                        <Link<AppRoute> to={AppRoute::SamplingProceduresNew}>
-                                            {"New Sampling procedure"}
-                                        </Link<AppRoute>>
-                                    </li>
-                                </ul>
-                            }
-                        } else {
-                            html! {<></>}
-                        }}
-                    </li>
                     <li class={if route == AppRoute::Teams { "active" } else { "" }}>
                         <Link<AppRoute> to={AppRoute::Teams}>
                             {"Teams"}
@@ -212,6 +104,19 @@ pub fn sidebar(props: &SidebarProps) -> Html {
                         <Link<AppRoute> to={AppRoute::Users}>
                             {"Users"}
                         </Link<AppRoute>>
+                        {if route == AppRoute::Users && user.has_user() {
+                            html! {
+                                <ul>
+                                    <li>
+                                        <Link<AppRoute> to={AppRoute::UsersNew}>
+                                            {"New User"}
+                                        </Link<AppRoute>>
+                                    </li>
+                                </ul>
+                            }
+                        } else {
+                            html! {<></>}
+                        }}
                     </li>
                     {if user.has_user() {
                         html! {

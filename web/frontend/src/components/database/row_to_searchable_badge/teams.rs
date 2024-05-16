@@ -26,9 +26,6 @@ impl RowToSearchableBadge for NestedTeam {
             </div>
         }
     }
-    fn matches(&self, query: &str) -> bool {
-        self.inner.name == query
-    }
     fn similarity_score(&self, query: &str) -> isize {
         self.inner.name.similarity_score(query) + self.inner.description.similarity_score(query)
     }

@@ -23,14 +23,56 @@ impl Authorization {
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, Copy)]
 pub enum PrimaryKey {
     Uuid(Uuid),
+    Uuid2(Uuid, Uuid),
+    Uuid3(Uuid, Uuid, Uuid),
     Int(i32),
+    Int2(i32, i32),
+    Int3(i32, i32, i32),
+    Mixed(Uuid, i32),
+    Mixed2(Uuid, i32, i32),
 }
 
 impl From<PrimaryKey> for Uuid {
     fn from(pk: PrimaryKey) -> Self {
         match pk {
             PrimaryKey::Uuid(uuid) => uuid,
-            PrimaryKey::Int(int) => unreachable!("Cannot convert PrimaryKey::Int to Uuid: {}", int),
+            _ => unreachable!("Cannot convert PrimaryKey to Uuid: {:?}", pk),
+        }
+    }
+}
+
+impl From<PrimaryKey> for (Uuid, i32) {
+    fn from(pk: PrimaryKey) -> Self {
+        match pk {
+            PrimaryKey::Mixed(uuid, int) => (uuid, int),
+            _ => unreachable!("Cannot convert PrimaryKey to (Uuid, i32): {:?}", pk),
+        }
+    }
+}
+
+impl From<PrimaryKey> for (Uuid, i32, i32) {
+    fn from(pk: PrimaryKey) -> Self {
+        match pk {
+            PrimaryKey::Mixed2(uuid, int1, int2) => (uuid, int1, int2),
+            _ => unreachable!("Cannot convert PrimaryKey to (Uuid, i32, i32): {:?}", pk),
+        }
+    }
+}
+
+impl From<PrimaryKey> for (Uuid, Uuid) {
+    fn from(pk: PrimaryKey) -> Self {
+        match pk {
+            PrimaryKey::Uuid2(uuid1, uuid2) => (uuid1, uuid2),
+            _ => unreachable!("Cannot convert PrimaryKey to (Uuid, Uuid): {:?}", pk),
+        }
+    }
+}
+
+impl From<PrimaryKey> for (Uuid, Uuid, Uuid) {
+    fn from(pk: PrimaryKey) -> Self {
+        match pk {
+            PrimaryKey::Uuid3(uuid1, uuid2, uuid3) => (uuid1, uuid2, uuid3),
+            _ => unreachable!("Cannot convert PrimaryKey to (Uuid, Uuid, Uuid): {:?}", pk),
         }
     }
 }
@@ -38,8 +80,26 @@ impl From<PrimaryKey> for Uuid {
 impl From<PrimaryKey> for i32 {
     fn from(pk: PrimaryKey) -> Self {
         match pk {
-            PrimaryKey::Uuid(uuid) => unreachable!("Cannot convert PrimaryKey::Uuid to i32: {}", uuid),
             PrimaryKey::Int(int) => int,
+            _ => unreachable!("Cannot convert PrimaryKey to i32: {:?}", pk),
+        }
+    }
+}
+
+impl From<PrimaryKey> for (i32, i32) {
+    fn from(pk: PrimaryKey) -> Self {
+        match pk {
+            PrimaryKey::Int2(int1, int2) => (int1, int2),
+            _ => unreachable!("Cannot convert PrimaryKey to (i32, i32): {:?}", pk),
+        }
+    }
+}
+
+impl From<PrimaryKey> for (i32, i32, i32) {
+    fn from(pk: PrimaryKey) -> Self {
+        match pk {
+            PrimaryKey::Int3(int1, int2, int3) => (int1, int2, int3),
+            _ => unreachable!("Cannot convert PrimaryKey to (i32, i32, i32): {:?}", pk),
         }
     }
 }
@@ -50,9 +110,39 @@ impl From<Uuid> for PrimaryKey {
     }
 }
 
+impl From<(Uuid, i32)> for PrimaryKey {
+    fn from(mixed: (Uuid, i32)) -> Self {
+        PrimaryKey::Mixed(mixed.0, mixed.1)
+    }
+}
+
+impl From<(Uuid, Uuid)> for PrimaryKey {
+    fn from(uuids: (Uuid, Uuid)) -> Self {
+        PrimaryKey::Uuid2(uuids.0, uuids.1)
+    }
+}
+
+impl From<(Uuid, Uuid, Uuid)> for PrimaryKey {
+    fn from(uuids: (Uuid, Uuid, Uuid)) -> Self {
+        PrimaryKey::Uuid3(uuids.0, uuids.1, uuids.2)
+    }
+}
+
 impl From<i32> for PrimaryKey {
     fn from(int: i32) -> Self {
         PrimaryKey::Int(int)
+    }
+}
+
+impl From<(i32, i32)> for PrimaryKey {
+    fn from(ints: (i32, i32)) -> Self {
+        PrimaryKey::Int2(ints.0, ints.1)
+    }
+}
+
+impl From<(i32, i32, i32)> for PrimaryKey {
+    fn from(ints: (i32, i32, i32)) -> Self {
+        PrimaryKey::Int3(ints.0, ints.1, ints.2)
     }
 }
 

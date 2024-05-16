@@ -22,67 +22,7 @@ pub trait PageLike: DeserializeOwned + PartialEq + Clone + Tabular + 'static {
     fn id(&self) -> PrimaryKey;
 }
 
-impl PageLike for NestedContainerHorizontalRule {
-    fn title(&self) -> String {
-        self.inner.name.clone()
-    }
-
-    fn id(&self) -> PrimaryKey {
-        self.inner.id.into()
-    }
-}
-
-impl PageLike for NestedContainerVerticalRule {
-    fn title(&self) -> String {
-        self.inner.name.clone()
-    }
-
-    fn id(&self) -> PrimaryKey {
-        self.inner.id.into()
-    }
-}
-
-impl PageLike for NestedItemCategory {
-    fn title(&self) -> String {
-        self.inner.name.clone()
-    }
-
-    fn id(&self) -> PrimaryKey {
-        self.inner.id.into()
-    }
-}
-
-impl PageLike for NestedProcedure {
-    fn title(&self) -> String {
-        self.inner.name.clone()
-    }
-
-    fn id(&self) -> PrimaryKey {
-        self.inner.id.into()
-    }
-}
-
-impl PageLike for NestedProjectRequirement {
-    fn title(&self) -> String {
-        format!("Requirement for project {}", self.project.inner.name)
-    }
-
-    fn id(&self) -> PrimaryKey {
-        self.inner.id.into()
-    }
-}
-
 impl PageLike for NestedProject {
-    fn title(&self) -> String {
-        self.inner.name.clone()
-    }
-
-    fn id(&self) -> PrimaryKey {
-        self.inner.id.into()
-    }
-}
-
-impl PageLike for NestedSamplingProcedure {
     fn title(&self) -> String {
         self.inner.name.clone()
     }

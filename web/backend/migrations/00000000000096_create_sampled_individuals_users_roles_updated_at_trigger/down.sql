@@ -1,0 +1,4 @@
+-- Drop the `sampled_individuals_users_roles_updated_at_trigger` trigger on the sampled_individuals_users_roles table.
+
+DROP TRIGGER sampled_individuals_users_roles_updated_at_trigger ON sampled_individuals_users_roles;
+DROP FUNCTION sampled_individuals_users_roles_updated_at_trigger;

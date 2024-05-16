@@ -26,9 +26,6 @@ impl RowToSearchableBadge for DocumentFormat {
             </div>
         }
     }
-    fn matches(&self, query: &str) -> bool {
-        self.extension == query
-    }
     fn similarity_score(&self, query: &str) -> isize {
         self.extension.similarity_score(query) + self.mime_type.similarity_score(query)
     }

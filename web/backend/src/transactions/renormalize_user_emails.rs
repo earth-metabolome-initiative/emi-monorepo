@@ -24,40 +24,38 @@
 //! contains the operations that should be performed as part of the transaction. If the closure returns an error, the
 //! transaction is rolled back, and the error is returned. If the closure returns Ok, the transaction is committed, and
 //! the Ok value is returned.
-use crate::model_implementations::{NewUser, NewUserEmail};
 use crate::models::*;
 use crate::transactions::create_user::create_user;
+use crate::new_variants::InsertRow;
+use web_common::api::ApiError;
+use web_common::database::NewUser;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
 use diesel::sql_query;
 use diesel::sql_types::Text;
 use email_address::EmailAddress;
+use web_common::database::NewUserEmail;
 
 pub(crate) struct Emails {
-    emails: Vec<String>,
-    primary: String,
+    emails: Vec<String>
 }
 
 impl Emails {
-    pub(crate) fn new(emails: Vec<String>, primary: String) -> Result<Emails, String> {
+    pub(crate) fn new(emails: Vec<String>, primary: String) -> Result<Emails, ApiError> {
         if !emails.contains(&primary) {
-            return Err("Primary email not in list of emails".to_string());
+            Err("Primary email not in list of emails")?;
         }
 
         // We check if any of the emails provided are not valid email addresses.
         if emails.iter().any(|email| !EmailAddress::is_valid(email)) {
-            return Err("Invalid email address".to_string());
+            Err("Invalid email address")?;
         }
 
-        Ok(Emails { emails, primary })
+        Ok(Emails { emails })
     }
 
     pub(crate) fn emails(&self) -> &[String] {
         &self.emails
-    }
-
-    pub(crate) fn is_primary(&self, email: &str) -> bool {
-        self.primary == email
     }
 }
 
@@ -146,11 +144,16 @@ fn insert_user_emails(
 
     for email in emails {
         // If the email is not associated with the user, we insert it.
-        let user_email = user.get_user_email_from_email(email, &mut conn);
+        let user_email =
+            UserEmail::from_email_and_login_provider_id(email, &provider_id, &mut conn);
 
-        if user_email.is_err() || user_email.unwrap().provider_id() != provider_id {
-            let new_user_email = NewUserEmail::new(email, user.id, provider_id);
-            new_user_email.insert(&mut conn)?;
+        if user_email.is_err() {
+            let new_user_email = NewUserEmail {
+                email: email.clone(),
+                login_provider_id: provider_id,
+                primary_email: true,
+            };
+            new_user_email.insert(user.id, &mut conn)?;
         }
     }
 
@@ -160,7 +163,6 @@ fn insert_user_emails(
 pub(crate) fn renormalize_user_emails(
     provider_id: i32,
     emails: Emails,
-    potential_new_user: NewUser,
     pool: &Pool<ConnectionManager<PgConnection>>,
 ) -> QueryResult<User> {
     use crate::schema::users::dsl::*;
@@ -183,7 +185,7 @@ pub(crate) fn renormalize_user_emails(
         0 => {
             log::info!("Creating the new user for provider {}", provider_id);
             // Case 0: If no mails are associated with a user, we can create a new user account.
-            create_user(provider_id, potential_new_user, emails, pool)
+            create_user(provider_id, emails, pool)
         }
         1 => {
             log::info!("Extending emails from provider {}", provider_id);

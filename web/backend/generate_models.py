@@ -61,7 +61,7 @@ import re
 import io
 import copy
 import shutil
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union, Dict
 from userinput import userinput
 import compress_json
 import pandas as pd
@@ -94,7 +94,9 @@ from constraint_checkers import write_frontend_pages, write_frontend_router_page
 from constraint_checkers import (
     enforce_migration_naming_convention,
     ensure_updatable_tables_have_roles_tables,
+    ensure_tables_have_creation_notification_trigger,
 )
+from constraint_checkers.regroup_tables import regroup_tables
 from constraint_checkers import generate_view_schema
 
 
@@ -141,7 +143,6 @@ TEMPORARELY_IGNORED_TABLES = [
     "derived_samples",
     "spectra",
     "spectra_collections",
-    "user_emails",
 ]
 
 
@@ -406,54 +407,54 @@ def write_backend_structs(
             # struct by the unique column. In the case of a view, we first retrieve
             # the associated base table and secondarily we execute with a get the
             # struct by the id column from the obtained base table.
-            for unique_column in table_metadatas.get_unique_constraint_columns(
-                struct.table_name
-            ):
-                if table_type == "views":
-                    # In the case of view, we do not receive simple string as unique column
-                    # but instances of ViewColumn.
-                    attribute = struct.get_attribute_by_name(unique_column.alias_name)
-                    attribute_data_type = attribute.data_type()
-                    if attribute_data_type == "String":
-                        attribute_data_type = "&str"
+            for unique_columns in struct.get_unique_constraints():
+                reference_unique_columns = [
+                    unique_column.as_ref()
+                    for unique_column in unique_columns
+                ]
 
-                    struct_name = struct_name_from_table_name(unique_column.table_name)
-
-                    file.write(
-                        f"    /// Get the struct from the database by its {unique_column.alias_name}.\n"
-                        "    ///\n"
-                        "    /// # Arguments\n"
-                        f"    /// * `{unique_column.alias_name}` - The {unique_column.alias_name} of the struct to get.\n"
-                        "    /// * `connection` - The connection to the database.\n"
-                        "    ///\n"
-                        f"    pub fn from_{unique_column.alias_name}(\n"
-                        f"        {unique_column.alias_name}: {attribute_data_type},\n"
-                        "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
-                        "    ) -> Result<Self, diesel::result::Error> {\n"
-                        f"        {struct_name}::from_{unique_column.column_name}({unique_column.alias_name}, connection)\n"
-                        f"            .map(|entry| {struct.name}::get(entry.{primary_key.name}, connection))\n"
-                        "    }\n"
-                    )
-
+                if len(reference_unique_columns) == 1:
+                    human_readable_unique_columns = reference_unique_columns[0].name
                 else:
-                    attribute = struct.get_attribute_by_name(unique_column)
-                    attribute_data_type = attribute.data_type()
-                    if attribute_data_type == "String":
-                        attribute_data_type = "&str"
+                    human_readable_unique_columns = ", ".join(
+                        [column.name for column in reference_unique_columns[:-1]]
+                    ) + f" and {reference_unique_columns[-1].name}"
+
+
+                from_method_name = f"from_{'_and_'.join([column.name for column in reference_unique_columns])}"
+
+                if table_type == "views":
+                    raise NotImplementedError(
+                        "The `from_{column_name}` method is not implemented for views."
+                    )
+                else:
                     file.write(
-                        f"    /// Get the struct from the database by its {unique_column}.\n"
+                        f"    /// Get the struct from the database by its {human_readable_unique_columns}.\n"
                         "    ///\n"
                         "    /// # Arguments\n"
-                        f"    /// * `{unique_column}` - The {unique_column} of the struct to get.\n"
+                    )
+                    for unique_column in reference_unique_columns:
+                        file.write(f"    /// * `{unique_column.name}` - The {unique_column.name} of the struct to get.\n")
+                    
+                    file.write(
                         "    /// * `connection` - The connection to the database.\n"
                         "    ///\n"
-                        f"    pub fn from_{unique_column}(\n"
-                        f"        {unique_column}: {attribute_data_type},\n"
+                        f"    pub fn {from_method_name}(\n"
+                    )
+                    for unique_column in reference_unique_columns:
+                        file.write(f"        {unique_column.name}: {unique_column.format_data_type()},\n")
+                    
+                    file.write(
                         "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
                         "    ) -> Result<Self, diesel::result::Error> {\n"
                         f"        use crate::schema::{struct.table_name};\n"
                         f"        {struct.table_name}::dsl::{struct.table_name}\n"
-                        f"            .filter({struct.table_name}::dsl::{unique_column}.eq({unique_column}))\n"
+                    )
+                    for unique_column in reference_unique_columns:
+                        file.write(
+                            f"            .filter({struct.table_name}::dsl::{unique_column.name}.eq({unique_column.name}))\n"
+                        )
+                    file.write(
                         "            .first::<Self>(connection)\n"
                         "    }\n"
                     )
@@ -645,7 +646,7 @@ def write_update_method_for_gluesql(
 
     if updator_user_id_attribute is not None:
         writer.write(
-            f"    /// * `user_id` - The ID of the user who is updating the struct.\n"
+            "    /// * `user_id` - The ID of the user who is updating the struct.\n"
         )
 
     writer.write(
@@ -658,7 +659,7 @@ def write_update_method_for_gluesql(
     )
 
     if updator_user_id_attribute is not None:
-        writer.write(f"        user_id: i32,\n")
+        writer.write("        user_id: i32,\n")
 
     writer.write(
         "        connection: &mut gluesql::prelude::Glue<C>,\n"
@@ -1371,7 +1372,6 @@ def generate_view_structs():
             views.write("}\n\n")
 
         if brackets_count == 0:
-            attributes = {}
             view_name = None
 
     view_names_from_sql = get_view_names()
@@ -1420,6 +1420,7 @@ def generate_nested_structs(
         "use serde::Serialize;",
         "use diesel::r2d2::ConnectionManager;",
         "use diesel::r2d2::PooledConnection;",
+        "use uuid::Uuid;",
         "use crate::models::*;",
         "use crate::views::views::*;",
     ]
@@ -1433,73 +1434,83 @@ def generate_nested_structs(
                 return struct
         raise ValueError(f"Table name {table_name} not found in the struct metadata.")
 
-    new_struct_metadatas = []
+    nested_structs = []
 
     # For each of the struct, we generated the Nested{struct_name} version
     # if the struct contains a reference to another struct.
     for struct in tqdm(
-        struct_metadatas, desc="Generating nested structs", leave=False, unit="struct"
+        struct_metadatas,
+        desc="Generating nested structs",
+        leave=False,
+        unit="struct"
     ):
         foreign_keys = struct.get_foreign_keys()
-        primary_keys = struct.get_primary_keys()
 
         if len(foreign_keys) == 0:
             continue
 
-        new_struct_metadata = StructMetadata(
-            f"Nested{struct.name}", struct.table_name, table_metadata=tables_metadata
+        nested_struct = StructMetadata(
+            f"Nested{struct.name}",
+            struct.table_name,
+            table_metadata=tables_metadata
         )
-        new_struct_metadata.set_flat_variant(struct)
+        nested_struct.set_flat_variant(struct)
 
-        for attribute in struct.attributes:
-
-            if attribute in primary_keys and len(primary_keys) == 1:
-                new_struct_metadata.add_attribute(
-                    AttributeMetadata(
-                        original_name=attribute.name,
-                        name="inner",
-                        data_type=struct,
-                        optional=False,
-                    )
+        if not struct.has_only_foreign_keys():
+            nested_struct.add_attribute(
+                AttributeMetadata(
+                    original_name="inner",
+                    name="inner",
+                    data_type=struct,
+                    optional=False,
                 )
-                continue
+            )
 
+        for attribute in foreign_keys:
             # If the current attribute is among the foreign keys, we replace it
             # with the foreign struct. This struct may be also nested if the foreign
             # table has foreign keys, which we check by using the `has_foreign_keys`
             # method of the `tables_metadata` object.
-            if attribute in foreign_keys:
-                foreign_key_table_name = tables_metadata.get_foreign_key_table_name(
-                    struct.table_name, attribute.name
+            foreign_key_table_name = tables_metadata.get_foreign_key_table_name(
+                struct.table_name, attribute.name
+            )
+            
+            normalized_attribute_name = attribute.name
+            foreign_struct = get_struct_by_table_name(foreign_key_table_name)
+
+            if normalized_attribute_name.endswith("_id"):
+                normalized_attribute_name = normalized_attribute_name[:-3]
+
+            if struct.name == foreign_struct.name or not foreign_struct.has_foreign_keys():
+                nested_struct.add_attribute(
+                    AttributeMetadata(
+                        original_name=attribute.name,
+                        name=normalized_attribute_name,
+                        data_type=foreign_struct,
+                        optional=attribute.optional,
+                    )
                 )
-                normalized_attribute_name = attribute.name
-                foreign_struct = get_struct_by_table_name(foreign_key_table_name)
-
-                if normalized_attribute_name.endswith("_id"):
-                    normalized_attribute_name = normalized_attribute_name[:-3]
-
-                if struct.name == foreign_struct.name:
-                    new_struct_metadata.add_attribute(
-                        AttributeMetadata(
-                            original_name=attribute.name,
-                            name=normalized_attribute_name,
-                            data_type=foreign_struct,
-                            optional=attribute.optional,
-                        )
-                    )
-                else:
-                    new_struct_metadata.add_attribute(
-                        AttributeMetadata(
-                            original_name=attribute.name,
-                            name=normalized_attribute_name,
-                            data_type=f"Nested{foreign_struct.name}",
-                            optional=attribute.optional,
-                        )
-                    )
             else:
-                continue
+                nested_struct.add_attribute(
+                    AttributeMetadata(
+                        original_name=attribute.name,
+                        name=normalized_attribute_name,
+                        data_type=f"Nested{foreign_struct.name}",
+                        optional=attribute.optional,
+                    )
+                )
 
-        new_struct_metadatas.append(new_struct_metadata)
+        foreign_keys = nested_struct.get_foreign_keys()
+        for foreign_key in foreign_keys:
+            assert any(
+                attribute.original_name == foreign_key.name
+                for attribute in nested_struct.attributes
+            ), (
+                f"Foreign key {foreign_key.name} not found in the nested struct {nested_struct.name}. "
+                f"The struct has the following attributes: {nested_struct.attributes}."
+            )
+        
+        nested_structs.append(nested_struct)
 
     # We replace until convergence the data type of the structs with the structs themselves.
     # This is necessary as the nested structs may contain references to other structs, which
@@ -1510,16 +1521,18 @@ def generate_nested_structs(
     while changed:
         changed = False
         updated_struct_metadatas = []
-        for new_struct in new_struct_metadatas:
-            if not new_struct.has_undefined_nested_dependencies():
-                updated_struct_metadatas.append(new_struct)
+        for nested_struct in nested_structs:
+            if not nested_struct.has_undefined_nested_dependencies():
+                updated_struct_metadatas.append(nested_struct)
                 continue
             new_attributes = []
             converged = True
-            for attribute in new_struct.attributes:
+            for attribute in nested_struct.attributes:
                 if attribute.is_undefined_nested_dependencies():
-                    for struct in new_struct_metadatas + struct_metadatas:
+                    struct_identified = False
+                    for struct in nested_structs + struct_metadatas:
                         if struct.name == attribute.data_type():
+                            struct_identified = True
                             if struct.has_undefined_nested_dependencies():
                                 converged = False
                                 continue
@@ -1533,16 +1546,39 @@ def generate_nested_structs(
                             )
                             changed = True
                             break
+                    if not struct_identified:
+                        raise RuntimeError(
+                            f"Could not identify the struct with the name {attribute.data_type()}. "
+                            f"Found while processing the nested struct {nested_struct.name}."
+                        )
                 else:
                     new_attributes.append(attribute)
             if converged:
-                new_struct.attributes = new_attributes
-            updated_struct_metadatas.append(new_struct)
-        new_struct_metadatas = updated_struct_metadatas
+                assert len(new_attributes) == len(nested_struct.attributes), (
+                    f"Expected the length of the new attributes to be equal to the length of the old attributes. "
+                    f"Expected {len(new_attributes)}, got {len(nested_struct.attributes)}."
+                )
+                nested_struct.attributes = new_attributes
+            updated_struct_metadatas.append(nested_struct)
+        nested_structs = updated_struct_metadatas
 
-    struct = None
+    # Consistency check:
+    # We check that all the nested struct contain the foreign keys
+    # present in the original struct.
+    for nested_struct in nested_structs:
+        assert nested_struct.is_nested()
+        foreign_keys = nested_struct.get_foreign_keys()
+        for foreign_key in foreign_keys:
+            assert any(
+                attribute.original_name == foreign_key.name
+                for attribute in nested_struct.attributes
+            ), (
+                f"Foreign key {foreign_key.name} not found in the nested struct {nested_struct.name}. "
+                f"The struct has the following attributes: {nested_struct.attributes}."
+            )
 
-    for nested_struct in new_struct_metadatas:
+
+    for nested_struct in nested_structs:
         nested_struct.write_to(document)
         flat_struct = nested_struct.get_flat_variant()
 
@@ -1629,10 +1665,6 @@ def generate_nested_structs(
                 "}\n"
             )
 
-        # We implement the `get` method, which returns the nested struct
-        # from a provided row primary key.
-        primary_keys = nested_struct.get_primary_keys()
-
         document.write(
             f"impl {nested_struct.name} {{\n"
             "    /// Get the nested struct from the provided primary key.\n"
@@ -1653,30 +1685,55 @@ def generate_nested_structs(
         # For each of the columns in the struct that have a UNIQUE constraint,
         # we implement the methods `from_{column_name}` by employing the method
         # of the same name available for the main struct associated to this struct
-        for unique_column in tables_metadata.get_unique_constraint_columns(
-            flat_struct.table_name
-        ):
-            if isinstance(unique_column, ViewColumn):
-                unique_column = unique_column.alias_name
+        for unique_columns in flat_struct.get_unique_constraints():
 
-            attribute = flat_struct.get_attribute_by_name(unique_column)
-            attribute_data_type = attribute.data_type()
-            if attribute_data_type == "String":
-                attribute_data_type = "&str"
+            unique_column_references = [
+                unique_column.as_ref()
+                for unique_column in unique_columns
+            ]
+
+            joined = '_and_'.join([
+                unique_column.name
+                for unique_column in unique_column_references
+            ])
+            from_method_name = f"from_{joined}"
+
+            if len(unique_column_references) == 1:
+                human_readable_column_names = unique_column_references[0].name
+            else:
+                human_readable_column_names = ', '.join([
+                    unique_column.name
+                    for unique_column in unique_column_references[:-1]
+                ]) + f" and {unique_column_references[-1].name}"
+
+            comma_separated_column_names = ', '.join([
+                unique_column.name
+                for unique_column in unique_column_references
+            ])
 
             document.write(
                 f"impl {nested_struct.name} {{\n"
-                f"    /// Get the nested struct from the provided {unique_column}.\n"
+                f"    /// Get the nested struct from the provided {human_readable_column_names}.\n"
                 "    ///\n"
                 f"    /// # Arguments\n"
-                f"    /// * `{attribute.name}` - The {attribute.name} of the row.\n"
+            )
+            for unique_column in unique_column_references:
+                document.write(
+                    f"    /// * `{unique_column.name}` - The {unique_column.name} of the row.\n"
+                )
+            document.write(         
                 "    /// * `connection` - The database connection.\n"
-                f"    pub fn from_{attribute.name}(\n"
-                f"        {attribute.name}: {attribute_data_type},\n"
+                f"    pub fn {from_method_name}(\n"
+            )
+            for unique_column in unique_column_references:
+                document.write(
+                f"        {unique_column.name}: {unique_column.format_data_type()},\n"
+                )
+            document.write(
                 "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
                 "    ) -> Result<Self, diesel::result::Error>\n"
                 "    {\n"
-                f"        {flat_struct.name}::from_{attribute.name}({attribute.name}, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))\n"
+                f"        {flat_struct.name}::{from_method_name}({comma_separated_column_names}, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))\n"
                 "    }\n"
                 "}\n"
             )
@@ -1741,7 +1798,7 @@ def generate_nested_structs(
 
     document.close()
 
-    return new_struct_metadatas
+    return nested_structs
 
 
 def write_web_common_nested_structs(path: str, nested_structs: List[StructMetadata]):
@@ -1768,6 +1825,7 @@ def write_web_common_nested_structs(path: str, nested_structs: List[StructMetada
     imports = [
         "use serde::Deserialize;",
         "use serde::Serialize;",
+        "use uuid::Uuid;",
         "use super::tables::*;",
         "use super::views::*;",
     ]
@@ -1776,25 +1834,13 @@ def write_web_common_nested_structs(path: str, nested_structs: List[StructMetada
         document.write(f"{import_statement}\n")
 
     for struct_metadata in nested_structs:
-        if not struct_metadata.can_implement_clone():
-            print(f"# {struct_metadata.name}")
-            for attribute in struct_metadata.attributes:
-                print(f"* {attribute.name} {attribute.implements_clone()}")
-
-        document.write("#[derive(" + ", ".join(struct_metadata.derives()) + ")]\n")
-        document.write(f"pub struct {struct_metadata.name} {{\n")
-        for attribute in struct_metadata.attributes:
-            document.write(
-                f"    pub {attribute.name}: {attribute.format_data_type()},\n"
-            )
-        document.write("}\n")
+        struct_metadata.write_to(document)
 
         # We implement the `get` method for the struct when the frontend feature
         # is enabled using GlueSQL. This method will be extremely similar to the
         # `get` method for the Diesel-based approach of the backend.
 
-        primary_key = struct_metadata.get_primary_keys()
-        flat_struct = struct_metadata.get_attribute_by_name("inner")._data_type
+        flat_struct = struct_metadata.get_flat_variant()
 
         document.write(
             f'#[cfg(feature = "frontend")]\n' f"impl {struct_metadata.name} {{\n"
@@ -1844,15 +1890,15 @@ def write_web_common_nested_structs(path: str, nested_structs: List[StructMetada
             "    /// Get the nested struct from the provided primary key.\n"
             "    ///\n"
             "    /// # Arguments\n"
-            f"    /// * `{primary_key.name}` - The primary key of the row.\n"
+            f"    /// * `{flat_struct.get_formatted_primary_keys(include_prefix=False)}` - The primary key(s) of the row.\n"
             "    /// * `connection` - The database connection.\n"
             "    pub async fn get<C>(\n"
-            f"        {primary_key.name}: {primary_key.format_data_type()},\n"
+            f"        {flat_struct.get_formatted_primary_keys(include_prefix=False)}: {flat_struct.get_formatted_primary_key_data_types()},\n"
             "        connection: &mut gluesql::prelude::Glue<C>,\n"
             "    ) -> Result<Option<Self>, gluesql::prelude::Error> where\n"
             "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
             "    {\n"
-            f"       let flat_struct = {flat_struct.name}::get({primary_key.name}, connection).await?;"
+            f"       let flat_struct = {flat_struct.name}::get({flat_struct.get_formatted_primary_keys(include_prefix=False)}, connection).await?;"
             "        match flat_struct {\n"
             "            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),\n"
             "            None => Ok(None),\n"
@@ -1950,7 +1996,7 @@ def write_web_common_nested_structs(path: str, nested_structs: List[StructMetada
 
         document.write("}\n")
 
-    tables.close()
+    document.close()
 
 
 def write_webcommons_table_names_enumeration(
@@ -2330,6 +2376,12 @@ def write_webcommons_table_names_enumeration(
     )
 
     for table in tables:
+        if table.is_junktion_table():
+            document.write(
+                f'            Table::{table.camel_cased()} => unimplemented!("Update not implemented for {table.name}."),\n'
+            )
+            continue
+
         if not table.is_updatable():
             document.write(
                 f'            Table::{table.camel_cased()} => unimplemented!("Update not implemented for {table.name}."),\n'
@@ -2342,7 +2394,7 @@ def write_webcommons_table_names_enumeration(
             )
             continue
 
-        flat_struct: StructMetadata = table.get_flat_struct()
+        flat_struct: StructMetadata = table.get_flat_variant()
 
         document.write(
             f"            Table::{table.camel_cased()} => {{\n"
@@ -2754,7 +2806,7 @@ def write_diesel_table_names_enumeration(
     )
 
     for table in tables:
-        if not table.is_insertable():
+        if not table.is_insertable() or table.is_junktion_table():
             document.write(
                 f'            web_common::database::Table::{table.camel_cased()} => unreachable!("Table `{table.name}` is not insertable as it does not have a known column associated to a creator user id."),\n'
             )
@@ -2834,7 +2886,7 @@ def write_diesel_table_names_enumeration(
     )
 
     for table in tables:
-        if not table.is_updatable():
+        if not table.is_updatable() or table.is_junktion_table():
             document.write(
                 f'            web_common::database::Table::{table.camel_cased()} => unreachable!("Table `{table.name}` is not updatable as it does not have a known column associated to an updater user id."),\n'
             )
@@ -2910,7 +2962,7 @@ def write_diesel_table_names_enumeration(
     )
 
     for table in tables:
-        flat_variant = table.get_flat_struct()
+        flat_variant = table.get_flat_variant()
         richest_variant = table.get_richest_struct()
 
         if not richest_variant.is_nested():
@@ -2942,7 +2994,9 @@ def write_web_common_search_trait_implementations(
     if not os.getcwd().endswith("backend"):
         raise Exception("This script must be executed in the `backend` crate.")
 
-    tables = open(f"../web_common/src/database/search_tables.rs", "w", encoding="utf8")
+    document = open(
+        f"../web_common/src/database/search_tables.rs", "w", encoding="utf8"
+    )
     similarity_indices: PGIndices = find_pg_trgm_indices()
 
     imports = [
@@ -2966,25 +3020,28 @@ def write_web_common_search_trait_implementations(
     # First, we create the Searchable trait that will be implemented by all the structs
     # that are searchable.
 
-    document.write("pub trait Searchable {\n")
-    document.write("    fn search_task(query: String, limit: u32) -> super::Select;\n")
-    document.write("}\n")
+    document.write(
+        "pub trait Searchable {\n"
+        "    fn search_task(query: String, limit: u32) -> super::Select;\n"
+        "}\n"
+    )
 
     for struct in struct_metadatas:
         if similarity_indices.has_table(struct.table_name):
-            document.write(f"impl Searchable for {struct.name} {{\n")
             document.write(
+                f"impl Searchable for {struct.name} {{\n"
                 "    fn search_task(query: String, limit: u32) -> super::Select {\n"
+                f"        super::Select::search(\n"
+                f"             Table::{struct.capitalized_table_name()},\n"
+                "              query,\n"
+                "              limit,\n"
+                "        )\n"
+                "    }\n"
+                "}\n"
             )
-            document.write(f"        super::Select::search(\n")
-            document.write(f"             Table::{struct.capitalized_table_name()},\n")
-            document.write("              query,\n")
-            document.write("              limit,\n")
-            document.write("        )\n")
-            document.write("    }\n")
-            document.write("}\n")
 
-    tables.close()
+    document.flush()
+    document.close()
 
 
 def derive_new_models(
@@ -3012,7 +3069,7 @@ def derive_new_models(
 
     for table_name in TEMPORARELY_IGNORED_TABLES:
         if not table_metadatas.is_table(table_name):
-            raise Exception(
+            raise RuntimeError(
                 f"Table {table_name} is in the deny list but does not exist in the database."
             )
 
@@ -3025,6 +3082,9 @@ def derive_new_models(
         leave=False,
     ):
         if not struct.is_insertable():
+            continue
+
+        if struct.is_junktion_table():
             continue
 
         if struct.table_name in TEMPORARELY_IGNORED_TABLES:
@@ -3059,6 +3119,8 @@ def derive_new_models(
                     continue
                 if attribute.is_uuid():
                     new_struct.add_attribute(attribute)
+                    continue
+                continue
             new_struct.add_attribute(attribute)
 
         new_structs.append(new_struct)
@@ -3096,6 +3158,9 @@ def derive_update_models(
         leave=False,
     ):
         if not struct.is_updatable():
+            continue
+
+        if struct.is_junktion_table():
             continue
 
         if struct.table_name in TEMPORARELY_IGNORED_TABLES:
@@ -3154,7 +3219,10 @@ def derive_model_builders(
     as the original attribute (Option<T>).
     """
     builders = []
-    table_metadata = find_foreign_keys()
+
+    deny_list_tables = [
+        "user_emails",
+    ]
 
     for struct in tqdm(
         new_or_update_struct_metadatas,
@@ -3164,6 +3232,9 @@ def derive_model_builders(
     ):
         assert not struct.is_nested()
         assert struct.is_new_variant() or struct.is_update_variant()
+
+        if struct.table_name in deny_list_tables:
+            continue
 
         if struct.is_update_variant() and not struct.is_new_variant():
             found = False
@@ -3182,6 +3253,7 @@ def derive_model_builders(
         builder = StructMetadata(
             struct_name=f"{flat_variant.name}Builder",
             table_name=struct.table_name,
+            table_metadata=struct.table_metadata,
         )
 
         builder.set_flat_variant(flat_variant)
@@ -3199,13 +3271,17 @@ def derive_model_builders(
 
         builder.add_decorator('store(storage = "local", storage_tab_sync)')
 
-        foreign_keys = table_metadata.get_foreign_keys(struct.table_name)
-        primary_key_name, _ = table_metadata.get_primary_key_name_and_type(
-            struct.table_name
-        )
+        foreign_keys = flat_variant.get_foreign_keys()
+        primary_keys = flat_variant.get_primary_keys()
 
+        assert len(primary_keys) == 1
+
+        attribute = copy.deepcopy(primary_keys[0])
+        attribute.optional = True
+        builder.add_attribute(attribute)
+        
         for attribute in flat_variant.attributes:
-            if attribute.name in foreign_keys and attribute.name != primary_key_name:
+            if attribute in foreign_keys or attribute in primary_keys:
                 continue
 
             if attribute.is_automatically_determined_column():
@@ -3214,6 +3290,9 @@ def derive_model_builders(
             attribute = copy.deepcopy(attribute)
             attribute.optional = True
             builder.add_attribute(attribute)
+
+        if len(foreign_keys) > 0:
+            assert richest_variant.is_nested()
 
         if richest_variant.is_nested():
             for attribute in richest_variant.attributes:
@@ -3247,7 +3326,7 @@ def derive_model_builders(
         # name clashes, we prefix the attribute name with `errors_`.
         new_attributes = []
         for attribute in builder.attributes:
-            if attribute.name == primary_key_name:
+            if attribute in primary_keys:
                 continue
 
             new_attributes.append(
@@ -3276,11 +3355,35 @@ def derive_model_builders(
             )
         )
 
+        # Self-consistency check - all of the foreign keys must appear in the builder,
+        # eventually in the normalized version.
+
+        for foreign_key in foreign_keys:
+
+            if foreign_key.is_automatically_determined_column():
+                continue
+
+            found = False
+            for attribute in builder.attributes:
+                if attribute.original_name == foreign_key.name:
+                    found = True
+                    break
+
+            if not found:
+                raise RuntimeError(
+                    f"Could not find the foreign key {foreign_key.name} in the builder {builder.name}. "
+                    f"The attributes of the flat variant are {flat_variant.attributes}. "
+                    f"The attributes of the richest variant are {richest_variant.attributes}."
+                )
+
         builders.append(builder)
 
     # We run a simple self-consistency check to ensure that the
     # builders have been correctly derived.
     for struct in new_or_update_struct_metadatas:
+
+        if struct.table_name in deny_list_tables:
+            continue
 
         # We identify the curresponding builder by the matching table name.
         found = False
@@ -3290,7 +3393,7 @@ def derive_model_builders(
                 break
 
         if not found:
-            raise Exception(f"Could not find the builder for the struct {struct.name}.")
+            raise RuntimeError(f"Could not find the builder for the struct {struct.name}.")
 
         if struct.is_new_variant():
             assert builder.get_new_variant() == struct
@@ -3367,10 +3470,6 @@ def write_web_common_new_structs(
             struct.get_updator_user_id_attribute()
         )
 
-        primary_key_name, primary_key_type = (
-            table_metadatas.get_primary_key_name_and_type(struct.table_name)
-        )
-
         columns = []
 
         document.write(f'#[cfg(feature = "frontend")]\n' f"impl {struct.name} {{\n")
@@ -3438,7 +3537,7 @@ def write_web_common_new_structs(
             "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
             "    {\n"
             "        use gluesql::core::ast_builder::*;\n"
-            f"        let {primary_key_name} = self.{primary_key_name};\n"
+            f"        let {struct.get_formatted_primary_keys(include_prefix=False)} = {struct.get_formatted_primary_keys(include_prefix=True)};\n"
             f'        table("{struct.table_name}")\n'
             "            .insert()\n"
             f'            .columns("{",".join(columns)}")\n'
@@ -3449,11 +3548,11 @@ def write_web_common_new_structs(
             "                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,\n"
             '                 _ => unreachable!("Payload must be an Insert"),\n'
             "             })?;\n"
-            f"        super::{struct.get_flat_variant().name}::get({primary_key_name}, connection).await.map(|maybe_row| maybe_row.unwrap())\n"
+            f"        super::{struct.get_flat_variant().name}::get({struct.get_formatted_primary_keys(include_prefix=False)}, connection).await.map(|maybe_row| maybe_row.unwrap())\n"
             "    }\n\n"
         )
 
-        if primary_key_type == "uuid" and struct.is_updatable():
+        if struct.is_updatable():
             write_update_method_for_gluesql(struct, document)
 
         document.write("}\n")
@@ -3529,12 +3628,6 @@ def write_web_common_update_structs(
             attributes = [updator_user_id_attribute] + attributes
         else:
             updator_user_id_attribute = None
-
-        primary_key_name, primary_key_type = (
-            table_metadatas.get_primary_key_name_and_type(struct.table_name)
-        )
-
-        columns = []
 
         document.write(f'#[cfg(feature = "frontend")]\n' f"impl {struct.name} {{\n")
 
@@ -3678,17 +3771,20 @@ def write_diesel_new_structs(
     ):
         assert struct.is_new_variant()
 
-        creator_user_id_attribute: AttributeMetadata = (
-            struct.get_creator_user_id_attribute()
-        )
+        if struct.table_name == "users":
+            creator_user_id_attribute = None
+        else:
+            creator_user_id_attribute: AttributeMetadata = (
+                struct.get_creator_user_id_attribute()
+            )
 
-        assert not creator_user_id_attribute.optional, (
-            f"The attribute {creator_user_id_attribute.name} of the struct {struct.name} "
-            "is optional, but it should not be. Most likely, you forgot to add NOT NULL "
-            f"to the attribute in the database im the table {struct.table_name}."
-        )
+            assert not creator_user_id_attribute.optional, (
+                f"The attribute {creator_user_id_attribute.name} of the struct {struct.name} "
+                "is optional, but it should not be. Most likely, you forgot to add NOT NULL "
+                f"to the attribute in the database im the table {struct.table_name}."
+            )
 
-        assert not isinstance(creator_user_id_attribute, StructMetadata)
+            assert not isinstance(creator_user_id_attribute, StructMetadata)
 
         intermediate_struct_name = f"Intermediate{struct.name}"
 
@@ -3700,15 +3796,16 @@ def write_diesel_new_structs(
             f"pub(super) struct {intermediate_struct_name} {{\n"
         )
 
-        all_attributes: List[AttributeMetadata] = [
-            creator_user_id_attribute
-        ] + struct.attributes
+        all_attributes: List[AttributeMetadata] = struct.attributes
+
+        if creator_user_id_attribute is not None:
+            all_attributes = [creator_user_id_attribute] + all_attributes
 
         # If this struct also has an updator attribute, we add it to the list of attributes.
         # This value initially will be set to the same value as the creator user id, but it
         # will be updated when the row is updated.
 
-        if struct.is_updatable():
+        if struct.is_updatable() and struct.table_name != "users":
             updator_user_id_attribute: AttributeMetadata = (
                 struct.get_updator_user_id_attribute()
             )
@@ -3721,19 +3818,23 @@ def write_diesel_new_structs(
 
         document.write("}\n\n")
 
+        underscored_user_id = ""
+        if struct.table_name == "users":
+            underscored_user_id = "_"
+
         # Next, we implement the InsertRow trait for the new variant.
         document.write(
             f"impl InsertRow for web_common::database::{struct.name} {{\n"
             f"    type Intermediate = {intermediate_struct_name};\n"
             f"    type Flat = {struct.get_flat_variant().name};\n\n"
-            f"    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {{\n"
+            f"    fn to_intermediate(self, {underscored_user_id}user_id: i32) -> Self::Intermediate {{\n"
             f"        {intermediate_struct_name} {{\n"
         )
 
         for attribute in all_attributes:
-            if attribute.name in (
-                creator_user_id_attribute.name,
-                updator_user_id_attribute.name,
+            if attribute in (
+                creator_user_id_attribute,
+                updator_user_id_attribute,
             ):
                 document.write(f"            {attribute.name}: user_id,\n")
             else:
@@ -3743,15 +3844,23 @@ def write_diesel_new_structs(
 
         document.write("        }\n    }\n\n")
 
+        defaulted_user_id = "user_id"
+        if struct.table_name == "users":
+            defaulted_user_id = "0"
+        
+        assert_user_id_check = ""
+        if struct.table_name == "users":
+            assert_user_id_check = "        assert_eq!(user_id, 0);\n"
+
         document.write(
             "    fn insert(\n"
             "        self,\n"
-            "        user_id: i32,\n"
+            f"       user_id: i32,\n"
             "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
             "    ) -> Result<Self::Flat, diesel::result::Error> {\n"
-            f"        use crate::schema::{struct.table_name};\n"
+            f"        use crate::schema::{struct.table_name};\n{assert_user_id_check}"
             f"        diesel::insert_into({struct.table_name}::dsl::{struct.table_name})\n"
-            "            .values(self.to_intermediate(user_id))\n"
+            f"            .values(self.to_intermediate({defaulted_user_id}))\n"
             "            .get_result(connection)\n"
             "    }\n"
             "}\n\n"
@@ -3867,9 +3976,7 @@ def write_diesel_update_structs(
 
         intermediate_struct_name = f"Intermediate{struct.name}"
 
-        primary_key_name, _ = find_foreign_keys().get_primary_key_name_and_type(
-            struct.table_name
-        )
+        primary_keys = struct.get_primary_keys()
 
         # First, we write the intermediate struct that is used to update the row in the database.
         document.write(
@@ -3885,7 +3992,7 @@ def write_diesel_update_structs(
             all_attributes = [updator_user_id_attribute] + all_attributes
 
         for attribute in all_attributes:
-            if attribute.name == primary_key_name:
+            if attribute in primary_keys:
                 continue
             document.write(f"    {attribute.name}: {attribute.format_data_type()},\n")
 
@@ -3908,7 +4015,7 @@ def write_diesel_update_structs(
         document.write(f"        {intermediate_struct_name} {{\n")
 
         for attribute in all_attributes:
-            if attribute.name == primary_key_name:
+            if attribute in primary_keys:
                 continue
             if struct.get_attribute_by_name(attribute.name) is not None:
                 document.write(
@@ -3927,9 +4034,14 @@ def write_diesel_update_structs(
             "    ) -> Result<Self::Flat, diesel::result::Error> {\n"
             f"        use crate::schema::{struct.table_name};\n"
             f"        diesel::update({struct.table_name}::dsl::{struct.table_name})\n"
-            "            .filter(\n"
-            f"                {struct.table_name}::dsl::{primary_key_name}.eq(self.{primary_key_name})\n"
-            "            )\n"
+        )
+        for primary_key in primary_keys:
+            document.write(
+                "            .filter(\n"
+                f"                {struct.table_name}::dsl::{primary_key.name}.eq(self.{primary_key.name})\n"
+                "            )\n"
+            )
+        document.write(
             "            .set(self.to_intermediate(user_id))\n"
             "            .get_result(connection)\n"
             "    }\n"
@@ -3964,7 +4076,6 @@ def write_frontend_builder_default_implementation(
     default value, the attribute is set to None.
     """
 
-    attributes = None
     flat_struct = builder.get_flat_variant()
 
     document.write(
@@ -3973,9 +4084,7 @@ def write_frontend_builder_default_implementation(
         f"        Self {{\n"
     )
 
-    primary_key_name, _ = table_metadata.get_primary_key_name_and_type(
-        builder.table_name
-    )
+    primary_keys = flat_struct.get_primary_keys()
 
     for attribute in builder.attributes:
         # If this is an error vector, we set it to
@@ -3989,7 +4098,7 @@ def write_frontend_builder_default_implementation(
             continue
 
         # If this is the primary key, we set it to None.
-        if attribute.name == primary_key_name:
+        if attribute in primary_keys:
             document.write(f"            {attribute.name}: None,\n")
             continue
 
@@ -4049,12 +4158,9 @@ def write_frontend_builder_action_enumeration(
     This method writes the enumeration of the builder actions for the builder struct.
     """
 
-    primary_key_name, _primary_key_type = table_metadata.get_primary_key_name_and_type(
-        builder.table_name
-    )
-
     flat_variant = builder.get_flat_variant()
     rich_variant = builder.get_richest_variant()
+    primary_keys = flat_variant.get_primary_keys()
 
     action_enum_name = f"{flat_variant.name}Actions"
 
@@ -4066,7 +4172,7 @@ def write_frontend_builder_action_enumeration(
     attributes_requiring_operations: List[AttributeMetadata] = []
 
     for attribute in builder.attributes:
-        if attribute.name == primary_key_name:
+        if attribute in primary_keys:
             continue
 
         # We do not want to include the errors attribute in the builder actions.
@@ -4155,7 +4261,7 @@ def write_frontend_builder_action_enumeration(
     }
 
     for attribute in builder.attributes:
-        if attribute.name == primary_key_name:
+        if attribute in primary_keys:
             continue
 
         # We do not want to include the errors attribute in the builder actions.
@@ -4330,15 +4436,13 @@ def write_frontend_form_builder_implementation(
 
     assert len(variants) > 0
 
-    primary_key_name, _primary_key_type = table_metadata.get_primary_key_name_and_type(
-        flat_struct.table_name
-    )
+    primary_keys = flat_struct.get_primary_keys()
 
     document.write(
         f"impl FormBuilder for {builder.name} {{\n"
         f"    type Actions = {flat_struct.name}Actions;\n\n"
         f"    type RichVariant = {rich_struct.name};\n\n"
-        f"    fn has_errors(&self) -> bool {{\n"
+        "    fn has_errors(&self) -> bool {\n"
     )
 
     error_vectors = [
@@ -4362,7 +4466,7 @@ def write_frontend_form_builder_implementation(
     # We implement the id method, which returns the primary key of the struct.
     document.write(
         "    fn id(&self) -> Option<PrimaryKey> {\n"
-        f"        self.{primary_key_name}.map(|{primary_key_name}| {primary_key_name}.into())\n"
+        f"        {flat_struct.get_formatted_primary_keys(include_prefix=True)}.map(|id| id.into())\n"
         "    }\n\n"
     )
 
@@ -4397,7 +4501,7 @@ def write_frontend_form_builder_implementation(
             # There is the issue of the timezone to pick though.
             continue
 
-        if attribute.name == primary_key_name:
+        if attribute in primary_keys:
             # TODO: maybe check that the primary key is equal?
             continue
 
@@ -4407,7 +4511,7 @@ def write_frontend_form_builder_implementation(
         if attribute.data_type() == rich_struct.name:
             assert rich_struct.is_nested()
             named_requests.append(
-                f'ComponentMessage::get_named::<&str, {variants[0].name}>("{attribute.name}", rich_variant.inner.{primary_key_name}.into())'
+                f'ComponentMessage::get_named::<&str, {variants[0].name}>("{attribute.name}", {flat_struct.get_formatted_primary_keys(include_prefix=True, prefix="rich_variant.inner")}.into())'
             )
             continue
 
@@ -4447,7 +4551,7 @@ def write_frontend_form_builder_implementation(
                         f"        dispatcher.apply({flat_struct.name}Actions::Set{attribute.capitalized_name()}(Some(rich_variant.inner.{attribute.name})));"
                     )
             else:
-                raise Exception(
+                raise RuntimeError(
                     f"Attribute {attribute.name} present in builder struct {builder.name} "
                     f"not found in neither the rich variant {rich_struct.name} nor the flat variant {flat_struct.name}."
                 )
@@ -4473,7 +4577,7 @@ def write_frontend_form_builder_implementation(
         if attribute.name.startswith("errors_"):
             continue
 
-        if attribute.name == primary_key_name:
+        if attribute in primary_keys:
             continue
 
         if attribute.name == "form_updated_at":
@@ -4486,7 +4590,7 @@ def write_frontend_form_builder_implementation(
             struct_attribute = flat_struct.get_attribute_by_name(f"{attribute.name}_id")
 
         if struct_attribute is None:
-            raise Exception(
+            raise RuntimeError(
                 f"Attribute {attribute.name} not found in the build target struct {flat_struct.name}."
             )
 
@@ -4506,22 +4610,25 @@ def write_frontend_form_builder_implementation(
             "        Self {\n"
         )
 
+        if variant.is_new_variant() and variant.is_update_variant():
+            assert len(primary_keys) == 1
+            primary_key = primary_keys[0]
+            assert primary_key.data_type() == "Uuid"
+            document.write(
+                f"            {primary_key.name}: builder.{primary_key.name}.unwrap_or_else(Uuid::new_v4),\n"
+            )
+        elif variant.is_update_variant():
+            for primary_key in primary_keys:
+                document.write(
+                    f"            {primary_key.name}: builder.{primary_key.name}.unwrap(),\n"
+                )
+
         for attribute in flat_struct.attributes:
 
             if attribute.is_automatically_determined_column():
                 continue
 
-            if attribute.name == primary_key_name:
-                if variant.is_new_variant() and variant.is_update_variant():
-                    assert attribute.data_type() == "Uuid"
-                    document.write(
-                        f"            {primary_key_name}: builder.{primary_key_name}.unwrap_or_else(Uuid::new_v4),\n"
-                    )
-                elif variant.is_update_variant():
-                    assert attribute.data_type() != "Uuid"
-                    document.write(
-                        f"            {primary_key_name}: builder.{primary_key_name}.unwrap(),\n"
-                    )
+            if attribute in primary_keys:
                 continue
 
             # There are 3 cases to consider:
@@ -4536,8 +4643,8 @@ def write_frontend_form_builder_implementation(
 
             if builder_attribute is None:
 
-                raise Exception(
-                    f"It was impossible to find the attribute names {attribute.name} in "
+                raise RuntimeError(
+                    f"It was impossible to find the attribute names '{attribute.name}' in "
                     f"the builder struct {builder.name}. The attributes present in the struct "
                     f"are {[attribute.name for attribute in builder.attributes]}."
                 )
@@ -4548,18 +4655,18 @@ def write_frontend_form_builder_implementation(
             # unwrap it.
             if attribute.optional:
                 if isinstance(builder_attribute.raw_data_type(), StructMetadata):
-                    inner_primary_key_name, _primary_key_type = (
-                        table_metadata.get_primary_key_name_and_type(
-                            builder_attribute.raw_data_type().table_name
-                        )
+                    inner_primary_keys = (
+                        builder_attribute.raw_data_type().get_primary_keys()
                     )
+                    assert len(inner_primary_keys) == 1
+                    inner_primary_key = inner_primary_keys[0]
                     if builder_attribute.raw_data_type().is_nested():
                         document.write(
-                            f"            {attribute.name}: builder.{builder_attribute.name}.map(|{builder_attribute.name}| {builder_attribute.name}.inner.{inner_primary_key_name}),\n"
+                            f"            {attribute.name}: builder.{builder_attribute.name}.map(|{builder_attribute.name}| {builder_attribute.name}.inner.{inner_primary_key.name}),\n"
                         )
                     else:
                         document.write(
-                            f"            {attribute.name}: builder.{builder_attribute.name}.map(|{builder_attribute.name}| {builder_attribute.name}.{inner_primary_key_name}),\n"
+                            f"            {attribute.name}: builder.{builder_attribute.name}.map(|{builder_attribute.name}| {builder_attribute.name}.{inner_primary_key.name}),\n"
                         )
                 else:
                     document.write(
@@ -4567,18 +4674,20 @@ def write_frontend_form_builder_implementation(
                     )
             else:
                 if isinstance(builder_attribute.raw_data_type(), StructMetadata):
-                    inner_primary_key_name, _primary_key_type = (
-                        table_metadata.get_primary_key_name_and_type(
-                            builder_attribute.raw_data_type().table_name
-                        )
+                    inner_primary_keys = (
+                        builder_attribute.raw_data_type().get_primary_keys()
                     )
+
+                    assert len(inner_primary_keys) == 1
+                    inner_primary_key = inner_primary_keys[0]
+
                     if builder_attribute.raw_data_type().is_nested():
                         document.write(
-                            f"            {attribute.name}: builder.{builder_attribute.name}.unwrap().inner.{inner_primary_key_name},\n"
+                            f"            {attribute.name}: builder.{builder_attribute.name}.unwrap().inner.{inner_primary_key.name},\n"
                         )
                     else:
                         document.write(
-                            f"            {attribute.name}: builder.{builder_attribute.name}.unwrap().{inner_primary_key_name},\n"
+                            f"            {attribute.name}: builder.{builder_attribute.name}.unwrap().{inner_primary_key.name},\n"
                         )
                 else:
                     document.write(
@@ -4590,7 +4699,17 @@ def write_frontend_form_builder_implementation(
 
 def handle_missing_gin_index(
     attribute: AttributeMetadata,
+    builder: StructMetadata,
 ):
+    """Handles the case where a GIN trigram index is missing.
+
+    Parameters
+    ----------
+    attribute : AttributeMetadata
+        The attribute for which the GIN trigram index is missing.
+    builder : StructMetadata
+        The builder struct associated with the attribute.
+    """
     # We prepare a message for the user to ask them whether we should generate the index
     # automatically for them. The exception will be raised nevertheless, as creating an
     # index in-medias-res will change many of the other metadata collected earlier on,
@@ -4617,7 +4736,7 @@ def handle_missing_gin_index(
 
     migration_number = int(target_migration.split("_")[0])
 
-    index_migration_name = f"create_{attribute.raw_data_type().table_name}_index"
+    index_migration_name = f"create_{attribute.raw_data_type().table_name}_gin_index"
 
     full_migration_name = (
         f"{(str(migration_number + 1)).zfill(14)}_{index_migration_name}"
@@ -4627,10 +4746,20 @@ def handle_missing_gin_index(
 
     flat_struct = None
 
+    assert not attribute.raw_data_type().has_only_foreign_keys()
+
     if attribute.raw_data_type().is_nested():
-        flat_struct = (
-            attribute.raw_data_type().get_attribute_by_name("inner").raw_data_type()
-        )
+        inner_attribute = attribute.raw_data_type().get_attribute_by_name("inner")
+
+        if inner_attribute is None:
+            raise RuntimeError(
+                f"The attribute {attribute.name} is nested, but we could not find the inner attribute. "
+                f"The builder struct is {builder.name}. "
+                f"It is of type {attribute.raw_data_type().name}. "
+                f"The other attributes in the struct are {', '.join(inner_attribute.name for inner_attribute in attribute.raw_data_type().attributes)}."
+            )
+
+        flat_struct = inner_attribute.raw_data_type()
     else:
         flat_struct = attribute.raw_data_type()
 
@@ -4639,31 +4768,25 @@ def handle_missing_gin_index(
             textual_columns.append(inner_attribute)
 
     if len(textual_columns) == 0:
-        raise Exception(
+        raise RuntimeError(
             f"The table {attribute.raw_data_type().table_name} is not searchable as "
             "we did not find a GIN trigram index for it. We cannot generate a datalist "
             "for it - please create a GIN trigram index for it and try again. "
             "If you have just created the index, recall that you may still need to run "
             "that particular migration. Furthermore, we have not even found any textual "
             "columns in the table, so we cannot help you creating the index. "
-            "This error was encountered while trying to generate "
-            f"the form for the {builder.name} builder."
+            f"The builder struct is {builder.name}. "
+            f"The attribute name is {attribute.name} and is of type {attribute.data_type()}."
         )
 
     if len(textual_columns) > 0:
         print(
-            "The table is not searchable as we did not find a GIN trigram index for it."
+            "The table is not searchable as we did not find a GIN trigram index for it.\n"
+            f"The following columns are searchable: {', '.join(textual_column.name for textual_column in textual_columns)}\n"
+            f"We can generate a GIN trigram index for the table {attribute.raw_data_type().table_name}.\n"
+            f"We will generate part of the index in the migration {full_migration_name}.\n"
+            "You will still need to refine the index afterwards to your liking."
         )
-        print(
-            f"The following columns are searchable: {', '.join(textual_column.name for textual_column in textual_columns)}"
-        )
-        print(
-            f"We can generate a GIN trigram index for the table {attribute.raw_data_type().table_name}."
-        )
-        print(
-            f"We will generate part of the index in the migration {full_migration_name}."
-        )
-        print(f"You will still need to refine the index afterwards to your liking.")
 
         user_answer = userinput(
             name="Create GIN index?",
@@ -4750,7 +4873,7 @@ def handle_missing_gin_index(
             print("Please create the index manually and re-run the pipeline.")
             sleep(2)
 
-    raise Exception(
+    raise RuntimeError(
         f"The table {attribute.raw_data_type().table_name} is not searchable as "
         "we did not find a GIN trigram index for it. We cannot generate a datalist "
         "for it - please create a GIN trigram index for it and try again. "
@@ -5102,13 +5225,8 @@ def write_frontend_yew_form(
 
     trigram_indices = find_pg_trgm_indices()
 
-    primary_key_name, _primary_key_type = table_metadata.get_primary_key_name_and_type(
-        builder.table_name
-    )
-
     flat_struct = builder.get_flat_variant()
-    primary_key_attribute = flat_struct.get_attribute_by_name(primary_key_name)
-    assert primary_key_attribute is not None
+    primary_keys = flat_struct.get_primary_keys()
 
     variants = []
 
@@ -5141,9 +5259,12 @@ def write_frontend_yew_form(
             document.write(
                 f"#[derive(Clone, PartialEq, Properties)]\n"
                 f"pub struct {form_component_name}Prop {{\n"
-                f"    pub {primary_key_attribute.name}: {primary_key_attribute.format_data_type()},\n"
-                "}\n\n"
             )
+            for primary_key in primary_keys:
+                document.write(
+                    f"    pub {primary_key.name}: {primary_key.format_data_type()},\n"
+                )
+            document.write("}\n\n")
 
         document.write(f"#[function_component({form_component_name})]\n")
 
@@ -5161,11 +5282,12 @@ def write_frontend_yew_form(
         )
 
         if method == "PUT":
-            document.write(
-                "     builder_dispatch.reduce_mut(|builder| {\n"
-                f"         builder.{primary_key_attribute.name} = Some(props.{primary_key_attribute.name});\n"
-                "     });\n"
-            )
+            document.write("     builder_dispatch.reduce_mut(|builder| {\n")
+            for primary_key in primary_keys:
+                document.write(
+                    f"         builder.{primary_key.name} = Some(props.{primary_key.name});\n"
+                )
+            document.write("     });\n")
 
         for attribute in builder.attributes:
             # We do not want to include the errors attribute in the builder actions.
@@ -5175,7 +5297,7 @@ def write_frontend_yew_form(
             ):
                 continue
 
-            if attribute.name == primary_key_name:
+            if attribute in primary_keys:
                 continue
 
             if attribute.name == "form_updated_at":
@@ -5198,7 +5320,7 @@ def write_frontend_yew_form(
                         f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: Option<Image>| {flat_struct.name}Actions::Set{attribute.capitalized_name()}({attribute.name}.map(|{attribute.name}| {attribute.name}.into())));\n"
                     )
                 else:
-                    raise Exception(
+                    raise RuntimeError(
                         f"Attribute {attribute.name} of type {attribute.data_type()} not supported in the frontend form generation."
                     )
             else:
@@ -5219,7 +5341,7 @@ def write_frontend_yew_form(
             ):
                 continue
 
-            if attribute.name == primary_key_name:
+            if attribute in primary_keys:
                 continue
 
             if attribute.name == "form_updated_at":
@@ -5254,7 +5376,7 @@ def write_frontend_yew_form(
                         f'            <FileInput<Image> label="{attribute.human_readable_name()}" errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} allowed_formats={{vec![{", ".join(allowed_formats)}]}} value={{builder_store.{attribute.name}.clone().map(|{attribute.name}| {attribute.name}.into())}} />\n'
                     )
                 else:
-                    raise Exception(
+                    raise RuntimeError(
                         f"Attribute {attribute.name} of type {attribute.data_type()} not supported in the frontend form generation."
                     )
 
@@ -5266,7 +5388,7 @@ def write_frontend_yew_form(
                 # We check that the table associated to the nested struct is searchable, otherwise
                 # we cannot generate the datalist for it and we need to raise an exception.
                 if not trigram_indices.has_table(attribute.raw_data_type().table_name):
-                    handle_missing_gin_index(attribute)
+                    handle_missing_gin_index(attribute, builder)
 
                 # We check that the nested struct implements the RowToSearchableBadge trait, as we need to
                 # be able to convert the nested struct to a badge within the Datalist.
@@ -5274,7 +5396,7 @@ def write_frontend_yew_form(
                     handle_missing_row_to_searchable_badge_implementation(
                         attribute.raw_data_type()
                     )
-                    raise Exception(
+                    raise RuntimeError(
                         f"The struct {attribute.raw_data_type().name} does not implement the RowToSearchableBadge trait."
                     )
 
@@ -5404,8 +5526,6 @@ def write_frontend_forms(
     for import_statement in imports:
         document.write(f"{import_statement}\n")
 
-    table_metadata = find_foreign_keys()
-
     document.write("\n")
 
     for builder in tqdm(
@@ -5415,13 +5535,17 @@ def write_frontend_forms(
         leave=False,
     ):
         builder.write_to(document, derives_deny_list=["Default"])
-        write_frontend_builder_default_implementation(builder, table_metadata, document)
-        write_frontend_builder_action_enumeration(builder, table_metadata, document)
-        write_frontend_form_builder_implementation(builder, table_metadata, document)
-        write_frontend_form_buildable_implementation(builder, document)
-        write_frontend_yew_form(
-            builder, table_metadata=table_metadata, document=document
+        write_frontend_builder_default_implementation(
+            builder, builder.table_metadata, document
         )
+        write_frontend_builder_action_enumeration(
+            builder, builder.table_metadata, document
+        )
+        write_frontend_form_builder_implementation(
+            builder, builder.table_metadata, document
+        )
+        write_frontend_form_buildable_implementation(builder, document)
+        write_frontend_yew_form(builder, builder.table_metadata, document=document)
 
     document.flush()
     document.close()
@@ -5478,19 +5602,19 @@ def check_for_common_typos_in_migrations():
         ):
             continue
 
-        with open(f"migrations/{directory}/up.sql", "r") as up_file:
+        with open(f"migrations/{directory}/up.sql", "r", encoding="utf8") as up_file:
             up_content = up_file.read()
 
-        with open(f"migrations/{directory}/down.sql", "r") as down_file:
+        with open(f"migrations/{directory}/down.sql", "r", encoding="utf8") as down_file:
             down_content = down_file.read()
 
         if "CREATE TABLE IF EXISTS" in up_content:
-            raise Exception(
+            raise RuntimeError(
                 f"Migration `{directory}` contains a typo: `CREATE TABLE IF EXISTS` instead of `CREATE TABLE IF NOT EXISTS`."
             )
 
         if "DROP TABLE IF NOT EXISTS" in down_content:
-            raise Exception(
+            raise RuntimeError(
                 f"Migration `{directory}` contains a typo: `DROP TABLE IF NOT EXISTS` instead of `DROP TABLE IF EXISTS`."
             )
 
@@ -5507,7 +5631,7 @@ def check_for_common_typos_in_migrations():
                 )
                 # We check that the deletion of the temporary table is present in the up migration.
                 if f"DROP TABLE {table_name}" not in content:
-                    raise Exception(
+                    raise RuntimeError(
                         f"Migration `{directory}` contains a `CREATE TEMPORARY TABLE` constraint in the {content_name}.sql file, but does not contain a `DROP TABLE {table_name}` constraint in the {content_name}.sql file."
                     )
 
@@ -5522,11 +5646,11 @@ def ensures_gluesql_compliance():
         ):
             continue
 
-        with open(f"migrations/{directory}/up.sql", "r") as up_file:
+        with open(f"migrations/{directory}/up.sql", "r", encoding="utf8") as up_file:
             up_content = up_file.read()
 
         if "SERIAL PRIMARY KEY" in up_content:
-            raise Exception(
+            raise RuntimeError(
                 f"Migration `{directory}` contains a `SERIAL PRIMARY KEY` constraint, which is not supported by GlueSQL. "
                 "Please replace it with `INTEGER PRIMARY KEY`."
             )
@@ -5534,7 +5658,7 @@ def ensures_gluesql_compliance():
         if up_content.count("CREATE TABLE") != up_content.count(
             "CREATE TABLE IF NOT EXISTS"
         ):
-            raise Exception(
+            raise RuntimeError(
                 f"Migration `{directory}` does not use `CREATE TABLE IF NOT EXISTS` consistently. "
                 f"Replace the use of `CREATE TABLE` with `CREATE TABLE IF NOT EXISTS` in the `up.sql` file "
                 "so to avoid conflicts when running the migrations within GlueSQL."
@@ -5567,19 +5691,21 @@ def ensures_migrations_simmetry():
         if directory == "00000000000000_diesel_initial_setup":
             continue
 
-        with open(f"migrations/{directory}/up.sql", "r") as up_file:
+        with open(f"migrations/{directory}/up.sql", "r", encoding="utf8") as up_file:
             up_content = up_file.read()
 
-        with open(f"migrations/{directory}/down.sql", "r") as down_file:
+        with open(
+            f"migrations/{directory}/down.sql", "r", encoding="utf8"
+        ) as down_file:
             down_content = down_file.read()
 
         for up_key, down_key in opposites.items():
             if up_key in up_content and down_key not in down_content:
-                raise Exception(
+                raise ValueError(
                     f"Migration {directory} is not symmetric: up.sql contains `{up_key}` but down.sql does not contain `{down_key}`."
                 )
             if down_key in down_content and up_key not in up_content:
-                raise Exception(
+                raise ValueError(
                     f"Migration {directory} is not symmetric: down.sql contains `{down_key}` but up.sql does not contain `{up_key}`."
                 )
 
@@ -5587,40 +5713,7 @@ def ensures_migrations_simmetry():
 if __name__ == "__main__":
     # Load dotenv file
     load_dotenv()
-
-    # Due to git collisions, it may happen that a migration has been renamed
-    # but the old directory is still there. For each directory in the migrations
-    # that is composed of the [0-9]+_[a-z_]+ pattern, we check if the directory
-    # as a twin with a different code but the same name. If so, we remove the
-    # empty version of these directories.
-    for directory in os.listdir("migrations"):
-        if not os.path.isdir(f"migrations/{directory}"):
-            continue
-        if re.match(r"^[0-9]+_[a-z_]+$", directory):
-            # We check whether the current directory DOES NOT
-            # contain either a down.sql or an up.sql file.
-            if not os.path.exists(
-                f"migrations/{directory}/down.sql"
-            ) or not os.path.exists(f"migrations/{directory}/up.sql"):
-                code, migration_name = directory.split("_", maxsplit=1)
-                twin_found = False
-                for directory2 in os.listdir("migrations"):
-                    if not os.path.isdir(f"migrations/{directory2}"):
-                        continue
-                    if re.match(r"^[0-9]+_[a-z_]+$", directory2):
-                        code2, migration_name2 = directory2.split("_", maxsplit=1)
-                        if code != code2 and migration_name == migration_name2:
-                            print(f"Removing {directory}")
-                            shutil.rmtree(f"migrations/{directory}")
-                            twin_found = True
-                            break
-                if not twin_found:
-                    raise Exception(
-                        f"Directory {directory} does not contain either a `down.sql` or an `up.sql` file "
-                        "and there is no twin directory with a different code."
-                    )
-
-    densify_directory_counter()
+    regroup_tables()
 
     # If there is a "__pycache__" directory, we remove it as Diesel
     # seems to be keen to try and run it as a migration, and it will
