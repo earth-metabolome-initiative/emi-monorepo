@@ -204,8 +204,8 @@ impl<Page: PageLike> Component for InnerBasicPage<Page> {
             // We render the page.
 
             html! {
-                <div>
-                    <h1>{ page.title() }</h1>
+                <div class="page">
+                    <h2>{ page.title() }</h2>
                     if self.can_update {
                         <Link<AppRoute> classes={"button-like"} to={page.update_path().unwrap()}>
                             <i class={FormMethod::PUT.font_awesome_icon()}></i>
