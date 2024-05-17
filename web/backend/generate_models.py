@@ -4760,7 +4760,7 @@ def write_frontend_builder_action_enumeration(
 
         for attribute in attributes_requiring_operations:
             document.write(
-                f'            "{attribute.name}" => {action_enum_name}::Set{attribute.capitalized_name()}(bincode::deserialize(&row).unwrap()),\n'
+                f'            "{attribute.name}" => {action_enum_name}::Set{attribute.capitalized_name()}(Some(bincode::deserialize(&row).unwrap())),\n'
             )
 
         document.write(
