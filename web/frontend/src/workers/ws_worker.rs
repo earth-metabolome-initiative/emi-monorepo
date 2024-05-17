@@ -44,6 +44,7 @@ pub struct WebsocketWorker {
 /// Messages from the frontend to the web-worker.
 pub enum ComponentMessage {
     Operation(Operation),
+    UserState(Option<User>)
 }
 
 /// Trait defining a struct that is associated to a Table.
@@ -121,6 +122,7 @@ pub enum InternalMessage {
     Backend(BackendMessage),
     Frontend(HandlerId, ComponentMessage),
     Disconnect(Option<CloseReason>),
+    User(Option<User>),
     Reconnect,
 }
 
@@ -226,22 +228,35 @@ impl WebsocketWorker {
                                     Err(err) => BackendMessage::Error(task_id, err),
                                 }
                             }
-                            Select::SearchEditableTable { table_name, query, number_of_results } => {
+                            Select::SearchEditableTable {
+                                table_name,
+                                query,
+                                number_of_results,
+                            } => {
                                 let table: Table = table_name.try_into().unwrap();
 
                                 todo!()
                             }
-                            Select::CanView { table_name, primary_key } => {
+                            Select::CanView {
+                                table_name,
+                                primary_key,
+                            } => {
                                 let table: Table = table_name.try_into().unwrap();
 
                                 todo!()
                             }
-                            Select::CanUpdate { table_name, primary_key } => {
+                            Select::CanUpdate {
+                                table_name,
+                                primary_key,
+                            } => {
                                 let table: Table = table_name.try_into().unwrap();
 
                                 todo!()
                             }
-                            Select::CanDelete { table_name, primary_key } => {
+                            Select::CanDelete {
+                                table_name,
+                                primary_key,
+                            } => {
                                 let table: Table = table_name.try_into().unwrap();
 
                                 todo!()
@@ -351,6 +366,9 @@ impl Worker for WebsocketWorker {
         internal_message: Self::Message,
     ) {
         match internal_message {
+            InternalMessage::User(user) => {
+                self.user = user;
+            }
             InternalMessage::Backend(backend_message) => {
                 log::debug!("Received message from backend: {:?}", backend_message);
                 match backend_message {
@@ -427,10 +445,14 @@ impl Worker for WebsocketWorker {
             }
             InternalMessage::Frontend(subscriber_id, message) => {
                 match message {
+                    ComponentMessage::UserState(user) => {
+                        scope.send_message(InternalMessage::User(user));
+                    }
                     ComponentMessage::Operation(operation) => {
                         if operation.requires_authentication() && self.user.is_none() {
                             // When the user is offline, but some operation requires authentication, we need to
                             // return an error.
+                            log::error!("Unauthorized operation: {:?}", operation);
                             scope.respond(
                                 subscriber_id,
                                 WebsocketMessage::Error(ApiError::Unauthorized),
@@ -523,6 +545,7 @@ impl Worker for WebsocketWorker {
         frontend_message: Self::Input,
         subscriber_id: HandlerId,
     ) {
+
         scope.send_message(InternalMessage::Frontend(subscriber_id, frontend_message));
     }
 }

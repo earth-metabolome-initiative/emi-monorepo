@@ -9,13 +9,13 @@ use yew_router::prelude::*;
 pub fn App() -> Html {
     html! {
         <WorkerProvider<WebsocketWorker> path="/web_socket_worker.js">
-                <BrowserRouter>
-                    <crate::components::NavigatorWrapper />
-                    <div class="app">
-                        <Switch<AppRoute> render={switch} />
-                        <Footer />
-                    </div>
-                </BrowserRouter>
+            <BrowserRouter>
+                <crate::components::NavigatorWrapper />
+                <div class="app">
+                    <Switch<AppRoute> render={switch} />
+                    <Footer />
+                </div>
+            </BrowserRouter>
         </WorkerProvider<WebsocketWorker>>
     }
 }

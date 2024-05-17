@@ -1,16 +1,20 @@
 //! Module providing a yew component for a basic page with a websocket connection.
+use std::rc::Rc;
+
+use crate::router::AppRoute;
+use crate::stores::user_state::UserState;
 use crate::workers::ws_worker::{ComponentMessage, Tabular, WebsocketMessage};
 use crate::workers::WebsocketWorker;
 use serde::de::DeserializeOwned;
+use web_common::api::form_traits::FormMethod;
 use web_common::database::PrimaryKey;
 use web_common::database::*;
 use yew::prelude::*;
-use crate::router::AppRoute;
 use yew_agent::prelude::WorkerBridgeHandle;
 use yew_agent::scope_ext::AgentScopeExt;
-use web_common::api::form_traits::FormMethod;
 use yew_router::hooks::use_navigator;
 use yew_router::prelude::Link;
+use yewdux::Dispatch;
 
 pub trait PageLike: DeserializeOwned + PartialEq + Clone + Tabular + 'static {
     fn title(&self) -> String;
@@ -108,7 +112,6 @@ where
     _phantom: std::marker::PhantomData<Page>,
 }
 
-
 #[derive(Properties, Clone, PartialEq)]
 pub struct InnerBasicPageProps<Page>
 where
@@ -123,12 +126,15 @@ where
 pub struct InnerBasicPage<Page> {
     websocket: WorkerBridgeHandle<WebsocketWorker>,
     page: Option<Page>,
+    user_state: Rc<UserState>,
+    _dispatcher: Dispatch<UserState>,
     can_update: bool,
     can_delete: bool,
 }
 
 pub enum PageMessage {
     Backend(WebsocketMessage),
+    UserState(Rc<UserState>),
 }
 
 impl<Page: PageLike> Component for InnerBasicPage<Page> {
@@ -136,6 +142,10 @@ impl<Page: PageLike> Component for InnerBasicPage<Page> {
     type Properties = InnerBasicPageProps<Page>;
 
     fn create(ctx: &Context<Self>) -> Self {
+        let user_dispatch =
+            Dispatch::<UserState>::global().subscribe(ctx.link().callback(PageMessage::UserState));
+        let user_state = user_dispatch.get();
+
         Self {
             websocket: ctx.link().bridge_worker(Callback::from({
                 let link = ctx.link().clone();
@@ -146,22 +156,39 @@ impl<Page: PageLike> Component for InnerBasicPage<Page> {
             page: None,
             can_update: false,
             can_delete: false,
+            user_state,
+            _dispatcher: user_dispatch,
         }
     }
 
     fn rendered(&mut self, ctx: &Context<Self>, first_render: bool) {
         if first_render {
             self.websocket
-                .send(ComponentMessage::can_update::<Page>(ctx.props().id));
-            self.websocket
-                .send(ComponentMessage::can_delete::<Page>(ctx.props().id));
-            self.websocket
                 .send(ComponentMessage::can_view::<Page>(ctx.props().id));
+            if self.user_state.has_user() {
+                self.websocket
+                    .send(ComponentMessage::can_delete::<Page>(ctx.props().id));
+                self.websocket
+                    .send(ComponentMessage::can_update::<Page>(ctx.props().id));
+            }
         }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
+            PageMessage::UserState(user_state) => {
+                if user_state.has_user() {
+                    self.websocket
+                        .send(ComponentMessage::can_delete::<Page>(ctx.props().id));
+                    self.websocket
+                        .send(ComponentMessage::can_update::<Page>(ctx.props().id));
+                }
+                self.websocket
+                    .send(ComponentMessage::can_view::<Page>(ctx.props().id));
+
+                self.user_state = user_state;
+                true
+            }
             PageMessage::Backend(message) => match message {
                 WebsocketMessage::GetTable(_, row) => {
                     self.page = Some(bincode::deserialize(&row).unwrap());
@@ -224,7 +251,6 @@ impl<Page: PageLike> Component for InnerBasicPage<Page> {
         }
     }
 }
-
 
 #[function_component(BasicPage)]
 pub fn basic_page<Page: PageLike>(props: &PageProps<Page>) -> Html {

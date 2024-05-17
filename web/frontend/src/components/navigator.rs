@@ -22,7 +22,7 @@
 use crate::router::AppRoute;
 use crate::stores::app_state::AppState;
 use crate::stores::user_state::UserState;
-use crate::workers::ws_worker::WebsocketMessage;
+use crate::workers::ws_worker::{ComponentMessage, WebsocketMessage};
 
 use web_common::database::User;
 use yew::prelude::*;
@@ -79,13 +79,17 @@ impl Component for Navigator {
             .subscribe(ctx.link().callback(NavigatorMessage::AppState));
         let app_state = app_dispatch.get();
 
+        let websocket = ctx.link().bridge_worker(Callback::from({
+            let link = ctx.link().clone();
+            move |message: WebsocketMessage| {
+                link.send_message(NavigatorMessage::Backend(message));
+            }
+        }));
+
+        websocket.send(ComponentMessage::UserState(user_state.user().cloned()));
+
         Self {
-            websocket: ctx.link().bridge_worker(Callback::from({
-                let link = ctx.link().clone();
-                move |message: WebsocketMessage| {
-                    link.send_message(NavigatorMessage::Backend(message));
-                }
-            })),
+            websocket,
             user_state,
             user_dispatch,
             app_state,
