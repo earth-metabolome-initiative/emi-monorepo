@@ -1,4 +1,0 @@
--- Drop the `spectra_collections_teams_roles_updated_at_trigger` trigger on the spectra_collections_teams_roles table.
-
-DROP TRIGGER spectra_collections_teams_roles_updated_at_trigger ON spectra_collections_teams_roles;
-DROP FUNCTION spectra_collections_teams_roles_updated_at_trigger;

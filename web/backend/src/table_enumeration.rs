@@ -74,28 +74,50 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::Organizations => NestedOrganization::similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::ProjectStates => NestedProjectState::similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::Projects => NestedProject::similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::ProjectsTeamsRoleInvitations => unimplemented!("Table `projects_teams_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::ProjectsTeamsRoleRequests => unimplemented!("Table `projects_teams_role_requests` does not have a GIN similarity index."),
             web_common::database::Table::ProjectsTeamsRoles => unimplemented!("Table `projects_teams_roles` does not have a GIN similarity index."),
+            web_common::database::Table::ProjectsUsersRoleInvitations => unimplemented!("Table `projects_users_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::ProjectsUsersRoleRequests => unimplemented!("Table `projects_users_role_requests` does not have a GIN similarity index."),
             web_common::database::Table::ProjectsUsersRoles => unimplemented!("Table `projects_users_roles` does not have a GIN similarity index."),
             web_common::database::Table::Roles => NestedRole::similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Table `sample_bio_ott_taxon_items` does not have a GIN similarity index."),
             web_common::database::Table::SampleStates => NestedSampleState::similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SampledIndividualBioOttTaxonItems => unimplemented!("Table `sampled_individual_bio_ott_taxon_items` does not have a GIN similarity index."),
             web_common::database::Table::SampledIndividuals => unimplemented!("Table `sampled_individuals` does not have a GIN similarity index."),
+            web_common::database::Table::SampledIndividualsTeamsRoleInvitations => unimplemented!("Table `sampled_individuals_teams_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::SampledIndividualsTeamsRoleRequests => unimplemented!("Table `sampled_individuals_teams_role_requests` does not have a GIN similarity index."),
             web_common::database::Table::SampledIndividualsTeamsRoles => unimplemented!("Table `sampled_individuals_teams_roles` does not have a GIN similarity index."),
+            web_common::database::Table::SampledIndividualsUsersRoleInvitations => unimplemented!("Table `sampled_individuals_users_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::SampledIndividualsUsersRoleRequests => unimplemented!("Table `sampled_individuals_users_role_requests` does not have a GIN similarity index."),
             web_common::database::Table::SampledIndividualsUsersRoles => unimplemented!("Table `sampled_individuals_users_roles` does not have a GIN similarity index."),
             web_common::database::Table::Samples => unimplemented!("Table `samples` does not have a GIN similarity index."),
+            web_common::database::Table::SamplesTeamsRoleInvitations => unimplemented!("Table `samples_teams_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::SamplesTeamsRoleRequests => unimplemented!("Table `samples_teams_role_requests` does not have a GIN similarity index."),
             web_common::database::Table::SamplesTeamsRoles => unimplemented!("Table `samples_teams_roles` does not have a GIN similarity index."),
+            web_common::database::Table::SamplesUsersRoleInvitations => unimplemented!("Table `samples_users_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::SamplesUsersRoleRequests => unimplemented!("Table `samples_users_role_requests` does not have a GIN similarity index."),
             web_common::database::Table::SamplesUsersRoles => unimplemented!("Table `samples_users_roles` does not have a GIN similarity index."),
             web_common::database::Table::Spectra => unimplemented!("Table `spectra` does not have a GIN similarity index."),
             web_common::database::Table::SpectraCollections => unimplemented!("Table `spectra_collections` does not have a GIN similarity index."),
+            web_common::database::Table::SpectraCollectionsTeamsRoleInvitations => unimplemented!("Table `spectra_collections_teams_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::SpectraCollectionsTeamsRoleRequests => unimplemented!("Table `spectra_collections_teams_role_requests` does not have a GIN similarity index."),
             web_common::database::Table::SpectraCollectionsTeamsRoles => unimplemented!("Table `spectra_collections_teams_roles` does not have a GIN similarity index."),
+            web_common::database::Table::SpectraCollectionsUsersRoleInvitations => unimplemented!("Table `spectra_collections_users_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::SpectraCollectionsUsersRoleRequests => unimplemented!("Table `spectra_collections_users_role_requests` does not have a GIN similarity index."),
             web_common::database::Table::SpectraCollectionsUsersRoles => unimplemented!("Table `spectra_collections_users_roles` does not have a GIN similarity index."),
             web_common::database::Table::TeamStates => NestedTeamState::similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::Teams => NestedTeam::similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::TeamsTeamsRoleInvitations => unimplemented!("Table `teams_teams_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::TeamsUsersRoleInvitations => unimplemented!("Table `teams_users_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::TeamsUsersRoleRequests => unimplemented!("Table `teams_users_role_requests` does not have a GIN similarity index."),
             web_common::database::Table::TeamsUsersRoles => unimplemented!("Table `teams_users_roles` does not have a GIN similarity index."),
             web_common::database::Table::Units => Unit::similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::UserEmails => unimplemented!("Table `user_emails` does not have a GIN similarity index."),
             web_common::database::Table::Users => User::similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::UsersUsersRoleInvitations => unimplemented!("Table `users_users_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::UsersUsersRoleRequests => unimplemented!("Table `users_users_role_requests` does not have a GIN similarity index."),
+            web_common::database::Table::UsersUsersRoles => unimplemented!("Table `users_users_roles` does not have a GIN similarity index."),
         }
     }
     fn word_similarity_search(&self, query: &str, limit: Option<i32>, connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>) -> Result<Vec<Vec<u8>>, web_common::api::ApiError> {
@@ -112,28 +134,50 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::Organizations => NestedOrganization::word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::ProjectStates => NestedProjectState::word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::Projects => NestedProject::word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::ProjectsTeamsRoleInvitations => unimplemented!("Table `projects_teams_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::ProjectsTeamsRoleRequests => unimplemented!("Table `projects_teams_role_requests` does not have a GIN similarity index."),
             web_common::database::Table::ProjectsTeamsRoles => unimplemented!("Table `projects_teams_roles` does not have a GIN similarity index."),
+            web_common::database::Table::ProjectsUsersRoleInvitations => unimplemented!("Table `projects_users_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::ProjectsUsersRoleRequests => unimplemented!("Table `projects_users_role_requests` does not have a GIN similarity index."),
             web_common::database::Table::ProjectsUsersRoles => unimplemented!("Table `projects_users_roles` does not have a GIN similarity index."),
             web_common::database::Table::Roles => NestedRole::word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Table `sample_bio_ott_taxon_items` does not have a GIN similarity index."),
             web_common::database::Table::SampleStates => NestedSampleState::word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SampledIndividualBioOttTaxonItems => unimplemented!("Table `sampled_individual_bio_ott_taxon_items` does not have a GIN similarity index."),
             web_common::database::Table::SampledIndividuals => unimplemented!("Table `sampled_individuals` does not have a GIN similarity index."),
+            web_common::database::Table::SampledIndividualsTeamsRoleInvitations => unimplemented!("Table `sampled_individuals_teams_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::SampledIndividualsTeamsRoleRequests => unimplemented!("Table `sampled_individuals_teams_role_requests` does not have a GIN similarity index."),
             web_common::database::Table::SampledIndividualsTeamsRoles => unimplemented!("Table `sampled_individuals_teams_roles` does not have a GIN similarity index."),
+            web_common::database::Table::SampledIndividualsUsersRoleInvitations => unimplemented!("Table `sampled_individuals_users_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::SampledIndividualsUsersRoleRequests => unimplemented!("Table `sampled_individuals_users_role_requests` does not have a GIN similarity index."),
             web_common::database::Table::SampledIndividualsUsersRoles => unimplemented!("Table `sampled_individuals_users_roles` does not have a GIN similarity index."),
             web_common::database::Table::Samples => unimplemented!("Table `samples` does not have a GIN similarity index."),
+            web_common::database::Table::SamplesTeamsRoleInvitations => unimplemented!("Table `samples_teams_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::SamplesTeamsRoleRequests => unimplemented!("Table `samples_teams_role_requests` does not have a GIN similarity index."),
             web_common::database::Table::SamplesTeamsRoles => unimplemented!("Table `samples_teams_roles` does not have a GIN similarity index."),
+            web_common::database::Table::SamplesUsersRoleInvitations => unimplemented!("Table `samples_users_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::SamplesUsersRoleRequests => unimplemented!("Table `samples_users_role_requests` does not have a GIN similarity index."),
             web_common::database::Table::SamplesUsersRoles => unimplemented!("Table `samples_users_roles` does not have a GIN similarity index."),
             web_common::database::Table::Spectra => unimplemented!("Table `spectra` does not have a GIN similarity index."),
             web_common::database::Table::SpectraCollections => unimplemented!("Table `spectra_collections` does not have a GIN similarity index."),
+            web_common::database::Table::SpectraCollectionsTeamsRoleInvitations => unimplemented!("Table `spectra_collections_teams_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::SpectraCollectionsTeamsRoleRequests => unimplemented!("Table `spectra_collections_teams_role_requests` does not have a GIN similarity index."),
             web_common::database::Table::SpectraCollectionsTeamsRoles => unimplemented!("Table `spectra_collections_teams_roles` does not have a GIN similarity index."),
+            web_common::database::Table::SpectraCollectionsUsersRoleInvitations => unimplemented!("Table `spectra_collections_users_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::SpectraCollectionsUsersRoleRequests => unimplemented!("Table `spectra_collections_users_role_requests` does not have a GIN similarity index."),
             web_common::database::Table::SpectraCollectionsUsersRoles => unimplemented!("Table `spectra_collections_users_roles` does not have a GIN similarity index."),
             web_common::database::Table::TeamStates => NestedTeamState::word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::Teams => NestedTeam::word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::TeamsTeamsRoleInvitations => unimplemented!("Table `teams_teams_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::TeamsUsersRoleInvitations => unimplemented!("Table `teams_users_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::TeamsUsersRoleRequests => unimplemented!("Table `teams_users_role_requests` does not have a GIN similarity index."),
             web_common::database::Table::TeamsUsersRoles => unimplemented!("Table `teams_users_roles` does not have a GIN similarity index."),
             web_common::database::Table::Units => Unit::word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::UserEmails => unimplemented!("Table `user_emails` does not have a GIN similarity index."),
             web_common::database::Table::Users => User::word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::UsersUsersRoleInvitations => unimplemented!("Table `users_users_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::UsersUsersRoleRequests => unimplemented!("Table `users_users_role_requests` does not have a GIN similarity index."),
+            web_common::database::Table::UsersUsersRoles => unimplemented!("Table `users_users_roles` does not have a GIN similarity index."),
         }
     }
     fn strict_word_similarity_search(&self, query: &str, limit: Option<i32>, connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>) -> Result<Vec<Vec<u8>>, web_common::api::ApiError> {
@@ -150,28 +194,50 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::Organizations => NestedOrganization::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::ProjectStates => NestedProjectState::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::Projects => NestedProject::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::ProjectsTeamsRoleInvitations => unimplemented!("Table `projects_teams_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::ProjectsTeamsRoleRequests => unimplemented!("Table `projects_teams_role_requests` does not have a GIN similarity index."),
             web_common::database::Table::ProjectsTeamsRoles => unimplemented!("Table `projects_teams_roles` does not have a GIN similarity index."),
+            web_common::database::Table::ProjectsUsersRoleInvitations => unimplemented!("Table `projects_users_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::ProjectsUsersRoleRequests => unimplemented!("Table `projects_users_role_requests` does not have a GIN similarity index."),
             web_common::database::Table::ProjectsUsersRoles => unimplemented!("Table `projects_users_roles` does not have a GIN similarity index."),
             web_common::database::Table::Roles => NestedRole::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Table `sample_bio_ott_taxon_items` does not have a GIN similarity index."),
             web_common::database::Table::SampleStates => NestedSampleState::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SampledIndividualBioOttTaxonItems => unimplemented!("Table `sampled_individual_bio_ott_taxon_items` does not have a GIN similarity index."),
             web_common::database::Table::SampledIndividuals => unimplemented!("Table `sampled_individuals` does not have a GIN similarity index."),
+            web_common::database::Table::SampledIndividualsTeamsRoleInvitations => unimplemented!("Table `sampled_individuals_teams_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::SampledIndividualsTeamsRoleRequests => unimplemented!("Table `sampled_individuals_teams_role_requests` does not have a GIN similarity index."),
             web_common::database::Table::SampledIndividualsTeamsRoles => unimplemented!("Table `sampled_individuals_teams_roles` does not have a GIN similarity index."),
+            web_common::database::Table::SampledIndividualsUsersRoleInvitations => unimplemented!("Table `sampled_individuals_users_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::SampledIndividualsUsersRoleRequests => unimplemented!("Table `sampled_individuals_users_role_requests` does not have a GIN similarity index."),
             web_common::database::Table::SampledIndividualsUsersRoles => unimplemented!("Table `sampled_individuals_users_roles` does not have a GIN similarity index."),
             web_common::database::Table::Samples => unimplemented!("Table `samples` does not have a GIN similarity index."),
+            web_common::database::Table::SamplesTeamsRoleInvitations => unimplemented!("Table `samples_teams_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::SamplesTeamsRoleRequests => unimplemented!("Table `samples_teams_role_requests` does not have a GIN similarity index."),
             web_common::database::Table::SamplesTeamsRoles => unimplemented!("Table `samples_teams_roles` does not have a GIN similarity index."),
+            web_common::database::Table::SamplesUsersRoleInvitations => unimplemented!("Table `samples_users_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::SamplesUsersRoleRequests => unimplemented!("Table `samples_users_role_requests` does not have a GIN similarity index."),
             web_common::database::Table::SamplesUsersRoles => unimplemented!("Table `samples_users_roles` does not have a GIN similarity index."),
             web_common::database::Table::Spectra => unimplemented!("Table `spectra` does not have a GIN similarity index."),
             web_common::database::Table::SpectraCollections => unimplemented!("Table `spectra_collections` does not have a GIN similarity index."),
+            web_common::database::Table::SpectraCollectionsTeamsRoleInvitations => unimplemented!("Table `spectra_collections_teams_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::SpectraCollectionsTeamsRoleRequests => unimplemented!("Table `spectra_collections_teams_role_requests` does not have a GIN similarity index."),
             web_common::database::Table::SpectraCollectionsTeamsRoles => unimplemented!("Table `spectra_collections_teams_roles` does not have a GIN similarity index."),
+            web_common::database::Table::SpectraCollectionsUsersRoleInvitations => unimplemented!("Table `spectra_collections_users_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::SpectraCollectionsUsersRoleRequests => unimplemented!("Table `spectra_collections_users_role_requests` does not have a GIN similarity index."),
             web_common::database::Table::SpectraCollectionsUsersRoles => unimplemented!("Table `spectra_collections_users_roles` does not have a GIN similarity index."),
             web_common::database::Table::TeamStates => NestedTeamState::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::Teams => NestedTeam::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::TeamsTeamsRoleInvitations => unimplemented!("Table `teams_teams_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::TeamsUsersRoleInvitations => unimplemented!("Table `teams_users_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::TeamsUsersRoleRequests => unimplemented!("Table `teams_users_role_requests` does not have a GIN similarity index."),
             web_common::database::Table::TeamsUsersRoles => unimplemented!("Table `teams_users_roles` does not have a GIN similarity index."),
             web_common::database::Table::Units => Unit::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::UserEmails => unimplemented!("Table `user_emails` does not have a GIN similarity index."),
             web_common::database::Table::Users => User::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::UsersUsersRoleInvitations => unimplemented!("Table `users_users_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::UsersUsersRoleRequests => unimplemented!("Table `users_users_role_requests` does not have a GIN similarity index."),
+            web_common::database::Table::UsersUsersRoles => unimplemented!("Table `users_users_roles` does not have a GIN similarity index."),
         }
     }
 }
@@ -212,28 +278,50 @@ impl IdentifiableTable for web_common::database::Table {
             web_common::database::Table::Organizations => bincode::serialize(&NestedOrganization::get(primary_key.into(), connection)?)?,
             web_common::database::Table::ProjectStates => bincode::serialize(&NestedProjectState::get(primary_key.into(), connection)?)?,
             web_common::database::Table::Projects => bincode::serialize(&NestedProject::get(primary_key.into(), connection)?)?,
+            web_common::database::Table::ProjectsTeamsRoleInvitations => bincode::serialize(&NestedProjectsTeamsRoleInvitation::get(primary_key.into(), connection)?)?,
+            web_common::database::Table::ProjectsTeamsRoleRequests => bincode::serialize(&NestedProjectsTeamsRoleRequest::get(primary_key.into(), connection)?)?,
             web_common::database::Table::ProjectsTeamsRoles => bincode::serialize(&NestedProjectsTeamsRole::get(primary_key.into(), connection)?)?,
+            web_common::database::Table::ProjectsUsersRoleInvitations => bincode::serialize(&NestedProjectsUsersRoleInvitation::get(primary_key.into(), connection)?)?,
+            web_common::database::Table::ProjectsUsersRoleRequests => bincode::serialize(&NestedProjectsUsersRoleRequest::get(primary_key.into(), connection)?)?,
             web_common::database::Table::ProjectsUsersRoles => bincode::serialize(&NestedProjectsUsersRole::get(primary_key.into(), connection)?)?,
             web_common::database::Table::Roles => bincode::serialize(&NestedRole::get(primary_key.into(), connection)?)?,
             web_common::database::Table::SampleBioOttTaxonItems => bincode::serialize(&NestedSampleBioOttTaxonItem::get(primary_key.into(), connection)?)?,
             web_common::database::Table::SampleStates => bincode::serialize(&NestedSampleState::get(primary_key.into(), connection)?)?,
             web_common::database::Table::SampledIndividualBioOttTaxonItems => bincode::serialize(&NestedSampledIndividualBioOttTaxonItem::get(primary_key.into(), connection)?)?,
             web_common::database::Table::SampledIndividuals => bincode::serialize(&NestedSampledIndividual::get(primary_key.into(), connection)?)?,
+            web_common::database::Table::SampledIndividualsTeamsRoleInvitations => bincode::serialize(&NestedSampledIndividualsTeamsRoleInvitation::get(primary_key.into(), connection)?)?,
+            web_common::database::Table::SampledIndividualsTeamsRoleRequests => bincode::serialize(&NestedSampledIndividualsTeamsRoleRequest::get(primary_key.into(), connection)?)?,
             web_common::database::Table::SampledIndividualsTeamsRoles => bincode::serialize(&NestedSampledIndividualsTeamsRole::get(primary_key.into(), connection)?)?,
+            web_common::database::Table::SampledIndividualsUsersRoleInvitations => bincode::serialize(&NestedSampledIndividualsUsersRoleInvitation::get(primary_key.into(), connection)?)?,
+            web_common::database::Table::SampledIndividualsUsersRoleRequests => bincode::serialize(&NestedSampledIndividualsUsersRoleRequest::get(primary_key.into(), connection)?)?,
             web_common::database::Table::SampledIndividualsUsersRoles => bincode::serialize(&NestedSampledIndividualsUsersRole::get(primary_key.into(), connection)?)?,
             web_common::database::Table::Samples => bincode::serialize(&NestedSample::get(primary_key.into(), connection)?)?,
+            web_common::database::Table::SamplesTeamsRoleInvitations => bincode::serialize(&NestedSamplesTeamsRoleInvitation::get(primary_key.into(), connection)?)?,
+            web_common::database::Table::SamplesTeamsRoleRequests => bincode::serialize(&NestedSamplesTeamsRoleRequest::get(primary_key.into(), connection)?)?,
             web_common::database::Table::SamplesTeamsRoles => bincode::serialize(&NestedSamplesTeamsRole::get(primary_key.into(), connection)?)?,
+            web_common::database::Table::SamplesUsersRoleInvitations => bincode::serialize(&NestedSamplesUsersRoleInvitation::get(primary_key.into(), connection)?)?,
+            web_common::database::Table::SamplesUsersRoleRequests => bincode::serialize(&NestedSamplesUsersRoleRequest::get(primary_key.into(), connection)?)?,
             web_common::database::Table::SamplesUsersRoles => bincode::serialize(&NestedSamplesUsersRole::get(primary_key.into(), connection)?)?,
             web_common::database::Table::Spectra => bincode::serialize(&NestedSpectra::get(primary_key.into(), connection)?)?,
             web_common::database::Table::SpectraCollections => bincode::serialize(&NestedSpectraCollection::get(primary_key.into(), connection)?)?,
+            web_common::database::Table::SpectraCollectionsTeamsRoleInvitations => bincode::serialize(&NestedSpectraCollectionsTeamsRoleInvitation::get(primary_key.into(), connection)?)?,
+            web_common::database::Table::SpectraCollectionsTeamsRoleRequests => bincode::serialize(&NestedSpectraCollectionsTeamsRoleRequest::get(primary_key.into(), connection)?)?,
             web_common::database::Table::SpectraCollectionsTeamsRoles => bincode::serialize(&NestedSpectraCollectionsTeamsRole::get(primary_key.into(), connection)?)?,
+            web_common::database::Table::SpectraCollectionsUsersRoleInvitations => bincode::serialize(&NestedSpectraCollectionsUsersRoleInvitation::get(primary_key.into(), connection)?)?,
+            web_common::database::Table::SpectraCollectionsUsersRoleRequests => bincode::serialize(&NestedSpectraCollectionsUsersRoleRequest::get(primary_key.into(), connection)?)?,
             web_common::database::Table::SpectraCollectionsUsersRoles => bincode::serialize(&NestedSpectraCollectionsUsersRole::get(primary_key.into(), connection)?)?,
             web_common::database::Table::TeamStates => bincode::serialize(&NestedTeamState::get(primary_key.into(), connection)?)?,
             web_common::database::Table::Teams => bincode::serialize(&NestedTeam::get(primary_key.into(), connection)?)?,
+            web_common::database::Table::TeamsTeamsRoleInvitations => bincode::serialize(&NestedTeamsTeamsRoleInvitation::get(primary_key.into(), connection)?)?,
+            web_common::database::Table::TeamsUsersRoleInvitations => bincode::serialize(&NestedTeamsUsersRoleInvitation::get(primary_key.into(), connection)?)?,
+            web_common::database::Table::TeamsUsersRoleRequests => bincode::serialize(&NestedTeamsUsersRoleRequest::get(primary_key.into(), connection)?)?,
             web_common::database::Table::TeamsUsersRoles => bincode::serialize(&NestedTeamsUsersRole::get(primary_key.into(), connection)?)?,
             web_common::database::Table::Units => bincode::serialize(&Unit::get(primary_key.into(), connection)?)?,
             web_common::database::Table::UserEmails => bincode::serialize(&NestedUserEmail::get(primary_key.into(), connection)?)?,
             web_common::database::Table::Users => bincode::serialize(&User::get(primary_key.into(), connection)?)?,
+            web_common::database::Table::UsersUsersRoleInvitations => bincode::serialize(&NestedUsersUsersRoleInvitation::get(primary_key.into(), connection)?)?,
+            web_common::database::Table::UsersUsersRoleRequests => bincode::serialize(&NestedUsersUsersRoleRequest::get(primary_key.into(), connection)?)?,
+            web_common::database::Table::UsersUsersRoles => bincode::serialize(&NestedUsersUsersRole::get(primary_key.into(), connection)?)?,
         })
     }
 }
@@ -274,28 +362,50 @@ impl DeletableTable for web_common::database::Table {
             web_common::database::Table::Organizations => Organization::delete_by_id(primary_key.into(), connection)?,
             web_common::database::Table::ProjectStates => ProjectState::delete_by_id(primary_key.into(), connection)?,
             web_common::database::Table::Projects => Project::delete_by_id(primary_key.into(), connection)?,
+            web_common::database::Table::ProjectsTeamsRoleInvitations => ProjectsTeamsRoleInvitation::delete_by_id(primary_key.into(), connection)?,
+            web_common::database::Table::ProjectsTeamsRoleRequests => ProjectsTeamsRoleRequest::delete_by_id(primary_key.into(), connection)?,
             web_common::database::Table::ProjectsTeamsRoles => ProjectsTeamsRole::delete_by_id(primary_key.into(), connection)?,
+            web_common::database::Table::ProjectsUsersRoleInvitations => ProjectsUsersRoleInvitation::delete_by_id(primary_key.into(), connection)?,
+            web_common::database::Table::ProjectsUsersRoleRequests => ProjectsUsersRoleRequest::delete_by_id(primary_key.into(), connection)?,
             web_common::database::Table::ProjectsUsersRoles => ProjectsUsersRole::delete_by_id(primary_key.into(), connection)?,
             web_common::database::Table::Roles => Role::delete_by_id(primary_key.into(), connection)?,
             web_common::database::Table::SampleBioOttTaxonItems => SampleBioOttTaxonItem::delete_by_id(primary_key.into(), connection)?,
             web_common::database::Table::SampleStates => SampleState::delete_by_id(primary_key.into(), connection)?,
             web_common::database::Table::SampledIndividualBioOttTaxonItems => SampledIndividualBioOttTaxonItem::delete_by_id(primary_key.into(), connection)?,
             web_common::database::Table::SampledIndividuals => SampledIndividual::delete_by_id(primary_key.into(), connection)?,
+            web_common::database::Table::SampledIndividualsTeamsRoleInvitations => SampledIndividualsTeamsRoleInvitation::delete_by_id(primary_key.into(), connection)?,
+            web_common::database::Table::SampledIndividualsTeamsRoleRequests => SampledIndividualsTeamsRoleRequest::delete_by_id(primary_key.into(), connection)?,
             web_common::database::Table::SampledIndividualsTeamsRoles => SampledIndividualsTeamsRole::delete_by_id(primary_key.into(), connection)?,
+            web_common::database::Table::SampledIndividualsUsersRoleInvitations => SampledIndividualsUsersRoleInvitation::delete_by_id(primary_key.into(), connection)?,
+            web_common::database::Table::SampledIndividualsUsersRoleRequests => SampledIndividualsUsersRoleRequest::delete_by_id(primary_key.into(), connection)?,
             web_common::database::Table::SampledIndividualsUsersRoles => SampledIndividualsUsersRole::delete_by_id(primary_key.into(), connection)?,
             web_common::database::Table::Samples => Sample::delete_by_id(primary_key.into(), connection)?,
+            web_common::database::Table::SamplesTeamsRoleInvitations => SamplesTeamsRoleInvitation::delete_by_id(primary_key.into(), connection)?,
+            web_common::database::Table::SamplesTeamsRoleRequests => SamplesTeamsRoleRequest::delete_by_id(primary_key.into(), connection)?,
             web_common::database::Table::SamplesTeamsRoles => SamplesTeamsRole::delete_by_id(primary_key.into(), connection)?,
+            web_common::database::Table::SamplesUsersRoleInvitations => SamplesUsersRoleInvitation::delete_by_id(primary_key.into(), connection)?,
+            web_common::database::Table::SamplesUsersRoleRequests => SamplesUsersRoleRequest::delete_by_id(primary_key.into(), connection)?,
             web_common::database::Table::SamplesUsersRoles => SamplesUsersRole::delete_by_id(primary_key.into(), connection)?,
             web_common::database::Table::Spectra => Spectra::delete_by_id(primary_key.into(), connection)?,
             web_common::database::Table::SpectraCollections => SpectraCollection::delete_by_id(primary_key.into(), connection)?,
+            web_common::database::Table::SpectraCollectionsTeamsRoleInvitations => SpectraCollectionsTeamsRoleInvitation::delete_by_id(primary_key.into(), connection)?,
+            web_common::database::Table::SpectraCollectionsTeamsRoleRequests => SpectraCollectionsTeamsRoleRequest::delete_by_id(primary_key.into(), connection)?,
             web_common::database::Table::SpectraCollectionsTeamsRoles => SpectraCollectionsTeamsRole::delete_by_id(primary_key.into(), connection)?,
+            web_common::database::Table::SpectraCollectionsUsersRoleInvitations => SpectraCollectionsUsersRoleInvitation::delete_by_id(primary_key.into(), connection)?,
+            web_common::database::Table::SpectraCollectionsUsersRoleRequests => SpectraCollectionsUsersRoleRequest::delete_by_id(primary_key.into(), connection)?,
             web_common::database::Table::SpectraCollectionsUsersRoles => SpectraCollectionsUsersRole::delete_by_id(primary_key.into(), connection)?,
             web_common::database::Table::TeamStates => TeamState::delete_by_id(primary_key.into(), connection)?,
             web_common::database::Table::Teams => Team::delete_by_id(primary_key.into(), connection)?,
+            web_common::database::Table::TeamsTeamsRoleInvitations => TeamsTeamsRoleInvitation::delete_by_id(primary_key.into(), connection)?,
+            web_common::database::Table::TeamsUsersRoleInvitations => TeamsUsersRoleInvitation::delete_by_id(primary_key.into(), connection)?,
+            web_common::database::Table::TeamsUsersRoleRequests => TeamsUsersRoleRequest::delete_by_id(primary_key.into(), connection)?,
             web_common::database::Table::TeamsUsersRoles => TeamsUsersRole::delete_by_id(primary_key.into(), connection)?,
             web_common::database::Table::Units => Unit::delete_by_id(primary_key.into(), connection)?,
             web_common::database::Table::UserEmails => UserEmail::delete_by_id(primary_key.into(), connection)?,
             web_common::database::Table::Users => User::delete_by_id(primary_key.into(), connection)?,
+            web_common::database::Table::UsersUsersRoleInvitations => UsersUsersRoleInvitation::delete_by_id(primary_key.into(), connection)?,
+            web_common::database::Table::UsersUsersRoleRequests => UsersUsersRoleRequest::delete_by_id(primary_key.into(), connection)?,
+            web_common::database::Table::UsersUsersRoles => UsersUsersRole::delete_by_id(primary_key.into(), connection)?,
         })
     }
 }
@@ -339,28 +449,50 @@ impl AllTable for web_common::database::Table {
             web_common::database::Table::Organizations => NestedOrganization::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::ProjectStates => NestedProjectState::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::Projects => NestedProject::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::ProjectsTeamsRoleInvitations => NestedProjectsTeamsRoleInvitation::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::ProjectsTeamsRoleRequests => NestedProjectsTeamsRoleRequest::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::ProjectsTeamsRoles => NestedProjectsTeamsRole::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::ProjectsUsersRoleInvitations => NestedProjectsUsersRoleInvitation::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::ProjectsUsersRoleRequests => NestedProjectsUsersRoleRequest::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::ProjectsUsersRoles => NestedProjectsUsersRole::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::Roles => NestedRole::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SampleBioOttTaxonItems => NestedSampleBioOttTaxonItem::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SampleStates => NestedSampleState::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SampledIndividualBioOttTaxonItems => NestedSampledIndividualBioOttTaxonItem::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SampledIndividuals => NestedSampledIndividual::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::SampledIndividualsTeamsRoleInvitations => NestedSampledIndividualsTeamsRoleInvitation::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::SampledIndividualsTeamsRoleRequests => NestedSampledIndividualsTeamsRoleRequest::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SampledIndividualsTeamsRoles => NestedSampledIndividualsTeamsRole::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::SampledIndividualsUsersRoleInvitations => NestedSampledIndividualsUsersRoleInvitation::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::SampledIndividualsUsersRoleRequests => NestedSampledIndividualsUsersRoleRequest::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SampledIndividualsUsersRoles => NestedSampledIndividualsUsersRole::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::Samples => NestedSample::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::SamplesTeamsRoleInvitations => NestedSamplesTeamsRoleInvitation::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::SamplesTeamsRoleRequests => NestedSamplesTeamsRoleRequest::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SamplesTeamsRoles => NestedSamplesTeamsRole::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::SamplesUsersRoleInvitations => NestedSamplesUsersRoleInvitation::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::SamplesUsersRoleRequests => NestedSamplesUsersRoleRequest::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SamplesUsersRoles => NestedSamplesUsersRole::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::Spectra => NestedSpectra::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SpectraCollections => NestedSpectraCollection::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::SpectraCollectionsTeamsRoleInvitations => NestedSpectraCollectionsTeamsRoleInvitation::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::SpectraCollectionsTeamsRoleRequests => NestedSpectraCollectionsTeamsRoleRequest::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SpectraCollectionsTeamsRoles => NestedSpectraCollectionsTeamsRole::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::SpectraCollectionsUsersRoleInvitations => NestedSpectraCollectionsUsersRoleInvitation::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::SpectraCollectionsUsersRoleRequests => NestedSpectraCollectionsUsersRoleRequest::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SpectraCollectionsUsersRoles => NestedSpectraCollectionsUsersRole::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::TeamStates => NestedTeamState::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::Teams => NestedTeam::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::TeamsTeamsRoleInvitations => NestedTeamsTeamsRoleInvitation::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::TeamsUsersRoleInvitations => NestedTeamsUsersRoleInvitation::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::TeamsUsersRoleRequests => NestedTeamsUsersRoleRequest::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::TeamsUsersRoles => NestedTeamsUsersRole::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::Units => Unit::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::UserEmails => NestedUserEmail::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::Users => User::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::UsersUsersRoleInvitations => NestedUsersUsersRoleInvitation::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::UsersUsersRoleRequests => NestedUsersUsersRoleRequest::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::UsersUsersRoles => NestedUsersUsersRole::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
         }
     }
 }
@@ -404,28 +536,50 @@ impl AllByUpdatedAtTable for web_common::database::Table {
             web_common::database::Table::Organizations => unimplemented!("all_by_updated_at not implemented for organizations."),
             web_common::database::Table::ProjectStates => unimplemented!("all_by_updated_at not implemented for project_states."),
             web_common::database::Table::Projects => NestedProject::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::ProjectsTeamsRoles => NestedProjectsTeamsRole::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::ProjectsUsersRoles => NestedProjectsUsersRole::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::ProjectsTeamsRoleInvitations => unimplemented!("all_by_updated_at not implemented for projects_teams_role_invitations."),
+            web_common::database::Table::ProjectsTeamsRoleRequests => unimplemented!("all_by_updated_at not implemented for projects_teams_role_requests."),
+            web_common::database::Table::ProjectsTeamsRoles => unimplemented!("all_by_updated_at not implemented for projects_teams_roles."),
+            web_common::database::Table::ProjectsUsersRoleInvitations => unimplemented!("all_by_updated_at not implemented for projects_users_role_invitations."),
+            web_common::database::Table::ProjectsUsersRoleRequests => unimplemented!("all_by_updated_at not implemented for projects_users_role_requests."),
+            web_common::database::Table::ProjectsUsersRoles => unimplemented!("all_by_updated_at not implemented for projects_users_roles."),
             web_common::database::Table::Roles => unimplemented!("all_by_updated_at not implemented for roles."),
             web_common::database::Table::SampleBioOttTaxonItems => NestedSampleBioOttTaxonItem::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SampleStates => unimplemented!("all_by_updated_at not implemented for sample_states."),
             web_common::database::Table::SampledIndividualBioOttTaxonItems => NestedSampledIndividualBioOttTaxonItem::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SampledIndividuals => NestedSampledIndividual::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::SampledIndividualsTeamsRoles => NestedSampledIndividualsTeamsRole::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::SampledIndividualsUsersRoles => NestedSampledIndividualsUsersRole::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::SampledIndividualsTeamsRoleInvitations => unimplemented!("all_by_updated_at not implemented for sampled_individuals_teams_role_invitations."),
+            web_common::database::Table::SampledIndividualsTeamsRoleRequests => unimplemented!("all_by_updated_at not implemented for sampled_individuals_teams_role_requests."),
+            web_common::database::Table::SampledIndividualsTeamsRoles => unimplemented!("all_by_updated_at not implemented for sampled_individuals_teams_roles."),
+            web_common::database::Table::SampledIndividualsUsersRoleInvitations => unimplemented!("all_by_updated_at not implemented for sampled_individuals_users_role_invitations."),
+            web_common::database::Table::SampledIndividualsUsersRoleRequests => unimplemented!("all_by_updated_at not implemented for sampled_individuals_users_role_requests."),
+            web_common::database::Table::SampledIndividualsUsersRoles => unimplemented!("all_by_updated_at not implemented for sampled_individuals_users_roles."),
             web_common::database::Table::Samples => NestedSample::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::SamplesTeamsRoles => NestedSamplesTeamsRole::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::SamplesUsersRoles => NestedSamplesUsersRole::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::SamplesTeamsRoleInvitations => unimplemented!("all_by_updated_at not implemented for samples_teams_role_invitations."),
+            web_common::database::Table::SamplesTeamsRoleRequests => unimplemented!("all_by_updated_at not implemented for samples_teams_role_requests."),
+            web_common::database::Table::SamplesTeamsRoles => unimplemented!("all_by_updated_at not implemented for samples_teams_roles."),
+            web_common::database::Table::SamplesUsersRoleInvitations => unimplemented!("all_by_updated_at not implemented for samples_users_role_invitations."),
+            web_common::database::Table::SamplesUsersRoleRequests => unimplemented!("all_by_updated_at not implemented for samples_users_role_requests."),
+            web_common::database::Table::SamplesUsersRoles => unimplemented!("all_by_updated_at not implemented for samples_users_roles."),
             web_common::database::Table::Spectra => unimplemented!("all_by_updated_at not implemented for spectra."),
             web_common::database::Table::SpectraCollections => NestedSpectraCollection::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::SpectraCollectionsTeamsRoles => NestedSpectraCollectionsTeamsRole::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::SpectraCollectionsUsersRoles => NestedSpectraCollectionsUsersRole::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::SpectraCollectionsTeamsRoleInvitations => unimplemented!("all_by_updated_at not implemented for spectra_collections_teams_role_invitations."),
+            web_common::database::Table::SpectraCollectionsTeamsRoleRequests => unimplemented!("all_by_updated_at not implemented for spectra_collections_teams_role_requests."),
+            web_common::database::Table::SpectraCollectionsTeamsRoles => unimplemented!("all_by_updated_at not implemented for spectra_collections_teams_roles."),
+            web_common::database::Table::SpectraCollectionsUsersRoleInvitations => unimplemented!("all_by_updated_at not implemented for spectra_collections_users_role_invitations."),
+            web_common::database::Table::SpectraCollectionsUsersRoleRequests => unimplemented!("all_by_updated_at not implemented for spectra_collections_users_role_requests."),
+            web_common::database::Table::SpectraCollectionsUsersRoles => unimplemented!("all_by_updated_at not implemented for spectra_collections_users_roles."),
             web_common::database::Table::TeamStates => unimplemented!("all_by_updated_at not implemented for team_states."),
             web_common::database::Table::Teams => NestedTeam::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::TeamsUsersRoles => NestedTeamsUsersRole::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::TeamsTeamsRoleInvitations => unimplemented!("all_by_updated_at not implemented for teams_teams_role_invitations."),
+            web_common::database::Table::TeamsUsersRoleInvitations => unimplemented!("all_by_updated_at not implemented for teams_users_role_invitations."),
+            web_common::database::Table::TeamsUsersRoleRequests => unimplemented!("all_by_updated_at not implemented for teams_users_role_requests."),
+            web_common::database::Table::TeamsUsersRoles => unimplemented!("all_by_updated_at not implemented for teams_users_roles."),
             web_common::database::Table::Units => unimplemented!("all_by_updated_at not implemented for units."),
             web_common::database::Table::UserEmails => unimplemented!("all_by_updated_at not implemented for user_emails."),
             web_common::database::Table::Users => User::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::UsersUsersRoleInvitations => unimplemented!("all_by_updated_at not implemented for users_users_role_invitations."),
+            web_common::database::Table::UsersUsersRoleRequests => unimplemented!("all_by_updated_at not implemented for users_users_role_requests."),
+            web_common::database::Table::UsersUsersRoles => unimplemented!("all_by_updated_at not implemented for users_users_roles."),
         }
     }
 }
@@ -474,7 +628,11 @@ impl InsertableTable for web_common::database::Table {
                 let nested_row = crate::nested_models::NestedProject::from_flat(inserted_row, connection)?;
                  bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
             },
+            web_common::database::Table::ProjectsTeamsRoleInvitations => unreachable!("Table `projects_teams_role_invitations` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::ProjectsTeamsRoleRequests => unreachable!("Table `projects_teams_role_requests` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::ProjectsTeamsRoles => unreachable!("Table `projects_teams_roles` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::ProjectsUsersRoleInvitations => unreachable!("Table `projects_users_role_invitations` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::ProjectsUsersRoleRequests => unreachable!("Table `projects_users_role_requests` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::ProjectsUsersRoles => unreachable!("Table `projects_users_roles` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::Roles => unreachable!("Table `roles` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::SampleBioOttTaxonItems => unreachable!("Table `sample_bio_ott_taxon_items` is not insertable as it does not have a known column associated to a creator user id."),
@@ -486,7 +644,11 @@ impl InsertableTable for web_common::database::Table {
                 let nested_row = crate::nested_models::NestedSampledIndividual::from_flat(inserted_row, connection)?;
                  bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
             },
+            web_common::database::Table::SampledIndividualsTeamsRoleInvitations => unreachable!("Table `sampled_individuals_teams_role_invitations` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::SampledIndividualsTeamsRoleRequests => unreachable!("Table `sampled_individuals_teams_role_requests` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::SampledIndividualsTeamsRoles => unreachable!("Table `sampled_individuals_teams_roles` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::SampledIndividualsUsersRoleInvitations => unreachable!("Table `sampled_individuals_users_role_invitations` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::SampledIndividualsUsersRoleRequests => unreachable!("Table `sampled_individuals_users_role_requests` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::SampledIndividualsUsersRoles => unreachable!("Table `sampled_individuals_users_roles` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::Samples => {
                 let row: web_common::database::NewSample = bincode::deserialize::<web_common::database::NewSample>(&row).map_err(web_common::api::ApiError::from)?;
@@ -494,11 +656,19 @@ impl InsertableTable for web_common::database::Table {
                 let nested_row = crate::nested_models::NestedSample::from_flat(inserted_row, connection)?;
                  bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
             },
+            web_common::database::Table::SamplesTeamsRoleInvitations => unreachable!("Table `samples_teams_role_invitations` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::SamplesTeamsRoleRequests => unreachable!("Table `samples_teams_role_requests` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::SamplesTeamsRoles => unreachable!("Table `samples_teams_roles` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::SamplesUsersRoleInvitations => unreachable!("Table `samples_users_role_invitations` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::SamplesUsersRoleRequests => unreachable!("Table `samples_users_role_requests` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::SamplesUsersRoles => unreachable!("Table `samples_users_roles` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::Spectra => unreachable!("Table `spectra` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::SpectraCollections => todo!("Insert not implemented for spectra_collections."),
+            web_common::database::Table::SpectraCollectionsTeamsRoleInvitations => unreachable!("Table `spectra_collections_teams_role_invitations` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::SpectraCollectionsTeamsRoleRequests => unreachable!("Table `spectra_collections_teams_role_requests` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::SpectraCollectionsTeamsRoles => unreachable!("Table `spectra_collections_teams_roles` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::SpectraCollectionsUsersRoleInvitations => unreachable!("Table `spectra_collections_users_role_invitations` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::SpectraCollectionsUsersRoleRequests => unreachable!("Table `spectra_collections_users_role_requests` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::SpectraCollectionsUsersRoles => unreachable!("Table `spectra_collections_users_roles` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::TeamStates => unreachable!("Table `team_states` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::Teams => {
@@ -507,6 +677,9 @@ impl InsertableTable for web_common::database::Table {
                 let nested_row = crate::nested_models::NestedTeam::from_flat(inserted_row, connection)?;
                  bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
             },
+            web_common::database::Table::TeamsTeamsRoleInvitations => unreachable!("Table `teams_teams_role_invitations` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::TeamsUsersRoleInvitations => unreachable!("Table `teams_users_role_invitations` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::TeamsUsersRoleRequests => unreachable!("Table `teams_users_role_requests` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::TeamsUsersRoles => unreachable!("Table `teams_users_roles` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::Units => unreachable!("Table `units` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::UserEmails => {
@@ -520,6 +693,9 @@ impl InsertableTable for web_common::database::Table {
                 let inserted_row: crate::models::User = <web_common::database::NewUser as InsertRow>::insert(row, user_id, connection)?;
                  bincode::serialize(&inserted_row).map_err(web_common::api::ApiError::from)?
             },
+            web_common::database::Table::UsersUsersRoleInvitations => unreachable!("Table `users_users_role_invitations` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::UsersUsersRoleRequests => unreachable!("Table `users_users_role_requests` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::UsersUsersRoles => unreachable!("Table `users_users_roles` is not insertable as it does not have a known column associated to a creator user id."),
 })
     }
 }
@@ -568,7 +744,11 @@ impl UpdatableTable for web_common::database::Table {
                 let nested_row = crate::nested_models::NestedProject::from_flat(updated_row, connection)?;
                  bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
             },
+            web_common::database::Table::ProjectsTeamsRoleInvitations => unreachable!("Table `projects_teams_role_invitations` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::ProjectsTeamsRoleRequests => unreachable!("Table `projects_teams_role_requests` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::ProjectsTeamsRoles => unreachable!("Table `projects_teams_roles` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::ProjectsUsersRoleInvitations => unreachable!("Table `projects_users_role_invitations` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::ProjectsUsersRoleRequests => unreachable!("Table `projects_users_role_requests` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::ProjectsUsersRoles => unreachable!("Table `projects_users_roles` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::Roles => unreachable!("Table `roles` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::SampleBioOttTaxonItems => unreachable!("Table `sample_bio_ott_taxon_items` is not updatable as it does not have a known column associated to an updater user id."),
@@ -580,7 +760,11 @@ impl UpdatableTable for web_common::database::Table {
                 let nested_row = crate::nested_models::NestedSampledIndividual::from_flat(updated_row, connection)?;
                  bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
             },
+            web_common::database::Table::SampledIndividualsTeamsRoleInvitations => unreachable!("Table `sampled_individuals_teams_role_invitations` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::SampledIndividualsTeamsRoleRequests => unreachable!("Table `sampled_individuals_teams_role_requests` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::SampledIndividualsTeamsRoles => unreachable!("Table `sampled_individuals_teams_roles` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::SampledIndividualsUsersRoleInvitations => unreachable!("Table `sampled_individuals_users_role_invitations` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::SampledIndividualsUsersRoleRequests => unreachable!("Table `sampled_individuals_users_role_requests` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::SampledIndividualsUsersRoles => unreachable!("Table `sampled_individuals_users_roles` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::Samples => {
                 let row: web_common::database::NewSample = bincode::deserialize::<web_common::database::NewSample>(&row).map_err(web_common::api::ApiError::from)?;
@@ -588,11 +772,19 @@ impl UpdatableTable for web_common::database::Table {
                 let nested_row = crate::nested_models::NestedSample::from_flat(updated_row, connection)?;
                  bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
             },
+            web_common::database::Table::SamplesTeamsRoleInvitations => unreachable!("Table `samples_teams_role_invitations` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::SamplesTeamsRoleRequests => unreachable!("Table `samples_teams_role_requests` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::SamplesTeamsRoles => unreachable!("Table `samples_teams_roles` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::SamplesUsersRoleInvitations => unreachable!("Table `samples_users_role_invitations` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::SamplesUsersRoleRequests => unreachable!("Table `samples_users_role_requests` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::SamplesUsersRoles => unreachable!("Table `samples_users_roles` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::Spectra => unreachable!("Table `spectra` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::SpectraCollections => todo!("Update not implemented for spectra_collections."),
+            web_common::database::Table::SpectraCollectionsTeamsRoleInvitations => unreachable!("Table `spectra_collections_teams_role_invitations` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::SpectraCollectionsTeamsRoleRequests => unreachable!("Table `spectra_collections_teams_role_requests` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::SpectraCollectionsTeamsRoles => unreachable!("Table `spectra_collections_teams_roles` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::SpectraCollectionsUsersRoleInvitations => unreachable!("Table `spectra_collections_users_role_invitations` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::SpectraCollectionsUsersRoleRequests => unreachable!("Table `spectra_collections_users_role_requests` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::SpectraCollectionsUsersRoles => unreachable!("Table `spectra_collections_users_roles` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::TeamStates => unreachable!("Table `team_states` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::Teams => {
@@ -601,6 +793,9 @@ impl UpdatableTable for web_common::database::Table {
                 let nested_row = crate::nested_models::NestedTeam::from_flat(updated_row, connection)?;
                  bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
             },
+            web_common::database::Table::TeamsTeamsRoleInvitations => unreachable!("Table `teams_teams_role_invitations` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::TeamsUsersRoleInvitations => unreachable!("Table `teams_users_role_invitations` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::TeamsUsersRoleRequests => unreachable!("Table `teams_users_role_requests` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::TeamsUsersRoles => unreachable!("Table `teams_users_roles` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::Units => unreachable!("Table `units` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::UserEmails => unreachable!("Table `user_emails` is not updatable as it does not have a known column associated to an updater user id."),
@@ -609,6 +804,9 @@ impl UpdatableTable for web_common::database::Table {
                 let updated_row: crate::models::User = <web_common::database::UpdateUser as UpdateRow>::update(row, user_id, connection)?;
                  bincode::serialize(&updated_row).map_err(web_common::api::ApiError::from)?
             },
+            web_common::database::Table::UsersUsersRoleInvitations => unreachable!("Table `users_users_role_invitations` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::UsersUsersRoleRequests => unreachable!("Table `users_users_role_requests` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::UsersUsersRoles => unreachable!("Table `users_users_roles` is not updatable as it does not have a known column associated to an updater user id."),
 })
     }
 }
@@ -681,9 +879,29 @@ impl FromFlatStrTable for web_common::database::Table {
                 let richest_row = crate::nested_models::NestedProject::from_flat(flat_row, connection)?;
                  bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
             },
+            web_common::database::Table::ProjectsTeamsRoleInvitations => {
+                let flat_row: crate::models::ProjectsTeamsRoleInvitation = serde_json::from_str::<crate::models::ProjectsTeamsRoleInvitation>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedProjectsTeamsRoleInvitation::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::ProjectsTeamsRoleRequests => {
+                let flat_row: crate::models::ProjectsTeamsRoleRequest = serde_json::from_str::<crate::models::ProjectsTeamsRoleRequest>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedProjectsTeamsRoleRequest::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
             web_common::database::Table::ProjectsTeamsRoles => {
                 let flat_row: crate::models::ProjectsTeamsRole = serde_json::from_str::<crate::models::ProjectsTeamsRole>(row).map_err(web_common::api::ApiError::from)?;
                 let richest_row = crate::nested_models::NestedProjectsTeamsRole::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::ProjectsUsersRoleInvitations => {
+                let flat_row: crate::models::ProjectsUsersRoleInvitation = serde_json::from_str::<crate::models::ProjectsUsersRoleInvitation>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedProjectsUsersRoleInvitation::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::ProjectsUsersRoleRequests => {
+                let flat_row: crate::models::ProjectsUsersRoleRequest = serde_json::from_str::<crate::models::ProjectsUsersRoleRequest>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedProjectsUsersRoleRequest::from_flat(flat_row, connection)?;
                  bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
             },
             web_common::database::Table::ProjectsUsersRoles => {
@@ -716,9 +934,29 @@ impl FromFlatStrTable for web_common::database::Table {
                 let richest_row = crate::nested_models::NestedSampledIndividual::from_flat(flat_row, connection)?;
                  bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
             },
+            web_common::database::Table::SampledIndividualsTeamsRoleInvitations => {
+                let flat_row: crate::models::SampledIndividualsTeamsRoleInvitation = serde_json::from_str::<crate::models::SampledIndividualsTeamsRoleInvitation>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedSampledIndividualsTeamsRoleInvitation::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::SampledIndividualsTeamsRoleRequests => {
+                let flat_row: crate::models::SampledIndividualsTeamsRoleRequest = serde_json::from_str::<crate::models::SampledIndividualsTeamsRoleRequest>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedSampledIndividualsTeamsRoleRequest::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
             web_common::database::Table::SampledIndividualsTeamsRoles => {
                 let flat_row: crate::models::SampledIndividualsTeamsRole = serde_json::from_str::<crate::models::SampledIndividualsTeamsRole>(row).map_err(web_common::api::ApiError::from)?;
                 let richest_row = crate::nested_models::NestedSampledIndividualsTeamsRole::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::SampledIndividualsUsersRoleInvitations => {
+                let flat_row: crate::models::SampledIndividualsUsersRoleInvitation = serde_json::from_str::<crate::models::SampledIndividualsUsersRoleInvitation>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedSampledIndividualsUsersRoleInvitation::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::SampledIndividualsUsersRoleRequests => {
+                let flat_row: crate::models::SampledIndividualsUsersRoleRequest = serde_json::from_str::<crate::models::SampledIndividualsUsersRoleRequest>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedSampledIndividualsUsersRoleRequest::from_flat(flat_row, connection)?;
                  bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
             },
             web_common::database::Table::SampledIndividualsUsersRoles => {
@@ -731,9 +969,29 @@ impl FromFlatStrTable for web_common::database::Table {
                 let richest_row = crate::nested_models::NestedSample::from_flat(flat_row, connection)?;
                  bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
             },
+            web_common::database::Table::SamplesTeamsRoleInvitations => {
+                let flat_row: crate::models::SamplesTeamsRoleInvitation = serde_json::from_str::<crate::models::SamplesTeamsRoleInvitation>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedSamplesTeamsRoleInvitation::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::SamplesTeamsRoleRequests => {
+                let flat_row: crate::models::SamplesTeamsRoleRequest = serde_json::from_str::<crate::models::SamplesTeamsRoleRequest>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedSamplesTeamsRoleRequest::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
             web_common::database::Table::SamplesTeamsRoles => {
                 let flat_row: crate::models::SamplesTeamsRole = serde_json::from_str::<crate::models::SamplesTeamsRole>(row).map_err(web_common::api::ApiError::from)?;
                 let richest_row = crate::nested_models::NestedSamplesTeamsRole::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::SamplesUsersRoleInvitations => {
+                let flat_row: crate::models::SamplesUsersRoleInvitation = serde_json::from_str::<crate::models::SamplesUsersRoleInvitation>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedSamplesUsersRoleInvitation::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::SamplesUsersRoleRequests => {
+                let flat_row: crate::models::SamplesUsersRoleRequest = serde_json::from_str::<crate::models::SamplesUsersRoleRequest>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedSamplesUsersRoleRequest::from_flat(flat_row, connection)?;
                  bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
             },
             web_common::database::Table::SamplesUsersRoles => {
@@ -751,9 +1009,29 @@ impl FromFlatStrTable for web_common::database::Table {
                 let richest_row = crate::nested_models::NestedSpectraCollection::from_flat(flat_row, connection)?;
                  bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
             },
+            web_common::database::Table::SpectraCollectionsTeamsRoleInvitations => {
+                let flat_row: crate::models::SpectraCollectionsTeamsRoleInvitation = serde_json::from_str::<crate::models::SpectraCollectionsTeamsRoleInvitation>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedSpectraCollectionsTeamsRoleInvitation::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::SpectraCollectionsTeamsRoleRequests => {
+                let flat_row: crate::models::SpectraCollectionsTeamsRoleRequest = serde_json::from_str::<crate::models::SpectraCollectionsTeamsRoleRequest>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedSpectraCollectionsTeamsRoleRequest::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
             web_common::database::Table::SpectraCollectionsTeamsRoles => {
                 let flat_row: crate::models::SpectraCollectionsTeamsRole = serde_json::from_str::<crate::models::SpectraCollectionsTeamsRole>(row).map_err(web_common::api::ApiError::from)?;
                 let richest_row = crate::nested_models::NestedSpectraCollectionsTeamsRole::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::SpectraCollectionsUsersRoleInvitations => {
+                let flat_row: crate::models::SpectraCollectionsUsersRoleInvitation = serde_json::from_str::<crate::models::SpectraCollectionsUsersRoleInvitation>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedSpectraCollectionsUsersRoleInvitation::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::SpectraCollectionsUsersRoleRequests => {
+                let flat_row: crate::models::SpectraCollectionsUsersRoleRequest = serde_json::from_str::<crate::models::SpectraCollectionsUsersRoleRequest>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedSpectraCollectionsUsersRoleRequest::from_flat(flat_row, connection)?;
                  bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
             },
             web_common::database::Table::SpectraCollectionsUsersRoles => {
@@ -771,6 +1049,21 @@ impl FromFlatStrTable for web_common::database::Table {
                 let richest_row = crate::nested_models::NestedTeam::from_flat(flat_row, connection)?;
                  bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
             },
+            web_common::database::Table::TeamsTeamsRoleInvitations => {
+                let flat_row: crate::models::TeamsTeamsRoleInvitation = serde_json::from_str::<crate::models::TeamsTeamsRoleInvitation>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedTeamsTeamsRoleInvitation::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::TeamsUsersRoleInvitations => {
+                let flat_row: crate::models::TeamsUsersRoleInvitation = serde_json::from_str::<crate::models::TeamsUsersRoleInvitation>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedTeamsUsersRoleInvitation::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::TeamsUsersRoleRequests => {
+                let flat_row: crate::models::TeamsUsersRoleRequest = serde_json::from_str::<crate::models::TeamsUsersRoleRequest>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedTeamsUsersRoleRequest::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
             web_common::database::Table::TeamsUsersRoles => {
                 let flat_row: crate::models::TeamsUsersRole = serde_json::from_str::<crate::models::TeamsUsersRole>(row).map_err(web_common::api::ApiError::from)?;
                 let richest_row = crate::nested_models::NestedTeamsUsersRole::from_flat(flat_row, connection)?;
@@ -783,6 +1076,21 @@ impl FromFlatStrTable for web_common::database::Table {
                  bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
             },
             web_common::database::Table::Users => bincode::serialize(&serde_json::from_str::<crate::models::User>(row).map_err(web_common::api::ApiError::from)?).map_err(web_common::api::ApiError::from)?,
+            web_common::database::Table::UsersUsersRoleInvitations => {
+                let flat_row: crate::models::UsersUsersRoleInvitation = serde_json::from_str::<crate::models::UsersUsersRoleInvitation>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedUsersUsersRoleInvitation::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::UsersUsersRoleRequests => {
+                let flat_row: crate::models::UsersUsersRoleRequest = serde_json::from_str::<crate::models::UsersUsersRoleRequest>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedUsersUsersRoleRequest::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::UsersUsersRoles => {
+                let flat_row: crate::models::UsersUsersRole = serde_json::from_str::<crate::models::UsersUsersRole>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedUsersUsersRole::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
         })
     }
 }

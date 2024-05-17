@@ -9,19 +9,43 @@ from constraint_checkers.table_metadata import TableStructMetadata
 from constraint_checkers.find_foreign_keys import TableMetadata
 from constraint_checkers.regroup_tables import get_desinences
 
+
 class MissingRolesTable(Exception):
     """Exception raised when a roles table is missing."""
 
     def __init__(self, table_name: str, referring_table_name: str):
         self.table_name = table_name
         self.referring_table_name = referring_table_name
+        super().__init__(f"Table {table_name}_{referring_table_name}_roles is missing.")
+
+
+class MissingRoleInvitationsTable(Exception):
+    """Exception raised when a role invitations table is missing."""
+
+    def __init__(self, table_name: str, referring_table_name: str):
+        self.table_name = table_name
+        self.referring_table_name = referring_table_name
         super().__init__(
-            f"Table {table_name}_{referring_table_name}_roles is missing."
+            f"Table {table_name}_{referring_table_name}_role_invitations is missing."
+        )
+
+
+class MissingRoleRequestsTable(Exception):
+    """Exception raised when a role requests table is missing."""
+
+    def __init__(self, table_name: str, referring_table_name: str):
+        self.table_name = table_name
+        self.referring_table_name = referring_table_name
+        super().__init__(
+            f"Table {table_name}_{referring_table_name}_role_requests is missing."
         )
 
 
 def handle_missing_roles_table(
-    table_name: str, referring_table_name: str, table_metadata: TableMetadata
+    table_name: str,
+    referring_table_name: str,
+    table_metadata: TableMetadata,
+    desinence: str = "roles",
 ):
     """Handle the missing user roles table.
 
@@ -33,15 +57,22 @@ def handle_missing_roles_table(
         The referring table name.
     table_metadata : TableMetadata
         The table metadata.
+    desinence : str
+        The desinence to use for the table name.
+        Can be either "roles" or "role_requests" or "role_invitations".
     """
 
     if referring_table_name not in ("users", "teams"):
         raise ValueError(f"Referring table name {referring_table_name} is not valid.")
 
-    expected_table_name = f"{table_name}_{referring_table_name}_roles"
+    if desinence not in ("roles", "role_requests", "role_invitations"):
+        raise ValueError(f"Desinence {desinence} is not valid.")
+
+    expected_table_name = f"{table_name}_{referring_table_name}_{desinence}"
 
     create_table = userinput(
         f"Table {expected_table_name} is missing. Do you want to create it? (yes/no)",
+        label="{name}",
         default=False,
         validator="human_bool",
         sanitizer="human_bool",
@@ -71,9 +102,7 @@ def handle_missing_roles_table(
         padded_migration_number = str(migration_number).zfill(14)
         full_migration_name = f"{padded_migration_number}_{expected_migration}"
 
-        primary_keys = (
-            table_metadata.get_primary_key_names_and_types(table_name)
-        )
+        primary_keys = table_metadata.get_primary_key_names_and_types(table_name)
 
         assert len(primary_keys) == 1
 
@@ -82,27 +111,109 @@ def handle_missing_roles_table(
         column_name = referring_table_name[:-1] + "_id"
 
         # First, we write the up migration.
-        with open(f"migrations/{full_migration_name}/up.sql", "w", encoding="utf-8") as f:
+        with open(
+            f"migrations/{full_migration_name}/up.sql", "w", encoding="utf-8"
+        ) as f:
             f.write(
                 f"-- Create the {expected_table_name} table.\n"
                 f"CREATE TABLE IF NOT EXISTS {expected_table_name} (\n"
-                f"    table_id {primary_key_type} NOT NULL REFERENCES {table_name}({primary_key_name}),\n"
-                f"    {column_name} INTEGER NOT NULL REFERENCES {referring_table_name}(id),\n"
-                "    role_id INTEGER NOT NULL REFERENCES roles(id),\n"
-                "    created_by INTEGER NOT NULL REFERENCES users(id),\n"
+                f"    table_id {primary_key_type} NOT NULL REFERENCES {table_name}({primary_key_name}) ON DELETE CASCADE,\n"
+                f"    {column_name} INTEGER NOT NULL REFERENCES {referring_table_name}(id) ON DELETE CASCADE,\n"
+                "    role_id INTEGER NOT NULL REFERENCES roles(id) ON DELETE CASCADE,\n"
+                "    created_by INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,\n"
                 "    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n"
-                "    updated_by INTEGER NOT NULL REFERENCES users(id),\n"
-                "    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n"
-                f"    PRIMARY KEY (table_id, {column_name}, role_id)\n"
+                f"    PRIMARY KEY (table_id, {column_name})\n"
                 ");\n"
             )
 
         # Then, we write the down migration.
-        with open(f"migrations/{full_migration_name}/down.sql", "w", encoding="utf-8") as f:
+        with open(
+            f"migrations/{full_migration_name}/down.sql", "w", encoding="utf-8"
+        ) as f:
             f.write(
                 f"-- Drop the {expected_table_name} table.\n"
                 f"DROP TABLE IF EXISTS {expected_table_name};\n"
             )
+
+
+def ensure_updatable_tables_have_role_requests_tables(
+    tables: List[TableStructMetadata], table_metadata: TableMetadata
+):
+    """Ensure that all updatable tables have role requests tables.
+
+    Parameters
+    ----------
+    new_model_structs : List[TableStructMetadata]
+        The new model structs.
+    table_metadata : TableMetadata
+        The table metadata.
+
+    Implementation details
+    ----------------------
+    All tables that contain a column such as `requested_by`, must have a corresponding
+    `{table_name}_role_requests` table.
+    When this table is missing, the function raises an exception and we
+    try to handle the creation process asking the user to confirm the creation of the
+    missing role requests table.
+    """
+
+    for table in tqdm(
+        tables,
+        desc="Ensuring updatable tables have role requests tables",
+        unit="table",
+        leave=False,
+    ):
+        if table.is_updatable() and not table.is_junktion_table():
+            if not table_metadata.is_table(f"{table.name}_users_role_requests"):
+                handle_missing_roles_table(
+                    table.name, "users", table_metadata, "role_requests"
+                )
+                raise MissingRoleRequestsTable(table.name, "users")
+            if not table_metadata.is_table(f"{table.name}_teams_role_requests") and table.name not in ("users", "teams"):
+                handle_missing_roles_table(
+                    table.name, "teams", table_metadata, "role_requests"
+                )
+                raise MissingRoleRequestsTable(table.name, "teams")
+
+
+def ensure_updatable_tables_have_role_invitations_tables(
+    tables: List[TableStructMetadata], table_metadata: TableMetadata
+):
+    """Ensure that all updatable tables have role invitations tables.
+
+    Parameters
+    ----------
+    new_model_structs : List[TableStructMetadata]
+        The new model structs.
+    table_metadata : TableMetadata
+        The table metadata.
+
+    Implementation details
+    ----------------------
+    All tables that contain a column such as `invited_by`, must have a corresponding
+    `{table_name}_role_invitations` table.
+    When this table is missing, the function raises an exception and we
+    try to handle the creation process asking the user to confirm the creation of the
+    missing role invitations table.
+    """
+
+    for table in tqdm(
+        tables,
+        desc="Ensuring updatable tables have role invitations tables",
+        unit="table",
+        leave=False,
+    ):
+        if table.is_updatable() and not table.is_junktion_table():
+            if not table_metadata.is_table(f"{table.name}_users_role_invitations"):
+                handle_missing_roles_table(
+                    table.name, "users", table_metadata, "role_invitations"
+                )
+                raise MissingRoleInvitationsTable(table.name, "users")
+            if not table_metadata.is_table(f"{table.name}_teams_role_invitations") and table.name not in ("users", "teams"):
+                handle_missing_roles_table(
+                    table.name, "teams", table_metadata, "role_invitations"
+                )
+                raise MissingRoleInvitationsTable(table.name, "teams")
 
 
 def ensure_updatable_tables_have_roles_tables(
@@ -125,14 +236,21 @@ def ensure_updatable_tables_have_roles_tables(
     try to handle the creation process asking the user to confirm the creation of the
     missing roles table.
     """
+    ensure_updatable_tables_have_role_invitations_tables(tables, table_metadata)
+    ensure_updatable_tables_have_role_requests_tables(tables, table_metadata)
 
     for table in tqdm(
-        tables, desc="Ensuring updatable tables have roles tables", unit="table", leave=False
+        tables,
+        desc="Ensuring updatable tables have roles tables",
+        unit="table",
+        leave=False,
     ):
         if table.is_updatable() and not table.is_junktion_table():
-            if not table_metadata.is_table(f"{table.name}_users_roles") and table.name not in ("users",):
+            if not table_metadata.is_table(f"{table.name}_users_roles"):
                 handle_missing_roles_table(table.name, "users", table_metadata)
                 raise MissingRolesTable(table.name, "users")
-            if not table_metadata.is_table(f"{table.name}_teams_roles") and table.name not in ("users", "teams"):
+            if not table_metadata.is_table(
+                f"{table.name}_teams_roles"
+            ) and table.name not in ("users", "teams"):
                 handle_missing_roles_table(table.name, "teams", table_metadata)
                 raise MissingRolesTable(table.name, "teams")

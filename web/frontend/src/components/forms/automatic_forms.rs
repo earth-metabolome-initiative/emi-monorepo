@@ -2,22 +2,22 @@
 //!
 //! This module is automatically generated. Do not write anything here.
 
-use crate::components::forms::*;
-use crate::workers::ws_worker::ComponentMessage;
-use crate::workers::ws_worker::Tabular;
-use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
-use std::ops::Deref;
+use web_common::database::*;
+use yew::prelude::*;
+use yewdux::{use_store, Reducer, Store};
+use crate::components::forms::*;
+use web_common::api::form_traits::FormMethod;
 use std::rc::Rc;
 use uuid::Uuid;
-use web_common::api::form_traits::FormMethod;
-use web_common::api::ApiError;
-use web_common::custom_validators::Image;
-use web_common::database::*;
-use web_common::file_formats::GenericFileFormat;
-use yew::prelude::*;
+use std::ops::Deref;
+use crate::workers::ws_worker::Tabular;
 use yewdux::Dispatch;
-use yewdux::{use_store, Reducer, Store};
+use chrono::NaiveDateTime;
+use web_common::api::ApiError;
+use crate::workers::ws_worker::ComponentMessage;
+use web_common::custom_validators::Image;
+use web_common::file_formats::GenericFileFormat;
 
 #[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
@@ -87,12 +87,8 @@ pub(super) enum ProjectActions {
 impl FromOperation for ProjectActions {
     fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
         match operation.as_ref() {
-            "parent_project" => {
-                ProjectActions::SetParentProject(bincode::deserialize(&row).unwrap())
-            }
-            operation_name => {
-                unreachable!("The operation name '{}' is not supported.", operation_name)
-            }
+            "parent_project" => ProjectActions::SetParentProject(bincode::deserialize(&row).unwrap()),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
         }
     }
 }
@@ -103,20 +99,20 @@ impl Reducer<ProjectBuilder> for ProjectActions {
         match self {
             ProjectActions::SetName(name) => 'name: {
                 state_mut.errors_name.clear();
-                if name.is_none() {
-                    state_mut.errors_name.push(ApiError::BadRequest(vec![
-                        "The Name field is required.".to_string(),
-                    ]));
-                    state_mut.name = None;
-                    break 'name;
-                }
+        if name.is_none() {
+            state_mut.errors_name.push(ApiError::BadRequest(vec![
+                "The Name field is required.".to_string()
+             ]));
+            state_mut.name = None;
+             break 'name;
+        }
                 if let Some(value) = name.as_ref() {
                     if value.is_empty() {
                         state_mut.errors_name.push(ApiError::BadRequest(vec![
-                            "The Name field cannot be left empty.".to_string(),
+                            "The Name field cannot be left empty.".to_string()
                         ]));
-                        state_mut.name = None;
-                        break 'name;
+                         state_mut.name = None;
+                          break 'name;
                     }
                 }
                 state_mut.name = name;
@@ -126,20 +122,20 @@ impl Reducer<ProjectBuilder> for ProjectActions {
             }
             ProjectActions::SetDescription(description) => 'description: {
                 state_mut.errors_description.clear();
-                if description.is_none() {
-                    state_mut.errors_description.push(ApiError::BadRequest(vec![
-                        "The Description field is required.".to_string(),
-                    ]));
-                    state_mut.description = None;
-                    break 'description;
-                }
+        if description.is_none() {
+            state_mut.errors_description.push(ApiError::BadRequest(vec![
+                "The Description field is required.".to_string()
+             ]));
+            state_mut.description = None;
+             break 'description;
+        }
                 if let Some(value) = description.as_ref() {
                     if value.is_empty() {
                         state_mut.errors_description.push(ApiError::BadRequest(vec![
-                            "The Description field cannot be left empty.".to_string(),
+                            "The Description field cannot be left empty.".to_string()
                         ]));
-                        state_mut.description = None;
-                        break 'description;
+                         state_mut.description = None;
+                          break 'description;
                     }
                 }
                 state_mut.description = description;
@@ -149,13 +145,13 @@ impl Reducer<ProjectBuilder> for ProjectActions {
             }
             ProjectActions::SetPublic(public) => 'public: {
                 state_mut.errors_public.clear();
-                if public.is_none() {
-                    state_mut.errors_public.push(ApiError::BadRequest(vec![
-                        "The Public field is required.".to_string(),
-                    ]));
-                    state_mut.public = None;
-                    break 'public;
-                }
+        if public.is_none() {
+            state_mut.errors_public.push(ApiError::BadRequest(vec![
+                "The Public field is required.".to_string()
+             ]));
+            state_mut.public = None;
+             break 'public;
+        }
                 state_mut.public = public;
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
@@ -169,23 +165,22 @@ impl Reducer<ProjectBuilder> for ProjectActions {
                         Ok(value) => {
                             if value.is_nan() || value.is_infinite() {
                                 state_mut.errors_budget.push(ApiError::BadRequest(vec![
-                                    "The budget field must be a valid f64.".to_string(),
+                                    "The budget field must be a valid f64.".to_string()
                                 ]));
-                            } else if value < f64::MIN as f64 || value > f64::MAX as f64 {
-                                state_mut
-                                    .errors_budget
-                                    .push(ApiError::BadRequest(vec![format!(
-                                        "The budget field must be between {} and {}.",
-                                        f64::MIN,
-                                        f64::MAX
-                                    )]));
+                            } else                             if value < f64::MIN as f64 || value > f64::MAX as f64 {
+                                state_mut.errors_budget.push(ApiError::BadRequest(vec![
+                                    format!(                                            "The budget field must be between {} and {}.",
+                                            f64::MIN,
+                                            f64::MAX
+                                    )
+                                ]));
                             } else {
                                 state_mut.budget = Some(value as f64);
                             }
                         }
                         Err(_) => {
                             state_mut.errors_budget.push(ApiError::BadRequest(vec![
-                                "The budget field must be a valid f64.".to_string(),
+                                "The budget field must be a valid f64.".to_string()
                             ]));
                         }
                     },
@@ -203,15 +198,14 @@ impl Reducer<ProjectBuilder> for ProjectActions {
                         Ok(value) => {
                             if value.is_nan() || value.is_infinite() {
                                 state_mut.errors_expenses.push(ApiError::BadRequest(vec![
-                                    "The expenses field must be a valid f64.".to_string(),
+                                    "The expenses field must be a valid f64.".to_string()
                                 ]));
-                            } else if value < f64::MIN as f64 || value > f64::MAX as f64 {
+                            } else                             if value < f64::MIN as f64 || value > f64::MAX as f64 {
                                 state_mut.errors_expenses.push(ApiError::BadRequest(vec![
-                                    format!(
-                                        "The expenses field must be between {} and {}.",
-                                        f64::MIN,
-                                        f64::MAX
-                                    ),
+                                    format!(                                            "The expenses field must be between {} and {}.",
+                                            f64::MIN,
+                                            f64::MAX
+                                    )
                                 ]));
                             } else {
                                 state_mut.expenses = Some(value as f64);
@@ -219,7 +213,7 @@ impl Reducer<ProjectBuilder> for ProjectActions {
                         }
                         Err(_) => {
                             state_mut.errors_expenses.push(ApiError::BadRequest(vec![
-                                "The expenses field must be a valid f64.".to_string(),
+                                "The expenses field must be a valid f64.".to_string()
                             ]));
                         }
                     },
@@ -233,15 +227,10 @@ impl Reducer<ProjectBuilder> for ProjectActions {
                 state_mut.errors_expected_end_date.clear();
                 match expected_end_date {
                     Some(value) => match NaiveDateTime::parse_from_str(&value, "%Y-%m-%dT%H:%M") {
-                        Ok(expected_end_date) => {
-                            state_mut.expected_end_date = Some(expected_end_date)
-                        }
-                        Err(_) => state_mut
-                            .errors_expected_end_date
-                            .push(ApiError::BadRequest(vec![
-                                "The expected_end_date field must be a valid date and time."
-                                    .to_string(),
-                            ])),
+                        Ok(expected_end_date) => state_mut.expected_end_date = Some(expected_end_date),
+                        Err(_) => state_mut.errors_expected_end_date.push(ApiError::BadRequest(vec![
+                            "The expected_end_date field must be a valid date and time.".to_string()
+                        ])),
                     },
                     None => state_mut.expected_end_date = None,
                 }
@@ -255,7 +244,7 @@ impl Reducer<ProjectBuilder> for ProjectActions {
                     Some(value) => match NaiveDateTime::parse_from_str(&value, "%Y-%m-%dT%H:%M") {
                         Ok(end_date) => state_mut.end_date = Some(end_date),
                         Err(_) => state_mut.errors_end_date.push(ApiError::BadRequest(vec![
-                            "The end_date field must be a valid date and time.".to_string(),
+                            "The end_date field must be a valid date and time.".to_string()
                         ])),
                     },
                     None => state_mut.end_date = None,
@@ -266,13 +255,13 @@ impl Reducer<ProjectBuilder> for ProjectActions {
             }
             ProjectActions::SetState(state) => 'state: {
                 state_mut.errors_state.clear();
-                if state.is_none() {
-                    state_mut.errors_state.push(ApiError::BadRequest(vec![
-                        "The State field is required.".to_string(),
-                    ]));
-                    state_mut.state = None;
-                    break 'state;
-                }
+        if state.is_none() {
+            state_mut.errors_state.push(ApiError::BadRequest(vec![
+                "The State field is required.".to_string()
+             ]));
+            state_mut.state = None;
+             break 'state;
+        }
                 state_mut.state = state;
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
@@ -295,67 +284,32 @@ impl FormBuilder for ProjectBuilder {
     type RichVariant = NestedProject;
 
     fn has_errors(&self) -> bool {
-        !self.errors_name.is_empty()
-            || !self.errors_description.is_empty()
-            || !self.errors_public.is_empty()
-            || !self.errors_budget.is_empty()
-            || !self.errors_expenses.is_empty()
-            || !self.errors_expected_end_date.is_empty()
-            || !self.errors_end_date.is_empty()
-            || !self.errors_state.is_empty()
-            || !self.errors_parent_project.is_empty()
+!self.errors_name.is_empty() || !self.errors_description.is_empty() || !self.errors_public.is_empty() || !self.errors_budget.is_empty() || !self.errors_expenses.is_empty() || !self.errors_expected_end_date.is_empty() || !self.errors_end_date.is_empty() || !self.errors_state.is_empty() || !self.errors_parent_project.is_empty()
     }
 
     fn id(&self) -> Option<PrimaryKey> {
         self.id.map(|id| id.into())
     }
 
-    fn update(
-        dispatcher: &Dispatch<Self>,
-        rich_variant: Self::RichVariant,
-    ) -> Vec<ComponentMessage> {
-        dispatcher.apply(ProjectActions::SetName(Some(
-            rich_variant.inner.name.to_string(),
-        )));
-        dispatcher.apply(ProjectActions::SetDescription(Some(
-            rich_variant.inner.description.to_string(),
-        )));
-        dispatcher.apply(ProjectActions::SetPublic(Some(rich_variant.inner.public)));
-        dispatcher.apply(ProjectActions::SetBudget(
-            rich_variant.inner.budget.map(|budget| budget.to_string()),
-        ));
-        dispatcher.apply(ProjectActions::SetExpenses(
-            rich_variant
-                .inner
-                .expenses
-                .map(|expenses| expenses.to_string()),
-        ));
-        dispatcher.apply(ProjectActions::SetExpectedEndDate(
-            rich_variant
-                .inner
-                .expected_end_date
-                .map(|expected_end_date| expected_end_date.to_string()),
-        ));
-        dispatcher.apply(ProjectActions::SetEndDate(
-            rich_variant
-                .inner
-                .end_date
-                .map(|end_date| end_date.to_string()),
-        ));
+    fn update(dispatcher: &Dispatch<Self>, rich_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+    dispatcher.apply(ProjectActions::SetName(Some(rich_variant.inner.name.to_string())));
+    dispatcher.apply(ProjectActions::SetDescription(Some(rich_variant.inner.description.to_string())));
+        dispatcher.apply(ProjectActions::SetPublic(Some(rich_variant.inner.public)));    dispatcher.apply(ProjectActions::SetBudget(rich_variant.inner.budget.map(|budget| budget.to_string())));
+    dispatcher.apply(ProjectActions::SetExpenses(rich_variant.inner.expenses.map(|expenses| expenses.to_string())));
+    dispatcher.apply(ProjectActions::SetExpectedEndDate(rich_variant.inner.expected_end_date.map(|expected_end_date| expected_end_date.to_string())));
+    dispatcher.apply(ProjectActions::SetEndDate(rich_variant.inner.end_date.map(|end_date| end_date.to_string())));
         dispatcher.apply(ProjectActions::SetState(Some(rich_variant.state)));
-        vec![ComponentMessage::get_named::<&str, NewProject>(
-            "parent_project",
-            rich_variant.inner.id.into(),
-        )]
+        vec![ComponentMessage::get_named::<&str, NewProject>("parent_project", rich_variant.inner.id.into())]
     }
 
     fn can_submit(&self) -> bool {
         !self.has_errors()
-            && self.name.is_some()
-            && self.description.is_some()
-            && self.public.is_some()
-            && self.state.is_some()
+        && self.name.is_some()
+        && self.description.is_some()
+        && self.public.is_some()
+        && self.state.is_some()
     }
+
 }
 
 impl From<ProjectBuilder> for NewProject {
@@ -365,9 +319,7 @@ impl From<ProjectBuilder> for NewProject {
             description: builder.description.unwrap(),
             public: builder.public.unwrap(),
             state_id: builder.state.unwrap().inner.id,
-            parent_project_id: builder
-                .parent_project
-                .map(|parent_project| parent_project.inner.id),
+            parent_project_id: builder.parent_project.map(|parent_project| parent_project.inner.id),
             budget: builder.budget,
             expenses: builder.expenses,
             expected_end_date: builder.expected_end_date,
@@ -383,9 +335,7 @@ impl From<ProjectBuilder> for UpdateProject {
             description: builder.description.unwrap(),
             public: builder.public.unwrap(),
             state_id: builder.state.unwrap().inner.id,
-            parent_project_id: builder
-                .parent_project
-                .map(|parent_project| parent_project.inner.id),
+            parent_project_id: builder.parent_project.map(|parent_project| parent_project.inner.id),
             budget: builder.budget,
             expenses: builder.expenses,
             expected_end_date: builder.expected_end_date,
@@ -440,28 +390,15 @@ impl FormBuildable for UpdateProject {
 #[function_component(CreateProjectForm)]
 pub fn create_project_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<ProjectBuilder>();
-    let set_name =
-        builder_dispatch.apply_callback(|name: Option<String>| ProjectActions::SetName(name));
-    let set_description = builder_dispatch
-        .apply_callback(|description: Option<String>| ProjectActions::SetDescription(description));
-    let set_public =
-        builder_dispatch.apply_callback(|public: bool| ProjectActions::SetPublic(Some(public)));
-    let set_budget =
-        builder_dispatch.apply_callback(|budget: Option<String>| ProjectActions::SetBudget(budget));
-    let set_expenses = builder_dispatch
-        .apply_callback(|expenses: Option<String>| ProjectActions::SetExpenses(expenses));
-    let set_expected_end_date =
-        builder_dispatch.apply_callback(|expected_end_date: Option<String>| {
-            ProjectActions::SetExpectedEndDate(expected_end_date)
-        });
-    let set_end_date = builder_dispatch
-        .apply_callback(|end_date: Option<String>| ProjectActions::SetEndDate(end_date));
-    let set_state = builder_dispatch
-        .apply_callback(|state: Option<NestedProjectState>| ProjectActions::SetState(state));
-    let set_parent_project =
-        builder_dispatch.apply_callback(|parent_project: Option<NestedProject>| {
-            ProjectActions::SetParentProject(parent_project)
-        });
+    let set_name = builder_dispatch.apply_callback(|name: Option<String>| ProjectActions::SetName(name));
+    let set_description = builder_dispatch.apply_callback(|description: Option<String>| ProjectActions::SetDescription(description));
+    let set_public = builder_dispatch.apply_callback(|public: bool| ProjectActions::SetPublic(Some(public)));
+    let set_budget = builder_dispatch.apply_callback(|budget: Option<String>| ProjectActions::SetBudget(budget));
+    let set_expenses = builder_dispatch.apply_callback(|expenses: Option<String>| ProjectActions::SetExpenses(expenses));
+    let set_expected_end_date = builder_dispatch.apply_callback(|expected_end_date: Option<String>| ProjectActions::SetExpectedEndDate(expected_end_date));
+    let set_end_date = builder_dispatch.apply_callback(|end_date: Option<String>| ProjectActions::SetEndDate(end_date));
+    let set_state = builder_dispatch.apply_callback(|state: Option<NestedProjectState>| ProjectActions::SetState(state));
+    let set_parent_project = builder_dispatch.apply_callback(|parent_project: Option<NestedProject>| ProjectActions::SetParentProject(parent_project));
     html! {
         <BasicForm<NewProject> method={FormMethod::POST} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
@@ -484,31 +421,18 @@ pub struct UpdateProjectFormProp {
 #[function_component(UpdateProjectForm)]
 pub fn update_project_form(props: &UpdateProjectFormProp) -> Html {
     let (builder_store, builder_dispatch) = use_store::<ProjectBuilder>();
-    builder_dispatch.reduce_mut(|builder| {
-        builder.id = Some(props.id);
-    });
-    let set_name =
-        builder_dispatch.apply_callback(|name: Option<String>| ProjectActions::SetName(name));
-    let set_description = builder_dispatch
-        .apply_callback(|description: Option<String>| ProjectActions::SetDescription(description));
-    let set_public =
-        builder_dispatch.apply_callback(|public: bool| ProjectActions::SetPublic(Some(public)));
-    let set_budget =
-        builder_dispatch.apply_callback(|budget: Option<String>| ProjectActions::SetBudget(budget));
-    let set_expenses = builder_dispatch
-        .apply_callback(|expenses: Option<String>| ProjectActions::SetExpenses(expenses));
-    let set_expected_end_date =
-        builder_dispatch.apply_callback(|expected_end_date: Option<String>| {
-            ProjectActions::SetExpectedEndDate(expected_end_date)
-        });
-    let set_end_date = builder_dispatch
-        .apply_callback(|end_date: Option<String>| ProjectActions::SetEndDate(end_date));
-    let set_state = builder_dispatch
-        .apply_callback(|state: Option<NestedProjectState>| ProjectActions::SetState(state));
-    let set_parent_project =
-        builder_dispatch.apply_callback(|parent_project: Option<NestedProject>| {
-            ProjectActions::SetParentProject(parent_project)
-        });
+     builder_dispatch.reduce_mut(|builder| {
+         builder.id = Some(props.id);
+     });
+    let set_name = builder_dispatch.apply_callback(|name: Option<String>| ProjectActions::SetName(name));
+    let set_description = builder_dispatch.apply_callback(|description: Option<String>| ProjectActions::SetDescription(description));
+    let set_public = builder_dispatch.apply_callback(|public: bool| ProjectActions::SetPublic(Some(public)));
+    let set_budget = builder_dispatch.apply_callback(|budget: Option<String>| ProjectActions::SetBudget(budget));
+    let set_expenses = builder_dispatch.apply_callback(|expenses: Option<String>| ProjectActions::SetExpenses(expenses));
+    let set_expected_end_date = builder_dispatch.apply_callback(|expected_end_date: Option<String>| ProjectActions::SetExpectedEndDate(expected_end_date));
+    let set_end_date = builder_dispatch.apply_callback(|end_date: Option<String>| ProjectActions::SetEndDate(end_date));
+    let set_state = builder_dispatch.apply_callback(|state: Option<NestedProjectState>| ProjectActions::SetState(state));
+    let set_parent_project = builder_dispatch.apply_callback(|parent_project: Option<NestedProject>| ProjectActions::SetParentProject(parent_project));
     html! {
         <BasicForm<UpdateProject> method={FormMethod::PUT} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
@@ -550,28 +474,23 @@ pub(super) enum SampledIndividualActions {
 
 impl FromOperation for SampledIndividualActions {
     fn from_operation<S: AsRef<str>>(_operation: S, _row: Vec<u8>) -> Self {
-        unreachable!(
-            "No operations are expected to be needed for the builder SampledIndividualBuilder."
-        )
+        unreachable!("No operations are expected to be needed for the builder SampledIndividualBuilder.")
     }
 }
 
 impl Reducer<SampledIndividualBuilder> for SampledIndividualActions {
-    fn apply(
-        self,
-        mut state: std::rc::Rc<SampledIndividualBuilder>,
-    ) -> std::rc::Rc<SampledIndividualBuilder> {
+    fn apply(self, mut state: std::rc::Rc<SampledIndividualBuilder>) -> std::rc::Rc<SampledIndividualBuilder> {
         let state_mut = Rc::make_mut(&mut state);
         match self {
             SampledIndividualActions::SetTagged(tagged) => 'tagged: {
                 state_mut.errors_tagged.clear();
-                if tagged.is_none() {
-                    state_mut.errors_tagged.push(ApiError::BadRequest(vec![
-                        "The Tagged field is required.".to_string(),
-                    ]));
-                    state_mut.tagged = None;
-                    break 'tagged;
-                }
+        if tagged.is_none() {
+            state_mut.errors_tagged.push(ApiError::BadRequest(vec![
+                "The Tagged field is required.".to_string()
+             ]));
+            state_mut.tagged = None;
+             break 'tagged;
+        }
                 state_mut.tagged = tagged;
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
@@ -587,26 +506,22 @@ impl FormBuilder for SampledIndividualBuilder {
     type RichVariant = NestedSampledIndividual;
 
     fn has_errors(&self) -> bool {
-        !self.errors_tagged.is_empty()
+!self.errors_tagged.is_empty()
     }
 
     fn id(&self) -> Option<PrimaryKey> {
         self.id.map(|id| id.into())
     }
 
-    fn update(
-        dispatcher: &Dispatch<Self>,
-        rich_variant: Self::RichVariant,
-    ) -> Vec<ComponentMessage> {
-        dispatcher.apply(SampledIndividualActions::SetTagged(Some(
-            rich_variant.inner.tagged,
-        )));
-        Vec::new()
+    fn update(dispatcher: &Dispatch<Self>, rich_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.apply(SampledIndividualActions::SetTagged(Some(rich_variant.inner.tagged)));        Vec::new()
     }
 
     fn can_submit(&self) -> bool {
-        !self.has_errors() && self.tagged.is_some()
+        !self.has_errors()
+        && self.tagged.is_some()
     }
+
 }
 
 impl From<SampledIndividualBuilder> for NewSampledIndividual {
@@ -644,8 +559,7 @@ impl FormBuildable for NewSampledIndividual {
 #[function_component(CreateSampledIndividualForm)]
 pub fn create_sampled_individual_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<SampledIndividualBuilder>();
-    let set_tagged = builder_dispatch
-        .apply_callback(|tagged: bool| SampledIndividualActions::SetTagged(Some(tagged)));
+    let set_tagged = builder_dispatch.apply_callback(|tagged: bool| SampledIndividualActions::SetTagged(Some(tagged)));
     html! {
         <BasicForm<NewSampledIndividual> method={FormMethod::POST} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <Checkbox label="Tagged" errors={builder_store.errors_tagged.clone()} builder={set_tagged} value={builder_store.tagged.unwrap_or(false)} />
@@ -660,11 +574,10 @@ pub struct UpdateSampledIndividualFormProp {
 #[function_component(UpdateSampledIndividualForm)]
 pub fn update_sampled_individual_form(props: &UpdateSampledIndividualFormProp) -> Html {
     let (builder_store, builder_dispatch) = use_store::<SampledIndividualBuilder>();
-    builder_dispatch.reduce_mut(|builder| {
-        builder.id = Some(props.id);
-    });
-    let set_tagged = builder_dispatch
-        .apply_callback(|tagged: bool| SampledIndividualActions::SetTagged(Some(tagged)));
+     builder_dispatch.reduce_mut(|builder| {
+         builder.id = Some(props.id);
+     });
+    let set_tagged = builder_dispatch.apply_callback(|tagged: bool| SampledIndividualActions::SetTagged(Some(tagged)));
     html! {
         <BasicForm<NewSampledIndividual> method={FormMethod::PUT} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <Checkbox label="Tagged" errors={builder_store.errors_tagged.clone()} builder={set_tagged} value={builder_store.tagged.unwrap_or(false)} />
@@ -713,13 +626,13 @@ impl Reducer<SampleBuilder> for SampleActions {
         match self {
             SampleActions::SetSampledBy(sampled_by) => 'sampled_by: {
                 state_mut.errors_sampled_by.clear();
-                if sampled_by.is_none() {
-                    state_mut.errors_sampled_by.push(ApiError::BadRequest(vec![
-                        "The Sampled by field is required.".to_string(),
-                    ]));
-                    state_mut.sampled_by = None;
-                    break 'sampled_by;
-                }
+        if sampled_by.is_none() {
+            state_mut.errors_sampled_by.push(ApiError::BadRequest(vec![
+                "The Sampled by field is required.".to_string()
+             ]));
+            state_mut.sampled_by = None;
+             break 'sampled_by;
+        }
                 state_mut.sampled_by = sampled_by;
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
@@ -727,13 +640,13 @@ impl Reducer<SampleBuilder> for SampleActions {
             }
             SampleActions::SetState(state) => 'state: {
                 state_mut.errors_state.clear();
-                if state.is_none() {
-                    state_mut.errors_state.push(ApiError::BadRequest(vec![
-                        "The State field is required.".to_string(),
-                    ]));
-                    state_mut.state = None;
-                    break 'state;
-                }
+        if state.is_none() {
+            state_mut.errors_state.push(ApiError::BadRequest(vec![
+                "The State field is required.".to_string()
+             ]));
+            state_mut.state = None;
+             break 'state;
+        }
                 state_mut.state = state;
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
@@ -749,25 +662,25 @@ impl FormBuilder for SampleBuilder {
     type RichVariant = NestedSample;
 
     fn has_errors(&self) -> bool {
-        !self.errors_sampled_by.is_empty() || !self.errors_state.is_empty()
+!self.errors_sampled_by.is_empty() || !self.errors_state.is_empty()
     }
 
     fn id(&self) -> Option<PrimaryKey> {
         self.id.map(|id| id.into())
     }
 
-    fn update(
-        dispatcher: &Dispatch<Self>,
-        rich_variant: Self::RichVariant,
-    ) -> Vec<ComponentMessage> {
+    fn update(dispatcher: &Dispatch<Self>, rich_variant: Self::RichVariant) -> Vec<ComponentMessage> {
         dispatcher.apply(SampleActions::SetSampledBy(Some(rich_variant.sampled_by)));
         dispatcher.apply(SampleActions::SetState(Some(rich_variant.state)));
         Vec::new()
     }
 
     fn can_submit(&self) -> bool {
-        !self.has_errors() && self.sampled_by.is_some() && self.state.is_some()
+        !self.has_errors()
+        && self.sampled_by.is_some()
+        && self.state.is_some()
     }
+
 }
 
 impl From<SampleBuilder> for NewSample {
@@ -806,10 +719,8 @@ impl FormBuildable for NewSample {
 #[function_component(CreateSampleForm)]
 pub fn create_sample_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<SampleBuilder>();
-    let set_sampled_by = builder_dispatch
-        .apply_callback(|sampled_by: Option<User>| SampleActions::SetSampledBy(sampled_by));
-    let set_state = builder_dispatch
-        .apply_callback(|state: Option<NestedSampleState>| SampleActions::SetState(state));
+    let set_sampled_by = builder_dispatch.apply_callback(|sampled_by: Option<User>| SampleActions::SetSampledBy(sampled_by));
+    let set_state = builder_dispatch.apply_callback(|state: Option<NestedSampleState>| SampleActions::SetState(state));
     html! {
         <BasicForm<NewSample> method={FormMethod::POST} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <Datalist<User> builder={set_sampled_by} errors={builder_store.errors_sampled_by.clone()} value={builder_store.sampled_by.clone()} label="Sampled by" />
@@ -825,13 +736,11 @@ pub struct UpdateSampleFormProp {
 #[function_component(UpdateSampleForm)]
 pub fn update_sample_form(props: &UpdateSampleFormProp) -> Html {
     let (builder_store, builder_dispatch) = use_store::<SampleBuilder>();
-    builder_dispatch.reduce_mut(|builder| {
-        builder.id = Some(props.id);
-    });
-    let set_sampled_by = builder_dispatch
-        .apply_callback(|sampled_by: Option<User>| SampleActions::SetSampledBy(sampled_by));
-    let set_state = builder_dispatch
-        .apply_callback(|state: Option<NestedSampleState>| SampleActions::SetState(state));
+     builder_dispatch.reduce_mut(|builder| {
+         builder.id = Some(props.id);
+     });
+    let set_sampled_by = builder_dispatch.apply_callback(|sampled_by: Option<User>| SampleActions::SetSampledBy(sampled_by));
+    let set_state = builder_dispatch.apply_callback(|state: Option<NestedSampleState>| SampleActions::SetState(state));
     html! {
         <BasicForm<NewSample> method={FormMethod::PUT} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <Datalist<User> builder={set_sampled_by} errors={builder_store.errors_sampled_by.clone()} value={builder_store.sampled_by.clone()} label="Sampled by" />
@@ -878,9 +787,7 @@ impl FromOperation for TeamActions {
     fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
         match operation.as_ref() {
             "parent_team" => TeamActions::SetParentTeam(bincode::deserialize(&row).unwrap()),
-            operation_name => {
-                unreachable!("The operation name '{}' is not supported.", operation_name)
-            }
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
         }
     }
 }
@@ -891,20 +798,20 @@ impl Reducer<TeamBuilder> for TeamActions {
         match self {
             TeamActions::SetName(name) => 'name: {
                 state_mut.errors_name.clear();
-                if name.is_none() {
-                    state_mut.errors_name.push(ApiError::BadRequest(vec![
-                        "The Name field is required.".to_string(),
-                    ]));
-                    state_mut.name = None;
-                    break 'name;
-                }
+        if name.is_none() {
+            state_mut.errors_name.push(ApiError::BadRequest(vec![
+                "The Name field is required.".to_string()
+             ]));
+            state_mut.name = None;
+             break 'name;
+        }
                 if let Some(value) = name.as_ref() {
                     if value.is_empty() {
                         state_mut.errors_name.push(ApiError::BadRequest(vec![
-                            "The Name field cannot be left empty.".to_string(),
+                            "The Name field cannot be left empty.".to_string()
                         ]));
-                        state_mut.name = None;
-                        break 'name;
+                         state_mut.name = None;
+                          break 'name;
                     }
                 }
                 state_mut.name = name;
@@ -914,20 +821,20 @@ impl Reducer<TeamBuilder> for TeamActions {
             }
             TeamActions::SetDescription(description) => 'description: {
                 state_mut.errors_description.clear();
-                if description.is_none() {
-                    state_mut.errors_description.push(ApiError::BadRequest(vec![
-                        "The Description field is required.".to_string(),
-                    ]));
-                    state_mut.description = None;
-                    break 'description;
-                }
+        if description.is_none() {
+            state_mut.errors_description.push(ApiError::BadRequest(vec![
+                "The Description field is required.".to_string()
+             ]));
+            state_mut.description = None;
+             break 'description;
+        }
                 if let Some(value) = description.as_ref() {
                     if value.is_empty() {
                         state_mut.errors_description.push(ApiError::BadRequest(vec![
-                            "The Description field cannot be left empty.".to_string(),
+                            "The Description field cannot be left empty.".to_string()
                         ]));
-                        state_mut.description = None;
-                        break 'description;
+                         state_mut.description = None;
+                          break 'description;
                     }
                 }
                 state_mut.description = description;
@@ -952,34 +859,25 @@ impl FormBuilder for TeamBuilder {
     type RichVariant = NestedTeam;
 
     fn has_errors(&self) -> bool {
-        !self.errors_name.is_empty()
-            || !self.errors_description.is_empty()
-            || !self.errors_parent_team.is_empty()
+!self.errors_name.is_empty() || !self.errors_description.is_empty() || !self.errors_parent_team.is_empty()
     }
 
     fn id(&self) -> Option<PrimaryKey> {
         self.id.map(|id| id.into())
     }
 
-    fn update(
-        dispatcher: &Dispatch<Self>,
-        rich_variant: Self::RichVariant,
-    ) -> Vec<ComponentMessage> {
-        dispatcher.apply(TeamActions::SetName(Some(
-            rich_variant.inner.name.to_string(),
-        )));
-        dispatcher.apply(TeamActions::SetDescription(Some(
-            rich_variant.inner.description.to_string(),
-        )));
-        vec![ComponentMessage::get_named::<&str, NewTeam>(
-            "parent_team",
-            rich_variant.inner.id.into(),
-        )]
+    fn update(dispatcher: &Dispatch<Self>, rich_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+    dispatcher.apply(TeamActions::SetName(Some(rich_variant.inner.name.to_string())));
+    dispatcher.apply(TeamActions::SetDescription(Some(rich_variant.inner.description.to_string())));
+        vec![ComponentMessage::get_named::<&str, NewTeam>("parent_team", rich_variant.inner.id.into())]
     }
 
     fn can_submit(&self) -> bool {
-        !self.has_errors() && self.name.is_some() && self.description.is_some()
+        !self.has_errors()
+        && self.name.is_some()
+        && self.description.is_some()
     }
+
 }
 
 impl From<TeamBuilder> for NewTeam {
@@ -1048,12 +946,9 @@ impl FormBuildable for UpdateTeam {
 #[function_component(CreateTeamForm)]
 pub fn create_team_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<TeamBuilder>();
-    let set_name =
-        builder_dispatch.apply_callback(|name: Option<String>| TeamActions::SetName(name));
-    let set_description = builder_dispatch
-        .apply_callback(|description: Option<String>| TeamActions::SetDescription(description));
-    let set_parent_team = builder_dispatch
-        .apply_callback(|parent_team: Option<NestedTeam>| TeamActions::SetParentTeam(parent_team));
+    let set_name = builder_dispatch.apply_callback(|name: Option<String>| TeamActions::SetName(name));
+    let set_description = builder_dispatch.apply_callback(|description: Option<String>| TeamActions::SetDescription(description));
+    let set_parent_team = builder_dispatch.apply_callback(|parent_team: Option<NestedTeam>| TeamActions::SetParentTeam(parent_team));
     html! {
         <BasicForm<NewTeam> method={FormMethod::POST} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
@@ -1070,15 +965,12 @@ pub struct UpdateTeamFormProp {
 #[function_component(UpdateTeamForm)]
 pub fn update_team_form(props: &UpdateTeamFormProp) -> Html {
     let (builder_store, builder_dispatch) = use_store::<TeamBuilder>();
-    builder_dispatch.reduce_mut(|builder| {
-        builder.id = Some(props.id);
-    });
-    let set_name =
-        builder_dispatch.apply_callback(|name: Option<String>| TeamActions::SetName(name));
-    let set_description = builder_dispatch
-        .apply_callback(|description: Option<String>| TeamActions::SetDescription(description));
-    let set_parent_team = builder_dispatch
-        .apply_callback(|parent_team: Option<NestedTeam>| TeamActions::SetParentTeam(parent_team));
+     builder_dispatch.reduce_mut(|builder| {
+         builder.id = Some(props.id);
+     });
+    let set_name = builder_dispatch.apply_callback(|name: Option<String>| TeamActions::SetName(name));
+    let set_description = builder_dispatch.apply_callback(|description: Option<String>| TeamActions::SetDescription(description));
+    let set_parent_team = builder_dispatch.apply_callback(|parent_team: Option<NestedTeam>| TeamActions::SetParentTeam(parent_team));
     html! {
         <BasicForm<UpdateTeam> method={FormMethod::PUT} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Name" errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
@@ -1139,20 +1031,20 @@ impl Reducer<UserBuilder> for UserActions {
         match self {
             UserActions::SetFirstName(first_name) => 'first_name: {
                 state_mut.errors_first_name.clear();
-                if first_name.is_none() {
-                    state_mut.errors_first_name.push(ApiError::BadRequest(vec![
-                        "The First name field is required.".to_string(),
-                    ]));
-                    state_mut.first_name = None;
-                    break 'first_name;
-                }
+        if first_name.is_none() {
+            state_mut.errors_first_name.push(ApiError::BadRequest(vec![
+                "The First name field is required.".to_string()
+             ]));
+            state_mut.first_name = None;
+             break 'first_name;
+        }
                 if let Some(value) = first_name.as_ref() {
                     if value.is_empty() {
                         state_mut.errors_first_name.push(ApiError::BadRequest(vec![
-                            "The First name field cannot be left empty.".to_string(),
+                            "The First name field cannot be left empty.".to_string()
                         ]));
-                        state_mut.first_name = None;
-                        break 'first_name;
+                         state_mut.first_name = None;
+                          break 'first_name;
                     }
                 }
                 state_mut.first_name = first_name;
@@ -1165,10 +1057,10 @@ impl Reducer<UserBuilder> for UserActions {
                 if let Some(value) = middle_name.as_ref() {
                     if value.is_empty() {
                         state_mut.errors_middle_name.push(ApiError::BadRequest(vec![
-                            "The Middle name field cannot be left empty.".to_string(),
+                            "The Middle name field cannot be left empty.".to_string()
                         ]));
-                        state_mut.middle_name = None;
-                        break 'middle_name;
+                         state_mut.middle_name = None;
+                          break 'middle_name;
                     }
                 }
                 state_mut.middle_name = middle_name;
@@ -1178,20 +1070,20 @@ impl Reducer<UserBuilder> for UserActions {
             }
             UserActions::SetLastName(last_name) => 'last_name: {
                 state_mut.errors_last_name.clear();
-                if last_name.is_none() {
-                    state_mut.errors_last_name.push(ApiError::BadRequest(vec![
-                        "The Last name field is required.".to_string(),
-                    ]));
-                    state_mut.last_name = None;
-                    break 'last_name;
-                }
+        if last_name.is_none() {
+            state_mut.errors_last_name.push(ApiError::BadRequest(vec![
+                "The Last name field is required.".to_string()
+             ]));
+            state_mut.last_name = None;
+             break 'last_name;
+        }
                 if let Some(value) = last_name.as_ref() {
                     if value.is_empty() {
                         state_mut.errors_last_name.push(ApiError::BadRequest(vec![
-                            "The Last name field cannot be left empty.".to_string(),
+                            "The Last name field cannot be left empty.".to_string()
                         ]));
-                        state_mut.last_name = None;
-                        break 'last_name;
+                         state_mut.last_name = None;
+                          break 'last_name;
                     }
                 }
                 state_mut.last_name = last_name;
@@ -1201,15 +1093,13 @@ impl Reducer<UserBuilder> for UserActions {
             }
             UserActions::SetProfilePicture(profile_picture) => 'profile_picture: {
                 state_mut.errors_profile_picture.clear();
-                if profile_picture.is_none() {
-                    state_mut
-                        .errors_profile_picture
-                        .push(ApiError::BadRequest(vec![
-                            "The Profile picture field is required.".to_string(),
-                        ]));
-                    state_mut.profile_picture = None;
-                    break 'profile_picture;
-                }
+        if profile_picture.is_none() {
+            state_mut.errors_profile_picture.push(ApiError::BadRequest(vec![
+                "The Profile picture field is required.".to_string()
+             ]));
+            state_mut.profile_picture = None;
+             break 'profile_picture;
+        }
                 state_mut.profile_picture = profile_picture;
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
@@ -1225,35 +1115,28 @@ impl FormBuilder for UserBuilder {
     type RichVariant = User;
 
     fn has_errors(&self) -> bool {
-        !self.errors_first_name.is_empty()
-            || !self.errors_middle_name.is_empty()
-            || !self.errors_last_name.is_empty()
-            || !self.errors_profile_picture.is_empty()
+!self.errors_first_name.is_empty() || !self.errors_middle_name.is_empty() || !self.errors_last_name.is_empty() || !self.errors_profile_picture.is_empty()
     }
 
     fn id(&self) -> Option<PrimaryKey> {
         self.id.map(|id| id.into())
     }
 
-    fn update(
-        dispatcher: &Dispatch<Self>,
-        rich_variant: Self::RichVariant,
-    ) -> Vec<ComponentMessage> {
+    fn update(dispatcher: &Dispatch<Self>, rich_variant: Self::RichVariant) -> Vec<ComponentMessage> {
         dispatcher.apply(UserActions::SetFirstName(Some(rich_variant.first_name)));
         dispatcher.apply(UserActions::SetMiddleName(rich_variant.middle_name));
         dispatcher.apply(UserActions::SetLastName(Some(rich_variant.last_name)));
-        dispatcher.apply(UserActions::SetProfilePicture(Some(
-            rich_variant.profile_picture,
-        )));
+        dispatcher.apply(UserActions::SetProfilePicture(Some(rich_variant.profile_picture)));
         Vec::new()
     }
 
     fn can_submit(&self) -> bool {
         !self.has_errors()
-            && self.first_name.is_some()
-            && self.last_name.is_some()
-            && self.profile_picture.is_some()
+        && self.first_name.is_some()
+        && self.last_name.is_some()
+        && self.profile_picture.is_some()
     }
+
 }
 
 impl From<UserBuilder> for NewUser {
@@ -1324,17 +1207,10 @@ impl FormBuildable for UpdateUser {
 #[function_component(CreateUserForm)]
 pub fn create_user_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<UserBuilder>();
-    let set_first_name = builder_dispatch
-        .apply_callback(|first_name: Option<String>| UserActions::SetFirstName(first_name));
-    let set_middle_name = builder_dispatch
-        .apply_callback(|middle_name: Option<String>| UserActions::SetMiddleName(middle_name));
-    let set_last_name = builder_dispatch
-        .apply_callback(|last_name: Option<String>| UserActions::SetLastName(last_name));
-    let set_profile_picture = builder_dispatch.apply_callback(|profile_picture: Option<Image>| {
-        UserActions::SetProfilePicture(
-            profile_picture.map(|profile_picture| profile_picture.into()),
-        )
-    });
+    let set_first_name = builder_dispatch.apply_callback(|first_name: Option<String>| UserActions::SetFirstName(first_name));
+    let set_middle_name = builder_dispatch.apply_callback(|middle_name: Option<String>| UserActions::SetMiddleName(middle_name));
+    let set_last_name = builder_dispatch.apply_callback(|last_name: Option<String>| UserActions::SetLastName(last_name));
+    let set_profile_picture = builder_dispatch.apply_callback(|profile_picture: Option<Image>| UserActions::SetProfilePicture(profile_picture.map(|profile_picture| profile_picture.into())));
     html! {
         <BasicForm<NewUser> method={FormMethod::POST} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="First name" errors={builder_store.errors_first_name.clone()} builder={set_first_name} value={builder_store.first_name.clone()} />
@@ -1352,20 +1228,13 @@ pub struct UpdateUserFormProp {
 #[function_component(UpdateUserForm)]
 pub fn update_user_form(props: &UpdateUserFormProp) -> Html {
     let (builder_store, builder_dispatch) = use_store::<UserBuilder>();
-    builder_dispatch.reduce_mut(|builder| {
-        builder.id = Some(props.id);
-    });
-    let set_first_name = builder_dispatch
-        .apply_callback(|first_name: Option<String>| UserActions::SetFirstName(first_name));
-    let set_middle_name = builder_dispatch
-        .apply_callback(|middle_name: Option<String>| UserActions::SetMiddleName(middle_name));
-    let set_last_name = builder_dispatch
-        .apply_callback(|last_name: Option<String>| UserActions::SetLastName(last_name));
-    let set_profile_picture = builder_dispatch.apply_callback(|profile_picture: Option<Image>| {
-        UserActions::SetProfilePicture(
-            profile_picture.map(|profile_picture| profile_picture.into()),
-        )
-    });
+     builder_dispatch.reduce_mut(|builder| {
+         builder.id = Some(props.id);
+     });
+    let set_first_name = builder_dispatch.apply_callback(|first_name: Option<String>| UserActions::SetFirstName(first_name));
+    let set_middle_name = builder_dispatch.apply_callback(|middle_name: Option<String>| UserActions::SetMiddleName(middle_name));
+    let set_last_name = builder_dispatch.apply_callback(|last_name: Option<String>| UserActions::SetLastName(last_name));
+    let set_profile_picture = builder_dispatch.apply_callback(|profile_picture: Option<Image>| UserActions::SetProfilePicture(profile_picture.map(|profile_picture| profile_picture.into())));
     html! {
         <BasicForm<UpdateUser> method={FormMethod::PUT} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="First name" errors={builder_store.errors_first_name.clone()} builder={set_first_name} value={builder_store.first_name.clone()} />

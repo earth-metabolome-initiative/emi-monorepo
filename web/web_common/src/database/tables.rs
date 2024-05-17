@@ -2893,14 +2893,446 @@ impl Project {
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
+pub struct ProjectsTeamsRoleInvitation {
+    pub table_id: i32,
+    pub team_id: i32,
+    pub role_id: i32,
+    pub created_by: i32,
+    pub created_at: NaiveDateTime,
+}
+#[cfg(feature = "frontend")]
+impl ProjectsTeamsRoleInvitation {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::num(self.table_id),
+            gluesql::core::ast_builder::num(self.team_id),
+            gluesql::core::ast_builder::num(self.role_id),
+            gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+        ]
+    }
+
+    /// Insert the ProjectsTeamsRoleInvitation into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows inserted in table ProjectsTeamsRoleInvitation
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("projects_teams_role_invitations")
+            .insert()
+            .columns("table_id, team_id, role_id, created_by, created_at")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
+                 _ => unreachable!("Payload must be an Insert"),
+             })
+    }
+
+    /// Get ProjectsTeamsRoleInvitation from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn get<C>(
+        ( table_id, team_id ): ( i32, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("projects_teams_role_invitations")
+            .select()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("team_id").eq(team_id.to_string()))
+            .project("table_id, team_id, role_id, created_by, created_at")
+            .limit(1)
+            .execute(connection)
+            .await?;
+         Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>()
+            .pop())
+    }
+
+    /// Delete ProjectsTeamsRoleInvitation from the database.
+    ///
+    /// # Arguments
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete_from_id<C>(
+        ( table_id, team_id ): ( i32, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("projects_teams_role_invitations")
+            .delete()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("team_id").eq(team_id.to_string()))
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
+                 _ => unreachable!("Payload must be a Delete"),
+             })
+    }
+
+    /// Delete the current instance of ProjectsTeamsRoleInvitation from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        Self::delete_from_id(( self.table_id, self.team_id ), connection).await
+    }
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("projects_teams_role_invitations")
+            .update()        
+.set("table_id", gluesql::core::ast_builder::num(self.table_id))        
+.set("team_id", gluesql::core::ast_builder::num(self.team_id))        
+.set("role_id", gluesql::core::ast_builder::num(self.role_id))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+    /// Update the struct in the database if it exists, otherwise insert it.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated or inserted.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let number_of_rows = self.clone().update(connection).await?;
+        if number_of_rows == 0 {
+            self.insert(connection).await
+        } else {
+            Ok(number_of_rows)
+        }
+    }
+    /// Get all ProjectsTeamsRoleInvitation from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("projects_teams_role_invitations")
+            .select()
+            .project("table_id, team_id, role_id, created_by, created_at")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
+        Self {
+            table_id: match row.get("table_id").unwrap() {
+                gluesql::prelude::Value::I32(table_id) => table_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            team_id: match row.get("team_id").unwrap() {
+                gluesql::prelude::Value::I32(team_id) => team_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            role_id: match row.get("role_id").unwrap() {
+                gluesql::prelude::Value::I32(role_id) => role_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_at: match row.get("created_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
+        }
+    }
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
+pub struct ProjectsTeamsRoleRequest {
+    pub table_id: i32,
+    pub team_id: i32,
+    pub role_id: i32,
+    pub created_by: i32,
+    pub created_at: NaiveDateTime,
+}
+#[cfg(feature = "frontend")]
+impl ProjectsTeamsRoleRequest {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::num(self.table_id),
+            gluesql::core::ast_builder::num(self.team_id),
+            gluesql::core::ast_builder::num(self.role_id),
+            gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+        ]
+    }
+
+    /// Insert the ProjectsTeamsRoleRequest into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows inserted in table ProjectsTeamsRoleRequest
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("projects_teams_role_requests")
+            .insert()
+            .columns("table_id, team_id, role_id, created_by, created_at")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
+                 _ => unreachable!("Payload must be an Insert"),
+             })
+    }
+
+    /// Get ProjectsTeamsRoleRequest from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn get<C>(
+        ( table_id, team_id ): ( i32, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("projects_teams_role_requests")
+            .select()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("team_id").eq(team_id.to_string()))
+            .project("table_id, team_id, role_id, created_by, created_at")
+            .limit(1)
+            .execute(connection)
+            .await?;
+         Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>()
+            .pop())
+    }
+
+    /// Delete ProjectsTeamsRoleRequest from the database.
+    ///
+    /// # Arguments
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete_from_id<C>(
+        ( table_id, team_id ): ( i32, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("projects_teams_role_requests")
+            .delete()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("team_id").eq(team_id.to_string()))
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
+                 _ => unreachable!("Payload must be a Delete"),
+             })
+    }
+
+    /// Delete the current instance of ProjectsTeamsRoleRequest from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        Self::delete_from_id(( self.table_id, self.team_id ), connection).await
+    }
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("projects_teams_role_requests")
+            .update()        
+.set("table_id", gluesql::core::ast_builder::num(self.table_id))        
+.set("team_id", gluesql::core::ast_builder::num(self.team_id))        
+.set("role_id", gluesql::core::ast_builder::num(self.role_id))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+    /// Update the struct in the database if it exists, otherwise insert it.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated or inserted.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let number_of_rows = self.clone().update(connection).await?;
+        if number_of_rows == 0 {
+            self.insert(connection).await
+        } else {
+            Ok(number_of_rows)
+        }
+    }
+    /// Get all ProjectsTeamsRoleRequest from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("projects_teams_role_requests")
+            .select()
+            .project("table_id, team_id, role_id, created_by, created_at")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
+        Self {
+            table_id: match row.get("table_id").unwrap() {
+                gluesql::prelude::Value::I32(table_id) => table_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            team_id: match row.get("team_id").unwrap() {
+                gluesql::prelude::Value::I32(team_id) => team_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            role_id: match row.get("role_id").unwrap() {
+                gluesql::prelude::Value::I32(role_id) => role_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_at: match row.get("created_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
+        }
+    }
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ProjectsTeamsRole {
     pub table_id: i32,
     pub team_id: i32,
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
-    pub updated_by: i32,
-    pub updated_at: NaiveDateTime,
 }
 #[cfg(feature = "frontend")]
 impl ProjectsTeamsRole {
@@ -2911,8 +3343,6 @@ impl ProjectsTeamsRole {
             gluesql::core::ast_builder::num(self.role_id),
             gluesql::core::ast_builder::num(self.created_by),
             gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
-            gluesql::core::ast_builder::num(self.updated_by),
-            gluesql::core::ast_builder::timestamp(self.updated_at.to_string()),
         ]
     }
 
@@ -2932,7 +3362,7 @@ impl ProjectsTeamsRole {
         use gluesql::core::ast_builder::*;
         table("projects_teams_roles")
             .insert()
-            .columns("table_id, team_id, role_id, created_by, created_at, updated_by, updated_at")
+            .columns("table_id, team_id, role_id, created_by, created_at")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -2945,11 +3375,11 @@ impl ProjectsTeamsRole {
     /// Get ProjectsTeamsRole from the database by its ID.
     ///
     /// # Arguments
-    /// * `( table_id, team_id, role_id )` - The primary key(s) of the struct to get.
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to get.
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        ( table_id, team_id, role_id ): ( i32, i32, i32 ),
+        ( table_id, team_id ): ( i32, i32 ),
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -2959,8 +3389,7 @@ impl ProjectsTeamsRole {
             .select()
             .filter(col("table_id").eq(table_id.to_string()))
             .filter(col("team_id").eq(team_id.to_string()))
-            .filter(col("role_id").eq(role_id.to_string()))
-            .project("table_id, team_id, role_id, created_by, created_at, updated_by, updated_at")
+            .project("table_id, team_id, role_id, created_by, created_at")
             .limit(1)
             .execute(connection)
             .await?;
@@ -2974,13 +3403,13 @@ impl ProjectsTeamsRole {
     /// Delete ProjectsTeamsRole from the database.
     ///
     /// # Arguments
-    /// * `( table_id, team_id, role_id )` - The primary key(s) of the struct to delete.
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to delete.
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        ( table_id, team_id, role_id ): ( i32, i32, i32 ),
+        ( table_id, team_id ): ( i32, i32 ),
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -2990,7 +3419,6 @@ impl ProjectsTeamsRole {
             .delete()
             .filter(col("table_id").eq(table_id.to_string()))
             .filter(col("team_id").eq(team_id.to_string()))
-            .filter(col("role_id").eq(role_id.to_string()))
             .execute(connection)
             .await
              .map(|payload| match payload {
@@ -3012,7 +3440,7 @@ impl ProjectsTeamsRole {
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        Self::delete_from_id(( self.table_id, self.team_id, self.role_id ), connection).await
+        Self::delete_from_id(( self.table_id, self.team_id ), connection).await
     }
     /// Update the struct in the database.
     ///
@@ -3034,9 +3462,7 @@ impl ProjectsTeamsRole {
 .set("team_id", gluesql::core::ast_builder::num(self.team_id))        
 .set("role_id", gluesql::core::ast_builder::num(self.role_id))        
 .set("created_by", gluesql::core::ast_builder::num(self.created_by))        
-.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
-.set("updated_by", gluesql::core::ast_builder::num(self.updated_by))        
-.set("updated_at", gluesql::core::ast_builder::timestamp(self.updated_at.to_string()))            .execute(connection)
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))            .execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -3081,35 +3507,7 @@ impl ProjectsTeamsRole {
         use gluesql::core::ast_builder::*;
         let select_row = table("projects_teams_roles")
             .select()
-            .project("table_id, team_id, role_id, created_by, created_at, updated_by, updated_at")
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .execute(connection)
-            .await?;
-        Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>())
-    }
-    /// Get all ProjectsTeamsRole from the database ordered by the `updated_at` column.
-    ///
-    /// # Arguments
-    /// * `limit` - The maximum number of results, by default `10`.
-    /// * `offset` - The offset of the results, by default `0`.
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn all_by_updated_at<C>(
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("projects_teams_roles")
-            .select()
-            .project("table_id, team_id, role_id, created_by, created_at, updated_by, updated_at")
-            .order_by("updated_at desc")
+            .project("table_id, team_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -3141,12 +3539,438 @@ impl ProjectsTeamsRole {
                 gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
                 _ => unreachable!("Expected Timestamp")
             },
-            updated_by: match row.get("updated_by").unwrap() {
-                gluesql::prelude::Value::I32(updated_by) => updated_by.clone(),
+        }
+    }
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
+pub struct ProjectsUsersRoleInvitation {
+    pub table_id: i32,
+    pub user_id: i32,
+    pub role_id: i32,
+    pub created_by: i32,
+    pub created_at: NaiveDateTime,
+}
+#[cfg(feature = "frontend")]
+impl ProjectsUsersRoleInvitation {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::num(self.table_id),
+            gluesql::core::ast_builder::num(self.user_id),
+            gluesql::core::ast_builder::num(self.role_id),
+            gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+        ]
+    }
+
+    /// Insert the ProjectsUsersRoleInvitation into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows inserted in table ProjectsUsersRoleInvitation
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("projects_users_role_invitations")
+            .insert()
+            .columns("table_id, user_id, role_id, created_by, created_at")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
+                 _ => unreachable!("Payload must be an Insert"),
+             })
+    }
+
+    /// Get ProjectsUsersRoleInvitation from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn get<C>(
+        ( table_id, user_id ): ( i32, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("projects_users_role_invitations")
+            .select()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("user_id").eq(user_id.to_string()))
+            .project("table_id, user_id, role_id, created_by, created_at")
+            .limit(1)
+            .execute(connection)
+            .await?;
+         Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>()
+            .pop())
+    }
+
+    /// Delete ProjectsUsersRoleInvitation from the database.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete_from_id<C>(
+        ( table_id, user_id ): ( i32, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("projects_users_role_invitations")
+            .delete()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("user_id").eq(user_id.to_string()))
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
+                 _ => unreachable!("Payload must be a Delete"),
+             })
+    }
+
+    /// Delete the current instance of ProjectsUsersRoleInvitation from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        Self::delete_from_id(( self.table_id, self.user_id ), connection).await
+    }
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("projects_users_role_invitations")
+            .update()        
+.set("table_id", gluesql::core::ast_builder::num(self.table_id))        
+.set("user_id", gluesql::core::ast_builder::num(self.user_id))        
+.set("role_id", gluesql::core::ast_builder::num(self.role_id))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+    /// Update the struct in the database if it exists, otherwise insert it.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated or inserted.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let number_of_rows = self.clone().update(connection).await?;
+        if number_of_rows == 0 {
+            self.insert(connection).await
+        } else {
+            Ok(number_of_rows)
+        }
+    }
+    /// Get all ProjectsUsersRoleInvitation from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("projects_users_role_invitations")
+            .select()
+            .project("table_id, user_id, role_id, created_by, created_at")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
+        Self {
+            table_id: match row.get("table_id").unwrap() {
+                gluesql::prelude::Value::I32(table_id) => table_id.clone(),
                 _ => unreachable!("Expected I32")
             },
-            updated_at: match row.get("updated_at").unwrap() {
-                gluesql::prelude::Value::Timestamp(updated_at) => updated_at.clone(),
+            user_id: match row.get("user_id").unwrap() {
+                gluesql::prelude::Value::I32(user_id) => user_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            role_id: match row.get("role_id").unwrap() {
+                gluesql::prelude::Value::I32(role_id) => role_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_at: match row.get("created_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
+        }
+    }
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
+pub struct ProjectsUsersRoleRequest {
+    pub table_id: i32,
+    pub user_id: i32,
+    pub role_id: i32,
+    pub created_by: i32,
+    pub created_at: NaiveDateTime,
+}
+#[cfg(feature = "frontend")]
+impl ProjectsUsersRoleRequest {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::num(self.table_id),
+            gluesql::core::ast_builder::num(self.user_id),
+            gluesql::core::ast_builder::num(self.role_id),
+            gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+        ]
+    }
+
+    /// Insert the ProjectsUsersRoleRequest into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows inserted in table ProjectsUsersRoleRequest
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("projects_users_role_requests")
+            .insert()
+            .columns("table_id, user_id, role_id, created_by, created_at")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
+                 _ => unreachable!("Payload must be an Insert"),
+             })
+    }
+
+    /// Get ProjectsUsersRoleRequest from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn get<C>(
+        ( table_id, user_id ): ( i32, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("projects_users_role_requests")
+            .select()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("user_id").eq(user_id.to_string()))
+            .project("table_id, user_id, role_id, created_by, created_at")
+            .limit(1)
+            .execute(connection)
+            .await?;
+         Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>()
+            .pop())
+    }
+
+    /// Delete ProjectsUsersRoleRequest from the database.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete_from_id<C>(
+        ( table_id, user_id ): ( i32, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("projects_users_role_requests")
+            .delete()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("user_id").eq(user_id.to_string()))
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
+                 _ => unreachable!("Payload must be a Delete"),
+             })
+    }
+
+    /// Delete the current instance of ProjectsUsersRoleRequest from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        Self::delete_from_id(( self.table_id, self.user_id ), connection).await
+    }
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("projects_users_role_requests")
+            .update()        
+.set("table_id", gluesql::core::ast_builder::num(self.table_id))        
+.set("user_id", gluesql::core::ast_builder::num(self.user_id))        
+.set("role_id", gluesql::core::ast_builder::num(self.role_id))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+    /// Update the struct in the database if it exists, otherwise insert it.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated or inserted.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let number_of_rows = self.clone().update(connection).await?;
+        if number_of_rows == 0 {
+            self.insert(connection).await
+        } else {
+            Ok(number_of_rows)
+        }
+    }
+    /// Get all ProjectsUsersRoleRequest from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("projects_users_role_requests")
+            .select()
+            .project("table_id, user_id, role_id, created_by, created_at")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
+        Self {
+            table_id: match row.get("table_id").unwrap() {
+                gluesql::prelude::Value::I32(table_id) => table_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            user_id: match row.get("user_id").unwrap() {
+                gluesql::prelude::Value::I32(user_id) => user_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            role_id: match row.get("role_id").unwrap() {
+                gluesql::prelude::Value::I32(role_id) => role_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_at: match row.get("created_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
                 _ => unreachable!("Expected Timestamp")
             },
         }
@@ -3159,9 +3983,7 @@ pub struct ProjectsUsersRole {
     pub user_id: i32,
     pub role_id: i32,
     pub created_by: i32,
-    pub created_at: Option<NaiveDateTime>,
-    pub updated_by: i32,
-    pub updated_at: Option<NaiveDateTime>,
+    pub created_at: NaiveDateTime,
 }
 #[cfg(feature = "frontend")]
 impl ProjectsUsersRole {
@@ -3171,15 +3993,7 @@ impl ProjectsUsersRole {
             gluesql::core::ast_builder::num(self.user_id),
             gluesql::core::ast_builder::num(self.role_id),
             gluesql::core::ast_builder::num(self.created_by),
-            match self.created_at {
-                Some(created_at) => gluesql::core::ast_builder::timestamp(created_at.to_string()),
-                None => gluesql::core::ast_builder::null(),
-            },
-            gluesql::core::ast_builder::num(self.updated_by),
-            match self.updated_at {
-                Some(updated_at) => gluesql::core::ast_builder::timestamp(updated_at.to_string()),
-                None => gluesql::core::ast_builder::null(),
-            },
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
         ]
     }
 
@@ -3199,7 +4013,7 @@ impl ProjectsUsersRole {
         use gluesql::core::ast_builder::*;
         table("projects_users_roles")
             .insert()
-            .columns("table_id, user_id, role_id, created_by, created_at, updated_by, updated_at")
+            .columns("table_id, user_id, role_id, created_by, created_at")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -3212,11 +4026,11 @@ impl ProjectsUsersRole {
     /// Get ProjectsUsersRole from the database by its ID.
     ///
     /// # Arguments
-    /// * `( table_id, user_id, role_id )` - The primary key(s) of the struct to get.
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to get.
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        ( table_id, user_id, role_id ): ( i32, i32, i32 ),
+        ( table_id, user_id ): ( i32, i32 ),
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -3226,8 +4040,7 @@ impl ProjectsUsersRole {
             .select()
             .filter(col("table_id").eq(table_id.to_string()))
             .filter(col("user_id").eq(user_id.to_string()))
-            .filter(col("role_id").eq(role_id.to_string()))
-            .project("table_id, user_id, role_id, created_by, created_at, updated_by, updated_at")
+            .project("table_id, user_id, role_id, created_by, created_at")
             .limit(1)
             .execute(connection)
             .await?;
@@ -3241,13 +4054,13 @@ impl ProjectsUsersRole {
     /// Delete ProjectsUsersRole from the database.
     ///
     /// # Arguments
-    /// * `( table_id, user_id, role_id )` - The primary key(s) of the struct to delete.
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        ( table_id, user_id, role_id ): ( i32, i32, i32 ),
+        ( table_id, user_id ): ( i32, i32 ),
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -3257,7 +4070,6 @@ impl ProjectsUsersRole {
             .delete()
             .filter(col("table_id").eq(table_id.to_string()))
             .filter(col("user_id").eq(user_id.to_string()))
-            .filter(col("role_id").eq(role_id.to_string()))
             .execute(connection)
             .await
              .map(|payload| match payload {
@@ -3279,7 +4091,7 @@ impl ProjectsUsersRole {
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        Self::delete_from_id(( self.table_id, self.user_id, self.role_id ), connection).await
+        Self::delete_from_id(( self.table_id, self.user_id ), connection).await
     }
     /// Update the struct in the database.
     ///
@@ -3295,20 +4107,13 @@ impl ProjectsUsersRole {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
-        let mut update_row = table("projects_users_roles")
+        table("projects_users_roles")
             .update()        
 .set("table_id", gluesql::core::ast_builder::num(self.table_id))        
 .set("user_id", gluesql::core::ast_builder::num(self.user_id))        
 .set("role_id", gluesql::core::ast_builder::num(self.role_id))        
 .set("created_by", gluesql::core::ast_builder::num(self.created_by))        
-.set("updated_by", gluesql::core::ast_builder::num(self.updated_by));
-        if let Some(created_at) = self.created_at {
-            update_row = update_row.set("created_at", gluesql::core::ast_builder::timestamp(created_at.to_string()));
-        }
-        if let Some(updated_at) = self.updated_at {
-            update_row = update_row.set("updated_at", gluesql::core::ast_builder::timestamp(updated_at.to_string()));
-        }
-            update_row.execute(connection)
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))            .execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -3353,35 +4158,7 @@ impl ProjectsUsersRole {
         use gluesql::core::ast_builder::*;
         let select_row = table("projects_users_roles")
             .select()
-            .project("table_id, user_id, role_id, created_by, created_at, updated_by, updated_at")
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .execute(connection)
-            .await?;
-        Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>())
-    }
-    /// Get all ProjectsUsersRole from the database ordered by the `updated_at` column.
-    ///
-    /// # Arguments
-    /// * `limit` - The maximum number of results, by default `10`.
-    /// * `offset` - The offset of the results, by default `0`.
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn all_by_updated_at<C>(
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("projects_users_roles")
-            .select()
-            .project("table_id, user_id, role_id, created_by, created_at, updated_by, updated_at")
-            .order_by("updated_at desc")
+            .project("table_id, user_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -3410,17 +4187,7 @@ impl ProjectsUsersRole {
                 _ => unreachable!("Expected I32")
             },
             created_at: match row.get("created_at").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Timestamp(created_at) => Some(created_at.clone()),
-                _ => unreachable!("Expected Timestamp")
-            },
-            updated_by: match row.get("updated_by").unwrap() {
-                gluesql::prelude::Value::I32(updated_by) => updated_by.clone(),
-                _ => unreachable!("Expected I32")
-            },
-            updated_at: match row.get("updated_at").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Timestamp(updated_at) => Some(updated_at.clone()),
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
                 _ => unreachable!("Expected Timestamp")
             },
         }
@@ -4612,14 +5379,446 @@ impl SampledIndividual {
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
+pub struct SampledIndividualsTeamsRoleInvitation {
+    pub table_id: Uuid,
+    pub team_id: i32,
+    pub role_id: i32,
+    pub created_by: i32,
+    pub created_at: NaiveDateTime,
+}
+#[cfg(feature = "frontend")]
+impl SampledIndividualsTeamsRoleInvitation {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::uuid(self.table_id.to_string()),
+            gluesql::core::ast_builder::num(self.team_id),
+            gluesql::core::ast_builder::num(self.role_id),
+            gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+        ]
+    }
+
+    /// Insert the SampledIndividualsTeamsRoleInvitation into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows inserted in table SampledIndividualsTeamsRoleInvitation
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("sampled_individuals_teams_role_invitations")
+            .insert()
+            .columns("table_id, team_id, role_id, created_by, created_at")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
+                 _ => unreachable!("Payload must be an Insert"),
+             })
+    }
+
+    /// Get SampledIndividualsTeamsRoleInvitation from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn get<C>(
+        ( table_id, team_id ): ( Uuid, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("sampled_individuals_teams_role_invitations")
+            .select()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("team_id").eq(team_id.to_string()))
+            .project("table_id, team_id, role_id, created_by, created_at")
+            .limit(1)
+            .execute(connection)
+            .await?;
+         Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>()
+            .pop())
+    }
+
+    /// Delete SampledIndividualsTeamsRoleInvitation from the database.
+    ///
+    /// # Arguments
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete_from_id<C>(
+        ( table_id, team_id ): ( Uuid, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("sampled_individuals_teams_role_invitations")
+            .delete()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("team_id").eq(team_id.to_string()))
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
+                 _ => unreachable!("Payload must be a Delete"),
+             })
+    }
+
+    /// Delete the current instance of SampledIndividualsTeamsRoleInvitation from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        Self::delete_from_id(( self.table_id, self.team_id ), connection).await
+    }
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("sampled_individuals_teams_role_invitations")
+            .update()        
+.set("table_id", gluesql::core::ast_builder::uuid(self.table_id.to_string()))        
+.set("team_id", gluesql::core::ast_builder::num(self.team_id))        
+.set("role_id", gluesql::core::ast_builder::num(self.role_id))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+    /// Update the struct in the database if it exists, otherwise insert it.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated or inserted.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let number_of_rows = self.clone().update(connection).await?;
+        if number_of_rows == 0 {
+            self.insert(connection).await
+        } else {
+            Ok(number_of_rows)
+        }
+    }
+    /// Get all SampledIndividualsTeamsRoleInvitation from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("sampled_individuals_teams_role_invitations")
+            .select()
+            .project("table_id, team_id, role_id, created_by, created_at")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
+        Self {
+            table_id: match row.get("table_id").unwrap() {
+                gluesql::prelude::Value::Uuid(table_id) => Uuid::from_u128(*table_id),
+                _ => unreachable!("Expected Uuid"),
+            },
+            team_id: match row.get("team_id").unwrap() {
+                gluesql::prelude::Value::I32(team_id) => team_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            role_id: match row.get("role_id").unwrap() {
+                gluesql::prelude::Value::I32(role_id) => role_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_at: match row.get("created_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
+        }
+    }
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
+pub struct SampledIndividualsTeamsRoleRequest {
+    pub table_id: Uuid,
+    pub team_id: i32,
+    pub role_id: i32,
+    pub created_by: i32,
+    pub created_at: NaiveDateTime,
+}
+#[cfg(feature = "frontend")]
+impl SampledIndividualsTeamsRoleRequest {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::uuid(self.table_id.to_string()),
+            gluesql::core::ast_builder::num(self.team_id),
+            gluesql::core::ast_builder::num(self.role_id),
+            gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+        ]
+    }
+
+    /// Insert the SampledIndividualsTeamsRoleRequest into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows inserted in table SampledIndividualsTeamsRoleRequest
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("sampled_individuals_teams_role_requests")
+            .insert()
+            .columns("table_id, team_id, role_id, created_by, created_at")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
+                 _ => unreachable!("Payload must be an Insert"),
+             })
+    }
+
+    /// Get SampledIndividualsTeamsRoleRequest from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn get<C>(
+        ( table_id, team_id ): ( Uuid, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("sampled_individuals_teams_role_requests")
+            .select()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("team_id").eq(team_id.to_string()))
+            .project("table_id, team_id, role_id, created_by, created_at")
+            .limit(1)
+            .execute(connection)
+            .await?;
+         Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>()
+            .pop())
+    }
+
+    /// Delete SampledIndividualsTeamsRoleRequest from the database.
+    ///
+    /// # Arguments
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete_from_id<C>(
+        ( table_id, team_id ): ( Uuid, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("sampled_individuals_teams_role_requests")
+            .delete()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("team_id").eq(team_id.to_string()))
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
+                 _ => unreachable!("Payload must be a Delete"),
+             })
+    }
+
+    /// Delete the current instance of SampledIndividualsTeamsRoleRequest from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        Self::delete_from_id(( self.table_id, self.team_id ), connection).await
+    }
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("sampled_individuals_teams_role_requests")
+            .update()        
+.set("table_id", gluesql::core::ast_builder::uuid(self.table_id.to_string()))        
+.set("team_id", gluesql::core::ast_builder::num(self.team_id))        
+.set("role_id", gluesql::core::ast_builder::num(self.role_id))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+    /// Update the struct in the database if it exists, otherwise insert it.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated or inserted.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let number_of_rows = self.clone().update(connection).await?;
+        if number_of_rows == 0 {
+            self.insert(connection).await
+        } else {
+            Ok(number_of_rows)
+        }
+    }
+    /// Get all SampledIndividualsTeamsRoleRequest from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("sampled_individuals_teams_role_requests")
+            .select()
+            .project("table_id, team_id, role_id, created_by, created_at")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
+        Self {
+            table_id: match row.get("table_id").unwrap() {
+                gluesql::prelude::Value::Uuid(table_id) => Uuid::from_u128(*table_id),
+                _ => unreachable!("Expected Uuid"),
+            },
+            team_id: match row.get("team_id").unwrap() {
+                gluesql::prelude::Value::I32(team_id) => team_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            role_id: match row.get("role_id").unwrap() {
+                gluesql::prelude::Value::I32(role_id) => role_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_at: match row.get("created_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
+        }
+    }
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SampledIndividualsTeamsRole {
     pub table_id: Uuid,
     pub team_id: i32,
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
-    pub updated_by: i32,
-    pub updated_at: NaiveDateTime,
 }
 #[cfg(feature = "frontend")]
 impl SampledIndividualsTeamsRole {
@@ -4630,8 +5829,6 @@ impl SampledIndividualsTeamsRole {
             gluesql::core::ast_builder::num(self.role_id),
             gluesql::core::ast_builder::num(self.created_by),
             gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
-            gluesql::core::ast_builder::num(self.updated_by),
-            gluesql::core::ast_builder::timestamp(self.updated_at.to_string()),
         ]
     }
 
@@ -4651,7 +5848,7 @@ impl SampledIndividualsTeamsRole {
         use gluesql::core::ast_builder::*;
         table("sampled_individuals_teams_roles")
             .insert()
-            .columns("table_id, team_id, role_id, created_by, created_at, updated_by, updated_at")
+            .columns("table_id, team_id, role_id, created_by, created_at")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -4664,11 +5861,11 @@ impl SampledIndividualsTeamsRole {
     /// Get SampledIndividualsTeamsRole from the database by its ID.
     ///
     /// # Arguments
-    /// * `( table_id, team_id, role_id )` - The primary key(s) of the struct to get.
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to get.
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        ( table_id, team_id, role_id ): ( Uuid, i32, i32 ),
+        ( table_id, team_id ): ( Uuid, i32 ),
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -4678,8 +5875,7 @@ impl SampledIndividualsTeamsRole {
             .select()
             .filter(col("table_id").eq(table_id.to_string()))
             .filter(col("team_id").eq(team_id.to_string()))
-            .filter(col("role_id").eq(role_id.to_string()))
-            .project("table_id, team_id, role_id, created_by, created_at, updated_by, updated_at")
+            .project("table_id, team_id, role_id, created_by, created_at")
             .limit(1)
             .execute(connection)
             .await?;
@@ -4693,13 +5889,13 @@ impl SampledIndividualsTeamsRole {
     /// Delete SampledIndividualsTeamsRole from the database.
     ///
     /// # Arguments
-    /// * `( table_id, team_id, role_id )` - The primary key(s) of the struct to delete.
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to delete.
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        ( table_id, team_id, role_id ): ( Uuid, i32, i32 ),
+        ( table_id, team_id ): ( Uuid, i32 ),
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -4709,7 +5905,6 @@ impl SampledIndividualsTeamsRole {
             .delete()
             .filter(col("table_id").eq(table_id.to_string()))
             .filter(col("team_id").eq(team_id.to_string()))
-            .filter(col("role_id").eq(role_id.to_string()))
             .execute(connection)
             .await
              .map(|payload| match payload {
@@ -4731,7 +5926,7 @@ impl SampledIndividualsTeamsRole {
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        Self::delete_from_id(( self.table_id, self.team_id, self.role_id ), connection).await
+        Self::delete_from_id(( self.table_id, self.team_id ), connection).await
     }
     /// Update the struct in the database.
     ///
@@ -4753,9 +5948,7 @@ impl SampledIndividualsTeamsRole {
 .set("team_id", gluesql::core::ast_builder::num(self.team_id))        
 .set("role_id", gluesql::core::ast_builder::num(self.role_id))        
 .set("created_by", gluesql::core::ast_builder::num(self.created_by))        
-.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
-.set("updated_by", gluesql::core::ast_builder::num(self.updated_by))        
-.set("updated_at", gluesql::core::ast_builder::timestamp(self.updated_at.to_string()))            .execute(connection)
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))            .execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -4800,35 +5993,7 @@ impl SampledIndividualsTeamsRole {
         use gluesql::core::ast_builder::*;
         let select_row = table("sampled_individuals_teams_roles")
             .select()
-            .project("table_id, team_id, role_id, created_by, created_at, updated_by, updated_at")
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .execute(connection)
-            .await?;
-        Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>())
-    }
-    /// Get all SampledIndividualsTeamsRole from the database ordered by the `updated_at` column.
-    ///
-    /// # Arguments
-    /// * `limit` - The maximum number of results, by default `10`.
-    /// * `offset` - The offset of the results, by default `0`.
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn all_by_updated_at<C>(
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("sampled_individuals_teams_roles")
-            .select()
-            .project("table_id, team_id, role_id, created_by, created_at, updated_by, updated_at")
-            .order_by("updated_at desc")
+            .project("table_id, team_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -4860,12 +6025,438 @@ impl SampledIndividualsTeamsRole {
                 gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
                 _ => unreachable!("Expected Timestamp")
             },
-            updated_by: match row.get("updated_by").unwrap() {
-                gluesql::prelude::Value::I32(updated_by) => updated_by.clone(),
+        }
+    }
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
+pub struct SampledIndividualsUsersRoleInvitation {
+    pub table_id: Uuid,
+    pub user_id: i32,
+    pub role_id: i32,
+    pub created_by: i32,
+    pub created_at: NaiveDateTime,
+}
+#[cfg(feature = "frontend")]
+impl SampledIndividualsUsersRoleInvitation {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::uuid(self.table_id.to_string()),
+            gluesql::core::ast_builder::num(self.user_id),
+            gluesql::core::ast_builder::num(self.role_id),
+            gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+        ]
+    }
+
+    /// Insert the SampledIndividualsUsersRoleInvitation into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows inserted in table SampledIndividualsUsersRoleInvitation
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("sampled_individuals_users_role_invitations")
+            .insert()
+            .columns("table_id, user_id, role_id, created_by, created_at")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
+                 _ => unreachable!("Payload must be an Insert"),
+             })
+    }
+
+    /// Get SampledIndividualsUsersRoleInvitation from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn get<C>(
+        ( table_id, user_id ): ( Uuid, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("sampled_individuals_users_role_invitations")
+            .select()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("user_id").eq(user_id.to_string()))
+            .project("table_id, user_id, role_id, created_by, created_at")
+            .limit(1)
+            .execute(connection)
+            .await?;
+         Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>()
+            .pop())
+    }
+
+    /// Delete SampledIndividualsUsersRoleInvitation from the database.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete_from_id<C>(
+        ( table_id, user_id ): ( Uuid, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("sampled_individuals_users_role_invitations")
+            .delete()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("user_id").eq(user_id.to_string()))
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
+                 _ => unreachable!("Payload must be a Delete"),
+             })
+    }
+
+    /// Delete the current instance of SampledIndividualsUsersRoleInvitation from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        Self::delete_from_id(( self.table_id, self.user_id ), connection).await
+    }
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("sampled_individuals_users_role_invitations")
+            .update()        
+.set("table_id", gluesql::core::ast_builder::uuid(self.table_id.to_string()))        
+.set("user_id", gluesql::core::ast_builder::num(self.user_id))        
+.set("role_id", gluesql::core::ast_builder::num(self.role_id))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+    /// Update the struct in the database if it exists, otherwise insert it.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated or inserted.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let number_of_rows = self.clone().update(connection).await?;
+        if number_of_rows == 0 {
+            self.insert(connection).await
+        } else {
+            Ok(number_of_rows)
+        }
+    }
+    /// Get all SampledIndividualsUsersRoleInvitation from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("sampled_individuals_users_role_invitations")
+            .select()
+            .project("table_id, user_id, role_id, created_by, created_at")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
+        Self {
+            table_id: match row.get("table_id").unwrap() {
+                gluesql::prelude::Value::Uuid(table_id) => Uuid::from_u128(*table_id),
+                _ => unreachable!("Expected Uuid"),
+            },
+            user_id: match row.get("user_id").unwrap() {
+                gluesql::prelude::Value::I32(user_id) => user_id.clone(),
                 _ => unreachable!("Expected I32")
             },
-            updated_at: match row.get("updated_at").unwrap() {
-                gluesql::prelude::Value::Timestamp(updated_at) => updated_at.clone(),
+            role_id: match row.get("role_id").unwrap() {
+                gluesql::prelude::Value::I32(role_id) => role_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_at: match row.get("created_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
+        }
+    }
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
+pub struct SampledIndividualsUsersRoleRequest {
+    pub table_id: Uuid,
+    pub user_id: i32,
+    pub role_id: i32,
+    pub created_by: i32,
+    pub created_at: NaiveDateTime,
+}
+#[cfg(feature = "frontend")]
+impl SampledIndividualsUsersRoleRequest {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::uuid(self.table_id.to_string()),
+            gluesql::core::ast_builder::num(self.user_id),
+            gluesql::core::ast_builder::num(self.role_id),
+            gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+        ]
+    }
+
+    /// Insert the SampledIndividualsUsersRoleRequest into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows inserted in table SampledIndividualsUsersRoleRequest
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("sampled_individuals_users_role_requests")
+            .insert()
+            .columns("table_id, user_id, role_id, created_by, created_at")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
+                 _ => unreachable!("Payload must be an Insert"),
+             })
+    }
+
+    /// Get SampledIndividualsUsersRoleRequest from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn get<C>(
+        ( table_id, user_id ): ( Uuid, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("sampled_individuals_users_role_requests")
+            .select()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("user_id").eq(user_id.to_string()))
+            .project("table_id, user_id, role_id, created_by, created_at")
+            .limit(1)
+            .execute(connection)
+            .await?;
+         Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>()
+            .pop())
+    }
+
+    /// Delete SampledIndividualsUsersRoleRequest from the database.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete_from_id<C>(
+        ( table_id, user_id ): ( Uuid, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("sampled_individuals_users_role_requests")
+            .delete()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("user_id").eq(user_id.to_string()))
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
+                 _ => unreachable!("Payload must be a Delete"),
+             })
+    }
+
+    /// Delete the current instance of SampledIndividualsUsersRoleRequest from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        Self::delete_from_id(( self.table_id, self.user_id ), connection).await
+    }
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("sampled_individuals_users_role_requests")
+            .update()        
+.set("table_id", gluesql::core::ast_builder::uuid(self.table_id.to_string()))        
+.set("user_id", gluesql::core::ast_builder::num(self.user_id))        
+.set("role_id", gluesql::core::ast_builder::num(self.role_id))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+    /// Update the struct in the database if it exists, otherwise insert it.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated or inserted.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let number_of_rows = self.clone().update(connection).await?;
+        if number_of_rows == 0 {
+            self.insert(connection).await
+        } else {
+            Ok(number_of_rows)
+        }
+    }
+    /// Get all SampledIndividualsUsersRoleRequest from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("sampled_individuals_users_role_requests")
+            .select()
+            .project("table_id, user_id, role_id, created_by, created_at")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
+        Self {
+            table_id: match row.get("table_id").unwrap() {
+                gluesql::prelude::Value::Uuid(table_id) => Uuid::from_u128(*table_id),
+                _ => unreachable!("Expected Uuid"),
+            },
+            user_id: match row.get("user_id").unwrap() {
+                gluesql::prelude::Value::I32(user_id) => user_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            role_id: match row.get("role_id").unwrap() {
+                gluesql::prelude::Value::I32(role_id) => role_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_at: match row.get("created_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
                 _ => unreachable!("Expected Timestamp")
             },
         }
@@ -4879,8 +6470,6 @@ pub struct SampledIndividualsUsersRole {
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
-    pub updated_by: i32,
-    pub updated_at: NaiveDateTime,
 }
 #[cfg(feature = "frontend")]
 impl SampledIndividualsUsersRole {
@@ -4891,8 +6480,6 @@ impl SampledIndividualsUsersRole {
             gluesql::core::ast_builder::num(self.role_id),
             gluesql::core::ast_builder::num(self.created_by),
             gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
-            gluesql::core::ast_builder::num(self.updated_by),
-            gluesql::core::ast_builder::timestamp(self.updated_at.to_string()),
         ]
     }
 
@@ -4912,7 +6499,7 @@ impl SampledIndividualsUsersRole {
         use gluesql::core::ast_builder::*;
         table("sampled_individuals_users_roles")
             .insert()
-            .columns("table_id, user_id, role_id, created_by, created_at, updated_by, updated_at")
+            .columns("table_id, user_id, role_id, created_by, created_at")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -4925,11 +6512,11 @@ impl SampledIndividualsUsersRole {
     /// Get SampledIndividualsUsersRole from the database by its ID.
     ///
     /// # Arguments
-    /// * `( table_id, user_id, role_id )` - The primary key(s) of the struct to get.
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to get.
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        ( table_id, user_id, role_id ): ( Uuid, i32, i32 ),
+        ( table_id, user_id ): ( Uuid, i32 ),
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -4939,8 +6526,7 @@ impl SampledIndividualsUsersRole {
             .select()
             .filter(col("table_id").eq(table_id.to_string()))
             .filter(col("user_id").eq(user_id.to_string()))
-            .filter(col("role_id").eq(role_id.to_string()))
-            .project("table_id, user_id, role_id, created_by, created_at, updated_by, updated_at")
+            .project("table_id, user_id, role_id, created_by, created_at")
             .limit(1)
             .execute(connection)
             .await?;
@@ -4954,13 +6540,13 @@ impl SampledIndividualsUsersRole {
     /// Delete SampledIndividualsUsersRole from the database.
     ///
     /// # Arguments
-    /// * `( table_id, user_id, role_id )` - The primary key(s) of the struct to delete.
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        ( table_id, user_id, role_id ): ( Uuid, i32, i32 ),
+        ( table_id, user_id ): ( Uuid, i32 ),
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -4970,7 +6556,6 @@ impl SampledIndividualsUsersRole {
             .delete()
             .filter(col("table_id").eq(table_id.to_string()))
             .filter(col("user_id").eq(user_id.to_string()))
-            .filter(col("role_id").eq(role_id.to_string()))
             .execute(connection)
             .await
              .map(|payload| match payload {
@@ -4992,7 +6577,7 @@ impl SampledIndividualsUsersRole {
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        Self::delete_from_id(( self.table_id, self.user_id, self.role_id ), connection).await
+        Self::delete_from_id(( self.table_id, self.user_id ), connection).await
     }
     /// Update the struct in the database.
     ///
@@ -5014,9 +6599,7 @@ impl SampledIndividualsUsersRole {
 .set("user_id", gluesql::core::ast_builder::num(self.user_id))        
 .set("role_id", gluesql::core::ast_builder::num(self.role_id))        
 .set("created_by", gluesql::core::ast_builder::num(self.created_by))        
-.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
-.set("updated_by", gluesql::core::ast_builder::num(self.updated_by))        
-.set("updated_at", gluesql::core::ast_builder::timestamp(self.updated_at.to_string()))            .execute(connection)
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))            .execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -5061,35 +6644,7 @@ impl SampledIndividualsUsersRole {
         use gluesql::core::ast_builder::*;
         let select_row = table("sampled_individuals_users_roles")
             .select()
-            .project("table_id, user_id, role_id, created_by, created_at, updated_by, updated_at")
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .execute(connection)
-            .await?;
-        Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>())
-    }
-    /// Get all SampledIndividualsUsersRole from the database ordered by the `updated_at` column.
-    ///
-    /// # Arguments
-    /// * `limit` - The maximum number of results, by default `10`.
-    /// * `offset` - The offset of the results, by default `0`.
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn all_by_updated_at<C>(
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("sampled_individuals_users_roles")
-            .select()
-            .project("table_id, user_id, role_id, created_by, created_at, updated_by, updated_at")
-            .order_by("updated_at desc")
+            .project("table_id, user_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -5119,14 +6674,6 @@ impl SampledIndividualsUsersRole {
             },
             created_at: match row.get("created_at").unwrap() {
                 gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
-                _ => unreachable!("Expected Timestamp")
-            },
-            updated_by: match row.get("updated_by").unwrap() {
-                gluesql::prelude::Value::I32(updated_by) => updated_by.clone(),
-                _ => unreachable!("Expected I32")
-            },
-            updated_at: match row.get("updated_at").unwrap() {
-                gluesql::prelude::Value::Timestamp(updated_at) => updated_at.clone(),
                 _ => unreachable!("Expected Timestamp")
             },
         }
@@ -5391,14 +6938,446 @@ impl Sample {
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
+pub struct SamplesTeamsRoleInvitation {
+    pub table_id: Uuid,
+    pub team_id: i32,
+    pub role_id: i32,
+    pub created_by: i32,
+    pub created_at: NaiveDateTime,
+}
+#[cfg(feature = "frontend")]
+impl SamplesTeamsRoleInvitation {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::uuid(self.table_id.to_string()),
+            gluesql::core::ast_builder::num(self.team_id),
+            gluesql::core::ast_builder::num(self.role_id),
+            gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+        ]
+    }
+
+    /// Insert the SamplesTeamsRoleInvitation into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows inserted in table SamplesTeamsRoleInvitation
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("samples_teams_role_invitations")
+            .insert()
+            .columns("table_id, team_id, role_id, created_by, created_at")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
+                 _ => unreachable!("Payload must be an Insert"),
+             })
+    }
+
+    /// Get SamplesTeamsRoleInvitation from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn get<C>(
+        ( table_id, team_id ): ( Uuid, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("samples_teams_role_invitations")
+            .select()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("team_id").eq(team_id.to_string()))
+            .project("table_id, team_id, role_id, created_by, created_at")
+            .limit(1)
+            .execute(connection)
+            .await?;
+         Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>()
+            .pop())
+    }
+
+    /// Delete SamplesTeamsRoleInvitation from the database.
+    ///
+    /// # Arguments
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete_from_id<C>(
+        ( table_id, team_id ): ( Uuid, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("samples_teams_role_invitations")
+            .delete()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("team_id").eq(team_id.to_string()))
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
+                 _ => unreachable!("Payload must be a Delete"),
+             })
+    }
+
+    /// Delete the current instance of SamplesTeamsRoleInvitation from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        Self::delete_from_id(( self.table_id, self.team_id ), connection).await
+    }
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("samples_teams_role_invitations")
+            .update()        
+.set("table_id", gluesql::core::ast_builder::uuid(self.table_id.to_string()))        
+.set("team_id", gluesql::core::ast_builder::num(self.team_id))        
+.set("role_id", gluesql::core::ast_builder::num(self.role_id))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+    /// Update the struct in the database if it exists, otherwise insert it.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated or inserted.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let number_of_rows = self.clone().update(connection).await?;
+        if number_of_rows == 0 {
+            self.insert(connection).await
+        } else {
+            Ok(number_of_rows)
+        }
+    }
+    /// Get all SamplesTeamsRoleInvitation from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("samples_teams_role_invitations")
+            .select()
+            .project("table_id, team_id, role_id, created_by, created_at")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
+        Self {
+            table_id: match row.get("table_id").unwrap() {
+                gluesql::prelude::Value::Uuid(table_id) => Uuid::from_u128(*table_id),
+                _ => unreachable!("Expected Uuid"),
+            },
+            team_id: match row.get("team_id").unwrap() {
+                gluesql::prelude::Value::I32(team_id) => team_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            role_id: match row.get("role_id").unwrap() {
+                gluesql::prelude::Value::I32(role_id) => role_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_at: match row.get("created_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
+        }
+    }
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
+pub struct SamplesTeamsRoleRequest {
+    pub table_id: Uuid,
+    pub team_id: i32,
+    pub role_id: i32,
+    pub created_by: i32,
+    pub created_at: NaiveDateTime,
+}
+#[cfg(feature = "frontend")]
+impl SamplesTeamsRoleRequest {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::uuid(self.table_id.to_string()),
+            gluesql::core::ast_builder::num(self.team_id),
+            gluesql::core::ast_builder::num(self.role_id),
+            gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+        ]
+    }
+
+    /// Insert the SamplesTeamsRoleRequest into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows inserted in table SamplesTeamsRoleRequest
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("samples_teams_role_requests")
+            .insert()
+            .columns("table_id, team_id, role_id, created_by, created_at")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
+                 _ => unreachable!("Payload must be an Insert"),
+             })
+    }
+
+    /// Get SamplesTeamsRoleRequest from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn get<C>(
+        ( table_id, team_id ): ( Uuid, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("samples_teams_role_requests")
+            .select()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("team_id").eq(team_id.to_string()))
+            .project("table_id, team_id, role_id, created_by, created_at")
+            .limit(1)
+            .execute(connection)
+            .await?;
+         Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>()
+            .pop())
+    }
+
+    /// Delete SamplesTeamsRoleRequest from the database.
+    ///
+    /// # Arguments
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete_from_id<C>(
+        ( table_id, team_id ): ( Uuid, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("samples_teams_role_requests")
+            .delete()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("team_id").eq(team_id.to_string()))
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
+                 _ => unreachable!("Payload must be a Delete"),
+             })
+    }
+
+    /// Delete the current instance of SamplesTeamsRoleRequest from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        Self::delete_from_id(( self.table_id, self.team_id ), connection).await
+    }
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("samples_teams_role_requests")
+            .update()        
+.set("table_id", gluesql::core::ast_builder::uuid(self.table_id.to_string()))        
+.set("team_id", gluesql::core::ast_builder::num(self.team_id))        
+.set("role_id", gluesql::core::ast_builder::num(self.role_id))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+    /// Update the struct in the database if it exists, otherwise insert it.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated or inserted.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let number_of_rows = self.clone().update(connection).await?;
+        if number_of_rows == 0 {
+            self.insert(connection).await
+        } else {
+            Ok(number_of_rows)
+        }
+    }
+    /// Get all SamplesTeamsRoleRequest from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("samples_teams_role_requests")
+            .select()
+            .project("table_id, team_id, role_id, created_by, created_at")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
+        Self {
+            table_id: match row.get("table_id").unwrap() {
+                gluesql::prelude::Value::Uuid(table_id) => Uuid::from_u128(*table_id),
+                _ => unreachable!("Expected Uuid"),
+            },
+            team_id: match row.get("team_id").unwrap() {
+                gluesql::prelude::Value::I32(team_id) => team_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            role_id: match row.get("role_id").unwrap() {
+                gluesql::prelude::Value::I32(role_id) => role_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_at: match row.get("created_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
+        }
+    }
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SamplesTeamsRole {
     pub table_id: Uuid,
     pub team_id: i32,
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
-    pub updated_by: i32,
-    pub updated_at: NaiveDateTime,
 }
 #[cfg(feature = "frontend")]
 impl SamplesTeamsRole {
@@ -5409,8 +7388,6 @@ impl SamplesTeamsRole {
             gluesql::core::ast_builder::num(self.role_id),
             gluesql::core::ast_builder::num(self.created_by),
             gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
-            gluesql::core::ast_builder::num(self.updated_by),
-            gluesql::core::ast_builder::timestamp(self.updated_at.to_string()),
         ]
     }
 
@@ -5430,7 +7407,7 @@ impl SamplesTeamsRole {
         use gluesql::core::ast_builder::*;
         table("samples_teams_roles")
             .insert()
-            .columns("table_id, team_id, role_id, created_by, created_at, updated_by, updated_at")
+            .columns("table_id, team_id, role_id, created_by, created_at")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -5443,11 +7420,11 @@ impl SamplesTeamsRole {
     /// Get SamplesTeamsRole from the database by its ID.
     ///
     /// # Arguments
-    /// * `( table_id, team_id, role_id )` - The primary key(s) of the struct to get.
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to get.
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        ( table_id, team_id, role_id ): ( Uuid, i32, i32 ),
+        ( table_id, team_id ): ( Uuid, i32 ),
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -5457,8 +7434,7 @@ impl SamplesTeamsRole {
             .select()
             .filter(col("table_id").eq(table_id.to_string()))
             .filter(col("team_id").eq(team_id.to_string()))
-            .filter(col("role_id").eq(role_id.to_string()))
-            .project("table_id, team_id, role_id, created_by, created_at, updated_by, updated_at")
+            .project("table_id, team_id, role_id, created_by, created_at")
             .limit(1)
             .execute(connection)
             .await?;
@@ -5472,13 +7448,13 @@ impl SamplesTeamsRole {
     /// Delete SamplesTeamsRole from the database.
     ///
     /// # Arguments
-    /// * `( table_id, team_id, role_id )` - The primary key(s) of the struct to delete.
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to delete.
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        ( table_id, team_id, role_id ): ( Uuid, i32, i32 ),
+        ( table_id, team_id ): ( Uuid, i32 ),
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -5488,7 +7464,6 @@ impl SamplesTeamsRole {
             .delete()
             .filter(col("table_id").eq(table_id.to_string()))
             .filter(col("team_id").eq(team_id.to_string()))
-            .filter(col("role_id").eq(role_id.to_string()))
             .execute(connection)
             .await
              .map(|payload| match payload {
@@ -5510,7 +7485,7 @@ impl SamplesTeamsRole {
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        Self::delete_from_id(( self.table_id, self.team_id, self.role_id ), connection).await
+        Self::delete_from_id(( self.table_id, self.team_id ), connection).await
     }
     /// Update the struct in the database.
     ///
@@ -5532,9 +7507,7 @@ impl SamplesTeamsRole {
 .set("team_id", gluesql::core::ast_builder::num(self.team_id))        
 .set("role_id", gluesql::core::ast_builder::num(self.role_id))        
 .set("created_by", gluesql::core::ast_builder::num(self.created_by))        
-.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
-.set("updated_by", gluesql::core::ast_builder::num(self.updated_by))        
-.set("updated_at", gluesql::core::ast_builder::timestamp(self.updated_at.to_string()))            .execute(connection)
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))            .execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -5579,35 +7552,7 @@ impl SamplesTeamsRole {
         use gluesql::core::ast_builder::*;
         let select_row = table("samples_teams_roles")
             .select()
-            .project("table_id, team_id, role_id, created_by, created_at, updated_by, updated_at")
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .execute(connection)
-            .await?;
-        Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>())
-    }
-    /// Get all SamplesTeamsRole from the database ordered by the `updated_at` column.
-    ///
-    /// # Arguments
-    /// * `limit` - The maximum number of results, by default `10`.
-    /// * `offset` - The offset of the results, by default `0`.
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn all_by_updated_at<C>(
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("samples_teams_roles")
-            .select()
-            .project("table_id, team_id, role_id, created_by, created_at, updated_by, updated_at")
-            .order_by("updated_at desc")
+            .project("table_id, team_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -5639,12 +7584,438 @@ impl SamplesTeamsRole {
                 gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
                 _ => unreachable!("Expected Timestamp")
             },
-            updated_by: match row.get("updated_by").unwrap() {
-                gluesql::prelude::Value::I32(updated_by) => updated_by.clone(),
+        }
+    }
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
+pub struct SamplesUsersRoleInvitation {
+    pub table_id: Uuid,
+    pub user_id: i32,
+    pub role_id: i32,
+    pub created_by: i32,
+    pub created_at: NaiveDateTime,
+}
+#[cfg(feature = "frontend")]
+impl SamplesUsersRoleInvitation {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::uuid(self.table_id.to_string()),
+            gluesql::core::ast_builder::num(self.user_id),
+            gluesql::core::ast_builder::num(self.role_id),
+            gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+        ]
+    }
+
+    /// Insert the SamplesUsersRoleInvitation into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows inserted in table SamplesUsersRoleInvitation
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("samples_users_role_invitations")
+            .insert()
+            .columns("table_id, user_id, role_id, created_by, created_at")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
+                 _ => unreachable!("Payload must be an Insert"),
+             })
+    }
+
+    /// Get SamplesUsersRoleInvitation from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn get<C>(
+        ( table_id, user_id ): ( Uuid, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("samples_users_role_invitations")
+            .select()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("user_id").eq(user_id.to_string()))
+            .project("table_id, user_id, role_id, created_by, created_at")
+            .limit(1)
+            .execute(connection)
+            .await?;
+         Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>()
+            .pop())
+    }
+
+    /// Delete SamplesUsersRoleInvitation from the database.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete_from_id<C>(
+        ( table_id, user_id ): ( Uuid, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("samples_users_role_invitations")
+            .delete()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("user_id").eq(user_id.to_string()))
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
+                 _ => unreachable!("Payload must be a Delete"),
+             })
+    }
+
+    /// Delete the current instance of SamplesUsersRoleInvitation from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        Self::delete_from_id(( self.table_id, self.user_id ), connection).await
+    }
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("samples_users_role_invitations")
+            .update()        
+.set("table_id", gluesql::core::ast_builder::uuid(self.table_id.to_string()))        
+.set("user_id", gluesql::core::ast_builder::num(self.user_id))        
+.set("role_id", gluesql::core::ast_builder::num(self.role_id))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+    /// Update the struct in the database if it exists, otherwise insert it.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated or inserted.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let number_of_rows = self.clone().update(connection).await?;
+        if number_of_rows == 0 {
+            self.insert(connection).await
+        } else {
+            Ok(number_of_rows)
+        }
+    }
+    /// Get all SamplesUsersRoleInvitation from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("samples_users_role_invitations")
+            .select()
+            .project("table_id, user_id, role_id, created_by, created_at")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
+        Self {
+            table_id: match row.get("table_id").unwrap() {
+                gluesql::prelude::Value::Uuid(table_id) => Uuid::from_u128(*table_id),
+                _ => unreachable!("Expected Uuid"),
+            },
+            user_id: match row.get("user_id").unwrap() {
+                gluesql::prelude::Value::I32(user_id) => user_id.clone(),
                 _ => unreachable!("Expected I32")
             },
-            updated_at: match row.get("updated_at").unwrap() {
-                gluesql::prelude::Value::Timestamp(updated_at) => updated_at.clone(),
+            role_id: match row.get("role_id").unwrap() {
+                gluesql::prelude::Value::I32(role_id) => role_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_at: match row.get("created_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
+        }
+    }
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
+pub struct SamplesUsersRoleRequest {
+    pub table_id: Uuid,
+    pub user_id: i32,
+    pub role_id: i32,
+    pub created_by: i32,
+    pub created_at: NaiveDateTime,
+}
+#[cfg(feature = "frontend")]
+impl SamplesUsersRoleRequest {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::uuid(self.table_id.to_string()),
+            gluesql::core::ast_builder::num(self.user_id),
+            gluesql::core::ast_builder::num(self.role_id),
+            gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+        ]
+    }
+
+    /// Insert the SamplesUsersRoleRequest into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows inserted in table SamplesUsersRoleRequest
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("samples_users_role_requests")
+            .insert()
+            .columns("table_id, user_id, role_id, created_by, created_at")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
+                 _ => unreachable!("Payload must be an Insert"),
+             })
+    }
+
+    /// Get SamplesUsersRoleRequest from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn get<C>(
+        ( table_id, user_id ): ( Uuid, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("samples_users_role_requests")
+            .select()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("user_id").eq(user_id.to_string()))
+            .project("table_id, user_id, role_id, created_by, created_at")
+            .limit(1)
+            .execute(connection)
+            .await?;
+         Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>()
+            .pop())
+    }
+
+    /// Delete SamplesUsersRoleRequest from the database.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete_from_id<C>(
+        ( table_id, user_id ): ( Uuid, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("samples_users_role_requests")
+            .delete()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("user_id").eq(user_id.to_string()))
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
+                 _ => unreachable!("Payload must be a Delete"),
+             })
+    }
+
+    /// Delete the current instance of SamplesUsersRoleRequest from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        Self::delete_from_id(( self.table_id, self.user_id ), connection).await
+    }
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("samples_users_role_requests")
+            .update()        
+.set("table_id", gluesql::core::ast_builder::uuid(self.table_id.to_string()))        
+.set("user_id", gluesql::core::ast_builder::num(self.user_id))        
+.set("role_id", gluesql::core::ast_builder::num(self.role_id))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+    /// Update the struct in the database if it exists, otherwise insert it.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated or inserted.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let number_of_rows = self.clone().update(connection).await?;
+        if number_of_rows == 0 {
+            self.insert(connection).await
+        } else {
+            Ok(number_of_rows)
+        }
+    }
+    /// Get all SamplesUsersRoleRequest from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("samples_users_role_requests")
+            .select()
+            .project("table_id, user_id, role_id, created_by, created_at")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
+        Self {
+            table_id: match row.get("table_id").unwrap() {
+                gluesql::prelude::Value::Uuid(table_id) => Uuid::from_u128(*table_id),
+                _ => unreachable!("Expected Uuid"),
+            },
+            user_id: match row.get("user_id").unwrap() {
+                gluesql::prelude::Value::I32(user_id) => user_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            role_id: match row.get("role_id").unwrap() {
+                gluesql::prelude::Value::I32(role_id) => role_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_at: match row.get("created_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
                 _ => unreachable!("Expected Timestamp")
             },
         }
@@ -5658,8 +8029,6 @@ pub struct SamplesUsersRole {
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
-    pub updated_by: i32,
-    pub updated_at: NaiveDateTime,
 }
 #[cfg(feature = "frontend")]
 impl SamplesUsersRole {
@@ -5670,8 +8039,6 @@ impl SamplesUsersRole {
             gluesql::core::ast_builder::num(self.role_id),
             gluesql::core::ast_builder::num(self.created_by),
             gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
-            gluesql::core::ast_builder::num(self.updated_by),
-            gluesql::core::ast_builder::timestamp(self.updated_at.to_string()),
         ]
     }
 
@@ -5691,7 +8058,7 @@ impl SamplesUsersRole {
         use gluesql::core::ast_builder::*;
         table("samples_users_roles")
             .insert()
-            .columns("table_id, user_id, role_id, created_by, created_at, updated_by, updated_at")
+            .columns("table_id, user_id, role_id, created_by, created_at")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -5704,11 +8071,11 @@ impl SamplesUsersRole {
     /// Get SamplesUsersRole from the database by its ID.
     ///
     /// # Arguments
-    /// * `( table_id, user_id, role_id )` - The primary key(s) of the struct to get.
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to get.
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        ( table_id, user_id, role_id ): ( Uuid, i32, i32 ),
+        ( table_id, user_id ): ( Uuid, i32 ),
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -5718,8 +8085,7 @@ impl SamplesUsersRole {
             .select()
             .filter(col("table_id").eq(table_id.to_string()))
             .filter(col("user_id").eq(user_id.to_string()))
-            .filter(col("role_id").eq(role_id.to_string()))
-            .project("table_id, user_id, role_id, created_by, created_at, updated_by, updated_at")
+            .project("table_id, user_id, role_id, created_by, created_at")
             .limit(1)
             .execute(connection)
             .await?;
@@ -5733,13 +8099,13 @@ impl SamplesUsersRole {
     /// Delete SamplesUsersRole from the database.
     ///
     /// # Arguments
-    /// * `( table_id, user_id, role_id )` - The primary key(s) of the struct to delete.
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        ( table_id, user_id, role_id ): ( Uuid, i32, i32 ),
+        ( table_id, user_id ): ( Uuid, i32 ),
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -5749,7 +8115,6 @@ impl SamplesUsersRole {
             .delete()
             .filter(col("table_id").eq(table_id.to_string()))
             .filter(col("user_id").eq(user_id.to_string()))
-            .filter(col("role_id").eq(role_id.to_string()))
             .execute(connection)
             .await
              .map(|payload| match payload {
@@ -5771,7 +8136,7 @@ impl SamplesUsersRole {
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        Self::delete_from_id(( self.table_id, self.user_id, self.role_id ), connection).await
+        Self::delete_from_id(( self.table_id, self.user_id ), connection).await
     }
     /// Update the struct in the database.
     ///
@@ -5793,9 +8158,7 @@ impl SamplesUsersRole {
 .set("user_id", gluesql::core::ast_builder::num(self.user_id))        
 .set("role_id", gluesql::core::ast_builder::num(self.role_id))        
 .set("created_by", gluesql::core::ast_builder::num(self.created_by))        
-.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
-.set("updated_by", gluesql::core::ast_builder::num(self.updated_by))        
-.set("updated_at", gluesql::core::ast_builder::timestamp(self.updated_at.to_string()))            .execute(connection)
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))            .execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -5840,35 +8203,7 @@ impl SamplesUsersRole {
         use gluesql::core::ast_builder::*;
         let select_row = table("samples_users_roles")
             .select()
-            .project("table_id, user_id, role_id, created_by, created_at, updated_by, updated_at")
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .execute(connection)
-            .await?;
-        Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>())
-    }
-    /// Get all SamplesUsersRole from the database ordered by the `updated_at` column.
-    ///
-    /// # Arguments
-    /// * `limit` - The maximum number of results, by default `10`.
-    /// * `offset` - The offset of the results, by default `0`.
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn all_by_updated_at<C>(
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("samples_users_roles")
-            .select()
-            .project("table_id, user_id, role_id, created_by, created_at, updated_by, updated_at")
-            .order_by("updated_at desc")
+            .project("table_id, user_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -5898,14 +8233,6 @@ impl SamplesUsersRole {
             },
             created_at: match row.get("created_at").unwrap() {
                 gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
-                _ => unreachable!("Expected Timestamp")
-            },
-            updated_by: match row.get("updated_by").unwrap() {
-                gluesql::prelude::Value::I32(updated_by) => updated_by.clone(),
-                _ => unreachable!("Expected I32")
-            },
-            updated_at: match row.get("updated_at").unwrap() {
-                gluesql::prelude::Value::Timestamp(updated_at) => updated_at.clone(),
                 _ => unreachable!("Expected Timestamp")
             },
         }
@@ -6357,14 +8684,446 @@ impl SpectraCollection {
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
+pub struct SpectraCollectionsTeamsRoleInvitation {
+    pub table_id: i32,
+    pub team_id: i32,
+    pub role_id: i32,
+    pub created_by: i32,
+    pub created_at: NaiveDateTime,
+}
+#[cfg(feature = "frontend")]
+impl SpectraCollectionsTeamsRoleInvitation {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::num(self.table_id),
+            gluesql::core::ast_builder::num(self.team_id),
+            gluesql::core::ast_builder::num(self.role_id),
+            gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+        ]
+    }
+
+    /// Insert the SpectraCollectionsTeamsRoleInvitation into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows inserted in table SpectraCollectionsTeamsRoleInvitation
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("spectra_collections_teams_role_invitations")
+            .insert()
+            .columns("table_id, team_id, role_id, created_by, created_at")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
+                 _ => unreachable!("Payload must be an Insert"),
+             })
+    }
+
+    /// Get SpectraCollectionsTeamsRoleInvitation from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn get<C>(
+        ( table_id, team_id ): ( i32, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("spectra_collections_teams_role_invitations")
+            .select()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("team_id").eq(team_id.to_string()))
+            .project("table_id, team_id, role_id, created_by, created_at")
+            .limit(1)
+            .execute(connection)
+            .await?;
+         Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>()
+            .pop())
+    }
+
+    /// Delete SpectraCollectionsTeamsRoleInvitation from the database.
+    ///
+    /// # Arguments
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete_from_id<C>(
+        ( table_id, team_id ): ( i32, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("spectra_collections_teams_role_invitations")
+            .delete()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("team_id").eq(team_id.to_string()))
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
+                 _ => unreachable!("Payload must be a Delete"),
+             })
+    }
+
+    /// Delete the current instance of SpectraCollectionsTeamsRoleInvitation from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        Self::delete_from_id(( self.table_id, self.team_id ), connection).await
+    }
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("spectra_collections_teams_role_invitations")
+            .update()        
+.set("table_id", gluesql::core::ast_builder::num(self.table_id))        
+.set("team_id", gluesql::core::ast_builder::num(self.team_id))        
+.set("role_id", gluesql::core::ast_builder::num(self.role_id))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+    /// Update the struct in the database if it exists, otherwise insert it.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated or inserted.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let number_of_rows = self.clone().update(connection).await?;
+        if number_of_rows == 0 {
+            self.insert(connection).await
+        } else {
+            Ok(number_of_rows)
+        }
+    }
+    /// Get all SpectraCollectionsTeamsRoleInvitation from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("spectra_collections_teams_role_invitations")
+            .select()
+            .project("table_id, team_id, role_id, created_by, created_at")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
+        Self {
+            table_id: match row.get("table_id").unwrap() {
+                gluesql::prelude::Value::I32(table_id) => table_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            team_id: match row.get("team_id").unwrap() {
+                gluesql::prelude::Value::I32(team_id) => team_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            role_id: match row.get("role_id").unwrap() {
+                gluesql::prelude::Value::I32(role_id) => role_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_at: match row.get("created_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
+        }
+    }
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
+pub struct SpectraCollectionsTeamsRoleRequest {
+    pub table_id: i32,
+    pub team_id: i32,
+    pub role_id: i32,
+    pub created_by: i32,
+    pub created_at: NaiveDateTime,
+}
+#[cfg(feature = "frontend")]
+impl SpectraCollectionsTeamsRoleRequest {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::num(self.table_id),
+            gluesql::core::ast_builder::num(self.team_id),
+            gluesql::core::ast_builder::num(self.role_id),
+            gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+        ]
+    }
+
+    /// Insert the SpectraCollectionsTeamsRoleRequest into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows inserted in table SpectraCollectionsTeamsRoleRequest
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("spectra_collections_teams_role_requests")
+            .insert()
+            .columns("table_id, team_id, role_id, created_by, created_at")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
+                 _ => unreachable!("Payload must be an Insert"),
+             })
+    }
+
+    /// Get SpectraCollectionsTeamsRoleRequest from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn get<C>(
+        ( table_id, team_id ): ( i32, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("spectra_collections_teams_role_requests")
+            .select()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("team_id").eq(team_id.to_string()))
+            .project("table_id, team_id, role_id, created_by, created_at")
+            .limit(1)
+            .execute(connection)
+            .await?;
+         Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>()
+            .pop())
+    }
+
+    /// Delete SpectraCollectionsTeamsRoleRequest from the database.
+    ///
+    /// # Arguments
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete_from_id<C>(
+        ( table_id, team_id ): ( i32, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("spectra_collections_teams_role_requests")
+            .delete()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("team_id").eq(team_id.to_string()))
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
+                 _ => unreachable!("Payload must be a Delete"),
+             })
+    }
+
+    /// Delete the current instance of SpectraCollectionsTeamsRoleRequest from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        Self::delete_from_id(( self.table_id, self.team_id ), connection).await
+    }
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("spectra_collections_teams_role_requests")
+            .update()        
+.set("table_id", gluesql::core::ast_builder::num(self.table_id))        
+.set("team_id", gluesql::core::ast_builder::num(self.team_id))        
+.set("role_id", gluesql::core::ast_builder::num(self.role_id))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+    /// Update the struct in the database if it exists, otherwise insert it.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated or inserted.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let number_of_rows = self.clone().update(connection).await?;
+        if number_of_rows == 0 {
+            self.insert(connection).await
+        } else {
+            Ok(number_of_rows)
+        }
+    }
+    /// Get all SpectraCollectionsTeamsRoleRequest from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("spectra_collections_teams_role_requests")
+            .select()
+            .project("table_id, team_id, role_id, created_by, created_at")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
+        Self {
+            table_id: match row.get("table_id").unwrap() {
+                gluesql::prelude::Value::I32(table_id) => table_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            team_id: match row.get("team_id").unwrap() {
+                gluesql::prelude::Value::I32(team_id) => team_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            role_id: match row.get("role_id").unwrap() {
+                gluesql::prelude::Value::I32(role_id) => role_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_at: match row.get("created_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
+        }
+    }
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SpectraCollectionsTeamsRole {
     pub table_id: i32,
     pub team_id: i32,
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
-    pub updated_by: i32,
-    pub updated_at: NaiveDateTime,
 }
 #[cfg(feature = "frontend")]
 impl SpectraCollectionsTeamsRole {
@@ -6375,8 +9134,6 @@ impl SpectraCollectionsTeamsRole {
             gluesql::core::ast_builder::num(self.role_id),
             gluesql::core::ast_builder::num(self.created_by),
             gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
-            gluesql::core::ast_builder::num(self.updated_by),
-            gluesql::core::ast_builder::timestamp(self.updated_at.to_string()),
         ]
     }
 
@@ -6396,7 +9153,7 @@ impl SpectraCollectionsTeamsRole {
         use gluesql::core::ast_builder::*;
         table("spectra_collections_teams_roles")
             .insert()
-            .columns("table_id, team_id, role_id, created_by, created_at, updated_by, updated_at")
+            .columns("table_id, team_id, role_id, created_by, created_at")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -6409,11 +9166,11 @@ impl SpectraCollectionsTeamsRole {
     /// Get SpectraCollectionsTeamsRole from the database by its ID.
     ///
     /// # Arguments
-    /// * `( table_id, team_id, role_id )` - The primary key(s) of the struct to get.
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to get.
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        ( table_id, team_id, role_id ): ( i32, i32, i32 ),
+        ( table_id, team_id ): ( i32, i32 ),
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -6423,8 +9180,7 @@ impl SpectraCollectionsTeamsRole {
             .select()
             .filter(col("table_id").eq(table_id.to_string()))
             .filter(col("team_id").eq(team_id.to_string()))
-            .filter(col("role_id").eq(role_id.to_string()))
-            .project("table_id, team_id, role_id, created_by, created_at, updated_by, updated_at")
+            .project("table_id, team_id, role_id, created_by, created_at")
             .limit(1)
             .execute(connection)
             .await?;
@@ -6438,13 +9194,13 @@ impl SpectraCollectionsTeamsRole {
     /// Delete SpectraCollectionsTeamsRole from the database.
     ///
     /// # Arguments
-    /// * `( table_id, team_id, role_id )` - The primary key(s) of the struct to delete.
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to delete.
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        ( table_id, team_id, role_id ): ( i32, i32, i32 ),
+        ( table_id, team_id ): ( i32, i32 ),
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -6454,7 +9210,6 @@ impl SpectraCollectionsTeamsRole {
             .delete()
             .filter(col("table_id").eq(table_id.to_string()))
             .filter(col("team_id").eq(team_id.to_string()))
-            .filter(col("role_id").eq(role_id.to_string()))
             .execute(connection)
             .await
              .map(|payload| match payload {
@@ -6476,7 +9231,7 @@ impl SpectraCollectionsTeamsRole {
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        Self::delete_from_id(( self.table_id, self.team_id, self.role_id ), connection).await
+        Self::delete_from_id(( self.table_id, self.team_id ), connection).await
     }
     /// Update the struct in the database.
     ///
@@ -6498,9 +9253,7 @@ impl SpectraCollectionsTeamsRole {
 .set("team_id", gluesql::core::ast_builder::num(self.team_id))        
 .set("role_id", gluesql::core::ast_builder::num(self.role_id))        
 .set("created_by", gluesql::core::ast_builder::num(self.created_by))        
-.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
-.set("updated_by", gluesql::core::ast_builder::num(self.updated_by))        
-.set("updated_at", gluesql::core::ast_builder::timestamp(self.updated_at.to_string()))            .execute(connection)
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))            .execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -6545,35 +9298,7 @@ impl SpectraCollectionsTeamsRole {
         use gluesql::core::ast_builder::*;
         let select_row = table("spectra_collections_teams_roles")
             .select()
-            .project("table_id, team_id, role_id, created_by, created_at, updated_by, updated_at")
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .execute(connection)
-            .await?;
-        Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>())
-    }
-    /// Get all SpectraCollectionsTeamsRole from the database ordered by the `updated_at` column.
-    ///
-    /// # Arguments
-    /// * `limit` - The maximum number of results, by default `10`.
-    /// * `offset` - The offset of the results, by default `0`.
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn all_by_updated_at<C>(
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("spectra_collections_teams_roles")
-            .select()
-            .project("table_id, team_id, role_id, created_by, created_at, updated_by, updated_at")
-            .order_by("updated_at desc")
+            .project("table_id, team_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -6605,12 +9330,438 @@ impl SpectraCollectionsTeamsRole {
                 gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
                 _ => unreachable!("Expected Timestamp")
             },
-            updated_by: match row.get("updated_by").unwrap() {
-                gluesql::prelude::Value::I32(updated_by) => updated_by.clone(),
+        }
+    }
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
+pub struct SpectraCollectionsUsersRoleInvitation {
+    pub table_id: i32,
+    pub user_id: i32,
+    pub role_id: i32,
+    pub created_by: i32,
+    pub created_at: NaiveDateTime,
+}
+#[cfg(feature = "frontend")]
+impl SpectraCollectionsUsersRoleInvitation {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::num(self.table_id),
+            gluesql::core::ast_builder::num(self.user_id),
+            gluesql::core::ast_builder::num(self.role_id),
+            gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+        ]
+    }
+
+    /// Insert the SpectraCollectionsUsersRoleInvitation into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows inserted in table SpectraCollectionsUsersRoleInvitation
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("spectra_collections_users_role_invitations")
+            .insert()
+            .columns("table_id, user_id, role_id, created_by, created_at")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
+                 _ => unreachable!("Payload must be an Insert"),
+             })
+    }
+
+    /// Get SpectraCollectionsUsersRoleInvitation from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn get<C>(
+        ( table_id, user_id ): ( i32, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("spectra_collections_users_role_invitations")
+            .select()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("user_id").eq(user_id.to_string()))
+            .project("table_id, user_id, role_id, created_by, created_at")
+            .limit(1)
+            .execute(connection)
+            .await?;
+         Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>()
+            .pop())
+    }
+
+    /// Delete SpectraCollectionsUsersRoleInvitation from the database.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete_from_id<C>(
+        ( table_id, user_id ): ( i32, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("spectra_collections_users_role_invitations")
+            .delete()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("user_id").eq(user_id.to_string()))
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
+                 _ => unreachable!("Payload must be a Delete"),
+             })
+    }
+
+    /// Delete the current instance of SpectraCollectionsUsersRoleInvitation from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        Self::delete_from_id(( self.table_id, self.user_id ), connection).await
+    }
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("spectra_collections_users_role_invitations")
+            .update()        
+.set("table_id", gluesql::core::ast_builder::num(self.table_id))        
+.set("user_id", gluesql::core::ast_builder::num(self.user_id))        
+.set("role_id", gluesql::core::ast_builder::num(self.role_id))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+    /// Update the struct in the database if it exists, otherwise insert it.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated or inserted.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let number_of_rows = self.clone().update(connection).await?;
+        if number_of_rows == 0 {
+            self.insert(connection).await
+        } else {
+            Ok(number_of_rows)
+        }
+    }
+    /// Get all SpectraCollectionsUsersRoleInvitation from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("spectra_collections_users_role_invitations")
+            .select()
+            .project("table_id, user_id, role_id, created_by, created_at")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
+        Self {
+            table_id: match row.get("table_id").unwrap() {
+                gluesql::prelude::Value::I32(table_id) => table_id.clone(),
                 _ => unreachable!("Expected I32")
             },
-            updated_at: match row.get("updated_at").unwrap() {
-                gluesql::prelude::Value::Timestamp(updated_at) => updated_at.clone(),
+            user_id: match row.get("user_id").unwrap() {
+                gluesql::prelude::Value::I32(user_id) => user_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            role_id: match row.get("role_id").unwrap() {
+                gluesql::prelude::Value::I32(role_id) => role_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_at: match row.get("created_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
+        }
+    }
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
+pub struct SpectraCollectionsUsersRoleRequest {
+    pub table_id: i32,
+    pub user_id: i32,
+    pub role_id: i32,
+    pub created_by: i32,
+    pub created_at: NaiveDateTime,
+}
+#[cfg(feature = "frontend")]
+impl SpectraCollectionsUsersRoleRequest {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::num(self.table_id),
+            gluesql::core::ast_builder::num(self.user_id),
+            gluesql::core::ast_builder::num(self.role_id),
+            gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+        ]
+    }
+
+    /// Insert the SpectraCollectionsUsersRoleRequest into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows inserted in table SpectraCollectionsUsersRoleRequest
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("spectra_collections_users_role_requests")
+            .insert()
+            .columns("table_id, user_id, role_id, created_by, created_at")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
+                 _ => unreachable!("Payload must be an Insert"),
+             })
+    }
+
+    /// Get SpectraCollectionsUsersRoleRequest from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn get<C>(
+        ( table_id, user_id ): ( i32, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("spectra_collections_users_role_requests")
+            .select()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("user_id").eq(user_id.to_string()))
+            .project("table_id, user_id, role_id, created_by, created_at")
+            .limit(1)
+            .execute(connection)
+            .await?;
+         Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>()
+            .pop())
+    }
+
+    /// Delete SpectraCollectionsUsersRoleRequest from the database.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete_from_id<C>(
+        ( table_id, user_id ): ( i32, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("spectra_collections_users_role_requests")
+            .delete()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("user_id").eq(user_id.to_string()))
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
+                 _ => unreachable!("Payload must be a Delete"),
+             })
+    }
+
+    /// Delete the current instance of SpectraCollectionsUsersRoleRequest from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        Self::delete_from_id(( self.table_id, self.user_id ), connection).await
+    }
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("spectra_collections_users_role_requests")
+            .update()        
+.set("table_id", gluesql::core::ast_builder::num(self.table_id))        
+.set("user_id", gluesql::core::ast_builder::num(self.user_id))        
+.set("role_id", gluesql::core::ast_builder::num(self.role_id))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+    /// Update the struct in the database if it exists, otherwise insert it.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated or inserted.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let number_of_rows = self.clone().update(connection).await?;
+        if number_of_rows == 0 {
+            self.insert(connection).await
+        } else {
+            Ok(number_of_rows)
+        }
+    }
+    /// Get all SpectraCollectionsUsersRoleRequest from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("spectra_collections_users_role_requests")
+            .select()
+            .project("table_id, user_id, role_id, created_by, created_at")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
+        Self {
+            table_id: match row.get("table_id").unwrap() {
+                gluesql::prelude::Value::I32(table_id) => table_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            user_id: match row.get("user_id").unwrap() {
+                gluesql::prelude::Value::I32(user_id) => user_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            role_id: match row.get("role_id").unwrap() {
+                gluesql::prelude::Value::I32(role_id) => role_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_at: match row.get("created_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
                 _ => unreachable!("Expected Timestamp")
             },
         }
@@ -6624,8 +9775,6 @@ pub struct SpectraCollectionsUsersRole {
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
-    pub updated_by: i32,
-    pub updated_at: NaiveDateTime,
 }
 #[cfg(feature = "frontend")]
 impl SpectraCollectionsUsersRole {
@@ -6636,8 +9785,6 @@ impl SpectraCollectionsUsersRole {
             gluesql::core::ast_builder::num(self.role_id),
             gluesql::core::ast_builder::num(self.created_by),
             gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
-            gluesql::core::ast_builder::num(self.updated_by),
-            gluesql::core::ast_builder::timestamp(self.updated_at.to_string()),
         ]
     }
 
@@ -6657,7 +9804,7 @@ impl SpectraCollectionsUsersRole {
         use gluesql::core::ast_builder::*;
         table("spectra_collections_users_roles")
             .insert()
-            .columns("table_id, user_id, role_id, created_by, created_at, updated_by, updated_at")
+            .columns("table_id, user_id, role_id, created_by, created_at")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -6670,11 +9817,11 @@ impl SpectraCollectionsUsersRole {
     /// Get SpectraCollectionsUsersRole from the database by its ID.
     ///
     /// # Arguments
-    /// * `( table_id, user_id, role_id )` - The primary key(s) of the struct to get.
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to get.
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        ( table_id, user_id, role_id ): ( i32, i32, i32 ),
+        ( table_id, user_id ): ( i32, i32 ),
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -6684,8 +9831,7 @@ impl SpectraCollectionsUsersRole {
             .select()
             .filter(col("table_id").eq(table_id.to_string()))
             .filter(col("user_id").eq(user_id.to_string()))
-            .filter(col("role_id").eq(role_id.to_string()))
-            .project("table_id, user_id, role_id, created_by, created_at, updated_by, updated_at")
+            .project("table_id, user_id, role_id, created_by, created_at")
             .limit(1)
             .execute(connection)
             .await?;
@@ -6699,13 +9845,13 @@ impl SpectraCollectionsUsersRole {
     /// Delete SpectraCollectionsUsersRole from the database.
     ///
     /// # Arguments
-    /// * `( table_id, user_id, role_id )` - The primary key(s) of the struct to delete.
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        ( table_id, user_id, role_id ): ( i32, i32, i32 ),
+        ( table_id, user_id ): ( i32, i32 ),
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -6715,7 +9861,6 @@ impl SpectraCollectionsUsersRole {
             .delete()
             .filter(col("table_id").eq(table_id.to_string()))
             .filter(col("user_id").eq(user_id.to_string()))
-            .filter(col("role_id").eq(role_id.to_string()))
             .execute(connection)
             .await
              .map(|payload| match payload {
@@ -6737,7 +9882,7 @@ impl SpectraCollectionsUsersRole {
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        Self::delete_from_id(( self.table_id, self.user_id, self.role_id ), connection).await
+        Self::delete_from_id(( self.table_id, self.user_id ), connection).await
     }
     /// Update the struct in the database.
     ///
@@ -6759,9 +9904,7 @@ impl SpectraCollectionsUsersRole {
 .set("user_id", gluesql::core::ast_builder::num(self.user_id))        
 .set("role_id", gluesql::core::ast_builder::num(self.role_id))        
 .set("created_by", gluesql::core::ast_builder::num(self.created_by))        
-.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
-.set("updated_by", gluesql::core::ast_builder::num(self.updated_by))        
-.set("updated_at", gluesql::core::ast_builder::timestamp(self.updated_at.to_string()))            .execute(connection)
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))            .execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -6806,35 +9949,7 @@ impl SpectraCollectionsUsersRole {
         use gluesql::core::ast_builder::*;
         let select_row = table("spectra_collections_users_roles")
             .select()
-            .project("table_id, user_id, role_id, created_by, created_at, updated_by, updated_at")
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .execute(connection)
-            .await?;
-        Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>())
-    }
-    /// Get all SpectraCollectionsUsersRole from the database ordered by the `updated_at` column.
-    ///
-    /// # Arguments
-    /// * `limit` - The maximum number of results, by default `10`.
-    /// * `offset` - The offset of the results, by default `0`.
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn all_by_updated_at<C>(
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("spectra_collections_users_roles")
-            .select()
-            .project("table_id, user_id, role_id, created_by, created_at, updated_by, updated_at")
-            .order_by("updated_at desc")
+            .project("table_id, user_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -6864,14 +9979,6 @@ impl SpectraCollectionsUsersRole {
             },
             created_at: match row.get("created_at").unwrap() {
                 gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
-                _ => unreachable!("Expected Timestamp")
-            },
-            updated_by: match row.get("updated_by").unwrap() {
-                gluesql::prelude::Value::I32(updated_by) => updated_by.clone(),
-                _ => unreachable!("Expected I32")
-            },
-            updated_at: match row.get("updated_at").unwrap() {
-                gluesql::prelude::Value::Timestamp(updated_at) => updated_at.clone(),
                 _ => unreachable!("Expected Timestamp")
             },
         }
@@ -7365,14 +10472,663 @@ impl Team {
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
+pub struct TeamsTeamsRoleInvitation {
+    pub table_id: i32,
+    pub team_id: i32,
+    pub role_id: i32,
+    pub created_by: i32,
+    pub created_at: NaiveDateTime,
+}
+#[cfg(feature = "frontend")]
+impl TeamsTeamsRoleInvitation {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::num(self.table_id),
+            gluesql::core::ast_builder::num(self.team_id),
+            gluesql::core::ast_builder::num(self.role_id),
+            gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+        ]
+    }
+
+    /// Insert the TeamsTeamsRoleInvitation into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows inserted in table TeamsTeamsRoleInvitation
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("teams_teams_role_invitations")
+            .insert()
+            .columns("table_id, team_id, role_id, created_by, created_at")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
+                 _ => unreachable!("Payload must be an Insert"),
+             })
+    }
+
+    /// Get TeamsTeamsRoleInvitation from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn get<C>(
+        ( table_id, team_id ): ( i32, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("teams_teams_role_invitations")
+            .select()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("team_id").eq(team_id.to_string()))
+            .project("table_id, team_id, role_id, created_by, created_at")
+            .limit(1)
+            .execute(connection)
+            .await?;
+         Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>()
+            .pop())
+    }
+
+    /// Delete TeamsTeamsRoleInvitation from the database.
+    ///
+    /// # Arguments
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete_from_id<C>(
+        ( table_id, team_id ): ( i32, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("teams_teams_role_invitations")
+            .delete()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("team_id").eq(team_id.to_string()))
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
+                 _ => unreachable!("Payload must be a Delete"),
+             })
+    }
+
+    /// Delete the current instance of TeamsTeamsRoleInvitation from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        Self::delete_from_id(( self.table_id, self.team_id ), connection).await
+    }
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("teams_teams_role_invitations")
+            .update()        
+.set("table_id", gluesql::core::ast_builder::num(self.table_id))        
+.set("team_id", gluesql::core::ast_builder::num(self.team_id))        
+.set("role_id", gluesql::core::ast_builder::num(self.role_id))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+    /// Update the struct in the database if it exists, otherwise insert it.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated or inserted.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let number_of_rows = self.clone().update(connection).await?;
+        if number_of_rows == 0 {
+            self.insert(connection).await
+        } else {
+            Ok(number_of_rows)
+        }
+    }
+    /// Get all TeamsTeamsRoleInvitation from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("teams_teams_role_invitations")
+            .select()
+            .project("table_id, team_id, role_id, created_by, created_at")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
+        Self {
+            table_id: match row.get("table_id").unwrap() {
+                gluesql::prelude::Value::I32(table_id) => table_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            team_id: match row.get("team_id").unwrap() {
+                gluesql::prelude::Value::I32(team_id) => team_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            role_id: match row.get("role_id").unwrap() {
+                gluesql::prelude::Value::I32(role_id) => role_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_at: match row.get("created_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
+        }
+    }
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
+pub struct TeamsUsersRoleInvitation {
+    pub table_id: i32,
+    pub user_id: i32,
+    pub role_id: i32,
+    pub created_by: i32,
+    pub created_at: NaiveDateTime,
+}
+#[cfg(feature = "frontend")]
+impl TeamsUsersRoleInvitation {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::num(self.table_id),
+            gluesql::core::ast_builder::num(self.user_id),
+            gluesql::core::ast_builder::num(self.role_id),
+            gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+        ]
+    }
+
+    /// Insert the TeamsUsersRoleInvitation into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows inserted in table TeamsUsersRoleInvitation
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("teams_users_role_invitations")
+            .insert()
+            .columns("table_id, user_id, role_id, created_by, created_at")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
+                 _ => unreachable!("Payload must be an Insert"),
+             })
+    }
+
+    /// Get TeamsUsersRoleInvitation from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn get<C>(
+        ( table_id, user_id ): ( i32, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("teams_users_role_invitations")
+            .select()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("user_id").eq(user_id.to_string()))
+            .project("table_id, user_id, role_id, created_by, created_at")
+            .limit(1)
+            .execute(connection)
+            .await?;
+         Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>()
+            .pop())
+    }
+
+    /// Delete TeamsUsersRoleInvitation from the database.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete_from_id<C>(
+        ( table_id, user_id ): ( i32, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("teams_users_role_invitations")
+            .delete()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("user_id").eq(user_id.to_string()))
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
+                 _ => unreachable!("Payload must be a Delete"),
+             })
+    }
+
+    /// Delete the current instance of TeamsUsersRoleInvitation from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        Self::delete_from_id(( self.table_id, self.user_id ), connection).await
+    }
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("teams_users_role_invitations")
+            .update()        
+.set("table_id", gluesql::core::ast_builder::num(self.table_id))        
+.set("user_id", gluesql::core::ast_builder::num(self.user_id))        
+.set("role_id", gluesql::core::ast_builder::num(self.role_id))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+    /// Update the struct in the database if it exists, otherwise insert it.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated or inserted.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let number_of_rows = self.clone().update(connection).await?;
+        if number_of_rows == 0 {
+            self.insert(connection).await
+        } else {
+            Ok(number_of_rows)
+        }
+    }
+    /// Get all TeamsUsersRoleInvitation from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("teams_users_role_invitations")
+            .select()
+            .project("table_id, user_id, role_id, created_by, created_at")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
+        Self {
+            table_id: match row.get("table_id").unwrap() {
+                gluesql::prelude::Value::I32(table_id) => table_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            user_id: match row.get("user_id").unwrap() {
+                gluesql::prelude::Value::I32(user_id) => user_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            role_id: match row.get("role_id").unwrap() {
+                gluesql::prelude::Value::I32(role_id) => role_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_at: match row.get("created_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
+        }
+    }
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
+pub struct TeamsUsersRoleRequest {
+    pub table_id: i32,
+    pub user_id: i32,
+    pub role_id: i32,
+    pub created_by: i32,
+    pub created_at: NaiveDateTime,
+}
+#[cfg(feature = "frontend")]
+impl TeamsUsersRoleRequest {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::num(self.table_id),
+            gluesql::core::ast_builder::num(self.user_id),
+            gluesql::core::ast_builder::num(self.role_id),
+            gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+        ]
+    }
+
+    /// Insert the TeamsUsersRoleRequest into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows inserted in table TeamsUsersRoleRequest
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("teams_users_role_requests")
+            .insert()
+            .columns("table_id, user_id, role_id, created_by, created_at")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
+                 _ => unreachable!("Payload must be an Insert"),
+             })
+    }
+
+    /// Get TeamsUsersRoleRequest from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn get<C>(
+        ( table_id, user_id ): ( i32, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("teams_users_role_requests")
+            .select()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("user_id").eq(user_id.to_string()))
+            .project("table_id, user_id, role_id, created_by, created_at")
+            .limit(1)
+            .execute(connection)
+            .await?;
+         Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>()
+            .pop())
+    }
+
+    /// Delete TeamsUsersRoleRequest from the database.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete_from_id<C>(
+        ( table_id, user_id ): ( i32, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("teams_users_role_requests")
+            .delete()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("user_id").eq(user_id.to_string()))
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
+                 _ => unreachable!("Payload must be a Delete"),
+             })
+    }
+
+    /// Delete the current instance of TeamsUsersRoleRequest from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        Self::delete_from_id(( self.table_id, self.user_id ), connection).await
+    }
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("teams_users_role_requests")
+            .update()        
+.set("table_id", gluesql::core::ast_builder::num(self.table_id))        
+.set("user_id", gluesql::core::ast_builder::num(self.user_id))        
+.set("role_id", gluesql::core::ast_builder::num(self.role_id))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+    /// Update the struct in the database if it exists, otherwise insert it.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated or inserted.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let number_of_rows = self.clone().update(connection).await?;
+        if number_of_rows == 0 {
+            self.insert(connection).await
+        } else {
+            Ok(number_of_rows)
+        }
+    }
+    /// Get all TeamsUsersRoleRequest from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("teams_users_role_requests")
+            .select()
+            .project("table_id, user_id, role_id, created_by, created_at")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
+        Self {
+            table_id: match row.get("table_id").unwrap() {
+                gluesql::prelude::Value::I32(table_id) => table_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            user_id: match row.get("user_id").unwrap() {
+                gluesql::prelude::Value::I32(user_id) => user_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            role_id: match row.get("role_id").unwrap() {
+                gluesql::prelude::Value::I32(role_id) => role_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_at: match row.get("created_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
+        }
+    }
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct TeamsUsersRole {
     pub table_id: i32,
     pub user_id: i32,
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
-    pub updated_by: i32,
-    pub updated_at: NaiveDateTime,
 }
 #[cfg(feature = "frontend")]
 impl TeamsUsersRole {
@@ -7383,8 +11139,6 @@ impl TeamsUsersRole {
             gluesql::core::ast_builder::num(self.role_id),
             gluesql::core::ast_builder::num(self.created_by),
             gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
-            gluesql::core::ast_builder::num(self.updated_by),
-            gluesql::core::ast_builder::timestamp(self.updated_at.to_string()),
         ]
     }
 
@@ -7404,7 +11158,7 @@ impl TeamsUsersRole {
         use gluesql::core::ast_builder::*;
         table("teams_users_roles")
             .insert()
-            .columns("table_id, user_id, role_id, created_by, created_at, updated_by, updated_at")
+            .columns("table_id, user_id, role_id, created_by, created_at")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -7417,11 +11171,11 @@ impl TeamsUsersRole {
     /// Get TeamsUsersRole from the database by its ID.
     ///
     /// # Arguments
-    /// * `( table_id, user_id, role_id )` - The primary key(s) of the struct to get.
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to get.
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        ( table_id, user_id, role_id ): ( i32, i32, i32 ),
+        ( table_id, user_id ): ( i32, i32 ),
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -7431,8 +11185,7 @@ impl TeamsUsersRole {
             .select()
             .filter(col("table_id").eq(table_id.to_string()))
             .filter(col("user_id").eq(user_id.to_string()))
-            .filter(col("role_id").eq(role_id.to_string()))
-            .project("table_id, user_id, role_id, created_by, created_at, updated_by, updated_at")
+            .project("table_id, user_id, role_id, created_by, created_at")
             .limit(1)
             .execute(connection)
             .await?;
@@ -7446,13 +11199,13 @@ impl TeamsUsersRole {
     /// Delete TeamsUsersRole from the database.
     ///
     /// # Arguments
-    /// * `( table_id, user_id, role_id )` - The primary key(s) of the struct to delete.
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        ( table_id, user_id, role_id ): ( i32, i32, i32 ),
+        ( table_id, user_id ): ( i32, i32 ),
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -7462,7 +11215,6 @@ impl TeamsUsersRole {
             .delete()
             .filter(col("table_id").eq(table_id.to_string()))
             .filter(col("user_id").eq(user_id.to_string()))
-            .filter(col("role_id").eq(role_id.to_string()))
             .execute(connection)
             .await
              .map(|payload| match payload {
@@ -7484,7 +11236,7 @@ impl TeamsUsersRole {
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        Self::delete_from_id(( self.table_id, self.user_id, self.role_id ), connection).await
+        Self::delete_from_id(( self.table_id, self.user_id ), connection).await
     }
     /// Update the struct in the database.
     ///
@@ -7506,9 +11258,7 @@ impl TeamsUsersRole {
 .set("user_id", gluesql::core::ast_builder::num(self.user_id))        
 .set("role_id", gluesql::core::ast_builder::num(self.role_id))        
 .set("created_by", gluesql::core::ast_builder::num(self.created_by))        
-.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
-.set("updated_by", gluesql::core::ast_builder::num(self.updated_by))        
-.set("updated_at", gluesql::core::ast_builder::timestamp(self.updated_at.to_string()))            .execute(connection)
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))            .execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -7553,35 +11303,7 @@ impl TeamsUsersRole {
         use gluesql::core::ast_builder::*;
         let select_row = table("teams_users_roles")
             .select()
-            .project("table_id, user_id, role_id, created_by, created_at, updated_by, updated_at")
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .execute(connection)
-            .await?;
-        Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>())
-    }
-    /// Get all TeamsUsersRole from the database ordered by the `updated_at` column.
-    ///
-    /// # Arguments
-    /// * `limit` - The maximum number of results, by default `10`.
-    /// * `offset` - The offset of the results, by default `0`.
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn all_by_updated_at<C>(
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("teams_users_roles")
-            .select()
-            .project("table_id, user_id, role_id, created_by, created_at, updated_by, updated_at")
-            .order_by("updated_at desc")
+            .project("table_id, user_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -7611,14 +11333,6 @@ impl TeamsUsersRole {
             },
             created_at: match row.get("created_at").unwrap() {
                 gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
-                _ => unreachable!("Expected Timestamp")
-            },
-            updated_by: match row.get("updated_by").unwrap() {
-                gluesql::prelude::Value::I32(updated_by) => updated_by.clone(),
-                _ => unreachable!("Expected I32")
-            },
-            updated_at: match row.get("updated_at").unwrap() {
-                gluesql::prelude::Value::Timestamp(updated_at) => updated_at.clone(),
                 _ => unreachable!("Expected Timestamp")
             },
         }
@@ -8313,6 +12027,657 @@ impl User {
             },
             updated_at: match row.get("updated_at").unwrap() {
                 gluesql::prelude::Value::Timestamp(updated_at) => updated_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
+        }
+    }
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
+pub struct UsersUsersRoleInvitation {
+    pub table_id: i32,
+    pub user_id: i32,
+    pub role_id: i32,
+    pub created_by: i32,
+    pub created_at: NaiveDateTime,
+}
+#[cfg(feature = "frontend")]
+impl UsersUsersRoleInvitation {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::num(self.table_id),
+            gluesql::core::ast_builder::num(self.user_id),
+            gluesql::core::ast_builder::num(self.role_id),
+            gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+        ]
+    }
+
+    /// Insert the UsersUsersRoleInvitation into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows inserted in table UsersUsersRoleInvitation
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("users_users_role_invitations")
+            .insert()
+            .columns("table_id, user_id, role_id, created_by, created_at")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
+                 _ => unreachable!("Payload must be an Insert"),
+             })
+    }
+
+    /// Get UsersUsersRoleInvitation from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn get<C>(
+        ( table_id, user_id ): ( i32, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("users_users_role_invitations")
+            .select()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("user_id").eq(user_id.to_string()))
+            .project("table_id, user_id, role_id, created_by, created_at")
+            .limit(1)
+            .execute(connection)
+            .await?;
+         Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>()
+            .pop())
+    }
+
+    /// Delete UsersUsersRoleInvitation from the database.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete_from_id<C>(
+        ( table_id, user_id ): ( i32, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("users_users_role_invitations")
+            .delete()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("user_id").eq(user_id.to_string()))
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
+                 _ => unreachable!("Payload must be a Delete"),
+             })
+    }
+
+    /// Delete the current instance of UsersUsersRoleInvitation from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        Self::delete_from_id(( self.table_id, self.user_id ), connection).await
+    }
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("users_users_role_invitations")
+            .update()        
+.set("table_id", gluesql::core::ast_builder::num(self.table_id))        
+.set("user_id", gluesql::core::ast_builder::num(self.user_id))        
+.set("role_id", gluesql::core::ast_builder::num(self.role_id))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+    /// Update the struct in the database if it exists, otherwise insert it.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated or inserted.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let number_of_rows = self.clone().update(connection).await?;
+        if number_of_rows == 0 {
+            self.insert(connection).await
+        } else {
+            Ok(number_of_rows)
+        }
+    }
+    /// Get all UsersUsersRoleInvitation from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("users_users_role_invitations")
+            .select()
+            .project("table_id, user_id, role_id, created_by, created_at")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
+        Self {
+            table_id: match row.get("table_id").unwrap() {
+                gluesql::prelude::Value::I32(table_id) => table_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            user_id: match row.get("user_id").unwrap() {
+                gluesql::prelude::Value::I32(user_id) => user_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            role_id: match row.get("role_id").unwrap() {
+                gluesql::prelude::Value::I32(role_id) => role_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_at: match row.get("created_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
+        }
+    }
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
+pub struct UsersUsersRoleRequest {
+    pub table_id: i32,
+    pub user_id: i32,
+    pub role_id: i32,
+    pub created_by: i32,
+    pub created_at: NaiveDateTime,
+}
+#[cfg(feature = "frontend")]
+impl UsersUsersRoleRequest {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::num(self.table_id),
+            gluesql::core::ast_builder::num(self.user_id),
+            gluesql::core::ast_builder::num(self.role_id),
+            gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+        ]
+    }
+
+    /// Insert the UsersUsersRoleRequest into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows inserted in table UsersUsersRoleRequest
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("users_users_role_requests")
+            .insert()
+            .columns("table_id, user_id, role_id, created_by, created_at")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
+                 _ => unreachable!("Payload must be an Insert"),
+             })
+    }
+
+    /// Get UsersUsersRoleRequest from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn get<C>(
+        ( table_id, user_id ): ( i32, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("users_users_role_requests")
+            .select()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("user_id").eq(user_id.to_string()))
+            .project("table_id, user_id, role_id, created_by, created_at")
+            .limit(1)
+            .execute(connection)
+            .await?;
+         Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>()
+            .pop())
+    }
+
+    /// Delete UsersUsersRoleRequest from the database.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete_from_id<C>(
+        ( table_id, user_id ): ( i32, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("users_users_role_requests")
+            .delete()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("user_id").eq(user_id.to_string()))
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
+                 _ => unreachable!("Payload must be a Delete"),
+             })
+    }
+
+    /// Delete the current instance of UsersUsersRoleRequest from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        Self::delete_from_id(( self.table_id, self.user_id ), connection).await
+    }
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("users_users_role_requests")
+            .update()        
+.set("table_id", gluesql::core::ast_builder::num(self.table_id))        
+.set("user_id", gluesql::core::ast_builder::num(self.user_id))        
+.set("role_id", gluesql::core::ast_builder::num(self.role_id))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+    /// Update the struct in the database if it exists, otherwise insert it.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated or inserted.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let number_of_rows = self.clone().update(connection).await?;
+        if number_of_rows == 0 {
+            self.insert(connection).await
+        } else {
+            Ok(number_of_rows)
+        }
+    }
+    /// Get all UsersUsersRoleRequest from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("users_users_role_requests")
+            .select()
+            .project("table_id, user_id, role_id, created_by, created_at")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
+        Self {
+            table_id: match row.get("table_id").unwrap() {
+                gluesql::prelude::Value::I32(table_id) => table_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            user_id: match row.get("user_id").unwrap() {
+                gluesql::prelude::Value::I32(user_id) => user_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            role_id: match row.get("role_id").unwrap() {
+                gluesql::prelude::Value::I32(role_id) => role_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_at: match row.get("created_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
+        }
+    }
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
+pub struct UsersUsersRole {
+    pub table_id: i32,
+    pub user_id: i32,
+    pub role_id: i32,
+    pub created_by: i32,
+    pub created_at: NaiveDateTime,
+}
+#[cfg(feature = "frontend")]
+impl UsersUsersRole {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::num(self.table_id),
+            gluesql::core::ast_builder::num(self.user_id),
+            gluesql::core::ast_builder::num(self.role_id),
+            gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+        ]
+    }
+
+    /// Insert the UsersUsersRole into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows inserted in table UsersUsersRole
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("users_users_roles")
+            .insert()
+            .columns("table_id, user_id, role_id, created_by, created_at")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
+                 _ => unreachable!("Payload must be an Insert"),
+             })
+    }
+
+    /// Get UsersUsersRole from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn get<C>(
+        ( table_id, user_id ): ( i32, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("users_users_roles")
+            .select()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("user_id").eq(user_id.to_string()))
+            .project("table_id, user_id, role_id, created_by, created_at")
+            .limit(1)
+            .execute(connection)
+            .await?;
+         Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>()
+            .pop())
+    }
+
+    /// Delete UsersUsersRole from the database.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete_from_id<C>(
+        ( table_id, user_id ): ( i32, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("users_users_roles")
+            .delete()
+            .filter(col("table_id").eq(table_id.to_string()))
+            .filter(col("user_id").eq(user_id.to_string()))
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
+                 _ => unreachable!("Payload must be a Delete"),
+             })
+    }
+
+    /// Delete the current instance of UsersUsersRole from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        Self::delete_from_id(( self.table_id, self.user_id ), connection).await
+    }
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("users_users_roles")
+            .update()        
+.set("table_id", gluesql::core::ast_builder::num(self.table_id))        
+.set("user_id", gluesql::core::ast_builder::num(self.user_id))        
+.set("role_id", gluesql::core::ast_builder::num(self.role_id))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+    /// Update the struct in the database if it exists, otherwise insert it.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated or inserted.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let number_of_rows = self.clone().update(connection).await?;
+        if number_of_rows == 0 {
+            self.insert(connection).await
+        } else {
+            Ok(number_of_rows)
+        }
+    }
+    /// Get all UsersUsersRole from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all<C>(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("users_users_roles")
+            .select()
+            .project("table_id, user_id, role_id, created_by, created_at")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
+        Self {
+            table_id: match row.get("table_id").unwrap() {
+                gluesql::prelude::Value::I32(table_id) => table_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            user_id: match row.get("user_id").unwrap() {
+                gluesql::prelude::Value::I32(user_id) => user_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            role_id: match row.get("role_id").unwrap() {
+                gluesql::prelude::Value::I32(role_id) => role_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_at: match row.get("created_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
                 _ => unreachable!("Expected Timestamp")
             },
         }

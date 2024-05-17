@@ -18,28 +18,50 @@ pub enum Table {
     Organizations,
     ProjectStates,
     Projects,
+    ProjectsTeamsRoleInvitations,
+    ProjectsTeamsRoleRequests,
     ProjectsTeamsRoles,
+    ProjectsUsersRoleInvitations,
+    ProjectsUsersRoleRequests,
     ProjectsUsersRoles,
     Roles,
     SampleBioOttTaxonItems,
     SampleStates,
     SampledIndividualBioOttTaxonItems,
     SampledIndividuals,
+    SampledIndividualsTeamsRoleInvitations,
+    SampledIndividualsTeamsRoleRequests,
     SampledIndividualsTeamsRoles,
+    SampledIndividualsUsersRoleInvitations,
+    SampledIndividualsUsersRoleRequests,
     SampledIndividualsUsersRoles,
     Samples,
+    SamplesTeamsRoleInvitations,
+    SamplesTeamsRoleRequests,
     SamplesTeamsRoles,
+    SamplesUsersRoleInvitations,
+    SamplesUsersRoleRequests,
     SamplesUsersRoles,
     Spectra,
     SpectraCollections,
+    SpectraCollectionsTeamsRoleInvitations,
+    SpectraCollectionsTeamsRoleRequests,
     SpectraCollectionsTeamsRoles,
+    SpectraCollectionsUsersRoleInvitations,
+    SpectraCollectionsUsersRoleRequests,
     SpectraCollectionsUsersRoles,
     TeamStates,
     Teams,
+    TeamsTeamsRoleInvitations,
+    TeamsUsersRoleInvitations,
+    TeamsUsersRoleRequests,
     TeamsUsersRoles,
     Units,
     UserEmails,
     Users,
+    UsersUsersRoleInvitations,
+    UsersUsersRoleRequests,
+    UsersUsersRoles,
 }
 
 impl AsRef<str> for Table {
@@ -57,28 +79,50 @@ impl AsRef<str> for Table {
             Table::Organizations => "organizations",
             Table::ProjectStates => "project_states",
             Table::Projects => "projects",
+            Table::ProjectsTeamsRoleInvitations => "projects_teams_role_invitations",
+            Table::ProjectsTeamsRoleRequests => "projects_teams_role_requests",
             Table::ProjectsTeamsRoles => "projects_teams_roles",
+            Table::ProjectsUsersRoleInvitations => "projects_users_role_invitations",
+            Table::ProjectsUsersRoleRequests => "projects_users_role_requests",
             Table::ProjectsUsersRoles => "projects_users_roles",
             Table::Roles => "roles",
             Table::SampleBioOttTaxonItems => "sample_bio_ott_taxon_items",
             Table::SampleStates => "sample_states",
             Table::SampledIndividualBioOttTaxonItems => "sampled_individual_bio_ott_taxon_items",
             Table::SampledIndividuals => "sampled_individuals",
+            Table::SampledIndividualsTeamsRoleInvitations => "sampled_individuals_teams_role_invitations",
+            Table::SampledIndividualsTeamsRoleRequests => "sampled_individuals_teams_role_requests",
             Table::SampledIndividualsTeamsRoles => "sampled_individuals_teams_roles",
+            Table::SampledIndividualsUsersRoleInvitations => "sampled_individuals_users_role_invitations",
+            Table::SampledIndividualsUsersRoleRequests => "sampled_individuals_users_role_requests",
             Table::SampledIndividualsUsersRoles => "sampled_individuals_users_roles",
             Table::Samples => "samples",
+            Table::SamplesTeamsRoleInvitations => "samples_teams_role_invitations",
+            Table::SamplesTeamsRoleRequests => "samples_teams_role_requests",
             Table::SamplesTeamsRoles => "samples_teams_roles",
+            Table::SamplesUsersRoleInvitations => "samples_users_role_invitations",
+            Table::SamplesUsersRoleRequests => "samples_users_role_requests",
             Table::SamplesUsersRoles => "samples_users_roles",
             Table::Spectra => "spectra",
             Table::SpectraCollections => "spectra_collections",
+            Table::SpectraCollectionsTeamsRoleInvitations => "spectra_collections_teams_role_invitations",
+            Table::SpectraCollectionsTeamsRoleRequests => "spectra_collections_teams_role_requests",
             Table::SpectraCollectionsTeamsRoles => "spectra_collections_teams_roles",
+            Table::SpectraCollectionsUsersRoleInvitations => "spectra_collections_users_role_invitations",
+            Table::SpectraCollectionsUsersRoleRequests => "spectra_collections_users_role_requests",
             Table::SpectraCollectionsUsersRoles => "spectra_collections_users_roles",
             Table::TeamStates => "team_states",
             Table::Teams => "teams",
+            Table::TeamsTeamsRoleInvitations => "teams_teams_role_invitations",
+            Table::TeamsUsersRoleInvitations => "teams_users_role_invitations",
+            Table::TeamsUsersRoleRequests => "teams_users_role_requests",
             Table::TeamsUsersRoles => "teams_users_roles",
             Table::Units => "units",
             Table::UserEmails => "user_emails",
             Table::Users => "users",
+            Table::UsersUsersRoleInvitations => "users_users_role_invitations",
+            Table::UsersUsersRoleRequests => "users_users_role_requests",
+            Table::UsersUsersRoles => "users_users_roles",
         }
     }
 }
@@ -108,28 +152,50 @@ impl std::convert::TryFrom<&str> for Table {
             "organizations" => Ok(Table::Organizations),
             "project_states" => Ok(Table::ProjectStates),
             "projects" => Ok(Table::Projects),
+            "projects_teams_role_invitations" => Ok(Table::ProjectsTeamsRoleInvitations),
+            "projects_teams_role_requests" => Ok(Table::ProjectsTeamsRoleRequests),
             "projects_teams_roles" => Ok(Table::ProjectsTeamsRoles),
+            "projects_users_role_invitations" => Ok(Table::ProjectsUsersRoleInvitations),
+            "projects_users_role_requests" => Ok(Table::ProjectsUsersRoleRequests),
             "projects_users_roles" => Ok(Table::ProjectsUsersRoles),
             "roles" => Ok(Table::Roles),
             "sample_bio_ott_taxon_items" => Ok(Table::SampleBioOttTaxonItems),
             "sample_states" => Ok(Table::SampleStates),
             "sampled_individual_bio_ott_taxon_items" => Ok(Table::SampledIndividualBioOttTaxonItems),
             "sampled_individuals" => Ok(Table::SampledIndividuals),
+            "sampled_individuals_teams_role_invitations" => Ok(Table::SampledIndividualsTeamsRoleInvitations),
+            "sampled_individuals_teams_role_requests" => Ok(Table::SampledIndividualsTeamsRoleRequests),
             "sampled_individuals_teams_roles" => Ok(Table::SampledIndividualsTeamsRoles),
+            "sampled_individuals_users_role_invitations" => Ok(Table::SampledIndividualsUsersRoleInvitations),
+            "sampled_individuals_users_role_requests" => Ok(Table::SampledIndividualsUsersRoleRequests),
             "sampled_individuals_users_roles" => Ok(Table::SampledIndividualsUsersRoles),
             "samples" => Ok(Table::Samples),
+            "samples_teams_role_invitations" => Ok(Table::SamplesTeamsRoleInvitations),
+            "samples_teams_role_requests" => Ok(Table::SamplesTeamsRoleRequests),
             "samples_teams_roles" => Ok(Table::SamplesTeamsRoles),
+            "samples_users_role_invitations" => Ok(Table::SamplesUsersRoleInvitations),
+            "samples_users_role_requests" => Ok(Table::SamplesUsersRoleRequests),
             "samples_users_roles" => Ok(Table::SamplesUsersRoles),
             "spectra" => Ok(Table::Spectra),
             "spectra_collections" => Ok(Table::SpectraCollections),
+            "spectra_collections_teams_role_invitations" => Ok(Table::SpectraCollectionsTeamsRoleInvitations),
+            "spectra_collections_teams_role_requests" => Ok(Table::SpectraCollectionsTeamsRoleRequests),
             "spectra_collections_teams_roles" => Ok(Table::SpectraCollectionsTeamsRoles),
+            "spectra_collections_users_role_invitations" => Ok(Table::SpectraCollectionsUsersRoleInvitations),
+            "spectra_collections_users_role_requests" => Ok(Table::SpectraCollectionsUsersRoleRequests),
             "spectra_collections_users_roles" => Ok(Table::SpectraCollectionsUsersRoles),
             "team_states" => Ok(Table::TeamStates),
             "teams" => Ok(Table::Teams),
+            "teams_teams_role_invitations" => Ok(Table::TeamsTeamsRoleInvitations),
+            "teams_users_role_invitations" => Ok(Table::TeamsUsersRoleInvitations),
+            "teams_users_role_requests" => Ok(Table::TeamsUsersRoleRequests),
             "teams_users_roles" => Ok(Table::TeamsUsersRoles),
             "units" => Ok(Table::Units),
             "user_emails" => Ok(Table::UserEmails),
             "users" => Ok(Table::Users),
+            "users_users_role_invitations" => Ok(Table::UsersUsersRoleInvitations),
+            "users_users_role_requests" => Ok(Table::UsersUsersRoleRequests),
+            "users_users_roles" => Ok(Table::UsersUsersRoles),
             table_name => Err(format!("Unknown table name: {table_name}")),
         }
     }
@@ -194,8 +260,20 @@ impl Table {
             Table::Projects => {
                 crate::database::Project::delete_from_id(primary_key.into(), connection).await
             },
+            Table::ProjectsTeamsRoleInvitations => {
+                crate::database::ProjectsTeamsRoleInvitation::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::ProjectsTeamsRoleRequests => {
+                crate::database::ProjectsTeamsRoleRequest::delete_from_id(primary_key.into(), connection).await
+            },
             Table::ProjectsTeamsRoles => {
                 crate::database::ProjectsTeamsRole::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::ProjectsUsersRoleInvitations => {
+                crate::database::ProjectsUsersRoleInvitation::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::ProjectsUsersRoleRequests => {
+                crate::database::ProjectsUsersRoleRequest::delete_from_id(primary_key.into(), connection).await
             },
             Table::ProjectsUsersRoles => {
                 crate::database::ProjectsUsersRole::delete_from_id(primary_key.into(), connection).await
@@ -215,8 +293,20 @@ impl Table {
             Table::SampledIndividuals => {
                 crate::database::SampledIndividual::delete_from_id(primary_key.into(), connection).await
             },
+            Table::SampledIndividualsTeamsRoleInvitations => {
+                crate::database::SampledIndividualsTeamsRoleInvitation::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::SampledIndividualsTeamsRoleRequests => {
+                crate::database::SampledIndividualsTeamsRoleRequest::delete_from_id(primary_key.into(), connection).await
+            },
             Table::SampledIndividualsTeamsRoles => {
                 crate::database::SampledIndividualsTeamsRole::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::SampledIndividualsUsersRoleInvitations => {
+                crate::database::SampledIndividualsUsersRoleInvitation::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::SampledIndividualsUsersRoleRequests => {
+                crate::database::SampledIndividualsUsersRoleRequest::delete_from_id(primary_key.into(), connection).await
             },
             Table::SampledIndividualsUsersRoles => {
                 crate::database::SampledIndividualsUsersRole::delete_from_id(primary_key.into(), connection).await
@@ -224,8 +314,20 @@ impl Table {
             Table::Samples => {
                 crate::database::Sample::delete_from_id(primary_key.into(), connection).await
             },
+            Table::SamplesTeamsRoleInvitations => {
+                crate::database::SamplesTeamsRoleInvitation::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::SamplesTeamsRoleRequests => {
+                crate::database::SamplesTeamsRoleRequest::delete_from_id(primary_key.into(), connection).await
+            },
             Table::SamplesTeamsRoles => {
                 crate::database::SamplesTeamsRole::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::SamplesUsersRoleInvitations => {
+                crate::database::SamplesUsersRoleInvitation::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::SamplesUsersRoleRequests => {
+                crate::database::SamplesUsersRoleRequest::delete_from_id(primary_key.into(), connection).await
             },
             Table::SamplesUsersRoles => {
                 crate::database::SamplesUsersRole::delete_from_id(primary_key.into(), connection).await
@@ -236,8 +338,20 @@ impl Table {
             Table::SpectraCollections => {
                 crate::database::SpectraCollection::delete_from_id(primary_key.into(), connection).await
             },
+            Table::SpectraCollectionsTeamsRoleInvitations => {
+                crate::database::SpectraCollectionsTeamsRoleInvitation::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::SpectraCollectionsTeamsRoleRequests => {
+                crate::database::SpectraCollectionsTeamsRoleRequest::delete_from_id(primary_key.into(), connection).await
+            },
             Table::SpectraCollectionsTeamsRoles => {
                 crate::database::SpectraCollectionsTeamsRole::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::SpectraCollectionsUsersRoleInvitations => {
+                crate::database::SpectraCollectionsUsersRoleInvitation::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::SpectraCollectionsUsersRoleRequests => {
+                crate::database::SpectraCollectionsUsersRoleRequest::delete_from_id(primary_key.into(), connection).await
             },
             Table::SpectraCollectionsUsersRoles => {
                 crate::database::SpectraCollectionsUsersRole::delete_from_id(primary_key.into(), connection).await
@@ -247,6 +361,15 @@ impl Table {
             },
             Table::Teams => {
                 crate::database::Team::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::TeamsTeamsRoleInvitations => {
+                crate::database::TeamsTeamsRoleInvitation::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::TeamsUsersRoleInvitations => {
+                crate::database::TeamsUsersRoleInvitation::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::TeamsUsersRoleRequests => {
+                crate::database::TeamsUsersRoleRequest::delete_from_id(primary_key.into(), connection).await
             },
             Table::TeamsUsersRoles => {
                 crate::database::TeamsUsersRole::delete_from_id(primary_key.into(), connection).await
@@ -259,6 +382,15 @@ impl Table {
             },
             Table::Users => {
                 crate::database::User::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::UsersUsersRoleInvitations => {
+                crate::database::UsersUsersRoleInvitation::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::UsersUsersRoleRequests => {
+                crate::database::UsersUsersRoleRequest::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::UsersUsersRoles => {
+                crate::database::UsersUsersRole::delete_from_id(primary_key.into(), connection).await
             },
         }
     }
@@ -290,28 +422,50 @@ impl Table {
             Table::Organizations => crate::database::NestedOrganization::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::ProjectStates => crate::database::NestedProjectState::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::Projects => crate::database::NestedProject::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::ProjectsTeamsRoleInvitations => crate::database::NestedProjectsTeamsRoleInvitation::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::ProjectsTeamsRoleRequests => crate::database::NestedProjectsTeamsRoleRequest::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::ProjectsTeamsRoles => crate::database::NestedProjectsTeamsRole::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::ProjectsUsersRoleInvitations => crate::database::NestedProjectsUsersRoleInvitation::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::ProjectsUsersRoleRequests => crate::database::NestedProjectsUsersRoleRequest::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::ProjectsUsersRoles => crate::database::NestedProjectsUsersRole::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::Roles => crate::database::NestedRole::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::SampleBioOttTaxonItems => crate::database::NestedSampleBioOttTaxonItem::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::SampleStates => crate::database::NestedSampleState::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::SampledIndividualBioOttTaxonItems => crate::database::NestedSampledIndividualBioOttTaxonItem::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::SampledIndividuals => crate::database::NestedSampledIndividual::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::SampledIndividualsTeamsRoleInvitations => crate::database::NestedSampledIndividualsTeamsRoleInvitation::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::SampledIndividualsTeamsRoleRequests => crate::database::NestedSampledIndividualsTeamsRoleRequest::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::SampledIndividualsTeamsRoles => crate::database::NestedSampledIndividualsTeamsRole::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::SampledIndividualsUsersRoleInvitations => crate::database::NestedSampledIndividualsUsersRoleInvitation::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::SampledIndividualsUsersRoleRequests => crate::database::NestedSampledIndividualsUsersRoleRequest::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::SampledIndividualsUsersRoles => crate::database::NestedSampledIndividualsUsersRole::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::Samples => crate::database::NestedSample::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::SamplesTeamsRoleInvitations => crate::database::NestedSamplesTeamsRoleInvitation::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::SamplesTeamsRoleRequests => crate::database::NestedSamplesTeamsRoleRequest::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::SamplesTeamsRoles => crate::database::NestedSamplesTeamsRole::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::SamplesUsersRoleInvitations => crate::database::NestedSamplesUsersRoleInvitation::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::SamplesUsersRoleRequests => crate::database::NestedSamplesUsersRoleRequest::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::SamplesUsersRoles => crate::database::NestedSamplesUsersRole::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::Spectra => crate::database::NestedSpectra::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::SpectraCollections => crate::database::NestedSpectraCollection::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::SpectraCollectionsTeamsRoleInvitations => crate::database::NestedSpectraCollectionsTeamsRoleInvitation::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::SpectraCollectionsTeamsRoleRequests => crate::database::NestedSpectraCollectionsTeamsRoleRequest::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::SpectraCollectionsTeamsRoles => crate::database::NestedSpectraCollectionsTeamsRole::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::SpectraCollectionsUsersRoleInvitations => crate::database::NestedSpectraCollectionsUsersRoleInvitation::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::SpectraCollectionsUsersRoleRequests => crate::database::NestedSpectraCollectionsUsersRoleRequest::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::SpectraCollectionsUsersRoles => crate::database::NestedSpectraCollectionsUsersRole::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::TeamStates => crate::database::NestedTeamState::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::Teams => crate::database::NestedTeam::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::TeamsTeamsRoleInvitations => crate::database::NestedTeamsTeamsRoleInvitation::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::TeamsUsersRoleInvitations => crate::database::NestedTeamsUsersRoleInvitation::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::TeamsUsersRoleRequests => crate::database::NestedTeamsUsersRoleRequest::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::TeamsUsersRoles => crate::database::NestedTeamsUsersRole::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::Units => crate::database::Unit::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::UserEmails => crate::database::NestedUserEmail::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::Users => crate::database::User::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::UsersUsersRoleInvitations => crate::database::NestedUsersUsersRoleInvitation::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::UsersUsersRoleRequests => crate::database::NestedUsersUsersRoleRequest::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::UsersUsersRoles => crate::database::NestedUsersUsersRole::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
         })
     }
     /// Get all the rows from the table.
@@ -344,28 +498,50 @@ impl Table {
             Table::Organizations => crate::database::NestedOrganization::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::ProjectStates => crate::database::NestedProjectState::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::Projects => crate::database::NestedProject::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::ProjectsTeamsRoleInvitations => crate::database::NestedProjectsTeamsRoleInvitation::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::ProjectsTeamsRoleRequests => crate::database::NestedProjectsTeamsRoleRequest::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::ProjectsTeamsRoles => crate::database::NestedProjectsTeamsRole::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::ProjectsUsersRoleInvitations => crate::database::NestedProjectsUsersRoleInvitation::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::ProjectsUsersRoleRequests => crate::database::NestedProjectsUsersRoleRequest::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::ProjectsUsersRoles => crate::database::NestedProjectsUsersRole::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::Roles => crate::database::NestedRole::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::SampleBioOttTaxonItems => crate::database::NestedSampleBioOttTaxonItem::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::SampleStates => crate::database::NestedSampleState::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::SampledIndividualBioOttTaxonItems => crate::database::NestedSampledIndividualBioOttTaxonItem::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::SampledIndividuals => crate::database::NestedSampledIndividual::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::SampledIndividualsTeamsRoleInvitations => crate::database::NestedSampledIndividualsTeamsRoleInvitation::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::SampledIndividualsTeamsRoleRequests => crate::database::NestedSampledIndividualsTeamsRoleRequest::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::SampledIndividualsTeamsRoles => crate::database::NestedSampledIndividualsTeamsRole::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::SampledIndividualsUsersRoleInvitations => crate::database::NestedSampledIndividualsUsersRoleInvitation::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::SampledIndividualsUsersRoleRequests => crate::database::NestedSampledIndividualsUsersRoleRequest::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::SampledIndividualsUsersRoles => crate::database::NestedSampledIndividualsUsersRole::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::Samples => crate::database::NestedSample::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::SamplesTeamsRoleInvitations => crate::database::NestedSamplesTeamsRoleInvitation::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::SamplesTeamsRoleRequests => crate::database::NestedSamplesTeamsRoleRequest::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::SamplesTeamsRoles => crate::database::NestedSamplesTeamsRole::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::SamplesUsersRoleInvitations => crate::database::NestedSamplesUsersRoleInvitation::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::SamplesUsersRoleRequests => crate::database::NestedSamplesUsersRoleRequest::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::SamplesUsersRoles => crate::database::NestedSamplesUsersRole::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::Spectra => crate::database::NestedSpectra::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::SpectraCollections => crate::database::NestedSpectraCollection::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::SpectraCollectionsTeamsRoleInvitations => crate::database::NestedSpectraCollectionsTeamsRoleInvitation::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::SpectraCollectionsTeamsRoleRequests => crate::database::NestedSpectraCollectionsTeamsRoleRequest::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::SpectraCollectionsTeamsRoles => crate::database::NestedSpectraCollectionsTeamsRole::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::SpectraCollectionsUsersRoleInvitations => crate::database::NestedSpectraCollectionsUsersRoleInvitation::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::SpectraCollectionsUsersRoleRequests => crate::database::NestedSpectraCollectionsUsersRoleRequest::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::SpectraCollectionsUsersRoles => crate::database::NestedSpectraCollectionsUsersRole::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::TeamStates => crate::database::NestedTeamState::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::Teams => crate::database::NestedTeam::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::TeamsTeamsRoleInvitations => crate::database::NestedTeamsTeamsRoleInvitation::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::TeamsUsersRoleInvitations => crate::database::NestedTeamsUsersRoleInvitation::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::TeamsUsersRoleRequests => crate::database::NestedTeamsUsersRoleRequest::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::TeamsUsersRoles => crate::database::NestedTeamsUsersRole::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::Units => crate::database::Unit::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::UserEmails => crate::database::NestedUserEmail::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::Users => crate::database::User::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::UsersUsersRoleInvitations => crate::database::NestedUsersUsersRoleInvitation::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::UsersUsersRoleRequests => crate::database::NestedUsersUsersRoleRequest::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::UsersUsersRoles => crate::database::NestedUsersUsersRole::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
         }
     }
     /// Get all the rows from the table ordered by the `updated_at` column.
@@ -398,28 +574,50 @@ impl Table {
             Table::Organizations => unimplemented!("all_by_updated_at not implemented for organizations."),
             Table::ProjectStates => unimplemented!("all_by_updated_at not implemented for project_states."),
             Table::Projects => crate::database::NestedProject::all_by_updated_at(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
-            Table::ProjectsTeamsRoles => crate::database::NestedProjectsTeamsRole::all_by_updated_at(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
-            Table::ProjectsUsersRoles => crate::database::NestedProjectsUsersRole::all_by_updated_at(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::ProjectsTeamsRoleInvitations => unimplemented!("all_by_updated_at not implemented for projects_teams_role_invitations."),
+            Table::ProjectsTeamsRoleRequests => unimplemented!("all_by_updated_at not implemented for projects_teams_role_requests."),
+            Table::ProjectsTeamsRoles => unimplemented!("all_by_updated_at not implemented for projects_teams_roles."),
+            Table::ProjectsUsersRoleInvitations => unimplemented!("all_by_updated_at not implemented for projects_users_role_invitations."),
+            Table::ProjectsUsersRoleRequests => unimplemented!("all_by_updated_at not implemented for projects_users_role_requests."),
+            Table::ProjectsUsersRoles => unimplemented!("all_by_updated_at not implemented for projects_users_roles."),
             Table::Roles => unimplemented!("all_by_updated_at not implemented for roles."),
             Table::SampleBioOttTaxonItems => crate::database::NestedSampleBioOttTaxonItem::all_by_updated_at(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::SampleStates => unimplemented!("all_by_updated_at not implemented for sample_states."),
             Table::SampledIndividualBioOttTaxonItems => crate::database::NestedSampledIndividualBioOttTaxonItem::all_by_updated_at(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
             Table::SampledIndividuals => crate::database::NestedSampledIndividual::all_by_updated_at(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
-            Table::SampledIndividualsTeamsRoles => crate::database::NestedSampledIndividualsTeamsRole::all_by_updated_at(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
-            Table::SampledIndividualsUsersRoles => crate::database::NestedSampledIndividualsUsersRole::all_by_updated_at(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::SampledIndividualsTeamsRoleInvitations => unimplemented!("all_by_updated_at not implemented for sampled_individuals_teams_role_invitations."),
+            Table::SampledIndividualsTeamsRoleRequests => unimplemented!("all_by_updated_at not implemented for sampled_individuals_teams_role_requests."),
+            Table::SampledIndividualsTeamsRoles => unimplemented!("all_by_updated_at not implemented for sampled_individuals_teams_roles."),
+            Table::SampledIndividualsUsersRoleInvitations => unimplemented!("all_by_updated_at not implemented for sampled_individuals_users_role_invitations."),
+            Table::SampledIndividualsUsersRoleRequests => unimplemented!("all_by_updated_at not implemented for sampled_individuals_users_role_requests."),
+            Table::SampledIndividualsUsersRoles => unimplemented!("all_by_updated_at not implemented for sampled_individuals_users_roles."),
             Table::Samples => crate::database::NestedSample::all_by_updated_at(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
-            Table::SamplesTeamsRoles => crate::database::NestedSamplesTeamsRole::all_by_updated_at(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
-            Table::SamplesUsersRoles => crate::database::NestedSamplesUsersRole::all_by_updated_at(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::SamplesTeamsRoleInvitations => unimplemented!("all_by_updated_at not implemented for samples_teams_role_invitations."),
+            Table::SamplesTeamsRoleRequests => unimplemented!("all_by_updated_at not implemented for samples_teams_role_requests."),
+            Table::SamplesTeamsRoles => unimplemented!("all_by_updated_at not implemented for samples_teams_roles."),
+            Table::SamplesUsersRoleInvitations => unimplemented!("all_by_updated_at not implemented for samples_users_role_invitations."),
+            Table::SamplesUsersRoleRequests => unimplemented!("all_by_updated_at not implemented for samples_users_role_requests."),
+            Table::SamplesUsersRoles => unimplemented!("all_by_updated_at not implemented for samples_users_roles."),
             Table::Spectra => unimplemented!("all_by_updated_at not implemented for spectra."),
             Table::SpectraCollections => crate::database::NestedSpectraCollection::all_by_updated_at(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
-            Table::SpectraCollectionsTeamsRoles => crate::database::NestedSpectraCollectionsTeamsRole::all_by_updated_at(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
-            Table::SpectraCollectionsUsersRoles => crate::database::NestedSpectraCollectionsUsersRole::all_by_updated_at(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::SpectraCollectionsTeamsRoleInvitations => unimplemented!("all_by_updated_at not implemented for spectra_collections_teams_role_invitations."),
+            Table::SpectraCollectionsTeamsRoleRequests => unimplemented!("all_by_updated_at not implemented for spectra_collections_teams_role_requests."),
+            Table::SpectraCollectionsTeamsRoles => unimplemented!("all_by_updated_at not implemented for spectra_collections_teams_roles."),
+            Table::SpectraCollectionsUsersRoleInvitations => unimplemented!("all_by_updated_at not implemented for spectra_collections_users_role_invitations."),
+            Table::SpectraCollectionsUsersRoleRequests => unimplemented!("all_by_updated_at not implemented for spectra_collections_users_role_requests."),
+            Table::SpectraCollectionsUsersRoles => unimplemented!("all_by_updated_at not implemented for spectra_collections_users_roles."),
             Table::TeamStates => unimplemented!("all_by_updated_at not implemented for team_states."),
             Table::Teams => crate::database::NestedTeam::all_by_updated_at(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
-            Table::TeamsUsersRoles => crate::database::NestedTeamsUsersRole::all_by_updated_at(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::TeamsTeamsRoleInvitations => unimplemented!("all_by_updated_at not implemented for teams_teams_role_invitations."),
+            Table::TeamsUsersRoleInvitations => unimplemented!("all_by_updated_at not implemented for teams_users_role_invitations."),
+            Table::TeamsUsersRoleRequests => unimplemented!("all_by_updated_at not implemented for teams_users_role_requests."),
+            Table::TeamsUsersRoles => unimplemented!("all_by_updated_at not implemented for teams_users_roles."),
             Table::Units => unimplemented!("all_by_updated_at not implemented for units."),
             Table::UserEmails => unimplemented!("all_by_updated_at not implemented for user_emails."),
             Table::Users => crate::database::User::all_by_updated_at(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),
+            Table::UsersUsersRoleInvitations => unimplemented!("all_by_updated_at not implemented for users_users_role_invitations."),
+            Table::UsersUsersRoleRequests => unimplemented!("all_by_updated_at not implemented for users_users_role_requests."),
+            Table::UsersUsersRoles => unimplemented!("all_by_updated_at not implemented for users_users_roles."),
         }
     }
     /// Insert a new row into the table.
@@ -452,7 +650,11 @@ impl Table {
             Table::Organizations => unimplemented!("Insert not implemented for organizations."),
             Table::ProjectStates => unimplemented!("Insert not implemented for project_states."),
             Table::Projects => unimplemented!("Insert not implemented for projects in frontend as it does not have a UUID primary key."),
+            Table::ProjectsTeamsRoleInvitations => unimplemented!("Insert not implemented for projects_teams_role_invitations in frontend as it does not have a UUID primary key."),
+            Table::ProjectsTeamsRoleRequests => unimplemented!("Insert not implemented for projects_teams_role_requests in frontend as it does not have a UUID primary key."),
             Table::ProjectsTeamsRoles => unimplemented!("Insert not implemented for projects_teams_roles in frontend as it does not have a UUID primary key."),
+            Table::ProjectsUsersRoleInvitations => unimplemented!("Insert not implemented for projects_users_role_invitations in frontend as it does not have a UUID primary key."),
+            Table::ProjectsUsersRoleRequests => unimplemented!("Insert not implemented for projects_users_role_requests in frontend as it does not have a UUID primary key."),
             Table::ProjectsUsersRoles => unimplemented!("Insert not implemented for projects_users_roles in frontend as it does not have a UUID primary key."),
             Table::Roles => unimplemented!("Insert not implemented for roles."),
             Table::SampleBioOttTaxonItems => unimplemented!("Insert not implemented for sample_bio_ott_taxon_items in frontend as it does not have a UUID primary key."),
@@ -464,7 +666,11 @@ impl Table {
                 let nested_row = super::NestedSampledIndividual::from_flat(inserted_row, connection).await?;
                  bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
             },
+            Table::SampledIndividualsTeamsRoleInvitations => unimplemented!("Insert not implemented for sampled_individuals_teams_role_invitations in frontend as it does not have a UUID primary key."),
+            Table::SampledIndividualsTeamsRoleRequests => unimplemented!("Insert not implemented for sampled_individuals_teams_role_requests in frontend as it does not have a UUID primary key."),
             Table::SampledIndividualsTeamsRoles => unimplemented!("Insert not implemented for sampled_individuals_teams_roles in frontend as it does not have a UUID primary key."),
+            Table::SampledIndividualsUsersRoleInvitations => unimplemented!("Insert not implemented for sampled_individuals_users_role_invitations in frontend as it does not have a UUID primary key."),
+            Table::SampledIndividualsUsersRoleRequests => unimplemented!("Insert not implemented for sampled_individuals_users_role_requests in frontend as it does not have a UUID primary key."),
             Table::SampledIndividualsUsersRoles => unimplemented!("Insert not implemented for sampled_individuals_users_roles in frontend as it does not have a UUID primary key."),
             Table::Samples => {
                 let new_row: super::NewSample = bincode::deserialize::<super::NewSample>(&new_row).map_err(crate::api::ApiError::from)?;
@@ -472,18 +678,32 @@ impl Table {
                 let nested_row = super::NestedSample::from_flat(inserted_row, connection).await?;
                  bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
             },
+            Table::SamplesTeamsRoleInvitations => unimplemented!("Insert not implemented for samples_teams_role_invitations in frontend as it does not have a UUID primary key."),
+            Table::SamplesTeamsRoleRequests => unimplemented!("Insert not implemented for samples_teams_role_requests in frontend as it does not have a UUID primary key."),
             Table::SamplesTeamsRoles => unimplemented!("Insert not implemented for samples_teams_roles in frontend as it does not have a UUID primary key."),
+            Table::SamplesUsersRoleInvitations => unimplemented!("Insert not implemented for samples_users_role_invitations in frontend as it does not have a UUID primary key."),
+            Table::SamplesUsersRoleRequests => unimplemented!("Insert not implemented for samples_users_role_requests in frontend as it does not have a UUID primary key."),
             Table::SamplesUsersRoles => unimplemented!("Insert not implemented for samples_users_roles in frontend as it does not have a UUID primary key."),
             Table::Spectra => unimplemented!("Insert not implemented for spectra."),
             Table::SpectraCollections => unimplemented!("Insert not implemented for spectra_collections in frontend as it does not have a UUID primary key."),
+            Table::SpectraCollectionsTeamsRoleInvitations => unimplemented!("Insert not implemented for spectra_collections_teams_role_invitations in frontend as it does not have a UUID primary key."),
+            Table::SpectraCollectionsTeamsRoleRequests => unimplemented!("Insert not implemented for spectra_collections_teams_role_requests in frontend as it does not have a UUID primary key."),
             Table::SpectraCollectionsTeamsRoles => unimplemented!("Insert not implemented for spectra_collections_teams_roles in frontend as it does not have a UUID primary key."),
+            Table::SpectraCollectionsUsersRoleInvitations => unimplemented!("Insert not implemented for spectra_collections_users_role_invitations in frontend as it does not have a UUID primary key."),
+            Table::SpectraCollectionsUsersRoleRequests => unimplemented!("Insert not implemented for spectra_collections_users_role_requests in frontend as it does not have a UUID primary key."),
             Table::SpectraCollectionsUsersRoles => unimplemented!("Insert not implemented for spectra_collections_users_roles in frontend as it does not have a UUID primary key."),
             Table::TeamStates => unimplemented!("Insert not implemented for team_states."),
             Table::Teams => unimplemented!("Insert not implemented for teams in frontend as it does not have a UUID primary key."),
+            Table::TeamsTeamsRoleInvitations => unimplemented!("Insert not implemented for teams_teams_role_invitations in frontend as it does not have a UUID primary key."),
+            Table::TeamsUsersRoleInvitations => unimplemented!("Insert not implemented for teams_users_role_invitations in frontend as it does not have a UUID primary key."),
+            Table::TeamsUsersRoleRequests => unimplemented!("Insert not implemented for teams_users_role_requests in frontend as it does not have a UUID primary key."),
             Table::TeamsUsersRoles => unimplemented!("Insert not implemented for teams_users_roles in frontend as it does not have a UUID primary key."),
             Table::Units => unimplemented!("Insert not implemented for units."),
             Table::UserEmails => unimplemented!("Insert not implemented for user_emails in frontend as it does not have a UUID primary key."),
             Table::Users => unimplemented!("Insert not implemented for users in frontend as it does not have a UUID primary key."),
+            Table::UsersUsersRoleInvitations => unimplemented!("Insert not implemented for users_users_role_invitations in frontend as it does not have a UUID primary key."),
+            Table::UsersUsersRoleRequests => unimplemented!("Insert not implemented for users_users_role_requests in frontend as it does not have a UUID primary key."),
+            Table::UsersUsersRoles => unimplemented!("Insert not implemented for users_users_roles in frontend as it does not have a UUID primary key."),
 })
     }
     /// Update a row in the table.
@@ -523,7 +743,11 @@ impl Table {
                 let nested_row = super::NestedProject::from_flat(updated_row, connection).await?;
                  bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
             },
+            Table::ProjectsTeamsRoleInvitations => unimplemented!("Update not implemented for projects_teams_role_invitations."),
+            Table::ProjectsTeamsRoleRequests => unimplemented!("Update not implemented for projects_teams_role_requests."),
             Table::ProjectsTeamsRoles => unimplemented!("Update not implemented for projects_teams_roles."),
+            Table::ProjectsUsersRoleInvitations => unimplemented!("Update not implemented for projects_users_role_invitations."),
+            Table::ProjectsUsersRoleRequests => unimplemented!("Update not implemented for projects_users_role_requests."),
             Table::ProjectsUsersRoles => unimplemented!("Update not implemented for projects_users_roles."),
             Table::Roles => unimplemented!("Update not implemented for roles."),
             Table::SampleBioOttTaxonItems => unimplemented!("Update not implemented for sample_bio_ott_taxon_items."),
@@ -537,7 +761,11 @@ impl Table {
                 let nested_row = super::NestedSampledIndividual::from_flat(updated_row, connection).await?;
                  bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
             },
+            Table::SampledIndividualsTeamsRoleInvitations => unimplemented!("Update not implemented for sampled_individuals_teams_role_invitations."),
+            Table::SampledIndividualsTeamsRoleRequests => unimplemented!("Update not implemented for sampled_individuals_teams_role_requests."),
             Table::SampledIndividualsTeamsRoles => unimplemented!("Update not implemented for sampled_individuals_teams_roles."),
+            Table::SampledIndividualsUsersRoleInvitations => unimplemented!("Update not implemented for sampled_individuals_users_role_invitations."),
+            Table::SampledIndividualsUsersRoleRequests => unimplemented!("Update not implemented for sampled_individuals_users_role_requests."),
             Table::SampledIndividualsUsersRoles => unimplemented!("Update not implemented for sampled_individuals_users_roles."),
             Table::Samples => {
                 let update_row: super::NewSample = bincode::deserialize::<super::NewSample>(&update_row).map_err(crate::api::ApiError::from)?;
@@ -547,11 +775,19 @@ impl Table {
                 let nested_row = super::NestedSample::from_flat(updated_row, connection).await?;
                  bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
             },
+            Table::SamplesTeamsRoleInvitations => unimplemented!("Update not implemented for samples_teams_role_invitations."),
+            Table::SamplesTeamsRoleRequests => unimplemented!("Update not implemented for samples_teams_role_requests."),
             Table::SamplesTeamsRoles => unimplemented!("Update not implemented for samples_teams_roles."),
+            Table::SamplesUsersRoleInvitations => unimplemented!("Update not implemented for samples_users_role_invitations."),
+            Table::SamplesUsersRoleRequests => unimplemented!("Update not implemented for samples_users_role_requests."),
             Table::SamplesUsersRoles => unimplemented!("Update not implemented for samples_users_roles."),
             Table::Spectra => unimplemented!("Update not implemented for spectra."),
             Table::SpectraCollections => todo!("Update not implemented for spectra_collections."),
+            Table::SpectraCollectionsTeamsRoleInvitations => unimplemented!("Update not implemented for spectra_collections_teams_role_invitations."),
+            Table::SpectraCollectionsTeamsRoleRequests => unimplemented!("Update not implemented for spectra_collections_teams_role_requests."),
             Table::SpectraCollectionsTeamsRoles => unimplemented!("Update not implemented for spectra_collections_teams_roles."),
+            Table::SpectraCollectionsUsersRoleInvitations => unimplemented!("Update not implemented for spectra_collections_users_role_invitations."),
+            Table::SpectraCollectionsUsersRoleRequests => unimplemented!("Update not implemented for spectra_collections_users_role_requests."),
             Table::SpectraCollectionsUsersRoles => unimplemented!("Update not implemented for spectra_collections_users_roles."),
             Table::TeamStates => unimplemented!("Update not implemented for team_states."),
             Table::Teams => {
@@ -562,6 +798,9 @@ impl Table {
                 let nested_row = super::NestedTeam::from_flat(updated_row, connection).await?;
                  bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
             },
+            Table::TeamsTeamsRoleInvitations => unimplemented!("Update not implemented for teams_teams_role_invitations."),
+            Table::TeamsUsersRoleInvitations => unimplemented!("Update not implemented for teams_users_role_invitations."),
+            Table::TeamsUsersRoleRequests => unimplemented!("Update not implemented for teams_users_role_requests."),
             Table::TeamsUsersRoles => unimplemented!("Update not implemented for teams_users_roles."),
             Table::Units => unimplemented!("Update not implemented for units."),
             Table::UserEmails => unimplemented!("Update not implemented for user_emails."),
@@ -572,6 +811,9 @@ impl Table {
                 let updated_row: super::User = super::User::get(id, connection).await?.unwrap();
                 bincode::serialize(&updated_row).map_err(crate::api::ApiError::from)?
             },
+            Table::UsersUsersRoleInvitations => unimplemented!("Update not implemented for users_users_role_invitations."),
+            Table::UsersUsersRoleRequests => unimplemented!("Update not implemented for users_users_role_requests."),
+            Table::UsersUsersRoles => unimplemented!("Update not implemented for users_users_roles."),
 })
     }
     /// Update or insert a row into the table.
@@ -661,9 +903,33 @@ impl Table {
                     row.update_or_insert(connection).await?;
                 }
             },
+            Table::ProjectsTeamsRoleInvitations => {
+                for row in rows {
+                    let row: super::NestedProjectsTeamsRoleInvitation = bincode::deserialize::<super::NestedProjectsTeamsRoleInvitation>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::ProjectsTeamsRoleRequests => {
+                for row in rows {
+                    let row: super::NestedProjectsTeamsRoleRequest = bincode::deserialize::<super::NestedProjectsTeamsRoleRequest>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
             Table::ProjectsTeamsRoles => {
                 for row in rows {
                     let row: super::NestedProjectsTeamsRole = bincode::deserialize::<super::NestedProjectsTeamsRole>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::ProjectsUsersRoleInvitations => {
+                for row in rows {
+                    let row: super::NestedProjectsUsersRoleInvitation = bincode::deserialize::<super::NestedProjectsUsersRoleInvitation>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::ProjectsUsersRoleRequests => {
+                for row in rows {
+                    let row: super::NestedProjectsUsersRoleRequest = bincode::deserialize::<super::NestedProjectsUsersRoleRequest>(&row).map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             },
@@ -703,9 +969,33 @@ impl Table {
                     row.update_or_insert(connection).await?;
                 }
             },
+            Table::SampledIndividualsTeamsRoleInvitations => {
+                for row in rows {
+                    let row: super::NestedSampledIndividualsTeamsRoleInvitation = bincode::deserialize::<super::NestedSampledIndividualsTeamsRoleInvitation>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::SampledIndividualsTeamsRoleRequests => {
+                for row in rows {
+                    let row: super::NestedSampledIndividualsTeamsRoleRequest = bincode::deserialize::<super::NestedSampledIndividualsTeamsRoleRequest>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
             Table::SampledIndividualsTeamsRoles => {
                 for row in rows {
                     let row: super::NestedSampledIndividualsTeamsRole = bincode::deserialize::<super::NestedSampledIndividualsTeamsRole>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::SampledIndividualsUsersRoleInvitations => {
+                for row in rows {
+                    let row: super::NestedSampledIndividualsUsersRoleInvitation = bincode::deserialize::<super::NestedSampledIndividualsUsersRoleInvitation>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::SampledIndividualsUsersRoleRequests => {
+                for row in rows {
+                    let row: super::NestedSampledIndividualsUsersRoleRequest = bincode::deserialize::<super::NestedSampledIndividualsUsersRoleRequest>(&row).map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             },
@@ -721,9 +1011,33 @@ impl Table {
                     row.update_or_insert(connection).await?;
                 }
             },
+            Table::SamplesTeamsRoleInvitations => {
+                for row in rows {
+                    let row: super::NestedSamplesTeamsRoleInvitation = bincode::deserialize::<super::NestedSamplesTeamsRoleInvitation>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::SamplesTeamsRoleRequests => {
+                for row in rows {
+                    let row: super::NestedSamplesTeamsRoleRequest = bincode::deserialize::<super::NestedSamplesTeamsRoleRequest>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
             Table::SamplesTeamsRoles => {
                 for row in rows {
                     let row: super::NestedSamplesTeamsRole = bincode::deserialize::<super::NestedSamplesTeamsRole>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::SamplesUsersRoleInvitations => {
+                for row in rows {
+                    let row: super::NestedSamplesUsersRoleInvitation = bincode::deserialize::<super::NestedSamplesUsersRoleInvitation>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::SamplesUsersRoleRequests => {
+                for row in rows {
+                    let row: super::NestedSamplesUsersRoleRequest = bincode::deserialize::<super::NestedSamplesUsersRoleRequest>(&row).map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             },
@@ -745,9 +1059,33 @@ impl Table {
                     row.update_or_insert(connection).await?;
                 }
             },
+            Table::SpectraCollectionsTeamsRoleInvitations => {
+                for row in rows {
+                    let row: super::NestedSpectraCollectionsTeamsRoleInvitation = bincode::deserialize::<super::NestedSpectraCollectionsTeamsRoleInvitation>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::SpectraCollectionsTeamsRoleRequests => {
+                for row in rows {
+                    let row: super::NestedSpectraCollectionsTeamsRoleRequest = bincode::deserialize::<super::NestedSpectraCollectionsTeamsRoleRequest>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
             Table::SpectraCollectionsTeamsRoles => {
                 for row in rows {
                     let row: super::NestedSpectraCollectionsTeamsRole = bincode::deserialize::<super::NestedSpectraCollectionsTeamsRole>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::SpectraCollectionsUsersRoleInvitations => {
+                for row in rows {
+                    let row: super::NestedSpectraCollectionsUsersRoleInvitation = bincode::deserialize::<super::NestedSpectraCollectionsUsersRoleInvitation>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::SpectraCollectionsUsersRoleRequests => {
+                for row in rows {
+                    let row: super::NestedSpectraCollectionsUsersRoleRequest = bincode::deserialize::<super::NestedSpectraCollectionsUsersRoleRequest>(&row).map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             },
@@ -766,6 +1104,24 @@ impl Table {
             Table::Teams => {
                 for row in rows {
                     let row: super::NestedTeam = bincode::deserialize::<super::NestedTeam>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::TeamsTeamsRoleInvitations => {
+                for row in rows {
+                    let row: super::NestedTeamsTeamsRoleInvitation = bincode::deserialize::<super::NestedTeamsTeamsRoleInvitation>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::TeamsUsersRoleInvitations => {
+                for row in rows {
+                    let row: super::NestedTeamsUsersRoleInvitation = bincode::deserialize::<super::NestedTeamsUsersRoleInvitation>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::TeamsUsersRoleRequests => {
+                for row in rows {
+                    let row: super::NestedTeamsUsersRoleRequest = bincode::deserialize::<super::NestedTeamsUsersRoleRequest>(&row).map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             },
@@ -790,6 +1146,24 @@ impl Table {
             Table::Users => {
                 for row in rows {
                     let row: super::User = bincode::deserialize::<super::User>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::UsersUsersRoleInvitations => {
+                for row in rows {
+                    let row: super::NestedUsersUsersRoleInvitation = bincode::deserialize::<super::NestedUsersUsersRoleInvitation>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::UsersUsersRoleRequests => {
+                for row in rows {
+                    let row: super::NestedUsersUsersRoleRequest = bincode::deserialize::<super::NestedUsersUsersRoleRequest>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::UsersUsersRoles => {
+                for row in rows {
+                    let row: super::NestedUsersUsersRole = bincode::deserialize::<super::NestedUsersUsersRole>(&row).map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             },

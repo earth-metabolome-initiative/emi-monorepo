@@ -1030,13 +1030,170 @@ impl From<NestedProject> for web_common::database::nested_models::NestedProject 
     }
 }
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+pub struct NestedProjectsTeamsRoleInvitation {
+    pub inner: ProjectsTeamsRoleInvitation,
+    pub table: NestedProject,
+    pub team: NestedTeam,
+    pub role: NestedRole,
+    pub created_by: User,
+}
+
+impl NestedProjectsTeamsRoleInvitation {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: ProjectsTeamsRoleInvitation,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            table: NestedProject::get(flat_struct.table_id, connection)?,
+            team: NestedTeam::get(flat_struct.team_id, connection)?,
+            role: NestedRole::get(flat_struct.role_id, connection)?,
+            created_by: User::get(flat_struct.created_by, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedProjectsTeamsRoleInvitation {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
+    /// * `connection` - The database connection.
+    pub fn all(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        ProjectsTeamsRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedProjectsTeamsRoleInvitation {
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `( table_id, team_id )` - The primary key(s) of the row.
+    /// * `connection` - The database connection.
+    pub fn get(
+        ( table_id, team_id ): ( i32, i32 ),
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+       ProjectsTeamsRoleInvitation::get(( table_id, team_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+    }
+}
+impl From<web_common::database::nested_models::NestedProjectsTeamsRoleInvitation> for NestedProjectsTeamsRoleInvitation {
+    fn from(item: web_common::database::nested_models::NestedProjectsTeamsRoleInvitation) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            team: item.team.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+impl From<NestedProjectsTeamsRoleInvitation> for web_common::database::nested_models::NestedProjectsTeamsRoleInvitation {
+    fn from(item: NestedProjectsTeamsRoleInvitation) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            team: item.team.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+pub struct NestedProjectsTeamsRoleRequest {
+    pub inner: ProjectsTeamsRoleRequest,
+    pub table: NestedProject,
+    pub team: NestedTeam,
+    pub role: NestedRole,
+    pub created_by: User,
+}
+
+impl NestedProjectsTeamsRoleRequest {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: ProjectsTeamsRoleRequest,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            table: NestedProject::get(flat_struct.table_id, connection)?,
+            team: NestedTeam::get(flat_struct.team_id, connection)?,
+            role: NestedRole::get(flat_struct.role_id, connection)?,
+            created_by: User::get(flat_struct.created_by, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedProjectsTeamsRoleRequest {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
+    /// * `connection` - The database connection.
+    pub fn all(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        ProjectsTeamsRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedProjectsTeamsRoleRequest {
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `( table_id, team_id )` - The primary key(s) of the row.
+    /// * `connection` - The database connection.
+    pub fn get(
+        ( table_id, team_id ): ( i32, i32 ),
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+       ProjectsTeamsRoleRequest::get(( table_id, team_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+    }
+}
+impl From<web_common::database::nested_models::NestedProjectsTeamsRoleRequest> for NestedProjectsTeamsRoleRequest {
+    fn from(item: web_common::database::nested_models::NestedProjectsTeamsRoleRequest) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            team: item.team.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+impl From<NestedProjectsTeamsRoleRequest> for web_common::database::nested_models::NestedProjectsTeamsRoleRequest {
+    fn from(item: NestedProjectsTeamsRoleRequest) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            team: item.team.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedProjectsTeamsRole {
     pub inner: ProjectsTeamsRole,
     pub table: NestedProject,
     pub team: NestedTeam,
     pub role: NestedRole,
     pub created_by: User,
-    pub updated_by: User,
 }
 
 impl NestedProjectsTeamsRole {
@@ -1054,7 +1211,6 @@ impl NestedProjectsTeamsRole {
             team: NestedTeam::get(flat_struct.team_id, connection)?,
             role: NestedRole::get(flat_struct.role_id, connection)?,
             created_by: User::get(flat_struct.created_by, connection)?,
-            updated_by: User::get(flat_struct.updated_by, connection)?,
                 inner: flat_struct,
         })
     }
@@ -1075,32 +1231,17 @@ impl NestedProjectsTeamsRole {
     }
 }
 impl NestedProjectsTeamsRole {
-    /// Get all the nested structs from the database ordered by the `updated_at` column.
-    ///
-    /// # Arguments
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all_by_updated_at(
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        ProjectsTeamsRole::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
-    }
-}
-impl NestedProjectsTeamsRole {
     /// Get the nested struct from the provided primary key.
     ///
     /// # Arguments
-    /// * `( table_id, team_id, role_id )` - The primary key(s) of the row.
+    /// * `( table_id, team_id )` - The primary key(s) of the row.
     /// * `connection` - The database connection.
     pub fn get(
-        ( table_id, team_id, role_id ): ( i32, i32, i32 ),
+        ( table_id, team_id ): ( i32, i32 ),
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       ProjectsTeamsRole::get(( table_id, team_id, role_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       ProjectsTeamsRole::get(( table_id, team_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedProjectsTeamsRole> for NestedProjectsTeamsRole {
@@ -1111,7 +1252,6 @@ impl From<web_common::database::nested_models::NestedProjectsTeamsRole> for Nest
             team: item.team.into(),
             role: item.role.into(),
             created_by: item.created_by.into(),
-            updated_by: item.updated_by.into(),
         }
     }
 }
@@ -1123,7 +1263,164 @@ impl From<NestedProjectsTeamsRole> for web_common::database::nested_models::Nest
             team: item.team.into(),
             role: item.role.into(),
             created_by: item.created_by.into(),
-            updated_by: item.updated_by.into(),
+        }
+    }
+}
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+pub struct NestedProjectsUsersRoleInvitation {
+    pub inner: ProjectsUsersRoleInvitation,
+    pub table: NestedProject,
+    pub user: User,
+    pub role: NestedRole,
+    pub created_by: User,
+}
+
+impl NestedProjectsUsersRoleInvitation {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: ProjectsUsersRoleInvitation,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            table: NestedProject::get(flat_struct.table_id, connection)?,
+            user: User::get(flat_struct.user_id, connection)?,
+            role: NestedRole::get(flat_struct.role_id, connection)?,
+            created_by: User::get(flat_struct.created_by, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedProjectsUsersRoleInvitation {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
+    /// * `connection` - The database connection.
+    pub fn all(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        ProjectsUsersRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedProjectsUsersRoleInvitation {
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the row.
+    /// * `connection` - The database connection.
+    pub fn get(
+        ( table_id, user_id ): ( i32, i32 ),
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+       ProjectsUsersRoleInvitation::get(( table_id, user_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+    }
+}
+impl From<web_common::database::nested_models::NestedProjectsUsersRoleInvitation> for NestedProjectsUsersRoleInvitation {
+    fn from(item: web_common::database::nested_models::NestedProjectsUsersRoleInvitation) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            user: item.user.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+impl From<NestedProjectsUsersRoleInvitation> for web_common::database::nested_models::NestedProjectsUsersRoleInvitation {
+    fn from(item: NestedProjectsUsersRoleInvitation) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            user: item.user.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+pub struct NestedProjectsUsersRoleRequest {
+    pub inner: ProjectsUsersRoleRequest,
+    pub table: NestedProject,
+    pub user: User,
+    pub role: NestedRole,
+    pub created_by: User,
+}
+
+impl NestedProjectsUsersRoleRequest {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: ProjectsUsersRoleRequest,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            table: NestedProject::get(flat_struct.table_id, connection)?,
+            user: User::get(flat_struct.user_id, connection)?,
+            role: NestedRole::get(flat_struct.role_id, connection)?,
+            created_by: User::get(flat_struct.created_by, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedProjectsUsersRoleRequest {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
+    /// * `connection` - The database connection.
+    pub fn all(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        ProjectsUsersRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedProjectsUsersRoleRequest {
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the row.
+    /// * `connection` - The database connection.
+    pub fn get(
+        ( table_id, user_id ): ( i32, i32 ),
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+       ProjectsUsersRoleRequest::get(( table_id, user_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+    }
+}
+impl From<web_common::database::nested_models::NestedProjectsUsersRoleRequest> for NestedProjectsUsersRoleRequest {
+    fn from(item: web_common::database::nested_models::NestedProjectsUsersRoleRequest) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            user: item.user.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+impl From<NestedProjectsUsersRoleRequest> for web_common::database::nested_models::NestedProjectsUsersRoleRequest {
+    fn from(item: NestedProjectsUsersRoleRequest) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            user: item.user.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
         }
     }
 }
@@ -1134,7 +1431,6 @@ pub struct NestedProjectsUsersRole {
     pub user: User,
     pub role: NestedRole,
     pub created_by: User,
-    pub updated_by: User,
 }
 
 impl NestedProjectsUsersRole {
@@ -1152,7 +1448,6 @@ impl NestedProjectsUsersRole {
             user: User::get(flat_struct.user_id, connection)?,
             role: NestedRole::get(flat_struct.role_id, connection)?,
             created_by: User::get(flat_struct.created_by, connection)?,
-            updated_by: User::get(flat_struct.updated_by, connection)?,
                 inner: flat_struct,
         })
     }
@@ -1173,32 +1468,17 @@ impl NestedProjectsUsersRole {
     }
 }
 impl NestedProjectsUsersRole {
-    /// Get all the nested structs from the database ordered by the `updated_at` column.
-    ///
-    /// # Arguments
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all_by_updated_at(
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        ProjectsUsersRole::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
-    }
-}
-impl NestedProjectsUsersRole {
     /// Get the nested struct from the provided primary key.
     ///
     /// # Arguments
-    /// * `( table_id, user_id, role_id )` - The primary key(s) of the row.
+    /// * `( table_id, user_id )` - The primary key(s) of the row.
     /// * `connection` - The database connection.
     pub fn get(
-        ( table_id, user_id, role_id ): ( i32, i32, i32 ),
+        ( table_id, user_id ): ( i32, i32 ),
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       ProjectsUsersRole::get(( table_id, user_id, role_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       ProjectsUsersRole::get(( table_id, user_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedProjectsUsersRole> for NestedProjectsUsersRole {
@@ -1209,7 +1489,6 @@ impl From<web_common::database::nested_models::NestedProjectsUsersRole> for Nest
             user: item.user.into(),
             role: item.role.into(),
             created_by: item.created_by.into(),
-            updated_by: item.updated_by.into(),
         }
     }
 }
@@ -1221,7 +1500,6 @@ impl From<NestedProjectsUsersRole> for web_common::database::nested_models::Nest
             user: item.user.into(),
             role: item.role.into(),
             created_by: item.created_by.into(),
-            updated_by: item.updated_by.into(),
         }
     }
 }
@@ -1810,13 +2088,170 @@ impl From<NestedSampledIndividual> for web_common::database::nested_models::Nest
     }
 }
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+pub struct NestedSampledIndividualsTeamsRoleInvitation {
+    pub inner: SampledIndividualsTeamsRoleInvitation,
+    pub table: NestedSampledIndividual,
+    pub team: NestedTeam,
+    pub role: NestedRole,
+    pub created_by: User,
+}
+
+impl NestedSampledIndividualsTeamsRoleInvitation {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: SampledIndividualsTeamsRoleInvitation,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            table: NestedSampledIndividual::get(flat_struct.table_id, connection)?,
+            team: NestedTeam::get(flat_struct.team_id, connection)?,
+            role: NestedRole::get(flat_struct.role_id, connection)?,
+            created_by: User::get(flat_struct.created_by, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedSampledIndividualsTeamsRoleInvitation {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
+    /// * `connection` - The database connection.
+    pub fn all(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        SampledIndividualsTeamsRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedSampledIndividualsTeamsRoleInvitation {
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `( table_id, team_id )` - The primary key(s) of the row.
+    /// * `connection` - The database connection.
+    pub fn get(
+        ( table_id, team_id ): ( Uuid, i32 ),
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+       SampledIndividualsTeamsRoleInvitation::get(( table_id, team_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+    }
+}
+impl From<web_common::database::nested_models::NestedSampledIndividualsTeamsRoleInvitation> for NestedSampledIndividualsTeamsRoleInvitation {
+    fn from(item: web_common::database::nested_models::NestedSampledIndividualsTeamsRoleInvitation) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            team: item.team.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+impl From<NestedSampledIndividualsTeamsRoleInvitation> for web_common::database::nested_models::NestedSampledIndividualsTeamsRoleInvitation {
+    fn from(item: NestedSampledIndividualsTeamsRoleInvitation) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            team: item.team.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+pub struct NestedSampledIndividualsTeamsRoleRequest {
+    pub inner: SampledIndividualsTeamsRoleRequest,
+    pub table: NestedSampledIndividual,
+    pub team: NestedTeam,
+    pub role: NestedRole,
+    pub created_by: User,
+}
+
+impl NestedSampledIndividualsTeamsRoleRequest {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: SampledIndividualsTeamsRoleRequest,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            table: NestedSampledIndividual::get(flat_struct.table_id, connection)?,
+            team: NestedTeam::get(flat_struct.team_id, connection)?,
+            role: NestedRole::get(flat_struct.role_id, connection)?,
+            created_by: User::get(flat_struct.created_by, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedSampledIndividualsTeamsRoleRequest {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
+    /// * `connection` - The database connection.
+    pub fn all(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        SampledIndividualsTeamsRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedSampledIndividualsTeamsRoleRequest {
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `( table_id, team_id )` - The primary key(s) of the row.
+    /// * `connection` - The database connection.
+    pub fn get(
+        ( table_id, team_id ): ( Uuid, i32 ),
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+       SampledIndividualsTeamsRoleRequest::get(( table_id, team_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+    }
+}
+impl From<web_common::database::nested_models::NestedSampledIndividualsTeamsRoleRequest> for NestedSampledIndividualsTeamsRoleRequest {
+    fn from(item: web_common::database::nested_models::NestedSampledIndividualsTeamsRoleRequest) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            team: item.team.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+impl From<NestedSampledIndividualsTeamsRoleRequest> for web_common::database::nested_models::NestedSampledIndividualsTeamsRoleRequest {
+    fn from(item: NestedSampledIndividualsTeamsRoleRequest) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            team: item.team.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedSampledIndividualsTeamsRole {
     pub inner: SampledIndividualsTeamsRole,
     pub table: NestedSampledIndividual,
     pub team: NestedTeam,
     pub role: NestedRole,
     pub created_by: User,
-    pub updated_by: User,
 }
 
 impl NestedSampledIndividualsTeamsRole {
@@ -1834,7 +2269,6 @@ impl NestedSampledIndividualsTeamsRole {
             team: NestedTeam::get(flat_struct.team_id, connection)?,
             role: NestedRole::get(flat_struct.role_id, connection)?,
             created_by: User::get(flat_struct.created_by, connection)?,
-            updated_by: User::get(flat_struct.updated_by, connection)?,
                 inner: flat_struct,
         })
     }
@@ -1855,32 +2289,17 @@ impl NestedSampledIndividualsTeamsRole {
     }
 }
 impl NestedSampledIndividualsTeamsRole {
-    /// Get all the nested structs from the database ordered by the `updated_at` column.
-    ///
-    /// # Arguments
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all_by_updated_at(
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampledIndividualsTeamsRole::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
-    }
-}
-impl NestedSampledIndividualsTeamsRole {
     /// Get the nested struct from the provided primary key.
     ///
     /// # Arguments
-    /// * `( table_id, team_id, role_id )` - The primary key(s) of the row.
+    /// * `( table_id, team_id )` - The primary key(s) of the row.
     /// * `connection` - The database connection.
     pub fn get(
-        ( table_id, team_id, role_id ): ( Uuid, i32, i32 ),
+        ( table_id, team_id ): ( Uuid, i32 ),
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       SampledIndividualsTeamsRole::get(( table_id, team_id, role_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       SampledIndividualsTeamsRole::get(( table_id, team_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedSampledIndividualsTeamsRole> for NestedSampledIndividualsTeamsRole {
@@ -1891,7 +2310,6 @@ impl From<web_common::database::nested_models::NestedSampledIndividualsTeamsRole
             team: item.team.into(),
             role: item.role.into(),
             created_by: item.created_by.into(),
-            updated_by: item.updated_by.into(),
         }
     }
 }
@@ -1903,7 +2321,164 @@ impl From<NestedSampledIndividualsTeamsRole> for web_common::database::nested_mo
             team: item.team.into(),
             role: item.role.into(),
             created_by: item.created_by.into(),
-            updated_by: item.updated_by.into(),
+        }
+    }
+}
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+pub struct NestedSampledIndividualsUsersRoleInvitation {
+    pub inner: SampledIndividualsUsersRoleInvitation,
+    pub table: NestedSampledIndividual,
+    pub user: User,
+    pub role: NestedRole,
+    pub created_by: User,
+}
+
+impl NestedSampledIndividualsUsersRoleInvitation {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: SampledIndividualsUsersRoleInvitation,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            table: NestedSampledIndividual::get(flat_struct.table_id, connection)?,
+            user: User::get(flat_struct.user_id, connection)?,
+            role: NestedRole::get(flat_struct.role_id, connection)?,
+            created_by: User::get(flat_struct.created_by, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedSampledIndividualsUsersRoleInvitation {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
+    /// * `connection` - The database connection.
+    pub fn all(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        SampledIndividualsUsersRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedSampledIndividualsUsersRoleInvitation {
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the row.
+    /// * `connection` - The database connection.
+    pub fn get(
+        ( table_id, user_id ): ( Uuid, i32 ),
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+       SampledIndividualsUsersRoleInvitation::get(( table_id, user_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+    }
+}
+impl From<web_common::database::nested_models::NestedSampledIndividualsUsersRoleInvitation> for NestedSampledIndividualsUsersRoleInvitation {
+    fn from(item: web_common::database::nested_models::NestedSampledIndividualsUsersRoleInvitation) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            user: item.user.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+impl From<NestedSampledIndividualsUsersRoleInvitation> for web_common::database::nested_models::NestedSampledIndividualsUsersRoleInvitation {
+    fn from(item: NestedSampledIndividualsUsersRoleInvitation) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            user: item.user.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+pub struct NestedSampledIndividualsUsersRoleRequest {
+    pub inner: SampledIndividualsUsersRoleRequest,
+    pub table: NestedSampledIndividual,
+    pub user: User,
+    pub role: NestedRole,
+    pub created_by: User,
+}
+
+impl NestedSampledIndividualsUsersRoleRequest {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: SampledIndividualsUsersRoleRequest,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            table: NestedSampledIndividual::get(flat_struct.table_id, connection)?,
+            user: User::get(flat_struct.user_id, connection)?,
+            role: NestedRole::get(flat_struct.role_id, connection)?,
+            created_by: User::get(flat_struct.created_by, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedSampledIndividualsUsersRoleRequest {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
+    /// * `connection` - The database connection.
+    pub fn all(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        SampledIndividualsUsersRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedSampledIndividualsUsersRoleRequest {
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the row.
+    /// * `connection` - The database connection.
+    pub fn get(
+        ( table_id, user_id ): ( Uuid, i32 ),
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+       SampledIndividualsUsersRoleRequest::get(( table_id, user_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+    }
+}
+impl From<web_common::database::nested_models::NestedSampledIndividualsUsersRoleRequest> for NestedSampledIndividualsUsersRoleRequest {
+    fn from(item: web_common::database::nested_models::NestedSampledIndividualsUsersRoleRequest) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            user: item.user.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+impl From<NestedSampledIndividualsUsersRoleRequest> for web_common::database::nested_models::NestedSampledIndividualsUsersRoleRequest {
+    fn from(item: NestedSampledIndividualsUsersRoleRequest) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            user: item.user.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
         }
     }
 }
@@ -1914,7 +2489,6 @@ pub struct NestedSampledIndividualsUsersRole {
     pub user: User,
     pub role: NestedRole,
     pub created_by: User,
-    pub updated_by: User,
 }
 
 impl NestedSampledIndividualsUsersRole {
@@ -1932,7 +2506,6 @@ impl NestedSampledIndividualsUsersRole {
             user: User::get(flat_struct.user_id, connection)?,
             role: NestedRole::get(flat_struct.role_id, connection)?,
             created_by: User::get(flat_struct.created_by, connection)?,
-            updated_by: User::get(flat_struct.updated_by, connection)?,
                 inner: flat_struct,
         })
     }
@@ -1953,32 +2526,17 @@ impl NestedSampledIndividualsUsersRole {
     }
 }
 impl NestedSampledIndividualsUsersRole {
-    /// Get all the nested structs from the database ordered by the `updated_at` column.
-    ///
-    /// # Arguments
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all_by_updated_at(
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampledIndividualsUsersRole::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
-    }
-}
-impl NestedSampledIndividualsUsersRole {
     /// Get the nested struct from the provided primary key.
     ///
     /// # Arguments
-    /// * `( table_id, user_id, role_id )` - The primary key(s) of the row.
+    /// * `( table_id, user_id )` - The primary key(s) of the row.
     /// * `connection` - The database connection.
     pub fn get(
-        ( table_id, user_id, role_id ): ( Uuid, i32, i32 ),
+        ( table_id, user_id ): ( Uuid, i32 ),
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       SampledIndividualsUsersRole::get(( table_id, user_id, role_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       SampledIndividualsUsersRole::get(( table_id, user_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedSampledIndividualsUsersRole> for NestedSampledIndividualsUsersRole {
@@ -1989,7 +2547,6 @@ impl From<web_common::database::nested_models::NestedSampledIndividualsUsersRole
             user: item.user.into(),
             role: item.role.into(),
             created_by: item.created_by.into(),
-            updated_by: item.updated_by.into(),
         }
     }
 }
@@ -2001,7 +2558,6 @@ impl From<NestedSampledIndividualsUsersRole> for web_common::database::nested_mo
             user: item.user.into(),
             role: item.role.into(),
             created_by: item.created_by.into(),
-            updated_by: item.updated_by.into(),
         }
     }
 }
@@ -2100,13 +2656,170 @@ impl From<NestedSample> for web_common::database::nested_models::NestedSample {
     }
 }
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+pub struct NestedSamplesTeamsRoleInvitation {
+    pub inner: SamplesTeamsRoleInvitation,
+    pub table: NestedSample,
+    pub team: NestedTeam,
+    pub role: NestedRole,
+    pub created_by: User,
+}
+
+impl NestedSamplesTeamsRoleInvitation {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: SamplesTeamsRoleInvitation,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            table: NestedSample::get(flat_struct.table_id, connection)?,
+            team: NestedTeam::get(flat_struct.team_id, connection)?,
+            role: NestedRole::get(flat_struct.role_id, connection)?,
+            created_by: User::get(flat_struct.created_by, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedSamplesTeamsRoleInvitation {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
+    /// * `connection` - The database connection.
+    pub fn all(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        SamplesTeamsRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedSamplesTeamsRoleInvitation {
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `( table_id, team_id )` - The primary key(s) of the row.
+    /// * `connection` - The database connection.
+    pub fn get(
+        ( table_id, team_id ): ( Uuid, i32 ),
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+       SamplesTeamsRoleInvitation::get(( table_id, team_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+    }
+}
+impl From<web_common::database::nested_models::NestedSamplesTeamsRoleInvitation> for NestedSamplesTeamsRoleInvitation {
+    fn from(item: web_common::database::nested_models::NestedSamplesTeamsRoleInvitation) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            team: item.team.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+impl From<NestedSamplesTeamsRoleInvitation> for web_common::database::nested_models::NestedSamplesTeamsRoleInvitation {
+    fn from(item: NestedSamplesTeamsRoleInvitation) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            team: item.team.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+pub struct NestedSamplesTeamsRoleRequest {
+    pub inner: SamplesTeamsRoleRequest,
+    pub table: NestedSample,
+    pub team: NestedTeam,
+    pub role: NestedRole,
+    pub created_by: User,
+}
+
+impl NestedSamplesTeamsRoleRequest {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: SamplesTeamsRoleRequest,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            table: NestedSample::get(flat_struct.table_id, connection)?,
+            team: NestedTeam::get(flat_struct.team_id, connection)?,
+            role: NestedRole::get(flat_struct.role_id, connection)?,
+            created_by: User::get(flat_struct.created_by, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedSamplesTeamsRoleRequest {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
+    /// * `connection` - The database connection.
+    pub fn all(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        SamplesTeamsRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedSamplesTeamsRoleRequest {
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `( table_id, team_id )` - The primary key(s) of the row.
+    /// * `connection` - The database connection.
+    pub fn get(
+        ( table_id, team_id ): ( Uuid, i32 ),
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+       SamplesTeamsRoleRequest::get(( table_id, team_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+    }
+}
+impl From<web_common::database::nested_models::NestedSamplesTeamsRoleRequest> for NestedSamplesTeamsRoleRequest {
+    fn from(item: web_common::database::nested_models::NestedSamplesTeamsRoleRequest) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            team: item.team.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+impl From<NestedSamplesTeamsRoleRequest> for web_common::database::nested_models::NestedSamplesTeamsRoleRequest {
+    fn from(item: NestedSamplesTeamsRoleRequest) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            team: item.team.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedSamplesTeamsRole {
     pub inner: SamplesTeamsRole,
     pub table: NestedSample,
     pub team: NestedTeam,
     pub role: NestedRole,
     pub created_by: User,
-    pub updated_by: User,
 }
 
 impl NestedSamplesTeamsRole {
@@ -2124,7 +2837,6 @@ impl NestedSamplesTeamsRole {
             team: NestedTeam::get(flat_struct.team_id, connection)?,
             role: NestedRole::get(flat_struct.role_id, connection)?,
             created_by: User::get(flat_struct.created_by, connection)?,
-            updated_by: User::get(flat_struct.updated_by, connection)?,
                 inner: flat_struct,
         })
     }
@@ -2145,32 +2857,17 @@ impl NestedSamplesTeamsRole {
     }
 }
 impl NestedSamplesTeamsRole {
-    /// Get all the nested structs from the database ordered by the `updated_at` column.
-    ///
-    /// # Arguments
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all_by_updated_at(
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        SamplesTeamsRole::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
-    }
-}
-impl NestedSamplesTeamsRole {
     /// Get the nested struct from the provided primary key.
     ///
     /// # Arguments
-    /// * `( table_id, team_id, role_id )` - The primary key(s) of the row.
+    /// * `( table_id, team_id )` - The primary key(s) of the row.
     /// * `connection` - The database connection.
     pub fn get(
-        ( table_id, team_id, role_id ): ( Uuid, i32, i32 ),
+        ( table_id, team_id ): ( Uuid, i32 ),
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       SamplesTeamsRole::get(( table_id, team_id, role_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       SamplesTeamsRole::get(( table_id, team_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedSamplesTeamsRole> for NestedSamplesTeamsRole {
@@ -2181,7 +2878,6 @@ impl From<web_common::database::nested_models::NestedSamplesTeamsRole> for Neste
             team: item.team.into(),
             role: item.role.into(),
             created_by: item.created_by.into(),
-            updated_by: item.updated_by.into(),
         }
     }
 }
@@ -2193,7 +2889,164 @@ impl From<NestedSamplesTeamsRole> for web_common::database::nested_models::Neste
             team: item.team.into(),
             role: item.role.into(),
             created_by: item.created_by.into(),
-            updated_by: item.updated_by.into(),
+        }
+    }
+}
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+pub struct NestedSamplesUsersRoleInvitation {
+    pub inner: SamplesUsersRoleInvitation,
+    pub table: NestedSample,
+    pub user: User,
+    pub role: NestedRole,
+    pub created_by: User,
+}
+
+impl NestedSamplesUsersRoleInvitation {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: SamplesUsersRoleInvitation,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            table: NestedSample::get(flat_struct.table_id, connection)?,
+            user: User::get(flat_struct.user_id, connection)?,
+            role: NestedRole::get(flat_struct.role_id, connection)?,
+            created_by: User::get(flat_struct.created_by, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedSamplesUsersRoleInvitation {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
+    /// * `connection` - The database connection.
+    pub fn all(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        SamplesUsersRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedSamplesUsersRoleInvitation {
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the row.
+    /// * `connection` - The database connection.
+    pub fn get(
+        ( table_id, user_id ): ( Uuid, i32 ),
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+       SamplesUsersRoleInvitation::get(( table_id, user_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+    }
+}
+impl From<web_common::database::nested_models::NestedSamplesUsersRoleInvitation> for NestedSamplesUsersRoleInvitation {
+    fn from(item: web_common::database::nested_models::NestedSamplesUsersRoleInvitation) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            user: item.user.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+impl From<NestedSamplesUsersRoleInvitation> for web_common::database::nested_models::NestedSamplesUsersRoleInvitation {
+    fn from(item: NestedSamplesUsersRoleInvitation) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            user: item.user.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+pub struct NestedSamplesUsersRoleRequest {
+    pub inner: SamplesUsersRoleRequest,
+    pub table: NestedSample,
+    pub user: User,
+    pub role: NestedRole,
+    pub created_by: User,
+}
+
+impl NestedSamplesUsersRoleRequest {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: SamplesUsersRoleRequest,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            table: NestedSample::get(flat_struct.table_id, connection)?,
+            user: User::get(flat_struct.user_id, connection)?,
+            role: NestedRole::get(flat_struct.role_id, connection)?,
+            created_by: User::get(flat_struct.created_by, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedSamplesUsersRoleRequest {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
+    /// * `connection` - The database connection.
+    pub fn all(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        SamplesUsersRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedSamplesUsersRoleRequest {
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the row.
+    /// * `connection` - The database connection.
+    pub fn get(
+        ( table_id, user_id ): ( Uuid, i32 ),
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+       SamplesUsersRoleRequest::get(( table_id, user_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+    }
+}
+impl From<web_common::database::nested_models::NestedSamplesUsersRoleRequest> for NestedSamplesUsersRoleRequest {
+    fn from(item: web_common::database::nested_models::NestedSamplesUsersRoleRequest) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            user: item.user.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+impl From<NestedSamplesUsersRoleRequest> for web_common::database::nested_models::NestedSamplesUsersRoleRequest {
+    fn from(item: NestedSamplesUsersRoleRequest) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            user: item.user.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
         }
     }
 }
@@ -2204,7 +3057,6 @@ pub struct NestedSamplesUsersRole {
     pub user: User,
     pub role: NestedRole,
     pub created_by: User,
-    pub updated_by: User,
 }
 
 impl NestedSamplesUsersRole {
@@ -2222,7 +3074,6 @@ impl NestedSamplesUsersRole {
             user: User::get(flat_struct.user_id, connection)?,
             role: NestedRole::get(flat_struct.role_id, connection)?,
             created_by: User::get(flat_struct.created_by, connection)?,
-            updated_by: User::get(flat_struct.updated_by, connection)?,
                 inner: flat_struct,
         })
     }
@@ -2243,32 +3094,17 @@ impl NestedSamplesUsersRole {
     }
 }
 impl NestedSamplesUsersRole {
-    /// Get all the nested structs from the database ordered by the `updated_at` column.
-    ///
-    /// # Arguments
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all_by_updated_at(
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        SamplesUsersRole::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
-    }
-}
-impl NestedSamplesUsersRole {
     /// Get the nested struct from the provided primary key.
     ///
     /// # Arguments
-    /// * `( table_id, user_id, role_id )` - The primary key(s) of the row.
+    /// * `( table_id, user_id )` - The primary key(s) of the row.
     /// * `connection` - The database connection.
     pub fn get(
-        ( table_id, user_id, role_id ): ( Uuid, i32, i32 ),
+        ( table_id, user_id ): ( Uuid, i32 ),
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       SamplesUsersRole::get(( table_id, user_id, role_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       SamplesUsersRole::get(( table_id, user_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedSamplesUsersRole> for NestedSamplesUsersRole {
@@ -2279,7 +3115,6 @@ impl From<web_common::database::nested_models::NestedSamplesUsersRole> for Neste
             user: item.user.into(),
             role: item.role.into(),
             created_by: item.created_by.into(),
-            updated_by: item.updated_by.into(),
         }
     }
 }
@@ -2291,7 +3126,6 @@ impl From<NestedSamplesUsersRole> for web_common::database::nested_models::Neste
             user: item.user.into(),
             role: item.role.into(),
             created_by: item.created_by.into(),
-            updated_by: item.updated_by.into(),
         }
     }
 }
@@ -2453,13 +3287,170 @@ impl From<NestedSpectraCollection> for web_common::database::nested_models::Nest
     }
 }
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+pub struct NestedSpectraCollectionsTeamsRoleInvitation {
+    pub inner: SpectraCollectionsTeamsRoleInvitation,
+    pub table: NestedSpectraCollection,
+    pub team: NestedTeam,
+    pub role: NestedRole,
+    pub created_by: User,
+}
+
+impl NestedSpectraCollectionsTeamsRoleInvitation {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: SpectraCollectionsTeamsRoleInvitation,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            table: NestedSpectraCollection::get(flat_struct.table_id, connection)?,
+            team: NestedTeam::get(flat_struct.team_id, connection)?,
+            role: NestedRole::get(flat_struct.role_id, connection)?,
+            created_by: User::get(flat_struct.created_by, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedSpectraCollectionsTeamsRoleInvitation {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
+    /// * `connection` - The database connection.
+    pub fn all(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        SpectraCollectionsTeamsRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedSpectraCollectionsTeamsRoleInvitation {
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `( table_id, team_id )` - The primary key(s) of the row.
+    /// * `connection` - The database connection.
+    pub fn get(
+        ( table_id, team_id ): ( i32, i32 ),
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+       SpectraCollectionsTeamsRoleInvitation::get(( table_id, team_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+    }
+}
+impl From<web_common::database::nested_models::NestedSpectraCollectionsTeamsRoleInvitation> for NestedSpectraCollectionsTeamsRoleInvitation {
+    fn from(item: web_common::database::nested_models::NestedSpectraCollectionsTeamsRoleInvitation) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            team: item.team.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+impl From<NestedSpectraCollectionsTeamsRoleInvitation> for web_common::database::nested_models::NestedSpectraCollectionsTeamsRoleInvitation {
+    fn from(item: NestedSpectraCollectionsTeamsRoleInvitation) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            team: item.team.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+pub struct NestedSpectraCollectionsTeamsRoleRequest {
+    pub inner: SpectraCollectionsTeamsRoleRequest,
+    pub table: NestedSpectraCollection,
+    pub team: NestedTeam,
+    pub role: NestedRole,
+    pub created_by: User,
+}
+
+impl NestedSpectraCollectionsTeamsRoleRequest {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: SpectraCollectionsTeamsRoleRequest,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            table: NestedSpectraCollection::get(flat_struct.table_id, connection)?,
+            team: NestedTeam::get(flat_struct.team_id, connection)?,
+            role: NestedRole::get(flat_struct.role_id, connection)?,
+            created_by: User::get(flat_struct.created_by, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedSpectraCollectionsTeamsRoleRequest {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
+    /// * `connection` - The database connection.
+    pub fn all(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        SpectraCollectionsTeamsRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedSpectraCollectionsTeamsRoleRequest {
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `( table_id, team_id )` - The primary key(s) of the row.
+    /// * `connection` - The database connection.
+    pub fn get(
+        ( table_id, team_id ): ( i32, i32 ),
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+       SpectraCollectionsTeamsRoleRequest::get(( table_id, team_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+    }
+}
+impl From<web_common::database::nested_models::NestedSpectraCollectionsTeamsRoleRequest> for NestedSpectraCollectionsTeamsRoleRequest {
+    fn from(item: web_common::database::nested_models::NestedSpectraCollectionsTeamsRoleRequest) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            team: item.team.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+impl From<NestedSpectraCollectionsTeamsRoleRequest> for web_common::database::nested_models::NestedSpectraCollectionsTeamsRoleRequest {
+    fn from(item: NestedSpectraCollectionsTeamsRoleRequest) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            team: item.team.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedSpectraCollectionsTeamsRole {
     pub inner: SpectraCollectionsTeamsRole,
     pub table: NestedSpectraCollection,
     pub team: NestedTeam,
     pub role: NestedRole,
     pub created_by: User,
-    pub updated_by: User,
 }
 
 impl NestedSpectraCollectionsTeamsRole {
@@ -2477,7 +3468,6 @@ impl NestedSpectraCollectionsTeamsRole {
             team: NestedTeam::get(flat_struct.team_id, connection)?,
             role: NestedRole::get(flat_struct.role_id, connection)?,
             created_by: User::get(flat_struct.created_by, connection)?,
-            updated_by: User::get(flat_struct.updated_by, connection)?,
                 inner: flat_struct,
         })
     }
@@ -2498,32 +3488,17 @@ impl NestedSpectraCollectionsTeamsRole {
     }
 }
 impl NestedSpectraCollectionsTeamsRole {
-    /// Get all the nested structs from the database ordered by the `updated_at` column.
-    ///
-    /// # Arguments
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all_by_updated_at(
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        SpectraCollectionsTeamsRole::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
-    }
-}
-impl NestedSpectraCollectionsTeamsRole {
     /// Get the nested struct from the provided primary key.
     ///
     /// # Arguments
-    /// * `( table_id, team_id, role_id )` - The primary key(s) of the row.
+    /// * `( table_id, team_id )` - The primary key(s) of the row.
     /// * `connection` - The database connection.
     pub fn get(
-        ( table_id, team_id, role_id ): ( i32, i32, i32 ),
+        ( table_id, team_id ): ( i32, i32 ),
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       SpectraCollectionsTeamsRole::get(( table_id, team_id, role_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       SpectraCollectionsTeamsRole::get(( table_id, team_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedSpectraCollectionsTeamsRole> for NestedSpectraCollectionsTeamsRole {
@@ -2534,7 +3509,6 @@ impl From<web_common::database::nested_models::NestedSpectraCollectionsTeamsRole
             team: item.team.into(),
             role: item.role.into(),
             created_by: item.created_by.into(),
-            updated_by: item.updated_by.into(),
         }
     }
 }
@@ -2546,7 +3520,164 @@ impl From<NestedSpectraCollectionsTeamsRole> for web_common::database::nested_mo
             team: item.team.into(),
             role: item.role.into(),
             created_by: item.created_by.into(),
-            updated_by: item.updated_by.into(),
+        }
+    }
+}
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+pub struct NestedSpectraCollectionsUsersRoleInvitation {
+    pub inner: SpectraCollectionsUsersRoleInvitation,
+    pub table: NestedSpectraCollection,
+    pub user: User,
+    pub role: NestedRole,
+    pub created_by: User,
+}
+
+impl NestedSpectraCollectionsUsersRoleInvitation {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: SpectraCollectionsUsersRoleInvitation,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            table: NestedSpectraCollection::get(flat_struct.table_id, connection)?,
+            user: User::get(flat_struct.user_id, connection)?,
+            role: NestedRole::get(flat_struct.role_id, connection)?,
+            created_by: User::get(flat_struct.created_by, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedSpectraCollectionsUsersRoleInvitation {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
+    /// * `connection` - The database connection.
+    pub fn all(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        SpectraCollectionsUsersRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedSpectraCollectionsUsersRoleInvitation {
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the row.
+    /// * `connection` - The database connection.
+    pub fn get(
+        ( table_id, user_id ): ( i32, i32 ),
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+       SpectraCollectionsUsersRoleInvitation::get(( table_id, user_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+    }
+}
+impl From<web_common::database::nested_models::NestedSpectraCollectionsUsersRoleInvitation> for NestedSpectraCollectionsUsersRoleInvitation {
+    fn from(item: web_common::database::nested_models::NestedSpectraCollectionsUsersRoleInvitation) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            user: item.user.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+impl From<NestedSpectraCollectionsUsersRoleInvitation> for web_common::database::nested_models::NestedSpectraCollectionsUsersRoleInvitation {
+    fn from(item: NestedSpectraCollectionsUsersRoleInvitation) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            user: item.user.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+pub struct NestedSpectraCollectionsUsersRoleRequest {
+    pub inner: SpectraCollectionsUsersRoleRequest,
+    pub table: NestedSpectraCollection,
+    pub user: User,
+    pub role: NestedRole,
+    pub created_by: User,
+}
+
+impl NestedSpectraCollectionsUsersRoleRequest {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: SpectraCollectionsUsersRoleRequest,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            table: NestedSpectraCollection::get(flat_struct.table_id, connection)?,
+            user: User::get(flat_struct.user_id, connection)?,
+            role: NestedRole::get(flat_struct.role_id, connection)?,
+            created_by: User::get(flat_struct.created_by, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedSpectraCollectionsUsersRoleRequest {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
+    /// * `connection` - The database connection.
+    pub fn all(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        SpectraCollectionsUsersRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedSpectraCollectionsUsersRoleRequest {
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the row.
+    /// * `connection` - The database connection.
+    pub fn get(
+        ( table_id, user_id ): ( i32, i32 ),
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+       SpectraCollectionsUsersRoleRequest::get(( table_id, user_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+    }
+}
+impl From<web_common::database::nested_models::NestedSpectraCollectionsUsersRoleRequest> for NestedSpectraCollectionsUsersRoleRequest {
+    fn from(item: web_common::database::nested_models::NestedSpectraCollectionsUsersRoleRequest) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            user: item.user.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+impl From<NestedSpectraCollectionsUsersRoleRequest> for web_common::database::nested_models::NestedSpectraCollectionsUsersRoleRequest {
+    fn from(item: NestedSpectraCollectionsUsersRoleRequest) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            user: item.user.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
         }
     }
 }
@@ -2557,7 +3688,6 @@ pub struct NestedSpectraCollectionsUsersRole {
     pub user: User,
     pub role: NestedRole,
     pub created_by: User,
-    pub updated_by: User,
 }
 
 impl NestedSpectraCollectionsUsersRole {
@@ -2575,7 +3705,6 @@ impl NestedSpectraCollectionsUsersRole {
             user: User::get(flat_struct.user_id, connection)?,
             role: NestedRole::get(flat_struct.role_id, connection)?,
             created_by: User::get(flat_struct.created_by, connection)?,
-            updated_by: User::get(flat_struct.updated_by, connection)?,
                 inner: flat_struct,
         })
     }
@@ -2596,32 +3725,17 @@ impl NestedSpectraCollectionsUsersRole {
     }
 }
 impl NestedSpectraCollectionsUsersRole {
-    /// Get all the nested structs from the database ordered by the `updated_at` column.
-    ///
-    /// # Arguments
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all_by_updated_at(
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        SpectraCollectionsUsersRole::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
-    }
-}
-impl NestedSpectraCollectionsUsersRole {
     /// Get the nested struct from the provided primary key.
     ///
     /// # Arguments
-    /// * `( table_id, user_id, role_id )` - The primary key(s) of the row.
+    /// * `( table_id, user_id )` - The primary key(s) of the row.
     /// * `connection` - The database connection.
     pub fn get(
-        ( table_id, user_id, role_id ): ( i32, i32, i32 ),
+        ( table_id, user_id ): ( i32, i32 ),
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       SpectraCollectionsUsersRole::get(( table_id, user_id, role_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       SpectraCollectionsUsersRole::get(( table_id, user_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedSpectraCollectionsUsersRole> for NestedSpectraCollectionsUsersRole {
@@ -2632,7 +3746,6 @@ impl From<web_common::database::nested_models::NestedSpectraCollectionsUsersRole
             user: item.user.into(),
             role: item.role.into(),
             created_by: item.created_by.into(),
-            updated_by: item.updated_by.into(),
         }
     }
 }
@@ -2644,7 +3757,6 @@ impl From<NestedSpectraCollectionsUsersRole> for web_common::database::nested_mo
             user: item.user.into(),
             role: item.role.into(),
             created_by: item.created_by.into(),
-            updated_by: item.updated_by.into(),
         }
     }
 }
@@ -2950,13 +4062,249 @@ impl From<NestedTeam> for web_common::database::nested_models::NestedTeam {
     }
 }
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+pub struct NestedTeamsTeamsRoleInvitation {
+    pub inner: TeamsTeamsRoleInvitation,
+    pub table: NestedTeam,
+    pub team: NestedTeam,
+    pub role: NestedRole,
+    pub created_by: User,
+}
+
+impl NestedTeamsTeamsRoleInvitation {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: TeamsTeamsRoleInvitation,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            table: NestedTeam::get(flat_struct.table_id, connection)?,
+            team: NestedTeam::get(flat_struct.team_id, connection)?,
+            role: NestedRole::get(flat_struct.role_id, connection)?,
+            created_by: User::get(flat_struct.created_by, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedTeamsTeamsRoleInvitation {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
+    /// * `connection` - The database connection.
+    pub fn all(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        TeamsTeamsRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedTeamsTeamsRoleInvitation {
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `( table_id, team_id )` - The primary key(s) of the row.
+    /// * `connection` - The database connection.
+    pub fn get(
+        ( table_id, team_id ): ( i32, i32 ),
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+       TeamsTeamsRoleInvitation::get(( table_id, team_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+    }
+}
+impl From<web_common::database::nested_models::NestedTeamsTeamsRoleInvitation> for NestedTeamsTeamsRoleInvitation {
+    fn from(item: web_common::database::nested_models::NestedTeamsTeamsRoleInvitation) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            team: item.team.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+impl From<NestedTeamsTeamsRoleInvitation> for web_common::database::nested_models::NestedTeamsTeamsRoleInvitation {
+    fn from(item: NestedTeamsTeamsRoleInvitation) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            team: item.team.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+pub struct NestedTeamsUsersRoleInvitation {
+    pub inner: TeamsUsersRoleInvitation,
+    pub table: NestedTeam,
+    pub user: User,
+    pub role: NestedRole,
+    pub created_by: User,
+}
+
+impl NestedTeamsUsersRoleInvitation {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: TeamsUsersRoleInvitation,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            table: NestedTeam::get(flat_struct.table_id, connection)?,
+            user: User::get(flat_struct.user_id, connection)?,
+            role: NestedRole::get(flat_struct.role_id, connection)?,
+            created_by: User::get(flat_struct.created_by, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedTeamsUsersRoleInvitation {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
+    /// * `connection` - The database connection.
+    pub fn all(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        TeamsUsersRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedTeamsUsersRoleInvitation {
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the row.
+    /// * `connection` - The database connection.
+    pub fn get(
+        ( table_id, user_id ): ( i32, i32 ),
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+       TeamsUsersRoleInvitation::get(( table_id, user_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+    }
+}
+impl From<web_common::database::nested_models::NestedTeamsUsersRoleInvitation> for NestedTeamsUsersRoleInvitation {
+    fn from(item: web_common::database::nested_models::NestedTeamsUsersRoleInvitation) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            user: item.user.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+impl From<NestedTeamsUsersRoleInvitation> for web_common::database::nested_models::NestedTeamsUsersRoleInvitation {
+    fn from(item: NestedTeamsUsersRoleInvitation) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            user: item.user.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+pub struct NestedTeamsUsersRoleRequest {
+    pub inner: TeamsUsersRoleRequest,
+    pub table: NestedTeam,
+    pub user: User,
+    pub role: NestedRole,
+    pub created_by: User,
+}
+
+impl NestedTeamsUsersRoleRequest {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: TeamsUsersRoleRequest,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            table: NestedTeam::get(flat_struct.table_id, connection)?,
+            user: User::get(flat_struct.user_id, connection)?,
+            role: NestedRole::get(flat_struct.role_id, connection)?,
+            created_by: User::get(flat_struct.created_by, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedTeamsUsersRoleRequest {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
+    /// * `connection` - The database connection.
+    pub fn all(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        TeamsUsersRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedTeamsUsersRoleRequest {
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the row.
+    /// * `connection` - The database connection.
+    pub fn get(
+        ( table_id, user_id ): ( i32, i32 ),
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+       TeamsUsersRoleRequest::get(( table_id, user_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+    }
+}
+impl From<web_common::database::nested_models::NestedTeamsUsersRoleRequest> for NestedTeamsUsersRoleRequest {
+    fn from(item: web_common::database::nested_models::NestedTeamsUsersRoleRequest) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            user: item.user.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+impl From<NestedTeamsUsersRoleRequest> for web_common::database::nested_models::NestedTeamsUsersRoleRequest {
+    fn from(item: NestedTeamsUsersRoleRequest) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            user: item.user.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedTeamsUsersRole {
     pub inner: TeamsUsersRole,
     pub table: NestedTeam,
     pub user: User,
     pub role: NestedRole,
     pub created_by: User,
-    pub updated_by: User,
 }
 
 impl NestedTeamsUsersRole {
@@ -2974,7 +4322,6 @@ impl NestedTeamsUsersRole {
             user: User::get(flat_struct.user_id, connection)?,
             role: NestedRole::get(flat_struct.role_id, connection)?,
             created_by: User::get(flat_struct.created_by, connection)?,
-            updated_by: User::get(flat_struct.updated_by, connection)?,
                 inner: flat_struct,
         })
     }
@@ -2995,32 +4342,17 @@ impl NestedTeamsUsersRole {
     }
 }
 impl NestedTeamsUsersRole {
-    /// Get all the nested structs from the database ordered by the `updated_at` column.
-    ///
-    /// # Arguments
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all_by_updated_at(
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        TeamsUsersRole::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
-    }
-}
-impl NestedTeamsUsersRole {
     /// Get the nested struct from the provided primary key.
     ///
     /// # Arguments
-    /// * `( table_id, user_id, role_id )` - The primary key(s) of the row.
+    /// * `( table_id, user_id )` - The primary key(s) of the row.
     /// * `connection` - The database connection.
     pub fn get(
-        ( table_id, user_id, role_id ): ( i32, i32, i32 ),
+        ( table_id, user_id ): ( i32, i32 ),
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       TeamsUsersRole::get(( table_id, user_id, role_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       TeamsUsersRole::get(( table_id, user_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedTeamsUsersRole> for NestedTeamsUsersRole {
@@ -3031,7 +4363,6 @@ impl From<web_common::database::nested_models::NestedTeamsUsersRole> for NestedT
             user: item.user.into(),
             role: item.role.into(),
             created_by: item.created_by.into(),
-            updated_by: item.updated_by.into(),
         }
     }
 }
@@ -3043,7 +4374,6 @@ impl From<NestedTeamsUsersRole> for web_common::database::nested_models::NestedT
             user: item.user.into(),
             role: item.role.into(),
             created_by: item.created_by.into(),
-            updated_by: item.updated_by.into(),
         }
     }
 }
@@ -3131,6 +4461,243 @@ impl From<NestedUserEmail> for web_common::database::nested_models::NestedUserEm
             inner: item.inner.into(),
             created_by: item.created_by.into(),
             login_provider: item.login_provider.into(),
+        }
+    }
+}
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+pub struct NestedUsersUsersRoleInvitation {
+    pub inner: UsersUsersRoleInvitation,
+    pub table: User,
+    pub user: User,
+    pub role: NestedRole,
+    pub created_by: User,
+}
+
+impl NestedUsersUsersRoleInvitation {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: UsersUsersRoleInvitation,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            table: User::get(flat_struct.table_id, connection)?,
+            user: User::get(flat_struct.user_id, connection)?,
+            role: NestedRole::get(flat_struct.role_id, connection)?,
+            created_by: User::get(flat_struct.created_by, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedUsersUsersRoleInvitation {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
+    /// * `connection` - The database connection.
+    pub fn all(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        UsersUsersRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedUsersUsersRoleInvitation {
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the row.
+    /// * `connection` - The database connection.
+    pub fn get(
+        ( table_id, user_id ): ( i32, i32 ),
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+       UsersUsersRoleInvitation::get(( table_id, user_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+    }
+}
+impl From<web_common::database::nested_models::NestedUsersUsersRoleInvitation> for NestedUsersUsersRoleInvitation {
+    fn from(item: web_common::database::nested_models::NestedUsersUsersRoleInvitation) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            user: item.user.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+impl From<NestedUsersUsersRoleInvitation> for web_common::database::nested_models::NestedUsersUsersRoleInvitation {
+    fn from(item: NestedUsersUsersRoleInvitation) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            user: item.user.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+pub struct NestedUsersUsersRoleRequest {
+    pub inner: UsersUsersRoleRequest,
+    pub created_by: User,
+    pub table: User,
+    pub user: User,
+    pub role: NestedRole,
+}
+
+impl NestedUsersUsersRoleRequest {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: UsersUsersRoleRequest,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            created_by: User::get(flat_struct.created_by, connection)?,
+            table: User::get(flat_struct.table_id, connection)?,
+            user: User::get(flat_struct.user_id, connection)?,
+            role: NestedRole::get(flat_struct.role_id, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedUsersUsersRoleRequest {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
+    /// * `connection` - The database connection.
+    pub fn all(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        UsersUsersRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedUsersUsersRoleRequest {
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the row.
+    /// * `connection` - The database connection.
+    pub fn get(
+        ( table_id, user_id ): ( i32, i32 ),
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+       UsersUsersRoleRequest::get(( table_id, user_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+    }
+}
+impl From<web_common::database::nested_models::NestedUsersUsersRoleRequest> for NestedUsersUsersRoleRequest {
+    fn from(item: web_common::database::nested_models::NestedUsersUsersRoleRequest) -> Self {
+        Self {
+            inner: item.inner.into(),
+            created_by: item.created_by.into(),
+            table: item.table.into(),
+            user: item.user.into(),
+            role: item.role.into(),
+        }
+    }
+}
+impl From<NestedUsersUsersRoleRequest> for web_common::database::nested_models::NestedUsersUsersRoleRequest {
+    fn from(item: NestedUsersUsersRoleRequest) -> Self {
+        Self {
+            inner: item.inner.into(),
+            created_by: item.created_by.into(),
+            table: item.table.into(),
+            user: item.user.into(),
+            role: item.role.into(),
+        }
+    }
+}
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+pub struct NestedUsersUsersRole {
+    pub inner: UsersUsersRole,
+    pub table: User,
+    pub user: User,
+    pub role: NestedRole,
+    pub created_by: User,
+}
+
+impl NestedUsersUsersRole {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_struct` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_struct: UsersUsersRole,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            table: User::get(flat_struct.table_id, connection)?,
+            user: User::get(flat_struct.user_id, connection)?,
+            role: NestedRole::get(flat_struct.role_id, connection)?,
+            created_by: User::get(flat_struct.created_by, connection)?,
+                inner: flat_struct,
+        })
+    }
+}
+impl NestedUsersUsersRole {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
+    /// * `connection` - The database connection.
+    pub fn all(
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        UsersUsersRole::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedUsersUsersRole {
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `( table_id, user_id )` - The primary key(s) of the row.
+    /// * `connection` - The database connection.
+    pub fn get(
+        ( table_id, user_id ): ( i32, i32 ),
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+       UsersUsersRole::get(( table_id, user_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+    }
+}
+impl From<web_common::database::nested_models::NestedUsersUsersRole> for NestedUsersUsersRole {
+    fn from(item: web_common::database::nested_models::NestedUsersUsersRole) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            user: item.user.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+impl From<NestedUsersUsersRole> for web_common::database::nested_models::NestedUsersUsersRole {
+    fn from(item: NestedUsersUsersRole) -> Self {
+        Self {
+            inner: item.inner.into(),
+            table: item.table.into(),
+            user: item.user.into(),
+            role: item.role.into(),
+            created_by: item.created_by.into(),
         }
     }
 }
