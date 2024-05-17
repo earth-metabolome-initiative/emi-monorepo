@@ -16,7 +16,7 @@ use yew_agent::prelude::WorkerBridgeHandle;
 use yew_agent::scope_ext::AgentScopeExt;
 
 #[derive(Clone, PartialEq, Properties)]
-pub struct MultiDatalistProp<Data>
+pub struct MultiDatalistProp<Data, const EDIT: bool>
 where
     Data: 'static + Clone + PartialEq,
 {
@@ -39,7 +39,7 @@ where
     pub number_of_candidates: u32,
 }
 
-impl<Data> MultiDatalistProp<Data>
+impl<Data, const EDIT: bool> MultiDatalistProp<Data, EDIT>
 where
     Data: 'static + Clone + PartialEq,
 {
@@ -56,7 +56,7 @@ where
     }
 }
 
-pub struct MultiDatalist<Data> {
+pub struct MultiDatalist<Data, const EDIT: bool> {
     websocket: WorkerBridgeHandle<WebsocketWorker>,
     errors: Vec<ApiError>,
     current_value: Option<String>,
@@ -88,12 +88,12 @@ pub enum DatalistMessage<Data> {
     Blur,
 }
 
-impl<Data> Component for MultiDatalist<Data>
+impl<Data, const EDIT: bool> Component for MultiDatalist<Data, EDIT>
 where
-    Data: 'static + Clone + PartialEq + DeserializeOwned + Searchable + RowToSearchableBadge,
+    Data: 'static + Clone + PartialEq + DeserializeOwned + Searchable<EDIT> + RowToSearchableBadge,
 {
     type Message = DatalistMessage<Data>;
-    type Properties = MultiDatalistProp<Data>;
+    type Properties = MultiDatalistProp<Data, EDIT>;
 
     fn create(ctx: &Context<Self>) -> Self {
         Self {
@@ -423,7 +423,7 @@ where
 }
 
 #[derive(Clone, PartialEq, Properties)]
-pub struct DatalistProp<Data>
+pub struct DatalistProp<Data, const EDIT: bool>
 where
     Data: 'static + Clone + PartialEq,
 {
@@ -443,9 +443,9 @@ where
 }
 
 #[function_component(Datalist)]
-pub fn datalist<Data>(props: &DatalistProp<Data>) -> Html
+pub fn datalist<Data, const EDIT: bool>(props: &DatalistProp<Data, EDIT>) -> Html
 where
-    Data: 'static + Clone + PartialEq + DeserializeOwned + Searchable + RowToSearchableBadge,
+    Data: 'static + Clone + PartialEq + DeserializeOwned + Searchable<EDIT> + RowToSearchableBadge,
 {
     let builder_callback = {
         let old_builder = props.builder.clone();
@@ -455,6 +455,6 @@ where
     };
 
     html! {
-        <MultiDatalist<Data> label={props.label.clone()} builder={builder_callback} errors={props.errors.clone()} show_label={props.show_label} placeholder={props.placeholder.clone()} value={props.value.clone().map_or_else(|| Vec::new(), |value| vec![value])} optional={props.optional} number_of_candidates={props.number_of_candidates} />
+        <MultiDatalist<Data, EDIT> label={props.label.clone()} builder={builder_callback} errors={props.errors.clone()} show_label={props.show_label} placeholder={props.placeholder.clone()} value={props.value.clone().map_or_else(|| Vec::new(), |value| vec![value])} optional={props.optional} number_of_candidates={props.number_of_candidates} />
     }
 }

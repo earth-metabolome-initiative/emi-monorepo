@@ -165,3 +165,13 @@ class TableStructMetadata:
         a combination of foreign keys.
         """
         return self.flat_struct.is_junktion_table()
+
+    def has_associated_roles(self) -> bool:
+        """Returns whether the table has an associated roles table.
+        
+        Implementation details
+        -----------------------
+        A table has an associated roles table if it has a column
+        that is a foreign key to the roles table.
+        """
+        return self.flat_struct.has_associated_roles()

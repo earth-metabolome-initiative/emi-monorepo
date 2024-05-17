@@ -4061,10 +4061,10 @@ impl NestedUsersUsersRoleInvitation {
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedUsersUsersRoleRequest {
     pub inner: UsersUsersRoleRequest,
-    pub created_by: User,
     pub table: User,
     pub user: User,
     pub role: NestedRole,
+    pub created_by: User,
 }
 
 #[cfg(feature = "frontend")]
@@ -4079,10 +4079,10 @@ impl NestedUsersUsersRoleRequest {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
             table: User::get(flat_struct.table_id, connection).await?.unwrap(),
             user: User::get(flat_struct.user_id, connection).await?.unwrap(),
             role: NestedRole::get(flat_struct.role_id, connection).await?.unwrap(),
+            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
             inner: flat_struct,
         })
     }
@@ -4133,10 +4133,10 @@ impl NestedUsersUsersRoleRequest {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         self.inner.update_or_insert(connection).await?;
-        self.created_by.update_or_insert(connection).await?;
         self.table.update_or_insert(connection).await?;
         self.user.update_or_insert(connection).await?;
         self.role.update_or_insert(connection).await?;
+        self.created_by.update_or_insert(connection).await?;
         Ok(())
     }
 }

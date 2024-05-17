@@ -472,7 +472,7 @@ class TableMetadata:
             view_columns = self.extract_view_columns(table_name)
             for column in view_columns:
                 if column.alias_name == "id":
-                    return self.get_primary_key_name_and_type(column.table_name)
+                    return self.get_primary_key_names_and_types(column.table_name)
             return None
         _conn, cursor = get_cursor()
 
@@ -678,7 +678,7 @@ class TableMetadata:
         if self.is_view(table_name):
             for view_column in self.extract_view_columns(table_name):
                 if view_column.alias_name == column_name:
-                    return self.get_default_value(view_column.table_name, column_name)
+                    return self.get_default_column_value(view_column.table_name, column_name)
 
         _conn, cursor = get_cursor()
         cursor.execute(
@@ -698,15 +698,23 @@ class TableMetadata:
 
         return default_value
 
-    def is_edge_table(self) -> bool:
-        """Returns whether the table is an edge table.
+    def has_associated_roles(self, table_name: str) -> bool:
+        """Returns whether the table has associated roles.
+
+        Parameters
+        ----------
+        table_name : str
+            The name of the table.
 
         Implementation details
-        -----------------------
-        An edge table is a table whose primary key is defined as a
-        tuple of two or more foreign keys.
+        ----------------------
+        This method returns whether there exists a table in the database
+        names `{table_name}_{referece}_roles`.
         """
-        return len(self.get_primary_key_name_and_type()) > 1
+        return any(
+            self.is_table(f"{table_name}_{reference}_roles")
+            for reference in ("users", "teams")
+        )
 
 
 def find_foreign_keys() -> TableMetadata:

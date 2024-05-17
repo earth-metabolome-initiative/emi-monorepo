@@ -211,6 +211,19 @@ impl WebsocketWorker {
                                     Err(err) => BackendMessage::Error(task_id, err),
                                 }
                             }
+                            Select::SearchEditableTable { table_name, query, number_of_results } => {
+                                let table: Table = table_name.try_into().unwrap();
+
+                                // Since GlueSQL does not support search queries, and we do not expect for the
+                                // frontend side to ever need to search a very large table, we always return all
+                                // of the rows in the table and then we let the datalist UI component handle the
+                                // search directly. Still, just in case something unexpected happens, we limit the
+                                // number of rows returned to 1_000.
+                                match table.all(Some(1_000), None, &mut database).await {
+                                    Ok(rows) => BackendMessage::SearchTable(task_id, rows),
+                                    Err(err) => BackendMessage::Error(task_id, err),
+                                }
+                            }
                         }
                     }
                     Operation::Update(table_name, serialized_row) => {

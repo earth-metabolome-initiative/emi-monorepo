@@ -8,7 +8,6 @@ use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::PooledConnection;
 use uuid::Uuid;
 use crate::models::*;
-use crate::views::views::*;
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedBioOttRank {
     pub inner: BioOttRank,
@@ -923,6 +922,23 @@ impl NestedProject {
     }
 }
 impl NestedProject {
+    /// Get all the editables nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The user id.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
+    /// * `connection` - The database connection.
+    pub fn all_editables(
+        author_user_id: i32,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        Project::all_editables(author_user_id, limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedProject {
     /// Get all the nested structs from the database ordered by the `updated_at` column.
     ///
     /// # Arguments
@@ -983,6 +999,22 @@ impl NestedProject {
     /// Search the table by the query.
     ///
     /// # Arguments
+    /// * `author_user_id` - The user id.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn similarity_search_editables(
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       Project::similarity_search_editables(author_user_id, query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedProject {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     pub fn word_similarity_search(
@@ -997,6 +1029,22 @@ impl NestedProject {
     /// Search the table by the query.
     ///
     /// # Arguments
+    /// * `author_user_id` - The user id.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn word_similarity_search_editables(
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       Project::word_similarity_search_editables(author_user_id, query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedProject {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     pub fn strict_word_similarity_search(
@@ -1005,6 +1053,22 @@ impl NestedProject {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
        Project::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedProject {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The user id.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn strict_word_similarity_search_editables(
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       Project::strict_word_similarity_search_editables(author_user_id, query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl From<web_common::database::nested_models::NestedProject> for NestedProject {
@@ -2041,6 +2105,23 @@ impl NestedSampledIndividual {
     }
 }
 impl NestedSampledIndividual {
+    /// Get all the editables nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The user id.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
+    /// * `connection` - The database connection.
+    pub fn all_editables(
+        author_user_id: i32,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        SampledIndividual::all_editables(author_user_id, limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedSampledIndividual {
     /// Get all the nested structs from the database ordered by the `updated_at` column.
     ///
     /// # Arguments
@@ -2602,6 +2683,23 @@ impl NestedSample {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         Sample::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedSample {
+    /// Get all the editables nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The user id.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
+    /// * `connection` - The database connection.
+    pub fn all_editables(
+        author_user_id: i32,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        Sample::all_editables(author_user_id, limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedSample {
@@ -3235,6 +3333,23 @@ impl NestedSpectraCollection {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         SpectraCollection::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedSpectraCollection {
+    /// Get all the editables nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The user id.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
+    /// * `connection` - The database connection.
+    pub fn all_editables(
+        author_user_id: i32,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        SpectraCollection::all_editables(author_user_id, limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl NestedSpectraCollection {
@@ -3957,6 +4072,23 @@ impl NestedTeam {
     }
 }
 impl NestedTeam {
+    /// Get all the editables nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The user id.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
+    /// * `connection` - The database connection.
+    pub fn all_editables(
+        author_user_id: i32,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        Team::all_editables(author_user_id, limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedTeam {
     /// Get all the nested structs from the database ordered by the `updated_at` column.
     ///
     /// # Arguments
@@ -4017,6 +4149,22 @@ impl NestedTeam {
     /// Search the table by the query.
     ///
     /// # Arguments
+    /// * `author_user_id` - The user id.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn similarity_search_editables(
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       Team::similarity_search_editables(author_user_id, query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedTeam {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     pub fn word_similarity_search(
@@ -4031,6 +4179,22 @@ impl NestedTeam {
     /// Search the table by the query.
     ///
     /// # Arguments
+    /// * `author_user_id` - The user id.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn word_similarity_search_editables(
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       Team::word_similarity_search_editables(author_user_id, query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedTeam {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     pub fn strict_word_similarity_search(
@@ -4039,6 +4203,22 @@ impl NestedTeam {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
        Team::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+    }
+}
+impl NestedTeam {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The user id.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn strict_word_similarity_search_editables(
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       Team::strict_word_similarity_search_editables(author_user_id, query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
     }
 }
 impl From<web_common::database::nested_models::NestedTeam> for NestedTeam {
@@ -4546,10 +4726,10 @@ impl From<NestedUsersUsersRoleInvitation> for web_common::database::nested_model
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedUsersUsersRoleRequest {
     pub inner: UsersUsersRoleRequest,
-    pub created_by: User,
     pub table: User,
     pub user: User,
     pub role: NestedRole,
+    pub created_by: User,
 }
 
 impl NestedUsersUsersRoleRequest {
@@ -4563,10 +4743,10 @@ impl NestedUsersUsersRoleRequest {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            created_by: User::get(flat_struct.created_by, connection)?,
             table: User::get(flat_struct.table_id, connection)?,
             user: User::get(flat_struct.user_id, connection)?,
             role: NestedRole::get(flat_struct.role_id, connection)?,
+            created_by: User::get(flat_struct.created_by, connection)?,
                 inner: flat_struct,
         })
     }
@@ -4604,10 +4784,10 @@ impl From<web_common::database::nested_models::NestedUsersUsersRoleRequest> for 
     fn from(item: web_common::database::nested_models::NestedUsersUsersRoleRequest) -> Self {
         Self {
             inner: item.inner.into(),
-            created_by: item.created_by.into(),
             table: item.table.into(),
             user: item.user.into(),
             role: item.role.into(),
+            created_by: item.created_by.into(),
         }
     }
 }
@@ -4615,10 +4795,10 @@ impl From<NestedUsersUsersRoleRequest> for web_common::database::nested_models::
     fn from(item: NestedUsersUsersRoleRequest) -> Self {
         Self {
             inner: item.inner.into(),
-            created_by: item.created_by.into(),
             table: item.table.into(),
             user: item.user.into(),
             role: item.role.into(),
+            created_by: item.created_by.into(),
         }
     }
 }

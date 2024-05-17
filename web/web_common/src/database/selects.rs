@@ -26,6 +26,11 @@ pub enum Select {
         query: String,
         number_of_results: u32,
     },
+    SearchEditableTable {
+        table_name: String,
+        query: String,
+        number_of_results: u32,
+    },
 }
 
 impl Select {
@@ -73,6 +78,20 @@ impl Select {
     /// * `number_of_results` - The number of results to return.
     pub fn search(table: super::Table, query: String, number_of_results: u32) -> Self {
         Self::SearchTable {
+            table_name: table.into(),
+            query,
+            number_of_results,
+        }
+    }
+
+    /// Create a new `Select` editable search query for a given `Table`, query, and number of results.
+    /// 
+    /// # Arguments
+    /// * `table` - The table to select from.
+    /// * `query` - The query to search for.
+    /// * `number_of_results` - The number of results to return.
+    pub fn search_editables(table: super::Table, query: String, number_of_results: u32) -> Self {
+        Self::SearchEditableTable {
             table_name: table.into(),
             query,
             number_of_results,

@@ -4,7 +4,6 @@
 
 use crate::models::*;
 use crate::nested_models::*;
-use crate::views::*;
 use diesel::r2d2::PooledConnection;
 use diesel::r2d2::ConnectionManager;
 use crate::new_variants::InsertRow;
@@ -27,6 +26,25 @@ pub trait SearchableTable {
          limit: Option<i32>,
          connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
 ) -> Result<Vec<Vec<u8>>, web_common::api::ApiError>;
+
+    /// Search editables rows by the query using the similarity method from PostgreSQL.
+    ///
+    /// # Arguments
+    /// * `user_id` - The user ID of the user performing the operation.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The database connection.
+    ///
+    /// # Returns
+    /// A serialized vector of the rows of the table, using bincode.
+    fn similarity_search_editables(
+         &self,
+         user_id: i32,
+         query: &str,
+         limit: Option<i32>,
+         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+) -> Result<Vec<Vec<u8>>, web_common::api::ApiError>;
+
     /// Search the table by the query using the word_similarity method from PostgreSQL.
     ///
     /// # Arguments
@@ -42,6 +60,25 @@ pub trait SearchableTable {
          limit: Option<i32>,
          connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
 ) -> Result<Vec<Vec<u8>>, web_common::api::ApiError>;
+
+    /// Search editables rows by the query using the word_similarity method from PostgreSQL.
+    ///
+    /// # Arguments
+    /// * `user_id` - The user ID of the user performing the operation.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The database connection.
+    ///
+    /// # Returns
+    /// A serialized vector of the rows of the table, using bincode.
+    fn word_similarity_search_editables(
+         &self,
+         user_id: i32,
+         query: &str,
+         limit: Option<i32>,
+         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+) -> Result<Vec<Vec<u8>>, web_common::api::ApiError>;
+
     /// Search the table by the query using the strict_word_similarity method from PostgreSQL.
     ///
     /// # Arguments
@@ -57,6 +94,25 @@ pub trait SearchableTable {
          limit: Option<i32>,
          connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
 ) -> Result<Vec<Vec<u8>>, web_common::api::ApiError>;
+
+    /// Search editables rows by the query using the strict_word_similarity method from PostgreSQL.
+    ///
+    /// # Arguments
+    /// * `user_id` - The user ID of the user performing the operation.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The database connection.
+    ///
+    /// # Returns
+    /// A serialized vector of the rows of the table, using bincode.
+    fn strict_word_similarity_search_editables(
+         &self,
+         user_id: i32,
+         query: &str,
+         limit: Option<i32>,
+         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+) -> Result<Vec<Vec<u8>>, web_common::api::ApiError>;
+
 }
 
 impl SearchableTable for web_common::database::Table {
@@ -115,6 +171,66 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::Units => Unit::similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::UserEmails => unimplemented!("Table `user_emails` does not have a GIN similarity index."),
             web_common::database::Table::Users => User::similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::UsersUsersRoleInvitations => unimplemented!("Table `users_users_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::UsersUsersRoleRequests => unimplemented!("Table `users_users_role_requests` does not have a GIN similarity index."),
+            web_common::database::Table::UsersUsersRoles => unimplemented!("Table `users_users_roles` does not have a GIN similarity index."),
+        }
+    }
+    fn similarity_search_editables(&self, user_id: i32, query: &str, limit: Option<i32>, connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>) -> Result<Vec<Vec<u8>>, web_common::api::ApiError> {
+        match self {
+            web_common::database::Table::BioOttRanks => unimplemented!("Table `bio_ott_ranks` does not have associated roles."),
+            web_common::database::Table::BioOttTaxonItems => unimplemented!("Table `bio_ott_taxon_items` does not have associated roles."),
+            web_common::database::Table::Colors => unimplemented!("Table `colors` does not have associated roles."),
+            web_common::database::Table::Countries => unimplemented!("Table `countries` does not have associated roles."),
+            web_common::database::Table::DerivedSamples => unimplemented!("Table `derived_samples` does not have a GIN similarity index."),
+            web_common::database::Table::DocumentFormats => unimplemented!("Table `document_formats` does not have associated roles."),
+            web_common::database::Table::FontAwesomeIcons => unimplemented!("Table `font_awesome_icons` does not have associated roles."),
+            web_common::database::Table::LoginProviders => unimplemented!("Table `login_providers` does not have a GIN similarity index."),
+            web_common::database::Table::Notifications => unimplemented!("Table `notifications` does not have a GIN similarity index."),
+            web_common::database::Table::Organizations => unimplemented!("Table `organizations` does not have associated roles."),
+            web_common::database::Table::ProjectStates => unimplemented!("Table `project_states` does not have associated roles."),
+            web_common::database::Table::Projects => NestedProject::similarity_search_editables(user_id, query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::ProjectsTeamsRoleInvitations => unimplemented!("Table `projects_teams_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::ProjectsTeamsRoleRequests => unimplemented!("Table `projects_teams_role_requests` does not have a GIN similarity index."),
+            web_common::database::Table::ProjectsTeamsRoles => unimplemented!("Table `projects_teams_roles` does not have a GIN similarity index."),
+            web_common::database::Table::ProjectsUsersRoleInvitations => unimplemented!("Table `projects_users_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::ProjectsUsersRoleRequests => unimplemented!("Table `projects_users_role_requests` does not have a GIN similarity index."),
+            web_common::database::Table::ProjectsUsersRoles => unimplemented!("Table `projects_users_roles` does not have a GIN similarity index."),
+            web_common::database::Table::Roles => unimplemented!("Table `roles` does not have associated roles."),
+            web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Table `sample_bio_ott_taxon_items` does not have a GIN similarity index."),
+            web_common::database::Table::SampleStates => unimplemented!("Table `sample_states` does not have associated roles."),
+            web_common::database::Table::SampledIndividualBioOttTaxonItems => unimplemented!("Table `sampled_individual_bio_ott_taxon_items` does not have a GIN similarity index."),
+            web_common::database::Table::SampledIndividuals => unimplemented!("Table `sampled_individuals` does not have a GIN similarity index."),
+            web_common::database::Table::SampledIndividualsTeamsRoleInvitations => unimplemented!("Table `sampled_individuals_teams_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::SampledIndividualsTeamsRoleRequests => unimplemented!("Table `sampled_individuals_teams_role_requests` does not have a GIN similarity index."),
+            web_common::database::Table::SampledIndividualsTeamsRoles => unimplemented!("Table `sampled_individuals_teams_roles` does not have a GIN similarity index."),
+            web_common::database::Table::SampledIndividualsUsersRoleInvitations => unimplemented!("Table `sampled_individuals_users_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::SampledIndividualsUsersRoleRequests => unimplemented!("Table `sampled_individuals_users_role_requests` does not have a GIN similarity index."),
+            web_common::database::Table::SampledIndividualsUsersRoles => unimplemented!("Table `sampled_individuals_users_roles` does not have a GIN similarity index."),
+            web_common::database::Table::Samples => unimplemented!("Table `samples` does not have a GIN similarity index."),
+            web_common::database::Table::SamplesTeamsRoleInvitations => unimplemented!("Table `samples_teams_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::SamplesTeamsRoleRequests => unimplemented!("Table `samples_teams_role_requests` does not have a GIN similarity index."),
+            web_common::database::Table::SamplesTeamsRoles => unimplemented!("Table `samples_teams_roles` does not have a GIN similarity index."),
+            web_common::database::Table::SamplesUsersRoleInvitations => unimplemented!("Table `samples_users_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::SamplesUsersRoleRequests => unimplemented!("Table `samples_users_role_requests` does not have a GIN similarity index."),
+            web_common::database::Table::SamplesUsersRoles => unimplemented!("Table `samples_users_roles` does not have a GIN similarity index."),
+            web_common::database::Table::Spectra => unimplemented!("Table `spectra` does not have a GIN similarity index."),
+            web_common::database::Table::SpectraCollections => unimplemented!("Table `spectra_collections` does not have a GIN similarity index."),
+            web_common::database::Table::SpectraCollectionsTeamsRoleInvitations => unimplemented!("Table `spectra_collections_teams_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::SpectraCollectionsTeamsRoleRequests => unimplemented!("Table `spectra_collections_teams_role_requests` does not have a GIN similarity index."),
+            web_common::database::Table::SpectraCollectionsTeamsRoles => unimplemented!("Table `spectra_collections_teams_roles` does not have a GIN similarity index."),
+            web_common::database::Table::SpectraCollectionsUsersRoleInvitations => unimplemented!("Table `spectra_collections_users_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::SpectraCollectionsUsersRoleRequests => unimplemented!("Table `spectra_collections_users_role_requests` does not have a GIN similarity index."),
+            web_common::database::Table::SpectraCollectionsUsersRoles => unimplemented!("Table `spectra_collections_users_roles` does not have a GIN similarity index."),
+            web_common::database::Table::TeamStates => unimplemented!("Table `team_states` does not have associated roles."),
+            web_common::database::Table::Teams => NestedTeam::similarity_search_editables(user_id, query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::TeamsTeamsRoleInvitations => unimplemented!("Table `teams_teams_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::TeamsUsersRoleInvitations => unimplemented!("Table `teams_users_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::TeamsUsersRoleRequests => unimplemented!("Table `teams_users_role_requests` does not have a GIN similarity index."),
+            web_common::database::Table::TeamsUsersRoles => unimplemented!("Table `teams_users_roles` does not have a GIN similarity index."),
+            web_common::database::Table::Units => unimplemented!("Table `units` does not have associated roles."),
+            web_common::database::Table::UserEmails => unimplemented!("Table `user_emails` does not have a GIN similarity index."),
+            web_common::database::Table::Users => unimplemented!("Table `users` does not have associated roles."),
             web_common::database::Table::UsersUsersRoleInvitations => unimplemented!("Table `users_users_role_invitations` does not have a GIN similarity index."),
             web_common::database::Table::UsersUsersRoleRequests => unimplemented!("Table `users_users_role_requests` does not have a GIN similarity index."),
             web_common::database::Table::UsersUsersRoles => unimplemented!("Table `users_users_roles` does not have a GIN similarity index."),
@@ -180,6 +296,66 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::UsersUsersRoles => unimplemented!("Table `users_users_roles` does not have a GIN similarity index."),
         }
     }
+    fn word_similarity_search_editables(&self, user_id: i32, query: &str, limit: Option<i32>, connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>) -> Result<Vec<Vec<u8>>, web_common::api::ApiError> {
+        match self {
+            web_common::database::Table::BioOttRanks => unimplemented!("Table `bio_ott_ranks` does not have associated roles."),
+            web_common::database::Table::BioOttTaxonItems => unimplemented!("Table `bio_ott_taxon_items` does not have associated roles."),
+            web_common::database::Table::Colors => unimplemented!("Table `colors` does not have associated roles."),
+            web_common::database::Table::Countries => unimplemented!("Table `countries` does not have associated roles."),
+            web_common::database::Table::DerivedSamples => unimplemented!("Table `derived_samples` does not have a GIN similarity index."),
+            web_common::database::Table::DocumentFormats => unimplemented!("Table `document_formats` does not have associated roles."),
+            web_common::database::Table::FontAwesomeIcons => unimplemented!("Table `font_awesome_icons` does not have associated roles."),
+            web_common::database::Table::LoginProviders => unimplemented!("Table `login_providers` does not have a GIN similarity index."),
+            web_common::database::Table::Notifications => unimplemented!("Table `notifications` does not have a GIN similarity index."),
+            web_common::database::Table::Organizations => unimplemented!("Table `organizations` does not have associated roles."),
+            web_common::database::Table::ProjectStates => unimplemented!("Table `project_states` does not have associated roles."),
+            web_common::database::Table::Projects => NestedProject::word_similarity_search_editables(user_id, query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::ProjectsTeamsRoleInvitations => unimplemented!("Table `projects_teams_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::ProjectsTeamsRoleRequests => unimplemented!("Table `projects_teams_role_requests` does not have a GIN similarity index."),
+            web_common::database::Table::ProjectsTeamsRoles => unimplemented!("Table `projects_teams_roles` does not have a GIN similarity index."),
+            web_common::database::Table::ProjectsUsersRoleInvitations => unimplemented!("Table `projects_users_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::ProjectsUsersRoleRequests => unimplemented!("Table `projects_users_role_requests` does not have a GIN similarity index."),
+            web_common::database::Table::ProjectsUsersRoles => unimplemented!("Table `projects_users_roles` does not have a GIN similarity index."),
+            web_common::database::Table::Roles => unimplemented!("Table `roles` does not have associated roles."),
+            web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Table `sample_bio_ott_taxon_items` does not have a GIN similarity index."),
+            web_common::database::Table::SampleStates => unimplemented!("Table `sample_states` does not have associated roles."),
+            web_common::database::Table::SampledIndividualBioOttTaxonItems => unimplemented!("Table `sampled_individual_bio_ott_taxon_items` does not have a GIN similarity index."),
+            web_common::database::Table::SampledIndividuals => unimplemented!("Table `sampled_individuals` does not have a GIN similarity index."),
+            web_common::database::Table::SampledIndividualsTeamsRoleInvitations => unimplemented!("Table `sampled_individuals_teams_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::SampledIndividualsTeamsRoleRequests => unimplemented!("Table `sampled_individuals_teams_role_requests` does not have a GIN similarity index."),
+            web_common::database::Table::SampledIndividualsTeamsRoles => unimplemented!("Table `sampled_individuals_teams_roles` does not have a GIN similarity index."),
+            web_common::database::Table::SampledIndividualsUsersRoleInvitations => unimplemented!("Table `sampled_individuals_users_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::SampledIndividualsUsersRoleRequests => unimplemented!("Table `sampled_individuals_users_role_requests` does not have a GIN similarity index."),
+            web_common::database::Table::SampledIndividualsUsersRoles => unimplemented!("Table `sampled_individuals_users_roles` does not have a GIN similarity index."),
+            web_common::database::Table::Samples => unimplemented!("Table `samples` does not have a GIN similarity index."),
+            web_common::database::Table::SamplesTeamsRoleInvitations => unimplemented!("Table `samples_teams_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::SamplesTeamsRoleRequests => unimplemented!("Table `samples_teams_role_requests` does not have a GIN similarity index."),
+            web_common::database::Table::SamplesTeamsRoles => unimplemented!("Table `samples_teams_roles` does not have a GIN similarity index."),
+            web_common::database::Table::SamplesUsersRoleInvitations => unimplemented!("Table `samples_users_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::SamplesUsersRoleRequests => unimplemented!("Table `samples_users_role_requests` does not have a GIN similarity index."),
+            web_common::database::Table::SamplesUsersRoles => unimplemented!("Table `samples_users_roles` does not have a GIN similarity index."),
+            web_common::database::Table::Spectra => unimplemented!("Table `spectra` does not have a GIN similarity index."),
+            web_common::database::Table::SpectraCollections => unimplemented!("Table `spectra_collections` does not have a GIN similarity index."),
+            web_common::database::Table::SpectraCollectionsTeamsRoleInvitations => unimplemented!("Table `spectra_collections_teams_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::SpectraCollectionsTeamsRoleRequests => unimplemented!("Table `spectra_collections_teams_role_requests` does not have a GIN similarity index."),
+            web_common::database::Table::SpectraCollectionsTeamsRoles => unimplemented!("Table `spectra_collections_teams_roles` does not have a GIN similarity index."),
+            web_common::database::Table::SpectraCollectionsUsersRoleInvitations => unimplemented!("Table `spectra_collections_users_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::SpectraCollectionsUsersRoleRequests => unimplemented!("Table `spectra_collections_users_role_requests` does not have a GIN similarity index."),
+            web_common::database::Table::SpectraCollectionsUsersRoles => unimplemented!("Table `spectra_collections_users_roles` does not have a GIN similarity index."),
+            web_common::database::Table::TeamStates => unimplemented!("Table `team_states` does not have associated roles."),
+            web_common::database::Table::Teams => NestedTeam::word_similarity_search_editables(user_id, query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::TeamsTeamsRoleInvitations => unimplemented!("Table `teams_teams_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::TeamsUsersRoleInvitations => unimplemented!("Table `teams_users_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::TeamsUsersRoleRequests => unimplemented!("Table `teams_users_role_requests` does not have a GIN similarity index."),
+            web_common::database::Table::TeamsUsersRoles => unimplemented!("Table `teams_users_roles` does not have a GIN similarity index."),
+            web_common::database::Table::Units => unimplemented!("Table `units` does not have associated roles."),
+            web_common::database::Table::UserEmails => unimplemented!("Table `user_emails` does not have a GIN similarity index."),
+            web_common::database::Table::Users => unimplemented!("Table `users` does not have associated roles."),
+            web_common::database::Table::UsersUsersRoleInvitations => unimplemented!("Table `users_users_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::UsersUsersRoleRequests => unimplemented!("Table `users_users_role_requests` does not have a GIN similarity index."),
+            web_common::database::Table::UsersUsersRoles => unimplemented!("Table `users_users_roles` does not have a GIN similarity index."),
+        }
+    }
     fn strict_word_similarity_search(&self, query: &str, limit: Option<i32>, connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>) -> Result<Vec<Vec<u8>>, web_common::api::ApiError> {
         match self {
             web_common::database::Table::BioOttRanks => NestedBioOttRank::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
@@ -235,6 +411,66 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::Units => Unit::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::UserEmails => unimplemented!("Table `user_emails` does not have a GIN similarity index."),
             web_common::database::Table::Users => User::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::UsersUsersRoleInvitations => unimplemented!("Table `users_users_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::UsersUsersRoleRequests => unimplemented!("Table `users_users_role_requests` does not have a GIN similarity index."),
+            web_common::database::Table::UsersUsersRoles => unimplemented!("Table `users_users_roles` does not have a GIN similarity index."),
+        }
+    }
+    fn strict_word_similarity_search_editables(&self, user_id: i32, query: &str, limit: Option<i32>, connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>) -> Result<Vec<Vec<u8>>, web_common::api::ApiError> {
+        match self {
+            web_common::database::Table::BioOttRanks => unimplemented!("Table `bio_ott_ranks` does not have associated roles."),
+            web_common::database::Table::BioOttTaxonItems => unimplemented!("Table `bio_ott_taxon_items` does not have associated roles."),
+            web_common::database::Table::Colors => unimplemented!("Table `colors` does not have associated roles."),
+            web_common::database::Table::Countries => unimplemented!("Table `countries` does not have associated roles."),
+            web_common::database::Table::DerivedSamples => unimplemented!("Table `derived_samples` does not have a GIN similarity index."),
+            web_common::database::Table::DocumentFormats => unimplemented!("Table `document_formats` does not have associated roles."),
+            web_common::database::Table::FontAwesomeIcons => unimplemented!("Table `font_awesome_icons` does not have associated roles."),
+            web_common::database::Table::LoginProviders => unimplemented!("Table `login_providers` does not have a GIN similarity index."),
+            web_common::database::Table::Notifications => unimplemented!("Table `notifications` does not have a GIN similarity index."),
+            web_common::database::Table::Organizations => unimplemented!("Table `organizations` does not have associated roles."),
+            web_common::database::Table::ProjectStates => unimplemented!("Table `project_states` does not have associated roles."),
+            web_common::database::Table::Projects => NestedProject::strict_word_similarity_search_editables(user_id, query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::ProjectsTeamsRoleInvitations => unimplemented!("Table `projects_teams_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::ProjectsTeamsRoleRequests => unimplemented!("Table `projects_teams_role_requests` does not have a GIN similarity index."),
+            web_common::database::Table::ProjectsTeamsRoles => unimplemented!("Table `projects_teams_roles` does not have a GIN similarity index."),
+            web_common::database::Table::ProjectsUsersRoleInvitations => unimplemented!("Table `projects_users_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::ProjectsUsersRoleRequests => unimplemented!("Table `projects_users_role_requests` does not have a GIN similarity index."),
+            web_common::database::Table::ProjectsUsersRoles => unimplemented!("Table `projects_users_roles` does not have a GIN similarity index."),
+            web_common::database::Table::Roles => unimplemented!("Table `roles` does not have associated roles."),
+            web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Table `sample_bio_ott_taxon_items` does not have a GIN similarity index."),
+            web_common::database::Table::SampleStates => unimplemented!("Table `sample_states` does not have associated roles."),
+            web_common::database::Table::SampledIndividualBioOttTaxonItems => unimplemented!("Table `sampled_individual_bio_ott_taxon_items` does not have a GIN similarity index."),
+            web_common::database::Table::SampledIndividuals => unimplemented!("Table `sampled_individuals` does not have a GIN similarity index."),
+            web_common::database::Table::SampledIndividualsTeamsRoleInvitations => unimplemented!("Table `sampled_individuals_teams_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::SampledIndividualsTeamsRoleRequests => unimplemented!("Table `sampled_individuals_teams_role_requests` does not have a GIN similarity index."),
+            web_common::database::Table::SampledIndividualsTeamsRoles => unimplemented!("Table `sampled_individuals_teams_roles` does not have a GIN similarity index."),
+            web_common::database::Table::SampledIndividualsUsersRoleInvitations => unimplemented!("Table `sampled_individuals_users_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::SampledIndividualsUsersRoleRequests => unimplemented!("Table `sampled_individuals_users_role_requests` does not have a GIN similarity index."),
+            web_common::database::Table::SampledIndividualsUsersRoles => unimplemented!("Table `sampled_individuals_users_roles` does not have a GIN similarity index."),
+            web_common::database::Table::Samples => unimplemented!("Table `samples` does not have a GIN similarity index."),
+            web_common::database::Table::SamplesTeamsRoleInvitations => unimplemented!("Table `samples_teams_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::SamplesTeamsRoleRequests => unimplemented!("Table `samples_teams_role_requests` does not have a GIN similarity index."),
+            web_common::database::Table::SamplesTeamsRoles => unimplemented!("Table `samples_teams_roles` does not have a GIN similarity index."),
+            web_common::database::Table::SamplesUsersRoleInvitations => unimplemented!("Table `samples_users_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::SamplesUsersRoleRequests => unimplemented!("Table `samples_users_role_requests` does not have a GIN similarity index."),
+            web_common::database::Table::SamplesUsersRoles => unimplemented!("Table `samples_users_roles` does not have a GIN similarity index."),
+            web_common::database::Table::Spectra => unimplemented!("Table `spectra` does not have a GIN similarity index."),
+            web_common::database::Table::SpectraCollections => unimplemented!("Table `spectra_collections` does not have a GIN similarity index."),
+            web_common::database::Table::SpectraCollectionsTeamsRoleInvitations => unimplemented!("Table `spectra_collections_teams_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::SpectraCollectionsTeamsRoleRequests => unimplemented!("Table `spectra_collections_teams_role_requests` does not have a GIN similarity index."),
+            web_common::database::Table::SpectraCollectionsTeamsRoles => unimplemented!("Table `spectra_collections_teams_roles` does not have a GIN similarity index."),
+            web_common::database::Table::SpectraCollectionsUsersRoleInvitations => unimplemented!("Table `spectra_collections_users_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::SpectraCollectionsUsersRoleRequests => unimplemented!("Table `spectra_collections_users_role_requests` does not have a GIN similarity index."),
+            web_common::database::Table::SpectraCollectionsUsersRoles => unimplemented!("Table `spectra_collections_users_roles` does not have a GIN similarity index."),
+            web_common::database::Table::TeamStates => unimplemented!("Table `team_states` does not have associated roles."),
+            web_common::database::Table::Teams => NestedTeam::strict_word_similarity_search_editables(user_id, query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::TeamsTeamsRoleInvitations => unimplemented!("Table `teams_teams_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::TeamsUsersRoleInvitations => unimplemented!("Table `teams_users_role_invitations` does not have a GIN similarity index."),
+            web_common::database::Table::TeamsUsersRoleRequests => unimplemented!("Table `teams_users_role_requests` does not have a GIN similarity index."),
+            web_common::database::Table::TeamsUsersRoles => unimplemented!("Table `teams_users_roles` does not have a GIN similarity index."),
+            web_common::database::Table::Units => unimplemented!("Table `units` does not have associated roles."),
+            web_common::database::Table::UserEmails => unimplemented!("Table `user_emails` does not have a GIN similarity index."),
+            web_common::database::Table::Users => unimplemented!("Table `users` does not have associated roles."),
             web_common::database::Table::UsersUsersRoleInvitations => unimplemented!("Table `users_users_role_invitations` does not have a GIN similarity index."),
             web_common::database::Table::UsersUsersRoleRequests => unimplemented!("Table `users_users_role_requests` does not have a GIN similarity index."),
             web_common::database::Table::UsersUsersRoles => unimplemented!("Table `users_users_roles` does not have a GIN similarity index."),
@@ -331,6 +567,7 @@ pub trait DeletableTable {
     ///
     /// # Arguments
     /// * `primary_key` - The primary key of the row.
+    /// * `author_user_id` - The user ID of the user performing the operation.
     /// * `connection` - The database connection.
     ///
     /// # Returns
@@ -338,6 +575,7 @@ pub trait DeletableTable {
     fn delete(
          &self,
          primary_key: web_common::database::operations::PrimaryKey,
+         author_user_id: i32,
          connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
 ) -> Result<usize, web_common::api::ApiError>;
 }
@@ -347,65 +585,66 @@ impl DeletableTable for web_common::database::Table {
     fn delete(
         &self,
         primary_key: web_common::database::operations::PrimaryKey,
+        author_user_id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<usize, web_common::api::ApiError> {
         Ok(match self {
-            web_common::database::Table::BioOttRanks => BioOttRank::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::BioOttTaxonItems => BioOttTaxonItem::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::Colors => Color::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::Countries => Country::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::DerivedSamples => DerivedSample::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::DocumentFormats => DocumentFormat::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::FontAwesomeIcons => FontAwesomeIcon::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::LoginProviders => LoginProvider::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::Notifications => Notification::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::Organizations => Organization::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::ProjectStates => ProjectState::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::Projects => Project::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::ProjectsTeamsRoleInvitations => ProjectsTeamsRoleInvitation::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::ProjectsTeamsRoleRequests => ProjectsTeamsRoleRequest::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::ProjectsTeamsRoles => ProjectsTeamsRole::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::ProjectsUsersRoleInvitations => ProjectsUsersRoleInvitation::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::ProjectsUsersRoleRequests => ProjectsUsersRoleRequest::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::ProjectsUsersRoles => ProjectsUsersRole::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::Roles => Role::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::SampleBioOttTaxonItems => SampleBioOttTaxonItem::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::SampleStates => SampleState::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::SampledIndividualBioOttTaxonItems => SampledIndividualBioOttTaxonItem::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::SampledIndividuals => SampledIndividual::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::SampledIndividualsTeamsRoleInvitations => SampledIndividualsTeamsRoleInvitation::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::SampledIndividualsTeamsRoleRequests => SampledIndividualsTeamsRoleRequest::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::SampledIndividualsTeamsRoles => SampledIndividualsTeamsRole::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::SampledIndividualsUsersRoleInvitations => SampledIndividualsUsersRoleInvitation::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::SampledIndividualsUsersRoleRequests => SampledIndividualsUsersRoleRequest::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::SampledIndividualsUsersRoles => SampledIndividualsUsersRole::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::Samples => Sample::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::SamplesTeamsRoleInvitations => SamplesTeamsRoleInvitation::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::SamplesTeamsRoleRequests => SamplesTeamsRoleRequest::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::SamplesTeamsRoles => SamplesTeamsRole::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::SamplesUsersRoleInvitations => SamplesUsersRoleInvitation::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::SamplesUsersRoleRequests => SamplesUsersRoleRequest::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::SamplesUsersRoles => SamplesUsersRole::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::Spectra => Spectra::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::SpectraCollections => SpectraCollection::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::SpectraCollectionsTeamsRoleInvitations => SpectraCollectionsTeamsRoleInvitation::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::SpectraCollectionsTeamsRoleRequests => SpectraCollectionsTeamsRoleRequest::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::SpectraCollectionsTeamsRoles => SpectraCollectionsTeamsRole::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::SpectraCollectionsUsersRoleInvitations => SpectraCollectionsUsersRoleInvitation::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::SpectraCollectionsUsersRoleRequests => SpectraCollectionsUsersRoleRequest::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::SpectraCollectionsUsersRoles => SpectraCollectionsUsersRole::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::TeamStates => TeamState::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::Teams => Team::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::TeamsTeamsRoleInvitations => TeamsTeamsRoleInvitation::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::TeamsUsersRoleInvitations => TeamsUsersRoleInvitation::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::TeamsUsersRoleRequests => TeamsUsersRoleRequest::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::TeamsUsersRoles => TeamsUsersRole::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::Units => Unit::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::UserEmails => UserEmail::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::Users => User::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::UsersUsersRoleInvitations => UsersUsersRoleInvitation::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::UsersUsersRoleRequests => UsersUsersRoleRequest::delete_by_id(primary_key.into(), connection)?,
-            web_common::database::Table::UsersUsersRoles => UsersUsersRole::delete_by_id(primary_key.into(), connection)?,
+            web_common::database::Table::BioOttRanks => unimplemented!("Delete not implemented for bio_ott_ranks."),
+            web_common::database::Table::BioOttTaxonItems => unimplemented!("Delete not implemented for bio_ott_taxon_items."),
+            web_common::database::Table::Colors => unimplemented!("Delete not implemented for colors."),
+            web_common::database::Table::Countries => unimplemented!("Delete not implemented for countries."),
+            web_common::database::Table::DerivedSamples => unimplemented!("Delete not implemented for derived_samples."),
+            web_common::database::Table::DocumentFormats => unimplemented!("Delete not implemented for document_formats."),
+            web_common::database::Table::FontAwesomeIcons => unimplemented!("Delete not implemented for font_awesome_icons."),
+            web_common::database::Table::LoginProviders => unimplemented!("Delete not implemented for login_providers."),
+            web_common::database::Table::Notifications => unimplemented!("Delete not implemented for notifications."),
+            web_common::database::Table::Organizations => unimplemented!("Delete not implemented for organizations."),
+            web_common::database::Table::ProjectStates => unimplemented!("Delete not implemented for project_states."),
+            web_common::database::Table::Projects => Project::delete_by_id(primary_key.into(), author_user_id, connection)?,
+            web_common::database::Table::ProjectsTeamsRoleInvitations => unimplemented!("Delete not implemented for projects_teams_role_invitations."),
+            web_common::database::Table::ProjectsTeamsRoleRequests => unimplemented!("Delete not implemented for projects_teams_role_requests."),
+            web_common::database::Table::ProjectsTeamsRoles => unimplemented!("Delete not implemented for projects_teams_roles."),
+            web_common::database::Table::ProjectsUsersRoleInvitations => unimplemented!("Delete not implemented for projects_users_role_invitations."),
+            web_common::database::Table::ProjectsUsersRoleRequests => unimplemented!("Delete not implemented for projects_users_role_requests."),
+            web_common::database::Table::ProjectsUsersRoles => unimplemented!("Delete not implemented for projects_users_roles."),
+            web_common::database::Table::Roles => unimplemented!("Delete not implemented for roles."),
+            web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Delete not implemented for sample_bio_ott_taxon_items."),
+            web_common::database::Table::SampleStates => unimplemented!("Delete not implemented for sample_states."),
+            web_common::database::Table::SampledIndividualBioOttTaxonItems => unimplemented!("Delete not implemented for sampled_individual_bio_ott_taxon_items."),
+            web_common::database::Table::SampledIndividuals => SampledIndividual::delete_by_id(primary_key.into(), author_user_id, connection)?,
+            web_common::database::Table::SampledIndividualsTeamsRoleInvitations => unimplemented!("Delete not implemented for sampled_individuals_teams_role_invitations."),
+            web_common::database::Table::SampledIndividualsTeamsRoleRequests => unimplemented!("Delete not implemented for sampled_individuals_teams_role_requests."),
+            web_common::database::Table::SampledIndividualsTeamsRoles => unimplemented!("Delete not implemented for sampled_individuals_teams_roles."),
+            web_common::database::Table::SampledIndividualsUsersRoleInvitations => unimplemented!("Delete not implemented for sampled_individuals_users_role_invitations."),
+            web_common::database::Table::SampledIndividualsUsersRoleRequests => unimplemented!("Delete not implemented for sampled_individuals_users_role_requests."),
+            web_common::database::Table::SampledIndividualsUsersRoles => unimplemented!("Delete not implemented for sampled_individuals_users_roles."),
+            web_common::database::Table::Samples => Sample::delete_by_id(primary_key.into(), author_user_id, connection)?,
+            web_common::database::Table::SamplesTeamsRoleInvitations => unimplemented!("Delete not implemented for samples_teams_role_invitations."),
+            web_common::database::Table::SamplesTeamsRoleRequests => unimplemented!("Delete not implemented for samples_teams_role_requests."),
+            web_common::database::Table::SamplesTeamsRoles => unimplemented!("Delete not implemented for samples_teams_roles."),
+            web_common::database::Table::SamplesUsersRoleInvitations => unimplemented!("Delete not implemented for samples_users_role_invitations."),
+            web_common::database::Table::SamplesUsersRoleRequests => unimplemented!("Delete not implemented for samples_users_role_requests."),
+            web_common::database::Table::SamplesUsersRoles => unimplemented!("Delete not implemented for samples_users_roles."),
+            web_common::database::Table::Spectra => unimplemented!("Delete not implemented for spectra."),
+            web_common::database::Table::SpectraCollections => SpectraCollection::delete_by_id(primary_key.into(), author_user_id, connection)?,
+            web_common::database::Table::SpectraCollectionsTeamsRoleInvitations => unimplemented!("Delete not implemented for spectra_collections_teams_role_invitations."),
+            web_common::database::Table::SpectraCollectionsTeamsRoleRequests => unimplemented!("Delete not implemented for spectra_collections_teams_role_requests."),
+            web_common::database::Table::SpectraCollectionsTeamsRoles => unimplemented!("Delete not implemented for spectra_collections_teams_roles."),
+            web_common::database::Table::SpectraCollectionsUsersRoleInvitations => unimplemented!("Delete not implemented for spectra_collections_users_role_invitations."),
+            web_common::database::Table::SpectraCollectionsUsersRoleRequests => unimplemented!("Delete not implemented for spectra_collections_users_role_requests."),
+            web_common::database::Table::SpectraCollectionsUsersRoles => unimplemented!("Delete not implemented for spectra_collections_users_roles."),
+            web_common::database::Table::TeamStates => unimplemented!("Delete not implemented for team_states."),
+            web_common::database::Table::Teams => Team::delete_by_id(primary_key.into(), author_user_id, connection)?,
+            web_common::database::Table::TeamsTeamsRoleInvitations => unimplemented!("Delete not implemented for teams_teams_role_invitations."),
+            web_common::database::Table::TeamsUsersRoleInvitations => unimplemented!("Delete not implemented for teams_users_role_invitations."),
+            web_common::database::Table::TeamsUsersRoleRequests => unimplemented!("Delete not implemented for teams_users_role_requests."),
+            web_common::database::Table::TeamsUsersRoles => unimplemented!("Delete not implemented for teams_users_roles."),
+            web_common::database::Table::Units => unimplemented!("Delete not implemented for units."),
+            web_common::database::Table::UserEmails => unimplemented!("Delete not implemented for user_emails."),
+            web_common::database::Table::Users => unimplemented!("Delete not implemented for users."),
+            web_common::database::Table::UsersUsersRoleInvitations => unimplemented!("Delete not implemented for users_users_role_invitations."),
+            web_common::database::Table::UsersUsersRoleRequests => unimplemented!("Delete not implemented for users_users_role_requests."),
+            web_common::database::Table::UsersUsersRoles => unimplemented!("Delete not implemented for users_users_roles."),
         })
     }
 }

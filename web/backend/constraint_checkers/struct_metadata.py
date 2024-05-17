@@ -651,6 +651,10 @@ class StructMetadata:
 
         return len(self.attributes) == len(foreign_keys)
 
+    def has_associated_roles(self) -> bool:
+        """Returns whether there is a roles table associated with the struct."""
+        return self.table_metadata.has_associated_roles(self.table_name)
+
     def get_unique_constraints(self) -> List[List[AttributeMetadata]]:
         """Returns the unique constraints of the struct.
 

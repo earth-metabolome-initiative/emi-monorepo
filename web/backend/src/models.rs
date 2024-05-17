@@ -66,35 +66,10 @@ impl BioOttRank {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::bio_ott_ranks;
-       bio_ott_ranks::dsl::bio_ott_ranks
+        bio_ott_ranks::dsl::bio_ott_ranks
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(self.id, connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(bio_ott_ranks::dsl::bio_ott_ranks
-            .filter(bio_ott_ranks::dsl::id.eq(id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -305,35 +280,10 @@ impl BioOttTaxonItem {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::bio_ott_taxon_items;
-       bio_ott_taxon_items::dsl::bio_ott_taxon_items
+        bio_ott_taxon_items::dsl::bio_ott_taxon_items
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(self.id, connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(bio_ott_taxon_items::dsl::bio_ott_taxon_items
-            .filter(bio_ott_taxon_items::dsl::id.eq(id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -496,35 +446,10 @@ impl Color {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::colors;
-       colors::dsl::colors
+        colors::dsl::colors
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(self.id, connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(colors::dsl::colors
-            .filter(colors::dsl::id.eq(id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -708,35 +633,10 @@ impl Country {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::countries;
-       countries::dsl::countries
+        countries::dsl::countries
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(self.id, connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(countries::dsl::countries
-            .filter(countries::dsl::id.eq(id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -953,7 +853,7 @@ impl DerivedSample {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::derived_samples;
-       derived_samples::dsl::derived_samples
+        derived_samples::dsl::derived_samples
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -976,32 +876,6 @@ impl DerivedSample {
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(( self.parent_sample_id, self.child_sample_id ), connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( parent_sample_id, child_sample_id )` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       ( parent_sample_id, child_sample_id ): ( Uuid, Uuid ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(derived_samples::dsl::derived_samples
-            .filter(derived_samples::dsl::parent_sample_id.eq(parent_sample_id))
-            .filter(derived_samples::dsl::child_sample_id.eq(child_sample_id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -1063,35 +937,10 @@ impl DocumentFormat {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::document_formats;
-       document_formats::dsl::document_formats
+        document_formats::dsl::document_formats
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(self.id, connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(document_formats::dsl::document_formats
-            .filter(document_formats::dsl::id.eq(id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -1251,35 +1100,10 @@ impl FontAwesomeIcon {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::font_awesome_icons;
-       font_awesome_icons::dsl::font_awesome_icons
+        font_awesome_icons::dsl::font_awesome_icons
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(self.id, connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(font_awesome_icons::dsl::font_awesome_icons
-            .filter(font_awesome_icons::dsl::id.eq(id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -1457,35 +1281,10 @@ impl LoginProvider {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::login_providers;
-       login_providers::dsl::login_providers
+        login_providers::dsl::login_providers
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(self.id, connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(login_providers::dsl::login_providers
-            .filter(login_providers::dsl::id.eq(id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -1600,35 +1399,10 @@ impl Notification {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::notifications;
-       notifications::dsl::notifications
+        notifications::dsl::notifications
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(self.id, connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(notifications::dsl::notifications
-            .filter(notifications::dsl::id.eq(id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -1698,35 +1472,10 @@ impl Organization {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::organizations;
-       organizations::dsl::organizations
+        organizations::dsl::organizations
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(self.id, connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(organizations::dsl::organizations
-            .filter(organizations::dsl::id.eq(id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -1931,35 +1680,10 @@ impl ProjectState {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::project_states;
-       project_states::dsl::project_states
+        project_states::dsl::project_states
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(self.id, connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(project_states::dsl::project_states
-            .filter(project_states::dsl::id.eq(id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -2172,6 +1896,157 @@ impl From<web_common::database::tables::Project> for Project {
 }
 
 impl Project {
+    /// Check whether the user has a role with a role_id less than or equal to the provided role_id.
+    ///
+    /// # Arguments
+    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `role_id` - The role_id to check against.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn has_role_by_id(
+        id: i32,
+        author_user_id: i32,
+        role_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, diesel::result::Error> {
+        diesel::select(diesel::dsl::exists(projects::dsl::projects
+            .filter(projects::dsl::id.eq(id))
+           .filter(projects::dsl::created_by.eq(author_user_id))
+            .or_filter(
+               projects::dsl::id.eq(id)
+                   .and(projects::dsl::id.eq_any(
+                       projects_users_roles::table
+                           .select(projects_users_roles::dsl::table_id)
+                           .filter(projects_users_roles::dsl::user_id.eq(author_user_id)
+                           .and(projects_users_roles::dsl::role_id.le(role_id)),
+                    )),
+               )
+         )
+                    .or_filter(
+                       projects::dsl::id.eq(id)
+                           .and(projects::dsl::id.eq_any(
+                               projects_teams_roles::table
+                                   .select(projects_teams_roles::dsl::table_id)
+                                   .filter(projects_teams_roles::dsl::role_id.le(role_id))
+                                   .inner_join(teams_users_roles::table.on(
+                                       projects_teams_roles::dsl::team_id.eq(teams_users_roles::dsl::table_id)
+                                           .and(teams_users_roles::dsl::user_id.eq(author_user_id))
+                                           .and(teams_users_roles::dsl::role_id.le(role_id)),
+                                   )),
+                              ))
+                       )
+            ))
+         .get_result::<bool>(connection)
+    }
+    /// Check whether the user is a Viewer (role_id >= 3).
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn is_viewer(
+        &self,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, diesel::result::Error> {
+        Self::is_viewer_by_id(
+            self.id,
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user is a Viewer (role_id >= 3) for the provided primary key(s).
+    ///
+    /// # Arguments
+    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn is_viewer_by_id(
+        id: i32,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, diesel::result::Error> {
+        Self::has_role_by_id(
+            id,
+            author_user_id,
+            3,
+            connection,
+        )
+    }
+    /// Check whether the user is an Editor (role_id >= 2).
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn is_editor(
+        &self,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, diesel::result::Error> {
+        Self::is_editor_by_id(
+            self.id,
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user is an Editor (role_id >= 2).
+    ///
+    /// # Arguments
+    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn is_editor_by_id(
+        id: i32,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, diesel::result::Error> {
+        Self::has_role_by_id(
+            id,
+            author_user_id,
+            2,
+            connection,
+        )
+    }
+    /// Check whether the user is an Admin (role_id == 1).
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn is_admin(
+        &self,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, diesel::result::Error> {
+        Self::is_admin_by_id(
+            self.id,
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user is an Admin (role_id == 1).
+    ///
+    /// # Arguments
+    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn is_admin_by_id(
+        id: i32,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, diesel::result::Error> {
+        Self::has_role_by_id(
+            id,
+            author_user_id,
+            1,
+            connection,
+        )
+    }
     /// Get all of the structs from the database.
     ///
     /// # Arguments
@@ -2185,7 +2060,48 @@ impl Project {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::projects;
-       projects::dsl::projects
+        projects::dsl::projects
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the editable structs from the database.
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_editables(
+        author_user_id: i32,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::projects;
+        projects::dsl::projects
+           .filter(projects::dsl::created_by.eq(author_user_id))
+            .or_filter(
+               projects::dsl::id.eq_any(
+                   projects_users_roles::table
+                       .select(projects_users_roles::dsl::table_id)
+                       .filter(projects_users_roles::dsl::user_id.eq(author_user_id)
+                       .and(projects_users_roles::dsl::role_id.le(2)),
+               )),
+            )
+                .or_filter(
+                   projects::dsl::id.eq_any(
+                       projects_teams_roles::table
+                           .select(projects_teams_roles::dsl::table_id)
+                           .filter(projects_teams_roles::dsl::role_id.le(2))
+                           .inner_join(teams_users_roles::table.on(
+                               projects_teams_roles::dsl::team_id.eq(teams_users_roles::dsl::table_id)
+                                   .and(teams_users_roles::dsl::user_id.eq(author_user_id))
+                                   .and(teams_users_roles::dsl::role_id.le(2)),
+                           )),
+                   ),
+            )
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -2212,24 +2128,31 @@ impl Project {
     /// Delete the struct from the database.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
     /// * `connection` - The connection to the database.
     ///
     pub fn delete(
         &self,
+        author_user_id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(self.id, connection)
+        Self::delete_by_id(self.id, author_user_id, connection)
     }
     /// Delete the struct from the database by its ID.
     ///
     /// # Arguments
     /// * `id` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
     /// * `connection` - The connection to the database.
     ///
     pub fn delete_by_id(
        id: i32,
+        author_user_id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<usize, diesel::result::Error> {
+        if !Self::is_admin_by_id(id, author_user_id, connection)? {
+            return Err(diesel::result::Error::NotFound);
+        }
         diesel::delete(projects::dsl::projects
             .filter(projects::dsl::id.eq(id))
         ).execute(connection)
@@ -2293,6 +2216,47 @@ impl Project {
             .bind::<diesel::sql_types::Integer, _>(limit)
             .load(connection)
 }
+    /// Search for the editable struct by a given string by Postgres's `similarity`.
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_editables(
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_editables(author_user_id, Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date FROM projects ",
+            "WHERE $1 % f_concat_projects_name_description(name, description) ",
+            "AND projects.created_by = $3 ",
+            "OR projects.id IN ",
+            "(SELECT projects_users_roles.table FROM projects_users_roles ",
+            "WHERE projects_users_roles.user_id = $3 AND projects_users_roles.role_id <= 2) ",
+            "OR projects.id IN ",
+            "(SELECT projects_teams_roles.table_id FROM projects_teams_roles ",
+            "WHERE projects_teams_roles.role_id <= 2 AND projects_teams_roles.table_id IN ",
+            "(SELECT teams_users_roles.table_id FROM teams_users_roles ",
+            "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2)) ",
+            "ORDER BY similarity($1, f_concat_projects_name_description(name, description)) DESC LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Integer, _>(author_user_id)
+            .load(connection)
+}
     /// Search for the struct by a given string by Postgres's `word_similarity`.
     ///
     /// # Arguments
@@ -2322,6 +2286,47 @@ impl Project {
             .bind::<diesel::sql_types::Integer, _>(limit)
             .load(connection)
 }
+    /// Search for the editable struct by a given string by Postgres's `word_similarity`.
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_editables(
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_editables(author_user_id, Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date FROM projects ",
+            "WHERE $1 <% f_concat_projects_name_description(name, description) ",
+            "AND projects.created_by = $3 ",
+            "OR projects.id IN ",
+            "(SELECT projects_users_roles.table FROM projects_users_roles ",
+            "WHERE projects_users_roles.user_id = $3 AND projects_users_roles.role_id <= 2) ",
+            "OR projects.id IN ",
+            "(SELECT projects_teams_roles.table_id FROM projects_teams_roles ",
+            "WHERE projects_teams_roles.role_id <= 2 AND projects_teams_roles.table_id IN ",
+            "(SELECT teams_users_roles.table_id FROM teams_users_roles ",
+            "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2)) ",
+            "ORDER BY word_similarity($1, f_concat_projects_name_description(name, description)) DESC LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Integer, _>(author_user_id)
+            .load(connection)
+}
     /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
     ///
     /// # Arguments
@@ -2349,6 +2354,47 @@ impl Project {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the editable struct by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_editables(
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_editables(author_user_id, Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date FROM projects ",
+            "WHERE $1 <<% f_concat_projects_name_description(name, description) ",
+            "AND projects.created_by = $3 ",
+            "OR projects.id IN ",
+            "(SELECT projects_users_roles.table FROM projects_users_roles ",
+            "WHERE projects_users_roles.user_id = $3 AND projects_users_roles.role_id <= 2) ",
+            "OR projects.id IN ",
+            "(SELECT projects_teams_roles.table_id FROM projects_teams_roles ",
+            "WHERE projects_teams_roles.role_id <= 2 AND projects_teams_roles.table_id IN ",
+            "(SELECT teams_users_roles.table_id FROM teams_users_roles ",
+            "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2)) ",
+            "ORDER BY strict_word_similarity($1, f_concat_projects_name_description(name, description)) DESC LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Integer, _>(author_user_id)
             .load(connection)
 }
 }
@@ -2401,36 +2447,10 @@ impl ProjectsTeamsRoleInvitation {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::projects_teams_role_invitations;
-       projects_teams_role_invitations::dsl::projects_teams_role_invitations
+        projects_teams_role_invitations::dsl::projects_teams_role_invitations
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(( self.table_id, self.team_id ), connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, team_id )` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       ( table_id, team_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(projects_teams_role_invitations::dsl::projects_teams_role_invitations
-            .filter(projects_teams_role_invitations::dsl::table_id.eq(table_id))
-            .filter(projects_teams_role_invitations::dsl::team_id.eq(team_id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -2498,36 +2518,10 @@ impl ProjectsTeamsRoleRequest {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::projects_teams_role_requests;
-       projects_teams_role_requests::dsl::projects_teams_role_requests
+        projects_teams_role_requests::dsl::projects_teams_role_requests
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(( self.table_id, self.team_id ), connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, team_id )` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       ( table_id, team_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(projects_teams_role_requests::dsl::projects_teams_role_requests
-            .filter(projects_teams_role_requests::dsl::table_id.eq(table_id))
-            .filter(projects_teams_role_requests::dsl::team_id.eq(team_id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -2595,36 +2589,10 @@ impl ProjectsTeamsRole {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::projects_teams_roles;
-       projects_teams_roles::dsl::projects_teams_roles
+        projects_teams_roles::dsl::projects_teams_roles
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(( self.table_id, self.team_id ), connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, team_id )` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       ( table_id, team_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(projects_teams_roles::dsl::projects_teams_roles
-            .filter(projects_teams_roles::dsl::table_id.eq(table_id))
-            .filter(projects_teams_roles::dsl::team_id.eq(team_id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -2692,36 +2660,10 @@ impl ProjectsUsersRoleInvitation {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::projects_users_role_invitations;
-       projects_users_role_invitations::dsl::projects_users_role_invitations
+        projects_users_role_invitations::dsl::projects_users_role_invitations
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(( self.table_id, self.user_id ), connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       ( table_id, user_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(projects_users_role_invitations::dsl::projects_users_role_invitations
-            .filter(projects_users_role_invitations::dsl::table_id.eq(table_id))
-            .filter(projects_users_role_invitations::dsl::user_id.eq(user_id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -2789,36 +2731,10 @@ impl ProjectsUsersRoleRequest {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::projects_users_role_requests;
-       projects_users_role_requests::dsl::projects_users_role_requests
+        projects_users_role_requests::dsl::projects_users_role_requests
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(( self.table_id, self.user_id ), connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       ( table_id, user_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(projects_users_role_requests::dsl::projects_users_role_requests
-            .filter(projects_users_role_requests::dsl::table_id.eq(table_id))
-            .filter(projects_users_role_requests::dsl::user_id.eq(user_id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -2886,36 +2802,10 @@ impl ProjectsUsersRole {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::projects_users_roles;
-       projects_users_roles::dsl::projects_users_roles
+        projects_users_roles::dsl::projects_users_roles
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(( self.table_id, self.user_id ), connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       ( table_id, user_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(projects_users_roles::dsl::projects_users_roles
-            .filter(projects_users_roles::dsl::table_id.eq(table_id))
-            .filter(projects_users_roles::dsl::user_id.eq(user_id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -2983,35 +2873,10 @@ impl Role {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::roles;
-       roles::dsl::roles
+        roles::dsl::roles
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(self.id, connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(roles::dsl::roles
-            .filter(roles::dsl::id.eq(id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -3228,7 +3093,7 @@ impl SampleBioOttTaxonItem {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::sample_bio_ott_taxon_items;
-       sample_bio_ott_taxon_items::dsl::sample_bio_ott_taxon_items
+        sample_bio_ott_taxon_items::dsl::sample_bio_ott_taxon_items
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -3251,32 +3116,6 @@ impl SampleBioOttTaxonItem {
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(( self.sample_id, self.taxon_id ), connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( sample_id, taxon_id )` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       ( sample_id, taxon_id ): ( Uuid, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(sample_bio_ott_taxon_items::dsl::sample_bio_ott_taxon_items
-            .filter(sample_bio_ott_taxon_items::dsl::sample_id.eq(sample_id))
-            .filter(sample_bio_ott_taxon_items::dsl::taxon_id.eq(taxon_id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -3344,35 +3183,10 @@ impl SampleState {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::sample_states;
-       sample_states::dsl::sample_states
+        sample_states::dsl::sample_states
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(self.id, connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(sample_states::dsl::sample_states
-            .filter(sample_states::dsl::id.eq(id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -3559,7 +3373,7 @@ impl SampledIndividualBioOttTaxonItem {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::sampled_individual_bio_ott_taxon_items;
-       sampled_individual_bio_ott_taxon_items::dsl::sampled_individual_bio_ott_taxon_items
+        sampled_individual_bio_ott_taxon_items::dsl::sampled_individual_bio_ott_taxon_items
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -3582,32 +3396,6 @@ impl SampledIndividualBioOttTaxonItem {
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(( self.sampled_individual_id, self.taxon_id ), connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( sampled_individual_id, taxon_id )` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       ( sampled_individual_id, taxon_id ): ( Uuid, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(sampled_individual_bio_ott_taxon_items::dsl::sampled_individual_bio_ott_taxon_items
-            .filter(sampled_individual_bio_ott_taxon_items::dsl::sampled_individual_id.eq(sampled_individual_id))
-            .filter(sampled_individual_bio_ott_taxon_items::dsl::taxon_id.eq(taxon_id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -3665,6 +3453,157 @@ impl From<web_common::database::tables::SampledIndividual> for SampledIndividual
 }
 
 impl SampledIndividual {
+    /// Check whether the user has a role with a role_id less than or equal to the provided role_id.
+    ///
+    /// # Arguments
+    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `role_id` - The role_id to check against.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn has_role_by_id(
+        id: Uuid,
+        author_user_id: i32,
+        role_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, diesel::result::Error> {
+        diesel::select(diesel::dsl::exists(sampled_individuals::dsl::sampled_individuals
+            .filter(sampled_individuals::dsl::id.eq(id))
+           .filter(sampled_individuals::dsl::created_by.eq(author_user_id))
+            .or_filter(
+               sampled_individuals::dsl::id.eq(id)
+                   .and(sampled_individuals::dsl::id.eq_any(
+                       sampled_individuals_users_roles::table
+                           .select(sampled_individuals_users_roles::dsl::table_id)
+                           .filter(sampled_individuals_users_roles::dsl::user_id.eq(author_user_id)
+                           .and(sampled_individuals_users_roles::dsl::role_id.le(role_id)),
+                    )),
+               )
+         )
+                    .or_filter(
+                       sampled_individuals::dsl::id.eq(id)
+                           .and(sampled_individuals::dsl::id.eq_any(
+                               sampled_individuals_teams_roles::table
+                                   .select(sampled_individuals_teams_roles::dsl::table_id)
+                                   .filter(sampled_individuals_teams_roles::dsl::role_id.le(role_id))
+                                   .inner_join(teams_users_roles::table.on(
+                                       sampled_individuals_teams_roles::dsl::team_id.eq(teams_users_roles::dsl::table_id)
+                                           .and(teams_users_roles::dsl::user_id.eq(author_user_id))
+                                           .and(teams_users_roles::dsl::role_id.le(role_id)),
+                                   )),
+                              ))
+                       )
+            ))
+         .get_result::<bool>(connection)
+    }
+    /// Check whether the user is a Viewer (role_id >= 3).
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn is_viewer(
+        &self,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, diesel::result::Error> {
+        Self::is_viewer_by_id(
+            self.id,
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user is a Viewer (role_id >= 3) for the provided primary key(s).
+    ///
+    /// # Arguments
+    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn is_viewer_by_id(
+        id: Uuid,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, diesel::result::Error> {
+        Self::has_role_by_id(
+            id,
+            author_user_id,
+            3,
+            connection,
+        )
+    }
+    /// Check whether the user is an Editor (role_id >= 2).
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn is_editor(
+        &self,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, diesel::result::Error> {
+        Self::is_editor_by_id(
+            self.id,
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user is an Editor (role_id >= 2).
+    ///
+    /// # Arguments
+    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn is_editor_by_id(
+        id: Uuid,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, diesel::result::Error> {
+        Self::has_role_by_id(
+            id,
+            author_user_id,
+            2,
+            connection,
+        )
+    }
+    /// Check whether the user is an Admin (role_id == 1).
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn is_admin(
+        &self,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, diesel::result::Error> {
+        Self::is_admin_by_id(
+            self.id,
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user is an Admin (role_id == 1).
+    ///
+    /// # Arguments
+    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn is_admin_by_id(
+        id: Uuid,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, diesel::result::Error> {
+        Self::has_role_by_id(
+            id,
+            author_user_id,
+            1,
+            connection,
+        )
+    }
     /// Get all of the structs from the database.
     ///
     /// # Arguments
@@ -3678,7 +3617,48 @@ impl SampledIndividual {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::sampled_individuals;
-       sampled_individuals::dsl::sampled_individuals
+        sampled_individuals::dsl::sampled_individuals
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the editable structs from the database.
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_editables(
+        author_user_id: i32,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::sampled_individuals;
+        sampled_individuals::dsl::sampled_individuals
+           .filter(sampled_individuals::dsl::created_by.eq(author_user_id))
+            .or_filter(
+               sampled_individuals::dsl::id.eq_any(
+                   sampled_individuals_users_roles::table
+                       .select(sampled_individuals_users_roles::dsl::table_id)
+                       .filter(sampled_individuals_users_roles::dsl::user_id.eq(author_user_id)
+                       .and(sampled_individuals_users_roles::dsl::role_id.le(2)),
+               )),
+            )
+                .or_filter(
+                   sampled_individuals::dsl::id.eq_any(
+                       sampled_individuals_teams_roles::table
+                           .select(sampled_individuals_teams_roles::dsl::table_id)
+                           .filter(sampled_individuals_teams_roles::dsl::role_id.le(2))
+                           .inner_join(teams_users_roles::table.on(
+                               sampled_individuals_teams_roles::dsl::team_id.eq(teams_users_roles::dsl::table_id)
+                                   .and(teams_users_roles::dsl::user_id.eq(author_user_id))
+                                   .and(teams_users_roles::dsl::role_id.le(2)),
+                           )),
+                   ),
+            )
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -3705,24 +3685,31 @@ impl SampledIndividual {
     /// Delete the struct from the database.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
     /// * `connection` - The connection to the database.
     ///
     pub fn delete(
         &self,
+        author_user_id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(self.id, connection)
+        Self::delete_by_id(self.id, author_user_id, connection)
     }
     /// Delete the struct from the database by its ID.
     ///
     /// # Arguments
     /// * `id` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
     /// * `connection` - The connection to the database.
     ///
     pub fn delete_by_id(
        id: Uuid,
+        author_user_id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<usize, diesel::result::Error> {
+        if !Self::is_admin_by_id(id, author_user_id, connection)? {
+            return Err(diesel::result::Error::NotFound);
+        }
         diesel::delete(sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::id.eq(id))
         ).execute(connection)
@@ -3792,36 +3779,10 @@ impl SampledIndividualsTeamsRoleInvitation {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::sampled_individuals_teams_role_invitations;
-       sampled_individuals_teams_role_invitations::dsl::sampled_individuals_teams_role_invitations
+        sampled_individuals_teams_role_invitations::dsl::sampled_individuals_teams_role_invitations
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(( self.table_id, self.team_id ), connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, team_id )` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       ( table_id, team_id ): ( Uuid, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(sampled_individuals_teams_role_invitations::dsl::sampled_individuals_teams_role_invitations
-            .filter(sampled_individuals_teams_role_invitations::dsl::table_id.eq(table_id))
-            .filter(sampled_individuals_teams_role_invitations::dsl::team_id.eq(team_id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -3889,36 +3850,10 @@ impl SampledIndividualsTeamsRoleRequest {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::sampled_individuals_teams_role_requests;
-       sampled_individuals_teams_role_requests::dsl::sampled_individuals_teams_role_requests
+        sampled_individuals_teams_role_requests::dsl::sampled_individuals_teams_role_requests
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(( self.table_id, self.team_id ), connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, team_id )` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       ( table_id, team_id ): ( Uuid, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(sampled_individuals_teams_role_requests::dsl::sampled_individuals_teams_role_requests
-            .filter(sampled_individuals_teams_role_requests::dsl::table_id.eq(table_id))
-            .filter(sampled_individuals_teams_role_requests::dsl::team_id.eq(team_id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -3986,36 +3921,10 @@ impl SampledIndividualsTeamsRole {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::sampled_individuals_teams_roles;
-       sampled_individuals_teams_roles::dsl::sampled_individuals_teams_roles
+        sampled_individuals_teams_roles::dsl::sampled_individuals_teams_roles
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(( self.table_id, self.team_id ), connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, team_id )` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       ( table_id, team_id ): ( Uuid, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(sampled_individuals_teams_roles::dsl::sampled_individuals_teams_roles
-            .filter(sampled_individuals_teams_roles::dsl::table_id.eq(table_id))
-            .filter(sampled_individuals_teams_roles::dsl::team_id.eq(team_id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -4083,36 +3992,10 @@ impl SampledIndividualsUsersRoleInvitation {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::sampled_individuals_users_role_invitations;
-       sampled_individuals_users_role_invitations::dsl::sampled_individuals_users_role_invitations
+        sampled_individuals_users_role_invitations::dsl::sampled_individuals_users_role_invitations
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(( self.table_id, self.user_id ), connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       ( table_id, user_id ): ( Uuid, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(sampled_individuals_users_role_invitations::dsl::sampled_individuals_users_role_invitations
-            .filter(sampled_individuals_users_role_invitations::dsl::table_id.eq(table_id))
-            .filter(sampled_individuals_users_role_invitations::dsl::user_id.eq(user_id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -4180,36 +4063,10 @@ impl SampledIndividualsUsersRoleRequest {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::sampled_individuals_users_role_requests;
-       sampled_individuals_users_role_requests::dsl::sampled_individuals_users_role_requests
+        sampled_individuals_users_role_requests::dsl::sampled_individuals_users_role_requests
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(( self.table_id, self.user_id ), connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       ( table_id, user_id ): ( Uuid, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(sampled_individuals_users_role_requests::dsl::sampled_individuals_users_role_requests
-            .filter(sampled_individuals_users_role_requests::dsl::table_id.eq(table_id))
-            .filter(sampled_individuals_users_role_requests::dsl::user_id.eq(user_id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -4277,36 +4134,10 @@ impl SampledIndividualsUsersRole {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::sampled_individuals_users_roles;
-       sampled_individuals_users_roles::dsl::sampled_individuals_users_roles
+        sampled_individuals_users_roles::dsl::sampled_individuals_users_roles
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(( self.table_id, self.user_id ), connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       ( table_id, user_id ): ( Uuid, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(sampled_individuals_users_roles::dsl::sampled_individuals_users_roles
-            .filter(sampled_individuals_users_roles::dsl::table_id.eq(table_id))
-            .filter(sampled_individuals_users_roles::dsl::user_id.eq(user_id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -4367,6 +4198,157 @@ impl From<web_common::database::tables::Sample> for Sample {
 }
 
 impl Sample {
+    /// Check whether the user has a role with a role_id less than or equal to the provided role_id.
+    ///
+    /// # Arguments
+    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `role_id` - The role_id to check against.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn has_role_by_id(
+        id: Uuid,
+        author_user_id: i32,
+        role_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, diesel::result::Error> {
+        diesel::select(diesel::dsl::exists(samples::dsl::samples
+            .filter(samples::dsl::id.eq(id))
+           .filter(samples::dsl::created_by.eq(author_user_id))
+            .or_filter(
+               samples::dsl::id.eq(id)
+                   .and(samples::dsl::id.eq_any(
+                       samples_users_roles::table
+                           .select(samples_users_roles::dsl::table_id)
+                           .filter(samples_users_roles::dsl::user_id.eq(author_user_id)
+                           .and(samples_users_roles::dsl::role_id.le(role_id)),
+                    )),
+               )
+         )
+                    .or_filter(
+                       samples::dsl::id.eq(id)
+                           .and(samples::dsl::id.eq_any(
+                               samples_teams_roles::table
+                                   .select(samples_teams_roles::dsl::table_id)
+                                   .filter(samples_teams_roles::dsl::role_id.le(role_id))
+                                   .inner_join(teams_users_roles::table.on(
+                                       samples_teams_roles::dsl::team_id.eq(teams_users_roles::dsl::table_id)
+                                           .and(teams_users_roles::dsl::user_id.eq(author_user_id))
+                                           .and(teams_users_roles::dsl::role_id.le(role_id)),
+                                   )),
+                              ))
+                       )
+            ))
+         .get_result::<bool>(connection)
+    }
+    /// Check whether the user is a Viewer (role_id >= 3).
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn is_viewer(
+        &self,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, diesel::result::Error> {
+        Self::is_viewer_by_id(
+            self.id,
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user is a Viewer (role_id >= 3) for the provided primary key(s).
+    ///
+    /// # Arguments
+    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn is_viewer_by_id(
+        id: Uuid,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, diesel::result::Error> {
+        Self::has_role_by_id(
+            id,
+            author_user_id,
+            3,
+            connection,
+        )
+    }
+    /// Check whether the user is an Editor (role_id >= 2).
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn is_editor(
+        &self,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, diesel::result::Error> {
+        Self::is_editor_by_id(
+            self.id,
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user is an Editor (role_id >= 2).
+    ///
+    /// # Arguments
+    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn is_editor_by_id(
+        id: Uuid,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, diesel::result::Error> {
+        Self::has_role_by_id(
+            id,
+            author_user_id,
+            2,
+            connection,
+        )
+    }
+    /// Check whether the user is an Admin (role_id == 1).
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn is_admin(
+        &self,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, diesel::result::Error> {
+        Self::is_admin_by_id(
+            self.id,
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user is an Admin (role_id == 1).
+    ///
+    /// # Arguments
+    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn is_admin_by_id(
+        id: Uuid,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, diesel::result::Error> {
+        Self::has_role_by_id(
+            id,
+            author_user_id,
+            1,
+            connection,
+        )
+    }
     /// Get all of the structs from the database.
     ///
     /// # Arguments
@@ -4380,7 +4362,48 @@ impl Sample {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::samples;
-       samples::dsl::samples
+        samples::dsl::samples
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the editable structs from the database.
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_editables(
+        author_user_id: i32,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::samples;
+        samples::dsl::samples
+           .filter(samples::dsl::created_by.eq(author_user_id))
+            .or_filter(
+               samples::dsl::id.eq_any(
+                   samples_users_roles::table
+                       .select(samples_users_roles::dsl::table_id)
+                       .filter(samples_users_roles::dsl::user_id.eq(author_user_id)
+                       .and(samples_users_roles::dsl::role_id.le(2)),
+               )),
+            )
+                .or_filter(
+                   samples::dsl::id.eq_any(
+                       samples_teams_roles::table
+                           .select(samples_teams_roles::dsl::table_id)
+                           .filter(samples_teams_roles::dsl::role_id.le(2))
+                           .inner_join(teams_users_roles::table.on(
+                               samples_teams_roles::dsl::team_id.eq(teams_users_roles::dsl::table_id)
+                                   .and(teams_users_roles::dsl::user_id.eq(author_user_id))
+                                   .and(teams_users_roles::dsl::role_id.le(2)),
+                           )),
+                   ),
+            )
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -4407,24 +4430,31 @@ impl Sample {
     /// Delete the struct from the database.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
     /// * `connection` - The connection to the database.
     ///
     pub fn delete(
         &self,
+        author_user_id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(self.id, connection)
+        Self::delete_by_id(self.id, author_user_id, connection)
     }
     /// Delete the struct from the database by its ID.
     ///
     /// # Arguments
     /// * `id` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
     /// * `connection` - The connection to the database.
     ///
     pub fn delete_by_id(
        id: Uuid,
+        author_user_id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<usize, diesel::result::Error> {
+        if !Self::is_admin_by_id(id, author_user_id, connection)? {
+            return Err(diesel::result::Error::NotFound);
+        }
         diesel::delete(samples::dsl::samples
             .filter(samples::dsl::id.eq(id))
         ).execute(connection)
@@ -4494,36 +4524,10 @@ impl SamplesTeamsRoleInvitation {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::samples_teams_role_invitations;
-       samples_teams_role_invitations::dsl::samples_teams_role_invitations
+        samples_teams_role_invitations::dsl::samples_teams_role_invitations
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(( self.table_id, self.team_id ), connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, team_id )` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       ( table_id, team_id ): ( Uuid, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(samples_teams_role_invitations::dsl::samples_teams_role_invitations
-            .filter(samples_teams_role_invitations::dsl::table_id.eq(table_id))
-            .filter(samples_teams_role_invitations::dsl::team_id.eq(team_id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -4591,36 +4595,10 @@ impl SamplesTeamsRoleRequest {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::samples_teams_role_requests;
-       samples_teams_role_requests::dsl::samples_teams_role_requests
+        samples_teams_role_requests::dsl::samples_teams_role_requests
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(( self.table_id, self.team_id ), connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, team_id )` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       ( table_id, team_id ): ( Uuid, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(samples_teams_role_requests::dsl::samples_teams_role_requests
-            .filter(samples_teams_role_requests::dsl::table_id.eq(table_id))
-            .filter(samples_teams_role_requests::dsl::team_id.eq(team_id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -4688,36 +4666,10 @@ impl SamplesTeamsRole {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::samples_teams_roles;
-       samples_teams_roles::dsl::samples_teams_roles
+        samples_teams_roles::dsl::samples_teams_roles
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(( self.table_id, self.team_id ), connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, team_id )` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       ( table_id, team_id ): ( Uuid, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(samples_teams_roles::dsl::samples_teams_roles
-            .filter(samples_teams_roles::dsl::table_id.eq(table_id))
-            .filter(samples_teams_roles::dsl::team_id.eq(team_id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -4785,36 +4737,10 @@ impl SamplesUsersRoleInvitation {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::samples_users_role_invitations;
-       samples_users_role_invitations::dsl::samples_users_role_invitations
+        samples_users_role_invitations::dsl::samples_users_role_invitations
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(( self.table_id, self.user_id ), connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       ( table_id, user_id ): ( Uuid, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(samples_users_role_invitations::dsl::samples_users_role_invitations
-            .filter(samples_users_role_invitations::dsl::table_id.eq(table_id))
-            .filter(samples_users_role_invitations::dsl::user_id.eq(user_id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -4882,36 +4808,10 @@ impl SamplesUsersRoleRequest {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::samples_users_role_requests;
-       samples_users_role_requests::dsl::samples_users_role_requests
+        samples_users_role_requests::dsl::samples_users_role_requests
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(( self.table_id, self.user_id ), connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       ( table_id, user_id ): ( Uuid, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(samples_users_role_requests::dsl::samples_users_role_requests
-            .filter(samples_users_role_requests::dsl::table_id.eq(table_id))
-            .filter(samples_users_role_requests::dsl::user_id.eq(user_id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -4979,36 +4879,10 @@ impl SamplesUsersRole {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::samples_users_roles;
-       samples_users_roles::dsl::samples_users_roles
+        samples_users_roles::dsl::samples_users_roles
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(( self.table_id, self.user_id ), connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       ( table_id, user_id ): ( Uuid, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(samples_users_roles::dsl::samples_users_roles
-            .filter(samples_users_roles::dsl::table_id.eq(table_id))
-            .filter(samples_users_roles::dsl::user_id.eq(user_id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -5067,35 +4941,10 @@ impl Spectra {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::spectra;
-       spectra::dsl::spectra
+        spectra::dsl::spectra
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(self.id, connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(spectra::dsl::spectra
-            .filter(spectra::dsl::id.eq(id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -5152,6 +5001,157 @@ impl From<web_common::database::tables::SpectraCollection> for SpectraCollection
 }
 
 impl SpectraCollection {
+    /// Check whether the user has a role with a role_id less than or equal to the provided role_id.
+    ///
+    /// # Arguments
+    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `role_id` - The role_id to check against.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn has_role_by_id(
+        id: i32,
+        author_user_id: i32,
+        role_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, diesel::result::Error> {
+        diesel::select(diesel::dsl::exists(spectra_collections::dsl::spectra_collections
+            .filter(spectra_collections::dsl::id.eq(id))
+           .filter(spectra_collections::dsl::created_by.eq(author_user_id))
+            .or_filter(
+               spectra_collections::dsl::id.eq(id)
+                   .and(spectra_collections::dsl::id.eq_any(
+                       spectra_collections_users_roles::table
+                           .select(spectra_collections_users_roles::dsl::table_id)
+                           .filter(spectra_collections_users_roles::dsl::user_id.eq(author_user_id)
+                           .and(spectra_collections_users_roles::dsl::role_id.le(role_id)),
+                    )),
+               )
+         )
+                    .or_filter(
+                       spectra_collections::dsl::id.eq(id)
+                           .and(spectra_collections::dsl::id.eq_any(
+                               spectra_collections_teams_roles::table
+                                   .select(spectra_collections_teams_roles::dsl::table_id)
+                                   .filter(spectra_collections_teams_roles::dsl::role_id.le(role_id))
+                                   .inner_join(teams_users_roles::table.on(
+                                       spectra_collections_teams_roles::dsl::team_id.eq(teams_users_roles::dsl::table_id)
+                                           .and(teams_users_roles::dsl::user_id.eq(author_user_id))
+                                           .and(teams_users_roles::dsl::role_id.le(role_id)),
+                                   )),
+                              ))
+                       )
+            ))
+         .get_result::<bool>(connection)
+    }
+    /// Check whether the user is a Viewer (role_id >= 3).
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn is_viewer(
+        &self,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, diesel::result::Error> {
+        Self::is_viewer_by_id(
+            self.id,
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user is a Viewer (role_id >= 3) for the provided primary key(s).
+    ///
+    /// # Arguments
+    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn is_viewer_by_id(
+        id: i32,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, diesel::result::Error> {
+        Self::has_role_by_id(
+            id,
+            author_user_id,
+            3,
+            connection,
+        )
+    }
+    /// Check whether the user is an Editor (role_id >= 2).
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn is_editor(
+        &self,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, diesel::result::Error> {
+        Self::is_editor_by_id(
+            self.id,
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user is an Editor (role_id >= 2).
+    ///
+    /// # Arguments
+    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn is_editor_by_id(
+        id: i32,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, diesel::result::Error> {
+        Self::has_role_by_id(
+            id,
+            author_user_id,
+            2,
+            connection,
+        )
+    }
+    /// Check whether the user is an Admin (role_id == 1).
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn is_admin(
+        &self,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, diesel::result::Error> {
+        Self::is_admin_by_id(
+            self.id,
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user is an Admin (role_id == 1).
+    ///
+    /// # Arguments
+    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn is_admin_by_id(
+        id: i32,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, diesel::result::Error> {
+        Self::has_role_by_id(
+            id,
+            author_user_id,
+            1,
+            connection,
+        )
+    }
     /// Get all of the structs from the database.
     ///
     /// # Arguments
@@ -5165,7 +5165,48 @@ impl SpectraCollection {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::spectra_collections;
-       spectra_collections::dsl::spectra_collections
+        spectra_collections::dsl::spectra_collections
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the editable structs from the database.
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_editables(
+        author_user_id: i32,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::spectra_collections;
+        spectra_collections::dsl::spectra_collections
+           .filter(spectra_collections::dsl::created_by.eq(author_user_id))
+            .or_filter(
+               spectra_collections::dsl::id.eq_any(
+                   spectra_collections_users_roles::table
+                       .select(spectra_collections_users_roles::dsl::table_id)
+                       .filter(spectra_collections_users_roles::dsl::user_id.eq(author_user_id)
+                       .and(spectra_collections_users_roles::dsl::role_id.le(2)),
+               )),
+            )
+                .or_filter(
+                   spectra_collections::dsl::id.eq_any(
+                       spectra_collections_teams_roles::table
+                           .select(spectra_collections_teams_roles::dsl::table_id)
+                           .filter(spectra_collections_teams_roles::dsl::role_id.le(2))
+                           .inner_join(teams_users_roles::table.on(
+                               spectra_collections_teams_roles::dsl::team_id.eq(teams_users_roles::dsl::table_id)
+                                   .and(teams_users_roles::dsl::user_id.eq(author_user_id))
+                                   .and(teams_users_roles::dsl::role_id.le(2)),
+                           )),
+                   ),
+            )
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -5192,24 +5233,31 @@ impl SpectraCollection {
     /// Delete the struct from the database.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
     /// * `connection` - The connection to the database.
     ///
     pub fn delete(
         &self,
+        author_user_id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(self.id, connection)
+        Self::delete_by_id(self.id, author_user_id, connection)
     }
     /// Delete the struct from the database by its ID.
     ///
     /// # Arguments
     /// * `id` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
     /// * `connection` - The connection to the database.
     ///
     pub fn delete_by_id(
        id: i32,
+        author_user_id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<usize, diesel::result::Error> {
+        if !Self::is_admin_by_id(id, author_user_id, connection)? {
+            return Err(diesel::result::Error::NotFound);
+        }
         diesel::delete(spectra_collections::dsl::spectra_collections
             .filter(spectra_collections::dsl::id.eq(id))
         ).execute(connection)
@@ -5279,36 +5327,10 @@ impl SpectraCollectionsTeamsRoleInvitation {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::spectra_collections_teams_role_invitations;
-       spectra_collections_teams_role_invitations::dsl::spectra_collections_teams_role_invitations
+        spectra_collections_teams_role_invitations::dsl::spectra_collections_teams_role_invitations
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(( self.table_id, self.team_id ), connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, team_id )` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       ( table_id, team_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(spectra_collections_teams_role_invitations::dsl::spectra_collections_teams_role_invitations
-            .filter(spectra_collections_teams_role_invitations::dsl::table_id.eq(table_id))
-            .filter(spectra_collections_teams_role_invitations::dsl::team_id.eq(team_id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -5376,36 +5398,10 @@ impl SpectraCollectionsTeamsRoleRequest {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::spectra_collections_teams_role_requests;
-       spectra_collections_teams_role_requests::dsl::spectra_collections_teams_role_requests
+        spectra_collections_teams_role_requests::dsl::spectra_collections_teams_role_requests
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(( self.table_id, self.team_id ), connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, team_id )` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       ( table_id, team_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(spectra_collections_teams_role_requests::dsl::spectra_collections_teams_role_requests
-            .filter(spectra_collections_teams_role_requests::dsl::table_id.eq(table_id))
-            .filter(spectra_collections_teams_role_requests::dsl::team_id.eq(team_id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -5473,36 +5469,10 @@ impl SpectraCollectionsTeamsRole {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::spectra_collections_teams_roles;
-       spectra_collections_teams_roles::dsl::spectra_collections_teams_roles
+        spectra_collections_teams_roles::dsl::spectra_collections_teams_roles
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(( self.table_id, self.team_id ), connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, team_id )` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       ( table_id, team_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(spectra_collections_teams_roles::dsl::spectra_collections_teams_roles
-            .filter(spectra_collections_teams_roles::dsl::table_id.eq(table_id))
-            .filter(spectra_collections_teams_roles::dsl::team_id.eq(team_id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -5570,36 +5540,10 @@ impl SpectraCollectionsUsersRoleInvitation {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::spectra_collections_users_role_invitations;
-       spectra_collections_users_role_invitations::dsl::spectra_collections_users_role_invitations
+        spectra_collections_users_role_invitations::dsl::spectra_collections_users_role_invitations
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(( self.table_id, self.user_id ), connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       ( table_id, user_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(spectra_collections_users_role_invitations::dsl::spectra_collections_users_role_invitations
-            .filter(spectra_collections_users_role_invitations::dsl::table_id.eq(table_id))
-            .filter(spectra_collections_users_role_invitations::dsl::user_id.eq(user_id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -5667,36 +5611,10 @@ impl SpectraCollectionsUsersRoleRequest {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::spectra_collections_users_role_requests;
-       spectra_collections_users_role_requests::dsl::spectra_collections_users_role_requests
+        spectra_collections_users_role_requests::dsl::spectra_collections_users_role_requests
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(( self.table_id, self.user_id ), connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       ( table_id, user_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(spectra_collections_users_role_requests::dsl::spectra_collections_users_role_requests
-            .filter(spectra_collections_users_role_requests::dsl::table_id.eq(table_id))
-            .filter(spectra_collections_users_role_requests::dsl::user_id.eq(user_id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -5764,36 +5682,10 @@ impl SpectraCollectionsUsersRole {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::spectra_collections_users_roles;
-       spectra_collections_users_roles::dsl::spectra_collections_users_roles
+        spectra_collections_users_roles::dsl::spectra_collections_users_roles
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(( self.table_id, self.user_id ), connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       ( table_id, user_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(spectra_collections_users_roles::dsl::spectra_collections_users_roles
-            .filter(spectra_collections_users_roles::dsl::table_id.eq(table_id))
-            .filter(spectra_collections_users_roles::dsl::user_id.eq(user_id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -5861,35 +5753,10 @@ impl TeamState {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::team_states;
-       team_states::dsl::team_states
+        team_states::dsl::team_states
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(self.id, connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(team_states::dsl::team_states
-            .filter(team_states::dsl::id.eq(id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -6084,6 +5951,144 @@ impl From<web_common::database::tables::Team> for Team {
 }
 
 impl Team {
+    /// Check whether the user has a role with a role_id less than or equal to the provided role_id.
+    ///
+    /// # Arguments
+    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `role_id` - The role_id to check against.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn has_role_by_id(
+        id: i32,
+        author_user_id: i32,
+        role_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, diesel::result::Error> {
+        diesel::select(diesel::dsl::exists(teams::dsl::teams
+            .filter(teams::dsl::id.eq(id))
+           .filter(teams::dsl::created_by.eq(author_user_id))
+            .or_filter(
+               teams::dsl::id.eq(id)
+                   .and(teams::dsl::id.eq_any(
+                       teams_users_roles::table
+                           .select(teams_users_roles::dsl::table_id)
+                           .filter(teams_users_roles::dsl::user_id.eq(author_user_id)
+                           .and(teams_users_roles::dsl::role_id.le(role_id)),
+                    )),
+               )
+         )
+            ))
+         .get_result::<bool>(connection)
+    }
+    /// Check whether the user is a Viewer (role_id >= 3).
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn is_viewer(
+        &self,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, diesel::result::Error> {
+        Self::is_viewer_by_id(
+            self.id,
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user is a Viewer (role_id >= 3) for the provided primary key(s).
+    ///
+    /// # Arguments
+    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn is_viewer_by_id(
+        id: i32,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, diesel::result::Error> {
+        Self::has_role_by_id(
+            id,
+            author_user_id,
+            3,
+            connection,
+        )
+    }
+    /// Check whether the user is an Editor (role_id >= 2).
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn is_editor(
+        &self,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, diesel::result::Error> {
+        Self::is_editor_by_id(
+            self.id,
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user is an Editor (role_id >= 2).
+    ///
+    /// # Arguments
+    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn is_editor_by_id(
+        id: i32,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, diesel::result::Error> {
+        Self::has_role_by_id(
+            id,
+            author_user_id,
+            2,
+            connection,
+        )
+    }
+    /// Check whether the user is an Admin (role_id == 1).
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn is_admin(
+        &self,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, diesel::result::Error> {
+        Self::is_admin_by_id(
+            self.id,
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user is an Admin (role_id == 1).
+    ///
+    /// # Arguments
+    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn is_admin_by_id(
+        id: i32,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, diesel::result::Error> {
+        Self::has_role_by_id(
+            id,
+            author_user_id,
+            1,
+            connection,
+        )
+    }
     /// Get all of the structs from the database.
     ///
     /// # Arguments
@@ -6097,7 +6102,36 @@ impl Team {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::teams;
-       teams::dsl::teams
+        teams::dsl::teams
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the editable structs from the database.
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_editables(
+        author_user_id: i32,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::teams;
+        teams::dsl::teams
+           .filter(teams::dsl::created_by.eq(author_user_id))
+            .or_filter(
+               teams::dsl::id.eq_any(
+                   teams_users_roles::table
+                       .select(teams_users_roles::dsl::table_id)
+                       .filter(teams_users_roles::dsl::user_id.eq(author_user_id)
+                       .and(teams_users_roles::dsl::role_id.le(2)),
+               )),
+            )
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -6124,24 +6158,31 @@ impl Team {
     /// Delete the struct from the database.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
     /// * `connection` - The connection to the database.
     ///
     pub fn delete(
         &self,
+        author_user_id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(self.id, connection)
+        Self::delete_by_id(self.id, author_user_id, connection)
     }
     /// Delete the struct from the database by its ID.
     ///
     /// # Arguments
     /// * `id` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
     /// * `connection` - The connection to the database.
     ///
     pub fn delete_by_id(
        id: i32,
+        author_user_id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<usize, diesel::result::Error> {
+        if !Self::is_admin_by_id(id, author_user_id, connection)? {
+            return Err(diesel::result::Error::NotFound);
+        }
         diesel::delete(teams::dsl::teams
             .filter(teams::dsl::id.eq(id))
         ).execute(connection)
@@ -6205,6 +6246,47 @@ impl Team {
             .bind::<diesel::sql_types::Integer, _>(limit)
             .load(connection)
 }
+    /// Search for the editable struct by a given string by Postgres's `similarity`.
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_editables(
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_editables(author_user_id, Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, name, description, parent_team_id, created_by, created_at, updated_by, updated_at FROM teams ",
+            "WHERE $1 % f_concat_teams_name_description(name, description) ",
+            "AND teams.created_by = $3 ",
+            "OR teams.id IN ",
+            "(SELECT teams_users_roles.table FROM teams_users_roles ",
+            "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2) ",
+            "OR teams.id IN ",
+            "(SELECT teams_teams_roles.table_id FROM teams_teams_roles ",
+            "WHERE teams_teams_roles.role_id <= 2 AND teams_teams_roles.table_id IN ",
+            "(SELECT teams_users_roles.table_id FROM teams_users_roles ",
+            "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2)) ",
+            "ORDER BY similarity($1, f_concat_teams_name_description(name, description)) DESC LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Integer, _>(author_user_id)
+            .load(connection)
+}
     /// Search for the struct by a given string by Postgres's `word_similarity`.
     ///
     /// # Arguments
@@ -6234,6 +6316,47 @@ impl Team {
             .bind::<diesel::sql_types::Integer, _>(limit)
             .load(connection)
 }
+    /// Search for the editable struct by a given string by Postgres's `word_similarity`.
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_editables(
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_editables(author_user_id, Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, name, description, parent_team_id, created_by, created_at, updated_by, updated_at FROM teams ",
+            "WHERE $1 <% f_concat_teams_name_description(name, description) ",
+            "AND teams.created_by = $3 ",
+            "OR teams.id IN ",
+            "(SELECT teams_users_roles.table FROM teams_users_roles ",
+            "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2) ",
+            "OR teams.id IN ",
+            "(SELECT teams_teams_roles.table_id FROM teams_teams_roles ",
+            "WHERE teams_teams_roles.role_id <= 2 AND teams_teams_roles.table_id IN ",
+            "(SELECT teams_users_roles.table_id FROM teams_users_roles ",
+            "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2)) ",
+            "ORDER BY word_similarity($1, f_concat_teams_name_description(name, description)) DESC LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Integer, _>(author_user_id)
+            .load(connection)
+}
     /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
     ///
     /// # Arguments
@@ -6261,6 +6384,47 @@ impl Team {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the editable struct by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_editables(
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_editables(author_user_id, Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, name, description, parent_team_id, created_by, created_at, updated_by, updated_at FROM teams ",
+            "WHERE $1 <<% f_concat_teams_name_description(name, description) ",
+            "AND teams.created_by = $3 ",
+            "OR teams.id IN ",
+            "(SELECT teams_users_roles.table FROM teams_users_roles ",
+            "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2) ",
+            "OR teams.id IN ",
+            "(SELECT teams_teams_roles.table_id FROM teams_teams_roles ",
+            "WHERE teams_teams_roles.role_id <= 2 AND teams_teams_roles.table_id IN ",
+            "(SELECT teams_users_roles.table_id FROM teams_users_roles ",
+            "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2)) ",
+            "ORDER BY strict_word_similarity($1, f_concat_teams_name_description(name, description)) DESC LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Integer, _>(author_user_id)
             .load(connection)
 }
 }
@@ -6313,36 +6477,10 @@ impl TeamsTeamsRoleInvitation {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::teams_teams_role_invitations;
-       teams_teams_role_invitations::dsl::teams_teams_role_invitations
+        teams_teams_role_invitations::dsl::teams_teams_role_invitations
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(( self.table_id, self.team_id ), connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, team_id )` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       ( table_id, team_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(teams_teams_role_invitations::dsl::teams_teams_role_invitations
-            .filter(teams_teams_role_invitations::dsl::table_id.eq(table_id))
-            .filter(teams_teams_role_invitations::dsl::team_id.eq(team_id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -6410,36 +6548,10 @@ impl TeamsUsersRoleInvitation {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::teams_users_role_invitations;
-       teams_users_role_invitations::dsl::teams_users_role_invitations
+        teams_users_role_invitations::dsl::teams_users_role_invitations
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(( self.table_id, self.user_id ), connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       ( table_id, user_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(teams_users_role_invitations::dsl::teams_users_role_invitations
-            .filter(teams_users_role_invitations::dsl::table_id.eq(table_id))
-            .filter(teams_users_role_invitations::dsl::user_id.eq(user_id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -6507,36 +6619,10 @@ impl TeamsUsersRoleRequest {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::teams_users_role_requests;
-       teams_users_role_requests::dsl::teams_users_role_requests
+        teams_users_role_requests::dsl::teams_users_role_requests
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(( self.table_id, self.user_id ), connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       ( table_id, user_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(teams_users_role_requests::dsl::teams_users_role_requests
-            .filter(teams_users_role_requests::dsl::table_id.eq(table_id))
-            .filter(teams_users_role_requests::dsl::user_id.eq(user_id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -6604,36 +6690,10 @@ impl TeamsUsersRole {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::teams_users_roles;
-       teams_users_roles::dsl::teams_users_roles
+        teams_users_roles::dsl::teams_users_roles
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(( self.table_id, self.user_id ), connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       ( table_id, user_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(teams_users_roles::dsl::teams_users_roles
-            .filter(teams_users_roles::dsl::table_id.eq(table_id))
-            .filter(teams_users_roles::dsl::user_id.eq(user_id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -6698,35 +6758,10 @@ impl Unit {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::units;
-       units::dsl::units
+        units::dsl::units
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(self.id, connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(units::dsl::units
-            .filter(units::dsl::id.eq(id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -6898,35 +6933,10 @@ impl UserEmail {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::user_emails;
-       user_emails::dsl::user_emails
+        user_emails::dsl::user_emails
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(self.id, connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(user_emails::dsl::user_emails
-            .filter(user_emails::dsl::id.eq(id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -7017,7 +7027,7 @@ impl User {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::users;
-       users::dsl::users
+        users::dsl::users
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -7040,31 +7050,6 @@ impl User {
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(self.id, connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(users::dsl::users
-            .filter(users::dsl::id.eq(id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -7218,36 +7203,10 @@ impl UsersUsersRoleInvitation {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::users_users_role_invitations;
-       users_users_role_invitations::dsl::users_users_role_invitations
+        users_users_role_invitations::dsl::users_users_role_invitations
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(( self.table_id, self.user_id ), connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       ( table_id, user_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::table_id.eq(table_id))
-            .filter(users_users_role_invitations::dsl::user_id.eq(user_id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -7315,36 +7274,10 @@ impl UsersUsersRoleRequest {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::users_users_role_requests;
-       users_users_role_requests::dsl::users_users_role_requests
+        users_users_role_requests::dsl::users_users_role_requests
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(( self.table_id, self.user_id ), connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       ( table_id, user_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(users_users_role_requests::dsl::users_users_role_requests
-            .filter(users_users_role_requests::dsl::table_id.eq(table_id))
-            .filter(users_users_role_requests::dsl::user_id.eq(user_id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -7412,36 +7345,10 @@ impl UsersUsersRole {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::users_users_roles;
-       users_users_roles::dsl::users_users_roles
+        users_users_roles::dsl::users_users_roles
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(( self.table_id, self.user_id ), connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       ( table_id, user_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        diesel::delete(users_users_roles::dsl::users_users_roles
-            .filter(users_users_roles::dsl::table_id.eq(table_id))
-            .filter(users_users_roles::dsl::user_id.eq(user_id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///

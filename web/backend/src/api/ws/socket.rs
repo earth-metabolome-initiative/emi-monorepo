@@ -270,6 +270,35 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                         }
                                     }
                                 }
+                                web_common::database::Select::SearchEditableTable { table_name, query, number_of_results } => {
+                                    let table: web_common::database::Table =
+                                        match table_name.as_str().try_into() {
+                                            Ok(table) => table,
+                                            Err(err) => {
+                                                ctx.address().do_send(BackendMessage::Error(
+                                                    task_id,
+                                                    ApiError::BadRequest(vec![err.to_string()]),
+                                                ));
+                                                return;
+                                            }
+                                        };
+                                    match table.strict_word_similarity_search_editables(
+                                        self.user().map(|user| user.id).unwrap(),
+                                        &query,
+                                        Some(number_of_results as i32),
+                                        &mut self.diesel_connection,
+                                    ) {
+                                        Ok(records) => {
+                                            ctx.address().do_send(BackendMessage::SearchTable(
+                                                task_id, records,
+                                            ));
+                                        }
+                                        Err(err) => {
+                                            ctx.address()
+                                                .do_send(BackendMessage::Error(task_id, err));
+                                        }
+                                    }
+                                }
                                 web_common::database::Select::Id {
                                     table_name,
                                     operation_name,
@@ -406,6 +435,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                 match <Table as DeletableTable>::delete(
                                     &table,
                                     primary_key,
+                                    self.user().map(|user| user.id).unwrap(),
                                     &mut self.diesel_connection,
                                 ) {
                                     Ok(_) => {

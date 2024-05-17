@@ -1,4 +1,3 @@
--- This is a no-op SQL statement
 CREATE TABLE IF NOT EXISTS roles (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL UNIQUE,

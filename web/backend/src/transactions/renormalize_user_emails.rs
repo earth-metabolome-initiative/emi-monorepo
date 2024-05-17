@@ -28,7 +28,6 @@ use crate::models::*;
 use crate::transactions::create_user::create_user;
 use crate::new_variants::InsertRow;
 use web_common::api::ApiError;
-use web_common::database::NewUser;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
 use diesel::sql_query;
