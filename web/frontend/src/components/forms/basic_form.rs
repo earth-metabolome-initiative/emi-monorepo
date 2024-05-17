@@ -88,6 +88,18 @@ pub trait FormBuildable:
 }
 
 #[derive(Clone, PartialEq, Properties)]
+pub struct InnerBasicFormProp<Data>
+where
+    Data: FormBuildable,
+{
+    pub builder: Data::Builder,
+    pub builder_dispatch: Dispatch<Data::Builder>,
+    pub children: Html,
+    pub method: FormMethod,
+    pub navigator: yew_router::navigator::Navigator,
+}
+
+#[derive(Clone, PartialEq, Properties)]
 pub struct BasicFormProp<Data>
 where
     Data: FormBuildable,
@@ -96,8 +108,6 @@ where
     pub builder_dispatch: Dispatch<Data::Builder>,
     pub children: Html,
     pub method: FormMethod,
-    #[prop_or_default]
-    pub navigator: Option<yew_router::navigator::Navigator>,
 }
 
 pub struct InnerBasicForm<Data> {
@@ -121,7 +131,7 @@ where
     Data: FormBuildable,
 {
     type Message = FormMessage;
-    type Properties = BasicFormProp<Data>;
+    type Properties = InnerBasicFormProp<Data>;
 
     fn create(ctx: &Context<Self>) -> Self {
         let user_dispatch =
@@ -151,6 +161,13 @@ where
                 self.waiting_for_reply = false;
                 true
             }
+            FormMessage::Backend(WebsocketMessage::CanView(status)) | FormMessage::Backend(WebsocketMessage::CanUpdate(status)) | FormMessage::Backend(WebsocketMessage::CanDelete(status)) => {
+                if !status {
+                    log::info!("User does not have permission to view the form, redirecting to home page.");
+                    ctx.props().navigator.push(&AppRoute::Home);
+                }
+                false
+            }
             FormMessage::Backend(WebsocketMessage::GetTable(operation_name, row)) => {
                 if let Some(operation_name) = operation_name {
                     log::info!(
@@ -173,6 +190,7 @@ where
                     .into_iter()
                     .for_each(|message| self.websocket.send(message))
                 }
+                
                 true
             }
             FormMessage::Backend(WebsocketMessage::Completed) => {
@@ -217,16 +235,26 @@ where
             // data that we are editing.
             if let Some(id) = ctx.props().builder.id() {
                 self.websocket.send(ComponentMessage::get::<Data>(id));
+                match ctx.props().method {
+                    FormMethod::POST => {}
+                    FormMethod::GET => {
+                        self.websocket.send(ComponentMessage::can_view::<Data>(id));
+                    }
+                    FormMethod::PUT => {
+                        self.websocket.send(ComponentMessage::can_update::<Data>(id));
+                    }
+                    FormMethod::DELETE => {
+                        self.websocket.send(ComponentMessage::can_delete::<Data>(id));
+                    }
+                }
             }
         }
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         if Data::requires_authentication() && !self.user_state.has_user() {
-            if let Some(navigator) = ctx.props().navigator.as_ref() {
-                log::info!("No access token found, redirecting to login page.");
-                navigator.push(&AppRoute::Login);
-            }
+            log::info!("No access token found, redirecting to login page.");
+            ctx.props().navigator.push(&AppRoute::Login);
         }
 
         let on_submit = {

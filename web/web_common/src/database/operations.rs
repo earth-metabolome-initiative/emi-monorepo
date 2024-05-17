@@ -1,24 +1,8 @@
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use super::roles::Role;
 use super::selects::Select;
 
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
-pub enum Authorization {
-    Editable(Uuid, Vec<Role>),
-    LoggedUser,
-}
-
-impl Authorization {
-    pub fn new(id: Uuid, roles: Vec<Role>) -> Self {
-        Self::Editable(id, roles)
-    }
-
-    pub fn logged_user() -> Self {
-        Self::LoggedUser
-    }
-}
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, Copy)]
 pub enum PrimaryKey {
@@ -164,18 +148,7 @@ pub enum Operation {
 }
 
 impl Operation {
-    pub fn authorizations(&self) -> Vec<Authorization> {
-        // match self {
-        //     Operation::Select(select) => select.authorizations(),
-        //     Operation::Delete(id, _table) => {
-        //         vec![Authorization::new(*id, vec![Role::Admin, Role::Creator])]
-        //     }
-        //     Operation::Update(update) => update.authorizations(),
-        //     Operation::Insert(insert) => insert.authorizations(),
-        // }
-        // TODO!
-        vec![]
-    }
+   
 
     /// Returns whether the current operation is an insert.
     pub fn is_insert(&self) -> bool {
@@ -202,14 +175,10 @@ impl Operation {
     }
 
     pub fn requires_authentication(&self) -> bool {
-        if self.is_insert() || self.is_delete() || self.is_update() {
-            return true;
+        match self {
+            Operation::Select(select) => select.requires_authentication(),
+            _ => true,
         }
-
-        self.authorizations().iter().any(|auth| match auth {
-            Authorization::LoggedUser => true,
-            Authorization::Editable(_, roles) => !roles.contains(&Role::Anonymous),
-        })
     }
 }
 
@@ -255,8 +224,7 @@ impl Task {
             return true;
         }
         let elapsed = chrono::Utc::now() - self.start;
-        let retry_time = (2u32.pow(self.attempts as u32) * 20).max(60*10);
+        let retry_time = (2u32.pow(self.attempts as u32) * 20).max(60 * 10);
         elapsed.num_seconds() > retry_time as i64
     }
 }
-

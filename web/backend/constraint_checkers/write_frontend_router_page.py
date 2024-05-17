@@ -2,7 +2,6 @@
 
 from typing import List
 from constraint_checkers.struct_metadata import StructMetadata
-from constraint_checkers.find_foreign_keys import find_foreign_keys
 
 
 def write_frontend_sidebar(builders: List[StructMetadata]):
@@ -138,7 +137,6 @@ def write_frontend_router_page(builders: List[StructMetadata]):
     * The component providing the left-side sidebar content.
     """
 
-    tables = find_foreign_keys()
     document = open("../frontend/src/router.rs", "w", encoding="utf-8")
 
     # Preliminarly, we write out a comment that warns the
@@ -156,6 +154,7 @@ def write_frontend_router_page(builders: List[StructMetadata]):
         "use crate::pages::*;",
         "use uuid::Uuid;",
         "use crate::components::BasicPages;",
+        "use crate::components::BasicPage;",
         "use web_common::database::*;",
         "use crate::components::forms::automatic_forms::*;",
     ]
@@ -233,8 +232,7 @@ def write_frontend_router_page(builders: List[StructMetadata]):
             f"            html! {{ <BasicPages<{richest_variant.name}> /> }}\n"
             f"        }}\n"
             f"        AppRoute::{builder.get_capitalized_table_name()}View{{{flat_variant.get_formatted_primary_keys(include_prefix=False)}}} => {{\n"
-            f'             html! {{ <span>{{format!("Specific {builder.human_readable_name()} page with primary key {{:?}}", {flat_variant.get_formatted_primary_keys(include_prefix=False)})}}</span> }}\n'
-            # f"            html! {{ <{builder.get_capitalized_table_name()}View {primary_key.name}={primary_key.name} /> }}\n"
+            f"            html! {{ <BasicPage<{richest_variant.name}> id={{PrimaryKey::from({flat_variant.get_formatted_primary_keys(include_prefix=False)})}} /> }}\n"
             f"        }}\n"
         )
 

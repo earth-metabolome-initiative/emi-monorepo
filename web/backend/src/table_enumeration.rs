@@ -561,8 +561,204 @@ impl IdentifiableTable for web_common::database::Table {
         })
     }
 }
-/// Trait providing the delete method for the Table enum.
+/// Trait providing the can_view method for the Table enum.
+pub trait ViewableTable {
+    /// Check whether the user can view the row.
+    ///
+    /// # Arguments
+    /// * `primary_key` - The primary key of the row.
+    /// * `user_id` - The user ID of the user performing the operation.
+    /// * `connection` - The database connection.
+    ///
+    /// # Returns
+    /// A boolean indicating whether the user can view the row.
+    fn can_view(
+         &self,
+         primary_key: web_common::database::operations::PrimaryKey,
+         user_id: Option<i32>,
+         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+) -> Result<bool, web_common::api::ApiError>;
+}
+
+impl ViewableTable for web_common::database::Table {
+
+    fn can_view(
+        &self,
+        primary_key: web_common::database::operations::PrimaryKey,
+        user_id: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, web_common::api::ApiError> {
+        Ok(match self {
+            web_common::database::Table::BioOttRanks => true,
+            web_common::database::Table::BioOttTaxonItems => true,
+            web_common::database::Table::Colors => true,
+            web_common::database::Table::Countries => true,
+            web_common::database::Table::DerivedSamples => true,
+            web_common::database::Table::DocumentFormats => true,
+            web_common::database::Table::FontAwesomeIcons => true,
+            web_common::database::Table::LoginProviders => true,
+            web_common::database::Table::Notifications => true,
+            web_common::database::Table::Organizations => true,
+            web_common::database::Table::ProjectStates => true,
+            web_common::database::Table::Projects => {
+                Project::get(primary_key.into(), connection)?.public ||
+                user_id.map_or(Ok(false), |user_id| Project::is_viewer_by_id(primary_key.into(), user_id, connection))?
+            },
+            web_common::database::Table::ProjectsTeamsRoleInvitations => true,
+            web_common::database::Table::ProjectsTeamsRoleRequests => true,
+            web_common::database::Table::ProjectsTeamsRoles => true,
+            web_common::database::Table::ProjectsUsersRoleInvitations => true,
+            web_common::database::Table::ProjectsUsersRoleRequests => true,
+            web_common::database::Table::ProjectsUsersRoles => true,
+            web_common::database::Table::Roles => true,
+            web_common::database::Table::SampleBioOttTaxonItems => true,
+            web_common::database::Table::SampleStates => true,
+            web_common::database::Table::SampledIndividualBioOttTaxonItems => true,
+            web_common::database::Table::SampledIndividuals => true,
+            web_common::database::Table::SampledIndividualsTeamsRoleInvitations => true,
+            web_common::database::Table::SampledIndividualsTeamsRoleRequests => true,
+            web_common::database::Table::SampledIndividualsTeamsRoles => true,
+            web_common::database::Table::SampledIndividualsUsersRoleInvitations => true,
+            web_common::database::Table::SampledIndividualsUsersRoleRequests => true,
+            web_common::database::Table::SampledIndividualsUsersRoles => true,
+            web_common::database::Table::Samples => true,
+            web_common::database::Table::SamplesTeamsRoleInvitations => true,
+            web_common::database::Table::SamplesTeamsRoleRequests => true,
+            web_common::database::Table::SamplesTeamsRoles => true,
+            web_common::database::Table::SamplesUsersRoleInvitations => true,
+            web_common::database::Table::SamplesUsersRoleRequests => true,
+            web_common::database::Table::SamplesUsersRoles => true,
+            web_common::database::Table::Spectra => true,
+            web_common::database::Table::SpectraCollections => true,
+            web_common::database::Table::SpectraCollectionsTeamsRoleInvitations => true,
+            web_common::database::Table::SpectraCollectionsTeamsRoleRequests => true,
+            web_common::database::Table::SpectraCollectionsTeamsRoles => true,
+            web_common::database::Table::SpectraCollectionsUsersRoleInvitations => true,
+            web_common::database::Table::SpectraCollectionsUsersRoleRequests => true,
+            web_common::database::Table::SpectraCollectionsUsersRoles => true,
+            web_common::database::Table::TeamStates => true,
+            web_common::database::Table::Teams => true,
+            web_common::database::Table::TeamsTeamsRoleInvitations => true,
+            web_common::database::Table::TeamsUsersRoleInvitations => true,
+            web_common::database::Table::TeamsUsersRoleRequests => true,
+            web_common::database::Table::TeamsUsersRoles => true,
+            web_common::database::Table::Units => true,
+            web_common::database::Table::UserEmails => true,
+            web_common::database::Table::Users => true,
+            web_common::database::Table::UsersUsersRoleInvitations => true,
+            web_common::database::Table::UsersUsersRoleRequests => true,
+            web_common::database::Table::UsersUsersRoles => true,
+        })
+    }
+}
+/// Trait providing the can_update method for the Table enum.
+pub trait EditableTable {
+    /// Check whether the user can edit the row.
+    ///
+    /// # Arguments
+    /// * `primary_key` - The primary key of the row.
+    /// * `user_id` - The user ID of the user performing the operation.
+    /// * `connection` - The database connection.
+    ///
+    /// # Returns
+    /// A boolean indicating whether the user can edit the row.
+    fn can_update(
+         &self,
+         primary_key: web_common::database::operations::PrimaryKey,
+         user_id: i32,
+         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+) -> Result<bool, web_common::api::ApiError>;
+}
+
+impl EditableTable for web_common::database::Table {
+
+    fn can_update(
+        &self,
+        primary_key: web_common::database::operations::PrimaryKey,
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, web_common::api::ApiError> {
+        Ok(match self {
+            web_common::database::Table::BioOttRanks => false,
+            web_common::database::Table::BioOttTaxonItems => false,
+            web_common::database::Table::Colors => false,
+            web_common::database::Table::Countries => false,
+            web_common::database::Table::DerivedSamples => false,
+            web_common::database::Table::DocumentFormats => false,
+            web_common::database::Table::FontAwesomeIcons => false,
+            web_common::database::Table::LoginProviders => false,
+            web_common::database::Table::Notifications => false,
+            web_common::database::Table::Organizations => false,
+            web_common::database::Table::ProjectStates => false,
+            web_common::database::Table::Projects => Project::is_editor_by_id(primary_key.into(), user_id, connection)?,
+            web_common::database::Table::ProjectsTeamsRoleInvitations => false,
+            web_common::database::Table::ProjectsTeamsRoleRequests => false,
+            web_common::database::Table::ProjectsTeamsRoles => false,
+            web_common::database::Table::ProjectsUsersRoleInvitations => false,
+            web_common::database::Table::ProjectsUsersRoleRequests => false,
+            web_common::database::Table::ProjectsUsersRoles => false,
+            web_common::database::Table::Roles => false,
+            web_common::database::Table::SampleBioOttTaxonItems => false,
+            web_common::database::Table::SampleStates => false,
+            web_common::database::Table::SampledIndividualBioOttTaxonItems => false,
+            web_common::database::Table::SampledIndividuals => SampledIndividual::is_editor_by_id(primary_key.into(), user_id, connection)?,
+            web_common::database::Table::SampledIndividualsTeamsRoleInvitations => false,
+            web_common::database::Table::SampledIndividualsTeamsRoleRequests => false,
+            web_common::database::Table::SampledIndividualsTeamsRoles => false,
+            web_common::database::Table::SampledIndividualsUsersRoleInvitations => false,
+            web_common::database::Table::SampledIndividualsUsersRoleRequests => false,
+            web_common::database::Table::SampledIndividualsUsersRoles => false,
+            web_common::database::Table::Samples => Sample::is_editor_by_id(primary_key.into(), user_id, connection)?,
+            web_common::database::Table::SamplesTeamsRoleInvitations => false,
+            web_common::database::Table::SamplesTeamsRoleRequests => false,
+            web_common::database::Table::SamplesTeamsRoles => false,
+            web_common::database::Table::SamplesUsersRoleInvitations => false,
+            web_common::database::Table::SamplesUsersRoleRequests => false,
+            web_common::database::Table::SamplesUsersRoles => false,
+            web_common::database::Table::Spectra => false,
+            web_common::database::Table::SpectraCollections => SpectraCollection::is_editor_by_id(primary_key.into(), user_id, connection)?,
+            web_common::database::Table::SpectraCollectionsTeamsRoleInvitations => false,
+            web_common::database::Table::SpectraCollectionsTeamsRoleRequests => false,
+            web_common::database::Table::SpectraCollectionsTeamsRoles => false,
+            web_common::database::Table::SpectraCollectionsUsersRoleInvitations => false,
+            web_common::database::Table::SpectraCollectionsUsersRoleRequests => false,
+            web_common::database::Table::SpectraCollectionsUsersRoles => false,
+            web_common::database::Table::TeamStates => false,
+            web_common::database::Table::Teams => Team::is_editor_by_id(primary_key.into(), user_id, connection)?,
+            web_common::database::Table::TeamsTeamsRoleInvitations => false,
+            web_common::database::Table::TeamsUsersRoleInvitations => false,
+            web_common::database::Table::TeamsUsersRoleRequests => false,
+            web_common::database::Table::TeamsUsersRoles => false,
+            web_common::database::Table::Units => false,
+            web_common::database::Table::UserEmails => false,
+            web_common::database::Table::Users => {
+                let primary_key: i32 = primary_key.into();
+                primary_key == user_id
+            },
+            web_common::database::Table::UsersUsersRoleInvitations => false,
+            web_common::database::Table::UsersUsersRoleRequests => false,
+            web_common::database::Table::UsersUsersRoles => false,
+        })
+    }
+}
+/// Trait providing the can_delete method for the Table enum.
 pub trait DeletableTable {
+    /// Check whether the user can delete the row.
+    ///
+    /// # Arguments
+    /// * `primary_key` - The primary key of the row.
+    /// * `user_id` - The user ID of the user performing the operation.
+    /// * `connection` - The database connection.
+    ///
+    /// # Returns
+    /// A boolean indicating whether the user can delete the row.
+    fn can_delete(
+         &self,
+         primary_key: web_common::database::operations::PrimaryKey,
+         user_id: i32,
+         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+) -> Result<bool, web_common::api::ApiError>;
+
     /// Delete the row from the table by the primary key.
     ///
     /// # Arguments
@@ -582,12 +778,80 @@ pub trait DeletableTable {
 
 impl DeletableTable for web_common::database::Table {
 
+    fn can_delete(
+        &self,
+        primary_key: web_common::database::operations::PrimaryKey,
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<bool, web_common::api::ApiError> {
+        Ok(match self {
+            web_common::database::Table::BioOttRanks => false,
+            web_common::database::Table::BioOttTaxonItems => false,
+            web_common::database::Table::Colors => false,
+            web_common::database::Table::Countries => false,
+            web_common::database::Table::DerivedSamples => false,
+            web_common::database::Table::DocumentFormats => false,
+            web_common::database::Table::FontAwesomeIcons => false,
+            web_common::database::Table::LoginProviders => false,
+            web_common::database::Table::Notifications => false,
+            web_common::database::Table::Organizations => false,
+            web_common::database::Table::ProjectStates => false,
+            web_common::database::Table::Projects => Project::is_admin_by_id(primary_key.into(), user_id, connection)?,
+            web_common::database::Table::ProjectsTeamsRoleInvitations => false,
+            web_common::database::Table::ProjectsTeamsRoleRequests => false,
+            web_common::database::Table::ProjectsTeamsRoles => false,
+            web_common::database::Table::ProjectsUsersRoleInvitations => false,
+            web_common::database::Table::ProjectsUsersRoleRequests => false,
+            web_common::database::Table::ProjectsUsersRoles => false,
+            web_common::database::Table::Roles => false,
+            web_common::database::Table::SampleBioOttTaxonItems => false,
+            web_common::database::Table::SampleStates => false,
+            web_common::database::Table::SampledIndividualBioOttTaxonItems => false,
+            web_common::database::Table::SampledIndividuals => SampledIndividual::is_admin_by_id(primary_key.into(), user_id, connection)?,
+            web_common::database::Table::SampledIndividualsTeamsRoleInvitations => false,
+            web_common::database::Table::SampledIndividualsTeamsRoleRequests => false,
+            web_common::database::Table::SampledIndividualsTeamsRoles => false,
+            web_common::database::Table::SampledIndividualsUsersRoleInvitations => false,
+            web_common::database::Table::SampledIndividualsUsersRoleRequests => false,
+            web_common::database::Table::SampledIndividualsUsersRoles => false,
+            web_common::database::Table::Samples => Sample::is_admin_by_id(primary_key.into(), user_id, connection)?,
+            web_common::database::Table::SamplesTeamsRoleInvitations => false,
+            web_common::database::Table::SamplesTeamsRoleRequests => false,
+            web_common::database::Table::SamplesTeamsRoles => false,
+            web_common::database::Table::SamplesUsersRoleInvitations => false,
+            web_common::database::Table::SamplesUsersRoleRequests => false,
+            web_common::database::Table::SamplesUsersRoles => false,
+            web_common::database::Table::Spectra => false,
+            web_common::database::Table::SpectraCollections => SpectraCollection::is_admin_by_id(primary_key.into(), user_id, connection)?,
+            web_common::database::Table::SpectraCollectionsTeamsRoleInvitations => false,
+            web_common::database::Table::SpectraCollectionsTeamsRoleRequests => false,
+            web_common::database::Table::SpectraCollectionsTeamsRoles => false,
+            web_common::database::Table::SpectraCollectionsUsersRoleInvitations => false,
+            web_common::database::Table::SpectraCollectionsUsersRoleRequests => false,
+            web_common::database::Table::SpectraCollectionsUsersRoles => false,
+            web_common::database::Table::TeamStates => false,
+            web_common::database::Table::Teams => Team::is_admin_by_id(primary_key.into(), user_id, connection)?,
+            web_common::database::Table::TeamsTeamsRoleInvitations => false,
+            web_common::database::Table::TeamsUsersRoleInvitations => false,
+            web_common::database::Table::TeamsUsersRoleRequests => false,
+            web_common::database::Table::TeamsUsersRoles => false,
+            web_common::database::Table::Units => false,
+            web_common::database::Table::UserEmails => false,
+            web_common::database::Table::Users => false,
+            web_common::database::Table::UsersUsersRoleInvitations => false,
+            web_common::database::Table::UsersUsersRoleRequests => false,
+            web_common::database::Table::UsersUsersRoles => false,
+        })
+    }
     fn delete(
         &self,
         primary_key: web_common::database::operations::PrimaryKey,
         author_user_id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<usize, web_common::api::ApiError> {
+        if !self.can_delete(primary_key, author_user_id, connection)? {
+            return Err(web_common::api::ApiError::unauthorized());
+        }
         Ok(match self {
             web_common::database::Table::BioOttRanks => unimplemented!("Delete not implemented for bio_ott_ranks."),
             web_common::database::Table::BioOttTaxonItems => unimplemented!("Delete not implemented for bio_ott_taxon_items."),

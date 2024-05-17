@@ -655,6 +655,16 @@ class StructMetadata:
         """Returns whether there is a roles table associated with the struct."""
         return self.table_metadata.has_associated_roles(self.table_name)
 
+    def has_public_column(self) -> bool:
+        """Returns whether the struct has a public column."""
+        if self._flat_variant is not None:
+            return self._flat_variant.has_public_column()
+
+        return any(
+            attribute.data_type() == "bool" and attribute.name == "public"
+            for attribute in self.attributes
+        )
+
     def get_unique_constraints(self) -> List[List[AttributeMetadata]]:
         """Returns the unique constraints of the struct.
 

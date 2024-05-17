@@ -88,6 +88,18 @@ impl ComponentMessage {
             primary_key,
         )))
     }
+
+    pub(crate) fn can_view<R: Tabular>(primary_key: PrimaryKey) -> Self {
+        Self::Operation(Operation::Select(Select::can_view(R::TABLE, primary_key)))
+    }
+
+    pub(crate) fn can_update<R: Tabular>(primary_key: PrimaryKey) -> Self {
+        Self::Operation(Operation::Select(Select::can_update(R::TABLE, primary_key)))
+    }
+
+    pub(crate) fn can_delete<R: Tabular>(primary_key: PrimaryKey) -> Self {
+        Self::Operation(Operation::Select(Select::can_delete(R::TABLE, primary_key)))
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -97,6 +109,9 @@ pub enum WebsocketMessage {
     SearchTable(Vec<Vec<u8>>),
     GetTable(Option<String>, Vec<u8>),
     AllTable(Vec<Vec<u8>>),
+    CanView(bool),
+    CanUpdate(bool),
+    CanDelete(bool),
     Completed,
     Error(ApiError),
     RefreshUser(User),
@@ -214,15 +229,22 @@ impl WebsocketWorker {
                             Select::SearchEditableTable { table_name, query, number_of_results } => {
                                 let table: Table = table_name.try_into().unwrap();
 
-                                // Since GlueSQL does not support search queries, and we do not expect for the
-                                // frontend side to ever need to search a very large table, we always return all
-                                // of the rows in the table and then we let the datalist UI component handle the
-                                // search directly. Still, just in case something unexpected happens, we limit the
-                                // number of rows returned to 1_000.
-                                match table.all(Some(1_000), None, &mut database).await {
-                                    Ok(rows) => BackendMessage::SearchTable(task_id, rows),
-                                    Err(err) => BackendMessage::Error(task_id, err),
-                                }
+                                todo!()
+                            }
+                            Select::CanView { table_name, primary_key } => {
+                                let table: Table = table_name.try_into().unwrap();
+
+                                todo!()
+                            }
+                            Select::CanUpdate { table_name, primary_key } => {
+                                let table: Table = table_name.try_into().unwrap();
+
+                                todo!()
+                            }
+                            Select::CanDelete { table_name, primary_key } => {
+                                let table: Table = table_name.try_into().unwrap();
+
+                                todo!()
                             }
                         }
                     }
@@ -332,6 +354,24 @@ impl Worker for WebsocketWorker {
             InternalMessage::Backend(backend_message) => {
                 log::debug!("Received message from backend: {:?}", backend_message);
                 match backend_message {
+                    BackendMessage::CanView(task_id, can_view) => {
+                        // We can remove this task from the queue.
+                        if let Some(subscriber_id) = self.tasks.remove(&task_id) {
+                            scope.respond(subscriber_id, WebsocketMessage::CanView(can_view));
+                        }
+                    }
+                    BackendMessage::CanUpdate(task_id, can_update) => {
+                        // We can remove this task from the queue.
+                        if let Some(subscriber_id) = self.tasks.remove(&task_id) {
+                            scope.respond(subscriber_id, WebsocketMessage::CanUpdate(can_update));
+                        }
+                    }
+                    BackendMessage::CanDelete(task_id, can_delete) => {
+                        // We can remove this task from the queue.
+                        if let Some(subscriber_id) = self.tasks.remove(&task_id) {
+                            scope.respond(subscriber_id, WebsocketMessage::CanDelete(can_delete));
+                        }
+                    }
                     BackendMessage::Notification(notification) => {
                         // TODO! HANDLE UPDATE OF THE DATABASE!
                         log::debug!("Notification received: {:?}", notification);

@@ -6,6 +6,7 @@ use yew_router::prelude::*;
 use crate::pages::*;
 use uuid::Uuid;
 use crate::components::BasicPages;
+use crate::components::BasicPage;
 use web_common::database::*;
 use crate::components::forms::automatic_forms::*;
 
@@ -71,7 +72,7 @@ pub fn switch(route: AppRoute) -> Html {
             html! { <BasicPages<NestedProject> /> }
         }
         AppRoute::ProjectsView{id} => {
-             html! { <span>{format!("Specific Project page with primary key {:?}", id)}</span> }
+            html! { <BasicPage<NestedProject> id={PrimaryKey::from(id)} /> }
         }
         AppRoute::ProjectsNew => {
             html! { <CreateProjectForm /> }
@@ -83,7 +84,7 @@ pub fn switch(route: AppRoute) -> Html {
             html! { <BasicPages<NestedSampledIndividual> /> }
         }
         AppRoute::SampledIndividualsView{id} => {
-             html! { <span>{format!("Specific Sampled individual page with primary key {:?}", id)}</span> }
+            html! { <BasicPage<NestedSampledIndividual> id={PrimaryKey::from(id)} /> }
         }
         AppRoute::SampledIndividualsNew => {
             html! { <CreateSampledIndividualForm /> }
@@ -95,7 +96,7 @@ pub fn switch(route: AppRoute) -> Html {
             html! { <BasicPages<NestedSample> /> }
         }
         AppRoute::SamplesView{id} => {
-             html! { <span>{format!("Specific Sample page with primary key {:?}", id)}</span> }
+            html! { <BasicPage<NestedSample> id={PrimaryKey::from(id)} /> }
         }
         AppRoute::SamplesNew => {
             html! { <CreateSampleForm /> }
@@ -107,7 +108,7 @@ pub fn switch(route: AppRoute) -> Html {
             html! { <BasicPages<NestedTeam> /> }
         }
         AppRoute::TeamsView{id} => {
-             html! { <span>{format!("Specific Team page with primary key {:?}", id)}</span> }
+            html! { <BasicPage<NestedTeam> id={PrimaryKey::from(id)} /> }
         }
         AppRoute::TeamsNew => {
             html! { <CreateTeamForm /> }
@@ -119,7 +120,7 @@ pub fn switch(route: AppRoute) -> Html {
             html! { <BasicPages<User> /> }
         }
         AppRoute::UsersView{id} => {
-             html! { <span>{format!("Specific User page with primary key {:?}", id)}</span> }
+            html! { <BasicPage<User> id={PrimaryKey::from(id)} /> }
         }
         AppRoute::UsersNew => {
             html! { <CreateUserForm /> }

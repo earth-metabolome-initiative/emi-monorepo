@@ -175,3 +175,13 @@ class TableStructMetadata:
         that is a foreign key to the roles table.
         """
         return self.flat_struct.has_associated_roles()
+
+    def has_public_column(self) -> bool:
+        """Returns whether the table has a public column.
+        
+        Implementation details
+        -----------------------
+        A table has a public column if it has a column that is
+        a boolean and that is named "public".
+        """
+        return self.flat_struct.has_public_column()

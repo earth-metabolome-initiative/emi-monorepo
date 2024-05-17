@@ -1,5 +1,4 @@
 //! Submodule providing structs relative to the database.
-pub mod roles;
 pub mod selects;
 pub use selects::*;
 pub mod tables;

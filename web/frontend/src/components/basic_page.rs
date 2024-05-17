@@ -78,6 +78,7 @@ where
     Page: PageLike,
 {
     pub id: PrimaryKey,
+    #[prop_or_default]
     _phantom: std::marker::PhantomData<Page>,
 }
 

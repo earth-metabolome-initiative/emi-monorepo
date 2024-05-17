@@ -2963,15 +2963,152 @@ def write_diesel_table_names_enumeration(
 
     document.write("        })\n" "    }\n" "}\n")
 
-    # We implement the `delete` method for the Table enum, which receives a primary key
+    # We implement the `can_view` method for the Table enum, which receives a primary key
+    # enum and a user ID. The method returns a Result, where the Ok variant is a boolean
+    # indicating whether the user can view the row, while the Err variant contains an ApiError.
+    # For all tables that do not have a `public` column, we always return true.
+    # For the entries that do have a `public` column, we return true if the column is true, or
+    # if the provided user is a valid viewer of that entry as determined by the associated roles
+    # method from the flat struct which is called by the `is_viewer_by_id` method.
+
+    document.write(
+        "/// Trait providing the can_view method for the Table enum.\n"
+        "pub trait ViewableTable {\n"
+        "    /// Check whether the user can view the row.\n"
+        "    ///\n"
+        "    /// # Arguments\n"
+        "    /// * `primary_key` - The primary key of the row.\n"
+        "    /// * `user_id` - The user ID of the user performing the operation.\n"
+        "    /// * `connection` - The database connection.\n"
+        "    ///\n"
+        "    /// # Returns\n"
+        "    /// A boolean indicating whether the user can view the row.\n"
+        "    fn can_view(\n"
+        "         &self,\n"
+        "         primary_key: web_common::database::operations::PrimaryKey,\n"
+        "         user_id: Option<i32>,\n"
+        "         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+        ") -> Result<bool, web_common::api::ApiError>;\n"
+        "}\n\n"
+    )
+
+    document.write(
+        "impl ViewableTable for web_common::database::Table {\n\n"
+        "    fn can_view(\n"
+        "        &self,\n"
+        "        primary_key: web_common::database::operations::PrimaryKey,\n"
+        "        user_id: Option<i32>,\n"
+        "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+        "    ) -> Result<bool, web_common::api::ApiError> {\n"
+        "        Ok(match self {\n"
+    )
+
+    for table in tables:
+        if table.has_public_column():
+            document.write(
+                f"            web_common::database::Table::{table.camel_cased()} => {{\n"
+                f"                {table.flat_struct_name()}::get(primary_key.into(), connection)?.public ||\n"
+                f"                user_id.map_or(Ok(false), |user_id| {table.flat_struct_name()}::is_viewer_by_id(primary_key.into(), user_id, connection))?\n"
+                "            },\n"
+            )
+        else:
+            document.write(
+                f"            web_common::database::Table::{table.camel_cased()} => true,\n"
+            )
+
+    document.write("        })\n" "    }\n" "}\n")
+
+    # We implement the can_update method for the Table enum, which receives a primary key
+    # enum and a user ID. The method returns a Result, where the Ok variant is a boolean
+    # indicating whether the user can edit the row, while the Err variant contains an ApiError.
+    # For the tables that do not have an associated roles, we always return false.
+    # For the users table specifically, we return true if the user ID is the same as the
+    # primary key, and false otherwise. For the other tables, we call the `is_editor_by_id` method
+    # from the flat struct, which returns true if the user is an editor of the entry.
+
+    document.write(
+        "/// Trait providing the can_update method for the Table enum.\n"
+        "pub trait EditableTable {\n"
+        "    /// Check whether the user can edit the row.\n"
+        "    ///\n"
+        "    /// # Arguments\n"
+        "    /// * `primary_key` - The primary key of the row.\n"
+        "    /// * `user_id` - The user ID of the user performing the operation.\n"
+        "    /// * `connection` - The database connection.\n"
+        "    ///\n"
+        "    /// # Returns\n"
+        "    /// A boolean indicating whether the user can edit the row.\n"
+        "    fn can_update(\n"
+        "         &self,\n"
+        "         primary_key: web_common::database::operations::PrimaryKey,\n"
+        "         user_id: i32,\n"
+        "         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+        ") -> Result<bool, web_common::api::ApiError>;\n"
+        "}\n\n"
+    )
+
+    document.write(
+        "impl EditableTable for web_common::database::Table {\n\n"
+        "    fn can_update(\n"
+        "        &self,\n"
+        "        primary_key: web_common::database::operations::PrimaryKey,\n"
+        "        user_id: i32,\n"
+        "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+        "    ) -> Result<bool, web_common::api::ApiError> {\n"
+        "        Ok(match self {\n"
+    )
+
+    for table in tables:
+        if table.has_associated_roles() and table.name != "users":
+            document.write(
+                f"            web_common::database::Table::{table.camel_cased()} => {table.flat_struct_name()}::is_editor_by_id(primary_key.into(), user_id, connection)?,\n"
+            )
+        elif table.name == "users":
+            document.write(
+                f"            web_common::database::Table::{table.camel_cased()} => {{\n"
+                "                let primary_key: i32 = primary_key.into();\n"
+                "                primary_key == user_id\n"
+                "            },\n"
+            )
+        else:
+            document.write(
+                f"            web_common::database::Table::{table.camel_cased()} => false,\n"
+            )
+
+    document.write("        })\n" "    }\n" "}\n")
+
+    # We implement the can_delete method for the Table enum, which receives a primary key
+    # enum and a user ID. The method returns a Result, where the Ok variant is a boolean
+    # indicating whether the user can delete the row, while the Err variant contains an ApiError.
+    # For the tables that do not have an associated roles, we always return false.
+    # For the users table specifically, we always return false. For the other tables, we call
+    # the `is_admin_by_id` method from the flat struct, which returns true if the user is an admin of
+    # the entry.
+
+    # We also implement the `delete` method for the Table enum, which receives a primary key
     # enum and a connection to the database. The method returns a Result, where the Ok variant
     # is the number of rows deleted, while the Err variant contains an ApiError. The delete
     # method is available for all tables with a primary key - tables that do not have a primary
     # key will raise a panic with the unimplemented!() macro.
 
     document.write(
-        "/// Trait providing the delete method for the Table enum.\n"
+        "/// Trait providing the can_delete method for the Table enum.\n"
         "pub trait DeletableTable {\n"
+        "    /// Check whether the user can delete the row.\n"
+        "    ///\n"
+        "    /// # Arguments\n"
+        "    /// * `primary_key` - The primary key of the row.\n"
+        "    /// * `user_id` - The user ID of the user performing the operation.\n"
+        "    /// * `connection` - The database connection.\n"
+        "    ///\n"
+        "    /// # Returns\n"
+        "    /// A boolean indicating whether the user can delete the row.\n"
+        "    fn can_delete(\n"
+        "         &self,\n"
+        "         primary_key: web_common::database::operations::PrimaryKey,\n"
+        "         user_id: i32,\n"
+        "         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+        ") -> Result<bool, web_common::api::ApiError>;\n\n"
         "    /// Delete the row from the table by the primary key.\n"
         "    ///\n"
         "    /// # Arguments\n"
@@ -2992,12 +3129,38 @@ def write_diesel_table_names_enumeration(
 
     document.write(
         "impl DeletableTable for web_common::database::Table {\n\n"
+        "    fn can_delete(\n"
+        "        &self,\n"
+        "        primary_key: web_common::database::operations::PrimaryKey,\n"
+        "        user_id: i32,\n"
+        "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+        "    ) -> Result<bool, web_common::api::ApiError> {\n"
+        "        Ok(match self {\n"
+    )
+
+    for table in tables:
+        if table.has_associated_roles() and table.name != "users":
+            document.write(
+                f"            web_common::database::Table::{table.camel_cased()} => {table.flat_struct_name()}::is_admin_by_id(primary_key.into(), user_id, connection)?,\n"
+            )
+        else:
+            document.write(
+                f"            web_common::database::Table::{table.camel_cased()} => false,\n"
+            )
+
+    document.write("        })\n" "    }\n")
+
+    
+    document.write(
         "    fn delete(\n"
         "        &self,\n"
         "        primary_key: web_common::database::operations::PrimaryKey,\n"
         "        author_user_id: i32,\n"
         "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
         "    ) -> Result<usize, web_common::api::ApiError> {\n"
+        "        if !self.can_delete(primary_key, author_user_id, connection)? {\n"
+        "            return Err(web_common::api::ApiError::unauthorized());\n"
+        "        }\n"
         "        Ok(match self {\n"
     )
 
