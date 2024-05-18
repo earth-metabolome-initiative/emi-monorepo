@@ -103,7 +103,7 @@ impl<Page: PageLike + RowToBadge> Component for BasicPages<Page> {
                 } else {
                     <></>
                 }
-                <button onclick={ctx.link().callback(|_| PagesMessage::LoadMore)} disabled={self.request_is_ongoing}>
+                <button class="retrieve" onclick={ctx.link().callback(|_| PagesMessage::LoadMore)} disabled={self.request_is_ongoing}>
                     if self.request_is_ongoing {
                         <i class="fas fa-arrows-rotate fa-spin"></i>
                     } else {

@@ -53,6 +53,23 @@ a.button-like, button {
         }
     }
 
+    &.retrieve {
+        border-color: $primary;
+        color: $primary;
+
+        &:hover {
+            background-color: $primary;
+            color: white;
+        }
+
+        &.enabled::before {
+            background: linear-gradient(120deg,
+                    transparent,
+                    rgba($primary, 0.2),
+                    transparent);
+        }
+    }
+
     &.create {
         border-color: $blue;
         color: $blue;
