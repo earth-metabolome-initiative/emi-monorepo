@@ -18,15 +18,15 @@ impl NestedBioOttRank {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: BioOttRank,
+        flat_variant: BioOttRank,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            font_awesome_icon: FontAwesomeIcon::get(flat_struct.font_awesome_icon_id, connection).await?.unwrap(),
-            inner: flat_struct,
+            font_awesome_icon: FontAwesomeIcon::get(flat_variant.font_awesome_icon_id, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -40,8 +40,8 @@ impl NestedBioOttRank {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = BioOttRank::get(id, connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = BioOttRank::get(id, connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -58,10 +58,10 @@ impl NestedBioOttRank {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = BioOttRank::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = BioOttRank::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -101,25 +101,25 @@ impl NestedBioOttTaxonItem {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: BioOttTaxonItem,
+        flat_variant: BioOttTaxonItem,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            ott_rank: NestedBioOttRank::get(flat_struct.ott_rank_id, connection).await?.unwrap(),
-            domain: if let Some(domain_id) = flat_struct.domain_id { BioOttTaxonItem::get(domain_id, connection).await? } else { None },
-            kingdom: if let Some(kingdom_id) = flat_struct.kingdom_id { BioOttTaxonItem::get(kingdom_id, connection).await? } else { None },
-            phylum: if let Some(phylum_id) = flat_struct.phylum_id { BioOttTaxonItem::get(phylum_id, connection).await? } else { None },
-            class: if let Some(class_id) = flat_struct.class_id { BioOttTaxonItem::get(class_id, connection).await? } else { None },
-            order: if let Some(order_id) = flat_struct.order_id { BioOttTaxonItem::get(order_id, connection).await? } else { None },
-            family: if let Some(family_id) = flat_struct.family_id { BioOttTaxonItem::get(family_id, connection).await? } else { None },
-            genus: if let Some(genus_id) = flat_struct.genus_id { BioOttTaxonItem::get(genus_id, connection).await? } else { None },
-            parent: BioOttTaxonItem::get(flat_struct.parent_id, connection).await?.unwrap(),
-            font_awesome_icon: FontAwesomeIcon::get(flat_struct.font_awesome_icon_id, connection).await?.unwrap(),
-            color: Color::get(flat_struct.color_id, connection).await?.unwrap(),
-            inner: flat_struct,
+            ott_rank: NestedBioOttRank::get(flat_variant.ott_rank_id, connection).await?.unwrap(),
+            domain: if let Some(domain_id) = flat_variant.domain_id { BioOttTaxonItem::get(domain_id, connection).await? } else { None },
+            kingdom: if let Some(kingdom_id) = flat_variant.kingdom_id { BioOttTaxonItem::get(kingdom_id, connection).await? } else { None },
+            phylum: if let Some(phylum_id) = flat_variant.phylum_id { BioOttTaxonItem::get(phylum_id, connection).await? } else { None },
+            class: if let Some(class_id) = flat_variant.class_id { BioOttTaxonItem::get(class_id, connection).await? } else { None },
+            order: if let Some(order_id) = flat_variant.order_id { BioOttTaxonItem::get(order_id, connection).await? } else { None },
+            family: if let Some(family_id) = flat_variant.family_id { BioOttTaxonItem::get(family_id, connection).await? } else { None },
+            genus: if let Some(genus_id) = flat_variant.genus_id { BioOttTaxonItem::get(genus_id, connection).await? } else { None },
+            parent: BioOttTaxonItem::get(flat_variant.parent_id, connection).await?.unwrap(),
+            font_awesome_icon: FontAwesomeIcon::get(flat_variant.font_awesome_icon_id, connection).await?.unwrap(),
+            color: Color::get(flat_variant.color_id, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -133,8 +133,8 @@ impl NestedBioOttTaxonItem {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = BioOttTaxonItem::get(id, connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = BioOttTaxonItem::get(id, connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -151,10 +151,10 @@ impl NestedBioOttTaxonItem {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = BioOttTaxonItem::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = BioOttTaxonItem::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -211,18 +211,18 @@ impl NestedDerivedSample {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: DerivedSample,
+        flat_variant: DerivedSample,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            updated_by: User::get(flat_struct.updated_by, connection).await?.unwrap(),
-            parent_sample: NestedSample::get(flat_struct.parent_sample_id, connection).await?.unwrap(),
-            child_sample: NestedSample::get(flat_struct.child_sample_id, connection).await?.unwrap(),
-            inner: flat_struct,
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            updated_by: User::get(flat_variant.updated_by, connection).await?.unwrap(),
+            parent_sample: NestedSample::get(flat_variant.parent_sample_id, connection).await?.unwrap(),
+            child_sample: NestedSample::get(flat_variant.child_sample_id, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -236,8 +236,8 @@ impl NestedDerivedSample {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = DerivedSample::get(( parent_sample_id, child_sample_id ), connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = DerivedSample::get(( parent_sample_id, child_sample_id ), connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -254,10 +254,10 @@ impl NestedDerivedSample {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = DerivedSample::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = DerivedSample::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -274,10 +274,10 @@ impl NestedDerivedSample {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = DerivedSample::all_by_updated_at(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = DerivedSample::all_by_updated_at(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -311,16 +311,16 @@ impl NestedLoginProvider {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: LoginProvider,
+        flat_variant: LoginProvider,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            font_awesome_icon: FontAwesomeIcon::get(flat_struct.font_awesome_icon_id, connection).await?.unwrap(),
-            color: Color::get(flat_struct.color_id, connection).await?.unwrap(),
-            inner: flat_struct,
+            font_awesome_icon: FontAwesomeIcon::get(flat_variant.font_awesome_icon_id, connection).await?.unwrap(),
+            color: Color::get(flat_variant.color_id, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -334,8 +334,8 @@ impl NestedLoginProvider {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = LoginProvider::get(id, connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = LoginProvider::get(id, connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -352,10 +352,10 @@ impl NestedLoginProvider {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = LoginProvider::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = LoginProvider::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -386,15 +386,15 @@ impl NestedNotification {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: Notification,
+        flat_variant: Notification,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            user: User::get(flat_struct.user_id, connection).await?.unwrap(),
-            inner: flat_struct,
+            user: User::get(flat_variant.user_id, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -408,8 +408,8 @@ impl NestedNotification {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = Notification::get(id, connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = Notification::get(id, connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -426,10 +426,10 @@ impl NestedNotification {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = Notification::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = Notification::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -459,15 +459,15 @@ impl NestedOrganization {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: Organization,
+        flat_variant: Organization,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            country: Country::get(flat_struct.country_id, connection).await?.unwrap(),
-            inner: flat_struct,
+            country: Country::get(flat_variant.country_id, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -481,8 +481,8 @@ impl NestedOrganization {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = Organization::get(id, connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = Organization::get(id, connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -499,10 +499,10 @@ impl NestedOrganization {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = Organization::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = Organization::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -533,16 +533,16 @@ impl NestedProjectState {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: ProjectState,
+        flat_variant: ProjectState,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            font_awesome_icon: FontAwesomeIcon::get(flat_struct.font_awesome_icon_id, connection).await?.unwrap(),
-            color: Color::get(flat_struct.color_id, connection).await?.unwrap(),
-            inner: flat_struct,
+            font_awesome_icon: FontAwesomeIcon::get(flat_variant.font_awesome_icon_id, connection).await?.unwrap(),
+            color: Color::get(flat_variant.color_id, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -556,8 +556,8 @@ impl NestedProjectState {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = ProjectState::get(id, connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = ProjectState::get(id, connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -574,10 +574,10 @@ impl NestedProjectState {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = ProjectState::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = ProjectState::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -611,18 +611,18 @@ impl NestedProject {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: Project,
+        flat_variant: Project,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            state: NestedProjectState::get(flat_struct.state_id, connection).await?.unwrap(),
-            parent_project: if let Some(parent_project_id) = flat_struct.parent_project_id { Project::get(parent_project_id, connection).await? } else { None },
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            updated_by: User::get(flat_struct.updated_by, connection).await?.unwrap(),
-            inner: flat_struct,
+            state: NestedProjectState::get(flat_variant.state_id, connection).await?.unwrap(),
+            parent_project: if let Some(parent_project_id) = flat_variant.parent_project_id { Project::get(parent_project_id, connection).await? } else { None },
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            updated_by: User::get(flat_variant.updated_by, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -636,8 +636,8 @@ impl NestedProject {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = Project::get(id, connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = Project::get(id, connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -654,10 +654,10 @@ impl NestedProject {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = Project::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = Project::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -674,10 +674,10 @@ impl NestedProject {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = Project::all_by_updated_at(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = Project::all_by_updated_at(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -715,18 +715,18 @@ impl NestedProjectsTeamsRoleInvitation {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: ProjectsTeamsRoleInvitation,
+        flat_variant: ProjectsTeamsRoleInvitation,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: NestedProject::get(flat_struct.table_id, connection).await?.unwrap(),
-            team: NestedTeam::get(flat_struct.team_id, connection).await?.unwrap(),
-            role: NestedRole::get(flat_struct.role_id, connection).await?.unwrap(),
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            inner: flat_struct,
+            table: NestedProject::get(flat_variant.table_id, connection).await?.unwrap(),
+            team: NestedTeam::get(flat_variant.team_id, connection).await?.unwrap(),
+            role: NestedRole::get(flat_variant.role_id, connection).await?.unwrap(),
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -740,8 +740,8 @@ impl NestedProjectsTeamsRoleInvitation {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = ProjectsTeamsRoleInvitation::get(( table_id, team_id ), connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = ProjectsTeamsRoleInvitation::get(( table_id, team_id ), connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -758,10 +758,10 @@ impl NestedProjectsTeamsRoleInvitation {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = ProjectsTeamsRoleInvitation::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = ProjectsTeamsRoleInvitation::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -797,18 +797,18 @@ impl NestedProjectsTeamsRoleRequest {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: ProjectsTeamsRoleRequest,
+        flat_variant: ProjectsTeamsRoleRequest,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: NestedProject::get(flat_struct.table_id, connection).await?.unwrap(),
-            team: NestedTeam::get(flat_struct.team_id, connection).await?.unwrap(),
-            role: NestedRole::get(flat_struct.role_id, connection).await?.unwrap(),
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            inner: flat_struct,
+            table: NestedProject::get(flat_variant.table_id, connection).await?.unwrap(),
+            team: NestedTeam::get(flat_variant.team_id, connection).await?.unwrap(),
+            role: NestedRole::get(flat_variant.role_id, connection).await?.unwrap(),
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -822,8 +822,8 @@ impl NestedProjectsTeamsRoleRequest {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = ProjectsTeamsRoleRequest::get(( table_id, team_id ), connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = ProjectsTeamsRoleRequest::get(( table_id, team_id ), connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -840,10 +840,10 @@ impl NestedProjectsTeamsRoleRequest {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = ProjectsTeamsRoleRequest::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = ProjectsTeamsRoleRequest::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -879,18 +879,18 @@ impl NestedProjectsTeamsRole {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: ProjectsTeamsRole,
+        flat_variant: ProjectsTeamsRole,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: NestedProject::get(flat_struct.table_id, connection).await?.unwrap(),
-            team: NestedTeam::get(flat_struct.team_id, connection).await?.unwrap(),
-            role: NestedRole::get(flat_struct.role_id, connection).await?.unwrap(),
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            inner: flat_struct,
+            table: NestedProject::get(flat_variant.table_id, connection).await?.unwrap(),
+            team: NestedTeam::get(flat_variant.team_id, connection).await?.unwrap(),
+            role: NestedRole::get(flat_variant.role_id, connection).await?.unwrap(),
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -904,8 +904,8 @@ impl NestedProjectsTeamsRole {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = ProjectsTeamsRole::get(( table_id, team_id ), connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = ProjectsTeamsRole::get(( table_id, team_id ), connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -922,10 +922,10 @@ impl NestedProjectsTeamsRole {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = ProjectsTeamsRole::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = ProjectsTeamsRole::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -961,18 +961,18 @@ impl NestedProjectsUsersRoleInvitation {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: ProjectsUsersRoleInvitation,
+        flat_variant: ProjectsUsersRoleInvitation,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: NestedProject::get(flat_struct.table_id, connection).await?.unwrap(),
-            user: User::get(flat_struct.user_id, connection).await?.unwrap(),
-            role: NestedRole::get(flat_struct.role_id, connection).await?.unwrap(),
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            inner: flat_struct,
+            table: NestedProject::get(flat_variant.table_id, connection).await?.unwrap(),
+            user: User::get(flat_variant.user_id, connection).await?.unwrap(),
+            role: NestedRole::get(flat_variant.role_id, connection).await?.unwrap(),
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -986,8 +986,8 @@ impl NestedProjectsUsersRoleInvitation {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = ProjectsUsersRoleInvitation::get(( table_id, user_id ), connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = ProjectsUsersRoleInvitation::get(( table_id, user_id ), connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -1004,10 +1004,10 @@ impl NestedProjectsUsersRoleInvitation {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = ProjectsUsersRoleInvitation::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = ProjectsUsersRoleInvitation::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -1043,18 +1043,18 @@ impl NestedProjectsUsersRoleRequest {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: ProjectsUsersRoleRequest,
+        flat_variant: ProjectsUsersRoleRequest,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: NestedProject::get(flat_struct.table_id, connection).await?.unwrap(),
-            user: User::get(flat_struct.user_id, connection).await?.unwrap(),
-            role: NestedRole::get(flat_struct.role_id, connection).await?.unwrap(),
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            inner: flat_struct,
+            table: NestedProject::get(flat_variant.table_id, connection).await?.unwrap(),
+            user: User::get(flat_variant.user_id, connection).await?.unwrap(),
+            role: NestedRole::get(flat_variant.role_id, connection).await?.unwrap(),
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -1068,8 +1068,8 @@ impl NestedProjectsUsersRoleRequest {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = ProjectsUsersRoleRequest::get(( table_id, user_id ), connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = ProjectsUsersRoleRequest::get(( table_id, user_id ), connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -1086,10 +1086,10 @@ impl NestedProjectsUsersRoleRequest {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = ProjectsUsersRoleRequest::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = ProjectsUsersRoleRequest::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -1125,18 +1125,18 @@ impl NestedProjectsUsersRole {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: ProjectsUsersRole,
+        flat_variant: ProjectsUsersRole,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: NestedProject::get(flat_struct.table_id, connection).await?.unwrap(),
-            user: User::get(flat_struct.user_id, connection).await?.unwrap(),
-            role: NestedRole::get(flat_struct.role_id, connection).await?.unwrap(),
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            inner: flat_struct,
+            table: NestedProject::get(flat_variant.table_id, connection).await?.unwrap(),
+            user: User::get(flat_variant.user_id, connection).await?.unwrap(),
+            role: NestedRole::get(flat_variant.role_id, connection).await?.unwrap(),
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -1150,8 +1150,8 @@ impl NestedProjectsUsersRole {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = ProjectsUsersRole::get(( table_id, user_id ), connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = ProjectsUsersRole::get(( table_id, user_id ), connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -1168,10 +1168,10 @@ impl NestedProjectsUsersRole {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = ProjectsUsersRole::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = ProjectsUsersRole::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -1205,16 +1205,16 @@ impl NestedRole {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: Role,
+        flat_variant: Role,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            font_awesome_icon: FontAwesomeIcon::get(flat_struct.font_awesome_icon_id, connection).await?.unwrap(),
-            color: Color::get(flat_struct.color_id, connection).await?.unwrap(),
-            inner: flat_struct,
+            font_awesome_icon: FontAwesomeIcon::get(flat_variant.font_awesome_icon_id, connection).await?.unwrap(),
+            color: Color::get(flat_variant.color_id, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -1228,8 +1228,8 @@ impl NestedRole {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = Role::get(id, connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = Role::get(id, connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -1246,10 +1246,10 @@ impl NestedRole {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = Role::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = Role::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -1283,18 +1283,18 @@ impl NestedSampleBioOttTaxonItem {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: SampleBioOttTaxonItem,
+        flat_variant: SampleBioOttTaxonItem,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            updated_by: User::get(flat_struct.updated_by, connection).await?.unwrap(),
-            sample: NestedSample::get(flat_struct.sample_id, connection).await?.unwrap(),
-            taxon: NestedBioOttTaxonItem::get(flat_struct.taxon_id, connection).await?.unwrap(),
-            inner: flat_struct,
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            updated_by: User::get(flat_variant.updated_by, connection).await?.unwrap(),
+            sample: NestedSample::get(flat_variant.sample_id, connection).await?.unwrap(),
+            taxon: NestedBioOttTaxonItem::get(flat_variant.taxon_id, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -1308,8 +1308,8 @@ impl NestedSampleBioOttTaxonItem {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = SampleBioOttTaxonItem::get(( sample_id, taxon_id ), connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = SampleBioOttTaxonItem::get(( sample_id, taxon_id ), connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -1326,10 +1326,10 @@ impl NestedSampleBioOttTaxonItem {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = SampleBioOttTaxonItem::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = SampleBioOttTaxonItem::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -1346,10 +1346,10 @@ impl NestedSampleBioOttTaxonItem {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = SampleBioOttTaxonItem::all_by_updated_at(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = SampleBioOttTaxonItem::all_by_updated_at(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -1383,16 +1383,16 @@ impl NestedSampleState {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: SampleState,
+        flat_variant: SampleState,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            font_awesome_icon: FontAwesomeIcon::get(flat_struct.font_awesome_icon_id, connection).await?.unwrap(),
-            color: Color::get(flat_struct.color_id, connection).await?.unwrap(),
-            inner: flat_struct,
+            font_awesome_icon: FontAwesomeIcon::get(flat_variant.font_awesome_icon_id, connection).await?.unwrap(),
+            color: Color::get(flat_variant.color_id, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -1406,8 +1406,8 @@ impl NestedSampleState {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = SampleState::get(id, connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = SampleState::get(id, connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -1424,10 +1424,10 @@ impl NestedSampleState {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = SampleState::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = SampleState::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -1461,18 +1461,18 @@ impl NestedSampledIndividualBioOttTaxonItem {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: SampledIndividualBioOttTaxonItem,
+        flat_variant: SampledIndividualBioOttTaxonItem,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            updated_by: User::get(flat_struct.updated_by, connection).await?.unwrap(),
-            sampled_individual: NestedSampledIndividual::get(flat_struct.sampled_individual_id, connection).await?.unwrap(),
-            taxon: NestedBioOttTaxonItem::get(flat_struct.taxon_id, connection).await?.unwrap(),
-            inner: flat_struct,
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            updated_by: User::get(flat_variant.updated_by, connection).await?.unwrap(),
+            sampled_individual: NestedSampledIndividual::get(flat_variant.sampled_individual_id, connection).await?.unwrap(),
+            taxon: NestedBioOttTaxonItem::get(flat_variant.taxon_id, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -1486,8 +1486,8 @@ impl NestedSampledIndividualBioOttTaxonItem {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = SampledIndividualBioOttTaxonItem::get(( sampled_individual_id, taxon_id ), connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = SampledIndividualBioOttTaxonItem::get(( sampled_individual_id, taxon_id ), connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -1504,10 +1504,10 @@ impl NestedSampledIndividualBioOttTaxonItem {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = SampledIndividualBioOttTaxonItem::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = SampledIndividualBioOttTaxonItem::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -1524,10 +1524,10 @@ impl NestedSampledIndividualBioOttTaxonItem {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = SampledIndividualBioOttTaxonItem::all_by_updated_at(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = SampledIndividualBioOttTaxonItem::all_by_updated_at(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -1561,16 +1561,16 @@ impl NestedSampledIndividual {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: SampledIndividual,
+        flat_variant: SampledIndividual,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            updated_by: User::get(flat_struct.updated_by, connection).await?.unwrap(),
-            inner: flat_struct,
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            updated_by: User::get(flat_variant.updated_by, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -1584,8 +1584,8 @@ impl NestedSampledIndividual {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = SampledIndividual::get(id, connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = SampledIndividual::get(id, connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -1602,10 +1602,10 @@ impl NestedSampledIndividual {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = SampledIndividual::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = SampledIndividual::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -1622,10 +1622,10 @@ impl NestedSampledIndividual {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = SampledIndividual::all_by_updated_at(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = SampledIndividual::all_by_updated_at(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -1659,18 +1659,18 @@ impl NestedSampledIndividualsTeamsRoleInvitation {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: SampledIndividualsTeamsRoleInvitation,
+        flat_variant: SampledIndividualsTeamsRoleInvitation,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: NestedSampledIndividual::get(flat_struct.table_id, connection).await?.unwrap(),
-            team: NestedTeam::get(flat_struct.team_id, connection).await?.unwrap(),
-            role: NestedRole::get(flat_struct.role_id, connection).await?.unwrap(),
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            inner: flat_struct,
+            table: NestedSampledIndividual::get(flat_variant.table_id, connection).await?.unwrap(),
+            team: NestedTeam::get(flat_variant.team_id, connection).await?.unwrap(),
+            role: NestedRole::get(flat_variant.role_id, connection).await?.unwrap(),
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -1684,8 +1684,8 @@ impl NestedSampledIndividualsTeamsRoleInvitation {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = SampledIndividualsTeamsRoleInvitation::get(( table_id, team_id ), connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = SampledIndividualsTeamsRoleInvitation::get(( table_id, team_id ), connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -1702,10 +1702,10 @@ impl NestedSampledIndividualsTeamsRoleInvitation {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = SampledIndividualsTeamsRoleInvitation::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = SampledIndividualsTeamsRoleInvitation::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -1741,18 +1741,18 @@ impl NestedSampledIndividualsTeamsRoleRequest {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: SampledIndividualsTeamsRoleRequest,
+        flat_variant: SampledIndividualsTeamsRoleRequest,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: NestedSampledIndividual::get(flat_struct.table_id, connection).await?.unwrap(),
-            team: NestedTeam::get(flat_struct.team_id, connection).await?.unwrap(),
-            role: NestedRole::get(flat_struct.role_id, connection).await?.unwrap(),
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            inner: flat_struct,
+            table: NestedSampledIndividual::get(flat_variant.table_id, connection).await?.unwrap(),
+            team: NestedTeam::get(flat_variant.team_id, connection).await?.unwrap(),
+            role: NestedRole::get(flat_variant.role_id, connection).await?.unwrap(),
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -1766,8 +1766,8 @@ impl NestedSampledIndividualsTeamsRoleRequest {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = SampledIndividualsTeamsRoleRequest::get(( table_id, team_id ), connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = SampledIndividualsTeamsRoleRequest::get(( table_id, team_id ), connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -1784,10 +1784,10 @@ impl NestedSampledIndividualsTeamsRoleRequest {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = SampledIndividualsTeamsRoleRequest::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = SampledIndividualsTeamsRoleRequest::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -1823,18 +1823,18 @@ impl NestedSampledIndividualsTeamsRole {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: SampledIndividualsTeamsRole,
+        flat_variant: SampledIndividualsTeamsRole,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: NestedSampledIndividual::get(flat_struct.table_id, connection).await?.unwrap(),
-            team: NestedTeam::get(flat_struct.team_id, connection).await?.unwrap(),
-            role: NestedRole::get(flat_struct.role_id, connection).await?.unwrap(),
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            inner: flat_struct,
+            table: NestedSampledIndividual::get(flat_variant.table_id, connection).await?.unwrap(),
+            team: NestedTeam::get(flat_variant.team_id, connection).await?.unwrap(),
+            role: NestedRole::get(flat_variant.role_id, connection).await?.unwrap(),
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -1848,8 +1848,8 @@ impl NestedSampledIndividualsTeamsRole {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = SampledIndividualsTeamsRole::get(( table_id, team_id ), connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = SampledIndividualsTeamsRole::get(( table_id, team_id ), connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -1866,10 +1866,10 @@ impl NestedSampledIndividualsTeamsRole {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = SampledIndividualsTeamsRole::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = SampledIndividualsTeamsRole::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -1905,18 +1905,18 @@ impl NestedSampledIndividualsUsersRoleInvitation {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: SampledIndividualsUsersRoleInvitation,
+        flat_variant: SampledIndividualsUsersRoleInvitation,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: NestedSampledIndividual::get(flat_struct.table_id, connection).await?.unwrap(),
-            user: User::get(flat_struct.user_id, connection).await?.unwrap(),
-            role: NestedRole::get(flat_struct.role_id, connection).await?.unwrap(),
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            inner: flat_struct,
+            table: NestedSampledIndividual::get(flat_variant.table_id, connection).await?.unwrap(),
+            user: User::get(flat_variant.user_id, connection).await?.unwrap(),
+            role: NestedRole::get(flat_variant.role_id, connection).await?.unwrap(),
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -1930,8 +1930,8 @@ impl NestedSampledIndividualsUsersRoleInvitation {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = SampledIndividualsUsersRoleInvitation::get(( table_id, user_id ), connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = SampledIndividualsUsersRoleInvitation::get(( table_id, user_id ), connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -1948,10 +1948,10 @@ impl NestedSampledIndividualsUsersRoleInvitation {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = SampledIndividualsUsersRoleInvitation::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = SampledIndividualsUsersRoleInvitation::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -1987,18 +1987,18 @@ impl NestedSampledIndividualsUsersRoleRequest {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: SampledIndividualsUsersRoleRequest,
+        flat_variant: SampledIndividualsUsersRoleRequest,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: NestedSampledIndividual::get(flat_struct.table_id, connection).await?.unwrap(),
-            user: User::get(flat_struct.user_id, connection).await?.unwrap(),
-            role: NestedRole::get(flat_struct.role_id, connection).await?.unwrap(),
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            inner: flat_struct,
+            table: NestedSampledIndividual::get(flat_variant.table_id, connection).await?.unwrap(),
+            user: User::get(flat_variant.user_id, connection).await?.unwrap(),
+            role: NestedRole::get(flat_variant.role_id, connection).await?.unwrap(),
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -2012,8 +2012,8 @@ impl NestedSampledIndividualsUsersRoleRequest {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = SampledIndividualsUsersRoleRequest::get(( table_id, user_id ), connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = SampledIndividualsUsersRoleRequest::get(( table_id, user_id ), connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -2030,10 +2030,10 @@ impl NestedSampledIndividualsUsersRoleRequest {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = SampledIndividualsUsersRoleRequest::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = SampledIndividualsUsersRoleRequest::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -2069,18 +2069,18 @@ impl NestedSampledIndividualsUsersRole {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: SampledIndividualsUsersRole,
+        flat_variant: SampledIndividualsUsersRole,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: NestedSampledIndividual::get(flat_struct.table_id, connection).await?.unwrap(),
-            user: User::get(flat_struct.user_id, connection).await?.unwrap(),
-            role: NestedRole::get(flat_struct.role_id, connection).await?.unwrap(),
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            inner: flat_struct,
+            table: NestedSampledIndividual::get(flat_variant.table_id, connection).await?.unwrap(),
+            user: User::get(flat_variant.user_id, connection).await?.unwrap(),
+            role: NestedRole::get(flat_variant.role_id, connection).await?.unwrap(),
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -2094,8 +2094,8 @@ impl NestedSampledIndividualsUsersRole {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = SampledIndividualsUsersRole::get(( table_id, user_id ), connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = SampledIndividualsUsersRole::get(( table_id, user_id ), connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -2112,10 +2112,10 @@ impl NestedSampledIndividualsUsersRole {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = SampledIndividualsUsersRole::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = SampledIndividualsUsersRole::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -2151,18 +2151,18 @@ impl NestedSample {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: Sample,
+        flat_variant: Sample,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            sampled_by: User::get(flat_struct.sampled_by, connection).await?.unwrap(),
-            updated_by: User::get(flat_struct.updated_by, connection).await?.unwrap(),
-            state: NestedSampleState::get(flat_struct.state, connection).await?.unwrap(),
-            inner: flat_struct,
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            sampled_by: User::get(flat_variant.sampled_by, connection).await?.unwrap(),
+            updated_by: User::get(flat_variant.updated_by, connection).await?.unwrap(),
+            state: NestedSampleState::get(flat_variant.state, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -2176,8 +2176,8 @@ impl NestedSample {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = Sample::get(id, connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = Sample::get(id, connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -2194,10 +2194,10 @@ impl NestedSample {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = Sample::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = Sample::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -2214,10 +2214,10 @@ impl NestedSample {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = Sample::all_by_updated_at(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = Sample::all_by_updated_at(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -2253,18 +2253,18 @@ impl NestedSamplesTeamsRoleInvitation {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: SamplesTeamsRoleInvitation,
+        flat_variant: SamplesTeamsRoleInvitation,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: NestedSample::get(flat_struct.table_id, connection).await?.unwrap(),
-            team: NestedTeam::get(flat_struct.team_id, connection).await?.unwrap(),
-            role: NestedRole::get(flat_struct.role_id, connection).await?.unwrap(),
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            inner: flat_struct,
+            table: NestedSample::get(flat_variant.table_id, connection).await?.unwrap(),
+            team: NestedTeam::get(flat_variant.team_id, connection).await?.unwrap(),
+            role: NestedRole::get(flat_variant.role_id, connection).await?.unwrap(),
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -2278,8 +2278,8 @@ impl NestedSamplesTeamsRoleInvitation {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = SamplesTeamsRoleInvitation::get(( table_id, team_id ), connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = SamplesTeamsRoleInvitation::get(( table_id, team_id ), connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -2296,10 +2296,10 @@ impl NestedSamplesTeamsRoleInvitation {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = SamplesTeamsRoleInvitation::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = SamplesTeamsRoleInvitation::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -2335,18 +2335,18 @@ impl NestedSamplesTeamsRoleRequest {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: SamplesTeamsRoleRequest,
+        flat_variant: SamplesTeamsRoleRequest,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: NestedSample::get(flat_struct.table_id, connection).await?.unwrap(),
-            team: NestedTeam::get(flat_struct.team_id, connection).await?.unwrap(),
-            role: NestedRole::get(flat_struct.role_id, connection).await?.unwrap(),
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            inner: flat_struct,
+            table: NestedSample::get(flat_variant.table_id, connection).await?.unwrap(),
+            team: NestedTeam::get(flat_variant.team_id, connection).await?.unwrap(),
+            role: NestedRole::get(flat_variant.role_id, connection).await?.unwrap(),
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -2360,8 +2360,8 @@ impl NestedSamplesTeamsRoleRequest {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = SamplesTeamsRoleRequest::get(( table_id, team_id ), connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = SamplesTeamsRoleRequest::get(( table_id, team_id ), connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -2378,10 +2378,10 @@ impl NestedSamplesTeamsRoleRequest {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = SamplesTeamsRoleRequest::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = SamplesTeamsRoleRequest::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -2417,18 +2417,18 @@ impl NestedSamplesTeamsRole {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: SamplesTeamsRole,
+        flat_variant: SamplesTeamsRole,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: NestedSample::get(flat_struct.table_id, connection).await?.unwrap(),
-            team: NestedTeam::get(flat_struct.team_id, connection).await?.unwrap(),
-            role: NestedRole::get(flat_struct.role_id, connection).await?.unwrap(),
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            inner: flat_struct,
+            table: NestedSample::get(flat_variant.table_id, connection).await?.unwrap(),
+            team: NestedTeam::get(flat_variant.team_id, connection).await?.unwrap(),
+            role: NestedRole::get(flat_variant.role_id, connection).await?.unwrap(),
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -2442,8 +2442,8 @@ impl NestedSamplesTeamsRole {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = SamplesTeamsRole::get(( table_id, team_id ), connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = SamplesTeamsRole::get(( table_id, team_id ), connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -2460,10 +2460,10 @@ impl NestedSamplesTeamsRole {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = SamplesTeamsRole::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = SamplesTeamsRole::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -2499,18 +2499,18 @@ impl NestedSamplesUsersRoleInvitation {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: SamplesUsersRoleInvitation,
+        flat_variant: SamplesUsersRoleInvitation,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: NestedSample::get(flat_struct.table_id, connection).await?.unwrap(),
-            user: User::get(flat_struct.user_id, connection).await?.unwrap(),
-            role: NestedRole::get(flat_struct.role_id, connection).await?.unwrap(),
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            inner: flat_struct,
+            table: NestedSample::get(flat_variant.table_id, connection).await?.unwrap(),
+            user: User::get(flat_variant.user_id, connection).await?.unwrap(),
+            role: NestedRole::get(flat_variant.role_id, connection).await?.unwrap(),
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -2524,8 +2524,8 @@ impl NestedSamplesUsersRoleInvitation {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = SamplesUsersRoleInvitation::get(( table_id, user_id ), connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = SamplesUsersRoleInvitation::get(( table_id, user_id ), connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -2542,10 +2542,10 @@ impl NestedSamplesUsersRoleInvitation {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = SamplesUsersRoleInvitation::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = SamplesUsersRoleInvitation::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -2581,18 +2581,18 @@ impl NestedSamplesUsersRoleRequest {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: SamplesUsersRoleRequest,
+        flat_variant: SamplesUsersRoleRequest,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: NestedSample::get(flat_struct.table_id, connection).await?.unwrap(),
-            user: User::get(flat_struct.user_id, connection).await?.unwrap(),
-            role: NestedRole::get(flat_struct.role_id, connection).await?.unwrap(),
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            inner: flat_struct,
+            table: NestedSample::get(flat_variant.table_id, connection).await?.unwrap(),
+            user: User::get(flat_variant.user_id, connection).await?.unwrap(),
+            role: NestedRole::get(flat_variant.role_id, connection).await?.unwrap(),
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -2606,8 +2606,8 @@ impl NestedSamplesUsersRoleRequest {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = SamplesUsersRoleRequest::get(( table_id, user_id ), connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = SamplesUsersRoleRequest::get(( table_id, user_id ), connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -2624,10 +2624,10 @@ impl NestedSamplesUsersRoleRequest {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = SamplesUsersRoleRequest::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = SamplesUsersRoleRequest::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -2663,18 +2663,18 @@ impl NestedSamplesUsersRole {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: SamplesUsersRole,
+        flat_variant: SamplesUsersRole,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: NestedSample::get(flat_struct.table_id, connection).await?.unwrap(),
-            user: User::get(flat_struct.user_id, connection).await?.unwrap(),
-            role: NestedRole::get(flat_struct.role_id, connection).await?.unwrap(),
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            inner: flat_struct,
+            table: NestedSample::get(flat_variant.table_id, connection).await?.unwrap(),
+            user: User::get(flat_variant.user_id, connection).await?.unwrap(),
+            role: NestedRole::get(flat_variant.role_id, connection).await?.unwrap(),
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -2688,8 +2688,8 @@ impl NestedSamplesUsersRole {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = SamplesUsersRole::get(( table_id, user_id ), connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = SamplesUsersRole::get(( table_id, user_id ), connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -2706,10 +2706,10 @@ impl NestedSamplesUsersRole {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = SamplesUsersRole::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = SamplesUsersRole::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -2742,15 +2742,15 @@ impl NestedSpectra {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: Spectra,
+        flat_variant: Spectra,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            spectra_collection: NestedSpectraCollection::get(flat_struct.spectra_collection_id, connection).await?.unwrap(),
-            inner: flat_struct,
+            spectra_collection: NestedSpectraCollection::get(flat_variant.spectra_collection_id, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -2764,8 +2764,8 @@ impl NestedSpectra {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = Spectra::get(id, connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = Spectra::get(id, connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -2782,10 +2782,10 @@ impl NestedSpectra {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = Spectra::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = Spectra::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -2817,17 +2817,17 @@ impl NestedSpectraCollection {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: SpectraCollection,
+        flat_variant: SpectraCollection,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            sample: NestedSample::get(flat_struct.sample_id, connection).await?.unwrap(),
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            updated_by: User::get(flat_struct.updated_by, connection).await?.unwrap(),
-            inner: flat_struct,
+            sample: NestedSample::get(flat_variant.sample_id, connection).await?.unwrap(),
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            updated_by: User::get(flat_variant.updated_by, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -2841,8 +2841,8 @@ impl NestedSpectraCollection {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = SpectraCollection::get(id, connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = SpectraCollection::get(id, connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -2859,10 +2859,10 @@ impl NestedSpectraCollection {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = SpectraCollection::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = SpectraCollection::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -2879,10 +2879,10 @@ impl NestedSpectraCollection {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = SpectraCollection::all_by_updated_at(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = SpectraCollection::all_by_updated_at(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -2917,18 +2917,18 @@ impl NestedSpectraCollectionsTeamsRoleInvitation {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: SpectraCollectionsTeamsRoleInvitation,
+        flat_variant: SpectraCollectionsTeamsRoleInvitation,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: NestedSpectraCollection::get(flat_struct.table_id, connection).await?.unwrap(),
-            team: NestedTeam::get(flat_struct.team_id, connection).await?.unwrap(),
-            role: NestedRole::get(flat_struct.role_id, connection).await?.unwrap(),
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            inner: flat_struct,
+            table: NestedSpectraCollection::get(flat_variant.table_id, connection).await?.unwrap(),
+            team: NestedTeam::get(flat_variant.team_id, connection).await?.unwrap(),
+            role: NestedRole::get(flat_variant.role_id, connection).await?.unwrap(),
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -2942,8 +2942,8 @@ impl NestedSpectraCollectionsTeamsRoleInvitation {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = SpectraCollectionsTeamsRoleInvitation::get(( table_id, team_id ), connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = SpectraCollectionsTeamsRoleInvitation::get(( table_id, team_id ), connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -2960,10 +2960,10 @@ impl NestedSpectraCollectionsTeamsRoleInvitation {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = SpectraCollectionsTeamsRoleInvitation::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = SpectraCollectionsTeamsRoleInvitation::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -2999,18 +2999,18 @@ impl NestedSpectraCollectionsTeamsRoleRequest {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: SpectraCollectionsTeamsRoleRequest,
+        flat_variant: SpectraCollectionsTeamsRoleRequest,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: NestedSpectraCollection::get(flat_struct.table_id, connection).await?.unwrap(),
-            team: NestedTeam::get(flat_struct.team_id, connection).await?.unwrap(),
-            role: NestedRole::get(flat_struct.role_id, connection).await?.unwrap(),
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            inner: flat_struct,
+            table: NestedSpectraCollection::get(flat_variant.table_id, connection).await?.unwrap(),
+            team: NestedTeam::get(flat_variant.team_id, connection).await?.unwrap(),
+            role: NestedRole::get(flat_variant.role_id, connection).await?.unwrap(),
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -3024,8 +3024,8 @@ impl NestedSpectraCollectionsTeamsRoleRequest {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = SpectraCollectionsTeamsRoleRequest::get(( table_id, team_id ), connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = SpectraCollectionsTeamsRoleRequest::get(( table_id, team_id ), connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -3042,10 +3042,10 @@ impl NestedSpectraCollectionsTeamsRoleRequest {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = SpectraCollectionsTeamsRoleRequest::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = SpectraCollectionsTeamsRoleRequest::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -3081,18 +3081,18 @@ impl NestedSpectraCollectionsTeamsRole {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: SpectraCollectionsTeamsRole,
+        flat_variant: SpectraCollectionsTeamsRole,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: NestedSpectraCollection::get(flat_struct.table_id, connection).await?.unwrap(),
-            team: NestedTeam::get(flat_struct.team_id, connection).await?.unwrap(),
-            role: NestedRole::get(flat_struct.role_id, connection).await?.unwrap(),
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            inner: flat_struct,
+            table: NestedSpectraCollection::get(flat_variant.table_id, connection).await?.unwrap(),
+            team: NestedTeam::get(flat_variant.team_id, connection).await?.unwrap(),
+            role: NestedRole::get(flat_variant.role_id, connection).await?.unwrap(),
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -3106,8 +3106,8 @@ impl NestedSpectraCollectionsTeamsRole {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = SpectraCollectionsTeamsRole::get(( table_id, team_id ), connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = SpectraCollectionsTeamsRole::get(( table_id, team_id ), connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -3124,10 +3124,10 @@ impl NestedSpectraCollectionsTeamsRole {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = SpectraCollectionsTeamsRole::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = SpectraCollectionsTeamsRole::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -3163,18 +3163,18 @@ impl NestedSpectraCollectionsUsersRoleInvitation {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: SpectraCollectionsUsersRoleInvitation,
+        flat_variant: SpectraCollectionsUsersRoleInvitation,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: NestedSpectraCollection::get(flat_struct.table_id, connection).await?.unwrap(),
-            user: User::get(flat_struct.user_id, connection).await?.unwrap(),
-            role: NestedRole::get(flat_struct.role_id, connection).await?.unwrap(),
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            inner: flat_struct,
+            table: NestedSpectraCollection::get(flat_variant.table_id, connection).await?.unwrap(),
+            user: User::get(flat_variant.user_id, connection).await?.unwrap(),
+            role: NestedRole::get(flat_variant.role_id, connection).await?.unwrap(),
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -3188,8 +3188,8 @@ impl NestedSpectraCollectionsUsersRoleInvitation {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = SpectraCollectionsUsersRoleInvitation::get(( table_id, user_id ), connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = SpectraCollectionsUsersRoleInvitation::get(( table_id, user_id ), connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -3206,10 +3206,10 @@ impl NestedSpectraCollectionsUsersRoleInvitation {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = SpectraCollectionsUsersRoleInvitation::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = SpectraCollectionsUsersRoleInvitation::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -3245,18 +3245,18 @@ impl NestedSpectraCollectionsUsersRoleRequest {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: SpectraCollectionsUsersRoleRequest,
+        flat_variant: SpectraCollectionsUsersRoleRequest,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: NestedSpectraCollection::get(flat_struct.table_id, connection).await?.unwrap(),
-            user: User::get(flat_struct.user_id, connection).await?.unwrap(),
-            role: NestedRole::get(flat_struct.role_id, connection).await?.unwrap(),
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            inner: flat_struct,
+            table: NestedSpectraCollection::get(flat_variant.table_id, connection).await?.unwrap(),
+            user: User::get(flat_variant.user_id, connection).await?.unwrap(),
+            role: NestedRole::get(flat_variant.role_id, connection).await?.unwrap(),
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -3270,8 +3270,8 @@ impl NestedSpectraCollectionsUsersRoleRequest {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = SpectraCollectionsUsersRoleRequest::get(( table_id, user_id ), connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = SpectraCollectionsUsersRoleRequest::get(( table_id, user_id ), connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -3288,10 +3288,10 @@ impl NestedSpectraCollectionsUsersRoleRequest {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = SpectraCollectionsUsersRoleRequest::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = SpectraCollectionsUsersRoleRequest::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -3327,18 +3327,18 @@ impl NestedSpectraCollectionsUsersRole {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: SpectraCollectionsUsersRole,
+        flat_variant: SpectraCollectionsUsersRole,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: NestedSpectraCollection::get(flat_struct.table_id, connection).await?.unwrap(),
-            user: User::get(flat_struct.user_id, connection).await?.unwrap(),
-            role: NestedRole::get(flat_struct.role_id, connection).await?.unwrap(),
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            inner: flat_struct,
+            table: NestedSpectraCollection::get(flat_variant.table_id, connection).await?.unwrap(),
+            user: User::get(flat_variant.user_id, connection).await?.unwrap(),
+            role: NestedRole::get(flat_variant.role_id, connection).await?.unwrap(),
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -3352,8 +3352,8 @@ impl NestedSpectraCollectionsUsersRole {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = SpectraCollectionsUsersRole::get(( table_id, user_id ), connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = SpectraCollectionsUsersRole::get(( table_id, user_id ), connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -3370,10 +3370,10 @@ impl NestedSpectraCollectionsUsersRole {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = SpectraCollectionsUsersRole::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = SpectraCollectionsUsersRole::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -3407,16 +3407,16 @@ impl NestedTeamState {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: TeamState,
+        flat_variant: TeamState,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            font_awesome_icon: FontAwesomeIcon::get(flat_struct.font_awesome_icon_id, connection).await?.unwrap(),
-            color: Color::get(flat_struct.color_id, connection).await?.unwrap(),
-            inner: flat_struct,
+            font_awesome_icon: FontAwesomeIcon::get(flat_variant.font_awesome_icon_id, connection).await?.unwrap(),
+            color: Color::get(flat_variant.color_id, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -3430,8 +3430,8 @@ impl NestedTeamState {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = TeamState::get(id, connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = TeamState::get(id, connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -3448,10 +3448,10 @@ impl NestedTeamState {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = TeamState::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = TeamState::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -3484,17 +3484,17 @@ impl NestedTeam {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: Team,
+        flat_variant: Team,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            parent_team: if let Some(parent_team_id) = flat_struct.parent_team_id { Team::get(parent_team_id, connection).await? } else { None },
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            updated_by: User::get(flat_struct.updated_by, connection).await?.unwrap(),
-            inner: flat_struct,
+            parent_team: if let Some(parent_team_id) = flat_variant.parent_team_id { Team::get(parent_team_id, connection).await? } else { None },
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            updated_by: User::get(flat_variant.updated_by, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -3508,8 +3508,8 @@ impl NestedTeam {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = Team::get(id, connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = Team::get(id, connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -3526,10 +3526,10 @@ impl NestedTeam {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = Team::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = Team::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -3546,10 +3546,10 @@ impl NestedTeam {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = Team::all_by_updated_at(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = Team::all_by_updated_at(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -3586,18 +3586,18 @@ impl NestedTeamsTeamsRoleInvitation {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: TeamsTeamsRoleInvitation,
+        flat_variant: TeamsTeamsRoleInvitation,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: NestedTeam::get(flat_struct.table_id, connection).await?.unwrap(),
-            team: NestedTeam::get(flat_struct.team_id, connection).await?.unwrap(),
-            role: NestedRole::get(flat_struct.role_id, connection).await?.unwrap(),
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            inner: flat_struct,
+            table: NestedTeam::get(flat_variant.table_id, connection).await?.unwrap(),
+            team: NestedTeam::get(flat_variant.team_id, connection).await?.unwrap(),
+            role: NestedRole::get(flat_variant.role_id, connection).await?.unwrap(),
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -3611,8 +3611,8 @@ impl NestedTeamsTeamsRoleInvitation {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = TeamsTeamsRoleInvitation::get(( table_id, team_id ), connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = TeamsTeamsRoleInvitation::get(( table_id, team_id ), connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -3629,10 +3629,10 @@ impl NestedTeamsTeamsRoleInvitation {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = TeamsTeamsRoleInvitation::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = TeamsTeamsRoleInvitation::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -3668,18 +3668,18 @@ impl NestedTeamsUsersRoleInvitation {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: TeamsUsersRoleInvitation,
+        flat_variant: TeamsUsersRoleInvitation,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: NestedTeam::get(flat_struct.table_id, connection).await?.unwrap(),
-            user: User::get(flat_struct.user_id, connection).await?.unwrap(),
-            role: NestedRole::get(flat_struct.role_id, connection).await?.unwrap(),
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            inner: flat_struct,
+            table: NestedTeam::get(flat_variant.table_id, connection).await?.unwrap(),
+            user: User::get(flat_variant.user_id, connection).await?.unwrap(),
+            role: NestedRole::get(flat_variant.role_id, connection).await?.unwrap(),
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -3693,8 +3693,8 @@ impl NestedTeamsUsersRoleInvitation {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = TeamsUsersRoleInvitation::get(( table_id, user_id ), connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = TeamsUsersRoleInvitation::get(( table_id, user_id ), connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -3711,10 +3711,10 @@ impl NestedTeamsUsersRoleInvitation {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = TeamsUsersRoleInvitation::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = TeamsUsersRoleInvitation::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -3750,18 +3750,18 @@ impl NestedTeamsUsersRoleRequest {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: TeamsUsersRoleRequest,
+        flat_variant: TeamsUsersRoleRequest,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: NestedTeam::get(flat_struct.table_id, connection).await?.unwrap(),
-            user: User::get(flat_struct.user_id, connection).await?.unwrap(),
-            role: NestedRole::get(flat_struct.role_id, connection).await?.unwrap(),
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            inner: flat_struct,
+            table: NestedTeam::get(flat_variant.table_id, connection).await?.unwrap(),
+            user: User::get(flat_variant.user_id, connection).await?.unwrap(),
+            role: NestedRole::get(flat_variant.role_id, connection).await?.unwrap(),
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -3775,8 +3775,8 @@ impl NestedTeamsUsersRoleRequest {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = TeamsUsersRoleRequest::get(( table_id, user_id ), connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = TeamsUsersRoleRequest::get(( table_id, user_id ), connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -3793,10 +3793,10 @@ impl NestedTeamsUsersRoleRequest {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = TeamsUsersRoleRequest::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = TeamsUsersRoleRequest::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -3832,18 +3832,18 @@ impl NestedTeamsUsersRole {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: TeamsUsersRole,
+        flat_variant: TeamsUsersRole,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: NestedTeam::get(flat_struct.table_id, connection).await?.unwrap(),
-            user: User::get(flat_struct.user_id, connection).await?.unwrap(),
-            role: NestedRole::get(flat_struct.role_id, connection).await?.unwrap(),
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            inner: flat_struct,
+            table: NestedTeam::get(flat_variant.table_id, connection).await?.unwrap(),
+            user: User::get(flat_variant.user_id, connection).await?.unwrap(),
+            role: NestedRole::get(flat_variant.role_id, connection).await?.unwrap(),
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -3857,8 +3857,8 @@ impl NestedTeamsUsersRole {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = TeamsUsersRole::get(( table_id, user_id ), connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = TeamsUsersRole::get(( table_id, user_id ), connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -3875,10 +3875,10 @@ impl NestedTeamsUsersRole {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = TeamsUsersRole::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = TeamsUsersRole::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -3912,16 +3912,16 @@ impl NestedUserEmail {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: UserEmail,
+        flat_variant: UserEmail,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            login_provider: NestedLoginProvider::get(flat_struct.login_provider_id, connection).await?.unwrap(),
-            inner: flat_struct,
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            login_provider: NestedLoginProvider::get(flat_variant.login_provider_id, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -3935,8 +3935,8 @@ impl NestedUserEmail {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = UserEmail::get(id, connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = UserEmail::get(id, connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -3953,10 +3953,10 @@ impl NestedUserEmail {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = UserEmail::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = UserEmail::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -3990,18 +3990,18 @@ impl NestedUsersUsersRoleInvitation {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: UsersUsersRoleInvitation,
+        flat_variant: UsersUsersRoleInvitation,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: User::get(flat_struct.table_id, connection).await?.unwrap(),
-            user: User::get(flat_struct.user_id, connection).await?.unwrap(),
-            role: NestedRole::get(flat_struct.role_id, connection).await?.unwrap(),
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            inner: flat_struct,
+            table: User::get(flat_variant.table_id, connection).await?.unwrap(),
+            user: User::get(flat_variant.user_id, connection).await?.unwrap(),
+            role: NestedRole::get(flat_variant.role_id, connection).await?.unwrap(),
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -4015,8 +4015,8 @@ impl NestedUsersUsersRoleInvitation {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = UsersUsersRoleInvitation::get(( table_id, user_id ), connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = UsersUsersRoleInvitation::get(( table_id, user_id ), connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -4033,10 +4033,10 @@ impl NestedUsersUsersRoleInvitation {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = UsersUsersRoleInvitation::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = UsersUsersRoleInvitation::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -4072,18 +4072,18 @@ impl NestedUsersUsersRoleRequest {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: UsersUsersRoleRequest,
+        flat_variant: UsersUsersRoleRequest,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: User::get(flat_struct.table_id, connection).await?.unwrap(),
-            user: User::get(flat_struct.user_id, connection).await?.unwrap(),
-            role: NestedRole::get(flat_struct.role_id, connection).await?.unwrap(),
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            inner: flat_struct,
+            table: User::get(flat_variant.table_id, connection).await?.unwrap(),
+            user: User::get(flat_variant.user_id, connection).await?.unwrap(),
+            role: NestedRole::get(flat_variant.role_id, connection).await?.unwrap(),
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -4097,8 +4097,8 @@ impl NestedUsersUsersRoleRequest {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = UsersUsersRoleRequest::get(( table_id, user_id ), connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = UsersUsersRoleRequest::get(( table_id, user_id ), connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -4115,10 +4115,10 @@ impl NestedUsersUsersRoleRequest {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = UsersUsersRoleRequest::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = UsersUsersRoleRequest::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }
@@ -4154,18 +4154,18 @@ impl NestedUsersUsersRole {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub async fn from_flat(
-        flat_struct: UsersUsersRole,
+        flat_variant: UsersUsersRole,
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: User::get(flat_struct.table_id, connection).await?.unwrap(),
-            user: User::get(flat_struct.user_id, connection).await?.unwrap(),
-            role: NestedRole::get(flat_struct.role_id, connection).await?.unwrap(),
-            created_by: User::get(flat_struct.created_by, connection).await?.unwrap(),
-            inner: flat_struct,
+            table: User::get(flat_variant.table_id, connection).await?.unwrap(),
+            user: User::get(flat_variant.user_id, connection).await?.unwrap(),
+            role: NestedRole::get(flat_variant.role_id, connection).await?.unwrap(),
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -4179,8 +4179,8 @@ impl NestedUsersUsersRole {
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_struct = UsersUsersRole::get(( table_id, user_id ), connection).await?;        match flat_struct {
-            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),
+       let flat_variant = UsersUsersRole::get(( table_id, user_id ), connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
     }
@@ -4197,10 +4197,10 @@ impl NestedUsersUsersRole {
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_structs = UsersUsersRole::all(limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_structs.len());
-         for flat_struct in flat_structs {
-             nested_structs.push(Self::from_flat(flat_struct, connection).await?);
+        let flat_variants = UsersUsersRole::all(limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
          }
          Ok(nested_structs)
     }

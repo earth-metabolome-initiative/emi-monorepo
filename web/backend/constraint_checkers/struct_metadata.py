@@ -37,6 +37,7 @@ class AttributeMetadata:
         return not self.has_struct_data_type() and self.data_type().startswith("Nested")
 
     def has_struct_data_type(self) -> bool:
+        """Returns whether the attribute has a struct data type."""
         return isinstance(self._data_type, StructMetadata)
 
     def format_data_type(self) -> str:
@@ -163,6 +164,42 @@ class AttributeMetadata:
 
     def __repr__(self) -> str:
         return f"AttributeMetadata({self.name}, {self.data_type()}, {self.optional})"
+
+    def get_attribute_path(self, attribute: "AttributeMetadata") -> str:
+        """Returns the path to the attribute.
+
+        Parameters
+        ----------
+        attribute : AttributeMetadata
+            The attribute to get the path to.
+
+        Raises
+        ------
+        ValueError
+            If the attribute is not in the struct.
+        """
+        isinstance(attribute, AttributeMetadata)
+
+        if attribute == self:
+            return self.name
+
+        if not self.has_struct_data_type():
+            raise ValueError(
+                f"The attribute {self.name} does not have a struct data type. "
+                f"As such, it cannot contain the attribute {attribute.name}."
+            )
+
+        for inner_attribute in self._data_type.attributes:
+            try:
+                path = inner_attribute.get_attribute_path(attribute)
+                return f"{self.name}.{path}"
+            except ValueError:
+                continue
+
+        raise ValueError(
+            f"The attribute {attribute.name} is not in the struct {self.name}."
+        )
+
 
 
 class StructMetadata:

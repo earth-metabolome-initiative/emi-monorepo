@@ -1,6 +1,7 @@
 //! Module providing a yew component that handles a basic form.
 
 use crate::components::forms::InputErrors;
+use crate::cookies::is_logged_in;
 use crate::router::AppRoute;
 use crate::stores::user_state::UserState;
 use crate::workers::ws_worker::Tabular;
@@ -252,7 +253,7 @@ where
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        if Data::requires_authentication() && !self.user_state.has_user() {
+        if Data::requires_authentication() && (!self.user_state.has_user() || !is_logged_in()){
             log::info!("No access token found, redirecting to login page.");
             ctx.props().navigator.push(&AppRoute::Login);
         }

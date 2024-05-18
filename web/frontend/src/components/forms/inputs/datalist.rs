@@ -357,6 +357,8 @@ where
             </>
         };
 
+        let all_errors: Vec<ApiError> = self.errors.iter().chain(ctx.props().errors.iter()).cloned().collect();
+
         html! {
             <div class={classes}>
                 {if props.show_label {
@@ -416,7 +418,7 @@ where
                         }
                     }}
                 }}
-                <InputErrors errors={self.errors.clone()} />
+                <InputErrors errors={all_errors} />
             </div>
         }
     }

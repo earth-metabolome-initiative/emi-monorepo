@@ -1838,7 +1838,7 @@ def generate_nested_structs(
 
     for nested_struct in nested_structs:
         nested_struct.write_to(document)
-        flat_struct = nested_struct.get_flat_variant()
+        flat_variant = nested_struct.get_flat_variant()
 
         # We implement the all for the nested structs
 
@@ -1850,10 +1850,10 @@ def generate_nested_structs(
             "    /// Convert the flat struct to the nested struct.\n"
             "    ///\n"
             "    /// # Arguments\n"
-            "    /// * `flat_struct` - The flat struct.\n"
+            "    /// * `flat_variant` - The flat struct.\n"
             "    /// * `connection` - The database connection.\n"
             "    pub fn from_flat(\n"
-            f"        flat_struct: {flat_struct.name},\n"
+            f"        flat_variant: {flat_variant.name},\n"
             "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
             "    ) -> Result<Self, diesel::result::Error> {\n"
             "        Ok(Self {\n"
@@ -1861,24 +1861,24 @@ def generate_nested_structs(
         for attribute in nested_struct.attributes:
             if attribute.name == "inner":
                 continue
-            if attribute.data_type() == nested_struct.name or flat_struct.has_attribute(
+            if attribute.data_type() == nested_struct.name or flat_variant.has_attribute(
                 attribute
             ):
                 document.write(
-                    f"            {attribute.name}: flat_struct.{attribute.name},\n"
+                    f"            {attribute.name}: flat_variant.{attribute.name},\n"
                 )
                 continue
             if attribute.optional:
                 document.write(
-                    f"            {attribute.name}: flat_struct.{attribute.original_name}.map(|flat_struct| {attribute.data_type()}::get(flat_struct, connection)).transpose()?,\n"
+                    f"            {attribute.name}: flat_variant.{attribute.original_name}.map(|flat_variant| {attribute.data_type()}::get(flat_variant, connection)).transpose()?,\n"
                 )
             else:
                 document.write(
-                    f"            {attribute.name}: {attribute.data_type()}::get(flat_struct.{attribute.original_name}, connection)?,\n"
+                    f"            {attribute.name}: {attribute.data_type()}::get(flat_variant.{attribute.original_name}, connection)?,\n"
                 )
 
         document.write(
-            "                inner: flat_struct,\n" "        })\n" "    }\n" "}\n"
+            "                inner: flat_variant,\n" "        })\n" "    }\n" "}\n"
         )
 
         # Then we implement the all query.
@@ -1896,7 +1896,7 @@ def generate_nested_structs(
             "        offset: Option<i64>,\n"
             "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
             "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
-            f"        {flat_struct.name}::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()\n"
+            f"        {flat_variant.name}::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()\n"
             "    }\n"
             "}\n"
         )
@@ -1917,7 +1917,7 @@ def generate_nested_structs(
                 "        offset: Option<i64>,\n"
                 "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
                 "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
-                f"        {flat_struct.name}::all_editables(author_user_id, limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()\n"
+                f"        {flat_variant.name}::all_editables(author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()\n"
                 "    }\n"
                 "}\n"
             )
@@ -1925,7 +1925,7 @@ def generate_nested_structs(
         # Then, for all the tables that have an updated_at column, we implement the
         # `all_by_updated_at` method, which returns all of the nested structs ordered
         # by the `updated_at` column.
-        if tables_metadata.has_updated_at_column(flat_struct.table_name):
+        if tables_metadata.has_updated_at_column(flat_variant.table_name):
             document.write(
                 f"impl {nested_struct.name} {{\n"
                 "    /// Get all the nested structs from the database ordered by the `updated_at` column.\n"
@@ -1939,7 +1939,7 @@ def generate_nested_structs(
                 "        offset: Option<i64>,\n"
                 "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
                 "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
-                f"        {flat_struct.name}::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()\n"
+                f"        {flat_variant.name}::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()\n"
                 "    }\n"
                 "}\n"
             )
@@ -1956,7 +1956,7 @@ def generate_nested_structs(
             "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
             "    ) -> Result<Self, diesel::result::Error>\n"
             "    {\n"
-            f"       {flat_struct.name}::get({nested_struct.get_formatted_primary_keys(include_prefix=False)}, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))\n"
+            f"       {flat_variant.name}::get({nested_struct.get_formatted_primary_keys(include_prefix=False)}, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))\n"
             "    }\n"
             "}\n"
         )
@@ -1964,7 +1964,7 @@ def generate_nested_structs(
         # For each of the columns in the struct that have a UNIQUE constraint,
         # we implement the methods `from_{column_name}` by employing the method
         # of the same name available for the main struct associated to this struct
-        for unique_columns in flat_struct.get_unique_constraints():
+        for unique_columns in flat_variant.get_unique_constraints():
 
             unique_column_references = [
                 unique_column.as_ref() for unique_column in unique_columns
@@ -2014,7 +2014,7 @@ def generate_nested_structs(
                 "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
                 "    ) -> Result<Self, diesel::result::Error>\n"
                 "    {\n"
-                f"        {flat_struct.name}::{from_method_name}({comma_separated_column_names}, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))\n"
+                f"        {flat_variant.name}::{from_method_name}({comma_separated_column_names}, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))\n"
                 "    }\n"
                 "}\n"
             )
@@ -2023,7 +2023,7 @@ def generate_nested_structs(
         # calls search on the flat version of the struct and then iterates on the
         # primary keys of the results and constructs the nested structs by calling
         # the `get` method several times.
-        if similarity_indices.has_table(flat_struct.table_name):
+        if similarity_indices.has_table(flat_variant.table_name):
             for method_name, _, _ in PGIndices.SIMILARITY_METHODS:
                 document.write(
                     f"impl {nested_struct.name} {{\n"
@@ -2037,7 +2037,7 @@ def generate_nested_structs(
                     "        limit: Option<i32>,\n"
                     "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
                     "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
-                    f"       {flat_struct.name}::{method_name}_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()\n"
+                    f"       {flat_variant.name}::{method_name}_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()\n"
                     "    }\n"
                     "}\n"
                 )
@@ -2057,7 +2057,7 @@ def generate_nested_structs(
                         "        limit: Option<i32>,\n"
                         "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
                         "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
-                        f"       {flat_struct.name}::{method_name}_search_editables(author_user_id, query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()\n"
+                        f"       {flat_variant.name}::{method_name}_search_editables(author_user_id, query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()\n"
                         "    }\n"
                         "}\n"
                     )
@@ -2142,7 +2142,7 @@ def write_web_common_nested_structs(path: str, nested_structs: List[StructMetada
         # is enabled using GlueSQL. This method will be extremely similar to the
         # `get` method for the Diesel-based approach of the backend.
 
-        flat_struct = struct_metadata.get_flat_variant()
+        flat_variant = struct_metadata.get_flat_variant()
 
         document.write(
             f'#[cfg(feature = "frontend")]\n' f"impl {struct_metadata.name} {{\n"
@@ -2155,10 +2155,10 @@ def write_web_common_nested_structs(path: str, nested_structs: List[StructMetada
             "    /// Convert the flat struct to the nested struct.\n"
             "    ///\n"
             "    /// # Arguments\n"
-            "    /// * `flat_struct` - The flat struct.\n"
+            "    /// * `flat_variant` - The flat struct.\n"
             "    /// * `connection` - The database connection.\n"
             "    pub async fn from_flat(\n"
-            f"        flat_struct: {flat_struct.name},\n"
+            f"        flat_variant: {flat_variant.name},\n"
             "        connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,\n"
             "    ) -> Result<Self, gluesql::prelude::Error> {\n"
             "        Ok(Self {\n"
@@ -2168,23 +2168,23 @@ def write_web_common_nested_structs(path: str, nested_structs: List[StructMetada
                 continue
             if (
                 attribute.data_type() == struct_metadata.name
-                or flat_struct.has_attribute(attribute)
+                or flat_variant.has_attribute(attribute)
             ):
                 document.write(
-                    f"            {attribute.name}: flat_struct.{attribute.name},\n"
+                    f"            {attribute.name}: flat_variant.{attribute.name},\n"
                 )
                 continue
             if attribute.optional:
                 document.write(
-                    f"            {attribute.name}: if let Some({attribute.original_name}) = flat_struct.{attribute.original_name} {{ {attribute.data_type()}::get({attribute.original_name}, connection).await? }} else {{ None }},\n"
+                    f"            {attribute.name}: if let Some({attribute.original_name}) = flat_variant.{attribute.original_name} {{ {attribute.data_type()}::get({attribute.original_name}, connection).await? }} else {{ None }},\n"
                 )
             else:
                 document.write(
-                    f"            {attribute.name}: {attribute.data_type()}::get(flat_struct.{attribute.original_name}, connection).await?.unwrap(),\n"
+                    f"            {attribute.name}: {attribute.data_type()}::get(flat_variant.{attribute.original_name}, connection).await?.unwrap(),\n"
                 )
 
         if any(attribute.name == "inner" for attribute in struct_metadata.attributes):
-            document.write(f"            inner: flat_struct,\n")
+            document.write(f"            inner: flat_variant,\n")
 
         document.write("        })\n" "    }\n")
 
@@ -2192,17 +2192,17 @@ def write_web_common_nested_structs(path: str, nested_structs: List[StructMetada
             "    /// Get the nested struct from the provided primary key.\n"
             "    ///\n"
             "    /// # Arguments\n"
-            f"    /// * `{flat_struct.get_formatted_primary_keys(include_prefix=False)}` - The primary key(s) of the row.\n"
+            f"    /// * `{flat_variant.get_formatted_primary_keys(include_prefix=False)}` - The primary key(s) of the row.\n"
             "    /// * `connection` - The database connection.\n"
             "    pub async fn get<C>(\n"
-            f"        {flat_struct.get_formatted_primary_keys(include_prefix=False)}: {flat_struct.get_formatted_primary_key_data_types()},\n"
+            f"        {flat_variant.get_formatted_primary_keys(include_prefix=False)}: {flat_variant.get_formatted_primary_key_data_types()},\n"
             "        connection: &mut gluesql::prelude::Glue<C>,\n"
             "    ) -> Result<Option<Self>, gluesql::prelude::Error> where\n"
             "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
             "    {\n"
-            f"       let flat_struct = {flat_struct.name}::get({flat_struct.get_formatted_primary_keys(include_prefix=False)}, connection).await?;"
-            "        match flat_struct {\n"
-            "            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),\n"
+            f"       let flat_variant = {flat_variant.name}::get({flat_variant.get_formatted_primary_keys(include_prefix=False)}, connection).await?;"
+            "        match flat_variant {\n"
+            "            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),\n"
             "            None => Ok(None),\n"
             "        }\n"
             "    }\n"
@@ -2226,10 +2226,10 @@ def write_web_common_nested_structs(path: str, nested_structs: List[StructMetada
             "    ) -> Result<Vec<Self>, gluesql::prelude::Error> where\n"
             "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
             "    {\n"
-            f"        let flat_structs = {flat_struct.name}::all(limit, offset, connection).await?;\n"
-            "         let mut nested_structs = Vec::with_capacity(flat_structs.len());\n"
-            "         for flat_struct in flat_structs {\n"
-            "             nested_structs.push(Self::from_flat(flat_struct, connection).await?);\n"
+            f"        let flat_variants = {flat_variant.name}::all(limit, offset, connection).await?;\n"
+            "         let mut nested_structs = Vec::with_capacity(flat_variants.len());\n"
+            "         for flat_variant in flat_variants {\n"
+            "             nested_structs.push(Self::from_flat(flat_variant, connection).await?);\n"
             "         }\n"
             "         Ok(nested_structs)\n"
             "    }\n"
@@ -2239,7 +2239,7 @@ def write_web_common_nested_structs(path: str, nested_structs: List[StructMetada
         # is enabled using GlueSQL. This method will be extremely similar to the `all_by_updated_at`
         # method for the Diesel-based approach of the backend.
 
-        if table_metadatas.has_updated_at_column(flat_struct.table_name):
+        if table_metadatas.has_updated_at_column(flat_variant.table_name):
             document.write(
                 "    /// Get all the nested structs from the database ordered by the `updated_at` column.\n"
                 "    ///\n"
@@ -2254,10 +2254,10 @@ def write_web_common_nested_structs(path: str, nested_structs: List[StructMetada
                 "    ) -> Result<Vec<Self>, gluesql::prelude::Error> where\n"
                 "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
                 "    {\n"
-                f"        let flat_structs = {flat_struct.name}::all_by_updated_at(limit, offset, connection).await?;\n"
-                "         let mut nested_structs = Vec::with_capacity(flat_structs.len());\n"
-                "         for flat_struct in flat_structs {\n"
-                "             nested_structs.push(Self::from_flat(flat_struct, connection).await?);\n"
+                f"        let flat_variants = {flat_variant.name}::all_by_updated_at(limit, offset, connection).await?;\n"
+                "         let mut nested_structs = Vec::with_capacity(flat_variants.len());\n"
+                "         for flat_variant in flat_variants {\n"
+                "             nested_structs.push(Self::from_flat(flat_variant, connection).await?);\n"
                 "         }\n"
                 "         Ok(nested_structs)\n"
                 "    }\n"
@@ -2343,7 +2343,7 @@ def write_webcommons_table_names_enumeration(
             tables[struct.table_name] = TableStructMetadata(struct.table_name)
         tables[struct.table_name].set_richest_struct(struct)
         if not struct.is_nested():
-            tables[struct.table_name].set_flat_struct(struct)
+            tables[struct.table_name].set_flat_variant(struct)
 
     # We set the new flat model struct variant for each of the tables,
     # when it is available.
@@ -2354,7 +2354,7 @@ def write_webcommons_table_names_enumeration(
             f"Expected a new variant for table {struct.table_name}. "
             f"Its flat variant is {struct.get_flat_variant().name}."
         )
-        tables[struct.table_name].set_new_flat_struct(struct)
+        tables[struct.table_name].set_new_flat_variant(struct)
         struct.set_richest_variant(tables[struct.table_name].get_richest_struct())
 
     # We set the update flat model struct variant for each of the tables,
@@ -2362,7 +2362,7 @@ def write_webcommons_table_names_enumeration(
     for struct in update_model_structs:
         assert struct.table_name in tables, f"Table {struct.table_name} not found."
         assert struct.is_update_variant()
-        tables[struct.table_name].set_update_flat_struct(struct)
+        tables[struct.table_name].set_update_flat_variant(struct)
         struct.set_richest_variant(tables[struct.table_name].get_richest_struct())
 
     tables: List[TableStructMetadata] = sorted(
@@ -2458,7 +2458,7 @@ def write_webcommons_table_names_enumeration(
     for table in tables:
         document.write(
             f"            Table::{table.camel_cased()} => {{\n"
-            f"                crate::database::{table.flat_struct_name()}::delete_from_id(primary_key.into(), connection).await\n"
+            f"                crate::database::{table.flat_variant_name()}::delete_from_id(primary_key.into(), connection).await\n"
             "            },\n"
         )
 
@@ -2623,8 +2623,8 @@ def write_webcommons_table_names_enumeration(
 
         document.write(
             f"            Table::{table.camel_cased()} => {{\n"
-            f"                let new_row: super::{table.new_flat_struct_name()} = bincode::deserialize::<super::{table.new_flat_struct_name()}>(&new_row).map_err(crate::api::ApiError::from)?;\n"
-            f"                let inserted_row: super::{table.flat_struct_name()} = new_row.insert(user_id, connection).await?;\n"
+            f"                let new_row: super::{table.new_flat_variant_name()} = bincode::deserialize::<super::{table.new_flat_variant_name()}>(&new_row).map_err(crate::api::ApiError::from)?;\n"
+            f"                let inserted_row: super::{table.flat_variant_name()} = new_row.insert(user_id, connection).await?;\n"
         )
 
         # If the table has a richer variant than the flat one, we convert the flat struct
@@ -2696,12 +2696,12 @@ def write_webcommons_table_names_enumeration(
             )
             continue
 
-        flat_struct: StructMetadata = table.get_flat_variant()
+        flat_variant: StructMetadata = table.get_flat_variant()
 
         document.write(
             f"            Table::{table.camel_cased()} => {{\n"
-            f"                let update_row: super::{table.update_flat_struct_name()} = bincode::deserialize::<super::{table.update_flat_struct_name()}>(&update_row).map_err(crate::api::ApiError::from)?;\n"
-            f"                let {flat_struct.get_formatted_primary_keys(include_prefix=False)} = {flat_struct.get_formatted_primary_keys(include_prefix=True, prefix='update_row')};\n"
+            f"                let update_row: super::{table.update_flat_variant_name()} = bincode::deserialize::<super::{table.update_flat_variant_name()}>(&update_row).map_err(crate::api::ApiError::from)?;\n"
+            f"                let {flat_variant.get_formatted_primary_keys(include_prefix=False)} = {flat_variant.get_formatted_primary_keys(include_prefix=True, prefix='update_row')};\n"
             f"                update_row.update("
         )
 
@@ -2711,7 +2711,7 @@ def write_webcommons_table_names_enumeration(
         document.write("connection).await?;\n")
 
         document.write(
-            f"                let updated_row: super::{table.flat_struct_name()} = super::{table.flat_struct_name()}::get({flat_struct.get_formatted_primary_keys(include_prefix=False)}, connection).await?.unwrap();\n"
+            f"                let updated_row: super::{table.flat_variant_name()} = super::{table.flat_variant_name()}::get({flat_variant.get_formatted_primary_keys(include_prefix=False)}, connection).await?.unwrap();\n"
         )
 
         # If the table has a richer variant than the flat one, we convert the flat struct
@@ -3007,8 +3007,8 @@ def write_diesel_table_names_enumeration(
         if table.has_public_column():
             document.write(
                 f"            web_common::database::Table::{table.camel_cased()} => {{\n"
-                f"                {table.flat_struct_name()}::get(primary_key.into(), connection)?.public ||\n"
-                f"                user_id.map_or(Ok(false), |user_id| {table.flat_struct_name()}::is_viewer_by_id(primary_key.into(), user_id, connection))?\n"
+                f"                {table.flat_variant_name()}::get(primary_key.into(), connection)?.public ||\n"
+                f"                user_id.map_or(Ok(false), |user_id| {table.flat_variant_name()}::is_viewer_by_id(primary_key.into(), user_id, connection))?\n"
                 "            },\n"
             )
         else:
@@ -3061,7 +3061,7 @@ def write_diesel_table_names_enumeration(
     for table in tables:
         if table.has_associated_roles() and table.name != "users":
             document.write(
-                f"            web_common::database::Table::{table.camel_cased()} => {table.flat_struct_name()}::is_editor_by_id(primary_key.into(), user_id, connection)?,\n"
+                f"            web_common::database::Table::{table.camel_cased()} => {table.flat_variant_name()}::is_editor_by_id(primary_key.into(), user_id, connection)?,\n"
             )
         elif table.name == "users":
             document.write(
@@ -3141,7 +3141,7 @@ def write_diesel_table_names_enumeration(
     for table in tables:
         if table.has_associated_roles() and table.name != "users":
             document.write(
-                f"            web_common::database::Table::{table.camel_cased()} => {table.flat_struct_name()}::is_admin_by_id(primary_key.into(), user_id, connection)?,\n"
+                f"            web_common::database::Table::{table.camel_cased()} => {table.flat_variant_name()}::is_admin_by_id(primary_key.into(), user_id, connection)?,\n"
             )
         else:
             document.write(
@@ -3168,7 +3168,7 @@ def write_diesel_table_names_enumeration(
 
         if table.has_associated_roles() and table.name != "users":
             document.write(
-                f"            web_common::database::Table::{table.camel_cased()} => {table.flat_struct_name()}::delete_by_id(primary_key.into(), author_user_id, connection)?,\n"
+                f"            web_common::database::Table::{table.camel_cased()} => {table.flat_variant_name()}::delete_by_id(primary_key.into(), author_user_id, connection)?,\n"
             )
         else:
             document.write(
@@ -3337,8 +3337,8 @@ def write_diesel_table_names_enumeration(
 
         document.write(
             f"            web_common::database::Table::{table.camel_cased()} => {{\n"
-            f"                let row: web_common::database::{table.new_flat_struct_name()} = bincode::deserialize::<web_common::database::{table.new_flat_struct_name()}>(&row).map_err(web_common::api::ApiError::from)?;\n"
-            f"                let inserted_row: crate::models::{table.flat_struct_name()} = <web_common::database::{table.new_flat_struct_name()} as InsertRow>::insert(row, user_id, connection)?;\n"
+            f"                let row: web_common::database::{table.new_flat_variant_name()} = bincode::deserialize::<web_common::database::{table.new_flat_variant_name()}>(&row).map_err(web_common::api::ApiError::from)?;\n"
+            f"                let inserted_row: crate::models::{table.flat_variant_name()} = <web_common::database::{table.new_flat_variant_name()} as InsertRow>::insert(row, user_id, connection)?;\n"
         )
 
         # If the table has a richer variant than the flat one, we convert the flat struct
@@ -3417,8 +3417,8 @@ def write_diesel_table_names_enumeration(
 
         document.write(
             f"            web_common::database::Table::{table.camel_cased()} => {{\n"
-            f"                let row: web_common::database::{table.update_flat_struct_name()} = bincode::deserialize::<web_common::database::{table.update_flat_struct_name()}>(&row).map_err(web_common::api::ApiError::from)?;\n"
-            f"                let updated_row: crate::models::{table.flat_struct_name()} = <web_common::database::{table.update_flat_struct_name()} as UpdateRow>::update(row, user_id, connection)?;\n"
+            f"                let row: web_common::database::{table.update_flat_variant_name()} = bincode::deserialize::<web_common::database::{table.update_flat_variant_name()}>(&row).map_err(web_common::api::ApiError::from)?;\n"
+            f"                let updated_row: crate::models::{table.flat_variant_name()} = <web_common::database::{table.update_flat_variant_name()} as UpdateRow>::update(row, user_id, connection)?;\n"
         )
 
         # If the table has a richer variant than the flat one, we convert the flat struct
@@ -3484,7 +3484,7 @@ def write_diesel_table_names_enumeration(
 
         if not richest_variant.is_nested():
             document.write(
-                f"            web_common::database::Table::{table.camel_cased()} => bincode::serialize(&serde_json::from_str::<crate::models::{table.flat_struct_name()}>(row).map_err(web_common::api::ApiError::from)?).map_err(web_common::api::ApiError::from)?,\n"
+                f"            web_common::database::Table::{table.camel_cased()} => bincode::serialize(&serde_json::from_str::<crate::models::{table.flat_variant_name()}>(row).map_err(web_common::api::ApiError::from)?).map_err(web_common::api::ApiError::from)?,\n"
             )
             continue
 
@@ -4608,7 +4608,7 @@ def write_frontend_builder_default_implementation(
     default value, the attribute is set to None.
     """
 
-    flat_struct = builder.get_flat_variant()
+    flat_variant = builder.get_flat_variant()
 
     document.write(
         f"impl Default for {builder.name} {{\n"
@@ -4616,7 +4616,7 @@ def write_frontend_builder_default_implementation(
         f"        Self {{\n"
     )
 
-    primary_keys = flat_struct.get_primary_keys()
+    primary_keys = flat_variant.get_primary_keys()
 
     for attribute in builder.attributes:
         # If this is an error vector, we set it to
@@ -4636,7 +4636,7 @@ def write_frontend_builder_default_implementation(
 
         # If the current attribute does not exist in the flat struct,
         # we set it to None.
-        if flat_struct.get_attribute_by_name(attribute.name) is None:
+        if flat_variant.get_attribute_by_name(attribute.name) is None:
             if attribute.optional:
                 document.write(f"            {attribute.name}: None,\n")
             else:
@@ -4835,6 +4835,33 @@ def write_frontend_builder_action_enumeration(
                 f"        }}\n"
             )
 
+        # If the provided value is a StructMetadata, and it is of the same type as the richest variant,
+        # we check that all of the primary keys are distinct from the primary keys of the richest variant.
+        # We do not want to find an entry equal to the one we are trying to insert.
+        if attribute.data_type() == rich_variant.name:
+            document.write(
+                f"                match {attribute.name}.as_ref() {{\n"
+                f"                    Some({attribute.name}) => {{\n"
+            )
+            is_first = True
+            for primary_key in primary_keys:
+                prefix = "if" if is_first else "&&"
+                is_first = False
+                document.write(
+                    f"                            {prefix} state_mut.{primary_key.name}.map_or(false, |{primary_key.name}| {primary_key.name} == {attribute.get_attribute_path(primary_key)})\n"
+                )
+            document.write(
+                "                        {\n"
+                f"                            state_mut.errors_{attribute.name}.push(ApiError::BadRequest(vec![\n"
+                f'                                "The {attribute.human_readable_name()} field must be distinct from the current value.".to_string()\n'
+                "                             ]));\n"
+                f"                            break '{attribute.name};\n"
+                "                        }\n"
+                "                    }\n"
+                "                    None => (),\n"
+                "                }\n"
+            )
+
         # If the provided value is a String, we need to check whether it is empty.
         # If it is, we add an error to the errors vector.
         if attribute.data_type() == "String":
@@ -4949,30 +4976,30 @@ def write_frontend_form_builder_implementation(
     This method implements the FormBuilder trait for the provided builder struct.
     """
 
-    flat_struct = builder.get_flat_variant()
+    flat_variant = builder.get_flat_variant()
     rich_struct = builder.get_richest_variant()
 
     variants = []
 
-    flat_struct = builder.get_flat_variant()
+    flat_variant = builder.get_flat_variant()
 
-    if flat_struct.is_insertable():
+    if flat_variant.is_insertable():
         variants.append(builder.get_new_variant())
 
     # If the new variant is not also used as an update
     # variant, we add it to the list of variants.
-    if flat_struct.is_updatable():
+    if flat_variant.is_updatable():
         update_variant = builder.get_update_variant()
         if not update_variant.is_new_variant():
             variants.append(update_variant)
 
     assert len(variants) > 0
 
-    primary_keys = flat_struct.get_primary_keys()
+    primary_keys = flat_variant.get_primary_keys()
 
     document.write(
         f"impl FormBuilder for {builder.name} {{\n"
-        f"    type Actions = {flat_struct.name}Actions;\n\n"
+        f"    type Actions = {flat_variant.name}Actions;\n\n"
         f"    type RichVariant = {rich_struct.name};\n\n"
         "    fn has_errors(&self) -> bool {\n"
     )
@@ -4998,7 +5025,7 @@ def write_frontend_form_builder_implementation(
     # We implement the id method, which returns the primary key of the struct.
     document.write(
         "    fn id(&self) -> Option<PrimaryKey> {\n"
-        f"        {flat_struct.get_formatted_primary_keys(include_prefix=True)}.map(|id| id.into())\n"
+        f"        {flat_variant.get_formatted_primary_keys(include_prefix=True)}.map(|id| id.into())\n"
         "    }\n\n"
     )
 
@@ -5043,7 +5070,7 @@ def write_frontend_form_builder_implementation(
         if attribute.data_type() == rich_struct.name:
             assert rich_struct.is_nested()
             named_requests.append(
-                f'ComponentMessage::get_named::<&str, {variants[0].name}>("{attribute.name}", {flat_struct.get_formatted_primary_keys(include_prefix=True, prefix="rich_variant.inner")}.into())'
+                f'ComponentMessage::get_named::<&str, {variants[0].name}>("{attribute.name}", {flat_variant.get_formatted_primary_keys(include_prefix=True, prefix="rich_variant.inner")}.into())'
             )
             continue
 
@@ -5052,14 +5079,14 @@ def write_frontend_form_builder_implementation(
         if struct_attribute is not None:
             if struct_attribute.optional:
                 document.write(
-                    f"        dispatcher.apply({flat_struct.name}Actions::Set{attribute.capitalized_name()}(rich_variant.{attribute.name}));\n"
+                    f"        dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_name()}(rich_variant.{attribute.name}));\n"
                 )
             else:
                 document.write(
-                    f"        dispatcher.apply({flat_struct.name}Actions::Set{attribute.capitalized_name()}(Some(rich_variant.{attribute.name})));\n"
+                    f"        dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_name()}(Some(rich_variant.{attribute.name})));\n"
                 )
         else:
-            struct_attribute = flat_struct.get_attribute_by_name(attribute.name)
+            struct_attribute = flat_variant.get_attribute_by_name(attribute.name)
 
             if struct_attribute is not None:
                 if (
@@ -5068,24 +5095,24 @@ def write_frontend_form_builder_implementation(
                 ):
                     if struct_attribute.optional:
                         document.write(
-                            f"    dispatcher.apply({flat_struct.name}Actions::Set{attribute.capitalized_name()}(rich_variant.inner.{attribute.name}.map(|{attribute.name}| {attribute.name}.to_string())));\n"
+                            f"    dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_name()}(rich_variant.inner.{attribute.name}.map(|{attribute.name}| {attribute.name}.to_string())));\n"
                         )
                     else:
                         document.write(
-                            f"    dispatcher.apply({flat_struct.name}Actions::Set{attribute.capitalized_name()}(Some(rich_variant.inner.{attribute.name}.to_string())));\n"
+                            f"    dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_name()}(Some(rich_variant.inner.{attribute.name}.to_string())));\n"
                         )
                 elif struct_attribute.optional:
                     document.write(
-                        f"        dispatcher.apply({flat_struct.name}Actions::Set{attribute.capitalized_name()}(rich_variant.inner.{attribute.name}));\n"
+                        f"        dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_name()}(rich_variant.inner.{attribute.name}));\n"
                     )
                 else:
                     document.write(
-                        f"        dispatcher.apply({flat_struct.name}Actions::Set{attribute.capitalized_name()}(Some(rich_variant.inner.{attribute.name})));"
+                        f"        dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_name()}(Some(rich_variant.inner.{attribute.name})));"
                     )
             else:
                 raise RuntimeError(
                     f"Attribute {attribute.name} present in builder struct {builder.name} "
-                    f"not found in neither the rich variant {rich_struct.name} nor the flat variant {flat_struct.name}."
+                    f"not found in neither the rich variant {rich_struct.name} nor the flat variant {flat_variant.name}."
                 )
 
     # We returns the names requests. When the list
@@ -5115,15 +5142,15 @@ def write_frontend_form_builder_implementation(
         if attribute.name == "form_updated_at":
             continue
 
-        struct_attribute = flat_struct.get_attribute_by_name(attribute.name)
+        struct_attribute = flat_variant.get_attribute_by_name(attribute.name)
 
         if struct_attribute is None:
             # We check whether the _id variant of the attribute is present.
-            struct_attribute = flat_struct.get_attribute_by_name(f"{attribute.name}_id")
+            struct_attribute = flat_variant.get_attribute_by_name(f"{attribute.name}_id")
 
         if struct_attribute is None:
             raise RuntimeError(
-                f"Attribute {attribute.name} not found in the build target struct {flat_struct.name}."
+                f"Attribute {attribute.name} not found in the build target struct {flat_variant.name}."
             )
 
         if not struct_attribute.optional and attribute.optional:
@@ -5155,7 +5182,7 @@ def write_frontend_form_builder_implementation(
                     f"            {primary_key.name}: builder.{primary_key.name}.unwrap(),\n"
                 )
 
-        for attribute in flat_struct.attributes:
+        for attribute in flat_variant.attributes:
 
             if attribute.is_automatically_determined_column():
                 continue
@@ -5276,7 +5303,7 @@ def handle_missing_gin_index(
 
     textual_columns = []
 
-    flat_struct = None
+    flat_variant = None
 
     assert not attribute.raw_data_type().has_only_foreign_keys()
 
@@ -5291,11 +5318,11 @@ def handle_missing_gin_index(
                 f"The other attributes in the struct are {', '.join(inner_attribute.name for inner_attribute in attribute.raw_data_type().attributes)}."
             )
 
-        flat_struct = inner_attribute.raw_data_type()
+        flat_variant = inner_attribute.raw_data_type()
     else:
-        flat_struct = attribute.raw_data_type()
+        flat_variant = attribute.raw_data_type()
 
-    for inner_attribute in flat_struct.attributes:
+    for inner_attribute in flat_variant.attributes:
         if inner_attribute.data_type() in TEXTUAL_DATA_TYPES:
             textual_columns.append(inner_attribute)
 
@@ -5728,22 +5755,23 @@ def write_frontend_yew_form(
 
     trigram_indices = find_pg_trgm_indices()
 
-    flat_struct = builder.get_flat_variant()
-    primary_keys = flat_struct.get_primary_keys()
+    flat_variant = builder.get_flat_variant()
+    rich_variant = builder.get_richest_variant()
+    primary_keys = flat_variant.get_primary_keys()
 
     variants = []
 
-    if flat_struct.is_insertable():
+    if flat_variant.is_insertable():
         variants.append((builder.get_new_variant(), "POST"))
 
-    if flat_struct.is_updatable():
+    if flat_variant.is_updatable():
         variants.append((builder.get_update_variant(), "PUT"))
 
     for variant, method in variants:
 
         action_name = "Create" if method == "POST" else "Update"
 
-        form_component_name = f"{action_name}{flat_struct.name}Form"
+        form_component_name = f"{action_name}{flat_variant.name}Form"
 
         # We generate the lowercased name of the form component by splitting
         # on the uppercased letters and joining the resulting list with an
@@ -5808,19 +5836,19 @@ def write_frontend_yew_form(
 
             if attribute.data_type() == "bool":
                 document.write(
-                    f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: bool| {flat_struct.name}Actions::Set{attribute.capitalized_name()}(Some({attribute.name})));\n"
+                    f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: bool| {flat_variant.name}Actions::Set{attribute.capitalized_name()}(Some({attribute.name})));\n"
                 )
             elif (
                 attribute.data_type() in INPUT_TYPE_MAP
                 or attribute.data_type() == "NaiveDateTime"
             ):
                 document.write(
-                    f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: Option<String>| {flat_struct.name}Actions::Set{attribute.capitalized_name()}({attribute.name}));\n"
+                    f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: Option<String>| {flat_variant.name}Actions::Set{attribute.capitalized_name()}({attribute.name}));\n"
                 )
             elif attribute.data_type() == "Vec<u8>":
                 if "picture" in attribute.name:
                     document.write(
-                        f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: Option<Image>| {flat_struct.name}Actions::Set{attribute.capitalized_name()}({attribute.name}.map(|{attribute.name}| {attribute.name}.into())));\n"
+                        f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: Option<Image>| {flat_variant.name}Actions::Set{attribute.capitalized_name()}({attribute.name}.map(|{attribute.name}| {attribute.name}.into())));\n"
                     )
                 else:
                     raise RuntimeError(
@@ -5828,7 +5856,7 @@ def write_frontend_yew_form(
                     )
             else:
                 document.write(
-                    f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: {attribute.format_data_type()}| {flat_struct.name}Actions::Set{attribute.capitalized_name()}({attribute.name}));\n"
+                    f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: {attribute.format_data_type()}| {flat_variant.name}Actions::Set{attribute.capitalized_name()}({attribute.name}));\n"
                 )
 
         document.write(
@@ -5856,12 +5884,23 @@ def write_frontend_yew_form(
                 error_attribute is not None
             ), f"Error attribute not found for {attribute.name} in {builder.name}."
 
+            struct_attribute = rich_variant.get_attribute_by_name(attribute.name)
+
+            if struct_attribute is None:
+                struct_attribute = flat_variant.get_attribute_by_name(attribute.name)
+
+            assert (
+                struct_attribute is not None
+            ), f"Attribute {attribute.name} not found in the struct {flat_variant.name}."
+
+            optional = "true" if struct_attribute.optional else "false"
+
             if (
                 attribute.data_type() in INPUT_TYPE_MAP
                 or attribute.data_type() == "NaiveDateTime"
             ):
                 document.write(
-                    f'            <BasicInput<{attribute.data_type()}> label="{attribute.human_readable_name()}" errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} value={{builder_store.{attribute.name}.clone()}} />\n'
+                    f'            <BasicInput<{attribute.data_type()}> label="{attribute.human_readable_name()}" optional={{{optional}}} errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} value={{builder_store.{attribute.name}.clone()}} />\n'
                 )
                 continue
 
@@ -5876,7 +5915,7 @@ def write_frontend_yew_form(
                     allowed_formats = ["GenericFileFormat::Image"]
 
                     document.write(
-                        f'            <FileInput<Image> label="{attribute.human_readable_name()}" errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} allowed_formats={{vec![{", ".join(allowed_formats)}]}} value={{builder_store.{attribute.name}.clone().map(|{attribute.name}| {attribute.name}.into())}} />\n'
+                        f'            <FileInput<Image> label="{attribute.human_readable_name()}" optional={{{optional}}} errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} allowed_formats={{vec![{", ".join(allowed_formats)}]}} value={{builder_store.{attribute.name}.clone().map(|{attribute.name}| {attribute.name}.into())}} />\n'
                     )
                 else:
                     raise RuntimeError(
@@ -5908,7 +5947,7 @@ def write_frontend_yew_form(
                 editables = "true" if struct.has_associated_roles() and struct.table_name != "users" else "false"
 
                 document.write(
-                    f'            <Datalist<{attribute.data_type()}, {editables}> builder={{set_{attribute.name}}} errors={{builder_store.{error_attribute.name}.clone()}} value={{builder_store.{attribute.name}.clone()}} label="{attribute.human_readable_name()}" />\n'
+                    f'            <Datalist<{attribute.data_type()}, {editables}> builder={{set_{attribute.name}}} optional={{{optional}}} errors={{builder_store.{error_attribute.name}.clone()}} value={{builder_store.{attribute.name}.clone()}} label="{attribute.human_readable_name()}" />\n'
                 )
                 continue
 
@@ -5939,15 +5978,15 @@ def write_frontend_form_buildable_implementation(
     This method implements the Buildable trait for the provided struct.
     """
 
-    flat_struct = builder.get_flat_variant()
+    flat_variant = builder.get_flat_variant()
     rich_struct = builder.get_richest_variant()
 
     variants: List[StructMetadata] = []
 
-    if flat_struct.is_insertable():
+    if flat_variant.is_insertable():
         variants.append(builder.get_new_variant())
 
-    if flat_struct.is_updatable():
+    if flat_variant.is_updatable():
         update_variant = builder.get_update_variant()
         if not update_variant.is_new_variant():
             variants.append(update_variant)
@@ -5963,7 +6002,7 @@ def write_frontend_form_buildable_implementation(
         # We implement the Tabular trait for the struct.
         document.write(
             f"impl Tabular for {variant.name} {{\n"
-            f"    const TABLE: Table = Table::{flat_struct.get_capitalized_table_name()};\n"
+            f"    const TABLE: Table = Table::{flat_variant.get_capitalized_table_name()};\n"
             "}\n\n"
         )
 

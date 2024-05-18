@@ -18,15 +18,15 @@ impl NestedBioOttRank {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: BioOttRank,
+        flat_variant: BioOttRank,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            font_awesome_icon: FontAwesomeIcon::get(flat_struct.font_awesome_icon_id, connection)?,
-                inner: flat_struct,
+            font_awesome_icon: FontAwesomeIcon::get(flat_variant.font_awesome_icon_id, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -42,7 +42,7 @@ impl NestedBioOttRank {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        BioOttRank::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        BioOttRank::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedBioOttRank {
@@ -56,7 +56,7 @@ impl NestedBioOttRank {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       BioOttRank::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       BioOttRank::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl NestedBioOttRank {
@@ -70,7 +70,7 @@ impl NestedBioOttRank {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        BioOttRank::from_name(name, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+        BioOttRank::from_name(name, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl NestedBioOttRank {
@@ -84,7 +84,7 @@ impl NestedBioOttRank {
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-       BioOttRank::similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+       BioOttRank::similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedBioOttRank {
@@ -98,7 +98,7 @@ impl NestedBioOttRank {
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-       BioOttRank::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+       BioOttRank::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedBioOttRank {
@@ -112,7 +112,7 @@ impl NestedBioOttRank {
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-       BioOttRank::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+       BioOttRank::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl From<web_common::database::nested_models::NestedBioOttRank> for NestedBioOttRank {
@@ -151,25 +151,25 @@ impl NestedBioOttTaxonItem {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: BioOttTaxonItem,
+        flat_variant: BioOttTaxonItem,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            ott_rank: NestedBioOttRank::get(flat_struct.ott_rank_id, connection)?,
-            domain: flat_struct.domain_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
-            kingdom: flat_struct.kingdom_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
-            phylum: flat_struct.phylum_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
-            class: flat_struct.class_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
-            order: flat_struct.order_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
-            family: flat_struct.family_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
-            genus: flat_struct.genus_id.map(|flat_struct| BioOttTaxonItem::get(flat_struct, connection)).transpose()?,
-            parent: BioOttTaxonItem::get(flat_struct.parent_id, connection)?,
-            font_awesome_icon: FontAwesomeIcon::get(flat_struct.font_awesome_icon_id, connection)?,
-            color: Color::get(flat_struct.color_id, connection)?,
-                inner: flat_struct,
+            ott_rank: NestedBioOttRank::get(flat_variant.ott_rank_id, connection)?,
+            domain: flat_variant.domain_id.map(|flat_variant| BioOttTaxonItem::get(flat_variant, connection)).transpose()?,
+            kingdom: flat_variant.kingdom_id.map(|flat_variant| BioOttTaxonItem::get(flat_variant, connection)).transpose()?,
+            phylum: flat_variant.phylum_id.map(|flat_variant| BioOttTaxonItem::get(flat_variant, connection)).transpose()?,
+            class: flat_variant.class_id.map(|flat_variant| BioOttTaxonItem::get(flat_variant, connection)).transpose()?,
+            order: flat_variant.order_id.map(|flat_variant| BioOttTaxonItem::get(flat_variant, connection)).transpose()?,
+            family: flat_variant.family_id.map(|flat_variant| BioOttTaxonItem::get(flat_variant, connection)).transpose()?,
+            genus: flat_variant.genus_id.map(|flat_variant| BioOttTaxonItem::get(flat_variant, connection)).transpose()?,
+            parent: BioOttTaxonItem::get(flat_variant.parent_id, connection)?,
+            font_awesome_icon: FontAwesomeIcon::get(flat_variant.font_awesome_icon_id, connection)?,
+            color: Color::get(flat_variant.color_id, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -185,7 +185,7 @@ impl NestedBioOttTaxonItem {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        BioOttTaxonItem::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        BioOttTaxonItem::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedBioOttTaxonItem {
@@ -199,7 +199,7 @@ impl NestedBioOttTaxonItem {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       BioOttTaxonItem::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       BioOttTaxonItem::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl NestedBioOttTaxonItem {
@@ -213,7 +213,7 @@ impl NestedBioOttTaxonItem {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        BioOttTaxonItem::from_ott_id(ott_id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+        BioOttTaxonItem::from_ott_id(ott_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl NestedBioOttTaxonItem {
@@ -227,7 +227,7 @@ impl NestedBioOttTaxonItem {
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-       BioOttTaxonItem::similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+       BioOttTaxonItem::similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedBioOttTaxonItem {
@@ -241,7 +241,7 @@ impl NestedBioOttTaxonItem {
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-       BioOttTaxonItem::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+       BioOttTaxonItem::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedBioOttTaxonItem {
@@ -255,7 +255,7 @@ impl NestedBioOttTaxonItem {
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-       BioOttTaxonItem::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+       BioOttTaxonItem::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl From<web_common::database::nested_models::NestedBioOttTaxonItem> for NestedBioOttTaxonItem {
@@ -307,18 +307,18 @@ impl NestedDerivedSample {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: DerivedSample,
+        flat_variant: DerivedSample,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            created_by: User::get(flat_struct.created_by, connection)?,
-            updated_by: User::get(flat_struct.updated_by, connection)?,
-            parent_sample: NestedSample::get(flat_struct.parent_sample_id, connection)?,
-            child_sample: NestedSample::get(flat_struct.child_sample_id, connection)?,
-                inner: flat_struct,
+            created_by: User::get(flat_variant.created_by, connection)?,
+            updated_by: User::get(flat_variant.updated_by, connection)?,
+            parent_sample: NestedSample::get(flat_variant.parent_sample_id, connection)?,
+            child_sample: NestedSample::get(flat_variant.child_sample_id, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -334,7 +334,7 @@ impl NestedDerivedSample {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        DerivedSample::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        DerivedSample::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedDerivedSample {
@@ -349,7 +349,7 @@ impl NestedDerivedSample {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        DerivedSample::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        DerivedSample::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedDerivedSample {
@@ -363,7 +363,7 @@ impl NestedDerivedSample {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       DerivedSample::get(( parent_sample_id, child_sample_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       DerivedSample::get(( parent_sample_id, child_sample_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedDerivedSample> for NestedDerivedSample {
@@ -399,16 +399,16 @@ impl NestedLoginProvider {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: LoginProvider,
+        flat_variant: LoginProvider,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            font_awesome_icon: FontAwesomeIcon::get(flat_struct.font_awesome_icon_id, connection)?,
-            color: Color::get(flat_struct.color_id, connection)?,
-                inner: flat_struct,
+            font_awesome_icon: FontAwesomeIcon::get(flat_variant.font_awesome_icon_id, connection)?,
+            color: Color::get(flat_variant.color_id, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -424,7 +424,7 @@ impl NestedLoginProvider {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        LoginProvider::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        LoginProvider::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedLoginProvider {
@@ -438,7 +438,7 @@ impl NestedLoginProvider {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       LoginProvider::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       LoginProvider::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl NestedLoginProvider {
@@ -452,7 +452,7 @@ impl NestedLoginProvider {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        LoginProvider::from_color_id(color_id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+        LoginProvider::from_color_id(color_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl NestedLoginProvider {
@@ -466,7 +466,7 @@ impl NestedLoginProvider {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        LoginProvider::from_font_awesome_icon_id(font_awesome_icon_id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+        LoginProvider::from_font_awesome_icon_id(font_awesome_icon_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl NestedLoginProvider {
@@ -480,7 +480,7 @@ impl NestedLoginProvider {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        LoginProvider::from_name(name, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+        LoginProvider::from_name(name, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedLoginProvider> for NestedLoginProvider {
@@ -511,15 +511,15 @@ impl NestedNotification {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: Notification,
+        flat_variant: Notification,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            user: User::get(flat_struct.user_id, connection)?,
-                inner: flat_struct,
+            user: User::get(flat_variant.user_id, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -535,7 +535,7 @@ impl NestedNotification {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        Notification::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        Notification::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedNotification {
@@ -549,7 +549,7 @@ impl NestedNotification {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       Notification::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       Notification::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedNotification> for NestedNotification {
@@ -578,15 +578,15 @@ impl NestedOrganization {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: Organization,
+        flat_variant: Organization,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            country: Country::get(flat_struct.country_id, connection)?,
-                inner: flat_struct,
+            country: Country::get(flat_variant.country_id, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -602,7 +602,7 @@ impl NestedOrganization {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        Organization::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        Organization::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedOrganization {
@@ -616,7 +616,7 @@ impl NestedOrganization {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       Organization::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       Organization::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl NestedOrganization {
@@ -630,7 +630,7 @@ impl NestedOrganization {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        Organization::from_domain(domain, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+        Organization::from_domain(domain, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl NestedOrganization {
@@ -648,7 +648,7 @@ impl NestedOrganization {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        Organization::from_name_and_country_id_and_state_province(name, country_id, state_province, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+        Organization::from_name_and_country_id_and_state_province(name, country_id, state_province, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl NestedOrganization {
@@ -662,7 +662,7 @@ impl NestedOrganization {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        Organization::from_url(url, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+        Organization::from_url(url, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl NestedOrganization {
@@ -676,7 +676,7 @@ impl NestedOrganization {
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-       Organization::similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+       Organization::similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedOrganization {
@@ -690,7 +690,7 @@ impl NestedOrganization {
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-       Organization::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+       Organization::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedOrganization {
@@ -704,7 +704,7 @@ impl NestedOrganization {
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-       Organization::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+       Organization::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl From<web_common::database::nested_models::NestedOrganization> for NestedOrganization {
@@ -734,16 +734,16 @@ impl NestedProjectState {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: ProjectState,
+        flat_variant: ProjectState,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            font_awesome_icon: FontAwesomeIcon::get(flat_struct.font_awesome_icon_id, connection)?,
-            color: Color::get(flat_struct.color_id, connection)?,
-                inner: flat_struct,
+            font_awesome_icon: FontAwesomeIcon::get(flat_variant.font_awesome_icon_id, connection)?,
+            color: Color::get(flat_variant.color_id, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -759,7 +759,7 @@ impl NestedProjectState {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        ProjectState::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        ProjectState::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedProjectState {
@@ -773,7 +773,7 @@ impl NestedProjectState {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       ProjectState::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       ProjectState::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl NestedProjectState {
@@ -787,7 +787,7 @@ impl NestedProjectState {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        ProjectState::from_color_id(color_id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+        ProjectState::from_color_id(color_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl NestedProjectState {
@@ -801,7 +801,7 @@ impl NestedProjectState {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        ProjectState::from_font_awesome_icon_id(font_awesome_icon_id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+        ProjectState::from_font_awesome_icon_id(font_awesome_icon_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl NestedProjectState {
@@ -815,7 +815,7 @@ impl NestedProjectState {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        ProjectState::from_name(name, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+        ProjectState::from_name(name, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl NestedProjectState {
@@ -829,7 +829,7 @@ impl NestedProjectState {
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-       ProjectState::similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+       ProjectState::similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedProjectState {
@@ -843,7 +843,7 @@ impl NestedProjectState {
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-       ProjectState::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+       ProjectState::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedProjectState {
@@ -857,7 +857,7 @@ impl NestedProjectState {
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-       ProjectState::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+       ProjectState::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl From<web_common::database::nested_models::NestedProjectState> for NestedProjectState {
@@ -891,18 +891,18 @@ impl NestedProject {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: Project,
+        flat_variant: Project,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            state: NestedProjectState::get(flat_struct.state_id, connection)?,
-            parent_project: flat_struct.parent_project_id.map(|flat_struct| Project::get(flat_struct, connection)).transpose()?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-            updated_by: User::get(flat_struct.updated_by, connection)?,
-                inner: flat_struct,
+            state: NestedProjectState::get(flat_variant.state_id, connection)?,
+            parent_project: flat_variant.parent_project_id.map(|flat_variant| Project::get(flat_variant, connection)).transpose()?,
+            created_by: User::get(flat_variant.created_by, connection)?,
+            updated_by: User::get(flat_variant.updated_by, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -918,7 +918,7 @@ impl NestedProject {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        Project::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        Project::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedProject {
@@ -935,7 +935,7 @@ impl NestedProject {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        Project::all_editables(author_user_id, limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        Project::all_editables(author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedProject {
@@ -950,7 +950,7 @@ impl NestedProject {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        Project::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        Project::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedProject {
@@ -964,7 +964,7 @@ impl NestedProject {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       Project::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       Project::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl NestedProject {
@@ -978,7 +978,7 @@ impl NestedProject {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        Project::from_name(name, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+        Project::from_name(name, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl NestedProject {
@@ -992,7 +992,7 @@ impl NestedProject {
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-       Project::similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+       Project::similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedProject {
@@ -1008,7 +1008,7 @@ impl NestedProject {
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-       Project::similarity_search_editables(author_user_id, query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+       Project::similarity_search_editables(author_user_id, query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedProject {
@@ -1022,7 +1022,7 @@ impl NestedProject {
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-       Project::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+       Project::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedProject {
@@ -1038,7 +1038,7 @@ impl NestedProject {
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-       Project::word_similarity_search_editables(author_user_id, query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+       Project::word_similarity_search_editables(author_user_id, query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedProject {
@@ -1052,7 +1052,7 @@ impl NestedProject {
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-       Project::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+       Project::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedProject {
@@ -1068,7 +1068,7 @@ impl NestedProject {
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-       Project::strict_word_similarity_search_editables(author_user_id, query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+       Project::strict_word_similarity_search_editables(author_user_id, query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl From<web_common::database::nested_models::NestedProject> for NestedProject {
@@ -1106,18 +1106,18 @@ impl NestedProjectsTeamsRoleInvitation {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: ProjectsTeamsRoleInvitation,
+        flat_variant: ProjectsTeamsRoleInvitation,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            table: NestedProject::get(flat_struct.table_id, connection)?,
-            team: NestedTeam::get(flat_struct.team_id, connection)?,
-            role: NestedRole::get(flat_struct.role_id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-                inner: flat_struct,
+            table: NestedProject::get(flat_variant.table_id, connection)?,
+            team: NestedTeam::get(flat_variant.team_id, connection)?,
+            role: NestedRole::get(flat_variant.role_id, connection)?,
+            created_by: User::get(flat_variant.created_by, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -1133,7 +1133,7 @@ impl NestedProjectsTeamsRoleInvitation {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        ProjectsTeamsRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        ProjectsTeamsRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedProjectsTeamsRoleInvitation {
@@ -1147,7 +1147,7 @@ impl NestedProjectsTeamsRoleInvitation {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       ProjectsTeamsRoleInvitation::get(( table_id, team_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       ProjectsTeamsRoleInvitation::get(( table_id, team_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedProjectsTeamsRoleInvitation> for NestedProjectsTeamsRoleInvitation {
@@ -1185,18 +1185,18 @@ impl NestedProjectsTeamsRoleRequest {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: ProjectsTeamsRoleRequest,
+        flat_variant: ProjectsTeamsRoleRequest,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            table: NestedProject::get(flat_struct.table_id, connection)?,
-            team: NestedTeam::get(flat_struct.team_id, connection)?,
-            role: NestedRole::get(flat_struct.role_id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-                inner: flat_struct,
+            table: NestedProject::get(flat_variant.table_id, connection)?,
+            team: NestedTeam::get(flat_variant.team_id, connection)?,
+            role: NestedRole::get(flat_variant.role_id, connection)?,
+            created_by: User::get(flat_variant.created_by, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -1212,7 +1212,7 @@ impl NestedProjectsTeamsRoleRequest {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        ProjectsTeamsRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        ProjectsTeamsRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedProjectsTeamsRoleRequest {
@@ -1226,7 +1226,7 @@ impl NestedProjectsTeamsRoleRequest {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       ProjectsTeamsRoleRequest::get(( table_id, team_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       ProjectsTeamsRoleRequest::get(( table_id, team_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedProjectsTeamsRoleRequest> for NestedProjectsTeamsRoleRequest {
@@ -1264,18 +1264,18 @@ impl NestedProjectsTeamsRole {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: ProjectsTeamsRole,
+        flat_variant: ProjectsTeamsRole,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            table: NestedProject::get(flat_struct.table_id, connection)?,
-            team: NestedTeam::get(flat_struct.team_id, connection)?,
-            role: NestedRole::get(flat_struct.role_id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-                inner: flat_struct,
+            table: NestedProject::get(flat_variant.table_id, connection)?,
+            team: NestedTeam::get(flat_variant.team_id, connection)?,
+            role: NestedRole::get(flat_variant.role_id, connection)?,
+            created_by: User::get(flat_variant.created_by, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -1291,7 +1291,7 @@ impl NestedProjectsTeamsRole {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        ProjectsTeamsRole::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        ProjectsTeamsRole::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedProjectsTeamsRole {
@@ -1305,7 +1305,7 @@ impl NestedProjectsTeamsRole {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       ProjectsTeamsRole::get(( table_id, team_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       ProjectsTeamsRole::get(( table_id, team_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedProjectsTeamsRole> for NestedProjectsTeamsRole {
@@ -1343,18 +1343,18 @@ impl NestedProjectsUsersRoleInvitation {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: ProjectsUsersRoleInvitation,
+        flat_variant: ProjectsUsersRoleInvitation,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            table: NestedProject::get(flat_struct.table_id, connection)?,
-            user: User::get(flat_struct.user_id, connection)?,
-            role: NestedRole::get(flat_struct.role_id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-                inner: flat_struct,
+            table: NestedProject::get(flat_variant.table_id, connection)?,
+            user: User::get(flat_variant.user_id, connection)?,
+            role: NestedRole::get(flat_variant.role_id, connection)?,
+            created_by: User::get(flat_variant.created_by, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -1370,7 +1370,7 @@ impl NestedProjectsUsersRoleInvitation {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        ProjectsUsersRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        ProjectsUsersRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedProjectsUsersRoleInvitation {
@@ -1384,7 +1384,7 @@ impl NestedProjectsUsersRoleInvitation {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       ProjectsUsersRoleInvitation::get(( table_id, user_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       ProjectsUsersRoleInvitation::get(( table_id, user_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedProjectsUsersRoleInvitation> for NestedProjectsUsersRoleInvitation {
@@ -1422,18 +1422,18 @@ impl NestedProjectsUsersRoleRequest {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: ProjectsUsersRoleRequest,
+        flat_variant: ProjectsUsersRoleRequest,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            table: NestedProject::get(flat_struct.table_id, connection)?,
-            user: User::get(flat_struct.user_id, connection)?,
-            role: NestedRole::get(flat_struct.role_id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-                inner: flat_struct,
+            table: NestedProject::get(flat_variant.table_id, connection)?,
+            user: User::get(flat_variant.user_id, connection)?,
+            role: NestedRole::get(flat_variant.role_id, connection)?,
+            created_by: User::get(flat_variant.created_by, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -1449,7 +1449,7 @@ impl NestedProjectsUsersRoleRequest {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        ProjectsUsersRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        ProjectsUsersRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedProjectsUsersRoleRequest {
@@ -1463,7 +1463,7 @@ impl NestedProjectsUsersRoleRequest {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       ProjectsUsersRoleRequest::get(( table_id, user_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       ProjectsUsersRoleRequest::get(( table_id, user_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedProjectsUsersRoleRequest> for NestedProjectsUsersRoleRequest {
@@ -1501,18 +1501,18 @@ impl NestedProjectsUsersRole {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: ProjectsUsersRole,
+        flat_variant: ProjectsUsersRole,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            table: NestedProject::get(flat_struct.table_id, connection)?,
-            user: User::get(flat_struct.user_id, connection)?,
-            role: NestedRole::get(flat_struct.role_id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-                inner: flat_struct,
+            table: NestedProject::get(flat_variant.table_id, connection)?,
+            user: User::get(flat_variant.user_id, connection)?,
+            role: NestedRole::get(flat_variant.role_id, connection)?,
+            created_by: User::get(flat_variant.created_by, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -1528,7 +1528,7 @@ impl NestedProjectsUsersRole {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        ProjectsUsersRole::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        ProjectsUsersRole::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedProjectsUsersRole {
@@ -1542,7 +1542,7 @@ impl NestedProjectsUsersRole {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       ProjectsUsersRole::get(( table_id, user_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       ProjectsUsersRole::get(( table_id, user_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedProjectsUsersRole> for NestedProjectsUsersRole {
@@ -1578,16 +1578,16 @@ impl NestedRole {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: Role,
+        flat_variant: Role,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            font_awesome_icon: FontAwesomeIcon::get(flat_struct.font_awesome_icon_id, connection)?,
-            color: Color::get(flat_struct.color_id, connection)?,
-                inner: flat_struct,
+            font_awesome_icon: FontAwesomeIcon::get(flat_variant.font_awesome_icon_id, connection)?,
+            color: Color::get(flat_variant.color_id, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -1603,7 +1603,7 @@ impl NestedRole {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        Role::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        Role::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedRole {
@@ -1617,7 +1617,7 @@ impl NestedRole {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       Role::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       Role::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl NestedRole {
@@ -1631,7 +1631,7 @@ impl NestedRole {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        Role::from_color_id(color_id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+        Role::from_color_id(color_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl NestedRole {
@@ -1645,7 +1645,7 @@ impl NestedRole {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        Role::from_description(description, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+        Role::from_description(description, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl NestedRole {
@@ -1659,7 +1659,7 @@ impl NestedRole {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        Role::from_font_awesome_icon_id(font_awesome_icon_id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+        Role::from_font_awesome_icon_id(font_awesome_icon_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl NestedRole {
@@ -1673,7 +1673,7 @@ impl NestedRole {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        Role::from_name(name, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+        Role::from_name(name, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl NestedRole {
@@ -1687,7 +1687,7 @@ impl NestedRole {
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-       Role::similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+       Role::similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedRole {
@@ -1701,7 +1701,7 @@ impl NestedRole {
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-       Role::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+       Role::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedRole {
@@ -1715,7 +1715,7 @@ impl NestedRole {
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-       Role::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+       Role::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl From<web_common::database::nested_models::NestedRole> for NestedRole {
@@ -1749,18 +1749,18 @@ impl NestedSampleBioOttTaxonItem {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: SampleBioOttTaxonItem,
+        flat_variant: SampleBioOttTaxonItem,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            created_by: User::get(flat_struct.created_by, connection)?,
-            updated_by: User::get(flat_struct.updated_by, connection)?,
-            sample: NestedSample::get(flat_struct.sample_id, connection)?,
-            taxon: NestedBioOttTaxonItem::get(flat_struct.taxon_id, connection)?,
-                inner: flat_struct,
+            created_by: User::get(flat_variant.created_by, connection)?,
+            updated_by: User::get(flat_variant.updated_by, connection)?,
+            sample: NestedSample::get(flat_variant.sample_id, connection)?,
+            taxon: NestedBioOttTaxonItem::get(flat_variant.taxon_id, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -1776,7 +1776,7 @@ impl NestedSampleBioOttTaxonItem {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampleBioOttTaxonItem::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        SampleBioOttTaxonItem::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSampleBioOttTaxonItem {
@@ -1791,7 +1791,7 @@ impl NestedSampleBioOttTaxonItem {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampleBioOttTaxonItem::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        SampleBioOttTaxonItem::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSampleBioOttTaxonItem {
@@ -1805,7 +1805,7 @@ impl NestedSampleBioOttTaxonItem {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       SampleBioOttTaxonItem::get(( sample_id, taxon_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       SampleBioOttTaxonItem::get(( sample_id, taxon_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedSampleBioOttTaxonItem> for NestedSampleBioOttTaxonItem {
@@ -1841,16 +1841,16 @@ impl NestedSampleState {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: SampleState,
+        flat_variant: SampleState,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            font_awesome_icon: FontAwesomeIcon::get(flat_struct.font_awesome_icon_id, connection)?,
-            color: Color::get(flat_struct.color_id, connection)?,
-                inner: flat_struct,
+            font_awesome_icon: FontAwesomeIcon::get(flat_variant.font_awesome_icon_id, connection)?,
+            color: Color::get(flat_variant.color_id, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -1866,7 +1866,7 @@ impl NestedSampleState {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampleState::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        SampleState::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSampleState {
@@ -1880,7 +1880,7 @@ impl NestedSampleState {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       SampleState::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       SampleState::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl NestedSampleState {
@@ -1894,7 +1894,7 @@ impl NestedSampleState {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        SampleState::from_color_id(color_id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+        SampleState::from_color_id(color_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl NestedSampleState {
@@ -1908,7 +1908,7 @@ impl NestedSampleState {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        SampleState::from_font_awesome_icon_id(font_awesome_icon_id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+        SampleState::from_font_awesome_icon_id(font_awesome_icon_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl NestedSampleState {
@@ -1922,7 +1922,7 @@ impl NestedSampleState {
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-       SampleState::similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+       SampleState::similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSampleState {
@@ -1936,7 +1936,7 @@ impl NestedSampleState {
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-       SampleState::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+       SampleState::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSampleState {
@@ -1950,7 +1950,7 @@ impl NestedSampleState {
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-       SampleState::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+       SampleState::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl From<web_common::database::nested_models::NestedSampleState> for NestedSampleState {
@@ -1984,18 +1984,18 @@ impl NestedSampledIndividualBioOttTaxonItem {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: SampledIndividualBioOttTaxonItem,
+        flat_variant: SampledIndividualBioOttTaxonItem,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            created_by: User::get(flat_struct.created_by, connection)?,
-            updated_by: User::get(flat_struct.updated_by, connection)?,
-            sampled_individual: NestedSampledIndividual::get(flat_struct.sampled_individual_id, connection)?,
-            taxon: NestedBioOttTaxonItem::get(flat_struct.taxon_id, connection)?,
-                inner: flat_struct,
+            created_by: User::get(flat_variant.created_by, connection)?,
+            updated_by: User::get(flat_variant.updated_by, connection)?,
+            sampled_individual: NestedSampledIndividual::get(flat_variant.sampled_individual_id, connection)?,
+            taxon: NestedBioOttTaxonItem::get(flat_variant.taxon_id, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -2011,7 +2011,7 @@ impl NestedSampledIndividualBioOttTaxonItem {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampledIndividualBioOttTaxonItem::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        SampledIndividualBioOttTaxonItem::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSampledIndividualBioOttTaxonItem {
@@ -2026,7 +2026,7 @@ impl NestedSampledIndividualBioOttTaxonItem {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampledIndividualBioOttTaxonItem::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        SampledIndividualBioOttTaxonItem::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSampledIndividualBioOttTaxonItem {
@@ -2040,7 +2040,7 @@ impl NestedSampledIndividualBioOttTaxonItem {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       SampledIndividualBioOttTaxonItem::get(( sampled_individual_id, taxon_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       SampledIndividualBioOttTaxonItem::get(( sampled_individual_id, taxon_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedSampledIndividualBioOttTaxonItem> for NestedSampledIndividualBioOttTaxonItem {
@@ -2076,16 +2076,16 @@ impl NestedSampledIndividual {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: SampledIndividual,
+        flat_variant: SampledIndividual,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            created_by: User::get(flat_struct.created_by, connection)?,
-            updated_by: User::get(flat_struct.updated_by, connection)?,
-                inner: flat_struct,
+            created_by: User::get(flat_variant.created_by, connection)?,
+            updated_by: User::get(flat_variant.updated_by, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -2101,7 +2101,7 @@ impl NestedSampledIndividual {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampledIndividual::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        SampledIndividual::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSampledIndividual {
@@ -2118,7 +2118,7 @@ impl NestedSampledIndividual {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampledIndividual::all_editables(author_user_id, limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        SampledIndividual::all_editables(author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSampledIndividual {
@@ -2133,7 +2133,7 @@ impl NestedSampledIndividual {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampledIndividual::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        SampledIndividual::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSampledIndividual {
@@ -2147,7 +2147,7 @@ impl NestedSampledIndividual {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       SampledIndividual::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       SampledIndividual::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedSampledIndividual> for NestedSampledIndividual {
@@ -2181,18 +2181,18 @@ impl NestedSampledIndividualsTeamsRoleInvitation {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: SampledIndividualsTeamsRoleInvitation,
+        flat_variant: SampledIndividualsTeamsRoleInvitation,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            table: NestedSampledIndividual::get(flat_struct.table_id, connection)?,
-            team: NestedTeam::get(flat_struct.team_id, connection)?,
-            role: NestedRole::get(flat_struct.role_id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-                inner: flat_struct,
+            table: NestedSampledIndividual::get(flat_variant.table_id, connection)?,
+            team: NestedTeam::get(flat_variant.team_id, connection)?,
+            role: NestedRole::get(flat_variant.role_id, connection)?,
+            created_by: User::get(flat_variant.created_by, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -2208,7 +2208,7 @@ impl NestedSampledIndividualsTeamsRoleInvitation {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampledIndividualsTeamsRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        SampledIndividualsTeamsRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSampledIndividualsTeamsRoleInvitation {
@@ -2222,7 +2222,7 @@ impl NestedSampledIndividualsTeamsRoleInvitation {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       SampledIndividualsTeamsRoleInvitation::get(( table_id, team_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       SampledIndividualsTeamsRoleInvitation::get(( table_id, team_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedSampledIndividualsTeamsRoleInvitation> for NestedSampledIndividualsTeamsRoleInvitation {
@@ -2260,18 +2260,18 @@ impl NestedSampledIndividualsTeamsRoleRequest {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: SampledIndividualsTeamsRoleRequest,
+        flat_variant: SampledIndividualsTeamsRoleRequest,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            table: NestedSampledIndividual::get(flat_struct.table_id, connection)?,
-            team: NestedTeam::get(flat_struct.team_id, connection)?,
-            role: NestedRole::get(flat_struct.role_id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-                inner: flat_struct,
+            table: NestedSampledIndividual::get(flat_variant.table_id, connection)?,
+            team: NestedTeam::get(flat_variant.team_id, connection)?,
+            role: NestedRole::get(flat_variant.role_id, connection)?,
+            created_by: User::get(flat_variant.created_by, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -2287,7 +2287,7 @@ impl NestedSampledIndividualsTeamsRoleRequest {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampledIndividualsTeamsRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        SampledIndividualsTeamsRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSampledIndividualsTeamsRoleRequest {
@@ -2301,7 +2301,7 @@ impl NestedSampledIndividualsTeamsRoleRequest {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       SampledIndividualsTeamsRoleRequest::get(( table_id, team_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       SampledIndividualsTeamsRoleRequest::get(( table_id, team_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedSampledIndividualsTeamsRoleRequest> for NestedSampledIndividualsTeamsRoleRequest {
@@ -2339,18 +2339,18 @@ impl NestedSampledIndividualsTeamsRole {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: SampledIndividualsTeamsRole,
+        flat_variant: SampledIndividualsTeamsRole,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            table: NestedSampledIndividual::get(flat_struct.table_id, connection)?,
-            team: NestedTeam::get(flat_struct.team_id, connection)?,
-            role: NestedRole::get(flat_struct.role_id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-                inner: flat_struct,
+            table: NestedSampledIndividual::get(flat_variant.table_id, connection)?,
+            team: NestedTeam::get(flat_variant.team_id, connection)?,
+            role: NestedRole::get(flat_variant.role_id, connection)?,
+            created_by: User::get(flat_variant.created_by, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -2366,7 +2366,7 @@ impl NestedSampledIndividualsTeamsRole {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampledIndividualsTeamsRole::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        SampledIndividualsTeamsRole::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSampledIndividualsTeamsRole {
@@ -2380,7 +2380,7 @@ impl NestedSampledIndividualsTeamsRole {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       SampledIndividualsTeamsRole::get(( table_id, team_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       SampledIndividualsTeamsRole::get(( table_id, team_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedSampledIndividualsTeamsRole> for NestedSampledIndividualsTeamsRole {
@@ -2418,18 +2418,18 @@ impl NestedSampledIndividualsUsersRoleInvitation {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: SampledIndividualsUsersRoleInvitation,
+        flat_variant: SampledIndividualsUsersRoleInvitation,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            table: NestedSampledIndividual::get(flat_struct.table_id, connection)?,
-            user: User::get(flat_struct.user_id, connection)?,
-            role: NestedRole::get(flat_struct.role_id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-                inner: flat_struct,
+            table: NestedSampledIndividual::get(flat_variant.table_id, connection)?,
+            user: User::get(flat_variant.user_id, connection)?,
+            role: NestedRole::get(flat_variant.role_id, connection)?,
+            created_by: User::get(flat_variant.created_by, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -2445,7 +2445,7 @@ impl NestedSampledIndividualsUsersRoleInvitation {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampledIndividualsUsersRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        SampledIndividualsUsersRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSampledIndividualsUsersRoleInvitation {
@@ -2459,7 +2459,7 @@ impl NestedSampledIndividualsUsersRoleInvitation {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       SampledIndividualsUsersRoleInvitation::get(( table_id, user_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       SampledIndividualsUsersRoleInvitation::get(( table_id, user_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedSampledIndividualsUsersRoleInvitation> for NestedSampledIndividualsUsersRoleInvitation {
@@ -2497,18 +2497,18 @@ impl NestedSampledIndividualsUsersRoleRequest {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: SampledIndividualsUsersRoleRequest,
+        flat_variant: SampledIndividualsUsersRoleRequest,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            table: NestedSampledIndividual::get(flat_struct.table_id, connection)?,
-            user: User::get(flat_struct.user_id, connection)?,
-            role: NestedRole::get(flat_struct.role_id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-                inner: flat_struct,
+            table: NestedSampledIndividual::get(flat_variant.table_id, connection)?,
+            user: User::get(flat_variant.user_id, connection)?,
+            role: NestedRole::get(flat_variant.role_id, connection)?,
+            created_by: User::get(flat_variant.created_by, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -2524,7 +2524,7 @@ impl NestedSampledIndividualsUsersRoleRequest {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampledIndividualsUsersRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        SampledIndividualsUsersRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSampledIndividualsUsersRoleRequest {
@@ -2538,7 +2538,7 @@ impl NestedSampledIndividualsUsersRoleRequest {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       SampledIndividualsUsersRoleRequest::get(( table_id, user_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       SampledIndividualsUsersRoleRequest::get(( table_id, user_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedSampledIndividualsUsersRoleRequest> for NestedSampledIndividualsUsersRoleRequest {
@@ -2576,18 +2576,18 @@ impl NestedSampledIndividualsUsersRole {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: SampledIndividualsUsersRole,
+        flat_variant: SampledIndividualsUsersRole,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            table: NestedSampledIndividual::get(flat_struct.table_id, connection)?,
-            user: User::get(flat_struct.user_id, connection)?,
-            role: NestedRole::get(flat_struct.role_id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-                inner: flat_struct,
+            table: NestedSampledIndividual::get(flat_variant.table_id, connection)?,
+            user: User::get(flat_variant.user_id, connection)?,
+            role: NestedRole::get(flat_variant.role_id, connection)?,
+            created_by: User::get(flat_variant.created_by, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -2603,7 +2603,7 @@ impl NestedSampledIndividualsUsersRole {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampledIndividualsUsersRole::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        SampledIndividualsUsersRole::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSampledIndividualsUsersRole {
@@ -2617,7 +2617,7 @@ impl NestedSampledIndividualsUsersRole {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       SampledIndividualsUsersRole::get(( table_id, user_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       SampledIndividualsUsersRole::get(( table_id, user_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedSampledIndividualsUsersRole> for NestedSampledIndividualsUsersRole {
@@ -2655,18 +2655,18 @@ impl NestedSample {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: Sample,
+        flat_variant: Sample,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            created_by: User::get(flat_struct.created_by, connection)?,
-            sampled_by: User::get(flat_struct.sampled_by, connection)?,
-            updated_by: User::get(flat_struct.updated_by, connection)?,
-            state: NestedSampleState::get(flat_struct.state, connection)?,
-                inner: flat_struct,
+            created_by: User::get(flat_variant.created_by, connection)?,
+            sampled_by: User::get(flat_variant.sampled_by, connection)?,
+            updated_by: User::get(flat_variant.updated_by, connection)?,
+            state: NestedSampleState::get(flat_variant.state, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -2682,7 +2682,7 @@ impl NestedSample {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        Sample::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        Sample::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSample {
@@ -2699,7 +2699,7 @@ impl NestedSample {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        Sample::all_editables(author_user_id, limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        Sample::all_editables(author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSample {
@@ -2714,7 +2714,7 @@ impl NestedSample {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        Sample::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        Sample::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSample {
@@ -2728,7 +2728,7 @@ impl NestedSample {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       Sample::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       Sample::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedSample> for NestedSample {
@@ -2766,18 +2766,18 @@ impl NestedSamplesTeamsRoleInvitation {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: SamplesTeamsRoleInvitation,
+        flat_variant: SamplesTeamsRoleInvitation,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            table: NestedSample::get(flat_struct.table_id, connection)?,
-            team: NestedTeam::get(flat_struct.team_id, connection)?,
-            role: NestedRole::get(flat_struct.role_id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-                inner: flat_struct,
+            table: NestedSample::get(flat_variant.table_id, connection)?,
+            team: NestedTeam::get(flat_variant.team_id, connection)?,
+            role: NestedRole::get(flat_variant.role_id, connection)?,
+            created_by: User::get(flat_variant.created_by, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -2793,7 +2793,7 @@ impl NestedSamplesTeamsRoleInvitation {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SamplesTeamsRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        SamplesTeamsRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSamplesTeamsRoleInvitation {
@@ -2807,7 +2807,7 @@ impl NestedSamplesTeamsRoleInvitation {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       SamplesTeamsRoleInvitation::get(( table_id, team_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       SamplesTeamsRoleInvitation::get(( table_id, team_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedSamplesTeamsRoleInvitation> for NestedSamplesTeamsRoleInvitation {
@@ -2845,18 +2845,18 @@ impl NestedSamplesTeamsRoleRequest {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: SamplesTeamsRoleRequest,
+        flat_variant: SamplesTeamsRoleRequest,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            table: NestedSample::get(flat_struct.table_id, connection)?,
-            team: NestedTeam::get(flat_struct.team_id, connection)?,
-            role: NestedRole::get(flat_struct.role_id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-                inner: flat_struct,
+            table: NestedSample::get(flat_variant.table_id, connection)?,
+            team: NestedTeam::get(flat_variant.team_id, connection)?,
+            role: NestedRole::get(flat_variant.role_id, connection)?,
+            created_by: User::get(flat_variant.created_by, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -2872,7 +2872,7 @@ impl NestedSamplesTeamsRoleRequest {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SamplesTeamsRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        SamplesTeamsRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSamplesTeamsRoleRequest {
@@ -2886,7 +2886,7 @@ impl NestedSamplesTeamsRoleRequest {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       SamplesTeamsRoleRequest::get(( table_id, team_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       SamplesTeamsRoleRequest::get(( table_id, team_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedSamplesTeamsRoleRequest> for NestedSamplesTeamsRoleRequest {
@@ -2924,18 +2924,18 @@ impl NestedSamplesTeamsRole {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: SamplesTeamsRole,
+        flat_variant: SamplesTeamsRole,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            table: NestedSample::get(flat_struct.table_id, connection)?,
-            team: NestedTeam::get(flat_struct.team_id, connection)?,
-            role: NestedRole::get(flat_struct.role_id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-                inner: flat_struct,
+            table: NestedSample::get(flat_variant.table_id, connection)?,
+            team: NestedTeam::get(flat_variant.team_id, connection)?,
+            role: NestedRole::get(flat_variant.role_id, connection)?,
+            created_by: User::get(flat_variant.created_by, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -2951,7 +2951,7 @@ impl NestedSamplesTeamsRole {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SamplesTeamsRole::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        SamplesTeamsRole::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSamplesTeamsRole {
@@ -2965,7 +2965,7 @@ impl NestedSamplesTeamsRole {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       SamplesTeamsRole::get(( table_id, team_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       SamplesTeamsRole::get(( table_id, team_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedSamplesTeamsRole> for NestedSamplesTeamsRole {
@@ -3003,18 +3003,18 @@ impl NestedSamplesUsersRoleInvitation {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: SamplesUsersRoleInvitation,
+        flat_variant: SamplesUsersRoleInvitation,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            table: NestedSample::get(flat_struct.table_id, connection)?,
-            user: User::get(flat_struct.user_id, connection)?,
-            role: NestedRole::get(flat_struct.role_id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-                inner: flat_struct,
+            table: NestedSample::get(flat_variant.table_id, connection)?,
+            user: User::get(flat_variant.user_id, connection)?,
+            role: NestedRole::get(flat_variant.role_id, connection)?,
+            created_by: User::get(flat_variant.created_by, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -3030,7 +3030,7 @@ impl NestedSamplesUsersRoleInvitation {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SamplesUsersRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        SamplesUsersRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSamplesUsersRoleInvitation {
@@ -3044,7 +3044,7 @@ impl NestedSamplesUsersRoleInvitation {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       SamplesUsersRoleInvitation::get(( table_id, user_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       SamplesUsersRoleInvitation::get(( table_id, user_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedSamplesUsersRoleInvitation> for NestedSamplesUsersRoleInvitation {
@@ -3082,18 +3082,18 @@ impl NestedSamplesUsersRoleRequest {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: SamplesUsersRoleRequest,
+        flat_variant: SamplesUsersRoleRequest,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            table: NestedSample::get(flat_struct.table_id, connection)?,
-            user: User::get(flat_struct.user_id, connection)?,
-            role: NestedRole::get(flat_struct.role_id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-                inner: flat_struct,
+            table: NestedSample::get(flat_variant.table_id, connection)?,
+            user: User::get(flat_variant.user_id, connection)?,
+            role: NestedRole::get(flat_variant.role_id, connection)?,
+            created_by: User::get(flat_variant.created_by, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -3109,7 +3109,7 @@ impl NestedSamplesUsersRoleRequest {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SamplesUsersRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        SamplesUsersRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSamplesUsersRoleRequest {
@@ -3123,7 +3123,7 @@ impl NestedSamplesUsersRoleRequest {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       SamplesUsersRoleRequest::get(( table_id, user_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       SamplesUsersRoleRequest::get(( table_id, user_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedSamplesUsersRoleRequest> for NestedSamplesUsersRoleRequest {
@@ -3161,18 +3161,18 @@ impl NestedSamplesUsersRole {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: SamplesUsersRole,
+        flat_variant: SamplesUsersRole,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            table: NestedSample::get(flat_struct.table_id, connection)?,
-            user: User::get(flat_struct.user_id, connection)?,
-            role: NestedRole::get(flat_struct.role_id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-                inner: flat_struct,
+            table: NestedSample::get(flat_variant.table_id, connection)?,
+            user: User::get(flat_variant.user_id, connection)?,
+            role: NestedRole::get(flat_variant.role_id, connection)?,
+            created_by: User::get(flat_variant.created_by, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -3188,7 +3188,7 @@ impl NestedSamplesUsersRole {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SamplesUsersRole::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        SamplesUsersRole::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSamplesUsersRole {
@@ -3202,7 +3202,7 @@ impl NestedSamplesUsersRole {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       SamplesUsersRole::get(( table_id, user_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       SamplesUsersRole::get(( table_id, user_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedSamplesUsersRole> for NestedSamplesUsersRole {
@@ -3237,15 +3237,15 @@ impl NestedSpectra {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: Spectra,
+        flat_variant: Spectra,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            spectra_collection: NestedSpectraCollection::get(flat_struct.spectra_collection_id, connection)?,
-                inner: flat_struct,
+            spectra_collection: NestedSpectraCollection::get(flat_variant.spectra_collection_id, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -3261,7 +3261,7 @@ impl NestedSpectra {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        Spectra::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        Spectra::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSpectra {
@@ -3275,7 +3275,7 @@ impl NestedSpectra {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       Spectra::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       Spectra::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedSpectra> for NestedSpectra {
@@ -3306,17 +3306,17 @@ impl NestedSpectraCollection {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: SpectraCollection,
+        flat_variant: SpectraCollection,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            sample: NestedSample::get(flat_struct.sample_id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-            updated_by: User::get(flat_struct.updated_by, connection)?,
-                inner: flat_struct,
+            sample: NestedSample::get(flat_variant.sample_id, connection)?,
+            created_by: User::get(flat_variant.created_by, connection)?,
+            updated_by: User::get(flat_variant.updated_by, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -3332,7 +3332,7 @@ impl NestedSpectraCollection {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SpectraCollection::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        SpectraCollection::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSpectraCollection {
@@ -3349,7 +3349,7 @@ impl NestedSpectraCollection {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SpectraCollection::all_editables(author_user_id, limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        SpectraCollection::all_editables(author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSpectraCollection {
@@ -3364,7 +3364,7 @@ impl NestedSpectraCollection {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SpectraCollection::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        SpectraCollection::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSpectraCollection {
@@ -3378,7 +3378,7 @@ impl NestedSpectraCollection {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       SpectraCollection::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       SpectraCollection::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedSpectraCollection> for NestedSpectraCollection {
@@ -3414,18 +3414,18 @@ impl NestedSpectraCollectionsTeamsRoleInvitation {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: SpectraCollectionsTeamsRoleInvitation,
+        flat_variant: SpectraCollectionsTeamsRoleInvitation,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            table: NestedSpectraCollection::get(flat_struct.table_id, connection)?,
-            team: NestedTeam::get(flat_struct.team_id, connection)?,
-            role: NestedRole::get(flat_struct.role_id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-                inner: flat_struct,
+            table: NestedSpectraCollection::get(flat_variant.table_id, connection)?,
+            team: NestedTeam::get(flat_variant.team_id, connection)?,
+            role: NestedRole::get(flat_variant.role_id, connection)?,
+            created_by: User::get(flat_variant.created_by, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -3441,7 +3441,7 @@ impl NestedSpectraCollectionsTeamsRoleInvitation {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SpectraCollectionsTeamsRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        SpectraCollectionsTeamsRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSpectraCollectionsTeamsRoleInvitation {
@@ -3455,7 +3455,7 @@ impl NestedSpectraCollectionsTeamsRoleInvitation {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       SpectraCollectionsTeamsRoleInvitation::get(( table_id, team_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       SpectraCollectionsTeamsRoleInvitation::get(( table_id, team_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedSpectraCollectionsTeamsRoleInvitation> for NestedSpectraCollectionsTeamsRoleInvitation {
@@ -3493,18 +3493,18 @@ impl NestedSpectraCollectionsTeamsRoleRequest {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: SpectraCollectionsTeamsRoleRequest,
+        flat_variant: SpectraCollectionsTeamsRoleRequest,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            table: NestedSpectraCollection::get(flat_struct.table_id, connection)?,
-            team: NestedTeam::get(flat_struct.team_id, connection)?,
-            role: NestedRole::get(flat_struct.role_id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-                inner: flat_struct,
+            table: NestedSpectraCollection::get(flat_variant.table_id, connection)?,
+            team: NestedTeam::get(flat_variant.team_id, connection)?,
+            role: NestedRole::get(flat_variant.role_id, connection)?,
+            created_by: User::get(flat_variant.created_by, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -3520,7 +3520,7 @@ impl NestedSpectraCollectionsTeamsRoleRequest {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SpectraCollectionsTeamsRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        SpectraCollectionsTeamsRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSpectraCollectionsTeamsRoleRequest {
@@ -3534,7 +3534,7 @@ impl NestedSpectraCollectionsTeamsRoleRequest {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       SpectraCollectionsTeamsRoleRequest::get(( table_id, team_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       SpectraCollectionsTeamsRoleRequest::get(( table_id, team_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedSpectraCollectionsTeamsRoleRequest> for NestedSpectraCollectionsTeamsRoleRequest {
@@ -3572,18 +3572,18 @@ impl NestedSpectraCollectionsTeamsRole {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: SpectraCollectionsTeamsRole,
+        flat_variant: SpectraCollectionsTeamsRole,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            table: NestedSpectraCollection::get(flat_struct.table_id, connection)?,
-            team: NestedTeam::get(flat_struct.team_id, connection)?,
-            role: NestedRole::get(flat_struct.role_id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-                inner: flat_struct,
+            table: NestedSpectraCollection::get(flat_variant.table_id, connection)?,
+            team: NestedTeam::get(flat_variant.team_id, connection)?,
+            role: NestedRole::get(flat_variant.role_id, connection)?,
+            created_by: User::get(flat_variant.created_by, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -3599,7 +3599,7 @@ impl NestedSpectraCollectionsTeamsRole {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SpectraCollectionsTeamsRole::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        SpectraCollectionsTeamsRole::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSpectraCollectionsTeamsRole {
@@ -3613,7 +3613,7 @@ impl NestedSpectraCollectionsTeamsRole {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       SpectraCollectionsTeamsRole::get(( table_id, team_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       SpectraCollectionsTeamsRole::get(( table_id, team_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedSpectraCollectionsTeamsRole> for NestedSpectraCollectionsTeamsRole {
@@ -3651,18 +3651,18 @@ impl NestedSpectraCollectionsUsersRoleInvitation {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: SpectraCollectionsUsersRoleInvitation,
+        flat_variant: SpectraCollectionsUsersRoleInvitation,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            table: NestedSpectraCollection::get(flat_struct.table_id, connection)?,
-            user: User::get(flat_struct.user_id, connection)?,
-            role: NestedRole::get(flat_struct.role_id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-                inner: flat_struct,
+            table: NestedSpectraCollection::get(flat_variant.table_id, connection)?,
+            user: User::get(flat_variant.user_id, connection)?,
+            role: NestedRole::get(flat_variant.role_id, connection)?,
+            created_by: User::get(flat_variant.created_by, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -3678,7 +3678,7 @@ impl NestedSpectraCollectionsUsersRoleInvitation {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SpectraCollectionsUsersRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        SpectraCollectionsUsersRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSpectraCollectionsUsersRoleInvitation {
@@ -3692,7 +3692,7 @@ impl NestedSpectraCollectionsUsersRoleInvitation {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       SpectraCollectionsUsersRoleInvitation::get(( table_id, user_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       SpectraCollectionsUsersRoleInvitation::get(( table_id, user_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedSpectraCollectionsUsersRoleInvitation> for NestedSpectraCollectionsUsersRoleInvitation {
@@ -3730,18 +3730,18 @@ impl NestedSpectraCollectionsUsersRoleRequest {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: SpectraCollectionsUsersRoleRequest,
+        flat_variant: SpectraCollectionsUsersRoleRequest,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            table: NestedSpectraCollection::get(flat_struct.table_id, connection)?,
-            user: User::get(flat_struct.user_id, connection)?,
-            role: NestedRole::get(flat_struct.role_id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-                inner: flat_struct,
+            table: NestedSpectraCollection::get(flat_variant.table_id, connection)?,
+            user: User::get(flat_variant.user_id, connection)?,
+            role: NestedRole::get(flat_variant.role_id, connection)?,
+            created_by: User::get(flat_variant.created_by, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -3757,7 +3757,7 @@ impl NestedSpectraCollectionsUsersRoleRequest {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SpectraCollectionsUsersRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        SpectraCollectionsUsersRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSpectraCollectionsUsersRoleRequest {
@@ -3771,7 +3771,7 @@ impl NestedSpectraCollectionsUsersRoleRequest {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       SpectraCollectionsUsersRoleRequest::get(( table_id, user_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       SpectraCollectionsUsersRoleRequest::get(( table_id, user_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedSpectraCollectionsUsersRoleRequest> for NestedSpectraCollectionsUsersRoleRequest {
@@ -3809,18 +3809,18 @@ impl NestedSpectraCollectionsUsersRole {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: SpectraCollectionsUsersRole,
+        flat_variant: SpectraCollectionsUsersRole,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            table: NestedSpectraCollection::get(flat_struct.table_id, connection)?,
-            user: User::get(flat_struct.user_id, connection)?,
-            role: NestedRole::get(flat_struct.role_id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-                inner: flat_struct,
+            table: NestedSpectraCollection::get(flat_variant.table_id, connection)?,
+            user: User::get(flat_variant.user_id, connection)?,
+            role: NestedRole::get(flat_variant.role_id, connection)?,
+            created_by: User::get(flat_variant.created_by, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -3836,7 +3836,7 @@ impl NestedSpectraCollectionsUsersRole {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SpectraCollectionsUsersRole::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        SpectraCollectionsUsersRole::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSpectraCollectionsUsersRole {
@@ -3850,7 +3850,7 @@ impl NestedSpectraCollectionsUsersRole {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       SpectraCollectionsUsersRole::get(( table_id, user_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       SpectraCollectionsUsersRole::get(( table_id, user_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedSpectraCollectionsUsersRole> for NestedSpectraCollectionsUsersRole {
@@ -3886,16 +3886,16 @@ impl NestedTeamState {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: TeamState,
+        flat_variant: TeamState,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            font_awesome_icon: FontAwesomeIcon::get(flat_struct.font_awesome_icon_id, connection)?,
-            color: Color::get(flat_struct.color_id, connection)?,
-                inner: flat_struct,
+            font_awesome_icon: FontAwesomeIcon::get(flat_variant.font_awesome_icon_id, connection)?,
+            color: Color::get(flat_variant.color_id, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -3911,7 +3911,7 @@ impl NestedTeamState {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        TeamState::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        TeamState::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedTeamState {
@@ -3925,7 +3925,7 @@ impl NestedTeamState {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       TeamState::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       TeamState::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl NestedTeamState {
@@ -3939,7 +3939,7 @@ impl NestedTeamState {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        TeamState::from_color_id(color_id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+        TeamState::from_color_id(color_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl NestedTeamState {
@@ -3953,7 +3953,7 @@ impl NestedTeamState {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        TeamState::from_font_awesome_icon_id(font_awesome_icon_id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+        TeamState::from_font_awesome_icon_id(font_awesome_icon_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl NestedTeamState {
@@ -3967,7 +3967,7 @@ impl NestedTeamState {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        TeamState::from_name(name, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+        TeamState::from_name(name, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl NestedTeamState {
@@ -3981,7 +3981,7 @@ impl NestedTeamState {
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-       TeamState::similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+       TeamState::similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedTeamState {
@@ -3995,7 +3995,7 @@ impl NestedTeamState {
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-       TeamState::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+       TeamState::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedTeamState {
@@ -4009,7 +4009,7 @@ impl NestedTeamState {
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-       TeamState::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+       TeamState::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl From<web_common::database::nested_models::NestedTeamState> for NestedTeamState {
@@ -4042,17 +4042,17 @@ impl NestedTeam {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: Team,
+        flat_variant: Team,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            parent_team: flat_struct.parent_team_id.map(|flat_struct| Team::get(flat_struct, connection)).transpose()?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-            updated_by: User::get(flat_struct.updated_by, connection)?,
-                inner: flat_struct,
+            parent_team: flat_variant.parent_team_id.map(|flat_variant| Team::get(flat_variant, connection)).transpose()?,
+            created_by: User::get(flat_variant.created_by, connection)?,
+            updated_by: User::get(flat_variant.updated_by, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -4068,7 +4068,7 @@ impl NestedTeam {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        Team::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        Team::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedTeam {
@@ -4085,7 +4085,7 @@ impl NestedTeam {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        Team::all_editables(author_user_id, limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        Team::all_editables(author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedTeam {
@@ -4100,7 +4100,7 @@ impl NestedTeam {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        Team::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        Team::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedTeam {
@@ -4114,7 +4114,7 @@ impl NestedTeam {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       Team::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       Team::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl NestedTeam {
@@ -4128,7 +4128,7 @@ impl NestedTeam {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        Team::from_name(name, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+        Team::from_name(name, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl NestedTeam {
@@ -4142,7 +4142,7 @@ impl NestedTeam {
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-       Team::similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+       Team::similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedTeam {
@@ -4158,7 +4158,7 @@ impl NestedTeam {
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-       Team::similarity_search_editables(author_user_id, query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+       Team::similarity_search_editables(author_user_id, query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedTeam {
@@ -4172,7 +4172,7 @@ impl NestedTeam {
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-       Team::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+       Team::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedTeam {
@@ -4188,7 +4188,7 @@ impl NestedTeam {
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-       Team::word_similarity_search_editables(author_user_id, query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+       Team::word_similarity_search_editables(author_user_id, query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedTeam {
@@ -4202,7 +4202,7 @@ impl NestedTeam {
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-       Team::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+       Team::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedTeam {
@@ -4218,7 +4218,7 @@ impl NestedTeam {
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-       Team::strict_word_similarity_search_editables(author_user_id, query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+       Team::strict_word_similarity_search_editables(author_user_id, query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl From<web_common::database::nested_models::NestedTeam> for NestedTeam {
@@ -4254,18 +4254,18 @@ impl NestedTeamsTeamsRoleInvitation {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: TeamsTeamsRoleInvitation,
+        flat_variant: TeamsTeamsRoleInvitation,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            table: NestedTeam::get(flat_struct.table_id, connection)?,
-            team: NestedTeam::get(flat_struct.team_id, connection)?,
-            role: NestedRole::get(flat_struct.role_id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-                inner: flat_struct,
+            table: NestedTeam::get(flat_variant.table_id, connection)?,
+            team: NestedTeam::get(flat_variant.team_id, connection)?,
+            role: NestedRole::get(flat_variant.role_id, connection)?,
+            created_by: User::get(flat_variant.created_by, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -4281,7 +4281,7 @@ impl NestedTeamsTeamsRoleInvitation {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        TeamsTeamsRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        TeamsTeamsRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedTeamsTeamsRoleInvitation {
@@ -4295,7 +4295,7 @@ impl NestedTeamsTeamsRoleInvitation {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       TeamsTeamsRoleInvitation::get(( table_id, team_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       TeamsTeamsRoleInvitation::get(( table_id, team_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedTeamsTeamsRoleInvitation> for NestedTeamsTeamsRoleInvitation {
@@ -4333,18 +4333,18 @@ impl NestedTeamsUsersRoleInvitation {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: TeamsUsersRoleInvitation,
+        flat_variant: TeamsUsersRoleInvitation,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            table: NestedTeam::get(flat_struct.table_id, connection)?,
-            user: User::get(flat_struct.user_id, connection)?,
-            role: NestedRole::get(flat_struct.role_id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-                inner: flat_struct,
+            table: NestedTeam::get(flat_variant.table_id, connection)?,
+            user: User::get(flat_variant.user_id, connection)?,
+            role: NestedRole::get(flat_variant.role_id, connection)?,
+            created_by: User::get(flat_variant.created_by, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -4360,7 +4360,7 @@ impl NestedTeamsUsersRoleInvitation {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        TeamsUsersRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        TeamsUsersRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedTeamsUsersRoleInvitation {
@@ -4374,7 +4374,7 @@ impl NestedTeamsUsersRoleInvitation {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       TeamsUsersRoleInvitation::get(( table_id, user_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       TeamsUsersRoleInvitation::get(( table_id, user_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedTeamsUsersRoleInvitation> for NestedTeamsUsersRoleInvitation {
@@ -4412,18 +4412,18 @@ impl NestedTeamsUsersRoleRequest {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: TeamsUsersRoleRequest,
+        flat_variant: TeamsUsersRoleRequest,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            table: NestedTeam::get(flat_struct.table_id, connection)?,
-            user: User::get(flat_struct.user_id, connection)?,
-            role: NestedRole::get(flat_struct.role_id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-                inner: flat_struct,
+            table: NestedTeam::get(flat_variant.table_id, connection)?,
+            user: User::get(flat_variant.user_id, connection)?,
+            role: NestedRole::get(flat_variant.role_id, connection)?,
+            created_by: User::get(flat_variant.created_by, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -4439,7 +4439,7 @@ impl NestedTeamsUsersRoleRequest {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        TeamsUsersRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        TeamsUsersRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedTeamsUsersRoleRequest {
@@ -4453,7 +4453,7 @@ impl NestedTeamsUsersRoleRequest {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       TeamsUsersRoleRequest::get(( table_id, user_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       TeamsUsersRoleRequest::get(( table_id, user_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedTeamsUsersRoleRequest> for NestedTeamsUsersRoleRequest {
@@ -4491,18 +4491,18 @@ impl NestedTeamsUsersRole {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: TeamsUsersRole,
+        flat_variant: TeamsUsersRole,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            table: NestedTeam::get(flat_struct.table_id, connection)?,
-            user: User::get(flat_struct.user_id, connection)?,
-            role: NestedRole::get(flat_struct.role_id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-                inner: flat_struct,
+            table: NestedTeam::get(flat_variant.table_id, connection)?,
+            user: User::get(flat_variant.user_id, connection)?,
+            role: NestedRole::get(flat_variant.role_id, connection)?,
+            created_by: User::get(flat_variant.created_by, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -4518,7 +4518,7 @@ impl NestedTeamsUsersRole {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        TeamsUsersRole::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        TeamsUsersRole::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedTeamsUsersRole {
@@ -4532,7 +4532,7 @@ impl NestedTeamsUsersRole {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       TeamsUsersRole::get(( table_id, user_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       TeamsUsersRole::get(( table_id, user_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedTeamsUsersRole> for NestedTeamsUsersRole {
@@ -4568,16 +4568,16 @@ impl NestedUserEmail {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: UserEmail,
+        flat_variant: UserEmail,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            created_by: User::get(flat_struct.created_by, connection)?,
-            login_provider: NestedLoginProvider::get(flat_struct.login_provider_id, connection)?,
-                inner: flat_struct,
+            created_by: User::get(flat_variant.created_by, connection)?,
+            login_provider: NestedLoginProvider::get(flat_variant.login_provider_id, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -4593,7 +4593,7 @@ impl NestedUserEmail {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        UserEmail::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        UserEmail::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedUserEmail {
@@ -4607,7 +4607,7 @@ impl NestedUserEmail {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       UserEmail::get(id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       UserEmail::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl NestedUserEmail {
@@ -4623,7 +4623,7 @@ impl NestedUserEmail {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-        UserEmail::from_email_and_login_provider_id(email, login_provider_id, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+        UserEmail::from_email_and_login_provider_id(email, login_provider_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedUserEmail> for NestedUserEmail {
@@ -4657,18 +4657,18 @@ impl NestedUsersUsersRoleInvitation {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: UsersUsersRoleInvitation,
+        flat_variant: UsersUsersRoleInvitation,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            table: User::get(flat_struct.table_id, connection)?,
-            user: User::get(flat_struct.user_id, connection)?,
-            role: NestedRole::get(flat_struct.role_id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-                inner: flat_struct,
+            table: User::get(flat_variant.table_id, connection)?,
+            user: User::get(flat_variant.user_id, connection)?,
+            role: NestedRole::get(flat_variant.role_id, connection)?,
+            created_by: User::get(flat_variant.created_by, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -4684,7 +4684,7 @@ impl NestedUsersUsersRoleInvitation {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        UsersUsersRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        UsersUsersRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedUsersUsersRoleInvitation {
@@ -4698,7 +4698,7 @@ impl NestedUsersUsersRoleInvitation {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       UsersUsersRoleInvitation::get(( table_id, user_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       UsersUsersRoleInvitation::get(( table_id, user_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedUsersUsersRoleInvitation> for NestedUsersUsersRoleInvitation {
@@ -4736,18 +4736,18 @@ impl NestedUsersUsersRoleRequest {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: UsersUsersRoleRequest,
+        flat_variant: UsersUsersRoleRequest,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            table: User::get(flat_struct.table_id, connection)?,
-            user: User::get(flat_struct.user_id, connection)?,
-            role: NestedRole::get(flat_struct.role_id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-                inner: flat_struct,
+            table: User::get(flat_variant.table_id, connection)?,
+            user: User::get(flat_variant.user_id, connection)?,
+            role: NestedRole::get(flat_variant.role_id, connection)?,
+            created_by: User::get(flat_variant.created_by, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -4763,7 +4763,7 @@ impl NestedUsersUsersRoleRequest {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        UsersUsersRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        UsersUsersRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedUsersUsersRoleRequest {
@@ -4777,7 +4777,7 @@ impl NestedUsersUsersRoleRequest {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       UsersUsersRoleRequest::get(( table_id, user_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       UsersUsersRoleRequest::get(( table_id, user_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedUsersUsersRoleRequest> for NestedUsersUsersRoleRequest {
@@ -4815,18 +4815,18 @@ impl NestedUsersUsersRole {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
-    /// * `flat_struct` - The flat struct.
+    /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub fn from_flat(
-        flat_struct: UsersUsersRole,
+        flat_variant: UsersUsersRole,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            table: User::get(flat_struct.table_id, connection)?,
-            user: User::get(flat_struct.user_id, connection)?,
-            role: NestedRole::get(flat_struct.role_id, connection)?,
-            created_by: User::get(flat_struct.created_by, connection)?,
-                inner: flat_struct,
+            table: User::get(flat_variant.table_id, connection)?,
+            user: User::get(flat_variant.user_id, connection)?,
+            role: NestedRole::get(flat_variant.role_id, connection)?,
+            created_by: User::get(flat_variant.created_by, connection)?,
+                inner: flat_variant,
         })
     }
 }
@@ -4842,7 +4842,7 @@ impl NestedUsersUsersRole {
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        UsersUsersRole::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()
+        UsersUsersRole::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedUsersUsersRole {
@@ -4856,7 +4856,7 @@ impl NestedUsersUsersRole {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       UsersUsersRole::get(( table_id, user_id ), connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))
+       UsersUsersRole::get(( table_id, user_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl From<web_common::database::nested_models::NestedUsersUsersRole> for NestedUsersUsersRole {
