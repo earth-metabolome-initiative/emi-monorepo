@@ -37,6 +37,7 @@ diesel::table! {
         id -> Int4,
         name -> Text,
         hexadecimal_value -> Text,
+        description -> Text,
     }
 }
 
@@ -68,6 +69,9 @@ diesel::table! {
         extension -> Varchar,
         #[max_length = 255]
         mime_type -> Varchar,
+        description -> Text,
+        font_awesome_icon_id -> Int4,
+        color_id -> Int4,
     }
 }
 
@@ -75,6 +79,7 @@ diesel::table! {
     font_awesome_icons (id) {
         id -> Int4,
         name -> Text,
+        description -> Text,
     }
 }
 
@@ -602,6 +607,8 @@ diesel::joinable!(bio_ott_ranks -> font_awesome_icons (font_awesome_icon_id));
 diesel::joinable!(bio_ott_taxon_items -> bio_ott_ranks (ott_rank_id));
 diesel::joinable!(bio_ott_taxon_items -> colors (color_id));
 diesel::joinable!(bio_ott_taxon_items -> font_awesome_icons (font_awesome_icon_id));
+diesel::joinable!(document_formats -> colors (color_id));
+diesel::joinable!(document_formats -> font_awesome_icons (font_awesome_icon_id));
 diesel::joinable!(login_providers -> colors (color_id));
 diesel::joinable!(login_providers -> font_awesome_icons (font_awesome_icon_id));
 diesel::joinable!(notifications -> users (user_id));

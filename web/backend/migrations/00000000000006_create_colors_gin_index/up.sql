@@ -1,3 +1,13 @@
--- Create the index to search approximately the composite columns of
--- project states, including name and description.
-CREATE INDEX colors_name_trgm_idx ON colors USING gin (name gin_trgm_ops);
+CREATE FUNCTION f_concat_colors_name(
+  name text,
+  description text
+) RETURNS text AS $$
+BEGIN
+  RETURN name || ' ' || description;
+END;
+$$ LANGUAGE plpgsql IMMUTABLE STRICT PARALLEL SAFE;
+
+
+CREATE INDEX colors_name_trgm_idx ON colors USING gin (
+  f_concat_colors_name(name, description) gin_trgm_ops
+);

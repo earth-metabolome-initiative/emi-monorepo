@@ -1,3 +1,13 @@
--- Create the index to search approximately the composite columns of
--- project states, including name.
-CREATE INDEX font_awesome_icons_name_trgm_idx ON font_awesome_icons USING gin (name gin_trgm_ops);
+CREATE FUNCTION f_concat_font_awesome_icons_name(
+  name text,
+  description text
+) RETURNS text AS $$
+BEGIN
+  RETURN name || ' ' || description;
+END;
+$$ LANGUAGE plpgsql IMMUTABLE STRICT PARALLEL SAFE;
+
+
+CREATE INDEX font_awesome_icons_name_trgm_idx ON font_awesome_icons USING gin (
+  f_concat_font_awesome_icons_name(name, description) gin_trgm_ops
+);

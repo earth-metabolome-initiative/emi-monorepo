@@ -1,12 +1,11 @@
-from typing import List, Tuple
+from typing import List
+from io import StringIO
 from downloaders import BaseDownloader
 from tqdm.auto import tqdm
 import numpy as np
 import pandas as pd
-from tqdm.auto import tqdm
 from cache_decorator import Cache
 from pyinaturalist.docs.font_awesome_icons import EXTENDED_FONT_AWESOME_ICONS
-from io import StringIO
 import requests
 
 
@@ -149,7 +148,7 @@ def enrich_ranks(df: pd.DataFrame):
 @Cache(use_approximated_hash=True)
 def populate_font_awesome_icons(df: pd.DataFrame):
     """Populate the font awesome icons"""
-    otol_to_inat = pd.read_csv("./migrations/otol_to_inat.csv").set_index("identifier")
+    otol_to_inat = pd.read_csv("./db_data/otol_to_inat.csv").set_index("identifier")
 
     colors = pd.read_csv("./db_data/colors.csv").set_index("name")
     icons = pd.read_csv("./db_data/font_awesome_icons.csv").set_index("name")
@@ -173,15 +172,16 @@ def populate_font_awesome_icons(df: pd.DataFrame):
 
         if pd.notna(row.OTT_ID):
             icon = EXTENDED_FONT_AWESOME_ICONS[inat_identifier]
-            df.at[row.OTT_ID, column_name] = icons.index.get_loc(icon.name)
+            # We remove the fa- prefix
+            df.at[row.OTT_ID, column_name] = icons.index.get_loc(icon.name[3:])
             df.at[row.OTT_ID, color_column_name] = colors.index.get_loc(icon.color)
 
     df = df.reset_index()
 
-    unknowns = [icons.index.get_loc("fa-question-circle"), colors.index.get_loc("grey")]
+    unknowns = [icons.index.get_loc("question-circle"), colors.index.get_loc("grey")]
 
-    for index, row in tqdm(
-        df.iterrows(), total=df.shape[0], desc=f"Propagating icons", leave=False
+    for _index, row in tqdm(
+        df.iterrows(), total=df.shape[0], desc="Propagating icons", leave=False
     ):
         propagate_down(df, row, [column_name, color_column_name], unknowns=unknowns)
 

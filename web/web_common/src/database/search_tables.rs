@@ -24,10 +24,10 @@ impl Searchable<false> for NestedBioOttTaxonItem {
         )
     }
 }
-impl Searchable<false> for NestedOrganization {
+impl Searchable<false> for NestedDocumentFormat {
     fn search_task(query: String, limit: u32) -> super::Select {
         super::Select::search(
-             Table::Organizations,
+             Table::DocumentFormats,
               query,
               limit,
         )
@@ -37,24 +37,6 @@ impl Searchable<false> for NestedProjectState {
     fn search_task(query: String, limit: u32) -> super::Select {
         super::Select::search(
              Table::ProjectStates,
-              query,
-              limit,
-        )
-    }
-}
-impl Searchable<false> for NestedProject {
-    fn search_task(query: String, limit: u32) -> super::Select {
-        super::Select::search(
-             Table::Projects,
-              query,
-              limit,
-        )
-    }
-}
-impl Searchable<true> for NestedProject {
-    fn search_task(query: String, limit: u32) -> super::Select {
-        super::Select::search_editables(
-             Table::Projects,
               query,
               limit,
         )
@@ -78,28 +60,10 @@ impl Searchable<false> for NestedSampleState {
         )
     }
 }
-impl Searchable<true> for NestedSampledIndividual {
-    fn search_task(query: String, limit: u32) -> super::Select {
-        super::Select::search_editables(
-             Table::SampledIndividuals,
-              query,
-              limit,
-        )
-    }
-}
 impl Searchable<true> for NestedSample {
     fn search_task(query: String, limit: u32) -> super::Select {
         super::Select::search_editables(
              Table::Samples,
-              query,
-              limit,
-        )
-    }
-}
-impl Searchable<true> for NestedSpectraCollection {
-    fn search_task(query: String, limit: u32) -> super::Select {
-        super::Select::search_editables(
-             Table::SpectraCollections,
               query,
               limit,
         )

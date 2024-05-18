@@ -1,5 +1,7 @@
 //! Module providing a yew component that handles a basic input, which is meant to be used in combination with BasicForm.
 
+use std::fmt::Debug;
+
 use super::InputErrors;
 use crate::components::database::row_to_searchable_badge::RowToSearchableBadge;
 use crate::workers::ws_worker::ComponentMessage;
@@ -41,7 +43,7 @@ where
 
 impl<Data, const EDIT: bool> MultiDatalistProp<Data, EDIT>
 where
-    Data: 'static + Clone + PartialEq,
+    Data: 'static + Clone + PartialEq + Debug
 {
     pub fn label(&self) -> String {
         self.label.clone()
@@ -90,7 +92,7 @@ pub enum DatalistMessage<Data> {
 
 impl<Data, const EDIT: bool> Component for MultiDatalist<Data, EDIT>
 where
-    Data: 'static + Clone + PartialEq + DeserializeOwned + Searchable<EDIT> + RowToSearchableBadge,
+    Data: 'static + Clone + PartialEq + DeserializeOwned + Searchable<EDIT> + RowToSearchableBadge + Debug,
 {
     type Message = DatalistMessage<Data>;
     type Properties = MultiDatalistProp<Data, EDIT>;
@@ -117,7 +119,7 @@ where
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
-        match msg {
+match msg {
             DatalistMessage::Backend(message) => match message {
                 WebsocketMessage::SearchTable(results) => {
                     self.number_of_search_queries -= 1;
@@ -461,7 +463,7 @@ where
 #[function_component(Datalist)]
 pub fn datalist<Data, const EDIT: bool>(props: &DatalistProp<Data, EDIT>) -> Html
 where
-    Data: 'static + Clone + PartialEq + DeserializeOwned + Searchable<EDIT> + RowToSearchableBadge,
+    Data: 'static + Clone + PartialEq + DeserializeOwned + Searchable<EDIT> + RowToSearchableBadge + Debug,
 {
     let builder_callback = {
         let old_builder = props.builder.clone();

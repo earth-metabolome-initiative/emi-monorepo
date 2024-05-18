@@ -415,6 +415,7 @@ pub struct Color {
     pub id: i32,
     pub name: String,
     pub hexadecimal_value: String,
+    pub description: String,
 }
 
 impl From<Color> for web_common::database::tables::Color {
@@ -423,6 +424,7 @@ impl From<Color> for web_common::database::tables::Color {
             id: item.id,
             name: item.name,
             hexadecimal_value: item.hexadecimal_value,
+            description: item.description,
         }
     }
 }
@@ -433,6 +435,7 @@ impl From<web_common::database::tables::Color> for Color {
             id: item.id,
             name: item.name,
             hexadecimal_value: item.hexadecimal_value,
+            description: item.description,
         }
     }
 }
@@ -521,9 +524,9 @@ impl Color {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, hexadecimal_value FROM colors ",
-            "WHERE $1 % name ",
-            "ORDER BY similarity($1, name) DESC LIMIT $2",
+            "SELECT id, name, hexadecimal_value, description FROM colors ",
+            "WHERE $1 % f_concat_colors_name(name, description) ",
+            "ORDER BY similarity($1, f_concat_colors_name(name, description)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -550,9 +553,9 @@ impl Color {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, hexadecimal_value FROM colors ",
-            "WHERE $1 <% name ",
-            "ORDER BY word_similarity($1, name) DESC LIMIT $2",
+            "SELECT id, name, hexadecimal_value, description FROM colors ",
+            "WHERE $1 <% f_concat_colors_name(name, description) ",
+            "ORDER BY word_similarity($1, f_concat_colors_name(name, description)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -579,9 +582,9 @@ impl Color {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, hexadecimal_value FROM colors ",
-            "WHERE $1 <<% name ",
-            "ORDER BY strict_word_similarity($1, name) DESC LIMIT $2",
+            "SELECT id, name, hexadecimal_value, description FROM colors ",
+            "WHERE $1 <<% f_concat_colors_name(name, description) ",
+            "ORDER BY strict_word_similarity($1, f_concat_colors_name(name, description)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -901,13 +904,18 @@ impl DerivedSample {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = document_formats)]
+#[diesel(belongs_to(FontAwesomeIcon, foreign_key = font_awesome_icon_id))]
+#[diesel(belongs_to(Color, foreign_key = color_id))]
 #[diesel(primary_key(id))]
 pub struct DocumentFormat {
     pub id: i32,
     pub extension: String,
     pub mime_type: String,
+    pub description: String,
+    pub font_awesome_icon_id: i32,
+    pub color_id: i32,
 }
 
 impl From<DocumentFormat> for web_common::database::tables::DocumentFormat {
@@ -916,6 +924,9 @@ impl From<DocumentFormat> for web_common::database::tables::DocumentFormat {
             id: item.id,
             extension: item.extension,
             mime_type: item.mime_type,
+            description: item.description,
+            font_awesome_icon_id: item.font_awesome_icon_id,
+            color_id: item.color_id,
         }
     }
 }
@@ -926,6 +937,9 @@ impl From<web_common::database::tables::DocumentFormat> for DocumentFormat {
             id: item.id,
             extension: item.extension,
             mime_type: item.mime_type,
+            description: item.description,
+            font_awesome_icon_id: item.font_awesome_icon_id,
+            color_id: item.color_id,
         }
     }
 }
@@ -999,7 +1013,7 @@ impl DocumentFormat {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, extension, mime_type FROM document_formats ",
+            "SELECT id, extension, mime_type, description, font_awesome_icon_id, color_id FROM document_formats ",
             "WHERE $1 % f_concat_document_formats_extension_mime_type((extension)::text, (mime_type)::text) ",
             "ORDER BY similarity($1, f_concat_document_formats_extension_mime_type((extension)::text, (mime_type)::text)) DESC LIMIT $2",
         );
@@ -1028,7 +1042,7 @@ impl DocumentFormat {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, extension, mime_type FROM document_formats ",
+            "SELECT id, extension, mime_type, description, font_awesome_icon_id, color_id FROM document_formats ",
             "WHERE $1 <% f_concat_document_formats_extension_mime_type((extension)::text, (mime_type)::text) ",
             "ORDER BY word_similarity($1, f_concat_document_formats_extension_mime_type((extension)::text, (mime_type)::text)) DESC LIMIT $2",
         );
@@ -1057,7 +1071,7 @@ impl DocumentFormat {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, extension, mime_type FROM document_formats ",
+            "SELECT id, extension, mime_type, description, font_awesome_icon_id, color_id FROM document_formats ",
             "WHERE $1 <<% f_concat_document_formats_extension_mime_type((extension)::text, (mime_type)::text) ",
             "ORDER BY strict_word_similarity($1, f_concat_document_formats_extension_mime_type((extension)::text, (mime_type)::text)) DESC LIMIT $2",
         );
@@ -1073,6 +1087,7 @@ impl DocumentFormat {
 pub struct FontAwesomeIcon {
     pub id: i32,
     pub name: String,
+    pub description: String,
 }
 
 impl From<FontAwesomeIcon> for web_common::database::tables::FontAwesomeIcon {
@@ -1080,6 +1095,7 @@ impl From<FontAwesomeIcon> for web_common::database::tables::FontAwesomeIcon {
         Self {
             id: item.id,
             name: item.name,
+            description: item.description,
         }
     }
 }
@@ -1089,6 +1105,7 @@ impl From<web_common::database::tables::FontAwesomeIcon> for FontAwesomeIcon {
         Self {
             id: item.id,
             name: item.name,
+            description: item.description,
         }
     }
 }
@@ -1162,9 +1179,9 @@ impl FontAwesomeIcon {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name FROM font_awesome_icons ",
-            "WHERE $1 % name ",
-            "ORDER BY similarity($1, name) DESC LIMIT $2",
+            "SELECT id, name, description FROM font_awesome_icons ",
+            "WHERE $1 % f_concat_font_awesome_icons_name(name, description) ",
+            "ORDER BY similarity($1, f_concat_font_awesome_icons_name(name, description)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -1191,9 +1208,9 @@ impl FontAwesomeIcon {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name FROM font_awesome_icons ",
-            "WHERE $1 <% name ",
-            "ORDER BY word_similarity($1, name) DESC LIMIT $2",
+            "SELECT id, name, description FROM font_awesome_icons ",
+            "WHERE $1 <% f_concat_font_awesome_icons_name(name, description) ",
+            "ORDER BY word_similarity($1, f_concat_font_awesome_icons_name(name, description)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -1220,9 +1237,9 @@ impl FontAwesomeIcon {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name FROM font_awesome_icons ",
-            "WHERE $1 <<% name ",
-            "ORDER BY strict_word_similarity($1, name) DESC LIMIT $2",
+            "SELECT id, name, description FROM font_awesome_icons ",
+            "WHERE $1 <<% f_concat_font_awesome_icons_name(name, description) ",
+            "ORDER BY strict_word_similarity($1, f_concat_font_awesome_icons_name(name, description)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -1430,9 +1447,8 @@ impl Notification {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = organizations)]
-#[diesel(belongs_to(Country, foreign_key = country_id))]
 #[diesel(primary_key(id))]
 pub struct Organization {
     pub id: i32,
@@ -1846,11 +1862,8 @@ impl ProjectState {
             .load(connection)
 }
 }
-#[derive(Queryable, Debug, Identifiable, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = projects)]
-#[diesel(belongs_to(ProjectState, foreign_key = state_id))]
-#[diesel(belongs_to(Project, foreign_key = parent_project_id))]
-#[diesel(belongs_to(User, foreign_key = created_by))]
 #[diesel(primary_key(id))]
 pub struct Project {
     pub id: i32,
@@ -2414,12 +2427,8 @@ impl Project {
             .load(connection)
 }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = projects_teams_role_invitations)]
-#[diesel(belongs_to(Project, foreign_key = table_id))]
-#[diesel(belongs_to(Team, foreign_key = team_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
-#[diesel(belongs_to(User, foreign_key = created_by))]
 #[diesel(primary_key(table_id, team_id))]
 pub struct ProjectsTeamsRoleInvitation {
     pub table_id: i32,
@@ -2489,12 +2498,8 @@ impl ProjectsTeamsRoleInvitation {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = projects_teams_role_requests)]
-#[diesel(belongs_to(Project, foreign_key = table_id))]
-#[diesel(belongs_to(Team, foreign_key = team_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
-#[diesel(belongs_to(User, foreign_key = created_by))]
 #[diesel(primary_key(table_id, team_id))]
 pub struct ProjectsTeamsRoleRequest {
     pub table_id: i32,
@@ -2564,12 +2569,8 @@ impl ProjectsTeamsRoleRequest {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = projects_teams_roles)]
-#[diesel(belongs_to(Project, foreign_key = table_id))]
-#[diesel(belongs_to(Team, foreign_key = team_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
-#[diesel(belongs_to(User, foreign_key = created_by))]
 #[diesel(primary_key(table_id, team_id))]
 pub struct ProjectsTeamsRole {
     pub table_id: i32,
@@ -2639,11 +2640,8 @@ impl ProjectsTeamsRole {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = projects_users_role_invitations)]
-#[diesel(belongs_to(Project, foreign_key = table_id))]
-#[diesel(belongs_to(User, foreign_key = user_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
 #[diesel(primary_key(table_id, user_id))]
 pub struct ProjectsUsersRoleInvitation {
     pub table_id: i32,
@@ -2713,11 +2711,8 @@ impl ProjectsUsersRoleInvitation {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = projects_users_role_requests)]
-#[diesel(belongs_to(Project, foreign_key = table_id))]
-#[diesel(belongs_to(User, foreign_key = user_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
 #[diesel(primary_key(table_id, user_id))]
 pub struct ProjectsUsersRoleRequest {
     pub table_id: i32,
@@ -2787,11 +2782,8 @@ impl ProjectsUsersRoleRequest {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = projects_users_roles)]
-#[diesel(belongs_to(Project, foreign_key = table_id))]
-#[diesel(belongs_to(User, foreign_key = user_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
 #[diesel(primary_key(table_id, user_id))]
 pub struct ProjectsUsersRole {
     pub table_id: i32,
@@ -3080,11 +3072,8 @@ impl Role {
             .load(connection)
 }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sample_bio_ott_taxon_items)]
-#[diesel(belongs_to(User, foreign_key = created_by))]
-#[diesel(belongs_to(Sample, foreign_key = sample_id))]
-#[diesel(belongs_to(BioOttTaxonItem, foreign_key = taxon_id))]
 #[diesel(primary_key(sample_id, taxon_id))]
 pub struct SampleBioOttTaxonItem {
     pub created_by: i32,
@@ -3365,11 +3354,8 @@ impl SampleState {
             .load(connection)
 }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sampled_individual_bio_ott_taxon_items)]
-#[diesel(belongs_to(User, foreign_key = created_by))]
-#[diesel(belongs_to(SampledIndividual, foreign_key = sampled_individual_id))]
-#[diesel(belongs_to(BioOttTaxonItem, foreign_key = taxon_id))]
 #[diesel(primary_key(sampled_individual_id, taxon_id))]
 pub struct SampledIndividualBioOttTaxonItem {
     pub created_by: i32,
@@ -3461,9 +3447,8 @@ impl SampledIndividualBioOttTaxonItem {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sampled_individuals)]
-#[diesel(belongs_to(User, foreign_key = created_by))]
 #[diesel(primary_key(id))]
 pub struct SampledIndividual {
     pub id: Uuid,
@@ -3778,12 +3763,8 @@ impl SampledIndividual {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sampled_individuals_teams_role_invitations)]
-#[diesel(belongs_to(SampledIndividual, foreign_key = table_id))]
-#[diesel(belongs_to(Team, foreign_key = team_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
-#[diesel(belongs_to(User, foreign_key = created_by))]
 #[diesel(primary_key(table_id, team_id))]
 pub struct SampledIndividualsTeamsRoleInvitation {
     pub table_id: Uuid,
@@ -3853,12 +3834,8 @@ impl SampledIndividualsTeamsRoleInvitation {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sampled_individuals_teams_role_requests)]
-#[diesel(belongs_to(SampledIndividual, foreign_key = table_id))]
-#[diesel(belongs_to(Team, foreign_key = team_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
-#[diesel(belongs_to(User, foreign_key = created_by))]
 #[diesel(primary_key(table_id, team_id))]
 pub struct SampledIndividualsTeamsRoleRequest {
     pub table_id: Uuid,
@@ -3928,12 +3905,8 @@ impl SampledIndividualsTeamsRoleRequest {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sampled_individuals_teams_roles)]
-#[diesel(belongs_to(SampledIndividual, foreign_key = table_id))]
-#[diesel(belongs_to(Team, foreign_key = team_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
-#[diesel(belongs_to(User, foreign_key = created_by))]
 #[diesel(primary_key(table_id, team_id))]
 pub struct SampledIndividualsTeamsRole {
     pub table_id: Uuid,
@@ -4003,11 +3976,8 @@ impl SampledIndividualsTeamsRole {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sampled_individuals_users_role_invitations)]
-#[diesel(belongs_to(SampledIndividual, foreign_key = table_id))]
-#[diesel(belongs_to(User, foreign_key = user_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
 #[diesel(primary_key(table_id, user_id))]
 pub struct SampledIndividualsUsersRoleInvitation {
     pub table_id: Uuid,
@@ -4077,11 +4047,8 @@ impl SampledIndividualsUsersRoleInvitation {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sampled_individuals_users_role_requests)]
-#[diesel(belongs_to(SampledIndividual, foreign_key = table_id))]
-#[diesel(belongs_to(User, foreign_key = user_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
 #[diesel(primary_key(table_id, user_id))]
 pub struct SampledIndividualsUsersRoleRequest {
     pub table_id: Uuid,
@@ -4151,11 +4118,8 @@ impl SampledIndividualsUsersRoleRequest {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sampled_individuals_users_roles)]
-#[diesel(belongs_to(SampledIndividual, foreign_key = table_id))]
-#[diesel(belongs_to(User, foreign_key = user_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
 #[diesel(primary_key(table_id, user_id))]
 pub struct SampledIndividualsUsersRole {
     pub table_id: Uuid,
@@ -4993,9 +4957,8 @@ impl SamplesUsersRole {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = spectra)]
-#[diesel(belongs_to(SpectraCollection, foreign_key = spectra_collection_id))]
 #[diesel(primary_key(id))]
 pub struct Spectra {
     pub id: i32,
@@ -5055,10 +5018,8 @@ impl Spectra {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = spectra_collections)]
-#[diesel(belongs_to(Sample, foreign_key = sample_id))]
-#[diesel(belongs_to(User, foreign_key = created_by))]
 #[diesel(primary_key(id))]
 pub struct SpectraCollection {
     pub id: i32,
@@ -5373,12 +5334,8 @@ impl SpectraCollection {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = spectra_collections_teams_role_invitations)]
-#[diesel(belongs_to(SpectraCollection, foreign_key = table_id))]
-#[diesel(belongs_to(Team, foreign_key = team_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
-#[diesel(belongs_to(User, foreign_key = created_by))]
 #[diesel(primary_key(table_id, team_id))]
 pub struct SpectraCollectionsTeamsRoleInvitation {
     pub table_id: i32,
@@ -5448,12 +5405,8 @@ impl SpectraCollectionsTeamsRoleInvitation {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = spectra_collections_teams_role_requests)]
-#[diesel(belongs_to(SpectraCollection, foreign_key = table_id))]
-#[diesel(belongs_to(Team, foreign_key = team_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
-#[diesel(belongs_to(User, foreign_key = created_by))]
 #[diesel(primary_key(table_id, team_id))]
 pub struct SpectraCollectionsTeamsRoleRequest {
     pub table_id: i32,
@@ -5523,12 +5476,8 @@ impl SpectraCollectionsTeamsRoleRequest {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = spectra_collections_teams_roles)]
-#[diesel(belongs_to(SpectraCollection, foreign_key = table_id))]
-#[diesel(belongs_to(Team, foreign_key = team_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
-#[diesel(belongs_to(User, foreign_key = created_by))]
 #[diesel(primary_key(table_id, team_id))]
 pub struct SpectraCollectionsTeamsRole {
     pub table_id: i32,
@@ -5598,11 +5547,8 @@ impl SpectraCollectionsTeamsRole {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = spectra_collections_users_role_invitations)]
-#[diesel(belongs_to(SpectraCollection, foreign_key = table_id))]
-#[diesel(belongs_to(User, foreign_key = user_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
 #[diesel(primary_key(table_id, user_id))]
 pub struct SpectraCollectionsUsersRoleInvitation {
     pub table_id: i32,
@@ -5672,11 +5618,8 @@ impl SpectraCollectionsUsersRoleInvitation {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = spectra_collections_users_role_requests)]
-#[diesel(belongs_to(SpectraCollection, foreign_key = table_id))]
-#[diesel(belongs_to(User, foreign_key = user_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
 #[diesel(primary_key(table_id, user_id))]
 pub struct SpectraCollectionsUsersRoleRequest {
     pub table_id: i32,
@@ -5746,11 +5689,8 @@ impl SpectraCollectionsUsersRoleRequest {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = spectra_collections_users_roles)]
-#[diesel(belongs_to(SpectraCollection, foreign_key = table_id))]
-#[diesel(belongs_to(User, foreign_key = user_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
 #[diesel(primary_key(table_id, user_id))]
 pub struct SpectraCollectionsUsersRole {
     pub table_id: i32,

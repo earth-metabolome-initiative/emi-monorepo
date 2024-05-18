@@ -3,5 +3,8 @@
 CREATE TABLE IF NOT EXISTS document_formats (
   id INTEGER PRIMARY KEY,
   extension VARCHAR(255) NOT NULL UNIQUE,
-  mime_type VARCHAR(255) NOT NULL
+  mime_type VARCHAR(255) NOT NULL,
+  description TEXT NOT NULL,
+  font_awesome_icon_id INTEGER REFERENCES font_awesome_icons(id) NOT NULL,
+  color_id INTEGER REFERENCES colors(id) NOT NULL
 );
