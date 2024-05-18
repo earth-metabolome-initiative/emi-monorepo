@@ -1,10 +1,13 @@
 //! Module providing a yew component for a basic page with a websocket connection.
 use crate::components::PageLike;
+use crate::router::AppRoute;
 use crate::workers::ws_worker::{ComponentMessage, WebsocketMessage};
 use crate::workers::WebsocketWorker;
+use web_common::api::form_traits::FormMethod;
 use yew::prelude::*;
 use yew_agent::prelude::WorkerBridgeHandle;
 use yew_agent::scope_ext::AgentScopeExt;
+use yew_router::prelude::Link;
 
 use super::database::row_to_badge::RowToBadge;
 
@@ -92,6 +95,14 @@ impl<Page: PageLike + RowToBadge> Component for BasicPages<Page> {
                     <></>
                 }
                 </ul>
+                if let Some(create_path) = Page::create_path() {
+                    <Link<AppRoute> classes={"button-like create"} to={create_path}>
+                        <i class={FormMethod::POST.font_awesome_icon()}></i>
+                        <span>{"New"}</span>
+                    </Link<AppRoute>>
+                } else {
+                    <></>
+                }
                 <button onclick={ctx.link().callback(|_| PagesMessage::LoadMore)} disabled={self.request_is_ongoing}>
                     if self.request_is_ongoing {
                         <i class="fas fa-arrows-rotate fa-spin"></i>

@@ -30,6 +30,8 @@ pub trait PageLike: DeserializeOwned + PartialEq + Clone + Tabular + 'static {
     fn id(&self) -> PrimaryKey;
 
     fn update_path(&self) -> Option<AppRoute>;
+
+    fn create_path() -> Option<AppRoute>;
 }
 
 impl PageLike for NestedProject {
@@ -43,6 +45,10 @@ impl PageLike for NestedProject {
 
     fn update_path(&self) -> Option<AppRoute> {
         Some(AppRoute::ProjectsUpdate { id: self.inner.id })
+    }
+
+    fn create_path() -> Option<AppRoute> {
+        Some(AppRoute::ProjectsNew)
     }
 }
 
@@ -58,6 +64,10 @@ impl PageLike for NestedSampledIndividual {
     fn update_path(&self) -> Option<AppRoute> {
         Some(AppRoute::SampledIndividualsUpdate { id: self.inner.id })
     }
+
+    fn create_path() -> Option<AppRoute> {
+        Some(AppRoute::SampledIndividualsNew)
+    }
 }
 
 impl PageLike for NestedSample {
@@ -71,6 +81,10 @@ impl PageLike for NestedSample {
 
     fn update_path(&self) -> Option<AppRoute> {
         Some(AppRoute::SamplesUpdate { id: self.inner.id })
+    }
+
+    fn create_path() -> Option<AppRoute> {
+        Some(AppRoute::SamplesNew)
     }
 }
 
@@ -86,6 +100,10 @@ impl PageLike for User {
     fn update_path(&self) -> Option<AppRoute> {
         Some(AppRoute::UsersUpdate { id: self.id })
     }
+
+    fn create_path() -> Option<AppRoute> {
+        None
+    }
 }
 
 impl PageLike for NestedTeam {
@@ -99,6 +117,10 @@ impl PageLike for NestedTeam {
 
     fn update_path(&self) -> Option<AppRoute> {
         Some(AppRoute::TeamsUpdate { id: self.inner.id })
+    }
+
+    fn create_path() -> Option<AppRoute> {
+        Some(AppRoute::TeamsNew)
     }
 }
 
@@ -234,9 +256,17 @@ impl<Page: PageLike> Component for InnerBasicPage<Page> {
                 <div class="page">
                     <h2>{ page.title() }</h2>
                     if self.can_update {
-                        <Link<AppRoute> classes={"button-like"} to={page.update_path().unwrap()}>
+                        <Link<AppRoute> classes={"button-like update"} to={page.update_path().unwrap()}>
                             <i class={FormMethod::PUT.font_awesome_icon()}></i>
                             <span>{"Update"}</span>
+                        </Link<AppRoute>>
+                    } else {
+                        <></>
+                    }
+                    if self.can_delete {
+                        <Link<AppRoute> classes={"button-like delete"} to={page.update_path().unwrap()}>
+                            <i class={FormMethod::DELETE.font_awesome_icon()}></i>
+                            <span>{"Delete"}</span>
                         </Link<AppRoute>>
                     } else {
                         <></>

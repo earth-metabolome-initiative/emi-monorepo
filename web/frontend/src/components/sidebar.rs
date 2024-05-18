@@ -32,91 +32,26 @@ pub fn sidebar(props: &SidebarProps) -> Html {
                         <Link<AppRoute> to={AppRoute::Projects}>
                             {"Projects"}
                         </Link<AppRoute>>
-                        {if route == AppRoute::Projects && user.has_user() {
-                            html! {
-                                <ul>
-                                    <li>
-                                        <Link<AppRoute> to={AppRoute::ProjectsNew}>
-                                            {"New Project"}
-                                        </Link<AppRoute>>
-                                    </li>
-                                </ul>
-                            }
-                        } else {
-                            html! {<></>}
-                        }}
                     </li>
                     <li class={if route == AppRoute::SampledIndividuals { "active" } else { "" }}>
                         <Link<AppRoute> to={AppRoute::SampledIndividuals}>
                             {"Sampled individuals"}
                         </Link<AppRoute>>
-                        {if route == AppRoute::SampledIndividuals && user.has_user() {
-                            html! {
-                                <ul>
-                                    <li>
-                                        <Link<AppRoute> to={AppRoute::SampledIndividualsNew}>
-                                            {"New Sampled individual"}
-                                        </Link<AppRoute>>
-                                    </li>
-                                </ul>
-                            }
-                        } else {
-                            html! {<></>}
-                        }}
                     </li>
                     <li class={if route == AppRoute::Samples { "active" } else { "" }}>
                         <Link<AppRoute> to={AppRoute::Samples}>
                             {"Samples"}
                         </Link<AppRoute>>
-                        {if route == AppRoute::Samples && user.has_user() {
-                            html! {
-                                <ul>
-                                    <li>
-                                        <Link<AppRoute> to={AppRoute::SamplesNew}>
-                                            {"New Sample"}
-                                        </Link<AppRoute>>
-                                    </li>
-                                </ul>
-                            }
-                        } else {
-                            html! {<></>}
-                        }}
                     </li>
                     <li class={if route == AppRoute::Teams { "active" } else { "" }}>
                         <Link<AppRoute> to={AppRoute::Teams}>
                             {"Teams"}
                         </Link<AppRoute>>
-                        {if route == AppRoute::Teams && user.has_user() {
-                            html! {
-                                <ul>
-                                    <li>
-                                        <Link<AppRoute> to={AppRoute::TeamsNew}>
-                                            {"New Team"}
-                                        </Link<AppRoute>>
-                                    </li>
-                                </ul>
-                            }
-                        } else {
-                            html! {<></>}
-                        }}
                     </li>
                     <li class={if route == AppRoute::Users { "active" } else { "" }}>
                         <Link<AppRoute> to={AppRoute::Users}>
                             {"Users"}
                         </Link<AppRoute>>
-                        {if route == AppRoute::Users && user.has_user() {
-                            html! {
-                                <ul>
-                                    <li>
-                                        <Link<AppRoute> to={AppRoute::UsersNew}>
-                                            {"New User"}
-                                        </Link<AppRoute>>
-                                    </li>
-                                </ul>
-                            }
-                        } else {
-                            html! {<></>}
-                        }}
                     </li>
                     {if user.has_user() {
                         html! {

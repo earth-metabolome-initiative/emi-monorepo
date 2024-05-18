@@ -256,7 +256,7 @@ def write_backend_structs(
                     f"                           .and({struct.table_name}_users_roles::dsl::role_id.le(role_id)),\n"
                     "                    )),\n"
                     "               )\n"
-                    "         )\n"  
+                    "         )\n"
                 )
                 if struct.table_name != "teams":
                     file.write(
@@ -585,9 +585,7 @@ def write_backend_structs(
             if table_type == "tables":
                 file.write(f"        use crate::schema::{struct.table_name};\n")
             else:
-                file.write(
-                    f"        use crate::views::schema::{struct.table_name};\n"
-                )
+                file.write(f"        use crate::views::schema::{struct.table_name};\n")
             file.write(f"        {struct.table_name}::dsl::{struct.table_name}\n")
             for primary_key in primary_keys:
                 file.write(
@@ -874,7 +872,9 @@ def extract_structs(path: str, table_metadata: TableMetadata) -> List[StructMeta
             # in the line.
             if "}" in line:
                 inside_struct = False
-                table_metadata.register_flat_variant(struct_metadata.table_name, struct_metadata.name)
+                table_metadata.register_flat_variant(
+                    struct_metadata.table_name, struct_metadata.name
+                )
                 struct_metadatas.append(struct_metadata)
 
     return struct_metadatas
@@ -1853,8 +1853,9 @@ def generate_nested_structs(
         for attribute in nested_struct.attributes:
             if attribute.name == "inner":
                 continue
-            if attribute.data_type() == nested_struct.name or flat_variant.has_attribute(
-                attribute
+            if (
+                attribute.data_type() == nested_struct.name
+                or flat_variant.has_attribute(attribute)
             ):
                 document.write(
                     f"            {attribute.name}: flat_variant.{attribute.name},\n"
@@ -2034,7 +2035,10 @@ def generate_nested_structs(
                     "}\n"
                 )
 
-                if nested_struct.has_associated_roles() and nested_struct.table_name != "users":
+                if (
+                    nested_struct.has_associated_roles()
+                    and nested_struct.table_name != "users"
+                ):
                     document.write(
                         f"impl {nested_struct.name} {{\n"
                         "    /// Search the table by the query.\n"
@@ -2053,7 +2057,6 @@ def generate_nested_structs(
                         "    }\n"
                         "}\n"
                     )
-                
 
         # We implement the bidirectional From methods for the nested struct
         # present in the web_common crate, which does not use Diesel or its
@@ -2095,7 +2098,9 @@ def generate_nested_structs(
     return nested_structs
 
 
-def write_web_common_nested_structs(path: str, nested_structs: List[StructMetadata], table_metadata: TableMetadata):
+def write_web_common_nested_structs(
+    path: str, nested_structs: List[StructMetadata], table_metadata: TableMetadata
+):
     """Writes the nested structs to the web_common crate."""
 
     # We open the file to write the nested structs
@@ -2848,7 +2853,7 @@ def write_diesel_table_names_enumeration(
             "         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
             ") -> Result<Vec<Vec<u8>>, web_common::api::ApiError>;\n\n"
         )
-        
+
         document.write(
             f"    /// Search editables rows by the query using the {similarity_method} method from PostgreSQL.\n"
             "    ///\n"
@@ -2894,7 +2899,7 @@ def write_diesel_table_names_enumeration(
             f"    fn {similarity_method}_search_editables(&self, user_id: i32, query: &str, limit: Option<i32>, connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>) -> Result<Vec<Vec<u8>>, web_common::api::ApiError> {{\n"
             "        match self {\n"
         )
-        
+
         for table in tables:
             if search_indices.has_table(table.name):
                 if table.has_associated_roles() and table.name != "users":
@@ -3142,7 +3147,6 @@ def write_diesel_table_names_enumeration(
 
     document.write("        })\n" "    }\n")
 
-    
     document.write(
         "    fn delete(\n"
         "        &self,\n"
@@ -3164,7 +3168,7 @@ def write_diesel_table_names_enumeration(
             )
         else:
             document.write(
-                f"            web_common::database::Table::{table.camel_cased()} => unimplemented!(\"Delete not implemented for {table.name}.\"),\n"
+                f'            web_common::database::Table::{table.camel_cased()} => unimplemented!("Delete not implemented for {table.name}."),\n'
             )
 
     document.write("        })\n")
@@ -3504,9 +3508,7 @@ def write_web_common_search_trait_implementations(
     if not os.getcwd().endswith("backend"):
         raise RuntimeError("This script must be executed in the `backend` crate.")
 
-    document = open(
-        "../web_common/src/database/search_tables.rs", "w", encoding="utf8"
-    )
+    document = open("../web_common/src/database/search_tables.rs", "w", encoding="utf8")
     similarity_indices: PGIndices = find_pg_trgm_indices(table_metadata)
 
     imports = [
@@ -5051,7 +5053,9 @@ def write_frontend_form_builder_implementation(
             flat_attribute = flat_variant.get_attribute_by_name(attribute.name)
 
             if flat_attribute is None:
-                flat_attribute = flat_variant.get_attribute_by_name(f"{attribute.name}_id")
+                flat_attribute = flat_variant.get_attribute_by_name(
+                    f"{attribute.name}_id"
+                )
 
             if flat_attribute is None:
                 raise RuntimeError(
@@ -5059,13 +5063,15 @@ def write_frontend_form_builder_implementation(
                 )
 
             if flat_attribute.optional:
-                named_option_requests.append((
-                    f"if let Some({flat_attribute.name}) = rich_variant.inner.{flat_attribute.name} {{\n"
-                    f"    named_requests.push(ComponentMessage::get_named::<&str, {variants[0].name}>(\"{attribute.name}\", {flat_attribute.name}.into()));\n"
-                    " } else {\n"
-                    f"    dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_name()}(None));\n"
-                    " }\n"
-                ))
+                named_option_requests.append(
+                    (
+                        f"if let Some({flat_attribute.name}) = rich_variant.inner.{flat_attribute.name} {{\n"
+                        f'    named_requests.push(ComponentMessage::get_named::<&str, {variants[0].name}>("{attribute.name}", {flat_attribute.name}.into()));\n'
+                        " } else {\n"
+                        f"    dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_name()}(None));\n"
+                        " }\n"
+                    )
+                )
             else:
                 named_requests.append(
                     f'ComponentMessage::get_named::<&str, {variants[0].name}>("{attribute.name}", rich_variant.inner.{flat_attribute.name}.into())'
@@ -5132,9 +5138,7 @@ def write_frontend_form_builder_implementation(
             document.write(f"        {named_option_request}")
 
         document.write("        named_requests\n")
-    document.write(
-        "    }\n\n"
-    )
+    document.write("    }\n\n")
 
     # We implement the can submit method, which checks whether the form
     # contains errors as specified by the has_errors method, plus checks
@@ -5157,7 +5161,9 @@ def write_frontend_form_builder_implementation(
 
         if struct_attribute is None:
             # We check whether the _id variant of the attribute is present.
-            struct_attribute = flat_variant.get_attribute_by_name(f"{attribute.name}_id")
+            struct_attribute = flat_variant.get_attribute_by_name(
+                f"{attribute.name}_id"
+            )
 
         if struct_attribute is None:
             raise RuntimeError(
@@ -5955,7 +5961,11 @@ def write_frontend_yew_form(
                         f"The struct {attribute.raw_data_type().name} does not implement the RowToSearchableBadge trait."
                     )
 
-                editables = "true" if struct.has_associated_roles() and struct.table_name != "users" else "false"
+                editables = (
+                    "true"
+                    if struct.has_associated_roles() and struct.table_name != "users"
+                    else "false"
+                )
 
                 document.write(
                     f'            <Datalist<{attribute.data_type()}, {editables}> builder={{set_{attribute.name}}} optional={{{optional}}} errors={{builder_store.{error_attribute.name}.clone()}} value={{builder_store.{attribute.name}.clone()}} label="{attribute.human_readable_name()}" />\n'

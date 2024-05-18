@@ -41,6 +41,12 @@ $sidebar-hover-color: #f76a00;
                         color: $sidebar-hover-color;
                     }
                 }
+
+                &.active {
+                    a, button {
+                        color: $sidebar-hover-color;
+                    }
+                }
             }
         }
     }

@@ -68,31 +68,13 @@ def write_frontend_sidebar(builders: List[StructMetadata]):
     )
 
     for builder in builders:
-
         document.write(
             f'                    <li class={{if route == AppRoute::{builder.get_capitalized_table_name()} {{ "active" }} else {{ "" }}}}>\n'
             f"                        <Link<AppRoute> to={{AppRoute::{builder.get_capitalized_table_name()}}}>\n"
             f'                            {{"{builder.capitalized_human_readable_table_name()}"}}\n'
             "                        </Link<AppRoute>>\n"
+            "                    </li>\n"
         )
-        if builder.get_flat_variant().is_insertable():
-            document.write(
-                f"                        {{if route == AppRoute::{builder.get_capitalized_table_name()} && user.has_user() {{\n"
-                "                            html! {\n"
-                "                                <ul>\n"
-                "                                    <li>\n"
-                f"                                        <Link<AppRoute> to={{AppRoute::{builder.get_capitalized_table_name()}New}}>\n"
-                f'                                            {{"New {builder.human_readable_name()}"}}\n'
-                "                                        </Link<AppRoute>>\n"
-                "                                    </li>\n"
-                "                                </ul>\n"
-                "                            }\n"
-                "                        } else {\n"
-                "                            html! {<></>}\n"
-                "                        }}\n"
-            )
-
-        document.write("                    </li>\n")
 
     document.write(
         "                    {if user.has_user() {\n"
