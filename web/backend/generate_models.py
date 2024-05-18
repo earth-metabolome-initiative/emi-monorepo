@@ -5826,7 +5826,7 @@ def write_frontend_yew_form(
             document.write(f"pub fn {form_method_name}() -> Html {{\n")
 
         document.write(
-            f"    let (builder_store, builder_dispatch) = use_store::<{builder.name}>();\n"
+            f"    let builder_dispatch = use_dispatch::<{builder.name}>();\n"
         )
 
         if method == "PUT":
@@ -5836,6 +5836,10 @@ def write_frontend_yew_form(
                     f"         builder.{primary_key.name} = Some(props.{primary_key.name});\n"
                 )
             document.write("     });\n")
+
+        document.write(
+            f"    let builder_store = use_store_value::<{builder.name}>();\n"
+        )
 
         for attribute in builder.attributes:
             # We do not want to include the errors attribute in the builder actions.
@@ -6075,7 +6079,7 @@ def write_frontend_forms(
         "use serde::{Deserialize, Serialize};",
         "use web_common::database::*;",
         "use yew::prelude::*;",
-        "use yewdux::{use_store, Reducer, Store};",
+        "use yewdux::{use_dispatch, use_store_value, Reducer, Store};",
         "use crate::components::forms::*;",
         "use web_common::api::form_traits::FormMethod;",
         "use std::rc::Rc;",

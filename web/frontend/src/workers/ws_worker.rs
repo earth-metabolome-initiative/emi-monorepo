@@ -370,7 +370,6 @@ impl Worker for WebsocketWorker {
                 self.user = user;
             }
             InternalMessage::Backend(backend_message) => {
-                log::debug!("Received message from backend: {:?}", backend_message);
                 match backend_message {
                     BackendMessage::CanView(task_id, can_view) => {
                         // We can remove this task from the queue.

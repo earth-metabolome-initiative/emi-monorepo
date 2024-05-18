@@ -5,7 +5,7 @@
 use serde::{Deserialize, Serialize};
 use web_common::database::*;
 use yew::prelude::*;
-use yewdux::{use_store, Reducer, Store};
+use yewdux::{use_dispatch, use_store_value, Reducer, Store};
 use crate::components::forms::*;
 use web_common::api::form_traits::FormMethod;
 use std::rc::Rc;
@@ -407,7 +407,8 @@ impl FormBuildable for UpdateProject {
 
 #[function_component(CreateProjectForm)]
 pub fn create_project_form() -> Html {
-    let (builder_store, builder_dispatch) = use_store::<ProjectBuilder>();
+    let builder_dispatch = use_dispatch::<ProjectBuilder>();
+    let builder_store = use_store_value::<ProjectBuilder>();
     let set_name = builder_dispatch.apply_callback(|name: Option<String>| ProjectActions::SetName(name));
     let set_description = builder_dispatch.apply_callback(|description: Option<String>| ProjectActions::SetDescription(description));
     let set_public = builder_dispatch.apply_callback(|public: bool| ProjectActions::SetPublic(Some(public)));
@@ -438,10 +439,11 @@ pub struct UpdateProjectFormProp {
 
 #[function_component(UpdateProjectForm)]
 pub fn update_project_form(props: &UpdateProjectFormProp) -> Html {
-    let (builder_store, builder_dispatch) = use_store::<ProjectBuilder>();
+    let builder_dispatch = use_dispatch::<ProjectBuilder>();
      builder_dispatch.reduce_mut(|builder| {
          builder.id = Some(props.id);
      });
+    let builder_store = use_store_value::<ProjectBuilder>();
     let set_name = builder_dispatch.apply_callback(|name: Option<String>| ProjectActions::SetName(name));
     let set_description = builder_dispatch.apply_callback(|description: Option<String>| ProjectActions::SetDescription(description));
     let set_public = builder_dispatch.apply_callback(|public: bool| ProjectActions::SetPublic(Some(public)));
@@ -576,7 +578,8 @@ impl FormBuildable for NewSampledIndividual {
 
 #[function_component(CreateSampledIndividualForm)]
 pub fn create_sampled_individual_form() -> Html {
-    let (builder_store, builder_dispatch) = use_store::<SampledIndividualBuilder>();
+    let builder_dispatch = use_dispatch::<SampledIndividualBuilder>();
+    let builder_store = use_store_value::<SampledIndividualBuilder>();
     let set_tagged = builder_dispatch.apply_callback(|tagged: bool| SampledIndividualActions::SetTagged(Some(tagged)));
     html! {
         <BasicForm<NewSampledIndividual> method={FormMethod::POST} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
@@ -591,10 +594,11 @@ pub struct UpdateSampledIndividualFormProp {
 
 #[function_component(UpdateSampledIndividualForm)]
 pub fn update_sampled_individual_form(props: &UpdateSampledIndividualFormProp) -> Html {
-    let (builder_store, builder_dispatch) = use_store::<SampledIndividualBuilder>();
+    let builder_dispatch = use_dispatch::<SampledIndividualBuilder>();
      builder_dispatch.reduce_mut(|builder| {
          builder.id = Some(props.id);
      });
+    let builder_store = use_store_value::<SampledIndividualBuilder>();
     let set_tagged = builder_dispatch.apply_callback(|tagged: bool| SampledIndividualActions::SetTagged(Some(tagged)));
     html! {
         <BasicForm<NewSampledIndividual> method={FormMethod::PUT} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
@@ -736,7 +740,8 @@ impl FormBuildable for NewSample {
 
 #[function_component(CreateSampleForm)]
 pub fn create_sample_form() -> Html {
-    let (builder_store, builder_dispatch) = use_store::<SampleBuilder>();
+    let builder_dispatch = use_dispatch::<SampleBuilder>();
+    let builder_store = use_store_value::<SampleBuilder>();
     let set_sampled_by = builder_dispatch.apply_callback(|sampled_by: Option<User>| SampleActions::SetSampledBy(sampled_by));
     let set_state = builder_dispatch.apply_callback(|state: Option<NestedSampleState>| SampleActions::SetState(state));
     html! {
@@ -753,10 +758,11 @@ pub struct UpdateSampleFormProp {
 
 #[function_component(UpdateSampleForm)]
 pub fn update_sample_form(props: &UpdateSampleFormProp) -> Html {
-    let (builder_store, builder_dispatch) = use_store::<SampleBuilder>();
+    let builder_dispatch = use_dispatch::<SampleBuilder>();
      builder_dispatch.reduce_mut(|builder| {
          builder.id = Some(props.id);
      });
+    let builder_store = use_store_value::<SampleBuilder>();
     let set_sampled_by = builder_dispatch.apply_callback(|sampled_by: Option<User>| SampleActions::SetSampledBy(sampled_by));
     let set_state = builder_dispatch.apply_callback(|state: Option<NestedSampleState>| SampleActions::SetState(state));
     html! {
@@ -981,7 +987,8 @@ impl FormBuildable for UpdateTeam {
 
 #[function_component(CreateTeamForm)]
 pub fn create_team_form() -> Html {
-    let (builder_store, builder_dispatch) = use_store::<TeamBuilder>();
+    let builder_dispatch = use_dispatch::<TeamBuilder>();
+    let builder_store = use_store_value::<TeamBuilder>();
     let set_name = builder_dispatch.apply_callback(|name: Option<String>| TeamActions::SetName(name));
     let set_description = builder_dispatch.apply_callback(|description: Option<String>| TeamActions::SetDescription(description));
     let set_parent_team = builder_dispatch.apply_callback(|parent_team: Option<NestedTeam>| TeamActions::SetParentTeam(parent_team));
@@ -1000,10 +1007,11 @@ pub struct UpdateTeamFormProp {
 
 #[function_component(UpdateTeamForm)]
 pub fn update_team_form(props: &UpdateTeamFormProp) -> Html {
-    let (builder_store, builder_dispatch) = use_store::<TeamBuilder>();
+    let builder_dispatch = use_dispatch::<TeamBuilder>();
      builder_dispatch.reduce_mut(|builder| {
          builder.id = Some(props.id);
      });
+    let builder_store = use_store_value::<TeamBuilder>();
     let set_name = builder_dispatch.apply_callback(|name: Option<String>| TeamActions::SetName(name));
     let set_description = builder_dispatch.apply_callback(|description: Option<String>| TeamActions::SetDescription(description));
     let set_parent_team = builder_dispatch.apply_callback(|parent_team: Option<NestedTeam>| TeamActions::SetParentTeam(parent_team));
@@ -1242,7 +1250,8 @@ impl FormBuildable for UpdateUser {
 
 #[function_component(CreateUserForm)]
 pub fn create_user_form() -> Html {
-    let (builder_store, builder_dispatch) = use_store::<UserBuilder>();
+    let builder_dispatch = use_dispatch::<UserBuilder>();
+    let builder_store = use_store_value::<UserBuilder>();
     let set_first_name = builder_dispatch.apply_callback(|first_name: Option<String>| UserActions::SetFirstName(first_name));
     let set_middle_name = builder_dispatch.apply_callback(|middle_name: Option<String>| UserActions::SetMiddleName(middle_name));
     let set_last_name = builder_dispatch.apply_callback(|last_name: Option<String>| UserActions::SetLastName(last_name));
@@ -1263,10 +1272,11 @@ pub struct UpdateUserFormProp {
 
 #[function_component(UpdateUserForm)]
 pub fn update_user_form(props: &UpdateUserFormProp) -> Html {
-    let (builder_store, builder_dispatch) = use_store::<UserBuilder>();
+    let builder_dispatch = use_dispatch::<UserBuilder>();
      builder_dispatch.reduce_mut(|builder| {
          builder.id = Some(props.id);
      });
+    let builder_store = use_store_value::<UserBuilder>();
     let set_first_name = builder_dispatch.apply_callback(|first_name: Option<String>| UserActions::SetFirstName(first_name));
     let set_middle_name = builder_dispatch.apply_callback(|middle_name: Option<String>| UserActions::SetMiddleName(middle_name));
     let set_last_name = builder_dispatch.apply_callback(|last_name: Option<String>| UserActions::SetLastName(last_name));

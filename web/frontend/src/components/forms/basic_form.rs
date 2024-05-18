@@ -32,7 +32,7 @@ pub(super) trait FormBuilder:
     Clone + Store + PartialEq + Serialize + Debug + Default
 {
     type Actions: Reducer<Self> + FromOperation;
-    type RichVariant: DeserializeOwned;
+    type RichVariant: DeserializeOwned + Debug;
 
     /// Returns whether the form contains errors.
     fn has_errors(&self) -> bool;
@@ -65,7 +65,7 @@ pub(super) trait FormBuilder:
 
 /// Trait defining something that can be built by a form.
 pub trait FormBuildable:
-    Clone + PartialEq + Serialize + 'static + From<<Self as FormBuildable>::Builder> + Tabular
+    Clone + PartialEq + Serialize + 'static + From<<Self as FormBuildable>::Builder> + Tabular + Debug
 {
     type Builder: FormBuilder;
 
@@ -203,7 +203,10 @@ where
                         ),
                     )
                 } else {
+                    log::info!("Received a row from the backend for an unknown operation");
                     let rich_variant: <<Data as FormBuildable>::Builder as FormBuilder>::RichVariant = bincode::deserialize(&row).unwrap();
+
+                    log::debug!("Updating the form with the received data, {:?}", rich_variant);
 
                     <<Data as FormBuildable>::Builder as FormBuilder>::update(
                         &ctx.props().builder_dispatch,
@@ -252,6 +255,7 @@ where
     }
 
     fn rendered(&mut self, ctx: &Context<Self>, first_render: bool) {
+        log::info!("Rendering the form for the first time: {}", first_render);
         if first_render {
             // If it is the first time that we are rendering this component,
             // we check whether the provided builder has an ID. If it does,
