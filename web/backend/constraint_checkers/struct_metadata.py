@@ -304,6 +304,31 @@ class StructMetadata:
         if diesel is not None:
             file.write(f"#[diesel(table_name = {self.table_name})]\n")
 
+        # For each of the attribute that is a foreign key, we add the
+        # #[diesel(belongs_to({foreign struct name}, foreign_key = {attribute name}))]
+        # decorator.
+        if diesel is not None:
+            # Diesel for the time being only supports one single foreign key
+            # per table in the belongs_to attribute. For this reason, we skip
+            # the keys associated to duplicated foreign keys.
+
+            encountered_tables = set()
+
+            for attribute in self.get_foreign_keys():
+                foreign_key_table = self.table_metadata.get_foreign_key_table_name(
+                    self.table_name, attribute.name
+                )
+                if foreign_key_table in encountered_tables:
+                    continue
+
+                encountered_tables.add(foreign_key_table)
+                foreign_key_flat_variant = self.table_metadata.get_flat_variant(
+                    foreign_key_table
+                )
+                file.write(
+                    f"#[diesel(belongs_to({foreign_key_flat_variant}, foreign_key = {attribute.name}))]\n"
+                )
+
         if diesel is not None:
             file.write(
                 f"#[diesel(primary_key({self.get_formatted_primary_keys(include_prefix=False, include_parenthesis=False)}))]\n"
@@ -422,8 +447,9 @@ class StructMetadata:
         return "".join(word.capitalize() for word in self.table_name.split("_"))
 
     def is_nested(self) -> bool:
+        """Returns whether the struct is nested."""
         return any(
-            isinstance(attribute._data_type, StructMetadata)
+            attribute.has_struct_data_type()
             for attribute in self.attributes
         )
 
@@ -589,6 +615,9 @@ class StructMetadata:
             "QueryableByName",
             "Queryable",
         ]
+
+        if diesel is not None and self.has_foreign_keys():
+            diesel_derives.append("Associations")
 
         if diesel == "tables":
             diesel_derives.extend(["Insertable", "Selectable"])

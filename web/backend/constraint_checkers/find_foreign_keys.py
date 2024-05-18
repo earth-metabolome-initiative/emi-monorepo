@@ -1,4 +1,4 @@
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union, Dict
 import pandas as pd
 from functools import cache
 from constraint_checkers.cursor import get_cursor
@@ -28,6 +28,7 @@ class TableMetadata:
         self.table_metadata = table_metadata
         self._view_names: List[str] = []
         self._table_names: List[str] = []
+        self._flat_variants: Dict[str, str] = {}
 
     def tables(self) -> List[str]:
         return self.table_metadata["referencing_table"].unique().tolist()
@@ -58,6 +59,31 @@ class TableMetadata:
             self._table_names.append(table_name)
 
         return is_table
+
+    def register_flat_variant(self, table_name: str, flat_variant: str):
+        """Registers a flat variant for a table.
+
+        Parameters
+        ----------
+        table_name : str
+            The name of the table.
+        flat_variant : str
+            The name of the flat variant.
+        """
+        if table_name in self._flat_variants:
+            raise ValueError(f"The table {table_name} already has a flat variant.")
+        
+        self._flat_variants[table_name] = flat_variant
+
+    def get_flat_variant(self, table_name: str) -> str:
+        """Returns the flat variant of the table.
+
+        Parameters
+        ----------
+        table_name : str
+            The name of the table.
+        """
+        return self._flat_variants.get(table_name)
 
     def is_view(self, table_name: str) -> bool:
         """Returns whether the table is a view."""

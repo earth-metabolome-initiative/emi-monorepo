@@ -104,14 +104,14 @@ def write_backend_structs(
     path: str,
     table_type: str,
     struct_metadatas: List[StructMetadata],
-    table_metadatas: TableMetadata,
+    table_metadata: TableMetadata,
 ):
     """Write the `From` implementations for the structs in the `src/models.rs` file."""
 
     if len(struct_metadatas) == 0:
         return
 
-    similarity_indices: PGIndices = find_pg_trgm_indices()
+    similarity_indices: PGIndices = find_pg_trgm_indices(table_metadata)
 
     # After each struct ends, as defined by the `}` character, after
     # we have found a `struct` keyword, we write the `From` implementation
@@ -498,7 +498,7 @@ def write_backend_structs(
             # table structured as a vector of the struct ordered by the updated_at
             # column in descending order.
 
-            if table_metadatas.has_updated_at_column(struct.table_name):
+            if table_metadata.has_updated_at_column(struct.table_name):
                 file.write(
                     "    /// Get all of the structs from the database ordered by the updated_at column.\n"
                     "    ///\n"
@@ -873,6 +873,7 @@ def extract_structs(path: str, table_metadata: TableMetadata) -> List[StructMeta
             # in the line.
             if "}" in line:
                 inside_struct = False
+                table_metadata.register_flat_variant(struct_metadata.table_name, struct_metadata.name)
                 struct_metadatas.append(struct_metadata)
 
     return struct_metadatas
@@ -1003,7 +1004,7 @@ def write_web_common_structs(
     structs: List[StructMetadata],
     target: str,
     enumeration: str,
-    table_metadatas: TableMetadata,
+    table_metadata: TableMetadata,
 ):
     """Write the structs in the target file in the `web_common` crate.
 
@@ -1015,7 +1016,7 @@ def write_web_common_structs(
         The path where to write the structs in the `web_common` crate.
     enumeration : str
         The name of the enumeration to write in the target file.
-    table_metadatas : TableMetadata
+    table_metadata : TableMetadata
         The metadata of the tables.
     """
     # The derive statements to include in the `src/database/tables.rs` document
@@ -1026,18 +1027,10 @@ def write_web_common_structs(
         "use chrono::NaiveDateTime;",
     ]
 
-    # We check that we are currently executing in the `backend` crate
-    # so to make sure that the relative path to the `web_common` crate
-    # is correct.
-    if not os.getcwd().endswith("backend"):
-        raise Exception("This script must be executed in the `backend` crate.")
-
     document = open(f"../web_common/src/database/{target}.rs", "w", encoding="utf8")
 
     for import_statament in imports:
         document.write(f"{import_statament}\n")
-
-    similarity_indices: PGIndices = find_pg_trgm_indices()
 
     for struct in tqdm(
         structs,
@@ -1045,8 +1038,6 @@ def write_web_common_structs(
         unit="struct",
         leave=False,
     ):
-        struct_has_just_finished = False
-
         document.write("#[derive(")
         document.write(", ".join(struct.derives()))
         document.write(")]\n")
@@ -1309,7 +1300,7 @@ def write_web_common_structs(
         # We implement for all tables that implement the `updated_at` column
         # the `all_by_updated_at` method. This method returns all of the structs
         # in the GlueSQL database ordered by the `updated_at` column.
-        if table_metadatas.has_updated_at_column(struct.table_name):
+        if table_metadata.has_updated_at_column(struct.table_name):
             document.write(
                 f"    /// Get all {struct.name} from the database ordered by the `updated_at` column.\n"
                 "    ///\n"
@@ -1498,7 +1489,7 @@ def check_schema_completion():
 
 
 def generate_view_structs(
-    table_metadatas: TableMetadata,
+    table_metadata: TableMetadata,
 ):
     """Generate the view structs.
 
@@ -1582,7 +1573,7 @@ def generate_view_structs(
             view_struct = StructMetadata(
                 struct_name=struct_name_from_table_name(view_name),
                 table_name=view_name,
-                table_metadata=table_metadatas,
+                table_metadata=table_metadata,
             )
             view_structs.append(view_struct)
 
@@ -1660,7 +1651,7 @@ def generate_nested_structs(
     For each table, we query the postgres to get the foreign keys. We then generate the nested
     structs for the referenced tables. The nested structs are written to the file `src/models.rs`.
     """
-    similarity_indices: PGIndices = find_pg_trgm_indices()
+    similarity_indices: PGIndices = find_pg_trgm_indices(tables_metadata)
 
     # We open the file to write the nested structs
     document = open(path, "w", encoding="utf8")
@@ -2103,12 +2094,11 @@ def generate_nested_structs(
     return nested_structs
 
 
-def write_web_common_nested_structs(path: str, nested_structs: List[StructMetadata]):
+def write_web_common_nested_structs(path: str, nested_structs: List[StructMetadata], table_metadata: TableMetadata):
     """Writes the nested structs to the web_common crate."""
 
     # We open the file to write the nested structs
     document = open(f"../web_common/src/database/{path}", "w", encoding="utf8")
-    table_metadatas = find_foreign_keys()
 
     # Preliminarly, we write a docstring at the very head
     # of this submodule to explain what it does and warn the
@@ -2239,7 +2229,7 @@ def write_web_common_nested_structs(path: str, nested_structs: List[StructMetada
         # is enabled using GlueSQL. This method will be extremely similar to the `all_by_updated_at`
         # method for the Diesel-based approach of the backend.
 
-        if table_metadatas.has_updated_at_column(flat_variant.table_name):
+        if table_metadata.has_updated_at_column(flat_variant.table_name):
             document.write(
                 "    /// Get all the nested structs from the database ordered by the `updated_at` column.\n"
                 "    ///\n"
@@ -2781,6 +2771,7 @@ def write_webcommons_table_names_enumeration(
 
 def write_diesel_table_names_enumeration(
     tables: List[TableStructMetadata],
+    tables_metadata: TableMetadata,
 ):
     # We check that we are currently executing in the `backend` crate
     # so to make sure that the relative path to the `web_common` crate
@@ -2824,7 +2815,7 @@ def write_diesel_table_names_enumeration(
 
     document.write("\n")
 
-    search_indices: PGIndices = find_pg_trgm_indices()
+    search_indices: PGIndices = find_pg_trgm_indices(tables_metadata)
 
     # We start with the first trait, the SearchableTable trait, which provides
     # a search method receiving a &str query and a number of rows to return (i32).
@@ -3504,6 +3495,7 @@ def write_diesel_table_names_enumeration(
 
 def write_web_common_search_trait_implementations(
     struct_metadatas: List[StructMetadata],
+    table_metadata: TableMetadata,
 ):
     # We check that we are currently executing in the `backend` crate
     # so to make sure that the relative path to the `web_common` crate
@@ -3514,7 +3506,7 @@ def write_web_common_search_trait_implementations(
     document = open(
         "../web_common/src/database/search_tables.rs", "w", encoding="utf8"
     )
-    similarity_indices: PGIndices = find_pg_trgm_indices()
+    similarity_indices: PGIndices = find_pg_trgm_indices(table_metadata)
 
     imports = [
         "use crate::database::*;",
@@ -3576,7 +3568,7 @@ def write_web_common_search_trait_implementations(
 
 def derive_new_models(
     struct_metadatas: List[StructMetadata],
-    table_metadatas: TableMetadata,
+    table_metadata: TableMetadata,
 ) -> List[StructMetadata]:
     """Returns list of the New{Model} structs.
 
@@ -3598,7 +3590,7 @@ def derive_new_models(
     # the form component.
 
     for table_name in TEMPORARELY_IGNORED_TABLES:
-        if not table_metadatas.is_table(table_name):
+        if not table_metadata.is_table(table_name):
             raise RuntimeError(
                 f"Table {table_name} is in the deny list but does not exist in the database."
             )
@@ -3630,7 +3622,7 @@ def derive_new_models(
         new_struct = StructMetadata(
             struct_name=f"New{struct.name}",
             table_name=struct.table_name,
-            table_metadata=table_metadatas,
+            table_metadata=table_metadata,
         )
 
         new_struct.set_flat_variant(struct)
@@ -3938,6 +3930,7 @@ def derive_model_builders(
 
 def write_web_common_new_structs(
     new_struct_metadatas: List[StructMetadata],
+    table_metadata: TableMetadata,
 ):
     """Writes the new structs to the web_common crate."""
 
@@ -3970,8 +3963,6 @@ def write_web_common_new_structs(
         document.write(f"{import_statement}\n")
 
     document.write("\n")
-
-    table_metadatas = find_foreign_keys()
 
     for struct in tqdm(
         new_struct_metadatas,
@@ -4095,6 +4086,7 @@ def write_web_common_new_structs(
 
 def write_web_common_update_structs(
     update_struct_metadatas: List[StructMetadata],
+    table_metadata: TableMetadata,
 ):
     """Writes the update structs to the web_common crate."""
 
@@ -4129,8 +4121,6 @@ def write_web_common_update_structs(
         document.write(f"{import_statement}\n")
 
     document.write("\n")
-
-    table_metadatas = find_foreign_keys()
 
     for struct in tqdm(
         update_struct_metadatas,
@@ -4508,13 +4498,13 @@ def write_diesel_update_structs(
 
         intermediate_struct_name = f"Intermediate{struct.name}"
 
-        primary_keys = struct.get_primary_keys()
-
         # First, we write the intermediate struct that is used to update the row in the database.
         document.write(
             f"/// Intermediate representation of the update variant {struct.name}.\n"
-            "#[derive(AsChangeset)]\n"
+            "#[derive(Identifiable, AsChangeset)]\n"
             f"#[diesel(table_name = {struct.table_name})]\n"
+            f"#[diesel(treat_none_as_null = true)]\n"
+            f"#[diesel(primary_key({struct.get_formatted_primary_keys(include_prefix=False)}))]\n"
             f"pub(super) struct {intermediate_struct_name} {{\n"
         )
 
@@ -4524,8 +4514,6 @@ def write_diesel_update_structs(
             all_attributes = [updator_user_id_attribute] + all_attributes
 
         for attribute in all_attributes:
-            if attribute in primary_keys:
-                continue
             document.write(f"    {attribute.name}: {attribute.format_data_type()},\n")
 
         document.write("}\n\n")
@@ -4547,8 +4535,6 @@ def write_diesel_update_structs(
         document.write(f"        {intermediate_struct_name} {{\n")
 
         for attribute in all_attributes:
-            if attribute in primary_keys:
-                continue
             if struct.get_attribute_by_name(attribute.name) is not None:
                 document.write(
                     f"            {attribute.name}: self.{attribute.name},\n"
@@ -4564,18 +4550,8 @@ def write_diesel_update_structs(
             "        user_id: i32,\n"
             "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
             "    ) -> Result<Self::Flat, diesel::result::Error> {\n"
-            f"        use crate::schema::{struct.table_name};\n"
-            f"        diesel::update({struct.table_name}::dsl::{struct.table_name})\n"
-        )
-        for primary_key in primary_keys:
-            document.write(
-                "            .filter(\n"
-                f"                {struct.table_name}::dsl::{primary_key.name}.eq(self.{primary_key.name})\n"
-                "            )\n"
-            )
-        document.write(
-            "            .set(self.to_intermediate(user_id))\n"
-            "            .get_result(connection)\n"
+            "        self.to_intermediate(user_id)\n"
+            "            .save_changes(connection)\n"
             "    }\n"
             "}\n\n"
         )
@@ -5753,7 +5729,7 @@ def write_frontend_yew_form(
     This method writes the Yew form for the provided builder struct.
     """
 
-    trigram_indices = find_pg_trgm_indices()
+    trigram_indices = find_pg_trgm_indices(table_metadata)
 
     flat_variant = builder.get_flat_variant()
     rich_variant = builder.get_richest_variant()
@@ -6337,22 +6313,23 @@ if __name__ == "__main__":
     ensure_tables_have_creation_notification_trigger(tables, tables_metadata)
     print("Generated table names enumeration for web_common.")
 
-    write_diesel_table_names_enumeration(tables)
+    write_diesel_table_names_enumeration(tables, tables_metadata)
     print("Generated table names enumeration for diesel.")
 
-    write_web_common_nested_structs("nested_models.rs", nested_structs)
+    write_web_common_nested_structs("nested_models.rs", nested_structs, tables_metadata)
     print("Generated nested structs for web_common.")
 
     write_web_common_search_trait_implementations(
-        nested_structs + table_structs + view_structs
+        nested_structs + table_structs + view_structs,
+        tables_metadata,
     )
     print("Generated search trait implementations for web_common.")
 
     builder_structs = derive_model_builders(new_model_structs + update_model_structs)
     print(f"Derived {len(builder_structs)} builders for the New & Update versions")
 
-    write_web_common_new_structs(new_model_structs)
-    write_web_common_update_structs(update_model_structs)
+    write_web_common_new_structs(new_model_structs, tables_metadata)
+    write_web_common_update_structs(update_model_structs, tables_metadata)
     print("Generated new & update structs for web_common.")
 
     write_diesel_new_structs(new_model_structs)

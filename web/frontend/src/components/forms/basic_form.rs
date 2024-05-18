@@ -117,14 +117,22 @@ pub struct InnerBasicForm<Data> {
     validate_timeout: Option<Timeout>,
     errors: Vec<ApiError>,
     user_state: Rc<UserState>,
+    loading_operations: usize,
     _dispatcher: Dispatch<UserState>,
     _phantom: std::marker::PhantomData<Data>,
 }
 
 pub enum FormMessage {
     Submit,
+    Frontend(ComponentMessage),
     Backend(WebsocketMessage),
     UserState(Rc<UserState>),
+}
+
+impl From<ComponentMessage> for FormMessage {
+    fn from(message: ComponentMessage) -> Self {
+        FormMessage::Frontend(message)
+    }
 }
 
 impl<Data> Component for InnerBasicForm<Data>
@@ -150,6 +158,7 @@ where
             validate_timeout: None,
             errors: Vec::new(),
             user_state,
+            loading_operations: 0,
             _dispatcher: user_dispatch,
             _phantom: std::marker::PhantomData,
         }
@@ -157,19 +166,31 @@ where
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
+            FormMessage::Frontend(operation) => {
+                log::info!("Sending operation to the backend: {:?}", operation);
+                self.websocket.send(operation);
+                self.loading_operations += 1;
+                true
+            }
             FormMessage::Backend(WebsocketMessage::Error(error)) => {
                 self.errors = vec![error];
                 self.waiting_for_reply = false;
                 true
             }
-            FormMessage::Backend(WebsocketMessage::CanView(status)) | FormMessage::Backend(WebsocketMessage::CanUpdate(status)) | FormMessage::Backend(WebsocketMessage::CanDelete(status)) => {
+            FormMessage::Backend(WebsocketMessage::CanView(status))
+            | FormMessage::Backend(WebsocketMessage::CanUpdate(status))
+            | FormMessage::Backend(WebsocketMessage::CanDelete(status)) => {
+                self.loading_operations -= 1;
                 if !status {
-                    log::info!("User does not have permission to view the form, redirecting to home page.");
+                    log::info!(
+                        "User does not have permission to view the form, redirecting to home page."
+                    );
                     ctx.props().navigator.push(&AppRoute::Home);
                 }
-                false
+                true
             }
             FormMessage::Backend(WebsocketMessage::GetTable(operation_name, row)) => {
+                self.loading_operations -= 1;
                 if let Some(operation_name) = operation_name {
                     log::info!(
                         "Received a row from the backend for operation: {}",
@@ -189,9 +210,11 @@ where
                         rich_variant,
                     )
                     .into_iter()
-                    .for_each(|message| self.websocket.send(message))
+                    .for_each(|message| {
+                        ctx.link().send_message(message);
+                    });
                 }
-                
+
                 true
             }
             FormMessage::Backend(WebsocketMessage::Completed) => {
@@ -235,17 +258,20 @@ where
             // we retrieve from the backend the most up to date version of the
             // data that we are editing.
             if let Some(id) = ctx.props().builder.id() {
-                self.websocket.send(ComponentMessage::get::<Data>(id));
+                ctx.link().send_message(ComponentMessage::get::<Data>(id));
                 match ctx.props().method {
                     FormMethod::POST => {}
                     FormMethod::GET => {
-                        self.websocket.send(ComponentMessage::can_view::<Data>(id));
+                        ctx.link()
+                            .send_message(ComponentMessage::can_view::<Data>(id));
                     }
                     FormMethod::PUT => {
-                        self.websocket.send(ComponentMessage::can_update::<Data>(id));
+                        ctx.link()
+                            .send_message(ComponentMessage::can_update::<Data>(id));
                     }
                     FormMethod::DELETE => {
-                        self.websocket.send(ComponentMessage::can_delete::<Data>(id));
+                        ctx.link()
+                            .send_message(ComponentMessage::can_delete::<Data>(id));
                     }
                 }
             }
@@ -253,7 +279,7 @@ where
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        if Data::requires_authentication() && (!self.user_state.has_user() || !is_logged_in()){
+        if Data::requires_authentication() && (!self.user_state.has_user() || !is_logged_in()) {
             log::info!("No access token found, redirecting to login page.");
             ctx.props().navigator.push(&AppRoute::Login);
         }
@@ -330,23 +356,27 @@ where
             <form enctype={ "multipart/form-data" } disabled={self.waiting_for_reply} class={classes} onsubmit={on_submit} method={ctx.props().method.to_string()}>
                 <h4>{ Data::title() }</h4>
                 <p class="instructions">{format!("{} {}", ctx.props().method.to_crud(), Data::task_target())}</p>
-                { ctx.props().children.clone() }
-                <InputErrors errors={self.errors.clone()} />
-                <button type="submit" title={title_message} class={submit_button_classes} disabled={submit_button_disabled || self.waiting_for_reply}>
-                    {if self.waiting_for_reply {
-                        html! { <i class="fas fa-spinner fa-spin"></i> }
-                    } else {
-                        html! { <i class={ctx.props().method.font_awesome_icon()}></i> }
-                    }}
-                    <span>{format!("{} new {}", ctx.props().method.to_crud(), Data::task_target())}</span>
-                </button>
-                if ctx.props().method.is_post() {
-                    <button onclick={clear_form} title={clear_button_title_message} class={clear_button_classes} disabled={ctx.props().builder.is_default() || self.waiting_for_reply}>
-                        <i class="fas fa-hand-sparkles"></i>
-                        <span>{format!("Clear {}", Data::task_target())}</span>
-                    </button>
+                if self.loading_operations > 0 {
+                    <p class="instructions">{format!("Loading, remaining {} operations...", self.loading_operations)}</p>
                 } else {
-                    <></>
+                    { ctx.props().children.clone() }
+                    <InputErrors errors={self.errors.clone()} />
+                    <button type="submit" title={title_message} class={submit_button_classes} disabled={submit_button_disabled || self.waiting_for_reply}>
+                        if self.waiting_for_reply {
+                            <i class="fas fa-spinner fa-spin"></i>
+                        } else {
+                            <i class={ctx.props().method.font_awesome_icon()}></i>
+                        }
+                        <span>{format!("{} new {}", ctx.props().method.to_crud(), Data::task_target())}</span>
+                    </button>
+                    if ctx.props().method.is_post() {
+                        <button onclick={clear_form} title={clear_button_title_message} class={clear_button_classes} disabled={ctx.props().builder.is_default() || self.waiting_for_reply}>
+                            <i class="fas fa-hand-sparkles"></i>
+                            <span>{format!("Clear {}", Data::task_target())}</span>
+                        </button>
+                    } else {
+                        <></>
+                    }
                 }
                 <div class="clear"></div>
             </form>

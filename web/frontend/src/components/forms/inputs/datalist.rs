@@ -274,11 +274,20 @@ where
             .as_ref()
             .map_or_else(|| "".to_string(), |value| value.clone());
 
+        let label_classes = format!(
+            "input-label{}",
+            if props.optional {
+                ""
+            } else {
+                " input-label-mandatory"
+            }
+        );
+
         let input_field = html! {
             <>
                 {if props.show_label {
                     html! {
-                        <label for={props.normalized_label()} class={"input-label"}>
+                        <label for={props.normalized_label()} class={label_classes}>
                             {props.label()}
                         </label>
                     }
@@ -357,7 +366,12 @@ where
             </>
         };
 
-        let all_errors: Vec<ApiError> = self.errors.iter().chain(ctx.props().errors.iter()).cloned().collect();
+        let all_errors: Vec<ApiError> = self
+            .errors
+            .iter()
+            .chain(ctx.props().errors.iter())
+            .cloned()
+            .collect();
 
         html! {
             <div class={classes}>

@@ -30,15 +30,17 @@ pub(super) trait UpdateRow {
 }
 
 /// Intermediate representation of the update variant UpdateProject.
-#[derive(AsChangeset)]
+#[derive(Identifiable, AsChangeset, Debug)]
 #[diesel(table_name = projects)]
+#[diesel(primary_key(id))]
 pub(super) struct IntermediateUpdateProject {
     updated_by: i32,
+    id: i32,
     name: String,
     description: String,
     public: bool,
     state_id: i32,
-    parent_project_id: Option<i32>,
+    parent_project_id: Option<Option<i32>>,
     budget: Option<f64>,
     expenses: Option<f64>,
     expected_end_date: Option<NaiveDateTime>,
@@ -52,11 +54,12 @@ impl UpdateRow for web_common::database::UpdateProject {
     fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
         IntermediateUpdateProject {
             updated_by: user_id,
+            id: self.id,
             name: self.name,
             description: self.description,
             public: self.public,
             state_id: self.state_id,
-            parent_project_id: self.parent_project_id,
+            parent_project_id: Some(self.parent_project_id),
             budget: self.budget,
             expenses: self.expenses,
             expected_end_date: self.expected_end_date,
@@ -69,21 +72,21 @@ impl UpdateRow for web_common::database::UpdateProject {
         user_id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self::Flat, diesel::result::Error> {
-        use crate::schema::projects;
-        diesel::update(projects::dsl::projects)
-            .filter(
-                projects::dsl::id.eq(self.id)
-            )
-            .set(self.to_intermediate(user_id))
-            .get_result(connection)
+        let intermediate = self.to_intermediate(user_id);
+        log::info!("Updating project {:?}", intermediate);
+        intermediate
+            .save_changes(connection)
     }
 }
 
 /// Intermediate representation of the update variant UpdateTeam.
-#[derive(AsChangeset)]
+#[derive(Identifiable, AsChangeset)]
 #[diesel(table_name = teams)]
+#[diesel(treat_none_as_null = true)]
+#[diesel(primary_key(id))]
 pub(super) struct IntermediateUpdateTeam {
     updated_by: i32,
+    id: i32,
     name: String,
     description: String,
     parent_team_id: Option<i32>,
@@ -96,6 +99,7 @@ impl UpdateRow for web_common::database::UpdateTeam {
     fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
         IntermediateUpdateTeam {
             updated_by: user_id,
+            id: self.id,
             name: self.name,
             description: self.description,
             parent_team_id: self.parent_team_id,
@@ -107,20 +111,18 @@ impl UpdateRow for web_common::database::UpdateTeam {
         user_id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self::Flat, diesel::result::Error> {
-        use crate::schema::teams;
-        diesel::update(teams::dsl::teams)
-            .filter(
-                teams::dsl::id.eq(self.id)
-            )
-            .set(self.to_intermediate(user_id))
-            .get_result(connection)
+        self.to_intermediate(user_id)
+            .save_changes(connection)
     }
 }
 
 /// Intermediate representation of the update variant UpdateUser.
-#[derive(AsChangeset)]
+#[derive(Identifiable, AsChangeset)]
 #[diesel(table_name = users)]
+#[diesel(treat_none_as_null = true)]
+#[diesel(primary_key(id))]
 pub(super) struct IntermediateUpdateUser {
+    id: i32,
     first_name: String,
     middle_name: Option<String>,
     last_name: String,
@@ -133,6 +135,7 @@ impl UpdateRow for web_common::database::UpdateUser {
 
     fn to_intermediate(self, _user_id: i32) -> Self::Intermediate {
         IntermediateUpdateUser {
+            id: self.id,
             first_name: self.first_name,
             middle_name: self.middle_name,
             last_name: self.last_name,
@@ -145,21 +148,19 @@ impl UpdateRow for web_common::database::UpdateUser {
         user_id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self::Flat, diesel::result::Error> {
-        use crate::schema::users;
-        diesel::update(users::dsl::users)
-            .filter(
-                users::dsl::id.eq(self.id)
-            )
-            .set(self.to_intermediate(user_id))
-            .get_result(connection)
+        self.to_intermediate(user_id)
+            .save_changes(connection)
     }
 }
 
 /// Intermediate representation of the update variant NewSampledIndividual.
-#[derive(AsChangeset)]
+#[derive(Identifiable, AsChangeset)]
 #[diesel(table_name = sampled_individuals)]
+#[diesel(treat_none_as_null = true)]
+#[diesel(primary_key(id))]
 pub(super) struct IntermediateNewSampledIndividual {
     updated_by: i32,
+    id: Uuid,
     tagged: bool,
 }
 
@@ -170,6 +171,7 @@ impl UpdateRow for web_common::database::NewSampledIndividual {
     fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
         IntermediateNewSampledIndividual {
             updated_by: user_id,
+            id: self.id,
             tagged: self.tagged,
         }
     }
@@ -179,21 +181,19 @@ impl UpdateRow for web_common::database::NewSampledIndividual {
         user_id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self::Flat, diesel::result::Error> {
-        use crate::schema::sampled_individuals;
-        diesel::update(sampled_individuals::dsl::sampled_individuals)
-            .filter(
-                sampled_individuals::dsl::id.eq(self.id)
-            )
-            .set(self.to_intermediate(user_id))
-            .get_result(connection)
+        self.to_intermediate(user_id)
+            .save_changes(connection)
     }
 }
 
 /// Intermediate representation of the update variant NewSample.
-#[derive(AsChangeset)]
+#[derive(Identifiable, AsChangeset)]
 #[diesel(table_name = samples)]
+#[diesel(treat_none_as_null = true)]
+#[diesel(primary_key(id))]
 pub(super) struct IntermediateNewSample {
     updated_by: i32,
+    id: Uuid,
     sampled_by: i32,
     state: i32,
 }
@@ -205,6 +205,7 @@ impl UpdateRow for web_common::database::NewSample {
     fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
         IntermediateNewSample {
             updated_by: user_id,
+            id: self.id,
             sampled_by: self.sampled_by,
             state: self.state,
         }
@@ -215,13 +216,8 @@ impl UpdateRow for web_common::database::NewSample {
         user_id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self::Flat, diesel::result::Error> {
-        use crate::schema::samples;
-        diesel::update(samples::dsl::samples)
-            .filter(
-                samples::dsl::id.eq(self.id)
-            )
-            .set(self.to_intermediate(user_id))
-            .get_result(connection)
+        self.to_intermediate(user_id)
+            .save_changes(connection)
     }
 }
 
