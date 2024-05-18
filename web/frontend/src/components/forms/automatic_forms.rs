@@ -311,7 +311,13 @@ impl FormBuilder for ProjectBuilder {
     dispatcher.apply(ProjectActions::SetExpectedEndDate(rich_variant.inner.expected_end_date.map(|expected_end_date| expected_end_date.to_string())));
     dispatcher.apply(ProjectActions::SetEndDate(rich_variant.inner.end_date.map(|end_date| end_date.to_string())));
         dispatcher.apply(ProjectActions::SetState(Some(rich_variant.state)));
-        vec![ComponentMessage::get_named::<&str, NewProject>("parent_project", rich_variant.inner.id.into())]
+        let mut named_requests = Vec::new();
+        if let Some(parent_project_id) = rich_variant.inner.parent_project_id {
+    named_requests.push(ComponentMessage::get_named::<&str, NewProject>("parent_project", parent_project_id.into()));
+ } else {
+    dispatcher.apply(ProjectActions::SetParentProject(None));
+ }
+        named_requests
     }
 
     fn can_submit(&self) -> bool {
@@ -526,7 +532,7 @@ impl FormBuilder for SampledIndividualBuilder {
     }
 
     fn update(dispatcher: &Dispatch<Self>, rich_variant: Self::RichVariant) -> Vec<ComponentMessage> {
-        dispatcher.apply(SampledIndividualActions::SetTagged(Some(rich_variant.inner.tagged)));        Vec::new()
+        dispatcher.apply(SampledIndividualActions::SetTagged(Some(rich_variant.inner.tagged)));        vec![]
     }
 
     fn can_submit(&self) -> bool {
@@ -684,7 +690,7 @@ impl FormBuilder for SampleBuilder {
     fn update(dispatcher: &Dispatch<Self>, rich_variant: Self::RichVariant) -> Vec<ComponentMessage> {
         dispatcher.apply(SampleActions::SetSampledBy(Some(rich_variant.sampled_by)));
         dispatcher.apply(SampleActions::SetState(Some(rich_variant.state)));
-        Vec::new()
+        vec![]
     }
 
     fn can_submit(&self) -> bool {
@@ -893,7 +899,13 @@ impl FormBuilder for TeamBuilder {
     fn update(dispatcher: &Dispatch<Self>, rich_variant: Self::RichVariant) -> Vec<ComponentMessage> {
     dispatcher.apply(TeamActions::SetName(Some(rich_variant.inner.name.to_string())));
     dispatcher.apply(TeamActions::SetDescription(Some(rich_variant.inner.description.to_string())));
-        vec![ComponentMessage::get_named::<&str, NewTeam>("parent_team", rich_variant.inner.id.into())]
+        let mut named_requests = Vec::new();
+        if let Some(parent_team_id) = rich_variant.inner.parent_team_id {
+    named_requests.push(ComponentMessage::get_named::<&str, NewTeam>("parent_team", parent_team_id.into()));
+ } else {
+    dispatcher.apply(TeamActions::SetParentTeam(None));
+ }
+        named_requests
     }
 
     fn can_submit(&self) -> bool {
@@ -1151,7 +1163,7 @@ impl FormBuilder for UserBuilder {
         dispatcher.apply(UserActions::SetMiddleName(rich_variant.middle_name));
         dispatcher.apply(UserActions::SetLastName(Some(rich_variant.last_name)));
         dispatcher.apply(UserActions::SetProfilePicture(Some(rich_variant.profile_picture)));
-        Vec::new()
+        vec![]
     }
 
     fn can_submit(&self) -> bool {

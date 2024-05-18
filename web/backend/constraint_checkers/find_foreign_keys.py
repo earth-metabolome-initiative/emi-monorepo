@@ -724,6 +724,61 @@ class TableMetadata:
 
         return default_value
 
+    def get_circular_foreign_keys(self, table_name: str) -> List[str]:
+        """Returns the circular foreign keys of the table.
+
+        Parameters
+        ----------
+        table_name : str
+            The name of the table.
+
+        Implementation details
+        ----------------------
+        This method returns the list of columns in the table metadata
+        associated with the table name that have a non-null value in the
+        `referenced_table` column and have a foreign key that references
+        the table name.
+        """
+        primary_keys = self.get_primary_key_names_and_types(table_name)
+        primary_key_names = [primary_key[0] for primary_key in primary_keys]
+
+        return [
+            column
+            for column in self.get_foreign_keys(table_name)
+            if self.get_foreign_key_table_name(table_name, column) == table_name and column not in primary_key_names
+        ]
+
+    def has_circular_parent_column(self, table_name: str) -> bool:
+        """Returns whether the table has a circular parent column.
+
+        Parameters
+        ----------
+        table_name : str
+            The name of the table.
+
+        Implementation details
+        ----------------------
+        This method returns whether the table has a column that is a
+        foreign key to the table itself.
+        """
+        return len(self.get_circular_foreign_keys(table_name)) > 0
+        
+
+    def has_parent_circularity_trigger(self, table_name: str) -> bool:
+        """Returns whether the table has a parent circularity trigger.
+
+        Parameters
+        ----------
+        table_name : str
+            The name of the table.
+
+        Implementation details
+        ----------------------
+        This method returns whether the table has a trigger named
+        `parent_circularity_trigger`.
+        """
+        return self.has_trigger_by_name(table_name, f"{table_name}_parent_circularity_trigger")
+
     def has_associated_roles(self, table_name: str) -> bool:
         """Returns whether the table has associated roles.
 

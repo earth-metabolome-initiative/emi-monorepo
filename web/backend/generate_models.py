@@ -36,6 +36,7 @@ from constraint_checkers import (
 )
 from constraint_checkers.regroup_tables import regroup_tables
 from constraint_checkers import generate_view_schema
+from constraint_checkers import check_parent_circularity_trigger
 
 
 TEXTUAL_DATA_TYPES = ["String"]
@@ -4953,7 +4954,7 @@ def write_frontend_form_builder_implementation(
     """
 
     flat_variant = builder.get_flat_variant()
-    rich_struct = builder.get_richest_variant()
+    rich_variant = builder.get_richest_variant()
 
     variants = []
 
@@ -4976,7 +4977,7 @@ def write_frontend_form_builder_implementation(
     document.write(
         f"impl FormBuilder for {builder.name} {{\n"
         f"    type Actions = {flat_variant.name}Actions;\n\n"
-        f"    type RichVariant = {rich_struct.name};\n\n"
+        f"    type RichVariant = {rich_variant.name};\n\n"
         "    fn has_errors(&self) -> bool {\n"
     )
 
@@ -5023,6 +5024,7 @@ def write_frontend_form_builder_implementation(
     )
 
     named_requests: List[str] = []
+    named_option_requests: List[str] = []
 
     for attribute in builder.attributes:
         if (
@@ -5043,14 +5045,34 @@ def write_frontend_form_builder_implementation(
         # We need to check whether is will be necessary to make a request to the backend
         # to obtain the nested version of the attribute. The request name is always equal
         # to the name of the attribute.
-        if attribute.data_type() == rich_struct.name:
-            assert rich_struct.is_nested()
-            named_requests.append(
-                f'ComponentMessage::get_named::<&str, {variants[0].name}>("{attribute.name}", {flat_variant.get_formatted_primary_keys(include_prefix=True, prefix="rich_variant.inner")}.into())'
-            )
+        if attribute.data_type() == rich_variant.name:
+            assert rich_variant.is_nested()
+
+            flat_attribute = flat_variant.get_attribute_by_name(attribute.name)
+
+            if flat_attribute is None:
+                flat_attribute = flat_variant.get_attribute_by_name(f"{attribute.name}_id")
+
+            if flat_attribute is None:
+                raise RuntimeError(
+                    f"Attribute {attribute.name} not found in the flat struct {flat_variant.name}."
+                )
+
+            if flat_attribute.optional:
+                named_option_requests.append((
+                    f"if let Some({flat_attribute.name}) = rich_variant.inner.{flat_attribute.name} {{\n"
+                    f"    named_requests.push(ComponentMessage::get_named::<&str, {variants[0].name}>(\"{attribute.name}\", {flat_attribute.name}.into()));\n"
+                    " } else {\n"
+                    f"    dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_name()}(None));\n"
+                    " }\n"
+                ))
+            else:
+                named_requests.append(
+                    f'ComponentMessage::get_named::<&str, {variants[0].name}>("{attribute.name}", rich_variant.inner.{flat_attribute.name}.into())'
+                )
             continue
 
-        struct_attribute = rich_struct.get_attribute_by_name(attribute.name)
+        struct_attribute = rich_variant.get_attribute_by_name(attribute.name)
 
         if struct_attribute is not None:
             if struct_attribute.optional:
@@ -5088,18 +5110,31 @@ def write_frontend_form_builder_implementation(
             else:
                 raise RuntimeError(
                     f"Attribute {attribute.name} present in builder struct {builder.name} "
-                    f"not found in neither the rich variant {rich_struct.name} nor the flat variant {flat_variant.name}."
+                    f"not found in neither the rich variant {rich_variant.name} nor the flat variant {flat_variant.name}."
                 )
 
-    # We returns the names requests. When the list
-    # is empty, the method returns an empty vector,
-    # otherwise it returns the list of requests.
-    if len(named_requests) == 0:
-        document.write("        Vec::new()\n")
-    else:
-        document.write(f"        vec![{', '.join(named_requests)}]\n")
+    if len(named_requests) == 0 and len(named_option_requests) == 0:
+        document.write("        vec![]\n")
+    elif len(named_requests) > 0 and len(named_option_requests) == 0:
+        document.write("        vec![\n")
 
-    document.write("    }\n\n")
+        for named_request in named_requests:
+            document.write(f"            {named_request},\n")
+
+        document.write("        ]\n")
+    else:
+        document.write("        let mut named_requests = Vec::new();\n")
+
+        for named_request in named_requests:
+            document.write(f"        named_requests.push({named_request});\n")
+
+        for named_option_request in named_option_requests:
+            document.write(f"        {named_option_request}")
+
+        document.write("        named_requests\n")
+    document.write(
+        "    }\n\n"
+    )
 
     # We implement the can submit method, which checks whether the form
     # contains errors as specified by the has_errors method, plus checks
@@ -5558,10 +5593,10 @@ def handle_missing_row_to_searchable_badge_implementation(
 
             document.write(
                 f"impl RowToSearchableBadge for {struct.name} {{\n"
-                f"    fn to_datalist_badge(&self, query: &str) -> Html {{\n"
-                f"        html! {{\n"
-                f"            <div>\n"
-                f"                <p>\n"
+                "    fn to_datalist_badge(&self, query: &str) -> Html \n"
+                "        html! \n"
+                "            <div>\n"
+                "                <p>\n"
             )
 
             font_awesome_icon = None
@@ -5955,7 +5990,7 @@ def write_frontend_form_buildable_implementation(
     """
 
     flat_variant = builder.get_flat_variant()
-    rich_struct = builder.get_richest_variant()
+    rich_variant = builder.get_richest_variant()
 
     variants: List[StructMetadata] = []
 
@@ -5969,8 +6004,8 @@ def write_frontend_form_buildable_implementation(
 
     # We implement the Tabular trait for the struct.
     document.write(
-        f"impl Tabular for {rich_struct.name} {{\n"
-        f"    const TABLE: Table = Table::{rich_struct.get_capitalized_table_name()};\n"
+        f"impl Tabular for {rich_variant.name} {{\n"
+        f"    const TABLE: Table = Table::{rich_variant.get_capitalized_table_name()};\n"
         "}\n\n"
     )
 
@@ -6267,6 +6302,7 @@ if __name__ == "__main__":
     ensures_all_update_at_trigger_exists(tables_metadata)
     ensure_created_at_columns(tables_metadata)
     ensure_updated_at_columns(tables_metadata)
+    check_parent_circularity_trigger(tables_metadata)
 
     generate_view_schema(tables_metadata)
     print("Generated view schema.")

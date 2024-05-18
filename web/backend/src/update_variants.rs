@@ -30,8 +30,9 @@ pub(super) trait UpdateRow {
 }
 
 /// Intermediate representation of the update variant UpdateProject.
-#[derive(Identifiable, AsChangeset, Debug)]
+#[derive(Identifiable, AsChangeset)]
 #[diesel(table_name = projects)]
+#[diesel(treat_none_as_null = true)]
 #[diesel(primary_key(id))]
 pub(super) struct IntermediateUpdateProject {
     updated_by: i32,
@@ -40,7 +41,7 @@ pub(super) struct IntermediateUpdateProject {
     description: String,
     public: bool,
     state_id: i32,
-    parent_project_id: Option<Option<i32>>,
+    parent_project_id: Option<i32>,
     budget: Option<f64>,
     expenses: Option<f64>,
     expected_end_date: Option<NaiveDateTime>,
@@ -59,7 +60,7 @@ impl UpdateRow for web_common::database::UpdateProject {
             description: self.description,
             public: self.public,
             state_id: self.state_id,
-            parent_project_id: Some(self.parent_project_id),
+            parent_project_id: self.parent_project_id,
             budget: self.budget,
             expenses: self.expenses,
             expected_end_date: self.expected_end_date,
@@ -72,9 +73,7 @@ impl UpdateRow for web_common::database::UpdateProject {
         user_id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self::Flat, diesel::result::Error> {
-        let intermediate = self.to_intermediate(user_id);
-        log::info!("Updating project {:?}", intermediate);
-        intermediate
+        self.to_intermediate(user_id)
             .save_changes(connection)
     }
 }

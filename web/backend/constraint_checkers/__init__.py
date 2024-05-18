@@ -23,6 +23,8 @@ from constraint_checkers.ensure_roles_tables import (
     ensure_updatable_tables_have_roles_tables
 )
 from constraint_checkers.regroup_tables import regroup_tables
+from constraint_checkers.parent_circularity_trigger import check_parent_circularity_trigger
+
 
 __all__ = [
     "ensures_all_update_at_trigger_exists",

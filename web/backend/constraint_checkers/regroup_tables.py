@@ -16,12 +16,74 @@ WHITE_LISTED_MIGRATIONS = [
     "00000000000002_enable_pg_trgm_extension"
 ]
 
+def get_best_insertion_point(
+    table_name: str,
+    expected_desinence: str
+) -> int:
+    """Get the best insertion point for a new migration related to a table.
+
+    Parameters
+    ----------
+    table_name : str
+        The name of the table for which we want to find the best insertion point.
+
+    Returns
+    -------
+    int
+        The best insertion point for a new migration related to the table.
+
+    Raises
+    ------
+    Exception
+        If the migration that created the table cannot be found.
+    """
+
+    assert table_name in expected_desinence, (
+        f"Table name {table_name} is not in the expected desinence {expected_desinence}"
+    )
+
+    valid_desinences = get_desinences(table_name)
+
+    assert expected_desinence in valid_desinences, (
+        f"Desinence {expected_desinence} is not in the desinences of the table {table_name}"
+    )
+
+    index_in_desinences = valid_desinences.index(expected_desinence)
+
+    # First, we identify the position of the migration that has created the current
+    # table by finding the one with desinence `_create_{table_name}_table`.
+    migrations = [
+        directory
+        for directory in os.listdir("migrations")
+        if os.path.isdir(f"migrations/{directory}")
+        and os.path.exists(f"migrations/{directory}/up.sql")
+    ]
+
+    migration_number = None
+
+    for migration in migrations:
+        number, desinence = migration.split("_", maxsplit=1)
+        if desinence == expected_desinence:
+            raise RuntimeError(
+                f"Migration {migration} already exists."
+            )
+        if desinence in valid_desinences and valid_desinences.index(desinence) < index_in_desinences:
+            migration_number = number
+
+    if migration_number is None:
+        raise RuntimeError(
+            f"Could not find the migration that created the {table_name} table."
+        )
+
+    return int(migration_number) + 1
+
 def get_desinences(table_name: str) -> List[str]:
     """Get the possible desinences of a table."""
     return [
         f"create_{table_name}_table",
         f"create_{table_name}_sequential_index",
         f"create_{table_name}_updated_at_trigger",
+        f"create_{table_name}_parent_circularity_trigger",
         f"populate_{table_name}_table",
         f"create_{table_name}_gin_index",
     ]

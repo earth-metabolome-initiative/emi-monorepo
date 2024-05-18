@@ -257,21 +257,28 @@ where
             // we check whether the provided builder has an ID. If it does,
             // we retrieve from the backend the most up to date version of the
             // data that we are editing.
-            if let Some(id) = ctx.props().builder.id() {
-                ctx.link().send_message(ComponentMessage::get::<Data>(id));
-                match ctx.props().method {
-                    FormMethod::POST => {}
-                    FormMethod::GET => {
-                        ctx.link()
-                            .send_message(ComponentMessage::can_view::<Data>(id));
-                    }
-                    FormMethod::PUT => {
-                        ctx.link()
-                            .send_message(ComponentMessage::can_update::<Data>(id));
-                    }
-                    FormMethod::DELETE => {
-                        ctx.link()
-                            .send_message(ComponentMessage::can_delete::<Data>(id));
+            if ctx.props().method.is_post() {
+                ctx.props().builder_dispatch.reduce_mut(|state| {
+                    *state = Default::default();
+                });
+            }
+            if ctx.props().method.is_update() {
+                if let Some(id) = ctx.props().builder.id() {
+                    ctx.link().send_message(ComponentMessage::get::<Data>(id));
+                    match ctx.props().method {
+                        FormMethod::POST => {}
+                        FormMethod::GET => {
+                            ctx.link()
+                                .send_message(ComponentMessage::can_view::<Data>(id));
+                        }
+                        FormMethod::PUT => {
+                            ctx.link()
+                                .send_message(ComponentMessage::can_update::<Data>(id));
+                        }
+                        FormMethod::DELETE => {
+                            ctx.link()
+                                .send_message(ComponentMessage::can_delete::<Data>(id));
+                        }
                     }
                 }
             }
