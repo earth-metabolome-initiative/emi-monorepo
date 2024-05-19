@@ -6,7 +6,7 @@
 CREATE TABLE IF NOT EXISTS login_providers (
     id INTEGER PRIMARY KEY,
     name VARCHAR(255) UNIQUE NOT NULL,
-    font_awesome_icon_id INTEGER NOT NULL UNIQUE REFERENCES font_awesome_icons(id),
+    icon_id INTEGER NOT NULL UNIQUE REFERENCES font_awesome_icons(id),
     color_id INTEGER NOT NULL UNIQUE REFERENCES colors(id),
     client_id_var_name VARCHAR(255) NOT NULL,
     redirect_uri_var_name VARCHAR(255) NOT NULL,

@@ -5,6 +5,8 @@ CREATE TABLE IF NOT EXISTS teams (
     name TEXT NOT NULL UNIQUE,
     -- a description of the team
     description TEXT NOT NULL,
+    icon_id INTEGER NOT NULL UNIQUE REFERENCES font_awesome_icons(id) ON DELETE CASCADE,
+    color_id INTEGER NOT NULL UNIQUE REFERENCES colors(id) ON DELETE CASCADE,
     parent_team_id INTEGER REFERENCES teams(id) ON
     DELETE
         CASCADE,

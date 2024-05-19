@@ -24,7 +24,7 @@ pub fn input_errors(props: &InputErrorsProp) -> Html {
                         html! {
                             <li class="input-error">
                                 <p>
-                                    <i class={format!("fas {}", font_awesome_icon)}></i>
+                                    <i class={format!("fas fa-{}", font_awesome_icon)}></i>
                                     {'\u{00a0}'}
                                     <span>{error}</span>
                                 </p>

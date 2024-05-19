@@ -25,12 +25,15 @@ use chrono::NaiveDateTime;
 
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = bio_ott_ranks)]
-#[diesel(belongs_to(FontAwesomeIcon, foreign_key = font_awesome_icon_id))]
+#[diesel(belongs_to(FontAwesomeIcon, foreign_key = icon_id))]
+#[diesel(belongs_to(Color, foreign_key = color_id))]
 #[diesel(primary_key(id))]
 pub struct BioOttRank {
     pub id: i32,
     pub name: String,
-    pub font_awesome_icon_id: i32,
+    pub description: String,
+    pub icon_id: i32,
+    pub color_id: i32,
 }
 
 impl From<BioOttRank> for web_common::database::tables::BioOttRank {
@@ -38,7 +41,9 @@ impl From<BioOttRank> for web_common::database::tables::BioOttRank {
         Self {
             id: item.id,
             name: item.name,
-            font_awesome_icon_id: item.font_awesome_icon_id,
+            description: item.description,
+            icon_id: item.icon_id,
+            color_id: item.color_id,
         }
     }
 }
@@ -48,7 +53,9 @@ impl From<web_common::database::tables::BioOttRank> for BioOttRank {
         Self {
             id: item.id,
             name: item.name,
-            font_awesome_icon_id: item.font_awesome_icon_id,
+            description: item.description,
+            icon_id: item.icon_id,
+            color_id: item.color_id,
         }
     }
 }
@@ -122,9 +129,9 @@ impl BioOttRank {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, font_awesome_icon_id FROM bio_ott_ranks ",
-            "WHERE $1 % name ",
-            "ORDER BY similarity($1, name) DESC LIMIT $2",
+            "SELECT id, name, description, icon_id, color_id FROM bio_ott_ranks ",
+            "WHERE $1 % f_concat_bio_ott_ranks_name_description(name, description) ",
+            "ORDER BY similarity($1, f_concat_bio_ott_ranks_name_description(name, description)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -151,9 +158,9 @@ impl BioOttRank {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, font_awesome_icon_id FROM bio_ott_ranks ",
-            "WHERE $1 <% name ",
-            "ORDER BY word_similarity($1, name) DESC LIMIT $2",
+            "SELECT id, name, description, icon_id, color_id FROM bio_ott_ranks ",
+            "WHERE $1 <% f_concat_bio_ott_ranks_name_description(name, description) ",
+            "ORDER BY word_similarity($1, f_concat_bio_ott_ranks_name_description(name, description)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -180,9 +187,9 @@ impl BioOttRank {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, font_awesome_icon_id FROM bio_ott_ranks ",
-            "WHERE $1 <<% name ",
-            "ORDER BY strict_word_similarity($1, name) DESC LIMIT $2",
+            "SELECT id, name, description, icon_id, color_id FROM bio_ott_ranks ",
+            "WHERE $1 <<% f_concat_bio_ott_ranks_name_description(name, description) ",
+            "ORDER BY strict_word_similarity($1, f_concat_bio_ott_ranks_name_description(name, description)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -194,7 +201,7 @@ impl BioOttRank {
 #[diesel(table_name = bio_ott_taxon_items)]
 #[diesel(belongs_to(BioOttRank, foreign_key = ott_rank_id))]
 #[diesel(belongs_to(BioOttTaxonItem, foreign_key = domain_id))]
-#[diesel(belongs_to(FontAwesomeIcon, foreign_key = font_awesome_icon_id))]
+#[diesel(belongs_to(FontAwesomeIcon, foreign_key = icon_id))]
 #[diesel(belongs_to(Color, foreign_key = color_id))]
 #[diesel(primary_key(id))]
 pub struct BioOttTaxonItem {
@@ -215,7 +222,7 @@ pub struct BioOttTaxonItem {
     pub family_id: Option<i32>,
     pub genus_id: Option<i32>,
     pub parent_id: i32,
-    pub font_awesome_icon_id: i32,
+    pub icon_id: i32,
     pub color_id: i32,
 }
 
@@ -239,7 +246,7 @@ impl From<BioOttTaxonItem> for web_common::database::tables::BioOttTaxonItem {
             family_id: item.family_id,
             genus_id: item.genus_id,
             parent_id: item.parent_id,
-            font_awesome_icon_id: item.font_awesome_icon_id,
+            icon_id: item.icon_id,
             color_id: item.color_id,
         }
     }
@@ -265,7 +272,7 @@ impl From<web_common::database::tables::BioOttTaxonItem> for BioOttTaxonItem {
             family_id: item.family_id,
             genus_id: item.genus_id,
             parent_id: item.parent_id,
-            font_awesome_icon_id: item.font_awesome_icon_id,
+            icon_id: item.icon_id,
             color_id: item.color_id,
         }
     }
@@ -340,7 +347,7 @@ impl BioOttTaxonItem {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, font_awesome_icon_id, color_id FROM bio_ott_taxon_items ",
+            "SELECT id, name, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, icon_id, color_id FROM bio_ott_taxon_items ",
             "WHERE $1 % name ",
             "ORDER BY similarity($1, name) DESC LIMIT $2",
         );
@@ -369,7 +376,7 @@ impl BioOttTaxonItem {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, font_awesome_icon_id, color_id FROM bio_ott_taxon_items ",
+            "SELECT id, name, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, icon_id, color_id FROM bio_ott_taxon_items ",
             "WHERE $1 <% name ",
             "ORDER BY word_similarity($1, name) DESC LIMIT $2",
         );
@@ -398,7 +405,7 @@ impl BioOttTaxonItem {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, font_awesome_icon_id, color_id FROM bio_ott_taxon_items ",
+            "SELECT id, name, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, icon_id, color_id FROM bio_ott_taxon_items ",
             "WHERE $1 <<% name ",
             "ORDER BY strict_word_similarity($1, name) DESC LIMIT $2",
         );
@@ -906,7 +913,7 @@ impl DerivedSample {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = document_formats)]
-#[diesel(belongs_to(FontAwesomeIcon, foreign_key = font_awesome_icon_id))]
+#[diesel(belongs_to(FontAwesomeIcon, foreign_key = icon_id))]
 #[diesel(belongs_to(Color, foreign_key = color_id))]
 #[diesel(primary_key(id))]
 pub struct DocumentFormat {
@@ -914,7 +921,7 @@ pub struct DocumentFormat {
     pub extension: String,
     pub mime_type: String,
     pub description: String,
-    pub font_awesome_icon_id: i32,
+    pub icon_id: i32,
     pub color_id: i32,
 }
 
@@ -925,7 +932,7 @@ impl From<DocumentFormat> for web_common::database::tables::DocumentFormat {
             extension: item.extension,
             mime_type: item.mime_type,
             description: item.description,
-            font_awesome_icon_id: item.font_awesome_icon_id,
+            icon_id: item.icon_id,
             color_id: item.color_id,
         }
     }
@@ -938,7 +945,7 @@ impl From<web_common::database::tables::DocumentFormat> for DocumentFormat {
             extension: item.extension,
             mime_type: item.mime_type,
             description: item.description,
-            font_awesome_icon_id: item.font_awesome_icon_id,
+            icon_id: item.icon_id,
             color_id: item.color_id,
         }
     }
@@ -1013,7 +1020,7 @@ impl DocumentFormat {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, extension, mime_type, description, font_awesome_icon_id, color_id FROM document_formats ",
+            "SELECT id, extension, mime_type, description, icon_id, color_id FROM document_formats ",
             "WHERE $1 % f_concat_document_formats_extension_mime_type((extension)::text, (mime_type)::text) ",
             "ORDER BY similarity($1, f_concat_document_formats_extension_mime_type((extension)::text, (mime_type)::text)) DESC LIMIT $2",
         );
@@ -1042,7 +1049,7 @@ impl DocumentFormat {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, extension, mime_type, description, font_awesome_icon_id, color_id FROM document_formats ",
+            "SELECT id, extension, mime_type, description, icon_id, color_id FROM document_formats ",
             "WHERE $1 <% f_concat_document_formats_extension_mime_type((extension)::text, (mime_type)::text) ",
             "ORDER BY word_similarity($1, f_concat_document_formats_extension_mime_type((extension)::text, (mime_type)::text)) DESC LIMIT $2",
         );
@@ -1071,7 +1078,7 @@ impl DocumentFormat {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, extension, mime_type, description, font_awesome_icon_id, color_id FROM document_formats ",
+            "SELECT id, extension, mime_type, description, icon_id, color_id FROM document_formats ",
             "WHERE $1 <<% f_concat_document_formats_extension_mime_type((extension)::text, (mime_type)::text) ",
             "ORDER BY strict_word_similarity($1, f_concat_document_formats_extension_mime_type((extension)::text, (mime_type)::text)) DESC LIMIT $2",
         );
@@ -1249,13 +1256,13 @@ impl FontAwesomeIcon {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = login_providers)]
-#[diesel(belongs_to(FontAwesomeIcon, foreign_key = font_awesome_icon_id))]
+#[diesel(belongs_to(FontAwesomeIcon, foreign_key = icon_id))]
 #[diesel(belongs_to(Color, foreign_key = color_id))]
 #[diesel(primary_key(id))]
 pub struct LoginProvider {
     pub id: i32,
     pub name: String,
-    pub font_awesome_icon_id: i32,
+    pub icon_id: i32,
     pub color_id: i32,
     pub client_id_var_name: String,
     pub redirect_uri_var_name: String,
@@ -1268,7 +1275,7 @@ impl From<LoginProvider> for web_common::database::tables::LoginProvider {
         Self {
             id: item.id,
             name: item.name,
-            font_awesome_icon_id: item.font_awesome_icon_id,
+            icon_id: item.icon_id,
             color_id: item.color_id,
             client_id_var_name: item.client_id_var_name,
             redirect_uri_var_name: item.redirect_uri_var_name,
@@ -1283,7 +1290,7 @@ impl From<web_common::database::tables::LoginProvider> for LoginProvider {
         Self {
             id: item.id,
             name: item.name,
-            font_awesome_icon_id: item.font_awesome_icon_id,
+            icon_id: item.icon_id,
             color_id: item.color_id,
             client_id_var_name: item.client_id_var_name,
             redirect_uri_var_name: item.redirect_uri_var_name,
@@ -1342,19 +1349,19 @@ impl LoginProvider {
             .filter(login_providers::dsl::color_id.eq(color_id))
             .first::<Self>(connection)
     }
-    /// Get the struct from the database by its font_awesome_icon_id.
+    /// Get the struct from the database by its icon_id.
     ///
     /// # Arguments
-    /// * `font_awesome_icon_id` - The font_awesome_icon_id of the struct to get.
+    /// * `icon_id` - The icon_id of the struct to get.
     /// * `connection` - The connection to the database.
     ///
-    pub fn from_font_awesome_icon_id(
-        font_awesome_icon_id: &i32,
+    pub fn from_icon_id(
+        icon_id: &i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         use crate::schema::login_providers;
         login_providers::dsl::login_providers
-            .filter(login_providers::dsl::font_awesome_icon_id.eq(font_awesome_icon_id))
+            .filter(login_providers::dsl::icon_id.eq(icon_id))
             .first::<Self>(connection)
     }
     /// Get the struct from the database by its name.
@@ -1447,8 +1454,9 @@ impl Notification {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = organizations)]
+#[diesel(belongs_to(Country, foreign_key = country_id))]
 #[diesel(primary_key(id))]
 pub struct Organization {
     pub id: i32,
@@ -1660,14 +1668,14 @@ impl Organization {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = project_states)]
-#[diesel(belongs_to(FontAwesomeIcon, foreign_key = font_awesome_icon_id))]
+#[diesel(belongs_to(FontAwesomeIcon, foreign_key = icon_id))]
 #[diesel(belongs_to(Color, foreign_key = color_id))]
 #[diesel(primary_key(id))]
 pub struct ProjectState {
     pub id: i32,
     pub name: String,
     pub description: String,
-    pub font_awesome_icon_id: i32,
+    pub icon_id: i32,
     pub color_id: i32,
 }
 
@@ -1677,7 +1685,7 @@ impl From<ProjectState> for web_common::database::tables::ProjectState {
             id: item.id,
             name: item.name,
             description: item.description,
-            font_awesome_icon_id: item.font_awesome_icon_id,
+            icon_id: item.icon_id,
             color_id: item.color_id,
         }
     }
@@ -1689,7 +1697,7 @@ impl From<web_common::database::tables::ProjectState> for ProjectState {
             id: item.id,
             name: item.name,
             description: item.description,
-            font_awesome_icon_id: item.font_awesome_icon_id,
+            icon_id: item.icon_id,
             color_id: item.color_id,
         }
     }
@@ -1744,19 +1752,19 @@ impl ProjectState {
             .filter(project_states::dsl::color_id.eq(color_id))
             .first::<Self>(connection)
     }
-    /// Get the struct from the database by its font_awesome_icon_id.
+    /// Get the struct from the database by its icon_id.
     ///
     /// # Arguments
-    /// * `font_awesome_icon_id` - The font_awesome_icon_id of the struct to get.
+    /// * `icon_id` - The icon_id of the struct to get.
     /// * `connection` - The connection to the database.
     ///
-    pub fn from_font_awesome_icon_id(
-        font_awesome_icon_id: &i32,
+    pub fn from_icon_id(
+        icon_id: &i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         use crate::schema::project_states;
         project_states::dsl::project_states
-            .filter(project_states::dsl::font_awesome_icon_id.eq(font_awesome_icon_id))
+            .filter(project_states::dsl::icon_id.eq(icon_id))
             .first::<Self>(connection)
     }
     /// Get the struct from the database by its name.
@@ -1794,7 +1802,7 @@ impl ProjectState {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, font_awesome_icon_id, color_id FROM project_states ",
+            "SELECT id, name, description, icon_id, color_id FROM project_states ",
             "WHERE $1 % f_concat_project_states_name_description(name, description) ",
             "ORDER BY similarity($1, f_concat_project_states_name_description(name, description)) DESC LIMIT $2",
         );
@@ -1823,7 +1831,7 @@ impl ProjectState {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, font_awesome_icon_id, color_id FROM project_states ",
+            "SELECT id, name, description, icon_id, color_id FROM project_states ",
             "WHERE $1 <% f_concat_project_states_name_description(name, description) ",
             "ORDER BY word_similarity($1, f_concat_project_states_name_description(name, description)) DESC LIMIT $2",
         );
@@ -1852,7 +1860,7 @@ impl ProjectState {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, font_awesome_icon_id, color_id FROM project_states ",
+            "SELECT id, name, description, icon_id, color_id FROM project_states ",
             "WHERE $1 <<% f_concat_project_states_name_description(name, description) ",
             "ORDER BY strict_word_similarity($1, f_concat_project_states_name_description(name, description)) DESC LIMIT $2",
         );
@@ -1862,8 +1870,13 @@ impl ProjectState {
             .load(connection)
 }
 }
-#[derive(Queryable, Debug, Identifiable, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = projects)]
+#[diesel(belongs_to(Project, foreign_key = parent_project_id))]
+#[diesel(belongs_to(User, foreign_key = created_by))]
+#[diesel(belongs_to(ProjectState, foreign_key = state_id))]
+#[diesel(belongs_to(FontAwesomeIcon, foreign_key = icon_id))]
+#[diesel(belongs_to(Color, foreign_key = color_id))]
 #[diesel(primary_key(id))]
 pub struct Project {
     pub id: i32,
@@ -1871,6 +1884,8 @@ pub struct Project {
     pub description: String,
     pub public: bool,
     pub state_id: i32,
+    pub icon_id: i32,
+    pub color_id: i32,
     pub parent_project_id: Option<i32>,
     pub budget: Option<f64>,
     pub expenses: Option<f64>,
@@ -1890,6 +1905,8 @@ impl From<Project> for web_common::database::tables::Project {
             description: item.description,
             public: item.public,
             state_id: item.state_id,
+            icon_id: item.icon_id,
+            color_id: item.color_id,
             parent_project_id: item.parent_project_id,
             budget: item.budget,
             expenses: item.expenses,
@@ -1911,6 +1928,8 @@ impl From<web_common::database::tables::Project> for Project {
             description: item.description,
             public: item.public,
             state_id: item.state_id,
+            icon_id: item.icon_id,
+            color_id: item.color_id,
             parent_project_id: item.parent_project_id,
             budget: item.budget,
             expenses: item.expenses,
@@ -2201,6 +2220,36 @@ impl Project {
             .filter(projects::dsl::id.eq(id))
             .first::<Self>(connection)
     }
+    /// Get the struct from the database by its color_id.
+    ///
+    /// # Arguments
+    /// * `color_id` - The color_id of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_color_id(
+        color_id: &i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::projects;
+        projects::dsl::projects
+            .filter(projects::dsl::color_id.eq(color_id))
+            .first::<Self>(connection)
+    }
+    /// Get the struct from the database by its icon_id.
+    ///
+    /// # Arguments
+    /// * `icon_id` - The icon_id of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_icon_id(
+        icon_id: &i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::projects;
+        projects::dsl::projects
+            .filter(projects::dsl::icon_id.eq(icon_id))
+            .first::<Self>(connection)
+    }
     /// Get the struct from the database by its name.
     ///
     /// # Arguments
@@ -2236,7 +2285,7 @@ impl Project {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date FROM projects ",
+            "SELECT id, name, description, public, state_id, icon_id, color_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date FROM projects ",
             "WHERE $1 % f_concat_projects_name_description(name, description) ",
             "ORDER BY similarity($1, f_concat_projects_name_description(name, description)) DESC LIMIT $2",
         );
@@ -2267,7 +2316,7 @@ impl Project {
             return Self::all_editables(author_user_id, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date FROM projects ",
+            "SELECT id, name, description, public, state_id, icon_id, color_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date FROM projects ",
             "WHERE $1 % f_concat_projects_name_description(name, description) ",
             "AND projects.created_by = $3 ",
             "OR projects.id IN ",
@@ -2306,7 +2355,7 @@ impl Project {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date FROM projects ",
+            "SELECT id, name, description, public, state_id, icon_id, color_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date FROM projects ",
             "WHERE $1 <% f_concat_projects_name_description(name, description) ",
             "ORDER BY word_similarity($1, f_concat_projects_name_description(name, description)) DESC LIMIT $2",
         );
@@ -2337,7 +2386,7 @@ impl Project {
             return Self::all_editables(author_user_id, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date FROM projects ",
+            "SELECT id, name, description, public, state_id, icon_id, color_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date FROM projects ",
             "WHERE $1 <% f_concat_projects_name_description(name, description) ",
             "AND projects.created_by = $3 ",
             "OR projects.id IN ",
@@ -2376,7 +2425,7 @@ impl Project {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date FROM projects ",
+            "SELECT id, name, description, public, state_id, icon_id, color_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date FROM projects ",
             "WHERE $1 <<% f_concat_projects_name_description(name, description) ",
             "ORDER BY strict_word_similarity($1, f_concat_projects_name_description(name, description)) DESC LIMIT $2",
         );
@@ -2407,7 +2456,7 @@ impl Project {
             return Self::all_editables(author_user_id, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date FROM projects ",
+            "SELECT id, name, description, public, state_id, icon_id, color_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date FROM projects ",
             "WHERE $1 <<% f_concat_projects_name_description(name, description) ",
             "AND projects.created_by = $3 ",
             "OR projects.id IN ",
@@ -2427,8 +2476,12 @@ impl Project {
             .load(connection)
 }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = projects_teams_role_invitations)]
+#[diesel(belongs_to(Project, foreign_key = table_id))]
+#[diesel(belongs_to(Team, foreign_key = team_id))]
+#[diesel(belongs_to(Role, foreign_key = role_id))]
+#[diesel(belongs_to(User, foreign_key = created_by))]
 #[diesel(primary_key(table_id, team_id))]
 pub struct ProjectsTeamsRoleInvitation {
     pub table_id: i32,
@@ -2498,8 +2551,12 @@ impl ProjectsTeamsRoleInvitation {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = projects_teams_role_requests)]
+#[diesel(belongs_to(Project, foreign_key = table_id))]
+#[diesel(belongs_to(Team, foreign_key = team_id))]
+#[diesel(belongs_to(Role, foreign_key = role_id))]
+#[diesel(belongs_to(User, foreign_key = created_by))]
 #[diesel(primary_key(table_id, team_id))]
 pub struct ProjectsTeamsRoleRequest {
     pub table_id: i32,
@@ -2569,8 +2626,12 @@ impl ProjectsTeamsRoleRequest {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = projects_teams_roles)]
+#[diesel(belongs_to(Project, foreign_key = table_id))]
+#[diesel(belongs_to(Team, foreign_key = team_id))]
+#[diesel(belongs_to(Role, foreign_key = role_id))]
+#[diesel(belongs_to(User, foreign_key = created_by))]
 #[diesel(primary_key(table_id, team_id))]
 pub struct ProjectsTeamsRole {
     pub table_id: i32,
@@ -2640,8 +2701,11 @@ impl ProjectsTeamsRole {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = projects_users_role_invitations)]
+#[diesel(belongs_to(Project, foreign_key = table_id))]
+#[diesel(belongs_to(User, foreign_key = user_id))]
+#[diesel(belongs_to(Role, foreign_key = role_id))]
 #[diesel(primary_key(table_id, user_id))]
 pub struct ProjectsUsersRoleInvitation {
     pub table_id: i32,
@@ -2711,8 +2775,11 @@ impl ProjectsUsersRoleInvitation {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = projects_users_role_requests)]
+#[diesel(belongs_to(Project, foreign_key = table_id))]
+#[diesel(belongs_to(User, foreign_key = user_id))]
+#[diesel(belongs_to(Role, foreign_key = role_id))]
 #[diesel(primary_key(table_id, user_id))]
 pub struct ProjectsUsersRoleRequest {
     pub table_id: i32,
@@ -2782,8 +2849,11 @@ impl ProjectsUsersRoleRequest {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = projects_users_roles)]
+#[diesel(belongs_to(Project, foreign_key = table_id))]
+#[diesel(belongs_to(User, foreign_key = user_id))]
+#[diesel(belongs_to(Role, foreign_key = role_id))]
 #[diesel(primary_key(table_id, user_id))]
 pub struct ProjectsUsersRole {
     pub table_id: i32,
@@ -2855,14 +2925,14 @@ impl ProjectsUsersRole {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = roles)]
-#[diesel(belongs_to(FontAwesomeIcon, foreign_key = font_awesome_icon_id))]
+#[diesel(belongs_to(FontAwesomeIcon, foreign_key = icon_id))]
 #[diesel(belongs_to(Color, foreign_key = color_id))]
 #[diesel(primary_key(id))]
 pub struct Role {
     pub id: i32,
     pub name: String,
     pub description: String,
-    pub font_awesome_icon_id: i32,
+    pub icon_id: i32,
     pub color_id: i32,
 }
 
@@ -2872,7 +2942,7 @@ impl From<Role> for web_common::database::tables::Role {
             id: item.id,
             name: item.name,
             description: item.description,
-            font_awesome_icon_id: item.font_awesome_icon_id,
+            icon_id: item.icon_id,
             color_id: item.color_id,
         }
     }
@@ -2884,7 +2954,7 @@ impl From<web_common::database::tables::Role> for Role {
             id: item.id,
             name: item.name,
             description: item.description,
-            font_awesome_icon_id: item.font_awesome_icon_id,
+            icon_id: item.icon_id,
             color_id: item.color_id,
         }
     }
@@ -2954,19 +3024,19 @@ impl Role {
             .filter(roles::dsl::description.eq(description))
             .first::<Self>(connection)
     }
-    /// Get the struct from the database by its font_awesome_icon_id.
+    /// Get the struct from the database by its icon_id.
     ///
     /// # Arguments
-    /// * `font_awesome_icon_id` - The font_awesome_icon_id of the struct to get.
+    /// * `icon_id` - The icon_id of the struct to get.
     /// * `connection` - The connection to the database.
     ///
-    pub fn from_font_awesome_icon_id(
-        font_awesome_icon_id: &i32,
+    pub fn from_icon_id(
+        icon_id: &i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         use crate::schema::roles;
         roles::dsl::roles
-            .filter(roles::dsl::font_awesome_icon_id.eq(font_awesome_icon_id))
+            .filter(roles::dsl::icon_id.eq(icon_id))
             .first::<Self>(connection)
     }
     /// Get the struct from the database by its name.
@@ -3004,7 +3074,7 @@ impl Role {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, font_awesome_icon_id, color_id FROM roles ",
+            "SELECT id, name, description, icon_id, color_id FROM roles ",
             "WHERE $1 % f_concat_roles_name(name, description) ",
             "ORDER BY similarity($1, f_concat_roles_name(name, description)) DESC LIMIT $2",
         );
@@ -3033,7 +3103,7 @@ impl Role {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, font_awesome_icon_id, color_id FROM roles ",
+            "SELECT id, name, description, icon_id, color_id FROM roles ",
             "WHERE $1 <% f_concat_roles_name(name, description) ",
             "ORDER BY word_similarity($1, f_concat_roles_name(name, description)) DESC LIMIT $2",
         );
@@ -3062,7 +3132,7 @@ impl Role {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, font_awesome_icon_id, color_id FROM roles ",
+            "SELECT id, name, description, icon_id, color_id FROM roles ",
             "WHERE $1 <<% f_concat_roles_name(name, description) ",
             "ORDER BY strict_word_similarity($1, f_concat_roles_name(name, description)) DESC LIMIT $2",
         );
@@ -3072,8 +3142,11 @@ impl Role {
             .load(connection)
 }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sample_bio_ott_taxon_items)]
+#[diesel(belongs_to(User, foreign_key = created_by))]
+#[diesel(belongs_to(Sample, foreign_key = sample_id))]
+#[diesel(belongs_to(BioOttTaxonItem, foreign_key = taxon_id))]
 #[diesel(primary_key(sample_id, taxon_id))]
 pub struct SampleBioOttTaxonItem {
     pub created_by: i32,
@@ -3167,14 +3240,14 @@ impl SampleBioOttTaxonItem {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sample_states)]
-#[diesel(belongs_to(FontAwesomeIcon, foreign_key = font_awesome_icon_id))]
+#[diesel(belongs_to(FontAwesomeIcon, foreign_key = icon_id))]
 #[diesel(belongs_to(Color, foreign_key = color_id))]
 #[diesel(primary_key(id))]
 pub struct SampleState {
     pub id: i32,
     pub name: String,
     pub description: String,
-    pub font_awesome_icon_id: i32,
+    pub icon_id: i32,
     pub color_id: i32,
 }
 
@@ -3184,7 +3257,7 @@ impl From<SampleState> for web_common::database::tables::SampleState {
             id: item.id,
             name: item.name,
             description: item.description,
-            font_awesome_icon_id: item.font_awesome_icon_id,
+            icon_id: item.icon_id,
             color_id: item.color_id,
         }
     }
@@ -3196,7 +3269,7 @@ impl From<web_common::database::tables::SampleState> for SampleState {
             id: item.id,
             name: item.name,
             description: item.description,
-            font_awesome_icon_id: item.font_awesome_icon_id,
+            icon_id: item.icon_id,
             color_id: item.color_id,
         }
     }
@@ -3251,19 +3324,19 @@ impl SampleState {
             .filter(sample_states::dsl::color_id.eq(color_id))
             .first::<Self>(connection)
     }
-    /// Get the struct from the database by its font_awesome_icon_id.
+    /// Get the struct from the database by its icon_id.
     ///
     /// # Arguments
-    /// * `font_awesome_icon_id` - The font_awesome_icon_id of the struct to get.
+    /// * `icon_id` - The icon_id of the struct to get.
     /// * `connection` - The connection to the database.
     ///
-    pub fn from_font_awesome_icon_id(
-        font_awesome_icon_id: &i32,
+    pub fn from_icon_id(
+        icon_id: &i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         use crate::schema::sample_states;
         sample_states::dsl::sample_states
-            .filter(sample_states::dsl::font_awesome_icon_id.eq(font_awesome_icon_id))
+            .filter(sample_states::dsl::icon_id.eq(icon_id))
             .first::<Self>(connection)
     }
     /// Search for the struct by a given string by Postgres's `similarity`.
@@ -3286,7 +3359,7 @@ impl SampleState {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, font_awesome_icon_id, color_id FROM sample_states ",
+            "SELECT id, name, description, icon_id, color_id FROM sample_states ",
             "WHERE $1 % f_concat_sample_states_name_description(name, description) ",
             "ORDER BY similarity($1, f_concat_sample_states_name_description(name, description)) DESC LIMIT $2",
         );
@@ -3315,7 +3388,7 @@ impl SampleState {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, font_awesome_icon_id, color_id FROM sample_states ",
+            "SELECT id, name, description, icon_id, color_id FROM sample_states ",
             "WHERE $1 <% f_concat_sample_states_name_description(name, description) ",
             "ORDER BY word_similarity($1, f_concat_sample_states_name_description(name, description)) DESC LIMIT $2",
         );
@@ -3344,7 +3417,7 @@ impl SampleState {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, font_awesome_icon_id, color_id FROM sample_states ",
+            "SELECT id, name, description, icon_id, color_id FROM sample_states ",
             "WHERE $1 <<% f_concat_sample_states_name_description(name, description) ",
             "ORDER BY strict_word_similarity($1, f_concat_sample_states_name_description(name, description)) DESC LIMIT $2",
         );
@@ -3354,8 +3427,11 @@ impl SampleState {
             .load(connection)
 }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sampled_individual_bio_ott_taxon_items)]
+#[diesel(belongs_to(User, foreign_key = created_by))]
+#[diesel(belongs_to(SampledIndividual, foreign_key = sampled_individual_id))]
+#[diesel(belongs_to(BioOttTaxonItem, foreign_key = taxon_id))]
 #[diesel(primary_key(sampled_individual_id, taxon_id))]
 pub struct SampledIndividualBioOttTaxonItem {
     pub created_by: i32,
@@ -3447,8 +3523,9 @@ impl SampledIndividualBioOttTaxonItem {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sampled_individuals)]
+#[diesel(belongs_to(User, foreign_key = created_by))]
 #[diesel(primary_key(id))]
 pub struct SampledIndividual {
     pub id: Uuid,
@@ -3763,8 +3840,12 @@ impl SampledIndividual {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sampled_individuals_teams_role_invitations)]
+#[diesel(belongs_to(SampledIndividual, foreign_key = table_id))]
+#[diesel(belongs_to(Team, foreign_key = team_id))]
+#[diesel(belongs_to(Role, foreign_key = role_id))]
+#[diesel(belongs_to(User, foreign_key = created_by))]
 #[diesel(primary_key(table_id, team_id))]
 pub struct SampledIndividualsTeamsRoleInvitation {
     pub table_id: Uuid,
@@ -3834,8 +3915,12 @@ impl SampledIndividualsTeamsRoleInvitation {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sampled_individuals_teams_role_requests)]
+#[diesel(belongs_to(SampledIndividual, foreign_key = table_id))]
+#[diesel(belongs_to(Team, foreign_key = team_id))]
+#[diesel(belongs_to(Role, foreign_key = role_id))]
+#[diesel(belongs_to(User, foreign_key = created_by))]
 #[diesel(primary_key(table_id, team_id))]
 pub struct SampledIndividualsTeamsRoleRequest {
     pub table_id: Uuid,
@@ -3905,8 +3990,12 @@ impl SampledIndividualsTeamsRoleRequest {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sampled_individuals_teams_roles)]
+#[diesel(belongs_to(SampledIndividual, foreign_key = table_id))]
+#[diesel(belongs_to(Team, foreign_key = team_id))]
+#[diesel(belongs_to(Role, foreign_key = role_id))]
+#[diesel(belongs_to(User, foreign_key = created_by))]
 #[diesel(primary_key(table_id, team_id))]
 pub struct SampledIndividualsTeamsRole {
     pub table_id: Uuid,
@@ -3976,8 +4065,11 @@ impl SampledIndividualsTeamsRole {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sampled_individuals_users_role_invitations)]
+#[diesel(belongs_to(SampledIndividual, foreign_key = table_id))]
+#[diesel(belongs_to(User, foreign_key = user_id))]
+#[diesel(belongs_to(Role, foreign_key = role_id))]
 #[diesel(primary_key(table_id, user_id))]
 pub struct SampledIndividualsUsersRoleInvitation {
     pub table_id: Uuid,
@@ -4047,8 +4139,11 @@ impl SampledIndividualsUsersRoleInvitation {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sampled_individuals_users_role_requests)]
+#[diesel(belongs_to(SampledIndividual, foreign_key = table_id))]
+#[diesel(belongs_to(User, foreign_key = user_id))]
+#[diesel(belongs_to(Role, foreign_key = role_id))]
 #[diesel(primary_key(table_id, user_id))]
 pub struct SampledIndividualsUsersRoleRequest {
     pub table_id: Uuid,
@@ -4118,8 +4213,11 @@ impl SampledIndividualsUsersRoleRequest {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sampled_individuals_users_roles)]
+#[diesel(belongs_to(SampledIndividual, foreign_key = table_id))]
+#[diesel(belongs_to(User, foreign_key = user_id))]
+#[diesel(belongs_to(Role, foreign_key = role_id))]
 #[diesel(primary_key(table_id, user_id))]
 pub struct SampledIndividualsUsersRole {
     pub table_id: Uuid,
@@ -4957,8 +5055,9 @@ impl SamplesUsersRole {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = spectra)]
+#[diesel(belongs_to(SpectraCollection, foreign_key = spectra_collection_id))]
 #[diesel(primary_key(id))]
 pub struct Spectra {
     pub id: i32,
@@ -5018,8 +5117,10 @@ impl Spectra {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = spectra_collections)]
+#[diesel(belongs_to(Sample, foreign_key = sample_id))]
+#[diesel(belongs_to(User, foreign_key = created_by))]
 #[diesel(primary_key(id))]
 pub struct SpectraCollection {
     pub id: i32,
@@ -5334,8 +5435,12 @@ impl SpectraCollection {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = spectra_collections_teams_role_invitations)]
+#[diesel(belongs_to(SpectraCollection, foreign_key = table_id))]
+#[diesel(belongs_to(Team, foreign_key = team_id))]
+#[diesel(belongs_to(Role, foreign_key = role_id))]
+#[diesel(belongs_to(User, foreign_key = created_by))]
 #[diesel(primary_key(table_id, team_id))]
 pub struct SpectraCollectionsTeamsRoleInvitation {
     pub table_id: i32,
@@ -5405,8 +5510,12 @@ impl SpectraCollectionsTeamsRoleInvitation {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = spectra_collections_teams_role_requests)]
+#[diesel(belongs_to(SpectraCollection, foreign_key = table_id))]
+#[diesel(belongs_to(Team, foreign_key = team_id))]
+#[diesel(belongs_to(Role, foreign_key = role_id))]
+#[diesel(belongs_to(User, foreign_key = created_by))]
 #[diesel(primary_key(table_id, team_id))]
 pub struct SpectraCollectionsTeamsRoleRequest {
     pub table_id: i32,
@@ -5476,8 +5585,12 @@ impl SpectraCollectionsTeamsRoleRequest {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = spectra_collections_teams_roles)]
+#[diesel(belongs_to(SpectraCollection, foreign_key = table_id))]
+#[diesel(belongs_to(Team, foreign_key = team_id))]
+#[diesel(belongs_to(Role, foreign_key = role_id))]
+#[diesel(belongs_to(User, foreign_key = created_by))]
 #[diesel(primary_key(table_id, team_id))]
 pub struct SpectraCollectionsTeamsRole {
     pub table_id: i32,
@@ -5547,8 +5660,11 @@ impl SpectraCollectionsTeamsRole {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = spectra_collections_users_role_invitations)]
+#[diesel(belongs_to(SpectraCollection, foreign_key = table_id))]
+#[diesel(belongs_to(User, foreign_key = user_id))]
+#[diesel(belongs_to(Role, foreign_key = role_id))]
 #[diesel(primary_key(table_id, user_id))]
 pub struct SpectraCollectionsUsersRoleInvitation {
     pub table_id: i32,
@@ -5618,8 +5734,11 @@ impl SpectraCollectionsUsersRoleInvitation {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = spectra_collections_users_role_requests)]
+#[diesel(belongs_to(SpectraCollection, foreign_key = table_id))]
+#[diesel(belongs_to(User, foreign_key = user_id))]
+#[diesel(belongs_to(Role, foreign_key = role_id))]
 #[diesel(primary_key(table_id, user_id))]
 pub struct SpectraCollectionsUsersRoleRequest {
     pub table_id: i32,
@@ -5689,8 +5808,11 @@ impl SpectraCollectionsUsersRoleRequest {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = spectra_collections_users_roles)]
+#[diesel(belongs_to(SpectraCollection, foreign_key = table_id))]
+#[diesel(belongs_to(User, foreign_key = user_id))]
+#[diesel(belongs_to(Role, foreign_key = role_id))]
 #[diesel(primary_key(table_id, user_id))]
 pub struct SpectraCollectionsUsersRole {
     pub table_id: i32,
@@ -5762,14 +5884,14 @@ impl SpectraCollectionsUsersRole {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = team_states)]
-#[diesel(belongs_to(FontAwesomeIcon, foreign_key = font_awesome_icon_id))]
+#[diesel(belongs_to(FontAwesomeIcon, foreign_key = icon_id))]
 #[diesel(belongs_to(Color, foreign_key = color_id))]
 #[diesel(primary_key(id))]
 pub struct TeamState {
     pub id: i32,
     pub name: String,
     pub description: String,
-    pub font_awesome_icon_id: i32,
+    pub icon_id: i32,
     pub color_id: i32,
 }
 
@@ -5779,7 +5901,7 @@ impl From<TeamState> for web_common::database::tables::TeamState {
             id: item.id,
             name: item.name,
             description: item.description,
-            font_awesome_icon_id: item.font_awesome_icon_id,
+            icon_id: item.icon_id,
             color_id: item.color_id,
         }
     }
@@ -5791,7 +5913,7 @@ impl From<web_common::database::tables::TeamState> for TeamState {
             id: item.id,
             name: item.name,
             description: item.description,
-            font_awesome_icon_id: item.font_awesome_icon_id,
+            icon_id: item.icon_id,
             color_id: item.color_id,
         }
     }
@@ -5846,19 +5968,19 @@ impl TeamState {
             .filter(team_states::dsl::color_id.eq(color_id))
             .first::<Self>(connection)
     }
-    /// Get the struct from the database by its font_awesome_icon_id.
+    /// Get the struct from the database by its icon_id.
     ///
     /// # Arguments
-    /// * `font_awesome_icon_id` - The font_awesome_icon_id of the struct to get.
+    /// * `icon_id` - The icon_id of the struct to get.
     /// * `connection` - The connection to the database.
     ///
-    pub fn from_font_awesome_icon_id(
-        font_awesome_icon_id: &i32,
+    pub fn from_icon_id(
+        icon_id: &i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         use crate::schema::team_states;
         team_states::dsl::team_states
-            .filter(team_states::dsl::font_awesome_icon_id.eq(font_awesome_icon_id))
+            .filter(team_states::dsl::icon_id.eq(icon_id))
             .first::<Self>(connection)
     }
     /// Get the struct from the database by its name.
@@ -5896,7 +6018,7 @@ impl TeamState {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, font_awesome_icon_id, color_id FROM team_states ",
+            "SELECT id, name, description, icon_id, color_id FROM team_states ",
             "WHERE $1 % f_concat_team_states_name_description(name, description) ",
             "ORDER BY similarity($1, f_concat_team_states_name_description(name, description)) DESC LIMIT $2",
         );
@@ -5925,7 +6047,7 @@ impl TeamState {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, font_awesome_icon_id, color_id FROM team_states ",
+            "SELECT id, name, description, icon_id, color_id FROM team_states ",
             "WHERE $1 <% f_concat_team_states_name_description(name, description) ",
             "ORDER BY word_similarity($1, f_concat_team_states_name_description(name, description)) DESC LIMIT $2",
         );
@@ -5954,7 +6076,7 @@ impl TeamState {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, font_awesome_icon_id, color_id FROM team_states ",
+            "SELECT id, name, description, icon_id, color_id FROM team_states ",
             "WHERE $1 <<% f_concat_team_states_name_description(name, description) ",
             "ORDER BY strict_word_similarity($1, f_concat_team_states_name_description(name, description)) DESC LIMIT $2",
         );
@@ -5966,6 +6088,8 @@ impl TeamState {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = teams)]
+#[diesel(belongs_to(FontAwesomeIcon, foreign_key = icon_id))]
+#[diesel(belongs_to(Color, foreign_key = color_id))]
 #[diesel(belongs_to(Team, foreign_key = parent_team_id))]
 #[diesel(belongs_to(User, foreign_key = created_by))]
 #[diesel(primary_key(id))]
@@ -5973,6 +6097,8 @@ pub struct Team {
     pub id: i32,
     pub name: String,
     pub description: String,
+    pub icon_id: i32,
+    pub color_id: i32,
     pub parent_team_id: Option<i32>,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
@@ -5986,6 +6112,8 @@ impl From<Team> for web_common::database::tables::Team {
             id: item.id,
             name: item.name,
             description: item.description,
+            icon_id: item.icon_id,
+            color_id: item.color_id,
             parent_team_id: item.parent_team_id,
             created_by: item.created_by,
             created_at: item.created_at,
@@ -6001,6 +6129,8 @@ impl From<web_common::database::tables::Team> for Team {
             id: item.id,
             name: item.name,
             description: item.description,
+            icon_id: item.icon_id,
+            color_id: item.color_id,
             parent_team_id: item.parent_team_id,
             created_by: item.created_by,
             created_at: item.created_at,
@@ -6262,6 +6392,36 @@ impl Team {
             .filter(teams::dsl::id.eq(id))
             .first::<Self>(connection)
     }
+    /// Get the struct from the database by its color_id.
+    ///
+    /// # Arguments
+    /// * `color_id` - The color_id of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_color_id(
+        color_id: &i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::teams;
+        teams::dsl::teams
+            .filter(teams::dsl::color_id.eq(color_id))
+            .first::<Self>(connection)
+    }
+    /// Get the struct from the database by its icon_id.
+    ///
+    /// # Arguments
+    /// * `icon_id` - The icon_id of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_icon_id(
+        icon_id: &i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::teams;
+        teams::dsl::teams
+            .filter(teams::dsl::icon_id.eq(icon_id))
+            .first::<Self>(connection)
+    }
     /// Get the struct from the database by its name.
     ///
     /// # Arguments
@@ -6297,7 +6457,7 @@ impl Team {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, parent_team_id, created_by, created_at, updated_by, updated_at FROM teams ",
+            "SELECT id, name, description, icon_id, color_id, parent_team_id, created_by, created_at, updated_by, updated_at FROM teams ",
             "WHERE $1 % f_concat_teams_name_description(name, description) ",
             "ORDER BY similarity($1, f_concat_teams_name_description(name, description)) DESC LIMIT $2",
         );
@@ -6328,7 +6488,7 @@ impl Team {
             return Self::all_editables(author_user_id, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, parent_team_id, created_by, created_at, updated_by, updated_at FROM teams ",
+            "SELECT id, name, description, icon_id, color_id, parent_team_id, created_by, created_at, updated_by, updated_at FROM teams ",
             "WHERE $1 % f_concat_teams_name_description(name, description) ",
             "AND teams.created_by = $3 ",
             "OR teams.id IN ",
@@ -6367,7 +6527,7 @@ impl Team {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, parent_team_id, created_by, created_at, updated_by, updated_at FROM teams ",
+            "SELECT id, name, description, icon_id, color_id, parent_team_id, created_by, created_at, updated_by, updated_at FROM teams ",
             "WHERE $1 <% f_concat_teams_name_description(name, description) ",
             "ORDER BY word_similarity($1, f_concat_teams_name_description(name, description)) DESC LIMIT $2",
         );
@@ -6398,7 +6558,7 @@ impl Team {
             return Self::all_editables(author_user_id, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, parent_team_id, created_by, created_at, updated_by, updated_at FROM teams ",
+            "SELECT id, name, description, icon_id, color_id, parent_team_id, created_by, created_at, updated_by, updated_at FROM teams ",
             "WHERE $1 <% f_concat_teams_name_description(name, description) ",
             "AND teams.created_by = $3 ",
             "OR teams.id IN ",
@@ -6437,7 +6597,7 @@ impl Team {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, parent_team_id, created_by, created_at, updated_by, updated_at FROM teams ",
+            "SELECT id, name, description, icon_id, color_id, parent_team_id, created_by, created_at, updated_by, updated_at FROM teams ",
             "WHERE $1 <<% f_concat_teams_name_description(name, description) ",
             "ORDER BY strict_word_similarity($1, f_concat_teams_name_description(name, description)) DESC LIMIT $2",
         );
@@ -6468,7 +6628,7 @@ impl Team {
             return Self::all_editables(author_user_id, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, name, description, parent_team_id, created_by, created_at, updated_by, updated_at FROM teams ",
+            "SELECT id, name, description, icon_id, color_id, parent_team_id, created_by, created_at, updated_by, updated_at FROM teams ",
             "WHERE $1 <<% f_concat_teams_name_description(name, description) ",
             "AND teams.created_by = $3 ",
             "OR teams.id IN ",

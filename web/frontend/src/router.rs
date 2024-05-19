@@ -69,10 +69,10 @@ pub enum AppRoute {
 pub fn switch(route: AppRoute) -> Html {
     match route {
         AppRoute::Projects => {
-            html! { <BasicPages<Project> /> }
+            html! { <BasicPages<NestedProject> /> }
         }
         AppRoute::ProjectsView{id} => {
-            html! { <BasicPage<Project> id={PrimaryKey::from(id)} /> }
+            html! { <BasicPage<NestedProject> id={PrimaryKey::from(id)} /> }
         }
         AppRoute::ProjectsNew => {
             html! { <CreateProjectForm /> }
@@ -81,10 +81,10 @@ pub fn switch(route: AppRoute) -> Html {
             html! { <UpdateProjectForm id={id} /> }
         }
         AppRoute::SampledIndividuals => {
-            html! { <BasicPages<SampledIndividual> /> }
+            html! { <BasicPages<NestedSampledIndividual> /> }
         }
         AppRoute::SampledIndividualsView{id} => {
-            html! { <BasicPage<SampledIndividual> id={PrimaryKey::from(id)} /> }
+            html! { <BasicPage<NestedSampledIndividual> id={PrimaryKey::from(id)} /> }
         }
         AppRoute::SampledIndividualsNew => {
             html! { <CreateSampledIndividualForm /> }

@@ -12,6 +12,8 @@ pub struct NewProject {
     pub description: String,
     pub public: bool,
     pub state_id: i32,
+    pub icon_id: i32,
+    pub color_id: i32,
     pub parent_project_id: Option<i32>,
     pub budget: Option<f64>,
     pub expenses: Option<f64>,
@@ -178,6 +180,8 @@ impl NewSample {
 pub struct NewTeam {
     pub name: String,
     pub description: String,
+    pub icon_id: i32,
+    pub color_id: i32,
     pub parent_team_id: Option<i32>,
 }
 

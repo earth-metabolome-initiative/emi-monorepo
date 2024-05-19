@@ -8,9 +8,10 @@ impl RowToSearchableBadge for NestedBioOttRank {
         html! {
             <div>
                 <p>
-                <i class={format!("fas {} grey", self.font_awesome_icon.name)}></i>
+                <i class={format!("fas fa-{} {}", self.icon.name, self.color.name)}></i>
                     <span>{self.inner.name.format_match(query)}</span>
                 </p>
+                <p>{self.inner.description.format_match(query)}</p>
             </div>
         }
     }
@@ -19,20 +20,21 @@ impl RowToSearchableBadge for NestedBioOttRank {
         html! {
             <div>
                 <p>
-                <i class={format!("fas {} grey", self.font_awesome_icon.name)}></i>
+                <i class={format!("fas fa-{} {}", self.icon.name, self.color.name)}></i>
                     <span>{self.inner.name.clone()}</span>
                 </p>
+                <p>{self.inner.description.clone()}</p>
             </div>
         }
     }
-    
+
     fn similarity_score(&self, query: &str) -> isize {
         self.inner.name.similarity_score(query)
     }
-fn primary_color_class(&self) -> &str {
-        "grey"
+    fn primary_color_class(&self) -> &str {
+        &self.color.name
     }
-fn description(&self) -> &str {
-        ""
+    fn description(&self) -> &str {
+        &self.inner.description
     }
 }

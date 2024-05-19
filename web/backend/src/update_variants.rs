@@ -41,6 +41,8 @@ pub(super) struct IntermediateUpdateProject {
     description: String,
     public: bool,
     state_id: i32,
+    icon_id: i32,
+    color_id: i32,
     parent_project_id: Option<i32>,
     budget: Option<f64>,
     expenses: Option<f64>,
@@ -60,6 +62,8 @@ impl UpdateRow for web_common::database::UpdateProject {
             description: self.description,
             public: self.public,
             state_id: self.state_id,
+            icon_id: self.icon_id,
+            color_id: self.color_id,
             parent_project_id: self.parent_project_id,
             budget: self.budget,
             expenses: self.expenses,
@@ -88,6 +92,8 @@ pub(super) struct IntermediateUpdateTeam {
     id: i32,
     name: String,
     description: String,
+    icon_id: i32,
+    color_id: i32,
     parent_team_id: Option<i32>,
 }
 
@@ -101,6 +107,8 @@ impl UpdateRow for web_common::database::UpdateTeam {
             id: self.id,
             name: self.name,
             description: self.description,
+            icon_id: self.icon_id,
+            color_id: self.color_id,
             parent_team_id: self.parent_team_id,
         }
     }

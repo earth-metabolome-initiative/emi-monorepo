@@ -24,7 +24,7 @@ COPY bio_ott_taxon_items(
     genus_id,
     domain_id,
     wikidata_id,
-    font_awesome_icon_id,
+    icon_id,
     color_id,
     ott_rank_id
 )

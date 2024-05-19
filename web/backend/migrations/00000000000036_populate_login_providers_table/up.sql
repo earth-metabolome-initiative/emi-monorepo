@@ -15,7 +15,7 @@ FROM
 INSERT INTO
     login_providers(
         name,
-        font_awesome_icon_id,
+        icon_id,
         color_id,
         client_id_var_name,
         redirect_uri_var_name,

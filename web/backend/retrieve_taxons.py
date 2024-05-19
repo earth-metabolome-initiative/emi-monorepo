@@ -1,12 +1,187 @@
+"""This module retrieves the taxons from the Open Tree of Life project and enriches them with additional information"""
 from typing import List
+from dataclasses import dataclass
 from io import StringIO
 from downloaders import BaseDownloader
 from tqdm.auto import tqdm
+import polars as pl
 import numpy as np
 import pandas as pd
 from cache_decorator import Cache
-from pyinaturalist.docs.font_awesome_icons import EXTENDED_FONT_AWESOME_ICONS
 import requests
+
+COLORS = {
+    'blue': '#5778a4',
+    'orange': '#e49444',
+    'red': '#d1615d',
+    'teal': '#85b6b2',
+    'green': '#6a9f58',
+    'yellow': '#e7ca60',
+    'purple': '#a87c9f',
+    'pink': '#f1a2a9',
+    'brown': '#967662',
+    'grey': '#b8b0ac',
+    'black': '#000000',
+}
+
+
+@dataclass
+class FontAwesomeIcon:
+    """A class to represent a Font Awesome icon"""
+    prefix: str
+    name: str
+    color: str
+    size: int = 16
+
+    def __str__(self):
+        return (
+            f'<i class="{self.prefix} {self.name}"'
+            f'style="color: {COLORS[self.color]};'
+            f'font-size: {self.size}px;"></i>'
+        )
+
+    def __repr__(self):
+        return f'<FontAwesomeIcon {self.prefix} {self.name} {self.color} {self.size}>'
+
+
+EXTENDED_FONT_AWESOME_ICONS = {
+    0: FontAwesomeIcon('fa-solid', 'fa-question-circle', 'grey'),
+    # Birds
+    3: FontAwesomeIcon('fa-solid', 'fa-dove', 'teal'),
+    # Pheasants, Grouse, and Allies
+    574: FontAwesomeIcon('fa-solid', 'fa-feather', 'teal'),
+    879: FontAwesomeIcon('fa-solid', 'fa-kiwi-bird', 'brown'),
+    71261: FontAwesomeIcon('fa-solid', 'fa-crow', 'black'),
+    6888: FontAwesomeIcon('fa-solid', 'fa-kiwi-bird', 'green'),
+    1199: FontAwesomeIcon('fa-solid', 'fa-kiwi-bird', 'brown'),
+    67569: FontAwesomeIcon('fa-solid', 'fa-kiwi-bird', 'pink'),
+    2708: FontAwesomeIcon('fa-solid', 'fa-dove', 'teal'),
+    6913: FontAwesomeIcon('fa-solid', 'fa-dove', 'teal'),
+    67564: FontAwesomeIcon('fa-solid', 'fa-kiwi-bird', 'blue'),
+    19350: FontAwesomeIcon('fa-solid', 'fa-crow', 'brown'),
+    18874: FontAwesomeIcon('fa-solid', 'fa-kiwi-bird', 'green'),
+    # Amphibians + reptiles
+    20978: FontAwesomeIcon('fa-solid', 'fa-frog', 'green'),
+    26036: FontAwesomeIcon('fa-solid', 'fa-dragon', 'green'),
+    26039: FontAwesomeIcon('fa-solid', 'fa-dragon', 'green'),
+    39532: FontAwesomeIcon('fa-solid', 'fa-dragon', 'green'),
+    85553: FontAwesomeIcon('fa-solid', 'fa-worm', 'green'),
+    # Mammals
+    786045: FontAwesomeIcon('fa-solid', 'fa-otter', 'brown'),
+    43579: FontAwesomeIcon('fa-solid', 'fa-otter', 'brown'),
+    846280: FontAwesomeIcon('fa-solid', 'fa-otter', 'brown'),
+    47144: FontAwesomeIcon('fa-solid', 'fa-dog', 'brown'),
+    42048: FontAwesomeIcon('fa-solid', 'fa-dog', 'grey'),
+    42054: FontAwesomeIcon('fa-solid', 'fa-dog', 'red'),
+    41660: FontAwesomeIcon('fa-solid', 'fa-dog', 'brown'),
+    41944: FontAwesomeIcon('fa-solid', 'fa-cat', 'orange'),
+    846273: FontAwesomeIcon('fa-solid', 'fa-cat', 'yellow'),
+    43328: FontAwesomeIcon('fa-solid', 'fa-horse', 'brown'),
+    42158: FontAwesomeIcon('fa-solid', 'fa-horse', 'brown'),
+    42406: FontAwesomeIcon('fa-solid', 'fa-horse', 'brown'),
+    568826: FontAwesomeIcon('fa-solid', 'fa-horse', 'brown'),
+    848343: FontAwesomeIcon('fa-solid', 'fa-paw', 'pink'),
+    568847: FontAwesomeIcon('fa-solid', 'fa-horse', 'grey'),
+    42348: FontAwesomeIcon('fa-solid', 'fa-horse', 'brown'),
+    846209: FontAwesomeIcon('fa-solid', 'fa-horse', 'brown'),
+    925150: FontAwesomeIcon('fa-solid', 'fa-horse', 'brown'),
+    43691: FontAwesomeIcon('fa-solid', 'fa-horse', 'grey'),
+    43698: FontAwesomeIcon('fa-solid', 'fa-otter', 'brown'),
+    43094: FontAwesomeIcon('fa-solid', 'fa-otter', 'brown'),
+    45933: FontAwesomeIcon('fa-solid', 'fa-otter', 'brown'),
+    43791: FontAwesomeIcon('fa-solid', 'fa-otter', 'brown'),
+    533971: FontAwesomeIcon('fa-solid', 'fa-otter', 'brown'),
+    40268: FontAwesomeIcon('fa-solid', 'fa-otter', 'brown'),
+    41636: FontAwesomeIcon('fa-solid', 'fa-paw', 'brown'),
+    848319: FontAwesomeIcon('fa-solid', 'fa-paw', 'brown'),
+    42981: FontAwesomeIcon('fa-solid', 'fa-paw', 'grey'),
+    53537: FontAwesomeIcon('fa-solid', 'fa-paw', 'brown'),
+    41770: FontAwesomeIcon('fa-solid', 'fa-paw', 'grey'),
+    526556: FontAwesomeIcon('fa-solid', 'fa-otter', 'brown'),
+    41871: FontAwesomeIcon('fa-solid', 'fa-otter', 'black'),
+    846287: FontAwesomeIcon('fa-solid', 'fa-otter', 'brown'),
+    # Fish
+    47178: FontAwesomeIcon('fa-solid', 'fa-fish', 'blue'),
+    47233: FontAwesomeIcon('fa-solid', 'fa-fish-fins', 'blue'),
+    47177: FontAwesomeIcon('fa-solid', 'fa-fish', 'blue'),
+    372843: FontAwesomeIcon('fa-solid', 'fa-otter', 'blue'),
+    152871: FontAwesomeIcon('fa-solid', 'fa-otter', 'blue'),
+    41479: FontAwesomeIcon('fa-solid', 'fa-otter', 'blue'),
+    47273: FontAwesomeIcon('fa-solid', 'fa-fish-fins', 'blue'),
+    # Molluscs
+    47115: FontAwesomeIcon('fa-solid', 'fa-worm', 'blue'),
+    47459: FontAwesomeIcon('fa-solid', 'fa-worm', 'blue'),
+    127352: FontAwesomeIcon('fa-solid', 'fa-worm', 'blue'),
+    # Arthropods
+    85493: FontAwesomeIcon('fa-solid', 'fa-shrimp', 'red'),
+    144114: FontAwesomeIcon('fa-solid', 'fa-shrimp', 'red'),
+    311310: FontAwesomeIcon('fa-solid', 'fa-shrimp', 'red'),
+    47119: FontAwesomeIcon('fa-solid', 'fa-spider', 'black'),
+    48894: FontAwesomeIcon('fa-solid', 'fa-spider', 'black'),
+    172373: FontAwesomeIcon('fa-solid', 'fa-spider', 'black'),
+    48900: FontAwesomeIcon('fa-solid', 'fa-spider', 'black'),
+    372739: FontAwesomeIcon('fa-solid', 'fa-worm', 'green'),
+    144128: FontAwesomeIcon('fa-solid', 'fa-worm', 'green'),
+    47822: FontAwesomeIcon('fa-solid', 'fa-mosquito', 'brown'),
+    153429: FontAwesomeIcon('fa-solid', 'fa-mosquito', 'brown'),
+    81769: FontAwesomeIcon('fa-solid', 'fa-mosquito', 'brown'),
+    47651: FontAwesomeIcon('fa-solid', 'fa-locust', 'green'),
+    47157: FontAwesomeIcon('fa-solid', 'fa-locust', 'teal'),
+    47201: FontAwesomeIcon('fa-solid', 'fa-mosquito', 'yellow'),
+    47336: FontAwesomeIcon('fa-solid', 'fa-mosquito', 'yellow'),
+    48511: FontAwesomeIcon('fa-solid', 'fa-bug', 'brown'),
+    47208: FontAwesomeIcon('fa-solid', 'fa-bug', 'brown'),
+    471714: FontAwesomeIcon('fa-solid', 'fa-bugs', 'brown'),
+    # Plants
+    47126: FontAwesomeIcon('fa-solid', 'fa-seedling', 'green'),
+    136329: FontAwesomeIcon('fa-solid', 'fa-tree', 'green'),
+    47903: FontAwesomeIcon('fa-solid', 'fa-sun-plant-wilt', 'brown'),
+    47162: FontAwesomeIcon('fa-solid', 'fa-wheat-awn', 'yellow'),
+    121943: FontAwesomeIcon('fa-solid', 'fa-pagelines', 'green'),
+    70233: FontAwesomeIcon('fa-solid', 'fa-seedling', 'green'),
+    48866: FontAwesomeIcon('fa-solid', 'fa-tree', 'green'),
+    544534: FontAwesomeIcon('fa-solid', 'fa-bowling-ball', 'brown'),
+    47605: FontAwesomeIcon('fa-solid', 'fa-fan', 'yellow'),
+    605446: FontAwesomeIcon('fa-solid', 'fa-fan', 'yellow'),
+    47690: FontAwesomeIcon('fa-solid', 'fa-fan', 'pink'),
+    48796: FontAwesomeIcon('fa-solid', 'fa-fan', 'pink'),
+    47329: FontAwesomeIcon('fa-solid', 'fa-fan', 'pink'),
+    47148: FontAwesomeIcon('fa-solid', 'fa-fan', 'red'),
+    47727: FontAwesomeIcon('fa-solid', 'fa-tree', 'red'),
+    53548: FontAwesomeIcon('fa-solid', 'fa-tree', 'green'),
+    47853: FontAwesomeIcon('fa-solid', 'fa-tree', 'green'),
+    151882: FontAwesomeIcon('fa-solid', 'fa-tree', 'green'),
+    50998: FontAwesomeIcon('fa-solid', 'fa-tree', 'green'),
+    47567: FontAwesomeIcon('fa-solid', 'fa-tree', 'green'),
+    71434: FontAwesomeIcon('fa-solid', 'fa-tree', 'green'),
+    47194: FontAwesomeIcon('fa-solid', 'fa-tree', 'green'),
+    48699: FontAwesomeIcon('fa-solid', 'fa-carrot', 'orange'),
+    47204: FontAwesomeIcon('fa-solid', 'fa-seedling', 'green'),
+    71291: FontAwesomeIcon('fa-solid', 'fa-wine-bottle', 'red'),
+    48620: FontAwesomeIcon('fa-solid', 'fa-bowling-ball', 'orange'),
+    62910: FontAwesomeIcon('fa-solid', 'fa-apple-whole', 'red'),
+    50623: FontAwesomeIcon('fa-solid', 'fa-apple-whole', 'red'),
+    723302: FontAwesomeIcon('fa-solid', 'fa-apple-whole', 'red'),
+    49570: FontAwesomeIcon('fa-solid', 'fa-apple-whole', 'yellow'),
+    48874: FontAwesomeIcon('fa-solid', 'fa-apple-whole', 'green'),
+    47351: FontAwesomeIcon('fa-solid', 'fa-apple-whole', 'red'),
+    47733: FontAwesomeIcon('fa-solid', 'fa-apple-whole', 'green'),
+    55849: FontAwesomeIcon('fa-solid', 'fa-pepper-hot', 'grey'),
+    48516: FontAwesomeIcon('fa-solid', 'fa-apple-whole', 'red'),
+    48517: FontAwesomeIcon('fa-solid', 'fa-pepper-hot', 'red'),
+    62848: FontAwesomeIcon('fa-solid', 'fa-apple-whole', 'red'),
+    635417: FontAwesomeIcon('fa-solid', 'fa-wheat-awn', 'yellow'),
+    55150: FontAwesomeIcon('fa-solid', 'fa-apple-whole', 'green'),
+    50299: FontAwesomeIcon('fa-solid', 'fa-apple-whole', 'red'),
+    634914: FontAwesomeIcon('fa-solid', 'fa-apple-whole', 'blue'),
+    # Other
+    1: FontAwesomeIcon('fa-solid', 'fa-paw', 'black'),
+    47491: FontAwesomeIcon('fa-solid', 'fa-worm', 'pink'),
+    47170: FontAwesomeIcon('fa-solid', 'fa-bacteria', 'brown'),  # mushroom
+    48222: FontAwesomeIcon('fa-solid', 'fa-bowling-ball', 'green'),
+    67333: FontAwesomeIcon('fa-solid', 'fa-bacterium', 'green'),
+    131236: FontAwesomeIcon('fa-solid', 'fa-virus', 'red'),
+}
 
 
 def download_taxon_document():
@@ -18,7 +193,6 @@ def download_taxon_document():
 @Cache(use_approximated_hash=True)
 def load_dataframe():
     """Load the taxonomy document from the Open Tree of Life project"""
-    import polars as pl
 
     ottl_lazy = (
         pl.scan_csv(
@@ -138,8 +312,8 @@ def enrich_ranks(df: pd.DataFrame):
     for rank in ranks:
         df[rank] = 0.0
 
-    for index, row in tqdm(
-        df.iterrows(), total=df.shape[0], desc=f"Propagating ranks", leave=False
+    for _index, row in tqdm(
+        df.iterrows(), total=df.shape[0], desc="Propagating ranks", leave=False
     ):
         get_rank(df, row, ranks)
     return df
@@ -153,7 +327,7 @@ def populate_font_awesome_icons(df: pd.DataFrame):
     colors = pd.read_csv("./db_data/colors.csv").set_index("name")
     icons = pd.read_csv("./db_data/font_awesome_icons.csv").set_index("name")
 
-    column_name = "font_awesome_icon_id"
+    column_name = "icon_id"
     color_column_name = "color_id"
 
     df[column_name] = df.shape[0]
@@ -296,7 +470,7 @@ def retrieve_taxons():
         "parent_id",
         "color_id",
         "ott_rank_id",
-        "font_awesome_icon_id",
+        "icon_id",
         "kingdom",
         "phylum",
         "class",

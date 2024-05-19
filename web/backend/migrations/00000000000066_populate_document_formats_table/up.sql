@@ -11,7 +11,7 @@ FROM
     '/app/document_formats.csv' DELIMITER ',' CSV HEADER;
 
 INSERT INTO
-    document_formats(extension, mime_type, description, font_awesome_icon_id, color_id)
+    document_formats(extension, mime_type, description, icon_id, color_id)
 SELECT
     tmp_document_formats.extension,
     tmp_document_formats.mime_type,

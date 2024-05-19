@@ -5609,9 +5609,9 @@ def handle_missing_row_to_searchable_badge_implementation(
 
             if struct.get_attribute_by_name("font_awesome_icon") is not None:
                 if struct.get_attribute_by_name("color") is not None:
-                    font_awesome_icon = '<i class={format!("{} {}", self.font_awesome_icon.name, self.color.name)}></i>'
+                    font_awesome_icon = '<i class={format!("{} {}", self.icon.name, self.color.name)}></i>'
                 else:
-                    font_awesome_icon = '<i class={format!("{} grey", self.font_awesome_icon.name)}></i>'
+                    font_awesome_icon = '<i class={format!("{} grey", self.icon.name)}></i>'
             else:
                 font_awesome_icon = '<i class="fas fa-question grey"></i>'
 

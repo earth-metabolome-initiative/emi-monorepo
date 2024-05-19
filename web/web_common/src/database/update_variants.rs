@@ -13,6 +13,8 @@ pub struct UpdateProject {
     pub description: String,
     pub public: bool,
     pub state_id: i32,
+    pub icon_id: i32,
+    pub color_id: i32,
     pub parent_project_id: Option<i32>,
     pub budget: Option<f64>,
     pub expenses: Option<f64>,
@@ -30,6 +32,8 @@ impl UpdateProject {
             gluesql::core::ast_builder::text(self.description),
             (self.public.into()),
             gluesql::core::ast_builder::num(self.state_id),
+            gluesql::core::ast_builder::num(self.icon_id),
+            gluesql::core::ast_builder::num(self.color_id),
             match self.parent_project_id {
                 Some(parent_project_id) => gluesql::core::ast_builder::num(parent_project_id),
                 None => gluesql::core::ast_builder::null(),
@@ -76,6 +80,8 @@ impl UpdateProject {
 .set("description", gluesql::core::ast_builder::text(self.description))        
 .set("public", self.public)        
 .set("state_id", gluesql::core::ast_builder::num(self.state_id))        
+.set("icon_id", gluesql::core::ast_builder::num(self.icon_id))        
+.set("color_id", gluesql::core::ast_builder::num(self.color_id))        
 .set("updated_by", gluesql::core::ast_builder::num(user_id));
         if let Some(parent_project_id) = self.parent_project_id {
             update_row = update_row.set("parent_project_id", gluesql::core::ast_builder::num(parent_project_id));
@@ -106,6 +112,8 @@ pub struct UpdateTeam {
     pub id: i32,
     pub name: String,
     pub description: String,
+    pub icon_id: i32,
+    pub color_id: i32,
     pub parent_team_id: Option<i32>,
 }
 
@@ -117,6 +125,8 @@ impl UpdateTeam {
             gluesql::core::ast_builder::num(self.id),
             gluesql::core::ast_builder::text(self.name),
             gluesql::core::ast_builder::text(self.description),
+            gluesql::core::ast_builder::num(self.icon_id),
+            gluesql::core::ast_builder::num(self.color_id),
             match self.parent_team_id {
                 Some(parent_team_id) => gluesql::core::ast_builder::num(parent_team_id),
                 None => gluesql::core::ast_builder::null(),
@@ -145,6 +155,8 @@ impl UpdateTeam {
 .set("id", gluesql::core::ast_builder::num(self.id))        
 .set("name", gluesql::core::ast_builder::text(self.name))        
 .set("description", gluesql::core::ast_builder::text(self.description))        
+.set("icon_id", gluesql::core::ast_builder::num(self.icon_id))        
+.set("color_id", gluesql::core::ast_builder::num(self.color_id))        
 .set("updated_by", gluesql::core::ast_builder::num(user_id));
         if let Some(parent_team_id) = self.parent_team_id {
             update_row = update_row.set("parent_team_id", gluesql::core::ast_builder::num(parent_team_id));

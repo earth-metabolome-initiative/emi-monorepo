@@ -1,42 +1,42 @@
-name,font_awesome_icon
-no rank,question-circle
-species,leaf
-no rank - terminal,question-circle
-genus,leaf
-subspecies,leaf
-species group,leaf
-species subgroup,leaf
-family,people-roof
-subfamily,people-roof
-tribe,people-group
-class,leaf
-order,leaf
-phylum,leaf
-subgenus,leaf
-forma,leaf
-varietas,leaf
-superfamily,people-roof
-subtribe,people-group
-subsection,leaf
-infraclass,leaf
-suborder,leaf
-subclass,leaf
-superorder,leaf
-infraorder,leaf
-subphylum,leaf
-superclass,leaf
-parvorder,leaf
-subcohort,people-group
-section,leaf
-infrakingdom,crown
-variety,leaf
-subkingdom,crown
-domain,chess-king
-kingdom,crown
-infraphylum,leaf
-supertribe,people-group
-infraspecificname,leaf
-subterclass,leaf
-subdivision,leaf
-cohort,people-group
-superphylum,leaf
+name,font_awesome_icon,color,description
+no rank,question-circle,grey,"A taxonomic level without a specified rank, used when the exact rank is not determined."
+species,leaf,green,"The basic unit of classification, representing a group of individuals that can interbreed."
+no rank - terminal,question-circle,light_grey,"The lowest level in a hierarchical classification with no further subdivisions."
+genus,tree,purple,"A rank above species, grouping together species that are closely related."
+subspecies,dna,pink,"A taxonomic rank below species, representing populations with distinct characteristics."
+species group,layer-group,blue,"A grouping of related species within a genus."
+species subgroup,layer-group,teal,"A subgroup within a species group, indicating closer relationships."
+family,users,brown,"A higher taxonomic rank grouping together related genera."
+subfamily,users-gear,orange,"A rank below family, grouping related genera within a family."
+tribe,network-wired,yellow,"A rank between family and genus, used in some classifications."
+class,building-columns,red,"A rank below phylum, grouping related orders."
+order,list-ol,black,"A rank below class, grouping related families."
+phylum,diagram-project,near_black,"A rank below kingdom, grouping related classes."
+subgenus,tree,pink,"A taxonomic rank below genus, grouping species within a genus."
+forma,flask,blue,"A rank below species, representing minor morphological differences."
+varietas,seedling,green,"A rank below species, indicating a botanical variety."
+superfamily,layer-group,orange,"A rank above family, grouping related families."
+subtribe,network-wired,yellow,"A rank below tribe, grouping related genera within a tribe."
+subsection,section,purple,"A rank below section, grouping related species within a section."
+infraclass,building-columns,pink,"A rank below class, grouping related orders within a class."
+suborder,arrow-down-short-wide,teal,"A rank below order, grouping related families within an order."
+subclass,building-columns,blue,"A rank below class, grouping related orders within a class."
+superorder,layer-group,brown,"A rank above order, grouping related orders."
+infraorder,arrow-up-short-wide,green,"A rank below order, grouping related families within an order."
+subphylum,diagram-project,red,"A rank below phylum, grouping related classes within a phylum."
+superclass,building-columns,yellow,"A rank above class, grouping related classes."
+parvorder,arrow-up-short-wide,purple,"A rank below infraorder, grouping related families within an infraorder."
+subcohort,users-line,pink,"A rank below cohort, grouping related orders within a cohort."
+section,section,purple,"A rank below genus, grouping related species."
+infrakingdom,crown,purple,"A rank below kingdom, grouping related phyla within a kingdom."
+variety,seedling,green,"A rank below species, indicating a botanical variety."
+subkingdom,crown,orange,"A rank below kingdom, grouping related phyla."
+domain,globe,red,"The highest taxonomic rank, grouping related kingdoms."
+kingdom,crown,blue,"A high taxonomic rank grouping related phyla."
+infraphylum,diagram-project,green,"A rank below subphylum, grouping related classes within a subphylum."
+supertribe,network-wired,yellow,"A rank above tribe, grouping related tribes."
+infraspecificname,dna,purple,"A name for a taxonomic rank below species, such as subspecies or variety."
+subterclass,building-columns,pink,"A rank below subclass, grouping related orders."
+subdivision,table-list,light_grey,"A rank below division, used primarily in botany."
+cohort,users,brown,"A rank below class, grouping related orders."
+superphylum,diagram-project,red,"A rank above phylum, grouping related phyla."

@@ -8,10 +8,10 @@ impl RowToSearchableBadge for NestedTeam {
         html! {
             <div>
                 <p>
-                <i class="fas fa-question grey"></i>
+                    <i class={format!("fas fa-{} {}", self.icon.name, self.color.name)}></i>
                     <span>{self.inner.name.format_match(query)}</span>
-                    <span>{self.inner.description.format_match(query)}</span>
                 </p>
+                <p>{self.inner.description.format_match(query)}</p>
             </div>
         }
     }
@@ -20,7 +20,7 @@ impl RowToSearchableBadge for NestedTeam {
         html! {
             <div>
                 <p>
-                <i class="fas fa-question grey"></i>
+                    <i class={format!("fas fa-{} {}", self.icon.name, self.color.name)}></i>
                     <span>{self.inner.name.clone()}</span>
                 </p>
             </div>
@@ -30,9 +30,9 @@ impl RowToSearchableBadge for NestedTeam {
         self.inner.name.similarity_score(query) + self.inner.description.similarity_score(query)
     }
 fn primary_color_class(&self) -> &str {
-        "grey"
+        &self.color.name
     }
 fn description(&self) -> &str {
-        ""
+        &self.inner.description
     }
 }

@@ -5,7 +5,13 @@ CREATE TABLE IF NOT EXISTS projects (
     description TEXT NOT NULL,
     public BOOLEAN NOT NULL DEFAULT TRUE,
     state_id INTEGER NOT NULL REFERENCES project_states(id),
-    parent_project_id INTEGER REFERENCES projects(id) ON
+    icon_id INTEGER NOT NULL UNIQUE REFERENCES font_awesome_icons(id) ON
+    DELETE
+        CASCADE,
+        color_id INTEGER NOT NULL UNIQUE REFERENCES colors(id) ON
+    DELETE
+        CASCADE,
+        parent_project_id INTEGER REFERENCES projects(id) ON
     DELETE
         CASCADE,
         budget FLOAT DEFAULT NULL,

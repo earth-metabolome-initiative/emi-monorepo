@@ -6,3 +6,4 @@ pub mod custom_validators;
 pub mod database;
 pub mod file_formats;
 pub mod macros;
+pub mod traits;

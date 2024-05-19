@@ -19,28 +19,32 @@ use crate::workers::ws_worker::ComponentMessage;
 use web_common::custom_validators::Image;
 use web_common::file_formats::GenericFileFormat;
 
-#[derive(Store, Debug, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct ProjectBuilder {
     pub id: Option<i32>,
     pub name: Option<String>,
     pub description: Option<String>,
     pub public: Option<bool>,
-    pub state_id: Option<i32>,
-    pub parent_project_id: Option<i32>,
     pub budget: Option<f64>,
     pub expenses: Option<f64>,
     pub expected_end_date: Option<NaiveDateTime>,
     pub end_date: Option<NaiveDateTime>,
+    pub parent_project: Option<NestedProject>,
+    pub state: Option<NestedProjectState>,
+    pub icon: Option<FontAwesomeIcon>,
+    pub color: Option<Color>,
     pub errors_name: Vec<ApiError>,
     pub errors_description: Vec<ApiError>,
     pub errors_public: Vec<ApiError>,
-    pub errors_state_id: Vec<ApiError>,
-    pub errors_parent_project_id: Vec<ApiError>,
     pub errors_budget: Vec<ApiError>,
     pub errors_expenses: Vec<ApiError>,
     pub errors_expected_end_date: Vec<ApiError>,
     pub errors_end_date: Vec<ApiError>,
+    pub errors_parent_project: Vec<ApiError>,
+    pub errors_state: Vec<ApiError>,
+    pub errors_icon: Vec<ApiError>,
+    pub errors_color: Vec<ApiError>,
     pub form_updated_at: NaiveDateTime,
 }
 
@@ -51,42 +55,51 @@ impl Default for ProjectBuilder {
             name: None,
             description: None,
             public: Some(true),
-            state_id: None,
-            parent_project_id: None,
             budget: None,
             expenses: None,
             expected_end_date: None,
             end_date: None,
+            parent_project: None,
+            state: None,
+            icon: None,
+            color: None,
             errors_name: Vec::new(),
             errors_description: Vec::new(),
             errors_public: Vec::new(),
-            errors_state_id: Vec::new(),
-            errors_parent_project_id: Vec::new(),
             errors_budget: Vec::new(),
             errors_expenses: Vec::new(),
             errors_expected_end_date: Vec::new(),
             errors_end_date: Vec::new(),
+            errors_parent_project: Vec::new(),
+            errors_state: Vec::new(),
+            errors_icon: Vec::new(),
+            errors_color: Vec::new(),
             form_updated_at: <NaiveDateTime>::default(),
         }
     }
 }
 
-#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum ProjectActions {
     SetName(Option<String>),
     SetDescription(Option<String>),
     SetPublic(Option<bool>),
-    SetStateId(Option<String>),
-    SetParentProjectId(Option<String>),
     SetBudget(Option<String>),
     SetExpenses(Option<String>),
     SetExpectedEndDate(Option<String>),
     SetEndDate(Option<String>),
+    SetParentProject(Option<NestedProject>),
+    SetState(Option<NestedProjectState>),
+    SetIcon(Option<FontAwesomeIcon>),
+    SetColor(Option<Color>),
 }
 
 impl FromOperation for ProjectActions {
-    fn from_operation<S: AsRef<str>>(_operation: S, _row: Vec<u8>) -> Self {
-        unreachable!("No operations are expected to be needed for the builder ProjectBuilder.")
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "parent_project" => ProjectActions::SetParentProject(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
     }
 }
 
@@ -153,71 +166,6 @@ impl Reducer<ProjectBuilder> for ProjectActions {
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'public;
-            }
-            ProjectActions::SetStateId(state_id) => 'state_id: {
-                state_mut.errors_state_id.clear();
-        if state_id.is_none() {
-            state_mut.errors_state_id.push(ApiError::BadRequest(vec![
-                "The State id field is required.".to_string()
-             ]));
-            state_mut.state_id = None;
-             break 'state_id;
-        }
-                state_mut.form_updated_at = chrono::Utc::now().naive_utc();
-                match state_id {
-                    Some(value) => match value.parse::<i128>() {
-                        Ok(value) => {
-                            if value < i32::MIN as i128 || value > i32::MAX as i128 {
-                                state_mut.errors_state_id.push(ApiError::BadRequest(vec![
-                                    format!(                                            "The state_id field must be between {} and {}.",
-                                            i32::MIN,
-                                            i32::MAX
-                                    )
-                                ]));
-                            } else {
-                                state_mut.state_id = Some(value as i32);
-                            }
-                        }
-                        Err(_) => {
-                            state_mut.errors_state_id.push(ApiError::BadRequest(vec![
-                                "The state_id field must be a valid i32.".to_string()
-                            ]));
-                        }
-                    },
-                    None => state_mut.state_id = None,
-                }
-                // To avoid having a codesmell relative to the cases where we are not
-                // yet handling more corner cases, we always use the break here.
-                break 'state_id;
-            }
-            ProjectActions::SetParentProjectId(parent_project_id) => 'parent_project_id: {
-                state_mut.errors_parent_project_id.clear();
-                state_mut.form_updated_at = chrono::Utc::now().naive_utc();
-                match parent_project_id {
-                    Some(value) => match value.parse::<i128>() {
-                        Ok(value) => {
-                            if value < i32::MIN as i128 || value > i32::MAX as i128 {
-                                state_mut.errors_parent_project_id.push(ApiError::BadRequest(vec![
-                                    format!(                                            "The parent_project_id field must be between {} and {}.",
-                                            i32::MIN,
-                                            i32::MAX
-                                    )
-                                ]));
-                            } else {
-                                state_mut.parent_project_id = Some(value as i32);
-                            }
-                        }
-                        Err(_) => {
-                            state_mut.errors_parent_project_id.push(ApiError::BadRequest(vec![
-                                "The parent_project_id field must be a valid i32.".to_string()
-                            ]));
-                        }
-                    },
-                    None => state_mut.parent_project_id = None,
-                }
-                // To avoid having a codesmell relative to the cases where we are not
-                // yet handling more corner cases, we always use the break here.
-                break 'parent_project_id;
             }
             ProjectActions::SetBudget(budget) => 'budget: {
                 state_mut.errors_budget.clear();
@@ -315,6 +263,67 @@ impl Reducer<ProjectBuilder> for ProjectActions {
                 // yet handling more corner cases, we always use the break here.
                 break 'end_date;
             }
+            ProjectActions::SetParentProject(parent_project) => 'parent_project: {
+                state_mut.errors_parent_project.clear();
+                match parent_project.as_ref() {
+                    Some(parent_project) => {
+                            if state_mut.id.map_or(false, |id| id == parent_project.inner.id)
+                        {
+                            state_mut.errors_parent_project.push(ApiError::BadRequest(vec![
+                                "The Parent project field must be distinct from the current value.".to_string()
+                             ]));
+                            break 'parent_project;
+                        }
+                    }
+                    None => (),
+                }
+                state_mut.parent_project = parent_project;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'parent_project;
+            }
+            ProjectActions::SetState(state) => 'state: {
+                state_mut.errors_state.clear();
+        if state.is_none() {
+            state_mut.errors_state.push(ApiError::BadRequest(vec![
+                "The State field is required.".to_string()
+             ]));
+            state_mut.state = None;
+             break 'state;
+        }
+                state_mut.state = state;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'state;
+            }
+            ProjectActions::SetIcon(icon) => 'icon: {
+                state_mut.errors_icon.clear();
+        if icon.is_none() {
+            state_mut.errors_icon.push(ApiError::BadRequest(vec![
+                "The Icon field is required.".to_string()
+             ]));
+            state_mut.icon = None;
+             break 'icon;
+        }
+                state_mut.icon = icon;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'icon;
+            }
+            ProjectActions::SetColor(color) => 'color: {
+                state_mut.errors_color.clear();
+        if color.is_none() {
+            state_mut.errors_color.push(ApiError::BadRequest(vec![
+                "The Color field is required.".to_string()
+             ]));
+            state_mut.color = None;
+             break 'color;
+        }
+                state_mut.color = color;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'color;
+            }
         }
         state
     }
@@ -322,10 +331,10 @@ impl Reducer<ProjectBuilder> for ProjectActions {
 impl FormBuilder for ProjectBuilder {
     type Actions = ProjectActions;
 
-    type RichVariant = Project;
+    type RichVariant = NestedProject;
 
     fn has_errors(&self) -> bool {
-!self.errors_name.is_empty() || !self.errors_description.is_empty() || !self.errors_public.is_empty() || !self.errors_state_id.is_empty() || !self.errors_parent_project_id.is_empty() || !self.errors_budget.is_empty() || !self.errors_expenses.is_empty() || !self.errors_expected_end_date.is_empty() || !self.errors_end_date.is_empty()
+!self.errors_name.is_empty() || !self.errors_description.is_empty() || !self.errors_public.is_empty() || !self.errors_budget.is_empty() || !self.errors_expenses.is_empty() || !self.errors_expected_end_date.is_empty() || !self.errors_end_date.is_empty() || !self.errors_parent_project.is_empty() || !self.errors_state.is_empty() || !self.errors_icon.is_empty() || !self.errors_color.is_empty()
     }
 
     fn id(&self) -> Option<PrimaryKey> {
@@ -333,16 +342,22 @@ impl FormBuilder for ProjectBuilder {
     }
 
     fn update(dispatcher: &Dispatch<Self>, rich_variant: Self::RichVariant) -> Vec<ComponentMessage> {
-        dispatcher.apply(ProjectActions::SetName(Some(rich_variant.name)));
-        dispatcher.apply(ProjectActions::SetDescription(Some(rich_variant.description)));
-        dispatcher.apply(ProjectActions::SetPublic(Some(rich_variant.public)));
-        dispatcher.apply(ProjectActions::SetStateId(Some(rich_variant.state_id)));
-        dispatcher.apply(ProjectActions::SetParentProjectId(rich_variant.parent_project_id));
-        dispatcher.apply(ProjectActions::SetBudget(rich_variant.budget));
-        dispatcher.apply(ProjectActions::SetExpenses(rich_variant.expenses));
-        dispatcher.apply(ProjectActions::SetExpectedEndDate(rich_variant.expected_end_date));
-        dispatcher.apply(ProjectActions::SetEndDate(rich_variant.end_date));
-        vec![]
+    dispatcher.apply(ProjectActions::SetName(Some(rich_variant.inner.name.to_string())));
+    dispatcher.apply(ProjectActions::SetDescription(Some(rich_variant.inner.description.to_string())));
+        dispatcher.apply(ProjectActions::SetPublic(Some(rich_variant.inner.public)));    dispatcher.apply(ProjectActions::SetBudget(rich_variant.inner.budget.map(|budget| budget.to_string())));
+    dispatcher.apply(ProjectActions::SetExpenses(rich_variant.inner.expenses.map(|expenses| expenses.to_string())));
+    dispatcher.apply(ProjectActions::SetExpectedEndDate(rich_variant.inner.expected_end_date.map(|expected_end_date| expected_end_date.to_string())));
+    dispatcher.apply(ProjectActions::SetEndDate(rich_variant.inner.end_date.map(|end_date| end_date.to_string())));
+        dispatcher.apply(ProjectActions::SetState(Some(rich_variant.state)));
+        dispatcher.apply(ProjectActions::SetIcon(Some(rich_variant.icon)));
+        dispatcher.apply(ProjectActions::SetColor(Some(rich_variant.color)));
+        let mut named_requests = Vec::new();
+        if let Some(parent_project_id) = rich_variant.inner.parent_project_id {
+    named_requests.push(ComponentMessage::get_named::<&str, NewProject>("parent_project", parent_project_id.into()));
+ } else {
+    dispatcher.apply(ProjectActions::SetParentProject(None));
+ }
+        named_requests
     }
 
     fn can_submit(&self) -> bool {
@@ -350,7 +365,9 @@ impl FormBuilder for ProjectBuilder {
         && self.name.is_some()
         && self.description.is_some()
         && self.public.is_some()
-        && self.state_id.is_some()
+        && self.state.is_some()
+        && self.icon.is_some()
+        && self.color.is_some()
     }
 
 }
@@ -361,8 +378,10 @@ impl From<ProjectBuilder> for NewProject {
             name: builder.name.unwrap(),
             description: builder.description.unwrap(),
             public: builder.public.unwrap(),
-            state_id: builder.state_id.unwrap(),
-            parent_project_id: builder.parent_project_id,
+            state_id: builder.state.unwrap().inner.id,
+            icon_id: builder.icon.unwrap().id,
+            color_id: builder.color.unwrap().id,
+            parent_project_id: builder.parent_project.map(|parent_project| parent_project.inner.id),
             budget: builder.budget,
             expenses: builder.expenses,
             expected_end_date: builder.expected_end_date,
@@ -377,8 +396,10 @@ impl From<ProjectBuilder> for UpdateProject {
             name: builder.name.unwrap(),
             description: builder.description.unwrap(),
             public: builder.public.unwrap(),
-            state_id: builder.state_id.unwrap(),
-            parent_project_id: builder.parent_project_id,
+            state_id: builder.state.unwrap().inner.id,
+            icon_id: builder.icon.unwrap().id,
+            color_id: builder.color.unwrap().id,
+            parent_project_id: builder.parent_project.map(|parent_project| parent_project.inner.id),
             budget: builder.budget,
             expenses: builder.expenses,
             expected_end_date: builder.expected_end_date,
@@ -386,7 +407,7 @@ impl From<ProjectBuilder> for UpdateProject {
         }
     }
 }
-impl Tabular for Project {
+impl Tabular for NestedProject {
     const TABLE: Table = Table::Projects;
 }
 
@@ -437,23 +458,27 @@ pub fn create_project_form() -> Html {
     let set_name = builder_dispatch.apply_callback(|name: Option<String>| ProjectActions::SetName(name));
     let set_description = builder_dispatch.apply_callback(|description: Option<String>| ProjectActions::SetDescription(description));
     let set_public = builder_dispatch.apply_callback(|public: bool| ProjectActions::SetPublic(Some(public)));
-    let set_state_id = builder_dispatch.apply_callback(|state_id: Option<String>| ProjectActions::SetStateId(state_id));
-    let set_parent_project_id = builder_dispatch.apply_callback(|parent_project_id: Option<String>| ProjectActions::SetParentProjectId(parent_project_id));
     let set_budget = builder_dispatch.apply_callback(|budget: Option<String>| ProjectActions::SetBudget(budget));
     let set_expenses = builder_dispatch.apply_callback(|expenses: Option<String>| ProjectActions::SetExpenses(expenses));
     let set_expected_end_date = builder_dispatch.apply_callback(|expected_end_date: Option<String>| ProjectActions::SetExpectedEndDate(expected_end_date));
     let set_end_date = builder_dispatch.apply_callback(|end_date: Option<String>| ProjectActions::SetEndDate(end_date));
+    let set_parent_project = builder_dispatch.apply_callback(|parent_project: Option<NestedProject>| ProjectActions::SetParentProject(parent_project));
+    let set_state = builder_dispatch.apply_callback(|state: Option<NestedProjectState>| ProjectActions::SetState(state));
+    let set_icon = builder_dispatch.apply_callback(|icon: Option<FontAwesomeIcon>| ProjectActions::SetIcon(icon));
+    let set_color = builder_dispatch.apply_callback(|color: Option<Color>| ProjectActions::SetColor(color));
     html! {
         <BasicForm<NewProject> method={FormMethod::POST} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Name" optional={false} errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
             <BasicInput<String> label="Description" optional={false} errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
             <Checkbox label="Public" errors={builder_store.errors_public.clone()} builder={set_public} value={builder_store.public.unwrap_or(false)} />
-            <BasicInput<i32> label="State id" optional={false} errors={builder_store.errors_state_id.clone()} builder={set_state_id} value={builder_store.state_id.clone()} />
-            <BasicInput<i32> label="Parent project id" optional={true} errors={builder_store.errors_parent_project_id.clone()} builder={set_parent_project_id} value={builder_store.parent_project_id.clone()} />
             <BasicInput<f64> label="Budget" optional={true} errors={builder_store.errors_budget.clone()} builder={set_budget} value={builder_store.budget.clone()} />
             <BasicInput<f64> label="Expenses" optional={true} errors={builder_store.errors_expenses.clone()} builder={set_expenses} value={builder_store.expenses.clone()} />
             <BasicInput<NaiveDateTime> label="Expected end date" optional={true} errors={builder_store.errors_expected_end_date.clone()} builder={set_expected_end_date} value={builder_store.expected_end_date.clone()} />
             <BasicInput<NaiveDateTime> label="End date" optional={true} errors={builder_store.errors_end_date.clone()} builder={set_end_date} value={builder_store.end_date.clone()} />
+            <Datalist<NestedProject, true> builder={set_parent_project} optional={true} errors={builder_store.errors_parent_project.clone()} value={builder_store.parent_project.clone()} label="Parent project" />
+            <Datalist<NestedProjectState, false> builder={set_state} optional={false} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" />
+            <Datalist<FontAwesomeIcon, false> builder={set_icon} optional={false} errors={builder_store.errors_icon.clone()} value={builder_store.icon.clone()} label="Icon" />
+            <Datalist<Color, false> builder={set_color} optional={false} errors={builder_store.errors_color.clone()} value={builder_store.color.clone()} label="Color" />
         </BasicForm<NewProject>>
     }
 }
@@ -472,27 +497,31 @@ pub fn update_project_form(props: &UpdateProjectFormProp) -> Html {
     let set_name = builder_dispatch.apply_callback(|name: Option<String>| ProjectActions::SetName(name));
     let set_description = builder_dispatch.apply_callback(|description: Option<String>| ProjectActions::SetDescription(description));
     let set_public = builder_dispatch.apply_callback(|public: bool| ProjectActions::SetPublic(Some(public)));
-    let set_state_id = builder_dispatch.apply_callback(|state_id: Option<String>| ProjectActions::SetStateId(state_id));
-    let set_parent_project_id = builder_dispatch.apply_callback(|parent_project_id: Option<String>| ProjectActions::SetParentProjectId(parent_project_id));
     let set_budget = builder_dispatch.apply_callback(|budget: Option<String>| ProjectActions::SetBudget(budget));
     let set_expenses = builder_dispatch.apply_callback(|expenses: Option<String>| ProjectActions::SetExpenses(expenses));
     let set_expected_end_date = builder_dispatch.apply_callback(|expected_end_date: Option<String>| ProjectActions::SetExpectedEndDate(expected_end_date));
     let set_end_date = builder_dispatch.apply_callback(|end_date: Option<String>| ProjectActions::SetEndDate(end_date));
+    let set_parent_project = builder_dispatch.apply_callback(|parent_project: Option<NestedProject>| ProjectActions::SetParentProject(parent_project));
+    let set_state = builder_dispatch.apply_callback(|state: Option<NestedProjectState>| ProjectActions::SetState(state));
+    let set_icon = builder_dispatch.apply_callback(|icon: Option<FontAwesomeIcon>| ProjectActions::SetIcon(icon));
+    let set_color = builder_dispatch.apply_callback(|color: Option<Color>| ProjectActions::SetColor(color));
     html! {
         <BasicForm<UpdateProject> method={FormMethod::PUT} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Name" optional={false} errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
             <BasicInput<String> label="Description" optional={false} errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
             <Checkbox label="Public" errors={builder_store.errors_public.clone()} builder={set_public} value={builder_store.public.unwrap_or(false)} />
-            <BasicInput<i32> label="State id" optional={false} errors={builder_store.errors_state_id.clone()} builder={set_state_id} value={builder_store.state_id.clone()} />
-            <BasicInput<i32> label="Parent project id" optional={true} errors={builder_store.errors_parent_project_id.clone()} builder={set_parent_project_id} value={builder_store.parent_project_id.clone()} />
             <BasicInput<f64> label="Budget" optional={true} errors={builder_store.errors_budget.clone()} builder={set_budget} value={builder_store.budget.clone()} />
             <BasicInput<f64> label="Expenses" optional={true} errors={builder_store.errors_expenses.clone()} builder={set_expenses} value={builder_store.expenses.clone()} />
             <BasicInput<NaiveDateTime> label="Expected end date" optional={true} errors={builder_store.errors_expected_end_date.clone()} builder={set_expected_end_date} value={builder_store.expected_end_date.clone()} />
             <BasicInput<NaiveDateTime> label="End date" optional={true} errors={builder_store.errors_end_date.clone()} builder={set_end_date} value={builder_store.end_date.clone()} />
+            <Datalist<NestedProject, true> builder={set_parent_project} optional={true} errors={builder_store.errors_parent_project.clone()} value={builder_store.parent_project.clone()} label="Parent project" />
+            <Datalist<NestedProjectState, false> builder={set_state} optional={false} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" />
+            <Datalist<FontAwesomeIcon, false> builder={set_icon} optional={false} errors={builder_store.errors_icon.clone()} value={builder_store.icon.clone()} label="Icon" />
+            <Datalist<Color, false> builder={set_color} optional={false} errors={builder_store.errors_color.clone()} value={builder_store.color.clone()} label="Color" />
         </BasicForm<UpdateProject>>
     }
 }
-#[derive(Store, Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct SampledIndividualBuilder {
     pub id: Option<Uuid>,
@@ -512,7 +541,7 @@ impl Default for SampledIndividualBuilder {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum SampledIndividualActions {
     SetTagged(Option<bool>),
 }
@@ -548,7 +577,7 @@ impl Reducer<SampledIndividualBuilder> for SampledIndividualActions {
 impl FormBuilder for SampledIndividualBuilder {
     type Actions = SampledIndividualActions;
 
-    type RichVariant = SampledIndividual;
+    type RichVariant = NestedSampledIndividual;
 
     fn has_errors(&self) -> bool {
 !self.errors_tagged.is_empty()
@@ -559,8 +588,7 @@ impl FormBuilder for SampledIndividualBuilder {
     }
 
     fn update(dispatcher: &Dispatch<Self>, rich_variant: Self::RichVariant) -> Vec<ComponentMessage> {
-        dispatcher.apply(SampledIndividualActions::SetTagged(Some(rich_variant.tagged)));
-        vec![]
+        dispatcher.apply(SampledIndividualActions::SetTagged(Some(rich_variant.inner.tagged)));        vec![]
     }
 
     fn can_submit(&self) -> bool {
@@ -578,7 +606,7 @@ impl From<SampledIndividualBuilder> for NewSampledIndividual {
         }
     }
 }
-impl Tabular for SampledIndividual {
+impl Tabular for NestedSampledIndividual {
     const TABLE: Table = Table::SampledIndividuals;
 }
 
@@ -804,9 +832,13 @@ pub struct TeamBuilder {
     pub id: Option<i32>,
     pub name: Option<String>,
     pub description: Option<String>,
+    pub icon: Option<FontAwesomeIcon>,
+    pub color: Option<Color>,
     pub parent_team: Option<NestedTeam>,
     pub errors_name: Vec<ApiError>,
     pub errors_description: Vec<ApiError>,
+    pub errors_icon: Vec<ApiError>,
+    pub errors_color: Vec<ApiError>,
     pub errors_parent_team: Vec<ApiError>,
     pub form_updated_at: NaiveDateTime,
 }
@@ -817,9 +849,13 @@ impl Default for TeamBuilder {
             id: None,
             name: None,
             description: None,
+            icon: None,
+            color: None,
             parent_team: None,
             errors_name: Vec::new(),
             errors_description: Vec::new(),
+            errors_icon: Vec::new(),
+            errors_color: Vec::new(),
             errors_parent_team: Vec::new(),
             form_updated_at: <NaiveDateTime>::default(),
         }
@@ -830,6 +866,8 @@ impl Default for TeamBuilder {
 pub(super) enum TeamActions {
     SetName(Option<String>),
     SetDescription(Option<String>),
+    SetIcon(Option<FontAwesomeIcon>),
+    SetColor(Option<Color>),
     SetParentTeam(Option<NestedTeam>),
 }
 
@@ -892,6 +930,34 @@ impl Reducer<TeamBuilder> for TeamActions {
                 // yet handling more corner cases, we always use the break here.
                 break 'description;
             }
+            TeamActions::SetIcon(icon) => 'icon: {
+                state_mut.errors_icon.clear();
+        if icon.is_none() {
+            state_mut.errors_icon.push(ApiError::BadRequest(vec![
+                "The Icon field is required.".to_string()
+             ]));
+            state_mut.icon = None;
+             break 'icon;
+        }
+                state_mut.icon = icon;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'icon;
+            }
+            TeamActions::SetColor(color) => 'color: {
+                state_mut.errors_color.clear();
+        if color.is_none() {
+            state_mut.errors_color.push(ApiError::BadRequest(vec![
+                "The Color field is required.".to_string()
+             ]));
+            state_mut.color = None;
+             break 'color;
+        }
+                state_mut.color = color;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'color;
+            }
             TeamActions::SetParentTeam(parent_team) => 'parent_team: {
                 state_mut.errors_parent_team.clear();
                 match parent_team.as_ref() {
@@ -921,7 +987,7 @@ impl FormBuilder for TeamBuilder {
     type RichVariant = NestedTeam;
 
     fn has_errors(&self) -> bool {
-!self.errors_name.is_empty() || !self.errors_description.is_empty() || !self.errors_parent_team.is_empty()
+!self.errors_name.is_empty() || !self.errors_description.is_empty() || !self.errors_icon.is_empty() || !self.errors_color.is_empty() || !self.errors_parent_team.is_empty()
     }
 
     fn id(&self) -> Option<PrimaryKey> {
@@ -931,6 +997,8 @@ impl FormBuilder for TeamBuilder {
     fn update(dispatcher: &Dispatch<Self>, rich_variant: Self::RichVariant) -> Vec<ComponentMessage> {
     dispatcher.apply(TeamActions::SetName(Some(rich_variant.inner.name.to_string())));
     dispatcher.apply(TeamActions::SetDescription(Some(rich_variant.inner.description.to_string())));
+        dispatcher.apply(TeamActions::SetIcon(Some(rich_variant.icon)));
+        dispatcher.apply(TeamActions::SetColor(Some(rich_variant.color)));
         let mut named_requests = Vec::new();
         if let Some(parent_team_id) = rich_variant.inner.parent_team_id {
     named_requests.push(ComponentMessage::get_named::<&str, NewTeam>("parent_team", parent_team_id.into()));
@@ -944,6 +1012,8 @@ impl FormBuilder for TeamBuilder {
         !self.has_errors()
         && self.name.is_some()
         && self.description.is_some()
+        && self.icon.is_some()
+        && self.color.is_some()
     }
 
 }
@@ -953,6 +1023,8 @@ impl From<TeamBuilder> for NewTeam {
         Self {
             name: builder.name.unwrap(),
             description: builder.description.unwrap(),
+            icon_id: builder.icon.unwrap().id,
+            color_id: builder.color.unwrap().id,
             parent_team_id: builder.parent_team.map(|parent_team| parent_team.inner.id),
         }
     }
@@ -963,6 +1035,8 @@ impl From<TeamBuilder> for UpdateTeam {
             id: builder.id.unwrap(),
             name: builder.name.unwrap(),
             description: builder.description.unwrap(),
+            icon_id: builder.icon.unwrap().id,
+            color_id: builder.color.unwrap().id,
             parent_team_id: builder.parent_team.map(|parent_team| parent_team.inner.id),
         }
     }
@@ -1017,11 +1091,15 @@ pub fn create_team_form() -> Html {
     let builder_store = use_store_value::<TeamBuilder>();
     let set_name = builder_dispatch.apply_callback(|name: Option<String>| TeamActions::SetName(name));
     let set_description = builder_dispatch.apply_callback(|description: Option<String>| TeamActions::SetDescription(description));
+    let set_icon = builder_dispatch.apply_callback(|icon: Option<FontAwesomeIcon>| TeamActions::SetIcon(icon));
+    let set_color = builder_dispatch.apply_callback(|color: Option<Color>| TeamActions::SetColor(color));
     let set_parent_team = builder_dispatch.apply_callback(|parent_team: Option<NestedTeam>| TeamActions::SetParentTeam(parent_team));
     html! {
         <BasicForm<NewTeam> method={FormMethod::POST} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Name" optional={false} errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
             <BasicInput<String> label="Description" optional={false} errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
+            <Datalist<FontAwesomeIcon, false> builder={set_icon} optional={false} errors={builder_store.errors_icon.clone()} value={builder_store.icon.clone()} label="Icon" />
+            <Datalist<Color, false> builder={set_color} optional={false} errors={builder_store.errors_color.clone()} value={builder_store.color.clone()} label="Color" />
             <Datalist<NestedTeam, true> builder={set_parent_team} optional={true} errors={builder_store.errors_parent_team.clone()} value={builder_store.parent_team.clone()} label="Parent team" />
         </BasicForm<NewTeam>>
     }
@@ -1040,11 +1118,15 @@ pub fn update_team_form(props: &UpdateTeamFormProp) -> Html {
     let builder_store = use_store_value::<TeamBuilder>();
     let set_name = builder_dispatch.apply_callback(|name: Option<String>| TeamActions::SetName(name));
     let set_description = builder_dispatch.apply_callback(|description: Option<String>| TeamActions::SetDescription(description));
+    let set_icon = builder_dispatch.apply_callback(|icon: Option<FontAwesomeIcon>| TeamActions::SetIcon(icon));
+    let set_color = builder_dispatch.apply_callback(|color: Option<Color>| TeamActions::SetColor(color));
     let set_parent_team = builder_dispatch.apply_callback(|parent_team: Option<NestedTeam>| TeamActions::SetParentTeam(parent_team));
     html! {
         <BasicForm<UpdateTeam> method={FormMethod::PUT} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Name" optional={false} errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
             <BasicInput<String> label="Description" optional={false} errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
+            <Datalist<FontAwesomeIcon, false> builder={set_icon} optional={false} errors={builder_store.errors_icon.clone()} value={builder_store.icon.clone()} label="Icon" />
+            <Datalist<Color, false> builder={set_color} optional={false} errors={builder_store.errors_color.clone()} value={builder_store.color.clone()} label="Color" />
             <Datalist<NestedTeam, true> builder={set_parent_team} optional={true} errors={builder_store.errors_parent_team.clone()} value={builder_store.parent_team.clone()} label="Parent team" />
         </BasicForm<UpdateTeam>>
     }

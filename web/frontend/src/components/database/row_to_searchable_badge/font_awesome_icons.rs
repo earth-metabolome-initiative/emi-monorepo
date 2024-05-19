@@ -8,9 +8,10 @@ impl RowToSearchableBadge for FontAwesomeIcon {
         html! {
             <div>
                 <p>
-                <i class="fas fa-question grey"></i>
+                    <i class={format!("fas fa-{} grey", self.name)}></i>
                     <span>{self.name.format_match(query)}</span>
                 </p>
+                <p>{self.description.format_match(query)}</p>
             </div>
         }
     }
@@ -19,7 +20,7 @@ impl RowToSearchableBadge for FontAwesomeIcon {
         html! {
             <div>
                 <p>
-                <i class="fas fa-question grey"></i>
+                    <i class={format!("fas fa-{} grey", self.name)}></i>
                     <span>{self.name.clone()}</span>
                 </p>
             </div>
@@ -32,6 +33,6 @@ impl RowToSearchableBadge for FontAwesomeIcon {
         "grey"
     }
     fn description(&self) -> &str {
-        ""
+        &self.description
     }
 }

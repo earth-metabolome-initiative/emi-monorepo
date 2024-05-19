@@ -27,11 +27,11 @@ pub enum ApiError {
 impl ApiError {
     pub fn font_awesome_icon(&self) -> &'static str {
         match self {
-            Self::Unauthorized => "fa-user-secret",
-            Self::BadGateway => "fa-dungeon",
-            Self::BadRequest(_) => "fa-circle-exclamation",
-            Self::InternalServerError => "fa-bomb",
-            Self::InvalidFileFormat(_) => "fa-file-circle-exclamation",
+            Self::Unauthorized => "user-secret",
+            Self::BadGateway => "dungeon",
+            Self::BadRequest(_) => "circle-exclamation",
+            Self::InternalServerError => "bomb",
+            Self::InvalidFileFormat(_) => "file-circle-exclamation",
         }
     }
 

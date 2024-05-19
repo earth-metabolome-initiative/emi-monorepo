@@ -17,7 +17,7 @@ INSERT INTO
     sample_states(
         name,
         description,
-        font_awesome_icon_id,
+        icon_id,
         color_id
     )
 SELECT

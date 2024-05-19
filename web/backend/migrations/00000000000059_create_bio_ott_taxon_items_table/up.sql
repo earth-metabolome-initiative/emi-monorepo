@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS bio_ott_taxon_items (
     parent_id INTEGER NOT NULL REFERENCES bio_ott_taxon_items(id) ON DELETE CASCADE,
 
     -- the font awesome icon of the taxon item
-    font_awesome_icon_id INTEGER NOT NULL REFERENCES font_awesome_icons(id) ON DELETE CASCADE,
+    icon_id INTEGER NOT NULL REFERENCES font_awesome_icons(id) ON DELETE CASCADE,
 
     -- the color of the font awesome icon of the taxon item
     color_id INTEGER NOT NULL REFERENCES colors(id) ON DELETE CASCADE

@@ -9,7 +9,7 @@ pub const FULL_ENDPOINT: &str = combine_path!(super::FULL_ENDPOINT, ENDPOINT);
 pub struct OAuth2LoginProvider {
     pub id: i32,
     pub name: String,
-    pub font_awesome_icon: String,
+    pub icon: String,
     pub client_id: String,
     pub redirect_uri: String,
     pub oauth_url: String,

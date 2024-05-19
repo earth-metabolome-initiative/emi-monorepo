@@ -4,7 +4,9 @@ diesel::table! {
     bio_ott_ranks (id) {
         id -> Int4,
         name -> Text,
-        font_awesome_icon_id -> Int4,
+        description -> Text,
+        icon_id -> Int4,
+        color_id -> Int4,
     }
 }
 
@@ -27,7 +29,7 @@ diesel::table! {
         family_id -> Nullable<Int4>,
         genus_id -> Nullable<Int4>,
         parent_id -> Int4,
-        font_awesome_icon_id -> Int4,
+        icon_id -> Int4,
         color_id -> Int4,
     }
 }
@@ -70,7 +72,7 @@ diesel::table! {
         #[max_length = 255]
         mime_type -> Varchar,
         description -> Text,
-        font_awesome_icon_id -> Int4,
+        icon_id -> Int4,
         color_id -> Int4,
     }
 }
@@ -88,7 +90,7 @@ diesel::table! {
         id -> Int4,
         #[max_length = 255]
         name -> Varchar,
-        font_awesome_icon_id -> Int4,
+        icon_id -> Int4,
         color_id -> Int4,
         #[max_length = 255]
         client_id_var_name -> Varchar,
@@ -130,7 +132,7 @@ diesel::table! {
         id -> Int4,
         name -> Text,
         description -> Text,
-        font_awesome_icon_id -> Int4,
+        icon_id -> Int4,
         color_id -> Int4,
     }
 }
@@ -142,6 +144,8 @@ diesel::table! {
         description -> Text,
         public -> Bool,
         state_id -> Int4,
+        icon_id -> Int4,
+        color_id -> Int4,
         parent_project_id -> Nullable<Int4>,
         budget -> Nullable<Float8>,
         expenses -> Nullable<Float8>,
@@ -219,7 +223,7 @@ diesel::table! {
         id -> Int4,
         name -> Text,
         description -> Text,
-        font_awesome_icon_id -> Int4,
+        icon_id -> Int4,
         color_id -> Int4,
     }
 }
@@ -240,7 +244,7 @@ diesel::table! {
         id -> Int4,
         name -> Text,
         description -> Text,
-        font_awesome_icon_id -> Int4,
+        icon_id -> Int4,
         color_id -> Int4,
     }
 }
@@ -482,7 +486,7 @@ diesel::table! {
         id -> Int4,
         name -> Text,
         description -> Text,
-        font_awesome_icon_id -> Int4,
+        icon_id -> Int4,
         color_id -> Int4,
     }
 }
@@ -492,6 +496,8 @@ diesel::table! {
         id -> Int4,
         name -> Text,
         description -> Text,
+        icon_id -> Int4,
+        color_id -> Int4,
         parent_team_id -> Nullable<Int4>,
         created_by -> Int4,
         created_at -> Timestamp,
@@ -603,18 +609,21 @@ diesel::table! {
     }
 }
 
-diesel::joinable!(bio_ott_ranks -> font_awesome_icons (font_awesome_icon_id));
+diesel::joinable!(bio_ott_ranks -> colors (color_id));
+diesel::joinable!(bio_ott_ranks -> font_awesome_icons (icon_id));
 diesel::joinable!(bio_ott_taxon_items -> bio_ott_ranks (ott_rank_id));
 diesel::joinable!(bio_ott_taxon_items -> colors (color_id));
-diesel::joinable!(bio_ott_taxon_items -> font_awesome_icons (font_awesome_icon_id));
+diesel::joinable!(bio_ott_taxon_items -> font_awesome_icons (icon_id));
 diesel::joinable!(document_formats -> colors (color_id));
-diesel::joinable!(document_formats -> font_awesome_icons (font_awesome_icon_id));
+diesel::joinable!(document_formats -> font_awesome_icons (icon_id));
 diesel::joinable!(login_providers -> colors (color_id));
-diesel::joinable!(login_providers -> font_awesome_icons (font_awesome_icon_id));
+diesel::joinable!(login_providers -> font_awesome_icons (icon_id));
 diesel::joinable!(notifications -> users (user_id));
 diesel::joinable!(organizations -> countries (country_id));
 diesel::joinable!(project_states -> colors (color_id));
-diesel::joinable!(project_states -> font_awesome_icons (font_awesome_icon_id));
+diesel::joinable!(project_states -> font_awesome_icons (icon_id));
+diesel::joinable!(projects -> colors (color_id));
+diesel::joinable!(projects -> font_awesome_icons (icon_id));
 diesel::joinable!(projects -> project_states (state_id));
 diesel::joinable!(projects_teams_role_invitations -> projects (table_id));
 diesel::joinable!(projects_teams_role_invitations -> roles (role_id));
@@ -635,11 +644,11 @@ diesel::joinable!(projects_users_role_requests -> roles (role_id));
 diesel::joinable!(projects_users_roles -> projects (table_id));
 diesel::joinable!(projects_users_roles -> roles (role_id));
 diesel::joinable!(roles -> colors (color_id));
-diesel::joinable!(roles -> font_awesome_icons (font_awesome_icon_id));
+diesel::joinable!(roles -> font_awesome_icons (icon_id));
 diesel::joinable!(sample_bio_ott_taxon_items -> bio_ott_taxon_items (taxon_id));
 diesel::joinable!(sample_bio_ott_taxon_items -> samples (sample_id));
 diesel::joinable!(sample_states -> colors (color_id));
-diesel::joinable!(sample_states -> font_awesome_icons (font_awesome_icon_id));
+diesel::joinable!(sample_states -> font_awesome_icons (icon_id));
 diesel::joinable!(sampled_individual_bio_ott_taxon_items -> bio_ott_taxon_items (taxon_id));
 diesel::joinable!(sampled_individual_bio_ott_taxon_items -> sampled_individuals (sampled_individual_id));
 diesel::joinable!(sampled_individuals_teams_role_invitations -> roles (role_id));
@@ -700,7 +709,9 @@ diesel::joinable!(spectra_collections_users_role_requests -> spectra_collections
 diesel::joinable!(spectra_collections_users_roles -> roles (role_id));
 diesel::joinable!(spectra_collections_users_roles -> spectra_collections (table_id));
 diesel::joinable!(team_states -> colors (color_id));
-diesel::joinable!(team_states -> font_awesome_icons (font_awesome_icon_id));
+diesel::joinable!(team_states -> font_awesome_icons (icon_id));
+diesel::joinable!(teams -> colors (color_id));
+diesel::joinable!(teams -> font_awesome_icons (icon_id));
 diesel::joinable!(teams_teams_role_invitations -> roles (role_id));
 diesel::joinable!(teams_teams_role_invitations -> users (created_by));
 diesel::joinable!(teams_users_role_invitations -> roles (role_id));

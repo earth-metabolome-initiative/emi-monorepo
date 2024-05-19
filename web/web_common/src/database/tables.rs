@@ -7,7 +7,9 @@ use chrono::NaiveDateTime;
 pub struct BioOttRank {
     pub id: i32,
     pub name: String,
-    pub font_awesome_icon_id: i32,
+    pub description: String,
+    pub icon_id: i32,
+    pub color_id: i32,
 }
 #[cfg(feature = "frontend")]
 impl BioOttRank {
@@ -15,7 +17,9 @@ impl BioOttRank {
         vec![
             gluesql::core::ast_builder::num(self.id),
             gluesql::core::ast_builder::text(self.name),
-            gluesql::core::ast_builder::num(self.font_awesome_icon_id),
+            gluesql::core::ast_builder::text(self.description),
+            gluesql::core::ast_builder::num(self.icon_id),
+            gluesql::core::ast_builder::num(self.color_id),
         ]
     }
 
@@ -35,7 +39,7 @@ impl BioOttRank {
         use gluesql::core::ast_builder::*;
         table("bio_ott_ranks")
             .insert()
-            .columns("id, name, font_awesome_icon_id")
+            .columns("id, name, description, icon_id, color_id")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -61,7 +65,7 @@ impl BioOttRank {
         let select_row = table("bio_ott_ranks")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, name, font_awesome_icon_id")
+            .project("id, name, description, icon_id, color_id")
             .limit(1)
             .execute(connection)
             .await?;
@@ -131,7 +135,9 @@ impl BioOttRank {
             .update()        
 .set("id", gluesql::core::ast_builder::num(self.id))        
 .set("name", gluesql::core::ast_builder::text(self.name))        
-.set("font_awesome_icon_id", gluesql::core::ast_builder::num(self.font_awesome_icon_id))            .execute(connection)
+.set("description", gluesql::core::ast_builder::text(self.description))        
+.set("icon_id", gluesql::core::ast_builder::num(self.icon_id))        
+.set("color_id", gluesql::core::ast_builder::num(self.color_id))            .execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -176,7 +182,7 @@ impl BioOttRank {
         use gluesql::core::ast_builder::*;
         let select_row = table("bio_ott_ranks")
             .select()
-            .project("id, name, font_awesome_icon_id")
+            .project("id, name, description, icon_id, color_id")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -196,8 +202,16 @@ impl BioOttRank {
                 gluesql::prelude::Value::Str(name) => name.clone(),
                 _ => unreachable!("Expected Str")
             },
-            font_awesome_icon_id: match row.get("font_awesome_icon_id").unwrap() {
-                gluesql::prelude::Value::I32(font_awesome_icon_id) => font_awesome_icon_id.clone(),
+            description: match row.get("description").unwrap() {
+                gluesql::prelude::Value::Str(description) => description.clone(),
+                _ => unreachable!("Expected Str")
+            },
+            icon_id: match row.get("icon_id").unwrap() {
+                gluesql::prelude::Value::I32(icon_id) => icon_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            color_id: match row.get("color_id").unwrap() {
+                gluesql::prelude::Value::I32(color_id) => color_id.clone(),
                 _ => unreachable!("Expected I32")
             },
         }
@@ -223,7 +237,7 @@ pub struct BioOttTaxonItem {
     pub family_id: Option<i32>,
     pub genus_id: Option<i32>,
     pub parent_id: i32,
-    pub font_awesome_icon_id: i32,
+    pub icon_id: i32,
     pub color_id: i32,
 }
 #[cfg(feature = "frontend")]
@@ -283,7 +297,7 @@ impl BioOttTaxonItem {
                 None => gluesql::core::ast_builder::null(),
             },
             gluesql::core::ast_builder::num(self.parent_id),
-            gluesql::core::ast_builder::num(self.font_awesome_icon_id),
+            gluesql::core::ast_builder::num(self.icon_id),
             gluesql::core::ast_builder::num(self.color_id),
         ]
     }
@@ -304,7 +318,7 @@ impl BioOttTaxonItem {
         use gluesql::core::ast_builder::*;
         table("bio_ott_taxon_items")
             .insert()
-            .columns("id, name, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, font_awesome_icon_id, color_id")
+            .columns("id, name, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, icon_id, color_id")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -330,7 +344,7 @@ impl BioOttTaxonItem {
         let select_row = table("bio_ott_taxon_items")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, name, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, font_awesome_icon_id, color_id")
+            .project("id, name, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, icon_id, color_id")
             .limit(1)
             .execute(connection)
             .await?;
@@ -403,7 +417,7 @@ impl BioOttTaxonItem {
 .set("ott_id", gluesql::core::ast_builder::num(self.ott_id))        
 .set("ott_rank_id", gluesql::core::ast_builder::num(self.ott_rank_id))        
 .set("parent_id", gluesql::core::ast_builder::num(self.parent_id))        
-.set("font_awesome_icon_id", gluesql::core::ast_builder::num(self.font_awesome_icon_id))        
+.set("icon_id", gluesql::core::ast_builder::num(self.icon_id))        
 .set("color_id", gluesql::core::ast_builder::num(self.color_id));
         if let Some(wikidata_id) = self.wikidata_id {
             update_row = update_row.set("wikidata_id", gluesql::core::ast_builder::num(wikidata_id));
@@ -486,7 +500,7 @@ impl BioOttTaxonItem {
         use gluesql::core::ast_builder::*;
         let select_row = table("bio_ott_taxon_items")
             .select()
-            .project("id, name, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, font_awesome_icon_id, color_id")
+            .project("id, name, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, icon_id, color_id")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -578,8 +592,8 @@ impl BioOttTaxonItem {
                 gluesql::prelude::Value::I32(parent_id) => parent_id.clone(),
                 _ => unreachable!("Expected I32")
             },
-            font_awesome_icon_id: match row.get("font_awesome_icon_id").unwrap() {
-                gluesql::prelude::Value::I32(font_awesome_icon_id) => font_awesome_icon_id.clone(),
+            icon_id: match row.get("icon_id").unwrap() {
+                gluesql::prelude::Value::I32(icon_id) => icon_id.clone(),
                 _ => unreachable!("Expected I32")
             },
             color_id: match row.get("color_id").unwrap() {
@@ -1271,7 +1285,7 @@ pub struct DocumentFormat {
     pub extension: String,
     pub mime_type: String,
     pub description: String,
-    pub font_awesome_icon_id: i32,
+    pub icon_id: i32,
     pub color_id: i32,
 }
 #[cfg(feature = "frontend")]
@@ -1282,7 +1296,7 @@ impl DocumentFormat {
             gluesql::core::ast_builder::text(self.extension),
             gluesql::core::ast_builder::text(self.mime_type),
             gluesql::core::ast_builder::text(self.description),
-            gluesql::core::ast_builder::num(self.font_awesome_icon_id),
+            gluesql::core::ast_builder::num(self.icon_id),
             gluesql::core::ast_builder::num(self.color_id),
         ]
     }
@@ -1303,7 +1317,7 @@ impl DocumentFormat {
         use gluesql::core::ast_builder::*;
         table("document_formats")
             .insert()
-            .columns("id, extension, mime_type, description, font_awesome_icon_id, color_id")
+            .columns("id, extension, mime_type, description, icon_id, color_id")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -1329,7 +1343,7 @@ impl DocumentFormat {
         let select_row = table("document_formats")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, extension, mime_type, description, font_awesome_icon_id, color_id")
+            .project("id, extension, mime_type, description, icon_id, color_id")
             .limit(1)
             .execute(connection)
             .await?;
@@ -1401,7 +1415,7 @@ impl DocumentFormat {
 .set("extension", gluesql::core::ast_builder::text(self.extension))        
 .set("mime_type", gluesql::core::ast_builder::text(self.mime_type))        
 .set("description", gluesql::core::ast_builder::text(self.description))        
-.set("font_awesome_icon_id", gluesql::core::ast_builder::num(self.font_awesome_icon_id))        
+.set("icon_id", gluesql::core::ast_builder::num(self.icon_id))        
 .set("color_id", gluesql::core::ast_builder::num(self.color_id))            .execute(connection)
             .await
              .map(|payload| match payload {
@@ -1447,7 +1461,7 @@ impl DocumentFormat {
         use gluesql::core::ast_builder::*;
         let select_row = table("document_formats")
             .select()
-            .project("id, extension, mime_type, description, font_awesome_icon_id, color_id")
+            .project("id, extension, mime_type, description, icon_id, color_id")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -1475,8 +1489,8 @@ impl DocumentFormat {
                 gluesql::prelude::Value::Str(description) => description.clone(),
                 _ => unreachable!("Expected Str")
             },
-            font_awesome_icon_id: match row.get("font_awesome_icon_id").unwrap() {
-                gluesql::prelude::Value::I32(font_awesome_icon_id) => font_awesome_icon_id.clone(),
+            icon_id: match row.get("icon_id").unwrap() {
+                gluesql::prelude::Value::I32(icon_id) => icon_id.clone(),
                 _ => unreachable!("Expected I32")
             },
             color_id: match row.get("color_id").unwrap() {
@@ -1692,7 +1706,7 @@ impl FontAwesomeIcon {
 pub struct LoginProvider {
     pub id: i32,
     pub name: String,
-    pub font_awesome_icon_id: i32,
+    pub icon_id: i32,
     pub color_id: i32,
     pub client_id_var_name: String,
     pub redirect_uri_var_name: String,
@@ -1705,7 +1719,7 @@ impl LoginProvider {
         vec![
             gluesql::core::ast_builder::num(self.id),
             gluesql::core::ast_builder::text(self.name),
-            gluesql::core::ast_builder::num(self.font_awesome_icon_id),
+            gluesql::core::ast_builder::num(self.icon_id),
             gluesql::core::ast_builder::num(self.color_id),
             gluesql::core::ast_builder::text(self.client_id_var_name),
             gluesql::core::ast_builder::text(self.redirect_uri_var_name),
@@ -1730,7 +1744,7 @@ impl LoginProvider {
         use gluesql::core::ast_builder::*;
         table("login_providers")
             .insert()
-            .columns("id, name, font_awesome_icon_id, color_id, client_id_var_name, redirect_uri_var_name, oauth_url, scope")
+            .columns("id, name, icon_id, color_id, client_id_var_name, redirect_uri_var_name, oauth_url, scope")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -1756,7 +1770,7 @@ impl LoginProvider {
         let select_row = table("login_providers")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, name, font_awesome_icon_id, color_id, client_id_var_name, redirect_uri_var_name, oauth_url, scope")
+            .project("id, name, icon_id, color_id, client_id_var_name, redirect_uri_var_name, oauth_url, scope")
             .limit(1)
             .execute(connection)
             .await?;
@@ -1826,7 +1840,7 @@ impl LoginProvider {
             .update()        
 .set("id", gluesql::core::ast_builder::num(self.id))        
 .set("name", gluesql::core::ast_builder::text(self.name))        
-.set("font_awesome_icon_id", gluesql::core::ast_builder::num(self.font_awesome_icon_id))        
+.set("icon_id", gluesql::core::ast_builder::num(self.icon_id))        
 .set("color_id", gluesql::core::ast_builder::num(self.color_id))        
 .set("client_id_var_name", gluesql::core::ast_builder::text(self.client_id_var_name))        
 .set("redirect_uri_var_name", gluesql::core::ast_builder::text(self.redirect_uri_var_name))        
@@ -1876,7 +1890,7 @@ impl LoginProvider {
         use gluesql::core::ast_builder::*;
         let select_row = table("login_providers")
             .select()
-            .project("id, name, font_awesome_icon_id, color_id, client_id_var_name, redirect_uri_var_name, oauth_url, scope")
+            .project("id, name, icon_id, color_id, client_id_var_name, redirect_uri_var_name, oauth_url, scope")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -1896,8 +1910,8 @@ impl LoginProvider {
                 gluesql::prelude::Value::Str(name) => name.clone(),
                 _ => unreachable!("Expected Str")
             },
-            font_awesome_icon_id: match row.get("font_awesome_icon_id").unwrap() {
-                gluesql::prelude::Value::I32(font_awesome_icon_id) => font_awesome_icon_id.clone(),
+            icon_id: match row.get("icon_id").unwrap() {
+                gluesql::prelude::Value::I32(icon_id) => icon_id.clone(),
                 _ => unreachable!("Expected I32")
             },
             color_id: match row.get("color_id").unwrap() {
@@ -2380,7 +2394,7 @@ pub struct ProjectState {
     pub id: i32,
     pub name: String,
     pub description: String,
-    pub font_awesome_icon_id: i32,
+    pub icon_id: i32,
     pub color_id: i32,
 }
 #[cfg(feature = "frontend")]
@@ -2390,7 +2404,7 @@ impl ProjectState {
             gluesql::core::ast_builder::num(self.id),
             gluesql::core::ast_builder::text(self.name),
             gluesql::core::ast_builder::text(self.description),
-            gluesql::core::ast_builder::num(self.font_awesome_icon_id),
+            gluesql::core::ast_builder::num(self.icon_id),
             gluesql::core::ast_builder::num(self.color_id),
         ]
     }
@@ -2411,7 +2425,7 @@ impl ProjectState {
         use gluesql::core::ast_builder::*;
         table("project_states")
             .insert()
-            .columns("id, name, description, font_awesome_icon_id, color_id")
+            .columns("id, name, description, icon_id, color_id")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -2437,7 +2451,7 @@ impl ProjectState {
         let select_row = table("project_states")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, name, description, font_awesome_icon_id, color_id")
+            .project("id, name, description, icon_id, color_id")
             .limit(1)
             .execute(connection)
             .await?;
@@ -2508,7 +2522,7 @@ impl ProjectState {
 .set("id", gluesql::core::ast_builder::num(self.id))        
 .set("name", gluesql::core::ast_builder::text(self.name))        
 .set("description", gluesql::core::ast_builder::text(self.description))        
-.set("font_awesome_icon_id", gluesql::core::ast_builder::num(self.font_awesome_icon_id))        
+.set("icon_id", gluesql::core::ast_builder::num(self.icon_id))        
 .set("color_id", gluesql::core::ast_builder::num(self.color_id))            .execute(connection)
             .await
              .map(|payload| match payload {
@@ -2554,7 +2568,7 @@ impl ProjectState {
         use gluesql::core::ast_builder::*;
         let select_row = table("project_states")
             .select()
-            .project("id, name, description, font_awesome_icon_id, color_id")
+            .project("id, name, description, icon_id, color_id")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -2578,8 +2592,8 @@ impl ProjectState {
                 gluesql::prelude::Value::Str(description) => description.clone(),
                 _ => unreachable!("Expected Str")
             },
-            font_awesome_icon_id: match row.get("font_awesome_icon_id").unwrap() {
-                gluesql::prelude::Value::I32(font_awesome_icon_id) => font_awesome_icon_id.clone(),
+            icon_id: match row.get("icon_id").unwrap() {
+                gluesql::prelude::Value::I32(icon_id) => icon_id.clone(),
                 _ => unreachable!("Expected I32")
             },
             color_id: match row.get("color_id").unwrap() {
@@ -2597,6 +2611,8 @@ pub struct Project {
     pub description: String,
     pub public: bool,
     pub state_id: i32,
+    pub icon_id: i32,
+    pub color_id: i32,
     pub parent_project_id: Option<i32>,
     pub budget: Option<f64>,
     pub expenses: Option<f64>,
@@ -2616,6 +2632,8 @@ impl Project {
             gluesql::core::ast_builder::text(self.description),
             (self.public.into()),
             gluesql::core::ast_builder::num(self.state_id),
+            gluesql::core::ast_builder::num(self.icon_id),
+            gluesql::core::ast_builder::num(self.color_id),
             match self.parent_project_id {
                 Some(parent_project_id) => gluesql::core::ast_builder::num(parent_project_id),
                 None => gluesql::core::ast_builder::null(),
@@ -2659,7 +2677,7 @@ impl Project {
         use gluesql::core::ast_builder::*;
         table("projects")
             .insert()
-            .columns("id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date")
+            .columns("id, name, description, public, state_id, icon_id, color_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -2685,7 +2703,7 @@ impl Project {
         let select_row = table("projects")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date")
+            .project("id, name, description, public, state_id, icon_id, color_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date")
             .limit(1)
             .execute(connection)
             .await?;
@@ -2758,6 +2776,8 @@ impl Project {
 .set("description", gluesql::core::ast_builder::text(self.description))        
 .set("public", self.public)        
 .set("state_id", gluesql::core::ast_builder::num(self.state_id))        
+.set("icon_id", gluesql::core::ast_builder::num(self.icon_id))        
+.set("color_id", gluesql::core::ast_builder::num(self.color_id))        
 .set("created_by", gluesql::core::ast_builder::num(self.created_by))        
 .set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
 .set("updated_by", gluesql::core::ast_builder::num(self.updated_by))        
@@ -2822,7 +2842,7 @@ impl Project {
         use gluesql::core::ast_builder::*;
         let select_row = table("projects")
             .select()
-            .project("id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date")
+            .project("id, name, description, public, state_id, icon_id, color_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -2849,7 +2869,7 @@ impl Project {
         use gluesql::core::ast_builder::*;
         let select_row = table("projects")
             .select()
-            .project("id, name, description, public, state_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date")
+            .project("id, name, description, public, state_id, icon_id, color_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date")
             .order_by("updated_at desc")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -2880,6 +2900,14 @@ impl Project {
             },
             state_id: match row.get("state_id").unwrap() {
                 gluesql::prelude::Value::I32(state_id) => state_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            icon_id: match row.get("icon_id").unwrap() {
+                gluesql::prelude::Value::I32(icon_id) => icon_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            color_id: match row.get("color_id").unwrap() {
+                gluesql::prelude::Value::I32(color_id) => color_id.clone(),
                 _ => unreachable!("Expected I32")
             },
             parent_project_id: match row.get("parent_project_id").unwrap() {
@@ -4234,7 +4262,7 @@ pub struct Role {
     pub id: i32,
     pub name: String,
     pub description: String,
-    pub font_awesome_icon_id: i32,
+    pub icon_id: i32,
     pub color_id: i32,
 }
 #[cfg(feature = "frontend")]
@@ -4244,7 +4272,7 @@ impl Role {
             gluesql::core::ast_builder::num(self.id),
             gluesql::core::ast_builder::text(self.name),
             gluesql::core::ast_builder::text(self.description),
-            gluesql::core::ast_builder::num(self.font_awesome_icon_id),
+            gluesql::core::ast_builder::num(self.icon_id),
             gluesql::core::ast_builder::num(self.color_id),
         ]
     }
@@ -4265,7 +4293,7 @@ impl Role {
         use gluesql::core::ast_builder::*;
         table("roles")
             .insert()
-            .columns("id, name, description, font_awesome_icon_id, color_id")
+            .columns("id, name, description, icon_id, color_id")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -4291,7 +4319,7 @@ impl Role {
         let select_row = table("roles")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, name, description, font_awesome_icon_id, color_id")
+            .project("id, name, description, icon_id, color_id")
             .limit(1)
             .execute(connection)
             .await?;
@@ -4362,7 +4390,7 @@ impl Role {
 .set("id", gluesql::core::ast_builder::num(self.id))        
 .set("name", gluesql::core::ast_builder::text(self.name))        
 .set("description", gluesql::core::ast_builder::text(self.description))        
-.set("font_awesome_icon_id", gluesql::core::ast_builder::num(self.font_awesome_icon_id))        
+.set("icon_id", gluesql::core::ast_builder::num(self.icon_id))        
 .set("color_id", gluesql::core::ast_builder::num(self.color_id))            .execute(connection)
             .await
              .map(|payload| match payload {
@@ -4408,7 +4436,7 @@ impl Role {
         use gluesql::core::ast_builder::*;
         let select_row = table("roles")
             .select()
-            .project("id, name, description, font_awesome_icon_id, color_id")
+            .project("id, name, description, icon_id, color_id")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -4432,8 +4460,8 @@ impl Role {
                 gluesql::prelude::Value::Str(description) => description.clone(),
                 _ => unreachable!("Expected Str")
             },
-            font_awesome_icon_id: match row.get("font_awesome_icon_id").unwrap() {
-                gluesql::prelude::Value::I32(font_awesome_icon_id) => font_awesome_icon_id.clone(),
+            icon_id: match row.get("icon_id").unwrap() {
+                gluesql::prelude::Value::I32(icon_id) => icon_id.clone(),
                 _ => unreachable!("Expected I32")
             },
             color_id: match row.get("color_id").unwrap() {
@@ -4701,7 +4729,7 @@ pub struct SampleState {
     pub id: i32,
     pub name: String,
     pub description: String,
-    pub font_awesome_icon_id: i32,
+    pub icon_id: i32,
     pub color_id: i32,
 }
 #[cfg(feature = "frontend")]
@@ -4711,7 +4739,7 @@ impl SampleState {
             gluesql::core::ast_builder::num(self.id),
             gluesql::core::ast_builder::text(self.name),
             gluesql::core::ast_builder::text(self.description),
-            gluesql::core::ast_builder::num(self.font_awesome_icon_id),
+            gluesql::core::ast_builder::num(self.icon_id),
             gluesql::core::ast_builder::num(self.color_id),
         ]
     }
@@ -4732,7 +4760,7 @@ impl SampleState {
         use gluesql::core::ast_builder::*;
         table("sample_states")
             .insert()
-            .columns("id, name, description, font_awesome_icon_id, color_id")
+            .columns("id, name, description, icon_id, color_id")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -4758,7 +4786,7 @@ impl SampleState {
         let select_row = table("sample_states")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, name, description, font_awesome_icon_id, color_id")
+            .project("id, name, description, icon_id, color_id")
             .limit(1)
             .execute(connection)
             .await?;
@@ -4829,7 +4857,7 @@ impl SampleState {
 .set("id", gluesql::core::ast_builder::num(self.id))        
 .set("name", gluesql::core::ast_builder::text(self.name))        
 .set("description", gluesql::core::ast_builder::text(self.description))        
-.set("font_awesome_icon_id", gluesql::core::ast_builder::num(self.font_awesome_icon_id))        
+.set("icon_id", gluesql::core::ast_builder::num(self.icon_id))        
 .set("color_id", gluesql::core::ast_builder::num(self.color_id))            .execute(connection)
             .await
              .map(|payload| match payload {
@@ -4875,7 +4903,7 @@ impl SampleState {
         use gluesql::core::ast_builder::*;
         let select_row = table("sample_states")
             .select()
-            .project("id, name, description, font_awesome_icon_id, color_id")
+            .project("id, name, description, icon_id, color_id")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -4899,8 +4927,8 @@ impl SampleState {
                 gluesql::prelude::Value::Str(description) => description.clone(),
                 _ => unreachable!("Expected Str")
             },
-            font_awesome_icon_id: match row.get("font_awesome_icon_id").unwrap() {
-                gluesql::prelude::Value::I32(font_awesome_icon_id) => font_awesome_icon_id.clone(),
+            icon_id: match row.get("icon_id").unwrap() {
+                gluesql::prelude::Value::I32(icon_id) => icon_id.clone(),
                 _ => unreachable!("Expected I32")
             },
             color_id: match row.get("color_id").unwrap() {
@@ -10025,7 +10053,7 @@ pub struct TeamState {
     pub id: i32,
     pub name: String,
     pub description: String,
-    pub font_awesome_icon_id: i32,
+    pub icon_id: i32,
     pub color_id: i32,
 }
 #[cfg(feature = "frontend")]
@@ -10035,7 +10063,7 @@ impl TeamState {
             gluesql::core::ast_builder::num(self.id),
             gluesql::core::ast_builder::text(self.name),
             gluesql::core::ast_builder::text(self.description),
-            gluesql::core::ast_builder::num(self.font_awesome_icon_id),
+            gluesql::core::ast_builder::num(self.icon_id),
             gluesql::core::ast_builder::num(self.color_id),
         ]
     }
@@ -10056,7 +10084,7 @@ impl TeamState {
         use gluesql::core::ast_builder::*;
         table("team_states")
             .insert()
-            .columns("id, name, description, font_awesome_icon_id, color_id")
+            .columns("id, name, description, icon_id, color_id")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -10082,7 +10110,7 @@ impl TeamState {
         let select_row = table("team_states")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, name, description, font_awesome_icon_id, color_id")
+            .project("id, name, description, icon_id, color_id")
             .limit(1)
             .execute(connection)
             .await?;
@@ -10153,7 +10181,7 @@ impl TeamState {
 .set("id", gluesql::core::ast_builder::num(self.id))        
 .set("name", gluesql::core::ast_builder::text(self.name))        
 .set("description", gluesql::core::ast_builder::text(self.description))        
-.set("font_awesome_icon_id", gluesql::core::ast_builder::num(self.font_awesome_icon_id))        
+.set("icon_id", gluesql::core::ast_builder::num(self.icon_id))        
 .set("color_id", gluesql::core::ast_builder::num(self.color_id))            .execute(connection)
             .await
              .map(|payload| match payload {
@@ -10199,7 +10227,7 @@ impl TeamState {
         use gluesql::core::ast_builder::*;
         let select_row = table("team_states")
             .select()
-            .project("id, name, description, font_awesome_icon_id, color_id")
+            .project("id, name, description, icon_id, color_id")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -10223,8 +10251,8 @@ impl TeamState {
                 gluesql::prelude::Value::Str(description) => description.clone(),
                 _ => unreachable!("Expected Str")
             },
-            font_awesome_icon_id: match row.get("font_awesome_icon_id").unwrap() {
-                gluesql::prelude::Value::I32(font_awesome_icon_id) => font_awesome_icon_id.clone(),
+            icon_id: match row.get("icon_id").unwrap() {
+                gluesql::prelude::Value::I32(icon_id) => icon_id.clone(),
                 _ => unreachable!("Expected I32")
             },
             color_id: match row.get("color_id").unwrap() {
@@ -10240,6 +10268,8 @@ pub struct Team {
     pub id: i32,
     pub name: String,
     pub description: String,
+    pub icon_id: i32,
+    pub color_id: i32,
     pub parent_team_id: Option<i32>,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
@@ -10253,6 +10283,8 @@ impl Team {
             gluesql::core::ast_builder::num(self.id),
             gluesql::core::ast_builder::text(self.name),
             gluesql::core::ast_builder::text(self.description),
+            gluesql::core::ast_builder::num(self.icon_id),
+            gluesql::core::ast_builder::num(self.color_id),
             match self.parent_team_id {
                 Some(parent_team_id) => gluesql::core::ast_builder::num(parent_team_id),
                 None => gluesql::core::ast_builder::null(),
@@ -10280,7 +10312,7 @@ impl Team {
         use gluesql::core::ast_builder::*;
         table("teams")
             .insert()
-            .columns("id, name, description, parent_team_id, created_by, created_at, updated_by, updated_at")
+            .columns("id, name, description, icon_id, color_id, parent_team_id, created_by, created_at, updated_by, updated_at")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -10306,7 +10338,7 @@ impl Team {
         let select_row = table("teams")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, name, description, parent_team_id, created_by, created_at, updated_by, updated_at")
+            .project("id, name, description, icon_id, color_id, parent_team_id, created_by, created_at, updated_by, updated_at")
             .limit(1)
             .execute(connection)
             .await?;
@@ -10377,6 +10409,8 @@ impl Team {
 .set("id", gluesql::core::ast_builder::num(self.id))        
 .set("name", gluesql::core::ast_builder::text(self.name))        
 .set("description", gluesql::core::ast_builder::text(self.description))        
+.set("icon_id", gluesql::core::ast_builder::num(self.icon_id))        
+.set("color_id", gluesql::core::ast_builder::num(self.color_id))        
 .set("created_by", gluesql::core::ast_builder::num(self.created_by))        
 .set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
 .set("updated_by", gluesql::core::ast_builder::num(self.updated_by))        
@@ -10429,7 +10463,7 @@ impl Team {
         use gluesql::core::ast_builder::*;
         let select_row = table("teams")
             .select()
-            .project("id, name, description, parent_team_id, created_by, created_at, updated_by, updated_at")
+            .project("id, name, description, icon_id, color_id, parent_team_id, created_by, created_at, updated_by, updated_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -10456,7 +10490,7 @@ impl Team {
         use gluesql::core::ast_builder::*;
         let select_row = table("teams")
             .select()
-            .project("id, name, description, parent_team_id, created_by, created_at, updated_by, updated_at")
+            .project("id, name, description, icon_id, color_id, parent_team_id, created_by, created_at, updated_by, updated_at")
             .order_by("updated_at desc")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -10480,6 +10514,14 @@ impl Team {
             description: match row.get("description").unwrap() {
                 gluesql::prelude::Value::Str(description) => description.clone(),
                 _ => unreachable!("Expected Str")
+            },
+            icon_id: match row.get("icon_id").unwrap() {
+                gluesql::prelude::Value::I32(icon_id) => icon_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            color_id: match row.get("color_id").unwrap() {
+                gluesql::prelude::Value::I32(color_id) => color_id.clone(),
+                _ => unreachable!("Expected I32")
             },
             parent_team_id: match row.get("parent_team_id").unwrap() {
                 gluesql::prelude::Value::Null => None,
