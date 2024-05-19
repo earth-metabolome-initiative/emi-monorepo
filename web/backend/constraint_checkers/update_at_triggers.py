@@ -1,8 +1,8 @@
 """This module contains the function that ensures that all tables that have an `updated_at` column
 have a trigger that updates the column upon each row update.
 """
-import os
-from constraint_checkers.find_foreign_keys import find_foreign_keys
+from constraint_checkers.find_foreign_keys import TableMetadata
+from constraint_checkers.regroup_tables import get_best_insertion_point
 from userinput import userinput
 from insert_migration import insert_migration
 
@@ -22,30 +22,10 @@ def handle_update_at_trigger_creation(
     )
 
     if proceed:
-        # First, we identify the position of the migration that has created the current
-        # table by finding the one with desinence `_create_{table_name}_table`.
-        migrations = [
-            directory
-            for directory in os.listdir("migrations")
-            if os.path.isdir(f"migrations/{directory}")
-            and os.path.exists(f"migrations/{directory}/up.sql")
-        ]
-
-        migration_number = None
-
-        for migration in migrations:
-            number, desinence = migration.split("_", maxsplit=1)
-            if desinence == f"create_{table_name}_table":
-                migration_number = number
-                break
-
-        if migration_number is None:
-            raise Exception(
-                f"Could not find the migration that created the {table_name} table."
-            )
+        trigger_migration_name = f"create_{trigger_name}"
+        migration_number = get_best_insertion_point(table_name=table_name, expected_desinence=trigger_migration_name)
 
         # We create the trigger migration.
-        trigger_migration_name = f"create_{trigger_name}"
         migration_number = int(migration_number) + 1
         padded_migration_number = str(migration_number).zfill(14)
         full_migration_name = f"{padded_migration_number}_{trigger_migration_name}"
@@ -84,7 +64,9 @@ def handle_update_at_trigger_creation(
         )
 
 
-def ensures_all_update_at_trigger_exists():
+def ensures_all_update_at_trigger_exists(
+    tables_metadata: TableMetadata
+):
     """Check that for all tables that have an updated_at column, there exists an update_at trigger.
 
     Implementation details
@@ -96,8 +78,6 @@ def ensures_all_update_at_trigger_exists():
     upon each row update. If it does not, the function guides the user to create the trigger and
     afterwards raises an exception to stop the pipeline as it will need to be rerun.
     """
-    tables_metadata = find_foreign_keys()
-
     for table_name in tables_metadata.tables():
         trigger_name = f"{table_name}_updated_at_trigger"
         if tables_metadata.has_updated_at_column(table_name):

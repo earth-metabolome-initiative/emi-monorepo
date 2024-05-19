@@ -238,6 +238,93 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                 }
                             }
                             web_common::database::Operation::Select(select) => match select {
+                                web_common::database::Select::CanView { table_name, primary_key } => {
+                                    let table: web_common::database::Table =
+                                        match table_name.as_str().try_into() {
+                                            Ok(table) => table,
+                                            Err(err) => {
+                                                ctx.address().do_send(BackendMessage::Error(
+                                                    task_id,
+                                                    ApiError::BadRequest(vec![err.to_string()]),
+                                                ));
+                                                return;
+                                            }
+                                        };
+                                    match <Table as ViewableTable>::can_view(
+                                        &table,
+                                        primary_key,
+                                        self.user().map(|user| user.id),
+                                        &mut self.diesel_connection,
+                                    ) {
+                                        Ok(can_view) => {
+                                            ctx.address().do_send(BackendMessage::CanView(
+                                                task_id, can_view,
+                                            ));
+                                        }
+                                        Err(err) => {
+                                            ctx.address()
+                                                .do_send(BackendMessage::Error(task_id, err));
+                                        }
+                                    }
+                                }
+                                web_common::database::Select::CanUpdate { table_name, primary_key } => {
+                                    let table: web_common::database::Table =
+                                        match table_name.as_str().try_into() {
+                                            Ok(table) => table,
+                                            Err(err) => {
+                                                ctx.address().do_send(BackendMessage::Error(
+                                                    task_id,
+                                                    ApiError::BadRequest(vec![err.to_string()]),
+                                                ));
+                                                return;
+                                            }
+                                        };
+                                    match <Table as EditableTable>::can_update(
+                                        &table,
+                                        primary_key,
+                                        self.user().map(|user| user.id).unwrap(),
+                                        &mut self.diesel_connection,
+                                    ) {
+                                        Ok(can_update) => {
+                                            ctx.address().do_send(BackendMessage::CanUpdate(
+                                                task_id, can_update,
+                                            ));
+                                        }
+                                        Err(err) => {
+                                            ctx.address()
+                                                .do_send(BackendMessage::Error(task_id, err));
+                                        }
+                                    }
+                                }
+                                web_common::database::Select::CanDelete { table_name, primary_key } => {
+                                    let table: web_common::database::Table =
+                                        match table_name.as_str().try_into() {
+                                            Ok(table) => table,
+                                            Err(err) => {
+                                                ctx.address().do_send(BackendMessage::Error(
+                                                    task_id,
+                                                    ApiError::BadRequest(vec![err.to_string()]),
+                                                ));
+                                                return;
+                                            }
+                                        };
+                                    match <Table as DeletableTable>::can_delete(
+                                        &table,
+                                        primary_key,
+                                        self.user().map(|user| user.id).unwrap(),
+                                        &mut self.diesel_connection,
+                                    ) {
+                                        Ok(can_delete) => {
+                                            ctx.address().do_send(BackendMessage::CanDelete(
+                                                task_id, can_delete,
+                                            ));
+                                        }
+                                        Err(err) => {
+                                            ctx.address()
+                                                .do_send(BackendMessage::Error(task_id, err));
+                                        }
+                                    }
+                                }
                                 web_common::database::selects::Select::SearchTable {
                                     table_name,
                                     query,
@@ -255,6 +342,35 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                             }
                                         };
                                     match table.strict_word_similarity_search(
+                                        &query,
+                                        Some(number_of_results as i32),
+                                        &mut self.diesel_connection,
+                                    ) {
+                                        Ok(records) => {
+                                            ctx.address().do_send(BackendMessage::SearchTable(
+                                                task_id, records,
+                                            ));
+                                        }
+                                        Err(err) => {
+                                            ctx.address()
+                                                .do_send(BackendMessage::Error(task_id, err));
+                                        }
+                                    }
+                                }
+                                web_common::database::Select::SearchEditableTable { table_name, query, number_of_results } => {
+                                    let table: web_common::database::Table =
+                                        match table_name.as_str().try_into() {
+                                            Ok(table) => table,
+                                            Err(err) => {
+                                                ctx.address().do_send(BackendMessage::Error(
+                                                    task_id,
+                                                    ApiError::BadRequest(vec![err.to_string()]),
+                                                ));
+                                                return;
+                                            }
+                                        };
+                                    match table.strict_word_similarity_search_editables(
+                                        self.user().map(|user| user.id).unwrap(),
                                         &query,
                                         Some(number_of_results as i32),
                                         &mut self.diesel_connection,
@@ -406,6 +522,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                 match <Table as DeletableTable>::delete(
                                     &table,
                                     primary_key,
+                                    self.user().map(|user| user.id).unwrap(),
                                     &mut self.diesel_connection,
                                 ) {
                                     Ok(_) => {

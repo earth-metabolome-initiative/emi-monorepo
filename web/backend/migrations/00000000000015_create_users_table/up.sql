@@ -1,0 +1,10 @@
+-- Your SQL goes here
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY,
+    first_name VARCHAR NOT NULL,
+    middle_name VARCHAR,
+    last_name VARCHAR NOT NULL,
+    profile_picture BYTEA NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

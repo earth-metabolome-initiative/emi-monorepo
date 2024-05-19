@@ -35,7 +35,7 @@ async fn get_providers(pool: web::Data<Pool<ConnectionManager<PgConnection>>>) -
         oauth_providers.push(OAuth2LoginProvider {
             id: provider.inner.id,
             name: provider.inner.name,
-            font_awesome_icon: provider.font_awesome_icon.name,
+            icon: provider.icon.name,
             client_id: client_id.unwrap(),
             redirect_uri: redirect_uri.unwrap(),
             oauth_url: provider.inner.oauth_url,

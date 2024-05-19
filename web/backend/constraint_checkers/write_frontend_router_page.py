@@ -2,11 +2,11 @@
 
 from typing import List
 from constraint_checkers.struct_metadata import StructMetadata
-from constraint_checkers.find_foreign_keys import find_foreign_keys
+
 
 def write_frontend_sidebar(builders: List[StructMetadata]):
     """Writes out the frontend sidebar.
-    
+
     Parameters
     ----------
     builders : List[StructMetadata]
@@ -56,43 +56,23 @@ def write_frontend_sidebar(builders: List[StructMetadata]):
         "    let route: AppRoute = use_route().unwrap_or_default();\n"
         "\n"
         "    let sidebar_class = if props.visible {\n"
-        "        \"sidebar\"\n"
+        '        "sidebar"\n'
         "    } else {\n"
-        "        \"sidebar hidden\"\n"
+        '        "sidebar hidden"\n'
         "    };\n"
         "\n"
         "    html! {\n"
         "        <div class={sidebar_class}>\n"
-        "            <div class=\"sidebar-content\">\n"
+        '            <div class="sidebar-content">\n'
         "                <ul>\n"
     )
 
     for builder in builders:
-
         document.write(
-            f"                    <li class={{if route == AppRoute::{builder.get_capitalized_table_name()} {{ \"active\" }} else {{ \"\" }}}}>\n"
+            f'                    <li class={{if route == AppRoute::{builder.get_capitalized_table_name()} {{ "active" }} else {{ "" }}}}>\n'
             f"                        <Link<AppRoute> to={{AppRoute::{builder.get_capitalized_table_name()}}}>\n"
-            f"                            {{\"{builder.capitalized_human_readable_table_name()}\"}}\n"
+            f'                            {{"{builder.capitalized_human_readable_table_name()}"}}\n'
             "                        </Link<AppRoute>>\n"
-        )
-        if builder.get_flat_variant().is_insertable():
-            document.write(
-                f"                        {{if route == AppRoute::{builder.get_capitalized_table_name()} && user.has_user() {{\n"
-                "                            html! {\n"
-                "                                <ul>\n"
-                "                                    <li>\n"
-                f"                                        <Link<AppRoute> to={{AppRoute::{builder.get_capitalized_table_name()}New}}>\n"
-                f"                                            {{\"New {builder.human_readable_name()}\"}}\n"
-                "                                        </Link<AppRoute>>\n"
-                "                                    </li>\n"
-                "                                </ul>\n"
-                "                            }\n"
-                "                        } else {\n"
-                "                            html! {<></>}\n"
-                "                        }}\n"
-            )
-            
-        document.write(
             "                    </li>\n"
         )
 
@@ -105,7 +85,7 @@ def write_frontend_sidebar(builders: List[StructMetadata]):
         "                        html! {\n"
         "                            <li>\n"
         "                                <Link<AppRoute> to={AppRoute::Login}>\n"
-        "                                    {\"Login\"}\n"
+        '                                    {"Login"}\n'
         "                                </Link<AppRoute>>\n"
         "                            </li>\n"
         "                        }\n"
@@ -120,9 +100,10 @@ def write_frontend_sidebar(builders: List[StructMetadata]):
     document.flush()
     document.close()
 
+
 def write_frontend_router_page(builders: List[StructMetadata]):
     """Writes out the frontend router page.
-    
+
     Parameters
     ----------
     builders : List[StructMetadata]
@@ -138,7 +119,6 @@ def write_frontend_router_page(builders: List[StructMetadata]):
     * The component providing the left-side sidebar content.
     """
 
-    tables = find_foreign_keys()
     document = open("../frontend/src/router.rs", "w", encoding="utf-8")
 
     # Preliminarly, we write out a comment that warns the
@@ -156,51 +136,58 @@ def write_frontend_router_page(builders: List[StructMetadata]):
         "use crate::pages::*;",
         "use uuid::Uuid;",
         "use crate::components::BasicPages;",
+        "use crate::components::BasicPage;",
         "use web_common::database::*;",
-        "use crate::components::forms::automatic_forms::*;"
+        "use crate::components::forms::automatic_forms::*;",
     ]
 
     document.write("\n".join(imports) + "\n\n")
 
     document.write(
-        "#[derive(Debug, Clone, Copy, PartialEq, Routable)]\n"
-        "pub enum AppRoute {\n"
+        "#[derive(Debug, Clone, Copy, PartialEq, Routable)]\n" "pub enum AppRoute {\n"
     )
 
     for builder in builders:
         flat_variant = builder.get_flat_variant()
+        primary_keys = flat_variant.get_primary_keys()
 
-        primary_key = flat_variant.get_primary_key()
+        ids_url = "".join([f"/:{primary_key.name}" for primary_key in primary_keys])
+        ids_struct = ", ".join(
+            [
+                f"{primary_key.name}: {primary_key.format_data_type()}"
+                for primary_key in primary_keys
+            ]
+        )
 
         document.write(
-            f"    #[at(\"/{builder.table_name}\")]\n"
+            f'    #[at("/{builder.table_name}")]\n'
             f"    {builder.get_capitalized_table_name()},\n"
-            f"    #[at(\"/{builder.table_name}/:{primary_key.name}\")]\n"
-            f"    {builder.get_capitalized_table_name()}View{{{primary_key.name}: {primary_key.format_data_type()}}},\n"
+            f'    #[at("/{builder.table_name}{ids_url}")]\n'
+            f"    {builder.get_capitalized_table_name()}View{{{ids_struct}}},\n"
         )
 
         if flat_variant.is_insertable():
             # We also add the /new sub-route
             document.write(
-                f"    #[at(\"/{builder.table_name}/new\")]\n"
+                f'    #[at("/{builder.table_name}/new")]\n'
                 f"    {builder.get_capitalized_table_name()}New,\n"
             )
-        
+
         if flat_variant.is_updatable():
             # We also add the /update sub-route
             document.write(
-                f"    #[at(\"/{builder.table_name}/:{primary_key.name}/update\")]\n"
-                f"    {builder.get_capitalized_table_name()}Update{{{primary_key.name}: {primary_key.format_data_type()}}},\n"
+                f'    #[at("/{builder.table_name}{ids_url}/update")]\n'
+                f"    {builder.get_capitalized_table_name()}Update{{{ids_struct}}},\n"
             )
 
     # Last, we insert the additional pages.
     document.write(
-        "    #[at(\"/\")]\n"
+        '    #[at("/")]\n'
         "    Home,\n"
-        "    #[at(\"/login\")]\n"
+        '    #[at("/login")]\n'
         "    Login,\n"
         "    #[not_found]\n"
-        "    #[at(\"/404\")]\n"
+        '    #[at("/404")]\n'
         "    NotFound,\n"
         "}\n\n"
     )
@@ -220,15 +207,14 @@ def write_frontend_router_page(builders: List[StructMetadata]):
         flat_variant = builder.get_flat_variant()
         richest_variant = builder.get_richest_variant()
 
-        primary_key = flat_variant.get_primary_key()
+        primary_keys = flat_variant.get_primary_keys()
 
         document.write(
             f"        AppRoute::{builder.get_capitalized_table_name()} => {{\n"
             f"            html! {{ <BasicPages<{richest_variant.name}> /> }}\n"
             f"        }}\n"
-            f"        AppRoute::{builder.get_capitalized_table_name()}View{{{primary_key.name}}} => {{\n"
-            f"             html! {{ <span>{{\"Specific {builder.human_readable_name()} page\"}}</span> }}\n"
-            #f"            html! {{ <{builder.get_capitalized_table_name()}View {primary_key.name}={primary_key.name} /> }}\n"
+            f"        AppRoute::{builder.get_capitalized_table_name()}View{{{flat_variant.get_formatted_primary_keys(include_prefix=False)}}} => {{\n"
+            f"            html! {{ <BasicPage<{richest_variant.name}> id={{PrimaryKey::from({flat_variant.get_formatted_primary_keys(include_prefix=False)})}} /> }}\n"
             f"        }}\n"
         )
 
@@ -240,9 +226,13 @@ def write_frontend_router_page(builders: List[StructMetadata]):
             )
 
         if flat_variant.is_updatable():
+            form_primary_key_properties = " ".join(
+                f"{primary_key.name}={{{primary_key.name}}}"
+                for primary_key in primary_keys
+            )
             document.write(
-                f"        AppRoute::{builder.get_capitalized_table_name()}Update{{{primary_key.name}}} => {{\n"
-                f"            html! {{ <Update{flat_variant.name}Form {primary_key.name}={{{primary_key.name}}} /> }}\n"
+                f"        AppRoute::{builder.get_capitalized_table_name()}Update{{{flat_variant.get_formatted_primary_keys(include_prefix=False)}}} => {{\n"
+                f"            html! {{ <Update{flat_variant.name}Form {form_primary_key_properties} /> }}\n"
                 f"        }}\n"
             )
 

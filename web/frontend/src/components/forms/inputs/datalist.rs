@@ -1,5 +1,7 @@
 //! Module providing a yew component that handles a basic input, which is meant to be used in combination with BasicForm.
 
+use std::fmt::Debug;
+
 use super::InputErrors;
 use crate::components::database::row_to_searchable_badge::RowToSearchableBadge;
 use crate::workers::ws_worker::ComponentMessage;
@@ -16,7 +18,7 @@ use yew_agent::prelude::WorkerBridgeHandle;
 use yew_agent::scope_ext::AgentScopeExt;
 
 #[derive(Clone, PartialEq, Properties)]
-pub struct MultiDatalistProp<Data>
+pub struct MultiDatalistProp<Data, const EDIT: bool>
 where
     Data: 'static + Clone + PartialEq,
 {
@@ -39,9 +41,9 @@ where
     pub number_of_candidates: u32,
 }
 
-impl<Data> MultiDatalistProp<Data>
+impl<Data, const EDIT: bool> MultiDatalistProp<Data, EDIT>
 where
-    Data: 'static + Clone + PartialEq,
+    Data: 'static + Clone + PartialEq + Debug
 {
     pub fn label(&self) -> String {
         self.label.clone()
@@ -56,7 +58,7 @@ where
     }
 }
 
-pub struct MultiDatalist<Data> {
+pub struct MultiDatalist<Data, const EDIT: bool> {
     websocket: WorkerBridgeHandle<WebsocketWorker>,
     errors: Vec<ApiError>,
     current_value: Option<String>,
@@ -88,12 +90,12 @@ pub enum DatalistMessage<Data> {
     Blur,
 }
 
-impl<Data> Component for MultiDatalist<Data>
+impl<Data, const EDIT: bool> Component for MultiDatalist<Data, EDIT>
 where
-    Data: 'static + Clone + PartialEq + DeserializeOwned + Searchable + RowToSearchableBadge,
+    Data: 'static + Clone + PartialEq + DeserializeOwned + Searchable<EDIT> + RowToSearchableBadge + Debug,
 {
     type Message = DatalistMessage<Data>;
-    type Properties = MultiDatalistProp<Data>;
+    type Properties = MultiDatalistProp<Data, EDIT>;
 
     fn create(ctx: &Context<Self>) -> Self {
         Self {
@@ -117,7 +119,7 @@ where
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
-        match msg {
+match msg {
             DatalistMessage::Backend(message) => match message {
                 WebsocketMessage::SearchTable(results) => {
                     self.number_of_search_queries -= 1;
@@ -274,11 +276,20 @@ where
             .as_ref()
             .map_or_else(|| "".to_string(), |value| value.clone());
 
+        let label_classes = format!(
+            "input-label{}",
+            if props.optional {
+                ""
+            } else {
+                " input-label-mandatory"
+            }
+        );
+
         let input_field = html! {
             <>
                 {if props.show_label {
                     html! {
-                        <label for={props.normalized_label()} class={"input-label"}>
+                        <label for={props.normalized_label()} class={label_classes}>
                             {props.label()}
                         </label>
                     }
@@ -357,6 +368,13 @@ where
             </>
         };
 
+        let all_errors: Vec<ApiError> = self
+            .errors
+            .iter()
+            .chain(ctx.props().errors.iter())
+            .cloned()
+            .collect();
+
         html! {
             <div class={classes}>
                 {if props.show_label {
@@ -416,14 +434,14 @@ where
                         }
                     }}
                 }}
-                <InputErrors errors={self.errors.clone()} />
+                <InputErrors errors={all_errors} />
             </div>
         }
     }
 }
 
 #[derive(Clone, PartialEq, Properties)]
-pub struct DatalistProp<Data>
+pub struct DatalistProp<Data, const EDIT: bool>
 where
     Data: 'static + Clone + PartialEq,
 {
@@ -443,9 +461,9 @@ where
 }
 
 #[function_component(Datalist)]
-pub fn datalist<Data>(props: &DatalistProp<Data>) -> Html
+pub fn datalist<Data, const EDIT: bool>(props: &DatalistProp<Data, EDIT>) -> Html
 where
-    Data: 'static + Clone + PartialEq + DeserializeOwned + Searchable + RowToSearchableBadge,
+    Data: 'static + Clone + PartialEq + DeserializeOwned + Searchable<EDIT> + RowToSearchableBadge + Debug,
 {
     let builder_callback = {
         let old_builder = props.builder.clone();
@@ -455,6 +473,6 @@ where
     };
 
     html! {
-        <MultiDatalist<Data> label={props.label.clone()} builder={builder_callback} errors={props.errors.clone()} show_label={props.show_label} placeholder={props.placeholder.clone()} value={props.value.clone().map_or_else(|| Vec::new(), |value| vec![value])} optional={props.optional} number_of_candidates={props.number_of_candidates} />
+        <MultiDatalist<Data, EDIT> label={props.label.clone()} builder={builder_callback} errors={props.errors.clone()} show_label={props.show_label} placeholder={props.placeholder.clone()} value={props.value.clone().map_or_else(|| Vec::new(), |value| vec![value])} optional={props.optional} number_of_candidates={props.number_of_candidates} />
     }
 }

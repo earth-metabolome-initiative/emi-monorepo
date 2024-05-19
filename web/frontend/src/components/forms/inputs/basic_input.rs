@@ -69,7 +69,7 @@ pub struct InputProp<Data: Inputtable> {
 
 impl<Data: Inputtable> InputProp<Data> {
     pub fn label(&self) -> String {
-        self.label.clone()
+        self.label.clone() 
     }
 
     pub fn normalized_label(&self) -> String {
@@ -134,9 +134,18 @@ pub fn basic_input<Data: Inputtable>(props: &InputProp<Data>) -> Html {
         .value()
         .map_or_else(|| "".to_string(), |value| value.to_string());
 
+    let label_classes = format!(
+        "input-label{}",
+        if props.optional {
+            ""
+        } else {
+            " input-label-mandatory"
+        }
+    );
+
     let input_field = html! {
         <>
-            <label for={props.normalized_label()} class={"input-label"}>
+            <label for={props.normalized_label()} class={label_classes}>
                 {props.label()}
             </label>
             {match Data::INPUT_TYPE {

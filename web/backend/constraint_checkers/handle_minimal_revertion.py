@@ -5,6 +5,7 @@ from typing import List, Dict
 from dict_hash import sha256
 import compress_json
 import os
+import sys
 
 
 def hash_migration(migration: str) -> str:

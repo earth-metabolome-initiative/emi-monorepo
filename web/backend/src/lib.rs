@@ -1,5 +1,4 @@
 pub mod api;
-pub mod model_implementations;
 pub mod models;
 pub mod nested_models;
 pub mod new_variants;

@@ -1,16 +1,16 @@
-name,hexadecimal_value
-blue,#5778a4
-orange,#e49444
-red,#d1615d
-error,#FF5733
-teal,#85b6b2
-green,#6a9f58
-yellow,#e7ca60
-purple,#a87c9f
-pink,#f1a2a9
-brown,#967662
-grey,#b8b0ac
-black,#000000
-near_black,#444
-light_grey,#ccc
-primary,#aa9639
+name,hexadecimal_value,description
+blue,#5778a4,"A desaturated blue with medium brightness."
+orange,#e49444,"A warm, muted orange."
+red,#d1615d,"A soft red with a hint of brown."
+error,#FF5733,"A bright, vivid orange-red."
+teal,#85b6b2,"A muted teal with a balanced mix of green and blue."
+green,#6a9f58,"A subdued green with a touch of earthiness."
+yellow,#e7ca60,"A warm yellow with medium brightness."
+purple,#a87c9f,"A muted purple with a hint of pink."
+pink,#f1a2a9,"A soft, pastel pink."
+brown,#967662,"A medium brown with a slightly muted tone."
+grey,#b8b0ac,"A medium grey with a neutral tone."
+black,#000000,"Pure black with no brightness."
+near_black,#444,"A very dark grey, almost black."
+light_grey,#ccc,"A light grey with a soft, neutral tone."
+primary,#aa9639,"A rich, warm golden-brown."

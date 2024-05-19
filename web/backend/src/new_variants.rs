@@ -29,213 +29,6 @@ pub(super) trait InsertRow {
     ) -> Result<Self::Flat, diesel::result::Error>;
 }
 
-/// Intermediate representation of the new variant NewContainerHorizontalRule.
-#[derive(Insertable)]
-#[diesel(table_name = container_horizontal_rules)]
-pub(super) struct IntermediateNewContainerHorizontalRule {
-    created_by: i32,
-    name: String,
-    item_type_id: i32,
-    other_item_type_id: i32,
-    minimum_temperature: Option<i32>,
-    maximum_temperature: Option<i32>,
-    minimum_humidity: Option<i32>,
-    maximum_humidity: Option<i32>,
-    minimum_pressure: Option<i32>,
-    maximum_pressure: Option<i32>,
-    updated_by: i32,
-}
-
-impl InsertRow for web_common::database::NewContainerHorizontalRule {
-    type Intermediate = IntermediateNewContainerHorizontalRule;
-    type Flat = ContainerHorizontalRule;
-
-    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
-        IntermediateNewContainerHorizontalRule {
-            created_by: user_id,
-            name: self.name,
-            item_type_id: self.item_type_id,
-            other_item_type_id: self.other_item_type_id,
-            minimum_temperature: self.minimum_temperature,
-            maximum_temperature: self.maximum_temperature,
-            minimum_humidity: self.minimum_humidity,
-            maximum_humidity: self.maximum_humidity,
-            minimum_pressure: self.minimum_pressure,
-            maximum_pressure: self.maximum_pressure,
-            updated_by: user_id,
-        }
-    }
-
-    fn insert(
-        self,
-        user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self::Flat, diesel::result::Error> {
-        use crate::schema::container_horizontal_rules;
-        diesel::insert_into(container_horizontal_rules::dsl::container_horizontal_rules)
-            .values(self.to_intermediate(user_id))
-            .get_result(connection)
-    }
-}
-
-/// Intermediate representation of the new variant NewContainerVerticalRule.
-#[derive(Insertable)]
-#[diesel(table_name = container_vertical_rules)]
-pub(super) struct IntermediateNewContainerVerticalRule {
-    created_by: i32,
-    name: String,
-    container_item_type_id: i32,
-    contained_item_type_id: i32,
-    minimum_temperature: Option<i32>,
-    maximum_temperature: Option<i32>,
-    minimum_humidity: Option<i32>,
-    maximum_humidity: Option<i32>,
-    minimum_pressure: Option<i32>,
-    maximum_pressure: Option<i32>,
-    updated_by: i32,
-}
-
-impl InsertRow for web_common::database::NewContainerVerticalRule {
-    type Intermediate = IntermediateNewContainerVerticalRule;
-    type Flat = ContainerVerticalRule;
-
-    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
-        IntermediateNewContainerVerticalRule {
-            created_by: user_id,
-            name: self.name,
-            container_item_type_id: self.container_item_type_id,
-            contained_item_type_id: self.contained_item_type_id,
-            minimum_temperature: self.minimum_temperature,
-            maximum_temperature: self.maximum_temperature,
-            minimum_humidity: self.minimum_humidity,
-            maximum_humidity: self.maximum_humidity,
-            minimum_pressure: self.minimum_pressure,
-            maximum_pressure: self.maximum_pressure,
-            updated_by: user_id,
-        }
-    }
-
-    fn insert(
-        self,
-        user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self::Flat, diesel::result::Error> {
-        use crate::schema::container_vertical_rules;
-        diesel::insert_into(container_vertical_rules::dsl::container_vertical_rules)
-            .values(self.to_intermediate(user_id))
-            .get_result(connection)
-    }
-}
-
-/// Intermediate representation of the new variant NewItemCategory.
-#[derive(Insertable)]
-#[diesel(table_name = item_categories)]
-pub(super) struct IntermediateNewItemCategory {
-    created_by: i32,
-    name: String,
-    description: String,
-    updated_by: i32,
-}
-
-impl InsertRow for web_common::database::NewItemCategory {
-    type Intermediate = IntermediateNewItemCategory;
-    type Flat = ItemCategory;
-
-    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
-        IntermediateNewItemCategory {
-            created_by: user_id,
-            name: self.name,
-            description: self.description,
-            updated_by: user_id,
-        }
-    }
-
-    fn insert(
-        self,
-        user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self::Flat, diesel::result::Error> {
-        use crate::schema::item_categories;
-        diesel::insert_into(item_categories::dsl::item_categories)
-            .values(self.to_intermediate(user_id))
-            .get_result(connection)
-    }
-}
-
-/// Intermediate representation of the new variant NewProcedure.
-#[derive(Insertable)]
-#[diesel(table_name = procedures)]
-pub(super) struct IntermediateNewProcedure {
-    created_by: i32,
-    name: String,
-    description: Option<String>,
-    updated_by: i32,
-}
-
-impl InsertRow for web_common::database::NewProcedure {
-    type Intermediate = IntermediateNewProcedure;
-    type Flat = Procedure;
-
-    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
-        IntermediateNewProcedure {
-            created_by: user_id,
-            name: self.name,
-            description: self.description,
-            updated_by: user_id,
-        }
-    }
-
-    fn insert(
-        self,
-        user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self::Flat, diesel::result::Error> {
-        use crate::schema::procedures;
-        diesel::insert_into(procedures::dsl::procedures)
-            .values(self.to_intermediate(user_id))
-            .get_result(connection)
-    }
-}
-
-/// Intermediate representation of the new variant NewProjectRequirement.
-#[derive(Insertable)]
-#[diesel(table_name = project_requirements)]
-pub(super) struct IntermediateNewProjectRequirement {
-    created_by: i32,
-    project_id: i32,
-    item_category_id: i32,
-    quantity: i32,
-    unit_id: Option<i32>,
-    updated_by: i32,
-}
-
-impl InsertRow for web_common::database::NewProjectRequirement {
-    type Intermediate = IntermediateNewProjectRequirement;
-    type Flat = ProjectRequirement;
-
-    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
-        IntermediateNewProjectRequirement {
-            created_by: user_id,
-            project_id: self.project_id,
-            item_category_id: self.item_category_id,
-            quantity: self.quantity,
-            unit_id: self.unit_id,
-            updated_by: user_id,
-        }
-    }
-
-    fn insert(
-        self,
-        user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self::Flat, diesel::result::Error> {
-        use crate::schema::project_requirements;
-        diesel::insert_into(project_requirements::dsl::project_requirements)
-            .values(self.to_intermediate(user_id))
-            .get_result(connection)
-    }
-}
-
 /// Intermediate representation of the new variant NewProject.
 #[derive(Insertable)]
 #[diesel(table_name = projects)]
@@ -245,6 +38,8 @@ pub(super) struct IntermediateNewProject {
     description: String,
     public: bool,
     state_id: i32,
+    icon_id: i32,
+    color_id: i32,
     parent_project_id: Option<i32>,
     budget: Option<f64>,
     expenses: Option<f64>,
@@ -264,6 +59,8 @@ impl InsertRow for web_common::database::NewProject {
             description: self.description,
             public: self.public,
             state_id: self.state_id,
+            icon_id: self.icon_id,
+            color_id: self.color_id,
             parent_project_id: self.parent_project_id,
             budget: self.budget,
             expenses: self.expenses,
@@ -275,7 +72,7 @@ impl InsertRow for web_common::database::NewProject {
 
     fn insert(
         self,
-        user_id: i32,
+       user_id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self::Flat, diesel::result::Error> {
         use crate::schema::projects;
@@ -291,7 +88,6 @@ impl InsertRow for web_common::database::NewProject {
 pub(super) struct IntermediateNewSampledIndividual {
     created_by: i32,
     id: Uuid,
-    name: Option<String>,
     tagged: bool,
     updated_by: i32,
 }
@@ -304,7 +100,6 @@ impl InsertRow for web_common::database::NewSampledIndividual {
         IntermediateNewSampledIndividual {
             created_by: user_id,
             id: self.id,
-            name: self.name,
             tagged: self.tagged,
             updated_by: user_id,
         }
@@ -312,7 +107,7 @@ impl InsertRow for web_common::database::NewSampledIndividual {
 
     fn insert(
         self,
-        user_id: i32,
+       user_id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self::Flat, diesel::result::Error> {
         use crate::schema::sampled_individuals;
@@ -329,7 +124,6 @@ pub(super) struct IntermediateNewSample {
     created_by: i32,
     id: Uuid,
     sampled_by: i32,
-    procedure_id: Uuid,
     state: i32,
     updated_by: i32,
 }
@@ -343,7 +137,6 @@ impl InsertRow for web_common::database::NewSample {
             created_by: user_id,
             id: self.id,
             sampled_by: self.sampled_by,
-            procedure_id: self.procedure_id,
             state: self.state,
             updated_by: user_id,
         }
@@ -351,48 +144,11 @@ impl InsertRow for web_common::database::NewSample {
 
     fn insert(
         self,
-        user_id: i32,
+       user_id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self::Flat, diesel::result::Error> {
         use crate::schema::samples;
         diesel::insert_into(samples::dsl::samples)
-            .values(self.to_intermediate(user_id))
-            .get_result(connection)
-    }
-}
-
-/// Intermediate representation of the new variant NewSamplingProcedure.
-#[derive(Insertable)]
-#[diesel(table_name = sampling_procedures)]
-pub(super) struct IntermediateNewSamplingProcedure {
-    created_by: i32,
-    id: Uuid,
-    name: String,
-    description: Option<String>,
-    updated_by: i32,
-}
-
-impl InsertRow for web_common::database::NewSamplingProcedure {
-    type Intermediate = IntermediateNewSamplingProcedure;
-    type Flat = SamplingProcedure;
-
-    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
-        IntermediateNewSamplingProcedure {
-            created_by: user_id,
-            id: self.id,
-            name: self.name,
-            description: self.description,
-            updated_by: user_id,
-        }
-    }
-
-    fn insert(
-        self,
-        user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self::Flat, diesel::result::Error> {
-        use crate::schema::sampling_procedures;
-        diesel::insert_into(sampling_procedures::dsl::sampling_procedures)
             .values(self.to_intermediate(user_id))
             .get_result(connection)
     }
@@ -405,6 +161,8 @@ pub(super) struct IntermediateNewTeam {
     created_by: i32,
     name: String,
     description: String,
+    icon_id: i32,
+    color_id: i32,
     parent_team_id: Option<i32>,
     updated_by: i32,
 }
@@ -418,6 +176,8 @@ impl InsertRow for web_common::database::NewTeam {
             created_by: user_id,
             name: self.name,
             description: self.description,
+            icon_id: self.icon_id,
+            color_id: self.color_id,
             parent_team_id: self.parent_team_id,
             updated_by: user_id,
         }
@@ -425,12 +185,83 @@ impl InsertRow for web_common::database::NewTeam {
 
     fn insert(
         self,
-        user_id: i32,
+       user_id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self::Flat, diesel::result::Error> {
         use crate::schema::teams;
         diesel::insert_into(teams::dsl::teams)
             .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
+/// Intermediate representation of the new variant NewUserEmail.
+#[derive(Insertable)]
+#[diesel(table_name = user_emails)]
+pub(super) struct IntermediateNewUserEmail {
+    created_by: i32,
+    email: String,
+    login_provider_id: i32,
+    primary_email: bool,
+}
+
+impl InsertRow for web_common::database::NewUserEmail {
+    type Intermediate = IntermediateNewUserEmail;
+    type Flat = UserEmail;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewUserEmail {
+            created_by: user_id,
+            email: self.email,
+            login_provider_id: self.login_provider_id,
+            primary_email: self.primary_email,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::user_emails;
+        diesel::insert_into(user_emails::dsl::user_emails)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
+/// Intermediate representation of the new variant NewUser.
+#[derive(Insertable)]
+#[diesel(table_name = users)]
+pub(super) struct IntermediateNewUser {
+    first_name: String,
+    middle_name: Option<String>,
+    last_name: String,
+    profile_picture: Vec<u8>,
+}
+
+impl InsertRow for web_common::database::NewUser {
+    type Intermediate = IntermediateNewUser;
+    type Flat = User;
+
+    fn to_intermediate(self, _user_id: i32) -> Self::Intermediate {
+        IntermediateNewUser {
+            first_name: self.first_name,
+            middle_name: self.middle_name,
+            last_name: self.last_name,
+            profile_picture: self.profile_picture,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::users;
+        assert_eq!(user_id, 0);
+        diesel::insert_into(users::dsl::users)
+            .values(self.to_intermediate(0))
             .get_result(connection)
     }
 }

@@ -1,85 +1,23 @@
-"""Python script to run a patched version of the diesel extended CLI to generate models.
-
-Implementation details
-----------------------
-The diesel extended CLI can be used to generated the structs associated to the database tables. However, the
-generated structs are not complete most commonly, as it does not come equipped with some of the postgres types.
-Fortunately, this can be easily patched with some replace statements.
-
-We start by running the extended CLI command:
-
-```bash
-diesel_ext --model --add-table-name > src/models.rs
-```
-
-Then, we need to handle the following replacements, plus adding on the top of the file the associated imports.
-The imports need to be added solely when the replacements are effective, i.e. there is actually a change in the file,
-otherwise we would add unnecessary imports and cause compilation warnings.
-
-The replacements are defined in the file `replacements.json` and are applied to the generated file `src/models.rs`.
-The structure of the JSON file is as follows:
-
-```json
-[
-    {
-        "search": "search_string",
-        "replace": "replace_string",
-        "imports": ["import1", "import2"]
-    }
-]
-```
-
-With a more concrete example:
-
-```json
-[
-    {
-        "search": "Option</* TODO: unknown type Nullable<Numrange> */>",
-        "replace": "Option<Range<Numeric>>",
-        "imports": [
-            "use diesel::sql_types::Numeric;",
-            "use diesel::sql_types::Range;"
-        ]
-    }
-]
-```
-
-Since we also need to interface with the Frontend database which are NOT based
-on Postgres, we also need to duplicate the code in the web commons and generate
-the From implementations for the structs in the `src/models.rs` file. The `web_common`
-structs will be generated in the `src/database/tables.rs` file in the `web_common` crate.
-Since these structs are field-by-field identical, we can simply copy the structs while
-ignoring the `#[derive(...)]` and `#[table_name = "..."]` attributes which would not be
-applicable in the `web_common` crate. The `From` implementations will be generated in the
-`src/models.rs` file in the `backend` crate, below each of the diesel-generated structs and
-will make use of the full path to the struct in the `web_common` crate so to avoid conflicts.
-
-"""
+"""This module contains the functions to generate the backend & frontend models."""
 
 import os
 import re
 import io
 import copy
 import shutil
-from typing import List, Optional, Tuple, Union
+from time import sleep
+from typing import List, Dict
 from userinput import userinput
 import compress_json
-import pandas as pd
-import psycopg2
-from time import sleep
-from densify_directory_counter import densify_directory_counter
 from dotenv import load_dotenv
 from retrieve_taxons import retrieve_taxons
 from tqdm.auto import tqdm
 from insert_migration import insert_migration
-from functools import cache
-import glob
 from constraint_checkers import (
     find_foreign_keys,
     ensures_all_update_at_trigger_exists,
     TableMetadata,
     ViewColumn,
-    get_cursor,
 )
 from constraint_checkers import ensure_created_at_columns, ensure_updated_at_columns
 from constraint_checkers import handle_minimal_revertion
@@ -91,6 +29,14 @@ from constraint_checkers import (
 )
 from constraint_checkers import TableStructMetadata, StructMetadata, AttributeMetadata
 from constraint_checkers import write_frontend_pages, write_frontend_router_page
+from constraint_checkers import (
+    enforce_migration_naming_convention,
+    ensure_updatable_tables_have_roles_tables,
+    ensure_tables_have_creation_notification_trigger,
+)
+from constraint_checkers.regroup_tables import regroup_tables
+from constraint_checkers import generate_view_schema
+from constraint_checkers import check_parent_circularity_trigger
 
 
 TEXTUAL_DATA_TYPES = ["String"]
@@ -134,15 +80,8 @@ INPUT_TYPE_MAP = {
 
 TEMPORARELY_IGNORED_TABLES = [
     "derived_samples",
-    "item_locations",
-    "item_units",
-    "items",
-    "locations",
-    "sample_bio_ott_taxon_items",
-    "sampled_individual_bio_ott_taxon_items",
     "spectra",
     "spectra_collections",
-    "user_emails",
 ]
 
 
@@ -163,15 +102,17 @@ def sql_type_to_rust_type(sql_type: str) -> str:
 
 
 def write_backend_structs(
-    path: str, table_type: str, struct_metadatas: List[StructMetadata]
+    path: str,
+    table_type: str,
+    struct_metadatas: List[StructMetadata],
+    table_metadata: TableMetadata,
 ):
     """Write the `From` implementations for the structs in the `src/models.rs` file."""
 
     if len(struct_metadatas) == 0:
         return
 
-    similarity_indices: PGIndices = find_pg_trgm_indices()
-    table_metadatas = find_foreign_keys()
+    similarity_indices: PGIndices = find_pg_trgm_indices(table_metadata)
 
     # After each struct ends, as defined by the `}` character, after
     # we have found a `struct` keyword, we write the `From` implementation
@@ -200,7 +141,7 @@ def write_backend_structs(
     if table_type == "views":
         imports.append("use crate::views::schema::*;")
 
-    with open(path, "w") as file:
+    with open(path, "w", encoding="utf8") as file:
         # Preliminarly, we write out a few docstrings explaining that
         # the file is generated and should not be modified.
         file.write(
@@ -228,6 +169,13 @@ def write_backend_structs(
             unit="struct",
             leave=False,
         ):
+
+            primary_keys = struct.get_primary_keys()
+
+            editable_variants = [False]
+
+            if struct.has_associated_roles() and struct.table_name != "users":
+                editable_variants.append(True)
 
             # First of all, we write out the struct.
             struct.write_to(file, diesel=table_type)
@@ -270,42 +218,288 @@ def write_backend_structs(
 
             file.write(f"impl {struct.name} {{\n")
 
+            # For all the tables that have an associated roles table, we implement methods
+            # to determine whetheer a provided user id is a Viewer (role_id >= 3), Editor (role_id >= 2), or Admin (role_id == 1),
+            # or the user is the creator of the struct (i.e. the created_by field is equal to the user_id).
+            if struct.has_associated_roles() and struct.table_name != "users":
+                # We start by creating the more general method that checks whether the user has a role
+                # with a role_id less than or equal to the provided role_id.
+                file.write(
+                    "    /// Check whether the user has a role with a role_id less than or equal to the provided role_id.\n"
+                    "    ///\n"
+                    "    /// # Arguments\n"
+                    f"    /// * `{struct.get_formatted_primary_keys(include_prefix=False)}` - The primary key(s) of the struct to delete.\n"
+                    "    /// * `author_user_id` - The ID of the user to check.\n"
+                    "    /// * `role_id` - The role_id to check against.\n"
+                    "    /// * `connection` - The connection to the database.\n"
+                    "    ///\n"
+                    "    pub fn has_role_by_id(\n"
+                    f"        {struct.get_formatted_primary_keys(include_prefix=False)}: {struct.get_formatted_primary_key_data_types()},\n"
+                    "        author_user_id: i32,\n"
+                    "        role_id: i32,\n"
+                    "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+                    "    ) -> Result<bool, diesel::result::Error> {\n"
+                    f"        diesel::select(diesel::dsl::exists({struct.table_name}::dsl::{struct.table_name}\n"
+                )
+                for primary_key in primary_keys:
+                    file.write(
+                        f"            .filter({struct.table_name}::dsl::{primary_key.name}.eq({primary_key.name}))\n"
+                    )
+                file.write(
+                    f"           .filter({struct.table_name}::dsl::created_by.eq(author_user_id))\n"
+                    "            .or_filter(\n"
+                    f"               {struct.table_name}::dsl::id.eq(id)\n"
+                    f"                   .and({struct.table_name}::dsl::id.eq_any(\n"
+                    f"                       {struct.table_name}_users_roles::table\n"
+                    f"                           .select({struct.table_name}_users_roles::dsl::table_id)\n"
+                    f"                           .filter({struct.table_name}_users_roles::dsl::user_id.eq(author_user_id)\n"
+                    f"                           .and({struct.table_name}_users_roles::dsl::role_id.le(role_id)),\n"
+                    "                    )),\n"
+                    "               )\n"
+                    "         )\n"
+                )
+                if struct.table_name != "teams":
+                    file.write(
+                        "                    .or_filter(\n"
+                        f"                       {struct.table_name}::dsl::id.eq(id)\n"
+                        f"                           .and({struct.table_name}::dsl::id.eq_any(\n"
+                        f"                               {struct.table_name}_teams_roles::table\n"
+                        f"                                   .select({struct.table_name}_teams_roles::dsl::table_id)\n"
+                        f"                                   .filter({struct.table_name}_teams_roles::dsl::role_id.le(role_id))\n"
+                        f"                                   .inner_join(teams_users_roles::table.on(\n"
+                        f"                                       {struct.table_name}_teams_roles::dsl::team_id.eq(teams_users_roles::dsl::table_id)\n"
+                        "                                           .and(teams_users_roles::dsl::user_id.eq(author_user_id))\n"
+                        "                                           .and(teams_users_roles::dsl::role_id.le(role_id)),\n"
+                        "                                   )),\n"
+                        "                              ))\n"
+                        "                       )\n"
+                    )
+                file.write(
+                    "            ))\n"
+                    "         .get_result::<bool>(connection)\n"
+                    "    }\n"
+                )
+
+                # We now create the more specific methods that check whether the user has a role
+                # with a role_id less than or equal to the provided role_id. We start with the Viewer role.
+
+                file.write(
+                    "    /// Check whether the user is a Viewer (role_id >= 3).\n"
+                    "    ///\n"
+                    "    /// # Arguments\n"
+                    "    /// * `author_user_id` - The ID of the user to check.\n"
+                    "    /// * `connection` - The connection to the database.\n"
+                    "    ///\n"
+                    "    pub fn is_viewer(\n"
+                    "        &self,\n"
+                    "        author_user_id: i32,\n"
+                    "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+                    "    ) -> Result<bool, diesel::result::Error> {\n"
+                    "        Self::is_viewer_by_id(\n"
+                    f"            {struct.get_formatted_primary_keys(include_prefix=True)},\n"
+                    "            author_user_id,\n"
+                    "            connection,\n"
+                    "        )\n"
+                    "    }\n"
+                )
+
+                file.write(
+                    "    /// Check whether the user is a Viewer (role_id >= 3) for the provided primary key(s).\n"
+                    "    ///\n"
+                    "    /// # Arguments\n"
+                    f"    /// * `{struct.get_formatted_primary_keys(include_prefix=False)}` - The primary key(s) of the struct to delete.\n"
+                    "    /// * `author_user_id` - The ID of the user to check.\n"
+                    "    /// * `connection` - The connection to the database.\n"
+                    "    ///\n"
+                    "    pub fn is_viewer_by_id(\n"
+                    f"        {struct.get_formatted_primary_keys(include_prefix=False)}: {struct.get_formatted_primary_key_data_types()},\n"
+                    "        author_user_id: i32,\n"
+                    "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+                    "    ) -> Result<bool, diesel::result::Error> {\n"
+                    "        Self::has_role_by_id(\n"
+                    f"            {struct.get_formatted_primary_keys(include_prefix=False)},\n"
+                    "            author_user_id,\n"
+                    "            3,\n"
+                    "            connection,\n"
+                    "        )\n"
+                    "    }\n"
+                )
+
+                # We now create the more specific methods that check whether the user has a role
+                # with a role_id less than or equal to the provided role_id. We continue with the Editor role.
+
+                file.write(
+                    "    /// Check whether the user is an Editor (role_id >= 2).\n"
+                    "    ///\n"
+                    "    /// # Arguments\n"
+                    "    /// * `author_user_id` - The ID of the user to check.\n"
+                    "    /// * `connection` - The connection to the database.\n"
+                    "    ///\n"
+                    "    pub fn is_editor(\n"
+                    "        &self,\n"
+                    "        author_user_id: i32,\n"
+                    "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+                    "    ) -> Result<bool, diesel::result::Error> {\n"
+                    "        Self::is_editor_by_id(\n"
+                    f"            {struct.get_formatted_primary_keys(include_prefix=True)},\n"
+                    "            author_user_id,\n"
+                    "            connection,\n"
+                    "        )\n"
+                    "    }\n"
+                )
+
+                file.write(
+                    "    /// Check whether the user is an Editor (role_id >= 2).\n"
+                    "    ///\n"
+                    "    /// # Arguments\n"
+                    f"    /// * `{struct.get_formatted_primary_keys(include_prefix=False)}` - The primary key(s) of the struct to delete.\n"
+                    "    /// * `author_user_id` - The ID of the user to check.\n"
+                    "    /// * `connection` - The connection to the database.\n"
+                    "    ///\n"
+                    "    pub fn is_editor_by_id(\n"
+                    f"        {struct.get_formatted_primary_keys(include_prefix=False)}: {struct.get_formatted_primary_key_data_types()},\n"
+                    "        author_user_id: i32,\n"
+                    "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+                    "    ) -> Result<bool, diesel::result::Error> {\n"
+                    "        Self::has_role_by_id(\n"
+                    f"            {struct.get_formatted_primary_keys(include_prefix=False)},\n"
+                    "            author_user_id,\n"
+                    "            2,\n"
+                    "            connection,\n"
+                    "        )\n"
+                    "    }\n"
+                )
+
+                # We now create the more specific methods that check whether the user has a role
+                # with a role_id less than or equal to the provided role_id. We finish with the Admin role.
+
+                file.write(
+                    "    /// Check whether the user is an Admin (role_id == 1).\n"
+                    "    ///\n"
+                    "    /// # Arguments\n"
+                    "    /// * `author_user_id` - The ID of the user to check.\n"
+                    "    /// * `connection` - The connection to the database.\n"
+                    "    ///\n"
+                    "    pub fn is_admin(\n"
+                    "        &self,\n"
+                    "        author_user_id: i32,\n"
+                    "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+                    "    ) -> Result<bool, diesel::result::Error> {\n"
+                    "        Self::is_admin_by_id(\n"
+                    f"            {struct.get_formatted_primary_keys(include_prefix=True)},\n"
+                    "            author_user_id,\n"
+                    "            connection,\n"
+                    "        )\n"
+                    "    }\n"
+                )
+
+                file.write(
+                    "    /// Check whether the user is an Admin (role_id == 1).\n"
+                    "    ///\n"
+                    "    /// # Arguments\n"
+                    f"    /// * `{struct.get_formatted_primary_keys(include_prefix=False)}` - The primary key(s) of the struct to delete.\n"
+                    "    /// * `author_user_id` - The ID of the user to check.\n"
+                    "    /// * `connection` - The connection to the database.\n"
+                    "    ///\n"
+                    "    pub fn is_admin_by_id(\n"
+                    f"        {struct.get_formatted_primary_keys(include_prefix=False)}: {struct.get_formatted_primary_key_data_types()},\n"
+                    "        author_user_id: i32,\n"
+                    "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+                    "    ) -> Result<bool, diesel::result::Error> {\n"
+                    "        Self::has_role_by_id(\n"
+                    f"            {struct.get_formatted_primary_keys(include_prefix=False)},\n"
+                    "            author_user_id,\n"
+                    "            1,\n"
+                    "            connection,\n"
+                    "        )\n"
+                    "    }\n"
+                )
+
             # For all tables we implement a `all` method that retrieves all of
             # the rows in the table structured as a vector of the struct.
 
-            file.write(
-                "    /// Get all of the structs from the database.\n"
-                "    ///\n"
-                "    /// # Arguments\n"
-                "    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.\n"
-                "    /// * `offset` - The number of structs to skip. By default, this is 0.\n"
-                "    /// * `connection` - The connection to the database.\n"
-                "    ///\n"
-                f"    pub fn all(\n"
-                "        limit: Option<i64>,\n"
-                "        offset: Option<i64>,\n"
-                "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
-                "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
-            )
-            if table_type == "tables":
-                file.write(f"        use crate::schema::{struct.table_name};\n")
-            else:
-                file.write(f"        use crate::views::schema::{struct.table_name};\n")
-            # If the limit is None, we do not apply any limit to the query.
-            file.write(
-                f"       {struct.table_name}::dsl::{struct.table_name}\n"
-                "            .offset(offset.unwrap_or(0))\n"
-                "            .limit(limit.unwrap_or(10))\n"
-                "            .load::<Self>(connection)\n"
-                "    }\n"
-            )
+            for editable_variant in editable_variants:
+                if editable_variant:
+                    file.write(
+                        "    /// Get all of the editable structs from the database.\n"
+                    )
+                else:
+                    file.write("    /// Get all of the structs from the database.\n")
+                file.write("    ///\n" "    /// # Arguments\n")
+
+                if editable_variant:
+                    file.write(
+                        "    /// * `author_user_id` - The ID of the user who is performing the search.\n"
+                    )
+
+                file.write(
+                    "    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.\n"
+                    "    /// * `offset` - The number of structs to skip. By default, this is 0.\n"
+                    "    /// * `connection` - The connection to the database.\n"
+                    "    ///\n"
+                )
+                if editable_variant:
+                    file.write(
+                        "    pub fn all_editables(\n" "        author_user_id: i32,\n"
+                    )
+                else:
+                    file.write("    pub fn all(\n")
+                file.write(
+                    "        limit: Option<i64>,\n"
+                    "        offset: Option<i64>,\n"
+                    "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+                )
+                file.write("    ) -> Result<Vec<Self>, diesel::result::Error> {\n")
+                if table_type == "tables":
+                    file.write(f"        use crate::schema::{struct.table_name};\n")
+                else:
+                    file.write(
+                        f"        use crate::views::schema::{struct.table_name};\n"
+                    )
+                # If the limit is None, we do not apply any limit to the query.
+
+                file.write(f"        {struct.table_name}::dsl::{struct.table_name}\n")
+
+                if editable_variant:
+                    file.write(
+                        f"           .filter({struct.table_name}::dsl::created_by.eq(author_user_id))\n"
+                        "            .or_filter(\n"
+                        f"               {struct.table_name}::dsl::id.eq_any(\n"
+                        f"                   {struct.table_name}_users_roles::table\n"
+                        f"                       .select({struct.table_name}_users_roles::dsl::table_id)\n"
+                        f"                       .filter({struct.table_name}_users_roles::dsl::user_id.eq(author_user_id)\n"
+                        f"                       .and({struct.table_name}_users_roles::dsl::role_id.le(2)),\n"
+                        "               )),\n"
+                        "            )\n"
+                    )
+                    if struct.table_name != "teams":
+                        file.write(
+                            "                .or_filter(\n"
+                            f"                   {struct.table_name}::dsl::id.eq_any(\n"
+                            f"                       {struct.table_name}_teams_roles::table\n"
+                            f"                           .select({struct.table_name}_teams_roles::dsl::table_id)\n"
+                            f"                           .filter({struct.table_name}_teams_roles::dsl::role_id.le(2))\n"
+                            f"                           .inner_join(teams_users_roles::table.on(\n"
+                            f"                               {struct.table_name}_teams_roles::dsl::team_id.eq(teams_users_roles::dsl::table_id)\n"
+                            "                                   .and(teams_users_roles::dsl::user_id.eq(author_user_id))\n"
+                            "                                   .and(teams_users_roles::dsl::role_id.le(2)),\n"
+                            "                           )),\n"
+                            "                   ),\n"
+                            "            )\n"
+                        )
+                file.write(
+                    "            .offset(offset.unwrap_or(0))\n"
+                    "            .limit(limit.unwrap_or(10))\n"
+                    "            .load::<Self>(connection)\n"
+                    "    }\n"
+                )
 
             # For the tables that have an updated_at column, we implement the
             # `all_by_updated_at` method that retrieves all of the rows in the
             # table structured as a vector of the struct ordered by the updated_at
             # column in descending order.
 
-            if table_metadatas.has_updated_at_column(struct.table_name):
+            if table_metadata.has_updated_at_column(struct.table_name):
                 file.write(
                     "    /// Get all of the structs from the database ordered by the updated_at column.\n"
                     "    ///\n"
@@ -314,7 +508,7 @@ def write_backend_structs(
                     "    /// * `offset` - The number of structs to skip. By default, this is 0.\n"
                     "    /// * `connection` - The connection to the database.\n"
                     "    ///\n"
-                    f"    pub fn all_by_updated_at(\n"
+                    "    pub fn all_by_updated_at(\n"
                     "        limit: Option<i64>,\n"
                     "        offset: Option<i64>,\n"
                     "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
@@ -335,26 +529,20 @@ def write_backend_structs(
                     "    }\n"
                 )
 
-            if table_metadatas.has_primary_key(struct.table_name):
-                primary_key_name, _ = table_metadatas.get_primary_key_name_and_type(
-                    struct.table_name
-                )
-                primary_key = struct.get_attribute_by_name(primary_key_name)
-            elif table_metadatas.is_view(struct.table_name):
-                primary_key = struct.get_attribute_by_name("id")
-
-            if primary_key is not None:
+            if struct.has_associated_roles() and struct.table_name != "users":
                 file.write(
                     "    /// Delete the struct from the database.\n"
                     "    ///\n"
                     "    /// # Arguments\n"
+                    "    /// * `author_user_id` - The ID of the user who is deleting the struct.\n"
                     "    /// * `connection` - The connection to the database.\n"
                     "    ///\n"
                     "    pub fn delete(\n"
                     "        &self,\n"
+                    "        author_user_id: i32,\n"
                     "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
                     "    ) -> Result<usize, diesel::result::Error> {\n"
-                    f"        Self::delete_by_id(self.{primary_key.name}, connection)\n"
+                    f"        Self::delete_by_id({struct.get_formatted_primary_keys(include_prefix=True)}, author_user_id, connection)\n"
                     "    }\n"
                 )
 
@@ -362,43 +550,48 @@ def write_backend_structs(
                     "    /// Delete the struct from the database by its ID.\n"
                     "    ///\n"
                     "    /// # Arguments\n"
-                    f"    /// * `{primary_key.name}` - The ID of the struct to delete.\n"
+                    f"    /// * `{struct.get_formatted_primary_keys(include_prefix=False)}` - The primary key(s) of the struct to delete.\n"
+                    "    /// * `author_user_id` - The ID of the user who is deleting the struct.\n"
                     "    /// * `connection` - The connection to the database.\n"
                     "    ///\n"
                     "    pub fn delete_by_id(\n"
-                    f"        {primary_key.name}: {primary_key.data_type()},\n"
+                    f"       {struct.get_formatted_primary_keys(include_prefix=False)}: {struct.get_formatted_primary_key_data_types()},\n"
+                    "        author_user_id: i32,\n"
                     "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
                     "    ) -> Result<usize, diesel::result::Error> {\n"
+                    f"        if !Self::is_admin_by_id({struct.get_formatted_primary_keys(include_prefix=False)}, author_user_id, connection)? {{\n"
+                    "            return Err(diesel::result::Error::NotFound);\n"
+                    "        }\n"
                     f"        diesel::delete({struct.table_name}::dsl::{struct.table_name}\n"
-                    f"            .filter({struct.table_name}::dsl::{primary_key.name}.eq({primary_key.name}))\n"
-                    "        ).execute(connection)\n"
-                    "    }\n"
                 )
-
-                file.write(
-                    "    /// Get the struct from the database by its ID.\n"
-                    "    ///\n"
-                    "    /// # Arguments\n"
-                    f"    /// * `{primary_key.name}` - The ID of the struct to get.\n"
-                    "    /// * `connection` - The connection to the database.\n"
-                    "    ///\n"
-                    "    pub fn get(\n"
-                    f"        {primary_key.name}: {primary_key.data_type()},\n"
-                    "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
-                    "    ) -> Result<Self, diesel::result::Error> {\n"
-                )
-                if table_type == "tables":
-                    file.write(f"        use crate::schema::{struct.table_name};\n")
-                else:
+                for primary_key in primary_keys:
                     file.write(
-                        f"        use crate::views::schema::{struct.table_name};\n"
+                        f"            .filter({struct.table_name}::dsl::{primary_key.name}.eq({primary_key.name}))\n"
                     )
+                file.write("        ).execute(connection)\n" "    }\n")
+
+            file.write(
+                "    /// Get the struct from the database by its ID.\n"
+                "    ///\n"
+                "    /// # Arguments\n"
+                f"    /// * `{struct.get_formatted_primary_keys(include_prefix=False)}` - The primary key(s) of the struct to get.\n"
+                "    /// * `connection` - The connection to the database.\n"
+                "    ///\n"
+                "    pub fn get(\n"
+                f"       {struct.get_formatted_primary_keys(include_prefix=False)}: {struct.get_formatted_primary_key_data_types()},\n"
+                "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+                "    ) -> Result<Self, diesel::result::Error> {\n"
+            )
+            if table_type == "tables":
+                file.write(f"        use crate::schema::{struct.table_name};\n")
+            else:
+                file.write(f"        use crate::views::schema::{struct.table_name};\n")
+            file.write(f"        {struct.table_name}::dsl::{struct.table_name}\n")
+            for primary_key in primary_keys:
                 file.write(
-                    f"        {struct.table_name}::dsl::{struct.table_name}\n"
                     f"            .filter({struct.table_name}::dsl::{primary_key.name}.eq({primary_key.name}))\n"
-                    "            .first::<Self>(connection)\n"
-                    "    }\n"
                 )
+            file.write("            .first::<Self>(connection)\n" "    }\n")
 
             # For each of the columns in the struct that are required to be UNIQUE
             # in the SQL, as defined by the get_unique_constraint_columns method, we
@@ -406,57 +599,59 @@ def write_backend_structs(
             # struct by the unique column. In the case of a view, we first retrieve
             # the associated base table and secondarily we execute with a get the
             # struct by the id column from the obtained base table.
-            for unique_column in table_metadatas.get_unique_constraint_columns(
-                struct.table_name
-            ):
-                if table_type == "views":
-                    # In the case of view, we do not receive simple string as unique column
-                    # but instances of ViewColumn.
-                    attribute = struct.get_attribute_by_name(unique_column.alias_name)
-                    attribute_data_type = attribute.data_type()
-                    if attribute_data_type == "String":
-                        attribute_data_type = "&str"
+            for unique_columns in struct.get_unique_constraints():
+                reference_unique_columns = [
+                    unique_column.as_ref() for unique_column in unique_columns
+                ]
 
-                    struct_name = struct_name_from_table_name(unique_column.table_name)
-
-                    file.write(
-                        f"    /// Get the struct from the database by its {unique_column.alias_name}.\n"
-                        "    ///\n"
-                        "    /// # Arguments\n"
-                        f"    /// * `{unique_column.alias_name}` - The {unique_column.alias_name} of the struct to get.\n"
-                        "    /// * `connection` - The connection to the database.\n"
-                        "    ///\n"
-                        f"    pub fn from_{unique_column.alias_name}(\n"
-                        f"        {unique_column.alias_name}: {attribute_data_type},\n"
-                        "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
-                        "    ) -> Result<Self, diesel::result::Error> {\n"
-                        f"        {struct_name}::from_{unique_column.column_name}({unique_column.alias_name}, connection)\n"
-                        f"            .map(|entry| {struct.name}::get(entry.{primary_key.name}, connection))\n"
-                        "    }\n"
+                if len(reference_unique_columns) == 1:
+                    human_readable_unique_columns = reference_unique_columns[0].name
+                else:
+                    human_readable_unique_columns = (
+                        ", ".join(
+                            [column.name for column in reference_unique_columns[:-1]]
+                        )
+                        + f" and {reference_unique_columns[-1].name}"
                     )
 
+                from_method_name = f"from_{'_and_'.join([column.name for column in reference_unique_columns])}"
+
+                if table_type == "views":
+                    raise NotImplementedError(
+                        "The `from_{column_name}` method is not implemented for views."
+                    )
                 else:
-                    attribute = struct.get_attribute_by_name(unique_column)
-                    attribute_data_type = attribute.data_type()
-                    if attribute_data_type == "String":
-                        attribute_data_type = "&str"
                     file.write(
-                        f"    /// Get the struct from the database by its {unique_column}.\n"
+                        f"    /// Get the struct from the database by its {human_readable_unique_columns}.\n"
                         "    ///\n"
                         "    /// # Arguments\n"
-                        f"    /// * `{unique_column}` - The {unique_column} of the struct to get.\n"
+                    )
+                    for unique_column in reference_unique_columns:
+                        file.write(
+                            f"    /// * `{unique_column.name}` - The {unique_column.name} of the struct to get.\n"
+                        )
+
+                    file.write(
                         "    /// * `connection` - The connection to the database.\n"
                         "    ///\n"
-                        f"    pub fn from_{unique_column}(\n"
-                        f"        {unique_column}: {attribute_data_type},\n"
+                        f"    pub fn {from_method_name}(\n"
+                    )
+                    for unique_column in reference_unique_columns:
+                        file.write(
+                            f"        {unique_column.name}: {unique_column.format_data_type()},\n"
+                        )
+
+                    file.write(
                         "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
                         "    ) -> Result<Self, diesel::result::Error> {\n"
                         f"        use crate::schema::{struct.table_name};\n"
                         f"        {struct.table_name}::dsl::{struct.table_name}\n"
-                        f"            .filter({struct.table_name}::dsl::{unique_column}.eq({unique_column}))\n"
-                        "            .first::<Self>(connection)\n"
-                        "    }\n"
                     )
+                    for unique_column in reference_unique_columns:
+                        file.write(
+                            f"            .filter({struct.table_name}::dsl::{unique_column.name}.eq({unique_column.name}))\n"
+                        )
+                    file.write("            .first::<Self>(connection)\n" "    }\n")
 
             # If this table implements the `pg_trgm` index, we also
             # provide the `search` method to search for the struct
@@ -473,82 +668,145 @@ def write_backend_structs(
                     distance_operator,
                 ) in PGIndices.SIMILARITY_METHODS:
 
-                    file.write(
-                        f"    /// Search for the struct by a given string by Postgres's `{method_name}`.\n"
-                        "    ///\n"
-                        "    /// # Arguments\n"
-                        "    /// * `query` - The string to search for.\n"
-                        "    /// * `limit` - The maximum number of results, by default `10`.\n"
-                        "    /// * `connection` - The connection to the database.\n"
-                        "    ///\n"
-                        f"    pub fn {method_name}_search(\n"
-                        "        query: &str,\n"
-                        "        limit: Option<i32>,\n"
-                        "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
-                        "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
-                        "        let limit = limit.unwrap_or(10);\n"
-                        "        // If the query string is empty, we run an all query with the\n"
-                        "        // limit parameter provided instead of a more complex similarity\n"
-                        "        // search.\n"
-                        "        if query.is_empty() {\n"
-                        "            return Self::all(Some(limit as i64), None, connection);\n"
-                        "        }\n"
-                    )
+                    for editable_filter in editable_variants:
 
-                    joined_field_names = ", ".join(
-                        attribute.name for attribute in struct.attributes
-                    )
-
-                    if table_type == "views":
-                        file.write(
-                            "        let similarity_query = concat!(\n"
-                            f'            "WITH selected_ids AS (",\n'
-                            f'            "SELECT {similarity_index.table_name}.{primary_key.name} AS id FROM {similarity_index.table_name} ",\n'
-                        )
-                        if similarity_index.is_gin():
+                        if editable_filter:
                             file.write(
-                                f'            "WHERE $1 {similarity_operator} {similarity_index.arguments}  ",\n'
-                                f'            "ORDER BY {method_name}($1, {similarity_index.arguments}) DESC LIMIT $2",\n'
+                                f"    /// Search for the editable struct by a given string by Postgres's `{method_name}`.\n"
                             )
                         else:
                             file.write(
-                                f'            "ORDER BY $1 {distance_operator} {similarity_index.arguments} LIMIT $2",\n'
+                                f"    /// Search for the struct by a given string by Postgres's `{method_name}`.\n"
+                            )
+                        file.write("    ///\n" "    /// # Arguments\n")
+
+                        if editable_filter:
+                            # In the editable filter version we also receive in input the author_user_id
+                            # of the user who is performing the search.
+                            file.write(
+                                "    /// * `author_user_id` - The ID of the user who is performing the search.\n"
                             )
                         file.write(
-                            '         ")",\n'
-                            f'            "SELECT {joined_field_names} FROM {struct.table_name} ",\n'
-                            f'            "JOIN selected_ids ON selected_ids.id = {struct.table_name}.id"\n'
-                            "        );\n"
+                            "    /// * `query` - The string to search for.\n"
+                            "    /// * `limit` - The maximum number of results, by default `10`.\n"
+                            "    /// * `connection` - The connection to the database.\n"
+                            "    ///\n"
                         )
-                    else:
+                        if editable_filter:
+                            file.write(f"    pub fn {method_name}_search_editables(\n")
+                        else:
+                            file.write(f"    pub fn {method_name}_search(\n")
+
+                        if editable_filter:
+                            file.write("        author_user_id: i32,\n")
+
                         file.write(
-                            "        let similarity_query = concat!(\n"
-                            f'            "SELECT {joined_field_names} FROM {struct.table_name} ",\n'
+                            "        query: &str,\n"
+                            "        limit: Option<i32>,\n"
+                            "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
                         )
-                        if similarity_index.is_gin():
+
+                        file.write(
+                            "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
+                            "        let limit = limit.unwrap_or(10);\n"
+                            "        // If the query string is empty, we run an all query with the\n"
+                            "        // limit parameter provided instead of a more complex similarity\n"
+                            "        // search.\n"
+                            "        if query.is_empty() {\n"
+                        )
+                        if editable_filter:
                             file.write(
-                                f'            "WHERE $1 {similarity_operator} {similarity_index.arguments} ",\n'
-                                f'            "ORDER BY {method_name}($1, {similarity_index.arguments}) DESC LIMIT $2",\n'
+                                "            return Self::all_editables(author_user_id, Some(limit as i64), None, connection);\n"
                             )
                         else:
                             file.write(
-                                f'            "ORDER BY $1 {distance_operator} {similarity_index.arguments} LIMIT $2;"\n'
+                                "            return Self::all(Some(limit as i64), None, connection);\n"
                             )
-                        file.write("        );\n")
+                        file.write("        }\n")
 
-                    file.write(
-                        "        diesel::sql_query(similarity_query)\n"
-                        "            .bind::<diesel::sql_types::Text, _>(query)\n"
-                        "            .bind::<diesel::sql_types::Integer, _>(limit)\n"
-                        "            .load(connection)\n"
-                        "}\n"
-                    )
+                        joined_field_names = ", ".join(
+                            attribute.name for attribute in struct.attributes
+                        )
+
+                        editable_where_clause = ""
+
+                        if editable_filter:
+                            editable_where_clause = (
+                                f'            "AND {struct.table_name}.created_by = $3 ",\n'
+                                f'            "OR {struct.table_name}.id IN ",\n'
+                                f'            "(SELECT {struct.table_name}_users_roles.table FROM {struct.table_name}_users_roles ",\n'
+                                f'            "WHERE {struct.table_name}_users_roles.user_id = $3 AND {struct.table_name}_users_roles.role_id <= 2) ",\n'
+                                f'            "OR {struct.table_name}.id IN ",\n'
+                                f'            "(SELECT {struct.table_name}_teams_roles.table_id FROM {struct.table_name}_teams_roles ",\n'
+                                f'            "WHERE {struct.table_name}_teams_roles.role_id <= 2 AND {struct.table_name}_teams_roles.table_id IN ",\n'
+                                f'            "(SELECT teams_users_roles.table_id FROM teams_users_roles ",\n'
+                                f'            "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2)) ",\n'
+                            )
+
+                        if table_type == "views":
+                            file.write(
+                                "        let similarity_query = concat!(\n"
+                                f'            "WITH selected_ids AS (",\n'
+                                f'            "SELECT {similarity_index.table_name}.{primary_key.name} AS id FROM {similarity_index.table_name} ",\n'
+                            )
+                            if similarity_index.is_gin():
+                                file.write(
+                                    f'            "WHERE $1 {similarity_operator} {similarity_index.arguments} ",\n'
+                                    f"{editable_where_clause}"
+                                    f'            "ORDER BY {method_name}($1, {similarity_index.arguments}) DESC LIMIT $2",\n'
+                                )
+                            else:
+                                file.write(
+                                    f'            "ORDER BY $1 {distance_operator} {similarity_index.arguments} LIMIT $2",\n'
+                                )
+                            file.write(
+                                '         ")",\n'
+                                f'            "SELECT {joined_field_names} FROM {struct.table_name} ",\n'
+                                f'            "JOIN selected_ids ON selected_ids.id = {struct.table_name}.id"\n'
+                                "        );\n"
+                            )
+                        else:
+                            file.write(
+                                "        let similarity_query = concat!(\n"
+                                f'            "SELECT {joined_field_names} FROM {struct.table_name} ",\n'
+                            )
+                            if similarity_index.is_gin():
+                                file.write(
+                                    f'            "WHERE $1 {similarity_operator} {similarity_index.arguments} ",\n'
+                                    f"{editable_where_clause}"
+                                    f'            "ORDER BY {method_name}($1, {similarity_index.arguments}) DESC LIMIT $2",\n'
+                                )
+                            else:
+                                file.write(
+                                    f'            "ORDER BY $1 {distance_operator} {similarity_index.arguments} LIMIT $2;"\n'
+                                )
+                            file.write("        );\n")
+
+                        file.write(
+                            "        diesel::sql_query(similarity_query)\n"
+                            "            .bind::<diesel::sql_types::Text, _>(query)\n"
+                            "            .bind::<diesel::sql_types::Integer, _>(limit)\n"
+                        )
+                        if editable_filter:
+                            file.write(
+                                "            .bind::<diesel::sql_types::Integer, _>(author_user_id)\n"
+                            )
+                        file.write("            .load(connection)\n" "}\n")
 
             # Finally, we cluse the struct implementation.
             file.write("}\n")
 
 
-def extract_structs(path: str) -> List[StructMetadata]:
+def extract_structs(path: str, table_metadata: TableMetadata) -> List[StructMetadata]:
+    """Extract the structs from the Rust file at the given path.
+
+    Parameters
+    ----------
+    path : str
+        The path to the Rust file.
+    table_metadata : TableMetadata
+        The metadata of the tables in the database.
+    """
     # A dictionary to store the table names and their
     # respective structs.
     struct_metadatas: List[StructMetadata] = []
@@ -582,6 +840,7 @@ def extract_structs(path: str) -> List[StructMetadata]:
             struct_metadata = StructMetadata(
                 table_name=last_table_name,
                 struct_name=struct_name,
+                table_metadata=table_metadata,
             )
 
             for derive in derives:
@@ -613,6 +872,9 @@ def extract_structs(path: str) -> List[StructMetadata]:
             # in the line.
             if "}" in line:
                 inside_struct = False
+                table_metadata.register_flat_variant(
+                    struct_metadata.table_name, struct_metadata.name
+                )
                 struct_metadatas.append(struct_metadata)
 
     return struct_metadatas
@@ -644,7 +906,7 @@ def write_update_method_for_gluesql(
 
     if updator_user_id_attribute is not None:
         writer.write(
-            f"    /// * `user_id` - The ID of the user who is updating the struct.\n"
+            "    /// * `user_id` - The ID of the user who is updating the struct.\n"
         )
 
     writer.write(
@@ -657,7 +919,7 @@ def write_update_method_for_gluesql(
     )
 
     if updator_user_id_attribute is not None:
-        writer.write(f"        user_id: i32,\n")
+        writer.write("        user_id: i32,\n")
 
     writer.write(
         "        connection: &mut gluesql::prelude::Glue<C>,\n"
@@ -740,7 +1002,10 @@ def write_update_method_for_gluesql(
 
 
 def write_web_common_structs(
-    structs: List[StructMetadata], target: str, enumeration: str
+    structs: List[StructMetadata],
+    target: str,
+    enumeration: str,
+    table_metadata: TableMetadata,
 ):
     """Write the structs in the target file in the `web_common` crate.
 
@@ -752,6 +1017,8 @@ def write_web_common_structs(
         The path where to write the structs in the `web_common` crate.
     enumeration : str
         The name of the enumeration to write in the target file.
+    table_metadata : TableMetadata
+        The metadata of the tables.
     """
     # The derive statements to include in the `src/database/tables.rs` document
     imports = [
@@ -761,20 +1028,10 @@ def write_web_common_structs(
         "use chrono::NaiveDateTime;",
     ]
 
-    table_metadatas = find_foreign_keys()
-
-    # We check that we are currently executing in the `backend` crate
-    # so to make sure that the relative path to the `web_common` crate
-    # is correct.
-    if not os.getcwd().endswith("backend"):
-        raise Exception("This script must be executed in the `backend` crate.")
-
-    tables = open(f"../web_common/src/database/{target}.rs", "w", encoding="utf8")
+    document = open(f"../web_common/src/database/{target}.rs", "w", encoding="utf8")
 
     for import_statament in imports:
-        tables.write(f"{import_statament}\n")
-
-    similarity_indices: PGIndices = find_pg_trgm_indices()
+        document.write(f"{import_statament}\n")
 
     for struct in tqdm(
         structs,
@@ -782,60 +1039,60 @@ def write_web_common_structs(
         unit="struct",
         leave=False,
     ):
-        struct_has_just_finished = False
-
-        tables.write("#[derive(")
-        tables.write(", ".join(struct.derives()))
-        tables.write(")]\n")
+        document.write("#[derive(")
+        document.write(", ".join(struct.derives()))
+        document.write(")]\n")
         # We also write conditional derives for the frontend feature
         # that ask for the `frontend` feature to be enabled and derive
         # the yew::html::Properties trait for the struct.
-        tables.write(
+        document.write(
             '#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]\n'
         )
 
-        tables.write(f"pub struct {struct.name} {{\n")
+        document.write(f"pub struct {struct.name} {{\n")
         for attribute in struct.attributes:
-            tables.write(f"    pub {attribute.name}: {attribute.format_data_type()},\n")
-        tables.write("}\n")
+            document.write(
+                f"    pub {attribute.name}: {attribute.format_data_type()},\n"
+            )
+        document.write("}\n")
 
         # This variant of the struct implementation is only
         # available when in the web_common is enabled the frontend
         # feature. It provides several methods including the use
         # of GlueSQL. Fortunately, it does not force us like Diesel
         # to create yet again another duplicate of the struct.
-        tables.write('#[cfg(feature = "frontend")]\n')
-        tables.write(f"impl {struct.name} {{\n")
+        document.write('#[cfg(feature = "frontend")]\n')
+        document.write(f"impl {struct.name} {{\n")
         columns = ", ".join([attribute.name for attribute in struct.attributes])
 
         # As first thing, we implement the `into_row` method for the struct. This method
         # converts the struct into a vector of `gluesql::core::ast_builder::ExprList`
         # variants, which are used to insert the struct into the GlueSQL database.
 
-        tables.write(
+        document.write(
             "    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {\n"
         )
 
-        tables.write("        vec![\n")
+        document.write("        vec![\n")
         for attribute in struct.attributes:
 
             if attribute.optional:
                 if attribute.data_type() in GLUESQL_TYPES_MAPPING:
-                    tables.write(f"            match self.{attribute.name} {{\n")
-                    tables.write(
+                    document.write(f"            match self.{attribute.name} {{\n")
+                    document.write(
                         f"                Some({attribute.name}) => {GLUESQL_TYPES_MAPPING[attribute.data_type()].format(attribute.name)},\n"
                     )
-                    tables.write(
+                    document.write(
                         "                None => gluesql::core::ast_builder::null(),\n"
                     )
-                    tables.write("            },\n")
+                    document.write("            },\n")
                 else:
                     raise NotImplementedError(
                         f"The type {attribute.data_type()} is not supported. "
                         f"The struct {struct.name} contains an {attribute.data_type()}. "
                     )
             elif attribute.data_type() in GLUESQL_TYPES_MAPPING:
-                tables.write(
+                document.write(
                     f"            {GLUESQL_TYPES_MAPPING[attribute.data_type()].format(f'self.{attribute.name}')},\n"
                 )
             else:
@@ -843,184 +1100,175 @@ def write_web_common_structs(
                     f"The type {attribute.data_type()} is not supported."
                 )
 
-        tables.write("        ]\n")
+        document.write("        ]\n")
 
-        tables.write("    }\n\n")
+        document.write("    }\n\n")
 
         # We implement the `insert` method for the struct. This method
         # receives a connection to the GlueSQL database and inserts the
         # struct into the database.
-        tables.write(f"    /// Insert the {struct.name} into the database.\n")
-        tables.write("    ///\n")
-        tables.write("    /// # Arguments\n")
-        tables.write("    /// * `connection` - The connection to the database.\n")
-        tables.write("    ///\n")
-        tables.write("    /// # Returns\n")
-        tables.write(f"    /// The number of rows inserted in table {struct.name}\n")
-        tables.write("    pub async fn insert<C>(\n")
-        tables.write("        self,\n")
-        tables.write("        connection: &mut gluesql::prelude::Glue<C>,\n")
-        tables.write("    ) -> Result<usize, gluesql::prelude::Error> where\n")
-        tables.write(
+        document.write(f"    /// Insert the {struct.name} into the database.\n")
+        document.write("    ///\n")
+        document.write("    /// # Arguments\n")
+        document.write("    /// * `connection` - The connection to the database.\n")
+        document.write("    ///\n")
+        document.write("    /// # Returns\n")
+        document.write(f"    /// The number of rows inserted in table {struct.name}\n")
+        document.write("    pub async fn insert<C>(\n")
+        document.write("        self,\n")
+        document.write("        connection: &mut gluesql::prelude::Glue<C>,\n")
+        document.write("    ) -> Result<usize, gluesql::prelude::Error> where\n")
+        document.write(
             "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
         )
-        tables.write("    {\n")
-        tables.write("        use gluesql::core::ast_builder::*;\n")
+        document.write("    {\n")
+        document.write("        use gluesql::core::ast_builder::*;\n")
         # We use the AST builder as much as possible so to avoid SQL injection attacks.
-        tables.write(f'        table("{struct.table_name}")\n')
-        tables.write("            .insert()\n")
-        tables.write(f'            .columns("{columns}")\n')
-        tables.write("            .values(vec![self.into_row()])\n")
-        tables.write("            .execute(connection)\n")
-        tables.write("            .await\n")
-        tables.write("             .map(|payload| match payload {\n")
-        tables.write(
+        document.write(f'        table("{struct.table_name}")\n')
+        document.write("            .insert()\n")
+        document.write(f'            .columns("{columns}")\n')
+        document.write("            .values(vec![self.into_row()])\n")
+        document.write("            .execute(connection)\n")
+        document.write("            .await\n")
+        document.write("             .map(|payload| match payload {\n")
+        document.write(
             "                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,\n"
         )
-        tables.write(
+        document.write(
             '                 _ => unreachable!("Payload must be an Insert"),\n'
         )
-        tables.write("             })\n")
-        tables.write("    }\n\n")
+        document.write("             })\n")
+        document.write("    }\n\n")
 
         # We implement the `get` method for the struct. This method
         # receives the ID of the struct and a connection to the GlueSQL
         # database. The method returns the struct from the database.
-        tables.write(f"    /// Get {struct.name} from the database by its ID.\n")
-        tables.write("    ///\n")
-        tables.write("    /// # Arguments\n")
-        primary_key_name, primary_key_type = (
-            table_metadatas.get_primary_key_name_and_type(struct.table_name)
-        )
-        rust_primary_key_type = sql_type_to_rust_type(primary_key_type)
+        document.write(f"    /// Get {struct.name} from the database by its ID.\n")
+        document.write("    ///\n")
+        document.write("    /// # Arguments\n")
+        primary_keys = struct.get_primary_keys()
 
-        tables.write(
-            f"    /// * `{primary_key_name}` - The ID of {struct.name} to get.\n"
+        document.write(
+            f"    /// * `{struct.get_formatted_primary_keys(include_prefix=False)}` - The primary key(s) of the struct to get.\n"
         )
-        tables.write("    /// * `connection` - The connection to the database.\n")
-        tables.write("    ///\n")
-        tables.write("    pub async fn get<C>(\n")
-        tables.write(f"        {primary_key_name}: {rust_primary_key_type},\n")
-        tables.write("        connection: &mut gluesql::prelude::Glue<C>,\n")
-        tables.write("    ) -> Result<Option<Self>, gluesql::prelude::Error> where\n")
-        tables.write(
+        document.write(
+            "    /// * `connection` - The connection to the database.\n"
+            "    ///\n"
+            "    pub async fn get<C>(\n"
+            f"        {struct.get_formatted_primary_keys(include_prefix=False)}: {struct.get_formatted_primary_key_data_types()},\n"
+            "        connection: &mut gluesql::prelude::Glue<C>,\n"
+            "    ) -> Result<Option<Self>, gluesql::prelude::Error> where\n"
             "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
+            "    {\n"
+            "        use gluesql::core::ast_builder::*;\n"
+            f'        let select_row = table("{struct.table_name}")\n'
+            "            .select()\n"
         )
-        tables.write("    {\n")
-        tables.write("        use gluesql::core::ast_builder::*;\n")
-        # We use the AST builder as much as possible so to avoid SQL injection attacks.
-        tables.write(f'        let select_row = table("{struct.table_name}")\n')
-        tables.write("            .select()\n")
-        tables.write(
-            f'            .filter(col("id").eq({primary_key_name}.to_string()))\n'
+        for primary_key in primary_keys:
+            document.write(
+                f'            .filter(col("{primary_key.name}").eq({primary_key.name}.to_string()))\n'
+            )
+        document.write(
+            f'            .project("{columns}")\n'
+            "            .limit(1)\n"
+            "            .execute(connection)\n"
+            "            .await?;\n"
+            "         Ok(select_row.select()\n"
+            "            .unwrap()\n"
+            "            .map(Self::from_row)\n"
+            "            .collect::<Vec<_>>()\n"
+            "            .pop())\n"
+            "    }\n\n"
         )
-        tables.write(f'            .project("{columns}")\n')
-        tables.write("            .limit(1)\n")
-        tables.write("            .execute(connection)\n")
-        tables.write("            .await?;\n")
-        tables.write("         Ok(select_row.select()\n")
-        tables.write("            .unwrap()\n")
-        tables.write("            .map(Self::from_row)\n")
-        tables.write("            .collect::<Vec<_>>()\n")
-        tables.write("            .pop())\n")
-        tables.write("    }\n\n")
 
         # We implement the `delete` method for the struct. This method deletes
         # the struct from the GlueSQL database.
-        tables.write(f"    /// Delete {struct.name} from the database.\n")
-        tables.write("    ///\n")
-        tables.write("    /// # Arguments\n")
-        tables.write(
-            f"    /// * `{primary_key_name}` - The ID of the struct to delete.\n"
-        )
-        tables.write("    /// * `connection` - The connection to the database.\n")
-        tables.write("    ///\n")
-        tables.write("    /// # Returns\n")
-        tables.write("    /// The number of rows deleted.\n")
-        tables.write("    pub async fn delete_from_id<C>(\n")
-        tables.write(f"        {primary_key_name}: {rust_primary_key_type},\n")
-        tables.write("        connection: &mut gluesql::prelude::Glue<C>,\n")
-        tables.write("    ) -> Result<usize, gluesql::prelude::Error> where\n")
-        tables.write(
+        document.write(
+            f"    /// Delete {struct.name} from the database.\n"
+            "    ///\n"
+            "    /// # Arguments\n"
+            f"    /// * `{struct.get_formatted_primary_keys(include_prefix=False)}` - The primary key(s) of the struct to delete.\n"
+            "    /// * `connection` - The connection to the database.\n"
+            "    ///\n"
+            "    /// # Returns\n"
+            "    /// The number of rows deleted.\n"
+            "    pub async fn delete_from_id<C>(\n"
+            f"        {struct.get_formatted_primary_keys(include_prefix=False)}: {struct.get_formatted_primary_key_data_types()},\n"
+            "        connection: &mut gluesql::prelude::Glue<C>,\n"
+            "    ) -> Result<usize, gluesql::prelude::Error> where\n"
             "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
+            "    {\n"
+            "        use gluesql::core::ast_builder::*;\n"
+            f'        table("{struct.table_name}")\n'
+            "            .delete()\n"
         )
-        tables.write("    {\n")
-        tables.write("        use gluesql::core::ast_builder::*;\n")
-        # We use the AST builder as much as possible so to avoid SQL injection attacks.
-        tables.write(f'        table("{struct.table_name}")\n')
-        tables.write("            .delete()\n")
-        tables.write('            .filter(col("id").eq(id.to_string()))\n')
-        tables.write("            .execute(connection)\n")
-        tables.write("            .await\n")
-        tables.write("             .map(|payload| match payload {\n")
-        tables.write(
+        for primary_key in primary_keys:
+            document.write(
+                f'            .filter(col("{primary_key.name}").eq({primary_key.name}.to_string()))\n'
+            )
+        document.write(
+            "            .execute(connection)\n"
+            "            .await\n"
+            "             .map(|payload| match payload {\n"
             "                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,\n"
-        )
-        tables.write(
             '                 _ => unreachable!("Payload must be a Delete"),\n'
+            "             })\n"
+            "    }\n\n"
         )
-        tables.write("             })\n")
-        tables.write("    }\n\n")
 
         # We implement the `delete` method for the struct. This method deletes
         # the current instance of the struct from the GlueSQL database.
-        tables.write(
+        document.write(
             f"    /// Delete the current instance of {struct.name} from the database.\n"
-        )
-        tables.write("    ///\n")
-        tables.write("    /// # Arguments\n")
-        tables.write("    /// * `connection` - The connection to the database.\n")
-        tables.write("    ///\n")
-        tables.write("    /// # Returns\n")
-        tables.write("    /// The number of rows deleted.\n")
-        tables.write("    pub async fn delete<C>(\n")
-        tables.write("        self,\n")
-        tables.write("        connection: &mut gluesql::prelude::Glue<C>,\n")
-        tables.write("    ) -> Result<usize, gluesql::prelude::Error> where\n")
-        tables.write(
+            "    ///\n"
+            "    /// # Arguments\n"
+            "    /// * `connection` - The connection to the database.\n"
+            "    ///\n"
+            "    /// # Returns\n"
+            "    /// The number of rows deleted.\n"
+            "    pub async fn delete<C>(\n"
+            "        self,\n"
+            "        connection: &mut gluesql::prelude::Glue<C>,\n"
+            "    ) -> Result<usize, gluesql::prelude::Error> where\n"
             "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
+            "    {\n"
+            f"        Self::delete_from_id({struct.get_formatted_primary_keys(include_prefix=True)}, connection).await\n"
+            "    }\n"
         )
-        tables.write("    {\n")
-        tables.write("        Self::delete_from_id(self.id, connection).await\n")
-        tables.write("    }\n")
 
         # We implement the `update` method for the struct. This method updates
         # the struct in the GlueSQL database.
-        write_update_method_for_gluesql(struct, tables)
+        write_update_method_for_gluesql(struct, document)
 
         # Next, we implement the `update_or_insert` method for the struct. This method
         # inserts the struct into the GlueSQL database if it does not exist, otherwise
         # it updates the struct in the database.
-        tables.write(
+        document.write(
             "    /// Update the struct in the database if it exists, otherwise insert it.\n"
-        )
-        tables.write("    ///\n")
-        tables.write("    /// # Arguments\n")
-        tables.write("    /// * `connection` - The connection to the database.\n")
-        tables.write("    ///\n")
-        tables.write("    /// # Returns\n")
-        tables.write("    /// The number of rows updated or inserted.\n")
-        tables.write("    pub async fn update_or_insert<C>(\n")
-        tables.write("        self,\n")
-        tables.write("        connection: &mut gluesql::prelude::Glue<C>,\n")
-        tables.write("    ) -> Result<usize, gluesql::prelude::Error> where\n")
-        tables.write(
+            "    ///\n"
+            "    /// # Arguments\n"
+            "    /// * `connection` - The connection to the database.\n"
+            "    ///\n"
+            "    /// # Returns\n"
+            "    /// The number of rows updated or inserted.\n"
+            "    pub async fn update_or_insert<C>(\n"
+            "        self,\n"
+            "        connection: &mut gluesql::prelude::Glue<C>,\n"
+            "    ) -> Result<usize, gluesql::prelude::Error> where\n"
             "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
-        )
-        tables.write("    {\n")
-        tables.write(
+            "    {\n"
             "        let number_of_rows = self.clone().update(connection).await?;\n"
+            "        if number_of_rows == 0 {\n"
+            "            self.insert(connection).await\n"
+            "        } else {\n"
+            "            Ok(number_of_rows)\n"
+            "        }\n"
+            "    }\n"
         )
-        tables.write("        if number_of_rows == 0 {\n")
-        tables.write("            self.insert(connection).await\n")
-        tables.write("        } else {\n")
-        tables.write("            Ok(number_of_rows)\n")
-        tables.write("        }\n")
-        tables.write("    }\n")
 
         # We implement the `all` method for the struct. This method returns all of the
         # structs in the GlueSQL database.
-        tables.write(
+        document.write(
             f"    /// Get all {struct.name} from the database.\n"
             "    ///\n"
             "    /// # Arguments\n"
@@ -1053,8 +1301,8 @@ def write_web_common_structs(
         # We implement for all tables that implement the `updated_at` column
         # the `all_by_updated_at` method. This method returns all of the structs
         # in the GlueSQL database ordered by the `updated_at` column.
-        if table_metadatas.has_updated_at_column(struct.table_name):
-            tables.write(
+        if table_metadata.has_updated_at_column(struct.table_name):
+            document.write(
                 f"    /// Get all {struct.name} from the database ordered by the `updated_at` column.\n"
                 "    ///\n"
                 "    /// # Arguments\n"
@@ -1088,10 +1336,10 @@ def write_web_common_structs(
         # We implement the `from_row` method for the struct. This method
         # receives a row from the GlueSQL database, which is a `HashMap<&str, &&Value>`.
         # The method returns the struct from the row.
-        tables.write(
+        document.write(
             "    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {\n"
         )
-        tables.write("        Self {\n")
+        document.write("        Self {\n")
 
         clonables = {
             "bool": "Bool",
@@ -1114,60 +1362,62 @@ def write_web_common_structs(
 
         for attribute in struct.attributes:
             if attribute.format_data_type() == "Uuid":
-                tables.write(
+                document.write(
                     f'            {attribute.name}: match row.get("{attribute.name}").unwrap() {{\n'
                     f"                gluesql::prelude::Value::Uuid({attribute.name}) => Uuid::from_u128(*{attribute.name}),\n"
                     '                _ => unreachable!("Expected Uuid"),\n'
                     "            },\n"
                 )
             elif attribute.format_data_type() == "Option<Uuid>":
-                tables.write(
+                document.write(
                     f'            {attribute.name}: match row.get("{attribute.name}").unwrap() {{\n'
                 )
-                tables.write("                gluesql::prelude::Value::Null => None,\n")
-                tables.write(
+                document.write(
+                    "                gluesql::prelude::Value::Null => None,\n"
+                )
+                document.write(
                     f"                gluesql::prelude::Value::Uuid({attribute.name}) => Some(Uuid::from_u128(*{attribute.name})),\n"
                 )
-                tables.write('                _ => unreachable!("Expected Uuid"),\n')
-                tables.write("            },\n")
+                document.write('                _ => unreachable!("Expected Uuid"),\n')
+                document.write("            },\n")
             elif attribute.implements_clone():
                 if attribute.optional:
-                    tables.write(
+                    document.write(
                         f'            {attribute.name}: match row.get("{attribute.name}").unwrap() {{\n'
                     )
-                    tables.write(
+                    document.write(
                         "                gluesql::prelude::Value::Null => None,\n"
                     )
-                    tables.write(
+                    document.write(
                         f"                gluesql::prelude::Value::{clonables[attribute.data_type()]}({attribute.name}) => Some({attribute.name}.clone()),\n"
                     )
-                    tables.write(
+                    document.write(
                         f'                _ => unreachable!("Expected {clonables[attribute.data_type()]}")\n'
                     )
-                    tables.write("            },\n")
+                    document.write("            },\n")
                 else:
-                    tables.write(
+                    document.write(
                         f'            {attribute.name}: match row.get("{attribute.name}").unwrap() {{\n'
                     )
-                    tables.write(
+                    document.write(
                         f"                gluesql::prelude::Value::{clonables[attribute.data_type()]}({attribute.name}) => {attribute.name}.clone(),\n"
                     )
-                    tables.write(
+                    document.write(
                         f'                _ => unreachable!("Expected {clonables[attribute.data_type()]}")\n'
                     )
-                    tables.write("            },\n")
+                    document.write("            },\n")
             else:
                 raise NotImplementedError(
                     f"Found an unsupported attribute type for the struct {struct.name}: {attribute.data_type()} "
                     f"for the attribute {attribute.name}."
                 )
-        tables.write("        }\n")
-        tables.write("    }\n")
+        document.write("        }\n")
+        document.write("    }\n")
 
         # And finally we close the struct implementation
-        tables.write("}\n")
+        document.write("}\n")
 
-    tables.close()
+    document.close()
 
 
 def get_view_names() -> List[str]:
@@ -1190,15 +1440,6 @@ def get_view_names() -> List[str]:
                 view_name = line.rsplit(" ", maxsplit=2)[1]
                 view_names.append(view_name)
     return view_names
-
-
-def get_views(cursor) -> List[str]:
-    """Return list with the view names"""
-    cursor.execute(
-        "SELECT table_name FROM information_schema.views WHERE table_schema = 'public';"
-    )
-    views = cursor.fetchall()
-    return views
 
 
 def map_postgres_to_rust_type(pg_type):
@@ -1229,38 +1470,6 @@ def generate_diesel_schema(view_name: str, columns: List[ViewColumn]) -> str:
     return schema_code
 
 
-def generate_view_schema():
-    """Generate the view schema.
-
-    Implementative details
-    -------------------------
-    We generate the views by connecting to the database and querying the `information_schema`
-    tables. We then write the views to the file `src/views/schema.rs`. The database is a postgres
-    database, and the connection string is read from the environment variable `DATABASE_URL`.
-    """
-    # We load the data from the environment variables from the `.env` file
-    # at `../.env`.
-    conn, cursor = get_cursor()
-
-    # Getting the list of views
-    views = get_views(cursor)
-    table_metadata = find_foreign_keys()
-
-    # We open the file to write the schema
-    schema_file = open("src/views/schema.rs", "w", encoding="utf8")
-
-    # Generating Diesel schema for each view
-    for view in views:
-        view_name = view[0]
-        columns = table_metadata.extract_view_columns(view_name)
-        schema_code = generate_diesel_schema(view_name, columns)
-        schema_file.write(schema_code + "\n")
-
-    # Closing the cursor and connection
-    cursor.close()
-    conn.close()
-
-
 def check_schema_completion():
     """Check the view schema completion.
 
@@ -1280,7 +1489,9 @@ def check_schema_completion():
             )
 
 
-def generate_view_structs():
+def generate_view_structs(
+    table_metadata: TableMetadata,
+):
     """Generate the view structs.
 
     Implementative details
@@ -1348,9 +1559,9 @@ def generate_view_structs():
     for import_statement in imports:
         views.write(f"{import_statement}\n")
 
-    view_structs = []
     last_line_was_table = False
     brackets_count = 0
+    view_structs = []
 
     for line in schema.split("\n"):
         if "{" in line:
@@ -1363,6 +1574,7 @@ def generate_view_structs():
             view_struct = StructMetadata(
                 struct_name=struct_name_from_table_name(view_name),
                 table_name=view_name,
+                table_metadata=table_metadata,
             )
             view_structs.append(view_struct)
 
@@ -1413,7 +1625,6 @@ def generate_view_structs():
             views.write("}\n\n")
 
         if brackets_count == 0:
-            attributes = {}
             view_name = None
 
     view_names_from_sql = get_view_names()
@@ -1426,7 +1637,7 @@ def generate_view_structs():
 
 
 def generate_nested_structs(
-    path: str, struct_metadatas: List[StructMetadata]
+    path: str, struct_metadatas: List[StructMetadata], tables_metadata: TableMetadata
 ) -> List[StructMetadata]:
     """Generate the nested structs.
 
@@ -1441,24 +1652,20 @@ def generate_nested_structs(
     For each table, we query the postgres to get the foreign keys. We then generate the nested
     structs for the referenced tables. The nested structs are written to the file `src/models.rs`.
     """
-    tables_metadata = find_foreign_keys()
-    similarity_indices: PGIndices = find_pg_trgm_indices()
+    similarity_indices: PGIndices = find_pg_trgm_indices(tables_metadata)
 
     # We open the file to write the nested structs
-    tables = open(path, "w", encoding="utf8")
+    document = open(path, "w", encoding="utf8")
 
     # Preliminarly, we write a docstring at the very head
     # of this submodule to explain what it does and warn the
     # reader not to write anything in this file as it is
     # automatically generated.
-    tables.write(
+    document.write(
         "//! This module contains the nested structs for the database tables.\n"
+        "//!\n"
+        "//! This file is automatically generated. Do not write anything here.\n\n"
     )
-    tables.write("//!\n")
-    tables.write(
-        "//! This file is automatically generated. Do not write anything here.\n"
-    )
-    tables.write("\n")
 
     # We start with the necessary imports.
     imports = [
@@ -1466,12 +1673,13 @@ def generate_nested_structs(
         "use serde::Serialize;",
         "use diesel::r2d2::ConnectionManager;",
         "use diesel::r2d2::PooledConnection;",
+        "use uuid::Uuid;",
         "use crate::models::*;",
-        "use crate::views::views::*;",
+        # "use crate::views::views::*;",
     ]
 
     for import_statement in imports:
-        tables.write(f"{import_statement}\n")
+        document.write(f"{import_statement}\n")
 
     def get_struct_by_table_name(table_name: str) -> StructMetadata:
         for struct in struct_metadatas:
@@ -1479,113 +1687,81 @@ def generate_nested_structs(
                 return struct
         raise ValueError(f"Table name {table_name} not found in the struct metadata.")
 
-    new_struct_metadatas = []
+    nested_structs = []
 
     # For each of the struct, we generated the Nested{struct_name} version
     # if the struct contains a reference to another struct.
     for struct in tqdm(
         struct_metadatas, desc="Generating nested structs", leave=False, unit="struct"
     ):
-        # If the struct does not have any foreign keys, we skip it
-        if not tables_metadata.has_foreign_keys(
-            struct.table_name
-        ) and not tables_metadata.is_view(struct.table_name):
+        foreign_keys = struct.get_foreign_keys()
+
+        if len(foreign_keys) == 0:
             continue
 
-        foreign_keys = tables_metadata.get_foreign_keys(struct.table_name)
+        nested_struct = StructMetadata(
+            f"Nested{struct.name}", struct.table_name, table_metadata=tables_metadata
+        )
+        nested_struct.set_flat_variant(struct)
 
-        primary_key_attribute = None
-        if tables_metadata.has_primary_key(struct.table_name):
-            # We implement the `get` method, which returns the nested struct
-            # from a provided row primary key.
-            primary_key_attribute, primary_key_type = (
-                tables_metadata.get_primary_key_name_and_type(struct.table_name)
-            )
-            rust_primary_key_type = sql_type_to_rust_type(primary_key_type)
-
-            # If all of the foreign keys are equal to the primary key, we skip
-            # the struct as it is a self-referencing struct.
-            if all(fk == primary_key_attribute for fk in foreign_keys):
-                continue
-
-        else:
-            # If the table does not have a primary key, as may happen in the context
-            # of a view, we use the attribyte `id` as the primary key.
-            for attribute in struct.attributes:
-                if attribute.name == "id":
-                    primary_key_attribute = "id"
-                    primary_key_type = attribute.data_type()
-                    rust_primary_key_type = primary_key_type
-                    break
-            if primary_key_attribute is None:
-                raise ValueError(
-                    f"Table {struct.table_name} does not have a primary key nor an `id` attribute. "
-                    f"It has the following attributes: {struct.attributes}"
+        if not struct.has_only_foreign_keys():
+            nested_struct.add_attribute(
+                AttributeMetadata(
+                    original_name="inner",
+                    name="inner",
+                    data_type=struct,
+                    optional=False,
                 )
+            )
 
-        if primary_key_attribute not in foreign_keys:
-            foreign_keys.append(primary_key_attribute)
-
-        new_struct_metadata = StructMetadata(f"Nested{struct.name}", struct.table_name)
-        new_struct_metadata.set_flat_variant(struct)
-
-        for attribute in struct.attributes:
-
+        for attribute in foreign_keys:
             # If the current attribute is among the foreign keys, we replace it
             # with the foreign struct. This struct may be also nested if the foreign
             # table has foreign keys, which we check by using the `has_foreign_keys`
             # method of the `tables_metadata` object.
-            if attribute.name in foreign_keys:
-                if attribute.name == primary_key_attribute:
-                    foreign_struct = struct
-                    normalized_attribute_name = "inner"
-                else:
-                    foreign_key_table_name = tables_metadata.get_foreign_key_table_name(
-                        struct.table_name, attribute.name
-                    )
-                    normalized_attribute_name = attribute.name
-                    foreign_struct = get_struct_by_table_name(foreign_key_table_name)
+            foreign_key_table_name = tables_metadata.get_foreign_key_table_name(
+                struct.table_name, attribute.name
+            )
 
-                if normalized_attribute_name.endswith("_id"):
-                    normalized_attribute_name = normalized_attribute_name[:-3]
-                if attribute.name != primary_key_attribute and (
-                    tables_metadata.foreign_key_table_has_foreign_keys(
-                        struct.table_name, attribute.name
-                    )
-                    or tables_metadata.is_view(struct.table_name)
-                    and primary_key_attribute == "id"
-                ):
-                    # If the nested version of the foreign struct is already present,
-                    # we cannot use it save risking the struct be extremely nested.
-                    # Think for instance a leaf taxon struct containing its parent taxon
-                    # and the parent taxon containing its parent taxon and so on.
-                    if struct.name == foreign_struct.name:
-                        new_attribute = AttributeMetadata(
-                            original_name=attribute.name,
-                            name=normalized_attribute_name,
-                            data_type=foreign_struct,
-                            optional=attribute.optional,
-                        )
-                    else:
-                        new_attribute = AttributeMetadata(
-                            original_name=attribute.name,
-                            name=normalized_attribute_name,
-                            data_type=f"Nested{foreign_struct.name}",
-                            optional=attribute.optional,
-                        )
-                    new_struct_metadata.add_attribute(new_attribute)
-                else:
-                    new_attribute = AttributeMetadata(
+            normalized_attribute_name = attribute.name
+            foreign_struct = get_struct_by_table_name(foreign_key_table_name)
+
+            if normalized_attribute_name.endswith("_id"):
+                normalized_attribute_name = normalized_attribute_name[:-3]
+
+            if (
+                struct.name == foreign_struct.name
+                or not foreign_struct.has_foreign_keys()
+            ):
+                nested_struct.add_attribute(
+                    AttributeMetadata(
                         original_name=attribute.name,
                         name=normalized_attribute_name,
                         data_type=foreign_struct,
                         optional=attribute.optional,
                     )
-                    new_struct_metadata.add_attribute(new_attribute)
+                )
             else:
-                continue
+                nested_struct.add_attribute(
+                    AttributeMetadata(
+                        original_name=attribute.name,
+                        name=normalized_attribute_name,
+                        data_type=f"Nested{foreign_struct.name}",
+                        optional=attribute.optional,
+                    )
+                )
 
-        new_struct_metadatas.append(new_struct_metadata)
+        foreign_keys = nested_struct.get_foreign_keys()
+        for foreign_key in foreign_keys:
+            assert any(
+                attribute.original_name == foreign_key.name
+                for attribute in nested_struct.attributes
+            ), (
+                f"Foreign key {foreign_key.name} not found in the nested struct {nested_struct.name}. "
+                f"The struct has the following attributes: {nested_struct.attributes}."
+            )
+
+        nested_structs.append(nested_struct)
 
     # We replace until convergence the data type of the structs with the structs themselves.
     # This is necessary as the nested structs may contain references to other structs, which
@@ -1596,16 +1772,18 @@ def generate_nested_structs(
     while changed:
         changed = False
         updated_struct_metadatas = []
-        for new_struct in new_struct_metadatas:
-            if not new_struct.has_undefined_nested_dependencies():
-                updated_struct_metadatas.append(new_struct)
+        for nested_struct in nested_structs:
+            if not nested_struct.has_undefined_nested_dependencies():
+                updated_struct_metadatas.append(nested_struct)
                 continue
             new_attributes = []
             converged = True
-            for attribute in new_struct.attributes:
+            for attribute in nested_struct.attributes:
                 if attribute.is_undefined_nested_dependencies():
-                    for struct in new_struct_metadatas + struct_metadatas:
+                    struct_identified = False
+                    for struct in nested_structs + struct_metadatas:
                         if struct.name == attribute.data_type():
+                            struct_identified = True
                             if struct.has_undefined_nested_dependencies():
                                 converged = False
                                 continue
@@ -1619,33 +1797,55 @@ def generate_nested_structs(
                             )
                             changed = True
                             break
+                    if not struct_identified:
+                        raise RuntimeError(
+                            f"Could not identify the struct with the name {attribute.data_type()}. "
+                            f"Found while processing the nested struct {nested_struct.name}."
+                        )
                 else:
                     new_attributes.append(attribute)
             if converged:
-                new_struct.attributes = new_attributes
-            updated_struct_metadatas.append(new_struct)
-        new_struct_metadatas = updated_struct_metadatas
+                assert len(new_attributes) == len(nested_struct.attributes), (
+                    f"Expected the length of the new attributes to be equal to the length of the old attributes. "
+                    f"Expected {len(new_attributes)}, got {len(nested_struct.attributes)}."
+                )
+                nested_struct.attributes = new_attributes
+            updated_struct_metadatas.append(nested_struct)
+        nested_structs = updated_struct_metadatas
 
-    struct = None
+    # Consistency check:
+    # We check that all the nested struct contain the foreign keys
+    # present in the original struct.
+    for nested_struct in nested_structs:
+        assert nested_struct.is_nested()
+        foreign_keys = nested_struct.get_foreign_keys()
+        for foreign_key in foreign_keys:
+            assert any(
+                attribute.original_name == foreign_key.name
+                for attribute in nested_struct.attributes
+            ), (
+                f"Foreign key {foreign_key.name} not found in the nested struct {nested_struct.name}. "
+                f"The struct has the following attributes: {nested_struct.attributes}."
+            )
 
-    for nested_struct in new_struct_metadatas:
-        nested_struct.write_to(tables)
-        flat_struct = nested_struct.get_flat_variant()
+    for nested_struct in nested_structs:
+        nested_struct.write_to(document)
+        flat_variant = nested_struct.get_flat_variant()
 
         # We implement the all for the nested structs
 
         # First, we implement a method that will be reused by several of the following methods,
         # including the all, get and search ones: a method that given the flat struct and a connection
         # to the database returns a result containing the nested struct.
-        tables.write(
+        document.write(
             f"impl {nested_struct.name} {{\n"
             "    /// Convert the flat struct to the nested struct.\n"
             "    ///\n"
             "    /// # Arguments\n"
-            "    /// * `flat_struct` - The flat struct.\n"
+            "    /// * `flat_variant` - The flat struct.\n"
             "    /// * `connection` - The database connection.\n"
             "    pub fn from_flat(\n"
-            f"        flat_struct: {flat_struct.name},\n"
+            f"        flat_variant: {flat_variant.name},\n"
             "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
             "    ) -> Result<Self, diesel::result::Error> {\n"
             "        Ok(Self {\n"
@@ -1653,28 +1853,30 @@ def generate_nested_structs(
         for attribute in nested_struct.attributes:
             if attribute.name == "inner":
                 continue
-            if attribute.data_type() == nested_struct.name or flat_struct.has_attribute(
-                attribute
+            if (
+                attribute.data_type() == nested_struct.name
+                or flat_variant.has_attribute(attribute)
             ):
-                tables.write(
-                    f"            {attribute.name}: flat_struct.{attribute.name},\n"
+                document.write(
+                    f"            {attribute.name}: flat_variant.{attribute.name},\n"
                 )
                 continue
             if attribute.optional:
-                tables.write(
-                    f"            {attribute.name}: flat_struct.{attribute.original_name}.map(|flat_struct| {attribute.data_type()}::get(flat_struct, connection)).transpose()?,\n"
+                document.write(
+                    f"            {attribute.name}: flat_variant.{attribute.original_name}.map(|flat_variant| {attribute.data_type()}::get(flat_variant, connection)).transpose()?,\n"
                 )
             else:
-                tables.write(
-                    f"            {attribute.name}: {attribute.data_type()}::get(flat_struct.{attribute.original_name}, connection)?,\n"
+                document.write(
+                    f"            {attribute.name}: {attribute.data_type()}::get(flat_variant.{attribute.original_name}, connection)?,\n"
                 )
 
-        tables.write(f"                inner: flat_struct,\n")
-        tables.write("        })\n" "    }\n" "}\n")
+        document.write(
+            "                inner: flat_variant,\n" "        })\n" "    }\n" "}\n"
+        )
 
         # Then we implement the all query.
 
-        tables.write(
+        document.write(
             f"impl {nested_struct.name} {{\n"
             "    /// Get all the nested structs from the database.\n"
             "    ///\n"
@@ -1687,16 +1889,37 @@ def generate_nested_structs(
             "        offset: Option<i64>,\n"
             "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
             "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
-            f"        {flat_struct.name}::all(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()\n"
+            f"        {flat_variant.name}::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()\n"
             "    }\n"
             "}\n"
         )
 
+        if nested_struct.has_associated_roles() and nested_struct.table_name != "users":
+            document.write(
+                f"impl {nested_struct.name} {{\n"
+                "    /// Get all the editables nested structs from the database.\n"
+                "    ///\n"
+                "    /// # Arguments\n"
+                "    /// * `author_user_id` - The user id.\n"
+                "    /// * `limit` - The maximum number of rows to return. By default `10`.\n"
+                "    /// * `offset` - The offset of the rows to return. By default `0`.\n"
+                "    /// * `connection` - The database connection.\n"
+                "    pub fn all_editables(\n"
+                "        author_user_id: i32,\n"
+                "        limit: Option<i64>,\n"
+                "        offset: Option<i64>,\n"
+                "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
+                "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
+                f"        {flat_variant.name}::all_editables(author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()\n"
+                "    }\n"
+                "}\n"
+            )
+
         # Then, for all the tables that have an updated_at column, we implement the
         # `all_by_updated_at` method, which returns all of the nested structs ordered
         # by the `updated_at` column.
-        if tables_metadata.has_updated_at_column(flat_struct.table_name):
-            tables.write(
+        if tables_metadata.has_updated_at_column(flat_variant.table_name):
+            document.write(
                 f"impl {nested_struct.name} {{\n"
                 "    /// Get all the nested structs from the database ordered by the `updated_at` column.\n"
                 "    ///\n"
@@ -1709,31 +1932,24 @@ def generate_nested_structs(
                 "        offset: Option<i64>,\n"
                 "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
                 "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
-                f"        {flat_struct.name}::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()\n"
+                f"        {flat_variant.name}::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()\n"
                 "    }\n"
                 "}\n"
             )
 
-        # We implement the `get` method, which returns the nested struct
-        # from a provided row primary key.
-        primary_key_attribute, primary_key_type = (
-            tables_metadata.get_primary_key_name_and_type(nested_struct.table_name)
-        )
-        rust_primary_key_type = sql_type_to_rust_type(primary_key_type)
-
-        tables.write(
+        document.write(
             f"impl {nested_struct.name} {{\n"
             "    /// Get the nested struct from the provided primary key.\n"
             "    ///\n"
             "    /// # Arguments\n"
-            f"    /// * `{primary_key_attribute}` - The primary key of the row.\n"
+            f"    /// * `{nested_struct.get_formatted_primary_keys(include_prefix=False)}` - The primary key(s) of the row.\n"
             "    /// * `connection` - The database connection.\n"
             "    pub fn get(\n"
-            f"        {primary_key_attribute}: {rust_primary_key_type},\n"
+            f"        {nested_struct.get_formatted_primary_keys(include_prefix=False)}: {nested_struct.get_formatted_primary_key_data_types()},\n"
             "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
             "    ) -> Result<Self, diesel::result::Error>\n"
             "    {\n"
-            f"       {flat_struct.name}::get({primary_key_attribute}, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))\n"
+            f"       {flat_variant.name}::get({nested_struct.get_formatted_primary_keys(include_prefix=False)}, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))\n"
             "    }\n"
             "}\n"
         )
@@ -1741,30 +1957,57 @@ def generate_nested_structs(
         # For each of the columns in the struct that have a UNIQUE constraint,
         # we implement the methods `from_{column_name}` by employing the method
         # of the same name available for the main struct associated to this struct
-        for unique_column in tables_metadata.get_unique_constraint_columns(
-            flat_struct.table_name
-        ):
-            if isinstance(unique_column, ViewColumn):
-                unique_column = unique_column.alias_name
+        for unique_columns in flat_variant.get_unique_constraints():
 
-            attribute = flat_struct.get_attribute_by_name(unique_column)
-            attribute_data_type = attribute.data_type()
-            if attribute_data_type == "String":
-                attribute_data_type = "&str"
+            unique_column_references = [
+                unique_column.as_ref() for unique_column in unique_columns
+            ]
 
-            tables.write(
+            joined = "_and_".join(
+                [unique_column.name for unique_column in unique_column_references]
+            )
+            from_method_name = f"from_{joined}"
+
+            if len(unique_column_references) == 1:
+                human_readable_column_names = unique_column_references[0].name
+            else:
+                human_readable_column_names = (
+                    ", ".join(
+                        [
+                            unique_column.name
+                            for unique_column in unique_column_references[:-1]
+                        ]
+                    )
+                    + f" and {unique_column_references[-1].name}"
+                )
+
+            comma_separated_column_names = ", ".join(
+                [unique_column.name for unique_column in unique_column_references]
+            )
+
+            document.write(
                 f"impl {nested_struct.name} {{\n"
-                f"    /// Get the nested struct from the provided {unique_column}.\n"
+                f"    /// Get the nested struct from the provided {human_readable_column_names}.\n"
                 "    ///\n"
                 f"    /// # Arguments\n"
-                f"    /// * `{attribute.name}` - The {attribute.name} of the row.\n"
+            )
+            for unique_column in unique_column_references:
+                document.write(
+                    f"    /// * `{unique_column.name}` - The {unique_column.name} of the row.\n"
+                )
+            document.write(
                 "    /// * `connection` - The database connection.\n"
-                f"    pub fn from_{attribute.name}(\n"
-                f"        {attribute.name}: {attribute_data_type},\n"
+                f"    pub fn {from_method_name}(\n"
+            )
+            for unique_column in unique_column_references:
+                document.write(
+                    f"        {unique_column.name}: {unique_column.format_data_type()},\n"
+                )
+            document.write(
                 "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
                 "    ) -> Result<Self, diesel::result::Error>\n"
                 "    {\n"
-                f"        {flat_struct.name}::from_{attribute.name}({attribute.name}, connection).and_then(|flat_struct| Self::from_flat(flat_struct, connection))\n"
+                f"        {flat_variant.name}::{from_method_name}({comma_separated_column_names}, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))\n"
                 "    }\n"
                 "}\n"
             )
@@ -1773,9 +2016,9 @@ def generate_nested_structs(
         # calls search on the flat version of the struct and then iterates on the
         # primary keys of the results and constructs the nested structs by calling
         # the `get` method several times.
-        if similarity_indices.has_table(flat_struct.table_name):
+        if similarity_indices.has_table(flat_variant.table_name):
             for method_name, _, _ in PGIndices.SIMILARITY_METHODS:
-                tables.write(
+                document.write(
                     f"impl {nested_struct.name} {{\n"
                     "    /// Search the table by the query.\n"
                     "    ///\n"
@@ -1787,120 +2030,131 @@ def generate_nested_structs(
                     "        limit: Option<i32>,\n"
                     "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
                     "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
-                    f"       {flat_struct.name}::{method_name}_search(query, limit, connection)?.into_iter().map(|flat_struct| Self::from_flat(flat_struct, connection)).collect()\n"
+                    f"       {flat_variant.name}::{method_name}_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()\n"
                     "    }\n"
                     "}\n"
                 )
 
+                if (
+                    nested_struct.has_associated_roles()
+                    and nested_struct.table_name != "users"
+                ):
+                    document.write(
+                        f"impl {nested_struct.name} {{\n"
+                        "    /// Search the table by the query.\n"
+                        "    ///\n"
+                        "    /// # Arguments\n"
+                        "    /// * `author_user_id` - The user id.\n"
+                        "    /// * `query` - The string to search for.\n"
+                        "    /// * `limit` - The maximum number of results, by default `10`.\n"
+                        f"    pub fn {method_name}_search_editables(\n"
+                        "        author_user_id: i32,\n"
+                        "        query: &str,\n"
+                        "        limit: Option<i32>,\n"
+                        "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
+                        "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
+                        f"       {flat_variant.name}::{method_name}_search_editables(author_user_id, query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()\n"
+                        "    }\n"
+                        "}\n"
+                    )
+
         # We implement the bidirectional From methods for the nested struct
         # present in the web_common crate, which does not use Diesel or its
         # structs, but the web_common version of the structs.
-        tables.write(
+        document.write(
             f"impl From<web_common::database::nested_models::{nested_struct.name}> for {nested_struct.name} {{\n"
             f"    fn from(item: web_common::database::nested_models::{nested_struct.name}) -> Self {{\n"
             "        Self {\n"
         )
         for attribute in nested_struct.attributes:
             if attribute.optional:
-                tables.write(
+                document.write(
                     f"            {attribute.name}: item.{attribute.name}.map(|item| item.into()),\n"
                 )
             else:
-                tables.write(
+                document.write(
                     f"            {attribute.name}: item.{attribute.name}.into(),\n"
                 )
-        tables.write("        }\n" "    }\n" "}\n")
+        document.write("        }\n" "    }\n" "}\n")
 
-        tables.write(
+        document.write(
             f"impl From<{nested_struct.name}> for web_common::database::nested_models::{nested_struct.name} {{\n"
             f"    fn from(item: {nested_struct.name}) -> Self {{\n"
             "        Self {\n"
         )
         for attribute in nested_struct.attributes:
             if attribute.optional:
-                tables.write(
+                document.write(
                     f"            {attribute.name}: item.{attribute.name}.map(|item| item.into()),\n"
                 )
             else:
-                tables.write(
+                document.write(
                     f"            {attribute.name}: item.{attribute.name}.into(),\n"
                 )
-        tables.write("        }\n" "    }\n" "}\n")
+        document.write("        }\n" "    }\n" "}\n")
 
-    tables.close()
+    document.close()
 
-    return new_struct_metadatas
+    return nested_structs
 
 
-def write_web_common_nested_structs(path: str, nested_structs: List[StructMetadata]):
+def write_web_common_nested_structs(
+    path: str, nested_structs: List[StructMetadata], table_metadata: TableMetadata
+):
     """Writes the nested structs to the web_common crate."""
 
     # We open the file to write the nested structs
-    tables = open(f"../web_common/src/database/{path}", "w", encoding="utf8")
-    table_metadatas = find_foreign_keys()
+    document = open(f"../web_common/src/database/{path}", "w", encoding="utf8")
 
     # Preliminarly, we write a docstring at the very head
     # of this submodule to explain what it does and warn the
     # reader not to write anything in this file as it is
     # automatically generated.
-    tables.write(
+    document.write(
         "//! This module contains the nested structs for the database tables.\n"
     )
-    tables.write("//!\n")
-    tables.write(
+    document.write("//!\n")
+    document.write(
         "//! This file is automatically generated. Do not write anything here.\n"
     )
-    tables.write("\n")
+    document.write("\n")
 
     # We start with the necessary imports.
     imports = [
         "use serde::Deserialize;",
         "use serde::Serialize;",
+        "use uuid::Uuid;",
         "use super::tables::*;",
         "use super::views::*;",
     ]
 
     for import_statement in imports:
-        tables.write(f"{import_statement}\n")
+        document.write(f"{import_statement}\n")
 
     for struct_metadata in nested_structs:
-        if not struct_metadata.can_implement_clone():
-            print(f"# {struct_metadata.name}")
-            for attribute in struct_metadata.attributes:
-                print(f"* {attribute.name} {attribute.implements_clone()}")
-
-        tables.write("#[derive(" + ", ".join(struct_metadata.derives()) + ")]\n")
-        tables.write(f"pub struct {struct_metadata.name} {{\n")
-        for attribute in struct_metadata.attributes:
-            tables.write(f"    pub {attribute.name}: {attribute.format_data_type()},\n")
-        tables.write("}\n")
+        struct_metadata.write_to(document)
 
         # We implement the `get` method for the struct when the frontend feature
         # is enabled using GlueSQL. This method will be extremely similar to the
         # `get` method for the Diesel-based approach of the backend.
 
-        primary_key_name, primary_key_type = (
-            table_metadatas.get_primary_key_name_and_type(struct_metadata.table_name)
-        )
+        flat_variant = struct_metadata.get_flat_variant()
 
-        rust_primary_key_type = sql_type_to_rust_type(primary_key_type)
-        flat_struct = struct_metadata.get_attribute_by_name("inner")._data_type
-
-        tables.write(
+        document.write(
             f'#[cfg(feature = "frontend")]\n' f"impl {struct_metadata.name} {{\n"
         )
 
         # First, we implement the `from_flat` method that will be used to convert
         # the flat struct to the nested struct. This method receives the flat struct
         # and the connection to the database and returns the nested struct.
-        tables.write(
+        document.write(
             "    /// Convert the flat struct to the nested struct.\n"
             "    ///\n"
             "    /// # Arguments\n"
-            "    /// * `flat_struct` - The flat struct.\n"
+            "    /// * `flat_variant` - The flat struct.\n"
             "    /// * `connection` - The database connection.\n"
             "    pub async fn from_flat(\n"
-            f"        flat_struct: {flat_struct.name},\n"
+            f"        flat_variant: {flat_variant.name},\n"
             "        connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,\n"
             "    ) -> Result<Self, gluesql::prelude::Error> {\n"
             "        Ok(Self {\n"
@@ -1910,41 +2164,41 @@ def write_web_common_nested_structs(path: str, nested_structs: List[StructMetada
                 continue
             if (
                 attribute.data_type() == struct_metadata.name
-                or flat_struct.has_attribute(attribute)
+                or flat_variant.has_attribute(attribute)
             ):
-                tables.write(
-                    f"            {attribute.name}: flat_struct.{attribute.name},\n"
+                document.write(
+                    f"            {attribute.name}: flat_variant.{attribute.name},\n"
                 )
                 continue
             if attribute.optional:
-                tables.write(
-                    f"            {attribute.name}: if let Some({attribute.original_name}) = flat_struct.{attribute.original_name} {{ {attribute.data_type()}::get({attribute.original_name}, connection).await? }} else {{ None }},\n"
+                document.write(
+                    f"            {attribute.name}: if let Some({attribute.original_name}) = flat_variant.{attribute.original_name} {{ {attribute.data_type()}::get({attribute.original_name}, connection).await? }} else {{ None }},\n"
                 )
             else:
-                tables.write(
-                    f"            {attribute.name}: {attribute.data_type()}::get(flat_struct.{attribute.original_name}, connection).await?.unwrap(),\n"
+                document.write(
+                    f"            {attribute.name}: {attribute.data_type()}::get(flat_variant.{attribute.original_name}, connection).await?.unwrap(),\n"
                 )
 
         if any(attribute.name == "inner" for attribute in struct_metadata.attributes):
-            tables.write(f"            inner: flat_struct,\n")
+            document.write(f"            inner: flat_variant,\n")
 
-        tables.write("        })\n" "    }\n")
+        document.write("        })\n" "    }\n")
 
-        tables.write(
+        document.write(
             "    /// Get the nested struct from the provided primary key.\n"
             "    ///\n"
             "    /// # Arguments\n"
-            f"    /// * `{primary_key_name}` - The primary key of the row.\n"
+            f"    /// * `{flat_variant.get_formatted_primary_keys(include_prefix=False)}` - The primary key(s) of the row.\n"
             "    /// * `connection` - The database connection.\n"
             "    pub async fn get<C>(\n"
-            f"        {primary_key_name}: {rust_primary_key_type},\n"
+            f"        {flat_variant.get_formatted_primary_keys(include_prefix=False)}: {flat_variant.get_formatted_primary_key_data_types()},\n"
             "        connection: &mut gluesql::prelude::Glue<C>,\n"
             "    ) -> Result<Option<Self>, gluesql::prelude::Error> where\n"
             "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
             "    {\n"
-            f"       let flat_struct = {flat_struct.name}::get({primary_key_name}, connection).await?;"
-            "        match flat_struct {\n"
-            "            Some(flat_struct) => Ok(Some(Self::from_flat(flat_struct, connection).await?)),\n"
+            f"       let flat_variant = {flat_variant.name}::get({flat_variant.get_formatted_primary_keys(include_prefix=False)}, connection).await?;"
+            "        match flat_variant {\n"
+            "            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),\n"
             "            None => Ok(None),\n"
             "        }\n"
             "    }\n"
@@ -1954,7 +2208,7 @@ def write_web_common_nested_structs(path: str, nested_structs: List[StructMetada
         # using GlueSQL. This method will be extremely similar to the `all` method for the
         # Diesel-based approach of the backend.
 
-        tables.write(
+        document.write(
             "    /// Get all the nested structs from the database.\n"
             "    ///\n"
             "    /// # Arguments\n"
@@ -1968,10 +2222,10 @@ def write_web_common_nested_structs(path: str, nested_structs: List[StructMetada
             "    ) -> Result<Vec<Self>, gluesql::prelude::Error> where\n"
             "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
             "    {\n"
-            f"        let flat_structs = {flat_struct.name}::all(limit, offset, connection).await?;\n"
-            "         let mut nested_structs = Vec::with_capacity(flat_structs.len());\n"
-            "         for flat_struct in flat_structs {\n"
-            "             nested_structs.push(Self::from_flat(flat_struct, connection).await?);\n"
+            f"        let flat_variants = {flat_variant.name}::all(limit, offset, connection).await?;\n"
+            "         let mut nested_structs = Vec::with_capacity(flat_variants.len());\n"
+            "         for flat_variant in flat_variants {\n"
+            "             nested_structs.push(Self::from_flat(flat_variant, connection).await?);\n"
             "         }\n"
             "         Ok(nested_structs)\n"
             "    }\n"
@@ -1981,8 +2235,8 @@ def write_web_common_nested_structs(path: str, nested_structs: List[StructMetada
         # is enabled using GlueSQL. This method will be extremely similar to the `all_by_updated_at`
         # method for the Diesel-based approach of the backend.
 
-        if table_metadatas.has_updated_at_column(flat_struct.table_name):
-            tables.write(
+        if table_metadata.has_updated_at_column(flat_variant.table_name):
+            document.write(
                 "    /// Get all the nested structs from the database ordered by the `updated_at` column.\n"
                 "    ///\n"
                 "    /// # Arguments\n"
@@ -1996,10 +2250,10 @@ def write_web_common_nested_structs(path: str, nested_structs: List[StructMetada
                 "    ) -> Result<Vec<Self>, gluesql::prelude::Error> where\n"
                 "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
                 "    {\n"
-                f"        let flat_structs = {flat_struct.name}::all_by_updated_at(limit, offset, connection).await?;\n"
-                "         let mut nested_structs = Vec::with_capacity(flat_structs.len());\n"
-                "         for flat_struct in flat_structs {\n"
-                "             nested_structs.push(Self::from_flat(flat_struct, connection).await?);\n"
+                f"        let flat_variants = {flat_variant.name}::all_by_updated_at(limit, offset, connection).await?;\n"
+                "         let mut nested_structs = Vec::with_capacity(flat_variants.len());\n"
+                "         for flat_variant in flat_variants {\n"
+                "             nested_structs.push(Self::from_flat(flat_variant, connection).await?);\n"
                 "         }\n"
                 "         Ok(nested_structs)\n"
                 "    }\n"
@@ -2010,7 +2264,7 @@ def write_web_common_nested_structs(path: str, nested_structs: List[StructMetada
         # for the flat version of the struct, with the important difference that we will call it
         # on all of its attributes that are nested structs.
 
-        tables.write(
+        document.write(
             "    /// Update or insert the nested struct into the database.\n"
             "    ///\n"
             "    /// # Arguments\n"
@@ -2026,27 +2280,28 @@ def write_web_common_nested_structs(path: str, nested_structs: List[StructMetada
             assert isinstance(attribute.raw_data_type(), StructMetadata)
 
             if attribute.optional:
-                tables.write(
+                document.write(
                     f"        if let Some({attribute.name}) = self.{attribute.name} {{\n"
                     f"            {attribute.name}.update_or_insert(connection).await?;\n"
                     "        }\n"
                 )
             else:
-                tables.write(
+                document.write(
                     f"        self.{attribute.name}.update_or_insert(connection).await?;\n"
                 )
 
-        tables.write("        Ok(())\n" "    }\n")
+        document.write("        Ok(())\n" "    }\n")
 
-        tables.write("}\n")
+        document.write("}\n")
 
-    tables.close()
+    document.close()
 
 
 def write_webcommons_table_names_enumeration(
     struct_metadatas: List[StructMetadata],
     new_model_structs: List[StructMetadata],
     update_model_structs: List[StructMetadata],
+    tables_metadata: TableMetadata,
 ) -> List[TableStructMetadata]:
     imports = [
         "use serde::Deserialize;",
@@ -2063,7 +2318,6 @@ def write_webcommons_table_names_enumeration(
         raise Exception("This script must be executed in the `backend` crate.")
 
     document = open(f"../web_common/src/database/table_names.rs", "w", encoding="utf8")
-    tables_metadata = find_foreign_keys()
 
     # Preliminarly, we write a docstring at the very head
     # of this submodule to explain what it does and warn the
@@ -2085,7 +2339,7 @@ def write_webcommons_table_names_enumeration(
             tables[struct.table_name] = TableStructMetadata(struct.table_name)
         tables[struct.table_name].set_richest_struct(struct)
         if not struct.is_nested():
-            tables[struct.table_name].set_flat_struct(struct)
+            tables[struct.table_name].set_flat_variant(struct)
 
     # We set the new flat model struct variant for each of the tables,
     # when it is available.
@@ -2096,7 +2350,7 @@ def write_webcommons_table_names_enumeration(
             f"Expected a new variant for table {struct.table_name}. "
             f"Its flat variant is {struct.get_flat_variant().name}."
         )
-        tables[struct.table_name].set_new_flat_struct(struct)
+        tables[struct.table_name].set_new_flat_variant(struct)
         struct.set_richest_variant(tables[struct.table_name].get_richest_struct())
 
     # We set the update flat model struct variant for each of the tables,
@@ -2104,7 +2358,7 @@ def write_webcommons_table_names_enumeration(
     for struct in update_model_structs:
         assert struct.table_name in tables, f"Table {struct.table_name} not found."
         assert struct.is_update_variant()
-        tables[struct.table_name].set_update_flat_struct(struct)
+        tables[struct.table_name].set_update_flat_variant(struct)
         struct.set_richest_variant(tables[struct.table_name].get_richest_struct())
 
     tables: List[TableStructMetadata] = sorted(
@@ -2200,7 +2454,7 @@ def write_webcommons_table_names_enumeration(
     for table in tables:
         document.write(
             f"            Table::{table.camel_cased()} => {{\n"
-            f"                crate::database::{table.flat_struct_name()}::delete_from_id(primary_key.into(), connection).await\n"
+            f"                crate::database::{table.flat_variant_name()}::delete_from_id(primary_key.into(), connection).await\n"
             "            },\n"
         )
 
@@ -2365,8 +2619,8 @@ def write_webcommons_table_names_enumeration(
 
         document.write(
             f"            Table::{table.camel_cased()} => {{\n"
-            f"                let new_row: super::{table.new_flat_struct_name()} = bincode::deserialize::<super::{table.new_flat_struct_name()}>(&new_row).map_err(crate::api::ApiError::from)?;\n"
-            f"                let inserted_row: super::{table.flat_struct_name()} = new_row.insert(user_id, connection).await?;\n"
+            f"                let new_row: super::{table.new_flat_variant_name()} = bincode::deserialize::<super::{table.new_flat_variant_name()}>(&new_row).map_err(crate::api::ApiError::from)?;\n"
+            f"                let inserted_row: super::{table.flat_variant_name()} = new_row.insert(user_id, connection).await?;\n"
         )
 
         # If the table has a richer variant than the flat one, we convert the flat struct
@@ -2420,6 +2674,12 @@ def write_webcommons_table_names_enumeration(
     )
 
     for table in tables:
+        if table.is_junktion_table():
+            document.write(
+                f'            Table::{table.camel_cased()} => unimplemented!("Update not implemented for {table.name}."),\n'
+            )
+            continue
+
         if not table.is_updatable():
             document.write(
                 f'            Table::{table.camel_cased()} => unimplemented!("Update not implemented for {table.name}."),\n'
@@ -2432,14 +2692,12 @@ def write_webcommons_table_names_enumeration(
             )
             continue
 
-        primary_key_name, primary_key_type = (
-            tables_metadata.get_primary_key_name_and_type(table.name)
-        )
+        flat_variant: StructMetadata = table.get_flat_variant()
 
         document.write(
             f"            Table::{table.camel_cased()} => {{\n"
-            f"                let update_row: super::{table.update_flat_struct_name()} = bincode::deserialize::<super::{table.update_flat_struct_name()}>(&update_row).map_err(crate::api::ApiError::from)?;\n"
-            f"                let {primary_key_name} = update_row.{primary_key_name};\n"
+            f"                let update_row: super::{table.update_flat_variant_name()} = bincode::deserialize::<super::{table.update_flat_variant_name()}>(&update_row).map_err(crate::api::ApiError::from)?;\n"
+            f"                let {flat_variant.get_formatted_primary_keys(include_prefix=False)} = {flat_variant.get_formatted_primary_keys(include_prefix=True, prefix='update_row')};\n"
             f"                update_row.update("
         )
 
@@ -2449,7 +2707,7 @@ def write_webcommons_table_names_enumeration(
         document.write("connection).await?;\n")
 
         document.write(
-            f"                let updated_row: super::{table.flat_struct_name()} = super::{table.flat_struct_name()}::get({primary_key_name}, connection).await?.unwrap();\n"
+            f"                let updated_row: super::{table.flat_variant_name()} = super::{table.flat_variant_name()}::get({flat_variant.get_formatted_primary_keys(include_prefix=False)}, connection).await?.unwrap();\n"
         )
 
         # If the table has a richer variant than the flat one, we convert the flat struct
@@ -2519,12 +2777,13 @@ def write_webcommons_table_names_enumeration(
 
 def write_diesel_table_names_enumeration(
     tables: List[TableStructMetadata],
+    tables_metadata: TableMetadata,
 ):
     # We check that we are currently executing in the `backend` crate
     # so to make sure that the relative path to the `web_common` crate
     # is correct.
     if not os.getcwd().endswith("backend"):
-        raise Exception("This script must be executed in the `backend` crate.")
+        raise RuntimeError("This script must be executed in the `backend` crate.")
 
     path = "src/table_enumeration.rs"
 
@@ -2550,7 +2809,7 @@ def write_diesel_table_names_enumeration(
     imports = [
         "use crate::models::*;",
         "use crate::nested_models::*;",
-        "use crate::views::*;",
+        # "use crate::views::*;",
         "use diesel::r2d2::PooledConnection;",
         "use diesel::r2d2::ConnectionManager;",
         "use crate::new_variants::InsertRow;",
@@ -2562,8 +2821,7 @@ def write_diesel_table_names_enumeration(
 
     document.write("\n")
 
-    table_metadatas = find_foreign_keys()
-    search_indices: PGIndices = find_pg_trgm_indices()
+    search_indices: PGIndices = find_pg_trgm_indices(tables_metadata)
 
     # We start with the first trait, the SearchableTable trait, which provides
     # a search method receiving a &str query and a number of rows to return (i32).
@@ -2593,8 +2851,29 @@ def write_diesel_table_names_enumeration(
             "         query: &str,\n"
             "         limit: Option<i32>,\n"
             "         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
-            ") -> Result<Vec<Vec<u8>>, web_common::api::ApiError>;\n"
+            ") -> Result<Vec<Vec<u8>>, web_common::api::ApiError>;\n\n"
         )
+
+        document.write(
+            f"    /// Search editables rows by the query using the {similarity_method} method from PostgreSQL.\n"
+            "    ///\n"
+            "    /// # Arguments\n"
+            "    /// * `user_id` - The user ID of the user performing the operation.\n"
+            "    /// * `query` - The string to search for.\n"
+            "    /// * `limit` - The maximum number of results, by default `10`.\n"
+            "    /// * `connection` - The database connection.\n"
+            "    ///\n"
+            "    /// # Returns\n"
+            "    /// A serialized vector of the rows of the table, using bincode.\n"
+            f"    fn {similarity_method}_search_editables(\n"
+            "         &self,\n"
+            "         user_id: i32,\n"
+            "         query: &str,\n"
+            "         limit: Option<i32>,\n"
+            "         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+            ") -> Result<Vec<Vec<u8>>, web_common::api::ApiError>;\n\n"
+        )
+
     document.write("}\n\n")
 
     document.write("impl SearchableTable for web_common::database::Table {\n")
@@ -2609,6 +2888,28 @@ def write_diesel_table_names_enumeration(
                 document.write(
                     f"            web_common::database::Table::{table.camel_cased()} => {table.richest_struct_name()}::{similarity_method}_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),\n"
                 )
+            else:
+                document.write(
+                    f'            web_common::database::Table::{table.camel_cased()} => unimplemented!("Table `{table.name}` does not have a GIN similarity index."),\n'
+                )
+
+        document.write("        }\n" "    }\n")
+
+        document.write(
+            f"    fn {similarity_method}_search_editables(&self, user_id: i32, query: &str, limit: Option<i32>, connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>) -> Result<Vec<Vec<u8>>, web_common::api::ApiError> {{\n"
+            "        match self {\n"
+        )
+
+        for table in tables:
+            if search_indices.has_table(table.name):
+                if table.has_associated_roles() and table.name != "users":
+                    document.write(
+                        f"            web_common::database::Table::{table.camel_cased()} => {table.richest_struct_name()}::{similarity_method}_search_editables(user_id, query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),\n"
+                    )
+                else:
+                    document.write(
+                        f'            web_common::database::Table::{table.camel_cased()} => unimplemented!("Table `{table.name}` does not have associated roles."),\n'
+                    )
             else:
                 document.write(
                     f'            web_common::database::Table::{table.camel_cased()} => unimplemented!("Table `{table.name}` does not have a GIN similarity index."),\n'
@@ -2659,19 +2960,157 @@ def write_diesel_table_names_enumeration(
 
     document.write("        })\n" "    }\n" "}\n")
 
-    # We implement the `delete` method for the Table enum, which receives a primary key
+    # We implement the `can_view` method for the Table enum, which receives a primary key
+    # enum and a user ID. The method returns a Result, where the Ok variant is a boolean
+    # indicating whether the user can view the row, while the Err variant contains an ApiError.
+    # For all tables that do not have a `public` column, we always return true.
+    # For the entries that do have a `public` column, we return true if the column is true, or
+    # if the provided user is a valid viewer of that entry as determined by the associated roles
+    # method from the flat struct which is called by the `is_viewer_by_id` method.
+
+    document.write(
+        "/// Trait providing the can_view method for the Table enum.\n"
+        "pub trait ViewableTable {\n"
+        "    /// Check whether the user can view the row.\n"
+        "    ///\n"
+        "    /// # Arguments\n"
+        "    /// * `primary_key` - The primary key of the row.\n"
+        "    /// * `user_id` - The user ID of the user performing the operation.\n"
+        "    /// * `connection` - The database connection.\n"
+        "    ///\n"
+        "    /// # Returns\n"
+        "    /// A boolean indicating whether the user can view the row.\n"
+        "    fn can_view(\n"
+        "         &self,\n"
+        "         primary_key: web_common::database::operations::PrimaryKey,\n"
+        "         user_id: Option<i32>,\n"
+        "         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+        ") -> Result<bool, web_common::api::ApiError>;\n"
+        "}\n\n"
+    )
+
+    document.write(
+        "impl ViewableTable for web_common::database::Table {\n\n"
+        "    fn can_view(\n"
+        "        &self,\n"
+        "        primary_key: web_common::database::operations::PrimaryKey,\n"
+        "        user_id: Option<i32>,\n"
+        "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+        "    ) -> Result<bool, web_common::api::ApiError> {\n"
+        "        Ok(match self {\n"
+    )
+
+    for table in tables:
+        if table.has_public_column():
+            document.write(
+                f"            web_common::database::Table::{table.camel_cased()} => {{\n"
+                f"                {table.flat_variant_name()}::get(primary_key.into(), connection)?.public ||\n"
+                f"                user_id.map_or(Ok(false), |user_id| {table.flat_variant_name()}::is_viewer_by_id(primary_key.into(), user_id, connection))?\n"
+                "            },\n"
+            )
+        else:
+            document.write(
+                f"            web_common::database::Table::{table.camel_cased()} => true,\n"
+            )
+
+    document.write("        })\n" "    }\n" "}\n")
+
+    # We implement the can_update method for the Table enum, which receives a primary key
+    # enum and a user ID. The method returns a Result, where the Ok variant is a boolean
+    # indicating whether the user can edit the row, while the Err variant contains an ApiError.
+    # For the tables that do not have an associated roles, we always return false.
+    # For the users table specifically, we return true if the user ID is the same as the
+    # primary key, and false otherwise. For the other tables, we call the `is_editor_by_id` method
+    # from the flat struct, which returns true if the user is an editor of the entry.
+
+    document.write(
+        "/// Trait providing the can_update method for the Table enum.\n"
+        "pub trait EditableTable {\n"
+        "    /// Check whether the user can edit the row.\n"
+        "    ///\n"
+        "    /// # Arguments\n"
+        "    /// * `primary_key` - The primary key of the row.\n"
+        "    /// * `user_id` - The user ID of the user performing the operation.\n"
+        "    /// * `connection` - The database connection.\n"
+        "    ///\n"
+        "    /// # Returns\n"
+        "    /// A boolean indicating whether the user can edit the row.\n"
+        "    fn can_update(\n"
+        "         &self,\n"
+        "         primary_key: web_common::database::operations::PrimaryKey,\n"
+        "         user_id: i32,\n"
+        "         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+        ") -> Result<bool, web_common::api::ApiError>;\n"
+        "}\n\n"
+    )
+
+    document.write(
+        "impl EditableTable for web_common::database::Table {\n\n"
+        "    fn can_update(\n"
+        "        &self,\n"
+        "        primary_key: web_common::database::operations::PrimaryKey,\n"
+        "        user_id: i32,\n"
+        "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+        "    ) -> Result<bool, web_common::api::ApiError> {\n"
+        "        Ok(match self {\n"
+    )
+
+    for table in tables:
+        if table.has_associated_roles() and table.name != "users":
+            document.write(
+                f"            web_common::database::Table::{table.camel_cased()} => {table.flat_variant_name()}::is_editor_by_id(primary_key.into(), user_id, connection)?,\n"
+            )
+        elif table.name == "users":
+            document.write(
+                f"            web_common::database::Table::{table.camel_cased()} => {{\n"
+                "                let primary_key: i32 = primary_key.into();\n"
+                "                primary_key == user_id\n"
+                "            },\n"
+            )
+        else:
+            document.write(
+                f"            web_common::database::Table::{table.camel_cased()} => false,\n"
+            )
+
+    document.write("        })\n" "    }\n" "}\n")
+
+    # We implement the can_delete method for the Table enum, which receives a primary key
+    # enum and a user ID. The method returns a Result, where the Ok variant is a boolean
+    # indicating whether the user can delete the row, while the Err variant contains an ApiError.
+    # For the tables that do not have an associated roles, we always return false.
+    # For the users table specifically, we always return false. For the other tables, we call
+    # the `is_admin_by_id` method from the flat struct, which returns true if the user is an admin of
+    # the entry.
+
+    # We also implement the `delete` method for the Table enum, which receives a primary key
     # enum and a connection to the database. The method returns a Result, where the Ok variant
     # is the number of rows deleted, while the Err variant contains an ApiError. The delete
     # method is available for all tables with a primary key - tables that do not have a primary
     # key will raise a panic with the unimplemented!() macro.
 
     document.write(
-        "/// Trait providing the delete method for the Table enum.\n"
+        "/// Trait providing the can_delete method for the Table enum.\n"
         "pub trait DeletableTable {\n"
+        "    /// Check whether the user can delete the row.\n"
+        "    ///\n"
+        "    /// # Arguments\n"
+        "    /// * `primary_key` - The primary key of the row.\n"
+        "    /// * `user_id` - The user ID of the user performing the operation.\n"
+        "    /// * `connection` - The database connection.\n"
+        "    ///\n"
+        "    /// # Returns\n"
+        "    /// A boolean indicating whether the user can delete the row.\n"
+        "    fn can_delete(\n"
+        "         &self,\n"
+        "         primary_key: web_common::database::operations::PrimaryKey,\n"
+        "         user_id: i32,\n"
+        "         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+        ") -> Result<bool, web_common::api::ApiError>;\n\n"
         "    /// Delete the row from the table by the primary key.\n"
         "    ///\n"
         "    /// # Arguments\n"
         "    /// * `primary_key` - The primary key of the row.\n"
+        "    /// * `author_user_id` - The user ID of the user performing the operation.\n"
         "    /// * `connection` - The database connection.\n"
         "    ///\n"
         "    /// # Returns\n"
@@ -2679,6 +3118,7 @@ def write_diesel_table_names_enumeration(
         "    fn delete(\n"
         "         &self,\n"
         "         primary_key: web_common::database::operations::PrimaryKey,\n"
+        "         author_user_id: i32,\n"
         "         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
         ") -> Result<usize, web_common::api::ApiError>;\n"
         "}\n\n"
@@ -2686,18 +3126,50 @@ def write_diesel_table_names_enumeration(
 
     document.write(
         "impl DeletableTable for web_common::database::Table {\n\n"
-        "    fn delete(\n"
+        "    fn can_delete(\n"
         "        &self,\n"
         "        primary_key: web_common::database::operations::PrimaryKey,\n"
+        "        user_id: i32,\n"
         "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
-        "    ) -> Result<usize, web_common::api::ApiError> {\n"
+        "    ) -> Result<bool, web_common::api::ApiError> {\n"
         "        Ok(match self {\n"
     )
 
     for table in tables:
-        document.write(
-            f"            web_common::database::Table::{table.camel_cased()} => {table.flat_struct_name()}::delete_by_id(primary_key.into(), connection)?,\n"
-        )
+        if table.has_associated_roles() and table.name != "users":
+            document.write(
+                f"            web_common::database::Table::{table.camel_cased()} => {table.flat_variant_name()}::is_admin_by_id(primary_key.into(), user_id, connection)?,\n"
+            )
+        else:
+            document.write(
+                f"            web_common::database::Table::{table.camel_cased()} => false,\n"
+            )
+
+    document.write("        })\n" "    }\n")
+
+    document.write(
+        "    fn delete(\n"
+        "        &self,\n"
+        "        primary_key: web_common::database::operations::PrimaryKey,\n"
+        "        author_user_id: i32,\n"
+        "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+        "    ) -> Result<usize, web_common::api::ApiError> {\n"
+        "        if !self.can_delete(primary_key, author_user_id, connection)? {\n"
+        "            return Err(web_common::api::ApiError::unauthorized());\n"
+        "        }\n"
+        "        Ok(match self {\n"
+    )
+
+    for table in tables:
+
+        if table.has_associated_roles() and table.name != "users":
+            document.write(
+                f"            web_common::database::Table::{table.camel_cased()} => {table.flat_variant_name()}::delete_by_id(primary_key.into(), author_user_id, connection)?,\n"
+            )
+        else:
+            document.write(
+                f'            web_common::database::Table::{table.camel_cased()} => unimplemented!("Delete not implemented for {table.name}."),\n'
+            )
 
     document.write("        })\n")
     document.write("    }\n")
@@ -2847,7 +3319,7 @@ def write_diesel_table_names_enumeration(
     )
 
     for table in tables:
-        if not table.is_insertable():
+        if not table.is_insertable() or table.is_junktion_table():
             document.write(
                 f'            web_common::database::Table::{table.camel_cased()} => unreachable!("Table `{table.name}` is not insertable as it does not have a known column associated to a creator user id."),\n'
             )
@@ -2861,8 +3333,8 @@ def write_diesel_table_names_enumeration(
 
         document.write(
             f"            web_common::database::Table::{table.camel_cased()} => {{\n"
-            f"                let row: web_common::database::{table.new_flat_struct_name()} = bincode::deserialize::<web_common::database::{table.new_flat_struct_name()}>(&row).map_err(web_common::api::ApiError::from)?;\n"
-            f"                let inserted_row: crate::models::{table.flat_struct_name()} = <web_common::database::{table.new_flat_struct_name()} as InsertRow>::insert(row, user_id, connection)?;\n"
+            f"                let row: web_common::database::{table.new_flat_variant_name()} = bincode::deserialize::<web_common::database::{table.new_flat_variant_name()}>(&row).map_err(web_common::api::ApiError::from)?;\n"
+            f"                let inserted_row: crate::models::{table.flat_variant_name()} = <web_common::database::{table.new_flat_variant_name()} as InsertRow>::insert(row, user_id, connection)?;\n"
         )
 
         # If the table has a richer variant than the flat one, we convert the flat struct
@@ -2927,7 +3399,7 @@ def write_diesel_table_names_enumeration(
     )
 
     for table in tables:
-        if not table.is_updatable():
+        if not table.is_updatable() or table.is_junktion_table():
             document.write(
                 f'            web_common::database::Table::{table.camel_cased()} => unreachable!("Table `{table.name}` is not updatable as it does not have a known column associated to an updater user id."),\n'
             )
@@ -2941,8 +3413,8 @@ def write_diesel_table_names_enumeration(
 
         document.write(
             f"            web_common::database::Table::{table.camel_cased()} => {{\n"
-            f"                let row: web_common::database::{table.update_flat_struct_name()} = bincode::deserialize::<web_common::database::{table.update_flat_struct_name()}>(&row).map_err(web_common::api::ApiError::from)?;\n"
-            f"                let updated_row: crate::models::{table.flat_struct_name()} = <web_common::database::{table.update_flat_struct_name()} as UpdateRow>::update(row, user_id, connection)?;\n"
+            f"                let row: web_common::database::{table.update_flat_variant_name()} = bincode::deserialize::<web_common::database::{table.update_flat_variant_name()}>(&row).map_err(web_common::api::ApiError::from)?;\n"
+            f"                let updated_row: crate::models::{table.flat_variant_name()} = <web_common::database::{table.update_flat_variant_name()} as UpdateRow>::update(row, user_id, connection)?;\n"
         )
 
         # If the table has a richer variant than the flat one, we convert the flat struct
@@ -3003,12 +3475,12 @@ def write_diesel_table_names_enumeration(
     )
 
     for table in tables:
-        flat_variant = table.get_flat_struct()
+        flat_variant = table.get_flat_variant()
         richest_variant = table.get_richest_struct()
 
         if not richest_variant.is_nested():
             document.write(
-                f"            web_common::database::Table::{table.camel_cased()} => bincode::serialize(&serde_json::from_str::<crate::models::{table.flat_struct_name()}>(row).map_err(web_common::api::ApiError::from)?).map_err(web_common::api::ApiError::from)?,\n"
+                f"            web_common::database::Table::{table.camel_cased()} => bincode::serialize(&serde_json::from_str::<crate::models::{table.flat_variant_name()}>(row).map_err(web_common::api::ApiError::from)?).map_err(web_common::api::ApiError::from)?,\n"
             )
             continue
 
@@ -3028,15 +3500,16 @@ def write_diesel_table_names_enumeration(
 
 def write_web_common_search_trait_implementations(
     struct_metadatas: List[StructMetadata],
+    table_metadata: TableMetadata,
 ):
     # We check that we are currently executing in the `backend` crate
     # so to make sure that the relative path to the `web_common` crate
     # is correct.
     if not os.getcwd().endswith("backend"):
-        raise Exception("This script must be executed in the `backend` crate.")
+        raise RuntimeError("This script must be executed in the `backend` crate.")
 
-    tables = open(f"../web_common/src/database/search_tables.rs", "w", encoding="utf8")
-    similarity_indices: PGIndices = find_pg_trgm_indices()
+    document = open("../web_common/src/database/search_tables.rs", "w", encoding="utf8")
+    similarity_indices: PGIndices = find_pg_trgm_indices(table_metadata)
 
     imports = [
         "use crate::database::*;",
@@ -3047,40 +3520,59 @@ def write_web_common_search_trait_implementations(
     # reader not to write anything in this file as it is
     # automatically generated.
 
-    tables.write(
+    document.write(
         "//! This module contains the table names enumeration.\n"
         "//!\n"
         "//! This module is automatically generated. Do not write anything here.\n\n"
     )
 
     for import_statement in imports:
-        tables.write(f"{import_statement}\n")
+        document.write(f"{import_statement}\n")
 
     # First, we create the Searchable trait that will be implemented by all the structs
     # that are searchable.
 
-    tables.write("pub trait Searchable {\n")
-    tables.write("    fn search_task(query: String, limit: u32) -> super::Select;\n")
-    tables.write("}\n")
+    document.write(
+        "pub trait Searchable<const EDIT: bool> {\n"
+        "    fn search_task(query: String, limit: u32) -> super::Select;\n"
+        "}\n"
+    )
 
     for struct in struct_metadatas:
         if similarity_indices.has_table(struct.table_name):
-            tables.write(f"impl Searchable for {struct.name} {{\n")
-            tables.write(
+            document.write(
+                f"impl Searchable<false> for {struct.name} {{\n"
                 "    fn search_task(query: String, limit: u32) -> super::Select {\n"
+                f"        super::Select::search(\n"
+                f"             Table::{struct.capitalized_table_name()},\n"
+                "              query,\n"
+                "              limit,\n"
+                "        )\n"
+                "    }\n"
+                "}\n"
             )
-            tables.write(f"        super::Select::search(\n")
-            tables.write(f"             Table::{struct.capitalized_table_name()},\n")
-            tables.write("              query,\n")
-            tables.write("              limit,\n")
-            tables.write("        )\n")
-            tables.write("    }\n")
-            tables.write("}\n")
 
-    tables.close()
+        if struct.has_associated_roles() and struct.table_name != "users":
+            document.write(
+                f"impl Searchable<true> for {struct.name} {{\n"
+                "    fn search_task(query: String, limit: u32) -> super::Select {\n"
+                f"        super::Select::search_editables(\n"
+                f"             Table::{struct.capitalized_table_name()},\n"
+                "              query,\n"
+                "              limit,\n"
+                "        )\n"
+                "    }\n"
+                "}\n"
+            )
+
+    document.flush()
+    document.close()
 
 
-def derive_new_models(struct_metadatas: List[StructMetadata]) -> List[StructMetadata]:
+def derive_new_models(
+    struct_metadatas: List[StructMetadata],
+    table_metadata: TableMetadata,
+) -> List[StructMetadata]:
     """Returns list of the New{Model} structs.
 
     Parameters
@@ -3100,11 +3592,9 @@ def derive_new_models(struct_metadatas: List[StructMetadata]) -> List[StructMeta
     # Temporary list of tables for which to refrain from generating
     # the form component.
 
-    table_metadatas = find_foreign_keys()
-
     for table_name in TEMPORARELY_IGNORED_TABLES:
-        if not table_metadatas.is_table(table_name):
-            raise Exception(
+        if not table_metadata.is_table(table_name):
+            raise RuntimeError(
                 f"Table {table_name} is in the deny list but does not exist in the database."
             )
 
@@ -3117,6 +3607,9 @@ def derive_new_models(struct_metadatas: List[StructMetadata]) -> List[StructMeta
         leave=False,
     ):
         if not struct.is_insertable():
+            continue
+
+        if struct.is_junktion_table():
             continue
 
         if struct.table_name in TEMPORARELY_IGNORED_TABLES:
@@ -3132,21 +3625,26 @@ def derive_new_models(struct_metadatas: List[StructMetadata]) -> List[StructMeta
         new_struct = StructMetadata(
             struct_name=f"New{struct.name}",
             table_name=struct.table_name,
+            table_metadata=table_metadata,
         )
 
         new_struct.set_flat_variant(struct)
 
-        primary_key_name, primary_key_type = (
-            table_metadatas.get_primary_key_name_and_type(struct.table_name)
-        )
+        primary_keys = struct.get_primary_keys()
 
         for derive in struct.derives():
             new_struct.add_derive(derive)
 
         for attribute in struct.attributes:
-            if attribute.name == primary_key_name and primary_key_type != "uuid":
-                continue
             if attribute.is_automatically_determined_column():
+                continue
+
+            if attribute in primary_keys:
+                if len(primary_keys) > 1:
+                    continue
+                if attribute.is_uuid():
+                    new_struct.add_attribute(attribute)
+                    continue
                 continue
             new_struct.add_attribute(attribute)
 
@@ -3177,7 +3675,6 @@ def derive_update_models(
     is no need to derive an Update variant.
     """
     update_structs = []
-    table_metadatas = find_foreign_keys()
 
     for struct in tqdm(
         struct_metadatas,
@@ -3186,6 +3683,9 @@ def derive_update_models(
         leave=False,
     ):
         if not struct.is_updatable():
+            continue
+
+        if struct.is_junktion_table():
             continue
 
         if struct.table_name in TEMPORARELY_IGNORED_TABLES:
@@ -3198,16 +3698,15 @@ def derive_update_models(
         if len(struct.attributes) == 1:
             continue
 
-        primary_key_name, primary_key_type = (
-            table_metadatas.get_primary_key_name_and_type(struct.table_name)
-        )
+        primary_keys = struct.get_primary_keys()
 
-        if primary_key_type == "uuid":
+        if len(primary_keys) == 1 and primary_keys[0].is_uuid():
             continue
 
         update_struct = StructMetadata(
             struct_name=f"Update{struct.name}",
             table_name=struct.table_name,
+            table_metadata=struct.table_metadata,
         )
 
         update_struct.set_flat_variant(struct)
@@ -3245,7 +3744,10 @@ def derive_model_builders(
     as the original attribute (Option<T>).
     """
     builders = []
-    table_metadata = find_foreign_keys()
+
+    deny_list_tables = [
+        "user_emails",
+    ]
 
     for struct in tqdm(
         new_or_update_struct_metadatas,
@@ -3255,6 +3757,9 @@ def derive_model_builders(
     ):
         assert not struct.is_nested()
         assert struct.is_new_variant() or struct.is_update_variant()
+
+        if struct.table_name in deny_list_tables:
+            continue
 
         if struct.is_update_variant() and not struct.is_new_variant():
             found = False
@@ -3273,6 +3778,7 @@ def derive_model_builders(
         builder = StructMetadata(
             struct_name=f"{flat_variant.name}Builder",
             table_name=struct.table_name,
+            table_metadata=struct.table_metadata,
         )
 
         builder.set_flat_variant(flat_variant)
@@ -3290,13 +3796,17 @@ def derive_model_builders(
 
         builder.add_decorator('store(storage = "local", storage_tab_sync)')
 
-        foreign_keys = table_metadata.get_foreign_keys(struct.table_name)
-        primary_key_name, _ = table_metadata.get_primary_key_name_and_type(
-            struct.table_name
-        )
+        foreign_keys = flat_variant.get_foreign_keys()
+        primary_keys = flat_variant.get_primary_keys()
+
+        assert len(primary_keys) == 1
+
+        attribute = copy.deepcopy(primary_keys[0])
+        attribute.optional = True
+        builder.add_attribute(attribute)
 
         for attribute in flat_variant.attributes:
-            if attribute.name in foreign_keys and attribute.name != primary_key_name:
+            if attribute in foreign_keys or attribute in primary_keys:
                 continue
 
             if attribute.is_automatically_determined_column():
@@ -3305,6 +3815,9 @@ def derive_model_builders(
             attribute = copy.deepcopy(attribute)
             attribute.optional = True
             builder.add_attribute(attribute)
+
+        if len(foreign_keys) > 0:
+            assert richest_variant.is_nested()
 
         if richest_variant.is_nested():
             for attribute in richest_variant.attributes:
@@ -3338,7 +3851,7 @@ def derive_model_builders(
         # name clashes, we prefix the attribute name with `errors_`.
         new_attributes = []
         for attribute in builder.attributes:
-            if attribute.name == primary_key_name:
+            if attribute in primary_keys:
                 continue
 
             new_attributes.append(
@@ -3367,11 +3880,35 @@ def derive_model_builders(
             )
         )
 
+        # Self-consistency check - all of the foreign keys must appear in the builder,
+        # eventually in the normalized version.
+
+        for foreign_key in foreign_keys:
+
+            if foreign_key.is_automatically_determined_column():
+                continue
+
+            found = False
+            for attribute in builder.attributes:
+                if attribute.original_name == foreign_key.name:
+                    found = True
+                    break
+
+            if not found:
+                raise RuntimeError(
+                    f"Could not find the foreign key {foreign_key.name} in the builder {builder.name}. "
+                    f"The attributes of the flat variant are {flat_variant.attributes}. "
+                    f"The attributes of the richest variant are {richest_variant.attributes}."
+                )
+
         builders.append(builder)
 
     # We run a simple self-consistency check to ensure that the
     # builders have been correctly derived.
     for struct in new_or_update_struct_metadatas:
+
+        if struct.table_name in deny_list_tables:
+            continue
 
         # We identify the curresponding builder by the matching table name.
         found = False
@@ -3381,7 +3918,9 @@ def derive_model_builders(
                 break
 
         if not found:
-            raise Exception(f"Could not find the builder for the struct {struct.name}.")
+            raise RuntimeError(
+                f"Could not find the builder for the struct {struct.name}."
+            )
 
         if struct.is_new_variant():
             assert builder.get_new_variant() == struct
@@ -3394,6 +3933,7 @@ def derive_model_builders(
 
 def write_web_common_new_structs(
     new_struct_metadatas: List[StructMetadata],
+    table_metadata: TableMetadata,
 ):
     """Writes the new structs to the web_common crate."""
 
@@ -3427,8 +3967,6 @@ def write_web_common_new_structs(
 
     document.write("\n")
 
-    table_metadatas = find_foreign_keys()
-
     for struct in tqdm(
         new_struct_metadatas,
         desc="Writing new structs",
@@ -3456,10 +3994,6 @@ def write_web_common_new_structs(
 
         updator_user_id_attribute: AttributeMetadata = (
             struct.get_updator_user_id_attribute()
-        )
-
-        primary_key_name, primary_key_type = (
-            table_metadatas.get_primary_key_name_and_type(struct.table_name)
         )
 
         columns = []
@@ -3529,7 +4063,7 @@ def write_web_common_new_structs(
             "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
             "    {\n"
             "        use gluesql::core::ast_builder::*;\n"
-            f"        let {primary_key_name} = self.{primary_key_name};\n"
+            f"        let {struct.get_formatted_primary_keys(include_prefix=False)} = {struct.get_formatted_primary_keys(include_prefix=True)};\n"
             f'        table("{struct.table_name}")\n'
             "            .insert()\n"
             f'            .columns("{",".join(columns)}")\n'
@@ -3540,11 +4074,11 @@ def write_web_common_new_structs(
             "                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,\n"
             '                 _ => unreachable!("Payload must be an Insert"),\n'
             "             })?;\n"
-            f"        super::{struct.get_flat_variant().name}::get({primary_key_name}, connection).await.map(|maybe_row| maybe_row.unwrap())\n"
+            f"        super::{struct.get_flat_variant().name}::get({struct.get_formatted_primary_keys(include_prefix=False)}, connection).await.map(|maybe_row| maybe_row.unwrap())\n"
             "    }\n\n"
         )
 
-        if primary_key_type == "uuid" and struct.is_updatable():
+        if struct.is_updatable():
             write_update_method_for_gluesql(struct, document)
 
         document.write("}\n")
@@ -3555,6 +4089,7 @@ def write_web_common_new_structs(
 
 def write_web_common_update_structs(
     update_struct_metadatas: List[StructMetadata],
+    table_metadata: TableMetadata,
 ):
     """Writes the update structs to the web_common crate."""
 
@@ -3590,8 +4125,6 @@ def write_web_common_update_structs(
 
     document.write("\n")
 
-    table_metadatas = find_foreign_keys()
-
     for struct in tqdm(
         update_struct_metadatas,
         desc="Writing update structs",
@@ -3620,12 +4153,6 @@ def write_web_common_update_structs(
             attributes = [updator_user_id_attribute] + attributes
         else:
             updator_user_id_attribute = None
-
-        primary_key_name, primary_key_type = (
-            table_metadatas.get_primary_key_name_and_type(struct.table_name)
-        )
-
-        columns = []
 
         document.write(f'#[cfg(feature = "frontend")]\n' f"impl {struct.name} {{\n")
 
@@ -3769,17 +4296,20 @@ def write_diesel_new_structs(
     ):
         assert struct.is_new_variant()
 
-        creator_user_id_attribute: AttributeMetadata = (
-            struct.get_creator_user_id_attribute()
-        )
+        if struct.table_name == "users":
+            creator_user_id_attribute = None
+        else:
+            creator_user_id_attribute: AttributeMetadata = (
+                struct.get_creator_user_id_attribute()
+            )
 
-        assert not creator_user_id_attribute.optional, (
-            f"The attribute {creator_user_id_attribute.name} of the struct {struct.name} "
-            "is optional, but it should not be. Most likely, you forgot to add NOT NULL "
-            f"to the attribute in the database im the table {struct.table_name}."
-        )
+            assert not creator_user_id_attribute.optional, (
+                f"The attribute {creator_user_id_attribute.name} of the struct {struct.name} "
+                "is optional, but it should not be. Most likely, you forgot to add NOT NULL "
+                f"to the attribute in the database im the table {struct.table_name}."
+            )
 
-        assert not isinstance(creator_user_id_attribute, StructMetadata)
+            assert not isinstance(creator_user_id_attribute, StructMetadata)
 
         intermediate_struct_name = f"Intermediate{struct.name}"
 
@@ -3791,15 +4321,16 @@ def write_diesel_new_structs(
             f"pub(super) struct {intermediate_struct_name} {{\n"
         )
 
-        all_attributes: List[AttributeMetadata] = [
-            creator_user_id_attribute
-        ] + struct.attributes
+        all_attributes: List[AttributeMetadata] = struct.attributes
+
+        if creator_user_id_attribute is not None:
+            all_attributes = [creator_user_id_attribute] + all_attributes
 
         # If this struct also has an updator attribute, we add it to the list of attributes.
         # This value initially will be set to the same value as the creator user id, but it
         # will be updated when the row is updated.
 
-        if struct.is_updatable():
+        if struct.is_updatable() and struct.table_name != "users":
             updator_user_id_attribute: AttributeMetadata = (
                 struct.get_updator_user_id_attribute()
             )
@@ -3812,19 +4343,23 @@ def write_diesel_new_structs(
 
         document.write("}\n\n")
 
+        underscored_user_id = ""
+        if struct.table_name == "users":
+            underscored_user_id = "_"
+
         # Next, we implement the InsertRow trait for the new variant.
         document.write(
             f"impl InsertRow for web_common::database::{struct.name} {{\n"
             f"    type Intermediate = {intermediate_struct_name};\n"
             f"    type Flat = {struct.get_flat_variant().name};\n\n"
-            f"    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {{\n"
+            f"    fn to_intermediate(self, {underscored_user_id}user_id: i32) -> Self::Intermediate {{\n"
             f"        {intermediate_struct_name} {{\n"
         )
 
         for attribute in all_attributes:
-            if attribute.name in (
-                creator_user_id_attribute.name,
-                updator_user_id_attribute.name,
+            if attribute in (
+                creator_user_id_attribute,
+                updator_user_id_attribute,
             ):
                 document.write(f"            {attribute.name}: user_id,\n")
             else:
@@ -3834,15 +4369,23 @@ def write_diesel_new_structs(
 
         document.write("        }\n    }\n\n")
 
+        defaulted_user_id = "user_id"
+        if struct.table_name == "users":
+            defaulted_user_id = "0"
+
+        assert_user_id_check = ""
+        if struct.table_name == "users":
+            assert_user_id_check = "        assert_eq!(user_id, 0);\n"
+
         document.write(
             "    fn insert(\n"
             "        self,\n"
-            "        user_id: i32,\n"
+            f"       user_id: i32,\n"
             "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
             "    ) -> Result<Self::Flat, diesel::result::Error> {\n"
-            f"        use crate::schema::{struct.table_name};\n"
+            f"        use crate::schema::{struct.table_name};\n{assert_user_id_check}"
             f"        diesel::insert_into({struct.table_name}::dsl::{struct.table_name})\n"
-            "            .values(self.to_intermediate(user_id))\n"
+            f"            .values(self.to_intermediate({defaulted_user_id}))\n"
             "            .get_result(connection)\n"
             "    }\n"
             "}\n\n"
@@ -3958,15 +4501,13 @@ def write_diesel_update_structs(
 
         intermediate_struct_name = f"Intermediate{struct.name}"
 
-        primary_key_name, _ = find_foreign_keys().get_primary_key_name_and_type(
-            struct.table_name
-        )
-
         # First, we write the intermediate struct that is used to update the row in the database.
         document.write(
             f"/// Intermediate representation of the update variant {struct.name}.\n"
-            "#[derive(AsChangeset)]\n"
+            "#[derive(Identifiable, AsChangeset)]\n"
             f"#[diesel(table_name = {struct.table_name})]\n"
+            f"#[diesel(treat_none_as_null = true)]\n"
+            f"#[diesel(primary_key({struct.get_formatted_primary_keys(include_prefix=False)}))]\n"
             f"pub(super) struct {intermediate_struct_name} {{\n"
         )
 
@@ -3976,8 +4517,6 @@ def write_diesel_update_structs(
             all_attributes = [updator_user_id_attribute] + all_attributes
 
         for attribute in all_attributes:
-            if attribute.name == primary_key_name:
-                continue
             document.write(f"    {attribute.name}: {attribute.format_data_type()},\n")
 
         document.write("}\n\n")
@@ -3999,8 +4538,6 @@ def write_diesel_update_structs(
         document.write(f"        {intermediate_struct_name} {{\n")
 
         for attribute in all_attributes:
-            if attribute.name == primary_key_name:
-                continue
             if struct.get_attribute_by_name(attribute.name) is not None:
                 document.write(
                     f"            {attribute.name}: self.{attribute.name},\n"
@@ -4016,13 +4553,8 @@ def write_diesel_update_structs(
             "        user_id: i32,\n"
             "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
             "    ) -> Result<Self::Flat, diesel::result::Error> {\n"
-            f"        use crate::schema::{struct.table_name};\n"
-            f"        diesel::update({struct.table_name}::dsl::{struct.table_name})\n"
-            "            .filter(\n"
-            f"                {struct.table_name}::dsl::{primary_key_name}.eq(self.{primary_key_name})\n"
-            "            )\n"
-            "            .set(self.to_intermediate(user_id))\n"
-            "            .get_result(connection)\n"
+            "        self.to_intermediate(user_id)\n"
+            "            .save_changes(connection)\n"
             "    }\n"
             "}\n\n"
         )
@@ -4055,8 +4587,7 @@ def write_frontend_builder_default_implementation(
     default value, the attribute is set to None.
     """
 
-    attributes = None
-    flat_struct = builder.get_flat_variant()
+    flat_variant = builder.get_flat_variant()
 
     document.write(
         f"impl Default for {builder.name} {{\n"
@@ -4064,31 +4595,34 @@ def write_frontend_builder_default_implementation(
         f"        Self {{\n"
     )
 
-    primary_key_name, _ = table_metadata.get_primary_key_name_and_type(
-        builder.table_name
-    )
+    primary_keys = flat_variant.get_primary_keys()
 
     for attribute in builder.attributes:
         # If this is an error vector, we set it to
         # an empty vector.
 
-        if attribute.name.startswith("errors_") and attribute.data_type() == "Vec<ApiError>":
+        if (
+            attribute.name.startswith("errors_")
+            and attribute.data_type() == "Vec<ApiError>"
+        ):
             document.write(f"            {attribute.name}: Vec::new(),\n")
             continue
 
         # If this is the primary key, we set it to None.
-        if attribute.name == primary_key_name:
+        if attribute in primary_keys:
             document.write(f"            {attribute.name}: None,\n")
             continue
 
         # If the current attribute does not exist in the flat struct,
         # we set it to None.
-        if flat_struct.get_attribute_by_name(attribute.name) is None:
+        if flat_variant.get_attribute_by_name(attribute.name) is None:
             if attribute.optional:
                 document.write(f"            {attribute.name}: None,\n")
             else:
                 # Otherwise, we set it to the default value of the data type.
-                document.write(f"            {attribute.name}: <{attribute.data_type()}>::default(),\n")
+                document.write(
+                    f"            {attribute.name}: <{attribute.data_type()}>::default(),\n"
+                )
             continue
 
         default_value = table_metadata.get_default_column_value(
@@ -4096,11 +4630,12 @@ def write_frontend_builder_default_implementation(
         )
 
         if default_value is not None:
-
             default_value = default_value.replace("'", '"')
 
             if default_value.endswith("::character varying"):
-                default_value = default_value.replace("::character varying", ".to_string()")
+                default_value = default_value.replace(
+                    "::character varying", ".to_string()"
+                )
 
             document.write(f"            {attribute.name}: Some({default_value}),\n")
             continue
@@ -4134,12 +4669,9 @@ def write_frontend_builder_action_enumeration(
     This method writes the enumeration of the builder actions for the builder struct.
     """
 
-    primary_key_name, _primary_key_type = table_metadata.get_primary_key_name_and_type(
-        builder.table_name
-    )
-
     flat_variant = builder.get_flat_variant()
     rich_variant = builder.get_richest_variant()
+    primary_keys = flat_variant.get_primary_keys()
 
     action_enum_name = f"{flat_variant.name}Actions"
 
@@ -4151,7 +4683,7 @@ def write_frontend_builder_action_enumeration(
     attributes_requiring_operations: List[AttributeMetadata] = []
 
     for attribute in builder.attributes:
-        if attribute.name == primary_key_name:
+        if attribute in primary_keys:
             continue
 
         # We do not want to include the errors attribute in the builder actions.
@@ -4207,7 +4739,7 @@ def write_frontend_builder_action_enumeration(
 
         for attribute in attributes_requiring_operations:
             document.write(
-                f'            "{attribute.name}" => {action_enum_name}::Set{attribute.capitalized_name()}(bincode::deserialize(&row).unwrap()),\n'
+                f'            "{attribute.name}" => {action_enum_name}::Set{attribute.capitalized_name()}(Some(bincode::deserialize(&row).unwrap())),\n'
             )
 
         document.write(
@@ -4240,7 +4772,7 @@ def write_frontend_builder_action_enumeration(
     }
 
     for attribute in builder.attributes:
-        if attribute.name == primary_key_name:
+        if attribute in primary_keys:
             continue
 
         # We do not want to include the errors attribute in the builder actions.
@@ -4280,6 +4812,33 @@ def write_frontend_builder_action_enumeration(
                 f"            state_mut.{attribute.name} = None;\n"
                 f"             break '{attribute.name};\n"
                 f"        }}\n"
+            )
+
+        # If the provided value is a StructMetadata, and it is of the same type as the richest variant,
+        # we check that all of the primary keys are distinct from the primary keys of the richest variant.
+        # We do not want to find an entry equal to the one we are trying to insert.
+        if attribute.data_type() == rich_variant.name:
+            document.write(
+                f"                match {attribute.name}.as_ref() {{\n"
+                f"                    Some({attribute.name}) => {{\n"
+            )
+            is_first = True
+            for primary_key in primary_keys:
+                prefix = "if" if is_first else "&&"
+                is_first = False
+                document.write(
+                    f"                            {prefix} state_mut.{primary_key.name}.map_or(false, |{primary_key.name}| {primary_key.name} == {attribute.get_attribute_path(primary_key)})\n"
+                )
+            document.write(
+                "                        {\n"
+                f"                            state_mut.errors_{attribute.name}.push(ApiError::BadRequest(vec![\n"
+                f'                                "The {attribute.human_readable_name()} field must be distinct from the current value.".to_string()\n'
+                "                             ]));\n"
+                f"                            break '{attribute.name};\n"
+                "                        }\n"
+                "                    }\n"
+                "                    None => (),\n"
+                "                }\n"
             )
 
         # If the provided value is a String, we need to check whether it is empty.
@@ -4396,34 +4955,32 @@ def write_frontend_form_builder_implementation(
     This method implements the FormBuilder trait for the provided builder struct.
     """
 
-    flat_struct = builder.get_flat_variant()
-    rich_struct = builder.get_richest_variant()
+    flat_variant = builder.get_flat_variant()
+    rich_variant = builder.get_richest_variant()
 
     variants = []
 
-    flat_struct = builder.get_flat_variant()
+    flat_variant = builder.get_flat_variant()
 
-    if flat_struct.is_insertable():
+    if flat_variant.is_insertable():
         variants.append(builder.get_new_variant())
 
     # If the new variant is not also used as an update
     # variant, we add it to the list of variants.
-    if flat_struct.is_updatable():
+    if flat_variant.is_updatable():
         update_variant = builder.get_update_variant()
         if not update_variant.is_new_variant():
             variants.append(update_variant)
 
     assert len(variants) > 0
 
-    primary_key_name, _primary_key_type = table_metadata.get_primary_key_name_and_type(
-        flat_struct.table_name
-    )
+    primary_keys = flat_variant.get_primary_keys()
 
     document.write(
         f"impl FormBuilder for {builder.name} {{\n"
-        f"    type Actions = {flat_struct.name}Actions;\n\n"
-        f"    type RichVariant = {rich_struct.name};\n\n"
-        f"    fn has_errors(&self) -> bool {{\n"
+        f"    type Actions = {flat_variant.name}Actions;\n\n"
+        f"    type RichVariant = {rich_variant.name};\n\n"
+        "    fn has_errors(&self) -> bool {\n"
     )
 
     error_vectors = [
@@ -4447,7 +5004,7 @@ def write_frontend_form_builder_implementation(
     # We implement the id method, which returns the primary key of the struct.
     document.write(
         "    fn id(&self) -> Option<PrimaryKey> {\n"
-        f"        self.{primary_key_name}.map(|{primary_key_name}| {primary_key_name}.into())\n"
+        f"        {flat_variant.get_formatted_primary_keys(include_prefix=True)}.map(|id| id.into())\n"
         "    }\n\n"
     )
 
@@ -4469,6 +5026,7 @@ def write_frontend_form_builder_implementation(
     )
 
     named_requests: List[str] = []
+    named_option_requests: List[str] = []
 
     for attribute in builder.attributes:
         if (
@@ -4482,33 +5040,57 @@ def write_frontend_form_builder_implementation(
             # There is the issue of the timezone to pick though.
             continue
 
-        if attribute.name == primary_key_name:
+        if attribute in primary_keys:
             # TODO: maybe check that the primary key is equal?
             continue
 
         # We need to check whether is will be necessary to make a request to the backend
         # to obtain the nested version of the attribute. The request name is always equal
         # to the name of the attribute.
-        if attribute.data_type() == rich_struct.name:
-            assert rich_struct.is_nested()
-            named_requests.append(
-                f'ComponentMessage::get_named::<&str, {variants[0].name}>("{attribute.name}", rich_variant.inner.{primary_key_name}.into())'
-            )
+        if attribute.data_type() == rich_variant.name:
+            assert rich_variant.is_nested()
+
+            flat_attribute = flat_variant.get_attribute_by_name(attribute.name)
+
+            if flat_attribute is None:
+                flat_attribute = flat_variant.get_attribute_by_name(
+                    f"{attribute.name}_id"
+                )
+
+            if flat_attribute is None:
+                raise RuntimeError(
+                    f"Attribute {attribute.name} not found in the flat struct {flat_variant.name}."
+                )
+
+            if flat_attribute.optional:
+                named_option_requests.append(
+                    (
+                        f"if let Some({flat_attribute.name}) = rich_variant.inner.{flat_attribute.name} {{\n"
+                        f'    named_requests.push(ComponentMessage::get_named::<&str, {variants[0].name}>("{attribute.name}", {flat_attribute.name}.into()));\n'
+                        " } else {\n"
+                        f"    dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_name()}(None));\n"
+                        " }\n"
+                    )
+                )
+            else:
+                named_requests.append(
+                    f'ComponentMessage::get_named::<&str, {variants[0].name}>("{attribute.name}", rich_variant.inner.{flat_attribute.name}.into())'
+                )
             continue
 
-        struct_attribute = rich_struct.get_attribute_by_name(attribute.name)
+        struct_attribute = rich_variant.get_attribute_by_name(attribute.name)
 
         if struct_attribute is not None:
             if struct_attribute.optional:
                 document.write(
-                    f"        dispatcher.apply({flat_struct.name}Actions::Set{attribute.capitalized_name()}(rich_variant.{attribute.name}));\n"
+                    f"        dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_name()}(rich_variant.{attribute.name}));\n"
                 )
             else:
                 document.write(
-                    f"        dispatcher.apply({flat_struct.name}Actions::Set{attribute.capitalized_name()}(Some(rich_variant.{attribute.name})));\n"
+                    f"        dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_name()}(Some(rich_variant.{attribute.name})));\n"
                 )
         else:
-            struct_attribute = flat_struct.get_attribute_by_name(attribute.name)
+            struct_attribute = flat_variant.get_attribute_by_name(attribute.name)
 
             if struct_attribute is not None:
                 if (
@@ -4517,34 +5099,45 @@ def write_frontend_form_builder_implementation(
                 ):
                     if struct_attribute.optional:
                         document.write(
-                            f"    dispatcher.apply({flat_struct.name}Actions::Set{attribute.capitalized_name()}(rich_variant.inner.{attribute.name}.map(|{attribute.name}| {attribute.name}.to_string())));\n"
+                            f"    dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_name()}(rich_variant.inner.{attribute.name}.map(|{attribute.name}| {attribute.name}.to_string())));\n"
                         )
                     else:
                         document.write(
-                            f"    dispatcher.apply({flat_struct.name}Actions::Set{attribute.capitalized_name()}(Some(rich_variant.inner.{attribute.name}.to_string())));\n"
+                            f"    dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_name()}(Some(rich_variant.inner.{attribute.name}.to_string())));\n"
                         )
                 elif struct_attribute.optional:
                     document.write(
-                        f"        dispatcher.apply({flat_struct.name}Actions::Set{attribute.capitalized_name()}(rich_variant.inner.{attribute.name}));\n"
+                        f"        dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_name()}(rich_variant.inner.{attribute.name}));\n"
                     )
                 else:
                     document.write(
-                        f"        dispatcher.apply({flat_struct.name}Actions::Set{attribute.capitalized_name()}(Some(rich_variant.inner.{attribute.name})));"
+                        f"        dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_name()}(Some(rich_variant.inner.{attribute.name})));"
                     )
             else:
-                raise Exception(
+                raise RuntimeError(
                     f"Attribute {attribute.name} present in builder struct {builder.name} "
-                    f"not found in neither the rich variant {rich_struct.name} nor the flat variant {flat_struct.name}."
+                    f"not found in neither the rich variant {rich_variant.name} nor the flat variant {flat_variant.name}."
                 )
 
-    # We returns the names requests. When the list
-    # is empty, the method returns an empty vector,
-    # otherwise it returns the list of requests.
-    if len(named_requests) == 0:
-        document.write("        Vec::new()\n")
-    else:
-        document.write(f"        vec![{', '.join(named_requests)}]\n")
+    if len(named_requests) == 0 and len(named_option_requests) == 0:
+        document.write("        vec![]\n")
+    elif len(named_requests) > 0 and len(named_option_requests) == 0:
+        document.write("        vec![\n")
 
+        for named_request in named_requests:
+            document.write(f"            {named_request},\n")
+
+        document.write("        ]\n")
+    else:
+        document.write("        let mut named_requests = Vec::new();\n")
+
+        for named_request in named_requests:
+            document.write(f"        named_requests.push({named_request});\n")
+
+        for named_option_request in named_option_requests:
+            document.write(f"        {named_option_request}")
+
+        document.write("        named_requests\n")
     document.write("    }\n\n")
 
     # We implement the can submit method, which checks whether the form
@@ -4558,21 +5151,23 @@ def write_frontend_form_builder_implementation(
         if attribute.name.startswith("errors_"):
             continue
 
-        if attribute.name == primary_key_name:
+        if attribute in primary_keys:
             continue
 
         if attribute.name == "form_updated_at":
             continue
 
-        struct_attribute = flat_struct.get_attribute_by_name(attribute.name)
+        struct_attribute = flat_variant.get_attribute_by_name(attribute.name)
 
         if struct_attribute is None:
             # We check whether the _id variant of the attribute is present.
-            struct_attribute = flat_struct.get_attribute_by_name(f"{attribute.name}_id")
+            struct_attribute = flat_variant.get_attribute_by_name(
+                f"{attribute.name}_id"
+            )
 
         if struct_attribute is None:
-            raise Exception(
-                f"Attribute {attribute.name} not found in the build target struct {flat_struct.name}."
+            raise RuntimeError(
+                f"Attribute {attribute.name} not found in the build target struct {flat_variant.name}."
             )
 
         if not struct_attribute.optional and attribute.optional:
@@ -4591,22 +5186,25 @@ def write_frontend_form_builder_implementation(
             "        Self {\n"
         )
 
-        for attribute in flat_struct.attributes:
+        if variant.is_new_variant() and variant.is_update_variant():
+            assert len(primary_keys) == 1
+            primary_key = primary_keys[0]
+            assert primary_key.data_type() == "Uuid"
+            document.write(
+                f"            {primary_key.name}: builder.{primary_key.name}.unwrap_or_else(Uuid::new_v4),\n"
+            )
+        elif variant.is_update_variant():
+            for primary_key in primary_keys:
+                document.write(
+                    f"            {primary_key.name}: builder.{primary_key.name}.unwrap(),\n"
+                )
+
+        for attribute in flat_variant.attributes:
 
             if attribute.is_automatically_determined_column():
                 continue
 
-            if attribute.name == primary_key_name:
-                if variant.is_new_variant() and variant.is_update_variant():
-                    assert attribute.data_type() == "Uuid"
-                    document.write(
-                        f"            {primary_key_name}: builder.{primary_key_name}.unwrap_or_else(Uuid::new_v4),\n"
-                    )
-                elif variant.is_update_variant():
-                    assert attribute.data_type() != "Uuid"
-                    document.write(
-                        f"            {primary_key_name}: builder.{primary_key_name}.unwrap(),\n"
-                    )
+            if attribute in primary_keys:
                 continue
 
             # There are 3 cases to consider:
@@ -4621,8 +5219,8 @@ def write_frontend_form_builder_implementation(
 
             if builder_attribute is None:
 
-                raise Exception(
-                    f"It was impossible to find the attribute names {attribute.name} in "
+                raise RuntimeError(
+                    f"It was impossible to find the attribute names '{attribute.name}' in "
                     f"the builder struct {builder.name}. The attributes present in the struct "
                     f"are {[attribute.name for attribute in builder.attributes]}."
                 )
@@ -4633,18 +5231,18 @@ def write_frontend_form_builder_implementation(
             # unwrap it.
             if attribute.optional:
                 if isinstance(builder_attribute.raw_data_type(), StructMetadata):
-                    inner_primary_key_name, _primary_key_type = (
-                        table_metadata.get_primary_key_name_and_type(
-                            builder_attribute.raw_data_type().table_name
-                        )
+                    inner_primary_keys = (
+                        builder_attribute.raw_data_type().get_primary_keys()
                     )
+                    assert len(inner_primary_keys) == 1
+                    inner_primary_key = inner_primary_keys[0]
                     if builder_attribute.raw_data_type().is_nested():
                         document.write(
-                            f"            {attribute.name}: builder.{builder_attribute.name}.map(|{builder_attribute.name}| {builder_attribute.name}.inner.{inner_primary_key_name}),\n"
+                            f"            {attribute.name}: builder.{builder_attribute.name}.map(|{builder_attribute.name}| {builder_attribute.name}.inner.{inner_primary_key.name}),\n"
                         )
                     else:
                         document.write(
-                            f"            {attribute.name}: builder.{builder_attribute.name}.map(|{builder_attribute.name}| {builder_attribute.name}.{inner_primary_key_name}),\n"
+                            f"            {attribute.name}: builder.{builder_attribute.name}.map(|{builder_attribute.name}| {builder_attribute.name}.{inner_primary_key.name}),\n"
                         )
                 else:
                     document.write(
@@ -4652,18 +5250,20 @@ def write_frontend_form_builder_implementation(
                     )
             else:
                 if isinstance(builder_attribute.raw_data_type(), StructMetadata):
-                    inner_primary_key_name, _primary_key_type = (
-                        table_metadata.get_primary_key_name_and_type(
-                            builder_attribute.raw_data_type().table_name
-                        )
+                    inner_primary_keys = (
+                        builder_attribute.raw_data_type().get_primary_keys()
                     )
+
+                    assert len(inner_primary_keys) == 1
+                    inner_primary_key = inner_primary_keys[0]
+
                     if builder_attribute.raw_data_type().is_nested():
                         document.write(
-                            f"            {attribute.name}: builder.{builder_attribute.name}.unwrap().inner.{inner_primary_key_name},\n"
+                            f"            {attribute.name}: builder.{builder_attribute.name}.unwrap().inner.{inner_primary_key.name},\n"
                         )
                     else:
                         document.write(
-                            f"            {attribute.name}: builder.{builder_attribute.name}.unwrap().{inner_primary_key_name},\n"
+                            f"            {attribute.name}: builder.{builder_attribute.name}.unwrap().{inner_primary_key.name},\n"
                         )
                 else:
                     document.write(
@@ -4675,7 +5275,17 @@ def write_frontend_form_builder_implementation(
 
 def handle_missing_gin_index(
     attribute: AttributeMetadata,
+    builder: StructMetadata,
 ):
+    """Handles the case where a GIN trigram index is missing.
+
+    Parameters
+    ----------
+    attribute : AttributeMetadata
+        The attribute for which the GIN trigram index is missing.
+    builder : StructMetadata
+        The builder struct associated with the attribute.
+    """
     # We prepare a message for the user to ask them whether we should generate the index
     # automatically for them. The exception will be raised nevertheless, as creating an
     # index in-medias-res will change many of the other metadata collected earlier on,
@@ -4702,7 +5312,7 @@ def handle_missing_gin_index(
 
     migration_number = int(target_migration.split("_")[0])
 
-    index_migration_name = f"create_{attribute.raw_data_type().table_name}_index"
+    index_migration_name = f"create_{attribute.raw_data_type().table_name}_gin_index"
 
     full_migration_name = (
         f"{(str(migration_number + 1)).zfill(14)}_{index_migration_name}"
@@ -4710,45 +5320,49 @@ def handle_missing_gin_index(
 
     textual_columns = []
 
-    flat_struct = None
+    flat_variant = None
+
+    assert not attribute.raw_data_type().has_only_foreign_keys()
 
     if attribute.raw_data_type().is_nested():
-        flat_struct = (
-            attribute.raw_data_type().get_attribute_by_name("inner").raw_data_type()
-        )
-    else:
-        flat_struct = attribute.raw_data_type()
+        inner_attribute = attribute.raw_data_type().get_attribute_by_name("inner")
 
-    for inner_attribute in flat_struct.attributes:
+        if inner_attribute is None:
+            raise RuntimeError(
+                f"The attribute {attribute.name} is nested, but we could not find the inner attribute. "
+                f"The builder struct is {builder.name}. "
+                f"It is of type {attribute.raw_data_type().name}. "
+                f"The other attributes in the struct are {', '.join(inner_attribute.name for inner_attribute in attribute.raw_data_type().attributes)}."
+            )
+
+        flat_variant = inner_attribute.raw_data_type()
+    else:
+        flat_variant = attribute.raw_data_type()
+
+    for inner_attribute in flat_variant.attributes:
         if inner_attribute.data_type() in TEXTUAL_DATA_TYPES:
             textual_columns.append(inner_attribute)
 
     if len(textual_columns) == 0:
-        raise Exception(
+        raise RuntimeError(
             f"The table {attribute.raw_data_type().table_name} is not searchable as "
             "we did not find a GIN trigram index for it. We cannot generate a datalist "
             "for it - please create a GIN trigram index for it and try again. "
             "If you have just created the index, recall that you may still need to run "
             "that particular migration. Furthermore, we have not even found any textual "
             "columns in the table, so we cannot help you creating the index. "
-            "This error was encountered while trying to generate "
-            f"the form for the {builder.name} builder."
+            f"The builder struct is {builder.name}. "
+            f"The attribute name is {attribute.name} and is of type {attribute.data_type()}."
         )
 
     if len(textual_columns) > 0:
         print(
-            "The table is not searchable as we did not find a GIN trigram index for it."
+            "The table is not searchable as we did not find a GIN trigram index for it.\n"
+            f"The following columns are searchable: {', '.join(textual_column.name for textual_column in textual_columns)}\n"
+            f"We can generate a GIN trigram index for the table {attribute.raw_data_type().table_name}.\n"
+            f"We will generate part of the index in the migration {full_migration_name}.\n"
+            "You will still need to refine the index afterwards to your liking."
         )
-        print(
-            f"The following columns are searchable: {', '.join(textual_column.name for textual_column in textual_columns)}"
-        )
-        print(
-            f"We can generate a GIN trigram index for the table {attribute.raw_data_type().table_name}."
-        )
-        print(
-            f"We will generate part of the index in the migration {full_migration_name}."
-        )
-        print(f"You will still need to refine the index afterwards to your liking.")
 
         user_answer = userinput(
             name="Create GIN index?",
@@ -4835,7 +5449,7 @@ def handle_missing_gin_index(
             print("Please create the index manually and re-run the pipeline.")
             sleep(2)
 
-    raise Exception(
+    raise RuntimeError(
         f"The table {attribute.raw_data_type().table_name} is not searchable as "
         "we did not find a GIN trigram index for it. We cannot generate a datalist "
         "for it - please create a GIN trigram index for it and try again. "
@@ -4882,7 +5496,7 @@ def implements_row_to_searchable_badge(
     if not os.path.exists(path):
         return False
 
-    module_path = f"../frontend/src/components/database/row_to_searchable_badge.rs"
+    module_path = "../frontend/src/components/database/row_to_searchable_badge.rs"
 
     # We check that the module is imported in the row_to_searchable_badge.rs file.
     with open(module_path, "r", encoding="utf8") as module:
@@ -4922,7 +5536,9 @@ def handle_missing_row_to_searchable_badge_implementation(
 
     # We check that the target implementation does not appear in some other file
     # with the mistaken name.
-    for file in os.listdir("../frontend/src/components/database/row_to_searchable_badge"):
+    for file in os.listdir(
+        "../frontend/src/components/database/row_to_searchable_badge"
+    ):
         target_string = f"impl RowToSearchableBadge for {struct.name} {{"
         with open(
             f"../frontend/src/components/database/row_to_searchable_badge/{file}",
@@ -4931,7 +5547,7 @@ def handle_missing_row_to_searchable_badge_implementation(
         ) as document:
             for line in document:
                 if target_string in line:
-                    raise Exception(
+                    raise RuntimeError(
                         "We expected to find the RowToSearchableBadge implementation for the "
                         f"{struct.name} struct in the {file} file, but it appears in the {path} file."
                     )
@@ -4983,19 +5599,19 @@ def handle_missing_row_to_searchable_badge_implementation(
 
             document.write(
                 f"impl RowToSearchableBadge for {struct.name} {{\n"
-                f"    fn to_datalist_badge(&self, query: &str) -> Html {{\n"
-                f"        html! {{\n"
-                f"            <div>\n"
-                f"                <p>\n"
+                "    fn to_datalist_badge(&self, query: &str) -> Html \n"
+                "        html! \n"
+                "            <div>\n"
+                "                <p>\n"
             )
 
             font_awesome_icon = None
 
             if struct.get_attribute_by_name("font_awesome_icon") is not None:
                 if struct.get_attribute_by_name("color") is not None:
-                    font_awesome_icon = '<i class={format!("{} {}", self.font_awesome_icon.name, self.color.name)}></i>'
+                    font_awesome_icon = '<i class={format!("{} {}", self.icon.name, self.color.name)}></i>'
                 else:
-                    font_awesome_icon = '<i class={format!("{} grey", self.font_awesome_icon.name)}></i>'
+                    font_awesome_icon = '<i class={format!("{} grey", self.icon.name)}></i>'
             else:
                 font_awesome_icon = '<i class="fas fa-question grey"></i>'
 
@@ -5034,10 +5650,10 @@ def handle_missing_row_to_searchable_badge_implementation(
             )
 
             document.write(
-                f"    fn to_selected_datalist_badge(&self) -> Html {{\n"
-                f"        html! {{\n"
-                f"            <div>\n"
-                f"                <p>\n"
+                "    fn to_selected_datalist_badge(&self) -> Html {\n"
+                "        html! {\n"
+                "            <div>\n"
+                "                <p>\n"
             )
 
             document.write(f"                {font_awesome_icon}\n")
@@ -5048,11 +5664,11 @@ def handle_missing_row_to_searchable_badge_implementation(
             if struct.get_attribute_by_name("name") is not None:
                 if struct.is_nested():
                     document.write(
-                        f"                <span>{{self.inner.name.clone()}}</span>\n"
+                        "                <span>{self.inner.name.clone()}</span>\n"
                     )
                 else:
                     document.write(
-                        f"                    <span>{{self.name.clone()}}</span>\n"
+                        "                    <span>{self.name.clone()}</span>\n"
                     )
             else:
                 if struct.is_nested():
@@ -5069,36 +5685,7 @@ def handle_missing_row_to_searchable_badge_implementation(
                 "                </p>\n" "            </div>\n" "        }\n" "    }\n"
             )
 
-            # We implement the matches method, where we chain the columns that are searchable
-            # if the column name is not available.
-
-            document.write(f"    fn matches(&self, query: &str) -> bool {{\n")
-
-            if "name" in [column.name for column in search_columns]:
-                if struct.is_nested():
-                    document.write(f"        self.inner.name.format_match(query)\n")
-                else:
-                    document.write(f"        self.name == query\n")
-            else:
-                column = search_columns[0]
-                if column.optional:
-                    if struct.is_nested():
-                        document.write(
-                            f"        self.inner.{column.name}.as_ref().map_or(false, |column| column == query)\n"
-                        )
-                    else:
-                        document.write(
-                            f"        self.{column.name}.as_ref().map_or(false, |column| column == query)\n"
-                        )
-                else:
-                    if struct.is_nested():
-                        document.write(f"        self.inner.{column.name} == query\n")
-                    else:
-                        document.write(f"        self.{column.name} == query\n")
-
-            document.write("    }\n")
-
-            document.write(f"    fn similarity_score(&self, query: &str) -> isize {{\n")
+            document.write("    fn similarity_score(&self, query: &str) -> isize {\n")
 
             scores = []
 
@@ -5183,29 +5770,25 @@ def write_frontend_yew_form(
     This method writes the Yew form for the provided builder struct.
     """
 
-    trigram_indices = find_pg_trgm_indices()
+    trigram_indices = find_pg_trgm_indices(table_metadata)
 
-    primary_key_name, _primary_key_type = table_metadata.get_primary_key_name_and_type(
-        builder.table_name
-    )
-
-    flat_struct = builder.get_flat_variant()
-    primary_key_attribute = flat_struct.get_attribute_by_name(primary_key_name)
-    assert primary_key_attribute is not None
+    flat_variant = builder.get_flat_variant()
+    rich_variant = builder.get_richest_variant()
+    primary_keys = flat_variant.get_primary_keys()
 
     variants = []
 
-    if flat_struct.is_insertable():
+    if flat_variant.is_insertable():
         variants.append((builder.get_new_variant(), "POST"))
 
-    if flat_struct.is_updatable():
+    if flat_variant.is_updatable():
         variants.append((builder.get_update_variant(), "PUT"))
 
     for variant, method in variants:
 
         action_name = "Create" if method == "POST" else "Update"
 
-        form_component_name = f"{action_name}{flat_struct.name}Form"
+        form_component_name = f"{action_name}{flat_variant.name}Form"
 
         # We generate the lowercased name of the form component by splitting
         # on the uppercased letters and joining the resulting list with an
@@ -5224,9 +5807,12 @@ def write_frontend_yew_form(
             document.write(
                 f"#[derive(Clone, PartialEq, Properties)]\n"
                 f"pub struct {form_component_name}Prop {{\n"
-                f"    pub {primary_key_attribute.name}: {primary_key_attribute.format_data_type()},\n"
-                "}\n\n"
             )
+            for primary_key in primary_keys:
+                document.write(
+                    f"    pub {primary_key.name}: {primary_key.format_data_type()},\n"
+                )
+            document.write("}\n\n")
 
         document.write(f"#[function_component({form_component_name})]\n")
 
@@ -5240,15 +5826,20 @@ def write_frontend_yew_form(
             document.write(f"pub fn {form_method_name}() -> Html {{\n")
 
         document.write(
-            f"    let (builder_store, builder_dispatch) = use_store::<{builder.name}>();\n"
+            f"    let builder_dispatch = use_dispatch::<{builder.name}>();\n"
         )
 
         if method == "PUT":
-            document.write(
-                "     builder_dispatch.reduce_mut(|builder| {\n"
-                f"         builder.{primary_key_attribute.name} = Some(props.{primary_key_attribute.name});\n"
-                "     });\n"
-            )
+            document.write("     builder_dispatch.reduce_mut(|builder| {\n")
+            for primary_key in primary_keys:
+                document.write(
+                    f"         builder.{primary_key.name} = Some(props.{primary_key.name});\n"
+                )
+            document.write("     });\n")
+
+        document.write(
+            f"    let builder_store = use_store_value::<{builder.name}>();\n"
+        )
 
         for attribute in builder.attributes:
             # We do not want to include the errors attribute in the builder actions.
@@ -5258,7 +5849,7 @@ def write_frontend_yew_form(
             ):
                 continue
 
-            if attribute.name == primary_key_name:
+            if attribute in primary_keys:
                 continue
 
             if attribute.name == "form_updated_at":
@@ -5266,27 +5857,27 @@ def write_frontend_yew_form(
 
             if attribute.data_type() == "bool":
                 document.write(
-                    f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: bool| {flat_struct.name}Actions::Set{attribute.capitalized_name()}(Some({attribute.name})));\n"
+                    f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: bool| {flat_variant.name}Actions::Set{attribute.capitalized_name()}(Some({attribute.name})));\n"
                 )
             elif (
                 attribute.data_type() in INPUT_TYPE_MAP
                 or attribute.data_type() == "NaiveDateTime"
             ):
                 document.write(
-                    f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: Option<String>| {flat_struct.name}Actions::Set{attribute.capitalized_name()}({attribute.name}));\n"
+                    f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: Option<String>| {flat_variant.name}Actions::Set{attribute.capitalized_name()}({attribute.name}));\n"
                 )
             elif attribute.data_type() == "Vec<u8>":
                 if "picture" in attribute.name:
                     document.write(
-                        f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: Option<Image>| {flat_struct.name}Actions::Set{attribute.capitalized_name()}({attribute.name}.map(|{attribute.name}| {attribute.name}.into())));\n"
+                        f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: Option<Image>| {flat_variant.name}Actions::Set{attribute.capitalized_name()}({attribute.name}.map(|{attribute.name}| {attribute.name}.into())));\n"
                     )
                 else:
-                    raise Exception(
+                    raise RuntimeError(
                         f"Attribute {attribute.name} of type {attribute.data_type()} not supported in the frontend form generation."
                     )
             else:
                 document.write(
-                    f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: {attribute.format_data_type()}| {flat_struct.name}Actions::Set{attribute.capitalized_name()}({attribute.name}));\n"
+                    f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: {attribute.format_data_type()}| {flat_variant.name}Actions::Set{attribute.capitalized_name()}({attribute.name}));\n"
                 )
 
         document.write(
@@ -5302,7 +5893,7 @@ def write_frontend_yew_form(
             ):
                 continue
 
-            if attribute.name == primary_key_name:
+            if attribute in primary_keys:
                 continue
 
             if attribute.name == "form_updated_at":
@@ -5314,12 +5905,23 @@ def write_frontend_yew_form(
                 error_attribute is not None
             ), f"Error attribute not found for {attribute.name} in {builder.name}."
 
+            struct_attribute = rich_variant.get_attribute_by_name(attribute.name)
+
+            if struct_attribute is None:
+                struct_attribute = flat_variant.get_attribute_by_name(attribute.name)
+
+            assert (
+                struct_attribute is not None
+            ), f"Attribute {attribute.name} not found in the struct {flat_variant.name}."
+
+            optional = "true" if struct_attribute.optional else "false"
+
             if (
                 attribute.data_type() in INPUT_TYPE_MAP
                 or attribute.data_type() == "NaiveDateTime"
             ):
                 document.write(
-                    f'            <BasicInput<{attribute.data_type()}> label="{attribute.human_readable_name()}" errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} value={{builder_store.{attribute.name}.clone()}} />\n'
+                    f'            <BasicInput<{attribute.data_type()}> label="{attribute.human_readable_name()}" optional={{{optional}}} errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} value={{builder_store.{attribute.name}.clone()}} />\n'
                 )
                 continue
 
@@ -5334,10 +5936,10 @@ def write_frontend_yew_form(
                     allowed_formats = ["GenericFileFormat::Image"]
 
                     document.write(
-                        f'            <FileInput<Image> label="{attribute.human_readable_name()}" errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} allowed_formats={{vec![{", ".join(allowed_formats)}]}} value={{builder_store.{attribute.name}.clone().map(|{attribute.name}| {attribute.name}.into())}} />\n'
+                        f'            <FileInput<Image> label="{attribute.human_readable_name()}" optional={{{optional}}} errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} allowed_formats={{vec![{", ".join(allowed_formats)}]}} value={{builder_store.{attribute.name}.clone().map(|{attribute.name}| {attribute.name}.into())}} />\n'
                     )
                 else:
-                    raise Exception(
+                    raise RuntimeError(
                         f"Attribute {attribute.name} of type {attribute.data_type()} not supported in the frontend form generation."
                     )
 
@@ -5346,10 +5948,12 @@ def write_frontend_yew_form(
             # If the attribute is a nested struct, we need to generate a Datalist
             # that will allow the user to select the nested struct.
             if isinstance(attribute.raw_data_type(), StructMetadata):
+                struct: StructMetadata = attribute.raw_data_type()
+
                 # We check that the table associated to the nested struct is searchable, otherwise
                 # we cannot generate the datalist for it and we need to raise an exception.
                 if not trigram_indices.has_table(attribute.raw_data_type().table_name):
-                    handle_missing_gin_index(attribute)
+                    handle_missing_gin_index(attribute, builder)
 
                 # We check that the nested struct implements the RowToSearchableBadge trait, as we need to
                 # be able to convert the nested struct to a badge within the Datalist.
@@ -5357,12 +5961,18 @@ def write_frontend_yew_form(
                     handle_missing_row_to_searchable_badge_implementation(
                         attribute.raw_data_type()
                     )
-                    raise Exception(
+                    raise RuntimeError(
                         f"The struct {attribute.raw_data_type().name} does not implement the RowToSearchableBadge trait."
                     )
 
+                editables = (
+                    "true"
+                    if struct.has_associated_roles() and struct.table_name != "users"
+                    else "false"
+                )
+
                 document.write(
-                    f'            <Datalist<{attribute.data_type()}> builder={{set_{attribute.name}}} errors={{builder_store.{error_attribute.name}.clone()}} value={{builder_store.{attribute.name}.clone()}} label="{attribute.human_readable_name()}" />\n'
+                    f'            <Datalist<{attribute.data_type()}, {editables}> builder={{set_{attribute.name}}} optional={{{optional}}} errors={{builder_store.{error_attribute.name}.clone()}} value={{builder_store.{attribute.name}.clone()}} label="{attribute.human_readable_name()}" />\n'
                 )
                 continue
 
@@ -5393,23 +6003,23 @@ def write_frontend_form_buildable_implementation(
     This method implements the Buildable trait for the provided struct.
     """
 
-    flat_struct = builder.get_flat_variant()
-    rich_struct = builder.get_richest_variant()
+    flat_variant = builder.get_flat_variant()
+    rich_variant = builder.get_richest_variant()
 
     variants: List[StructMetadata] = []
 
-    if flat_struct.is_insertable():
+    if flat_variant.is_insertable():
         variants.append(builder.get_new_variant())
 
-    if flat_struct.is_updatable():
+    if flat_variant.is_updatable():
         update_variant = builder.get_update_variant()
         if not update_variant.is_new_variant():
             variants.append(update_variant)
 
     # We implement the Tabular trait for the struct.
     document.write(
-        f"impl Tabular for {rich_struct.name} {{\n"
-        f"    const TABLE: Table = Table::{rich_struct.get_capitalized_table_name()};\n"
+        f"impl Tabular for {rich_variant.name} {{\n"
+        f"    const TABLE: Table = Table::{rich_variant.get_capitalized_table_name()};\n"
         "}\n\n"
     )
 
@@ -5417,7 +6027,7 @@ def write_frontend_form_buildable_implementation(
         # We implement the Tabular trait for the struct.
         document.write(
             f"impl Tabular for {variant.name} {{\n"
-            f"    const TABLE: Table = Table::{flat_struct.get_capitalized_table_name()};\n"
+            f"    const TABLE: Table = Table::{flat_variant.get_capitalized_table_name()};\n"
             "}\n\n"
         )
 
@@ -5469,7 +6079,7 @@ def write_frontend_forms(
         "use serde::{Deserialize, Serialize};",
         "use web_common::database::*;",
         "use yew::prelude::*;",
-        "use yewdux::{use_store, Reducer, Store};",
+        "use yewdux::{use_dispatch, use_store_value, Reducer, Store};",
         "use crate::components::forms::*;",
         "use web_common::api::form_traits::FormMethod;",
         "use std::rc::Rc;",
@@ -5487,8 +6097,6 @@ def write_frontend_forms(
     for import_statement in imports:
         document.write(f"{import_statement}\n")
 
-    table_metadata = find_foreign_keys()
-
     document.write("\n")
 
     for builder in tqdm(
@@ -5498,13 +6106,17 @@ def write_frontend_forms(
         leave=False,
     ):
         builder.write_to(document, derives_deny_list=["Default"])
-        write_frontend_builder_default_implementation(builder, table_metadata, document)
-        write_frontend_builder_action_enumeration(builder, table_metadata, document)
-        write_frontend_form_builder_implementation(builder, table_metadata, document)
-        write_frontend_form_buildable_implementation(builder, document)
-        write_frontend_yew_form(
-            builder, table_metadata=table_metadata, document=document
+        write_frontend_builder_default_implementation(
+            builder, builder.table_metadata, document
         )
+        write_frontend_builder_action_enumeration(
+            builder, builder.table_metadata, document
+        )
+        write_frontend_form_builder_implementation(
+            builder, builder.table_metadata, document
+        )
+        write_frontend_form_buildable_implementation(builder, document)
+        write_frontend_yew_form(builder, builder.table_metadata, document=document)
 
     document.flush()
     document.close()
@@ -5542,13 +6154,13 @@ def generate_table_schema():
     status = os.system("diesel migration run")
 
     if status != 0:
-        raise Exception("The migrations were not fully executed.")
+        raise RuntimeError("The migrations were not fully executed.")
 
     # We run the diesel extended CLI command
     status = os.system("diesel_ext --model --add-table-name > src/models.rs")
 
     if status != 0:
-        raise Exception("The diesel_ext command failed.")
+        raise RuntimeError("The diesel_ext command failed.")
 
 
 def check_for_common_typos_in_migrations():
@@ -5561,19 +6173,21 @@ def check_for_common_typos_in_migrations():
         ):
             continue
 
-        with open(f"migrations/{directory}/up.sql", "r") as up_file:
+        with open(f"migrations/{directory}/up.sql", "r", encoding="utf8") as up_file:
             up_content = up_file.read()
 
-        with open(f"migrations/{directory}/down.sql", "r") as down_file:
+        with open(
+            f"migrations/{directory}/down.sql", "r", encoding="utf8"
+        ) as down_file:
             down_content = down_file.read()
 
         if "CREATE TABLE IF EXISTS" in up_content:
-            raise Exception(
+            raise RuntimeError(
                 f"Migration `{directory}` contains a typo: `CREATE TABLE IF EXISTS` instead of `CREATE TABLE IF NOT EXISTS`."
             )
 
         if "DROP TABLE IF NOT EXISTS" in down_content:
-            raise Exception(
+            raise RuntimeError(
                 f"Migration `{directory}` contains a typo: `DROP TABLE IF NOT EXISTS` instead of `DROP TABLE IF EXISTS`."
             )
 
@@ -5590,7 +6204,7 @@ def check_for_common_typos_in_migrations():
                 )
                 # We check that the deletion of the temporary table is present in the up migration.
                 if f"DROP TABLE {table_name}" not in content:
-                    raise Exception(
+                    raise RuntimeError(
                         f"Migration `{directory}` contains a `CREATE TEMPORARY TABLE` constraint in the {content_name}.sql file, but does not contain a `DROP TABLE {table_name}` constraint in the {content_name}.sql file."
                     )
 
@@ -5605,11 +6219,11 @@ def ensures_gluesql_compliance():
         ):
             continue
 
-        with open(f"migrations/{directory}/up.sql", "r") as up_file:
+        with open(f"migrations/{directory}/up.sql", "r", encoding="utf8") as up_file:
             up_content = up_file.read()
 
         if "SERIAL PRIMARY KEY" in up_content:
-            raise Exception(
+            raise RuntimeError(
                 f"Migration `{directory}` contains a `SERIAL PRIMARY KEY` constraint, which is not supported by GlueSQL. "
                 "Please replace it with `INTEGER PRIMARY KEY`."
             )
@@ -5617,7 +6231,7 @@ def ensures_gluesql_compliance():
         if up_content.count("CREATE TABLE") != up_content.count(
             "CREATE TABLE IF NOT EXISTS"
         ):
-            raise Exception(
+            raise RuntimeError(
                 f"Migration `{directory}` does not use `CREATE TABLE IF NOT EXISTS` consistently. "
                 f"Replace the use of `CREATE TABLE` with `CREATE TABLE IF NOT EXISTS` in the `up.sql` file "
                 "so to avoid conflicts when running the migrations within GlueSQL."
@@ -5650,181 +6264,29 @@ def ensures_migrations_simmetry():
         if directory == "00000000000000_diesel_initial_setup":
             continue
 
-        with open(f"migrations/{directory}/up.sql", "r") as up_file:
+        with open(f"migrations/{directory}/up.sql", "r", encoding="utf8") as up_file:
             up_content = up_file.read()
 
-        with open(f"migrations/{directory}/down.sql", "r") as down_file:
+        with open(
+            f"migrations/{directory}/down.sql", "r", encoding="utf8"
+        ) as down_file:
             down_content = down_file.read()
 
         for up_key, down_key in opposites.items():
             if up_key in up_content and down_key not in down_content:
-                raise Exception(
+                raise ValueError(
                     f"Migration {directory} is not symmetric: up.sql contains `{up_key}` but down.sql does not contain `{down_key}`."
                 )
             if down_key in down_content and up_key not in up_content:
-                raise Exception(
+                raise ValueError(
                     f"Migration {directory} is not symmetric: down.sql contains `{down_key}` but up.sql does not contain `{up_key}`."
                 )
-
-
-def enforce_migration_naming_convention():
-    """Check that the migrations are named according to the convention."""
-
-    # We check that if a migration directory contains a population of a given table,
-    # we verify that if there is also another migration that creates a search index
-    # as indicated by the suffix `_index`, the migration that populates the table must
-    # have a lower number than the migration that creates the search index.
-    migrations = [
-        directory
-        for directory in os.listdir("migrations")
-        if os.path.isdir(f"migrations/{directory}")
-        and os.path.exists(f"migrations/{directory}/up.sql")
-    ]
-
-    # We check that all directories are named in one of the following patterns:
-    # {number_of_migration}_create_{table_name}_table
-    # {number_of_migration}_create_{table_name}_view
-    # {number_of_migration}_populate_{table_name}_table
-    # {number_of_migration}_create_{table_name}_gin_index
-    # {number_of_migration}_create_{table_name}_sequential_index
-    # {number_of_migration}_create_{table_name}_notification_trigger
-    # {number_of_migration}_create_{table_name}_updated_at_trigger
-    # {number_of_migration}_enable_{extension_name}_extension
-
-    # We iterate over the migrations and check that the naming convention is respected.
-    for migration in migrations:
-        if migration == "00000000000000_diesel_initial_setup":
-            continue
-
-        migration_number, migration_name = migration.split("_", maxsplit=1)
-
-        if not any(
-            [
-                migration_name.startswith("create_")
-                and migration_name.endswith("_table"),
-                migration_name.startswith("create_")
-                and migration_name.endswith("_view"),
-                migration_name.startswith("populate_")
-                and migration_name.endswith("_table"),
-                migration_name.startswith("create_")
-                and migration_name.endswith("_gin_index"),
-                migration_name.startswith("create_")
-                and migration_name.endswith("_sequential_index"),
-                migration_name.startswith("create_")
-                and migration_name.endswith("_notification_trigger"),
-                migration_name.startswith("create_")
-                and migration_name.endswith("_updated_at_trigger"),
-                migration_name.startswith("enable_")
-                and migration_name.endswith("_extension"),
-            ]
-        ):
-            raise Exception(
-                f"Migration {migration} does not conform to the naming convention. "
-                "Please rename it to match the naming convention."
-            )
-
-    for migration in migrations:
-        str_number, migration_name = migration.split("_", maxsplit=1)
-        number = int(str_number)
-        if migration_name.startswith("populate_") and migration_name.endswith("_table"):
-            trimmed_migration_name = migration_name[9:-6]
-            search_index_migration_name = f"create_{trimmed_migration_name}_gin_index"
-
-            # We search if there exist a migration with a name ending with the
-            # migration name we just determined.
-
-            for other_migration in migrations:
-                if other_migration.endswith(search_index_migration_name):
-                    other_str_number, other_migration_name = other_migration.split(
-                        "_", maxsplit=1
-                    )
-                    other_number = int(other_str_number)
-
-                    if other_number < number:
-                        raise Exception(
-                            f"Migration {migration} populates a table, "
-                            f"but there exists a migration {other_migration} that creates "
-                            "a search index for the same table, and it has a lower number "
-                            "than the migration that populates the table."
-                        )
-
-    for directory in os.listdir("migrations"):
-        if not os.path.isdir(f"migrations/{directory}"):
-            continue
-
-        if not os.path.exists(f"migrations/{directory}/up.sql") or not os.path.exists(
-            f"migrations/{directory}/down.sql"
-        ):
-            continue
-
-        if directory == "00000000000000_diesel_initial_setup":
-            continue
-
-        with open(f"migrations/{directory}/up.sql", "r") as up_file:
-            up_content = up_file.read()
-
-        expected_name = directory
-
-        if "CREATE TEMP TABLE" in up_content:
-            raise Exception(
-                f"Migration {directory} contains a `CREATE TEMP TABLE` constraint. Please standardize the naming convention "
-                "and replace it with `CREATE TEMPORARY TABLE`."
-            )
-
-        if "CREATE TABLE IF NOT EXISTS" in up_content:
-            # This document contains a table creation, and as such
-            # we expect its name to conform to {number_of_migration}_create_{table_name}_table
-            table_name = (
-                up_content.split("CREATE TABLE IF NOT EXISTS")[1].split("(")[0].strip()
-            )
-            number_of_migration = directory.split("_")[0]
-
-            expected_name = f"{number_of_migration}_create_{table_name}_table"
-
-        if directory != expected_name:
-            raise Exception(
-                f"Migration {directory} does not conform to the naming convention. "
-                f"Expected name: {expected_name}."
-            )
 
 
 if __name__ == "__main__":
     # Load dotenv file
     load_dotenv()
-
-    # Due to git collisions, it may happen that a migration has been renamed
-    # but the old directory is still there. For each directory in the migrations
-    # that is composed of the [0-9]+_[a-z_]+ pattern, we check if the directory
-    # as a twin with a different code but the same name. If so, we remove the
-    # empty version of these directories.
-    for directory in os.listdir("migrations"):
-        if not os.path.isdir(f"migrations/{directory}"):
-            continue
-        if re.match(r"^[0-9]+_[a-z_]+$", directory):
-            # We check whether the current directory DOES NOT
-            # contain either a down.sql or an up.sql file.
-            if not os.path.exists(
-                f"migrations/{directory}/down.sql"
-            ) or not os.path.exists(f"migrations/{directory}/up.sql"):
-                code, migration_name = directory.split("_", maxsplit=1)
-                twin_found = False
-                for directory2 in os.listdir("migrations"):
-                    if not os.path.isdir(f"migrations/{directory2}"):
-                        continue
-                    if re.match(r"^[0-9]+_[a-z_]+$", directory2):
-                        code2, migration_name2 = directory2.split("_", maxsplit=1)
-                        if code != code2 and migration_name == migration_name2:
-                            print(f"Removing {directory}")
-                            shutil.rmtree(f"migrations/{directory}")
-                            twin_found = True
-                            break
-                if not twin_found:
-                    raise Exception(
-                        f"Directory {directory} does not contain either a `down.sql` or an `up.sql` file "
-                        "and there is no twin directory with a different code."
-                    )
-
-    densify_directory_counter()
+    regroup_tables()
 
     # If there is a "__pycache__" directory, we remove it as Diesel
     # seems to be keen to try and run it as a migration, and it will
@@ -5838,6 +6300,8 @@ if __name__ == "__main__":
     if not os.path.exists("./db_data/bio_ott_taxons.csv.gz"):
         retrieve_taxons()
 
+    tables_metadata = find_foreign_keys()
+
     enforce_migration_naming_convention()
     replace_serial_indices()
     check_for_common_typos_in_migrations()
@@ -5849,36 +6313,41 @@ if __name__ == "__main__":
     generate_table_schema()
     print("Generated models.")
 
-    ensures_all_update_at_trigger_exists()
-    ensure_created_at_columns()
-    ensure_updated_at_columns()
+    ensures_all_update_at_trigger_exists(tables_metadata)
+    ensure_created_at_columns(tables_metadata)
+    ensure_updated_at_columns(tables_metadata)
+    check_parent_circularity_trigger(tables_metadata)
 
-    generate_view_schema()
+    generate_view_schema(tables_metadata)
     print("Generated view schema.")
     check_schema_completion()
     print("Checked schema completion.")
-    generate_view_structs()
+    generate_view_structs(tables_metadata)
     print("Generated view structs.")
 
-    table_structs: List[StructMetadata] = extract_structs("src/models.rs")
-    view_structs: List[StructMetadata] = extract_structs("src/views/views.rs")
+    table_structs: List[StructMetadata] = extract_structs(
+        "src/models.rs", table_metadata=tables_metadata
+    )
+    view_structs: List[StructMetadata] = extract_structs(
+        "src/views/views.rs", table_metadata=tables_metadata
+    )
 
-    write_backend_structs("src/models.rs", "tables", table_structs)
-    write_backend_structs("src/views/views.rs", "views", view_structs)
+    write_backend_structs("src/models.rs", "tables", table_structs, tables_metadata)
+    write_backend_structs("src/views/views.rs", "views", view_structs, tables_metadata)
     print(
         f"Generated {len(table_structs)} tables and {len(view_structs)} views implementations for backend."
     )
 
-    write_web_common_structs(table_structs, "tables", "Table")
-    write_web_common_structs(view_structs, "views", "View")
+    write_web_common_structs(table_structs, "tables", "Table", tables_metadata)
+    write_web_common_structs(view_structs, "views", "View", tables_metadata)
     print("Generated web common structs.")
 
     nested_structs: List[StructMetadata] = generate_nested_structs(
-        "src/nested_models.rs", table_structs + view_structs
+        "src/nested_models.rs", table_structs + view_structs, tables_metadata
     )
     print(f"Generated {len(nested_structs)} nested structs for backend.")
 
-    new_model_structs = derive_new_models(table_structs)
+    new_model_structs = derive_new_models(table_structs, tables_metadata)
     print(f"Derived {len(new_model_structs)} structs for the New versions")
 
     update_model_structs = derive_update_models(table_structs)
@@ -5888,25 +6357,29 @@ if __name__ == "__main__":
         table_structs + view_structs + nested_structs,
         new_model_structs,
         update_model_structs,
+        tables_metadata,
     )
+    ensure_updatable_tables_have_roles_tables(tables, tables_metadata)
+    ensure_tables_have_creation_notification_trigger(tables, tables_metadata)
     print("Generated table names enumeration for web_common.")
 
-    write_diesel_table_names_enumeration(tables)
+    write_diesel_table_names_enumeration(tables, tables_metadata)
     print("Generated table names enumeration for diesel.")
 
-    write_web_common_nested_structs("nested_models.rs", nested_structs)
+    write_web_common_nested_structs("nested_models.rs", nested_structs, tables_metadata)
     print("Generated nested structs for web_common.")
 
     write_web_common_search_trait_implementations(
-        nested_structs + table_structs + view_structs
+        nested_structs + table_structs + view_structs,
+        tables_metadata,
     )
     print("Generated search trait implementations for web_common.")
 
     builder_structs = derive_model_builders(new_model_structs + update_model_structs)
     print(f"Derived {len(builder_structs)} builders for the New & Update versions")
 
-    write_web_common_new_structs(new_model_structs)
-    write_web_common_update_structs(update_model_structs)
+    write_web_common_new_structs(new_model_structs, tables_metadata)
+    write_web_common_update_structs(update_model_structs, tables_metadata)
     print("Generated new & update structs for web_common.")
 
     write_diesel_new_structs(new_model_structs)

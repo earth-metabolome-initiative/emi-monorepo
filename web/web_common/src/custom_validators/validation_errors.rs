@@ -1,4 +1,3 @@
-use chrono::NaiveDateTime;
 use validator::{ValidationError, ValidationErrors, ValidationErrorsKind};
 
 use crate::api::ApiError;

@@ -1,7 +1,6 @@
 use actix_web::web;
 
 mod auth;
-mod documents;
 mod healthchecker;
 mod oauth;
 mod ws;
@@ -15,6 +14,5 @@ pub fn configure(conf: &mut web::ServiceConfig) {
             .configure(auth::configure)
             .configure(ws::configure)
             .configure(oauth::configure)
-            .configure(documents::configure),
     );
 }

@@ -1,4 +1,4 @@
-button {
+a.button-like, button {
     padding: 0.5em;
     border: none;
     cursor: pointer;
@@ -7,7 +7,9 @@ button {
     border-radius: 0.5em;
     float: right;
     font-size: 1em;
+    margin-left: 0.5em;
     transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+    text-decoration: none;
 
     position: relative;
     overflow: hidden;
@@ -48,6 +50,74 @@ button {
             color: $grey !important;
             // We make the button visually say "no" when disabled
             animation: small-shake 0.2s;
+        }
+    }
+
+    &.retrieve {
+        border-color: $primary;
+        color: $primary;
+
+        &:hover {
+            background-color: $primary;
+            color: white;
+        }
+
+        &.enabled::before {
+            background: linear-gradient(120deg,
+                    transparent,
+                    rgba($primary, 0.2),
+                    transparent);
+        }
+    }
+
+    &.create {
+        border-color: $blue;
+        color: $blue;
+
+        &:hover {
+            background-color: $blue;
+            color: white;
+        }
+
+        &.enabled::before {
+            background: linear-gradient(120deg,
+                    transparent,
+                    rgba($blue, 0.2),
+                    transparent);
+        }
+    }
+
+    &.delete {
+        border-color: $red;
+        color: $red;
+
+        &:hover {
+            background-color: $red;
+            color: white;
+        }
+
+        &.enabled::before {
+            background: linear-gradient(120deg,
+                    transparent,
+                    rgba($red, 0.2),
+                    transparent);
+        }
+    }
+
+    &.update {
+        border-color: $green;
+        color: $green;
+
+        &:hover {
+            background-color: $green;
+            color: white;
+        }
+
+        &.enabled::before {
+            background: linear-gradient(120deg,
+                    transparent,
+                    rgba($green, 0.2),
+                    transparent);
         }
     }
 }

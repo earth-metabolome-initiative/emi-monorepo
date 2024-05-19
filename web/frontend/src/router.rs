@@ -6,51 +6,12 @@ use yew_router::prelude::*;
 use crate::pages::*;
 use uuid::Uuid;
 use crate::components::BasicPages;
+use crate::components::BasicPage;
 use web_common::database::*;
 use crate::components::forms::automatic_forms::*;
 
 #[derive(Debug, Clone, Copy, PartialEq, Routable)]
 pub enum AppRoute {
-    #[at("/container_horizontal_rules")]
-    ContainerHorizontalRules,
-    #[at("/container_horizontal_rules/:id")]
-    ContainerHorizontalRulesView{id: i32},
-    #[at("/container_horizontal_rules/new")]
-    ContainerHorizontalRulesNew,
-    #[at("/container_horizontal_rules/:id/update")]
-    ContainerHorizontalRulesUpdate{id: i32},
-    #[at("/container_vertical_rules")]
-    ContainerVerticalRules,
-    #[at("/container_vertical_rules/:id")]
-    ContainerVerticalRulesView{id: i32},
-    #[at("/container_vertical_rules/new")]
-    ContainerVerticalRulesNew,
-    #[at("/container_vertical_rules/:id/update")]
-    ContainerVerticalRulesUpdate{id: i32},
-    #[at("/item_categories")]
-    ItemCategories,
-    #[at("/item_categories/:id")]
-    ItemCategoriesView{id: i32},
-    #[at("/item_categories/new")]
-    ItemCategoriesNew,
-    #[at("/item_categories/:id/update")]
-    ItemCategoriesUpdate{id: i32},
-    #[at("/procedures")]
-    Procedures,
-    #[at("/procedures/:id")]
-    ProceduresView{id: i32},
-    #[at("/procedures/new")]
-    ProceduresNew,
-    #[at("/procedures/:id/update")]
-    ProceduresUpdate{id: i32},
-    #[at("/project_requirements")]
-    ProjectRequirements,
-    #[at("/project_requirements/:id")]
-    ProjectRequirementsView{id: i32},
-    #[at("/project_requirements/new")]
-    ProjectRequirementsNew,
-    #[at("/project_requirements/:id/update")]
-    ProjectRequirementsUpdate{id: i32},
     #[at("/projects")]
     Projects,
     #[at("/projects/:id")]
@@ -75,14 +36,6 @@ pub enum AppRoute {
     SamplesNew,
     #[at("/samples/:id/update")]
     SamplesUpdate{id: Uuid},
-    #[at("/sampling_procedures")]
-    SamplingProcedures,
-    #[at("/sampling_procedures/:id")]
-    SamplingProceduresView{id: Uuid},
-    #[at("/sampling_procedures/new")]
-    SamplingProceduresNew,
-    #[at("/sampling_procedures/:id/update")]
-    SamplingProceduresUpdate{id: Uuid},
     #[at("/teams")]
     Teams,
     #[at("/teams/:id")]
@@ -95,6 +48,8 @@ pub enum AppRoute {
     Users,
     #[at("/users/:id")]
     UsersView{id: i32},
+    #[at("/users/new")]
+    UsersNew,
     #[at("/users/:id/update")]
     UsersUpdate{id: i32},
     #[at("/")]
@@ -113,71 +68,11 @@ pub enum AppRoute {
 ///
 pub fn switch(route: AppRoute) -> Html {
     match route {
-        AppRoute::ContainerHorizontalRules => {
-            html! { <BasicPages<NestedContainerHorizontalRule> /> }
-        }
-        AppRoute::ContainerHorizontalRulesView{id} => {
-             html! { <span>{"Specific Container horizontal rule page"}</span> }
-        }
-        AppRoute::ContainerHorizontalRulesNew => {
-            html! { <CreateContainerHorizontalRuleForm /> }
-        }
-        AppRoute::ContainerHorizontalRulesUpdate{id} => {
-            html! { <UpdateContainerHorizontalRuleForm id={id} /> }
-        }
-        AppRoute::ContainerVerticalRules => {
-            html! { <BasicPages<NestedContainerVerticalRule> /> }
-        }
-        AppRoute::ContainerVerticalRulesView{id} => {
-             html! { <span>{"Specific Container vertical rule page"}</span> }
-        }
-        AppRoute::ContainerVerticalRulesNew => {
-            html! { <CreateContainerVerticalRuleForm /> }
-        }
-        AppRoute::ContainerVerticalRulesUpdate{id} => {
-            html! { <UpdateContainerVerticalRuleForm id={id} /> }
-        }
-        AppRoute::ItemCategories => {
-            html! { <BasicPages<NestedItemCategory> /> }
-        }
-        AppRoute::ItemCategoriesView{id} => {
-             html! { <span>{"Specific Item category page"}</span> }
-        }
-        AppRoute::ItemCategoriesNew => {
-            html! { <CreateItemCategoryForm /> }
-        }
-        AppRoute::ItemCategoriesUpdate{id} => {
-            html! { <UpdateItemCategoryForm id={id} /> }
-        }
-        AppRoute::Procedures => {
-            html! { <BasicPages<NestedProcedure> /> }
-        }
-        AppRoute::ProceduresView{id} => {
-             html! { <span>{"Specific Procedure page"}</span> }
-        }
-        AppRoute::ProceduresNew => {
-            html! { <CreateProcedureForm /> }
-        }
-        AppRoute::ProceduresUpdate{id} => {
-            html! { <UpdateProcedureForm id={id} /> }
-        }
-        AppRoute::ProjectRequirements => {
-            html! { <BasicPages<NestedProjectRequirement> /> }
-        }
-        AppRoute::ProjectRequirementsView{id} => {
-             html! { <span>{"Specific Project requirement page"}</span> }
-        }
-        AppRoute::ProjectRequirementsNew => {
-            html! { <CreateProjectRequirementForm /> }
-        }
-        AppRoute::ProjectRequirementsUpdate{id} => {
-            html! { <UpdateProjectRequirementForm id={id} /> }
-        }
         AppRoute::Projects => {
             html! { <BasicPages<NestedProject> /> }
         }
         AppRoute::ProjectsView{id} => {
-             html! { <span>{"Specific Project page"}</span> }
+            html! { <BasicPage<NestedProject> id={PrimaryKey::from(id)} /> }
         }
         AppRoute::ProjectsNew => {
             html! { <CreateProjectForm /> }
@@ -189,7 +84,7 @@ pub fn switch(route: AppRoute) -> Html {
             html! { <BasicPages<NestedSampledIndividual> /> }
         }
         AppRoute::SampledIndividualsView{id} => {
-             html! { <span>{"Specific Sampled individual page"}</span> }
+            html! { <BasicPage<NestedSampledIndividual> id={PrimaryKey::from(id)} /> }
         }
         AppRoute::SampledIndividualsNew => {
             html! { <CreateSampledIndividualForm /> }
@@ -201,7 +96,7 @@ pub fn switch(route: AppRoute) -> Html {
             html! { <BasicPages<NestedSample> /> }
         }
         AppRoute::SamplesView{id} => {
-             html! { <span>{"Specific Sample page"}</span> }
+            html! { <BasicPage<NestedSample> id={PrimaryKey::from(id)} /> }
         }
         AppRoute::SamplesNew => {
             html! { <CreateSampleForm /> }
@@ -209,23 +104,11 @@ pub fn switch(route: AppRoute) -> Html {
         AppRoute::SamplesUpdate{id} => {
             html! { <UpdateSampleForm id={id} /> }
         }
-        AppRoute::SamplingProcedures => {
-            html! { <BasicPages<NestedSamplingProcedure> /> }
-        }
-        AppRoute::SamplingProceduresView{id} => {
-             html! { <span>{"Specific Sampling procedure page"}</span> }
-        }
-        AppRoute::SamplingProceduresNew => {
-            html! { <CreateSamplingProcedureForm /> }
-        }
-        AppRoute::SamplingProceduresUpdate{id} => {
-            html! { <UpdateSamplingProcedureForm id={id} /> }
-        }
         AppRoute::Teams => {
             html! { <BasicPages<NestedTeam> /> }
         }
         AppRoute::TeamsView{id} => {
-             html! { <span>{"Specific Team page"}</span> }
+            html! { <BasicPage<NestedTeam> id={PrimaryKey::from(id)} /> }
         }
         AppRoute::TeamsNew => {
             html! { <CreateTeamForm /> }
@@ -237,7 +120,10 @@ pub fn switch(route: AppRoute) -> Html {
             html! { <BasicPages<User> /> }
         }
         AppRoute::UsersView{id} => {
-             html! { <span>{"Specific User page"}</span> }
+            html! { <BasicPage<User> id={PrimaryKey::from(id)} /> }
+        }
+        AppRoute::UsersNew => {
+            html! { <CreateUserForm /> }
         }
         AppRoute::UsersUpdate{id} => {
             html! { <UpdateUserForm id={id} /> }

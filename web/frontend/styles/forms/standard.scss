@@ -611,6 +611,11 @@ form.standard-form {
             padding-right: 0.5em;
             display: inline-block;
             min-width: 100px;
+
+            &.input-label-mandatory::after {
+                content: "*";
+                color: $red;
+            }
         }
 
         &.text,
@@ -702,7 +707,6 @@ form.standard-form {
     button.clear-button {
         border-color: $red;
         color: $red;
-        margin-right: 1em;
 
         &:hover {
             background-color: $red;

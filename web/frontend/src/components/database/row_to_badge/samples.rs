@@ -19,12 +19,6 @@ impl RowToBadge for NestedSample {
                     <Link<AppRoute> to={AppRoute::UsersView{ id: self.sampled_by.id}}>{self.sampled_by.title()}</Link<AppRoute>>
                 </div>
 
-                // Print the sampling procedure
-                <div class="sample-info">
-                    <span>{"Sampling procedure: "}</span>
-                    <Link<AppRoute> to={AppRoute::SamplingProceduresView{ id: self.procedure.id().try_into().unwrap()}}>{self.procedure.title()}</Link<AppRoute>>
-                </div>
-
                 <div class="sample-info">
                     <span>{"Sample state: "}</span>
                     <span>{self.state.inner.name.clone()}</span>

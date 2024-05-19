@@ -1,6 +1,7 @@
+"""This module contains the logic to find the indices of a PostgreSQL database."""
 from typing import List
 from constraint_checkers.cursor import get_cursor
-from constraint_checkers.find_foreign_keys import find_foreign_keys
+from constraint_checkers.find_foreign_keys import TableMetadata
 
 class PGIndex:
 
@@ -21,9 +22,9 @@ class PGIndices:
         ("strict_word_similarity", "<<%", "<<<->"),
     )
 
-    def __init__(self, indices: List[PGIndex]):
+    def __init__(self, indices: List[PGIndex], tables_metadata: TableMetadata):
         self.indices = indices
-        self.foreign_keys_information = find_foreign_keys()
+        self.foreign_keys_information = tables_metadata
 
     def tables(self) -> List[str]:
         return list(set(index.table_name for index in self.indices))
@@ -58,9 +59,10 @@ class PGIndices:
                 return index
         return None
 
-def find_pg_trgm_indices() -> PGIndices:
+def find_pg_trgm_indices(
+    tables_metadata: TableMetadata,
+) -> PGIndices:
     """Returns the list of indices that are of type `pg_trgm`."""
-    tables_metadata = find_foreign_keys()
     conn, cursor = get_cursor()
     cursor.execute(
         """
@@ -119,4 +121,4 @@ def find_pg_trgm_indices() -> PGIndices:
     cursor.close()
     conn.close()
 
-    return PGIndices(pg_indices)
+    return PGIndices(pg_indices, tables_metadata)

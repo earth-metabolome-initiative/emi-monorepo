@@ -16,10 +16,22 @@ pub fn input_errors(props: &InputErrorsProp) -> Html {
 
     html! {
         <ul class="input-errors">
-            { for props.errors.iter().map(|error| html! {
-                <li class="input-error">
-                    <p>{format!("{:?}", error)}</p>
-                </li>
+            { for props.errors.iter().map(|error| {
+                let font_awesome_icon = error.font_awesome_icon();
+                let errors: Vec<String> = error.clone().into();
+                html! {
+                    { for errors.iter().map(|error| {
+                        html! {
+                            <li class="input-error">
+                                <p>
+                                    <i class={format!("fas fa-{}", font_awesome_icon)}></i>
+                                    {'\u{00a0}'}
+                                    <span>{error}</span>
+                                </p>
+                            </li>
+                        }
+                    })}
+                }
             })}
         </ul>
     }

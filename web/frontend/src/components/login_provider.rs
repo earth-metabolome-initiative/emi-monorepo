@@ -36,7 +36,7 @@ pub fn login_provider(props: &OAuthLoginProviderProps) -> Html {
 
     html! {
         <a class="login-provider" href={url}>
-            <i class={format!("fab {}", props.provider.font_awesome_icon)}></i>
+            <i class={format!("fab fa-{}", props.provider.icon)}></i>
             {format!("Login with {}", props.provider.name)}
         </a>
     }

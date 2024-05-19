@@ -1,4 +1,4 @@
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union, Dict
 import pandas as pd
 from functools import cache
 from constraint_checkers.cursor import get_cursor
@@ -28,6 +28,7 @@ class TableMetadata:
         self.table_metadata = table_metadata
         self._view_names: List[str] = []
         self._table_names: List[str] = []
+        self._flat_variants: Dict[str, str] = {}
 
     def tables(self) -> List[str]:
         return self.table_metadata["referencing_table"].unique().tolist()
@@ -58,6 +59,31 @@ class TableMetadata:
             self._table_names.append(table_name)
 
         return is_table
+
+    def register_flat_variant(self, table_name: str, flat_variant: str):
+        """Registers a flat variant for a table.
+
+        Parameters
+        ----------
+        table_name : str
+            The name of the table.
+        flat_variant : str
+            The name of the flat variant.
+        """
+        if table_name in self._flat_variants:
+            raise ValueError(f"The table {table_name} already has a flat variant.")
+        
+        self._flat_variants[table_name] = flat_variant
+
+    def get_flat_variant(self, table_name: str) -> str:
+        """Returns the flat variant of the table.
+
+        Parameters
+        ----------
+        table_name : str
+            The name of the table.
+        """
+        return self._flat_variants.get(table_name)
 
     def is_view(self, table_name: str) -> bool:
         """Returns whether the table is a view."""
@@ -236,9 +262,12 @@ class TableMetadata:
                     return True
             return False
 
-        primary_key_name, _ = self.get_primary_key_name_and_type(table_name)
+        primary_keys = self.get_primary_key_names_and_types(table_name)
+
+        primary_key_names = [primary_key[0] for primary_key in primary_keys]
+
         foreign_keys = self.get_foreign_keys(table_name)
-        return any(foreign_key != primary_key_name for foreign_key in foreign_keys)
+        return any(foreign_key not in primary_key_names for foreign_key in foreign_keys)
 
     @cache
     def get_foreign_keys(self, table_name: str) -> List[str]:
@@ -299,13 +328,19 @@ class TableMetadata:
                 f"The column {column_name} does not exist in the view {table_name}."
             )
 
-        if self.is_primary_key(table_name, column_name):
-            return table_name
-
         table_columns = self.table_metadata[
             (self.table_metadata["referencing_table"] == table_name)
             & (self.table_metadata["referencing_column"] == column_name)
         ]
+
+        if table_columns.empty:
+            if self.is_primary_key(table_name, column_name):
+                return table_name
+            else:
+                raise ValueError(
+                    f"The column {column_name} does not exist in the table {table_name}."
+                )
+
         return table_columns["referenced_table"].values[0]
 
     @cache
@@ -343,7 +378,7 @@ class TableMetadata:
         This method returns whether the table metadata associated with
         the table name has a non-null value in the `column_key` column.
         """
-        return self.get_primary_key_name_and_type(table_name) is not None
+        return self.get_primary_key_names_and_types(table_name) is not None
 
     def is_primary_key(self, table_name: str, candidate_key: str) -> bool:
         """Returns whether the candidate key is the primary key of the table.
@@ -360,8 +395,10 @@ class TableMetadata:
         This method returns whether the candidate key is the primary key
         of the table metadata associated with the table name.
         """
-        primary_key_name, _ = self.get_primary_key_name_and_type(table_name)
-        return primary_key_name == candidate_key
+        return any(
+            primary_key[0] == candidate_key
+            for primary_key in self.get_primary_key_names_and_types(table_name)
+        )
 
     @cache
     def get_column_data_type(self, table_name: str, column_name: str) -> str:
@@ -436,10 +473,10 @@ class TableMetadata:
         return is_nullable == "YES"
 
     @cache
-    def get_primary_key_name_and_type(
+    def get_primary_key_names_and_types(
         self, table_name: str
-    ) -> Optional[Tuple[str, str]]:
-        """Returns the name and type of the primary key of the table.
+    ) -> Optional[List[Tuple[str, str]]]:
+        """Returns the names and types of the components of the primary key of the table.
 
         Parameters
         ----------
@@ -451,7 +488,9 @@ class TableMetadata:
         This method returns the name and data type of the column in the
         table metadata associated with the table name that has the value
         `PRI` in the `column_key` column. This column is the primary key
-        of the table.
+        of the table. When the primary key is a composite key, this method
+        returns the names and data types of the components of the primary
+        key.
         """
         if self.is_view(table_name):
             # We check if the view has an "id" column and if it does,
@@ -459,7 +498,7 @@ class TableMetadata:
             view_columns = self.extract_view_columns(table_name)
             for column in view_columns:
                 if column.alias_name == "id":
-                    return self.get_primary_key_name_and_type(column.table_name)
+                    return self.get_primary_key_names_and_types(column.table_name)
             return None
         _conn, cursor = get_cursor()
 
@@ -485,7 +524,7 @@ class TableMetadata:
             """
         )
 
-        primary_key = cursor.fetchone()
+        primary_key = cursor.fetchall()
 
         cursor.close()
 
@@ -494,7 +533,7 @@ class TableMetadata:
     @cache
     def get_unique_constraint_columns(
         self, table_name: str
-    ) -> Union[List[str], List[ViewColumn]]:
+    ) -> Union[List[List[str]], List[ViewColumn]]:
         """Returns the columns of the unique constraint."""
         if self.is_view(table_name):
             # In a view, we return as set of unique columns the columns
@@ -529,20 +568,30 @@ class TableMetadata:
         _conn, cursor = get_cursor()
         cursor.execute(
             f"""
-            SELECT min(column_name)
-            FROM information_schema.table_constraints AS c
-            JOIN information_schema.constraint_column_usage AS cc
-                USING (table_schema, table_name, constraint_name)
-            WHERE c.constraint_type = 'UNIQUE' AND c.table_name = '{table_name}'
-            GROUP BY table_schema, table_name
-            HAVING count(*) = 1;
+            SELECT array_agg(attname ORDER BY attnum) AS columns
+            FROM pg_constraint
+            JOIN pg_attribute ON pg_constraint.conrelid = pg_attribute.attrelid
+            AND pg_attribute.attnum = ANY(pg_constraint.conkey)
+            JOIN pg_class ON pg_class.oid = pg_constraint.conrelid
+            JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+            WHERE contype = 'u' -- 'u' for unique constraint
+            AND pg_namespace.nspname = 'public'
+            AND pg_class.relname = '{table_name}'
+            GROUP BY conname, contype;
             """
         )
 
         columns = cursor.fetchall()
         cursor.close()
 
-        return [column[0] for column in columns]
+        # We flatten the list of lists of lists
+
+        unique_constraints = []
+
+        for column in columns:
+            unique_constraints.append(column[0])
+
+        return unique_constraints
 
     @cache
     def has_trigger_by_name(self, table_name: str, trigger_name: str) -> bool:
@@ -634,7 +683,9 @@ class TableMetadata:
         return "updated_at" in self.get_columns(table_name)
 
     @cache
-    def get_default_column_value(self, table_name: str, column_name: str) -> Optional[str]:
+    def get_default_column_value(
+        self, table_name: str, column_name: str
+    ) -> Optional[str]:
         """Returns the default value of the column.
 
         Parameters
@@ -653,7 +704,7 @@ class TableMetadata:
         if self.is_view(table_name):
             for view_column in self.extract_view_columns(table_name):
                 if view_column.alias_name == column_name:
-                    return self.get_default_value(view_column.table_name, column_name)
+                    return self.get_default_column_value(view_column.table_name, column_name)
 
         _conn, cursor = get_cursor()
         cursor.execute(
@@ -672,6 +723,80 @@ class TableMetadata:
         cursor.close()
 
         return default_value
+
+    def get_circular_foreign_keys(self, table_name: str) -> List[str]:
+        """Returns the circular foreign keys of the table.
+
+        Parameters
+        ----------
+        table_name : str
+            The name of the table.
+
+        Implementation details
+        ----------------------
+        This method returns the list of columns in the table metadata
+        associated with the table name that have a non-null value in the
+        `referenced_table` column and have a foreign key that references
+        the table name.
+        """
+        primary_keys = self.get_primary_key_names_and_types(table_name)
+        primary_key_names = [primary_key[0] for primary_key in primary_keys]
+
+        return [
+            column
+            for column in self.get_foreign_keys(table_name)
+            if self.get_foreign_key_table_name(table_name, column) == table_name and column not in primary_key_names
+        ]
+
+    def has_circular_parent_column(self, table_name: str) -> bool:
+        """Returns whether the table has a circular parent column.
+
+        Parameters
+        ----------
+        table_name : str
+            The name of the table.
+
+        Implementation details
+        ----------------------
+        This method returns whether the table has a column that is a
+        foreign key to the table itself.
+        """
+        return len(self.get_circular_foreign_keys(table_name)) > 0
+        
+
+    def has_parent_circularity_trigger(self, table_name: str) -> bool:
+        """Returns whether the table has a parent circularity trigger.
+
+        Parameters
+        ----------
+        table_name : str
+            The name of the table.
+
+        Implementation details
+        ----------------------
+        This method returns whether the table has a trigger named
+        `parent_circularity_trigger`.
+        """
+        return self.has_trigger_by_name(table_name, f"{table_name}_parent_circularity_trigger")
+
+    def has_associated_roles(self, table_name: str) -> bool:
+        """Returns whether the table has associated roles.
+
+        Parameters
+        ----------
+        table_name : str
+            The name of the table.
+
+        Implementation details
+        ----------------------
+        This method returns whether there exists a table in the database
+        names `{table_name}_{referece}_roles`.
+        """
+        return any(
+            self.is_table(f"{table_name}_{reference}_roles")
+            for reference in ("users", "teams")
+        )
+
 
 def find_foreign_keys() -> TableMetadata:
     """Returns the list of indices that are of type `pg_trgm`."""

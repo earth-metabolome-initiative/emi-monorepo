@@ -9,7 +9,7 @@ impl RowToSearchableBadge for NestedProject {
         html! {
             <div>
                 <p>
-                    // <i class={format!("{} {}", self.font_awesome_icon, self.icon_color)}></i>
+                    <i class={format!("fas fa-{} {}", self.icon.name, self.color.name)}></i>
                     <span>{self.inner.name.format_match(query)}</span>
                 </p>
                 <p class="description">{self.inner.description.format_match(query)}</p>
@@ -20,23 +20,18 @@ impl RowToSearchableBadge for NestedProject {
     fn to_selected_datalist_badge(&self) -> Html {
         html! {
             <p>
-                // <i class={format!("{} {}", self.font_awesome_icon, self.icon_color)}></i>
+                <i class={format!("fas fa-{} {}", self.icon.name, self.color.name)}></i>
                 <span>{&self.inner.name}</span>
             </p>
         }
     }
     
-
-    fn matches(&self, query: &str) -> bool {
-        self.inner.name == query
-    }
-
     fn similarity_score(&self, query: &str) -> isize {
         self.inner.name.similarity_score(query) + self.inner.description.similarity_score(query)
     }
 
     fn primary_color_class(&self) -> &str {
-        "grey"
+        &self.color.name
     }
 
     fn description(&self) -> &str {

@@ -4,7 +4,9 @@ diesel::table! {
     bio_ott_ranks (id) {
         id -> Int4,
         name -> Text,
-        font_awesome_icon_id -> Int4,
+        description -> Text,
+        icon_id -> Int4,
+        color_id -> Int4,
     }
 }
 
@@ -27,7 +29,7 @@ diesel::table! {
         family_id -> Nullable<Int4>,
         genus_id -> Nullable<Int4>,
         parent_id -> Int4,
-        font_awesome_icon_id -> Int4,
+        icon_id -> Int4,
         color_id -> Int4,
     }
 }
@@ -37,50 +39,7 @@ diesel::table! {
         id -> Int4,
         name -> Text,
         hexadecimal_value -> Text,
-    }
-}
-
-diesel::table! {
-    container_horizontal_rules (id) {
-        id -> Int4,
-        created_by -> Int4,
-        created_at -> Timestamp,
-        updated_by -> Int4,
-        updated_at -> Timestamp,
-        name -> Text,
-        item_type_id -> Int4,
-        other_item_type_id -> Int4,
-        minimum_temperature -> Nullable<Int4>,
-        maximum_temperature -> Nullable<Int4>,
-        minimum_humidity -> Nullable<Int4>,
-        maximum_humidity -> Nullable<Int4>,
-        minimum_pressure -> Nullable<Int4>,
-        maximum_pressure -> Nullable<Int4>,
-    }
-}
-
-diesel::table! {
-    container_vertical_rules (id) {
-        id -> Int4,
-        created_by -> Int4,
-        created_at -> Timestamp,
-        updated_by -> Int4,
-        updated_at -> Timestamp,
-        name -> Text,
-        container_item_type_id -> Int4,
-        contained_item_type_id -> Int4,
-        minimum_temperature -> Nullable<Int4>,
-        maximum_temperature -> Nullable<Int4>,
-        minimum_humidity -> Nullable<Int4>,
-        maximum_humidity -> Nullable<Int4>,
-        minimum_pressure -> Nullable<Int4>,
-        maximum_pressure -> Nullable<Int4>,
-    }
-}
-
-diesel::table! {
-    continuous_units (id) {
-        id -> Int4,
+        description -> Text,
     }
 }
 
@@ -95,8 +54,7 @@ diesel::table! {
 }
 
 diesel::table! {
-    derived_samples (id) {
-        id -> Int4,
+    derived_samples (parent_sample_id, child_sample_id) {
         created_by -> Int4,
         created_at -> Timestamp,
         updated_by -> Int4,
@@ -107,29 +65,15 @@ diesel::table! {
 }
 
 diesel::table! {
-    discrete_units (id) {
-        id -> Int4,
-    }
-}
-
-diesel::table! {
     document_formats (id) {
         id -> Int4,
         #[max_length = 255]
         extension -> Varchar,
         #[max_length = 255]
         mime_type -> Varchar,
-    }
-}
-
-diesel::table! {
-    documents (id) {
-        id -> Uuid,
-        author_id -> Int4,
-        #[max_length = 255]
-        path -> Varchar,
-        format_id -> Int4,
-        bytes -> Int4,
+        description -> Text,
+        icon_id -> Int4,
+        color_id -> Int4,
     }
 }
 
@@ -137,77 +81,7 @@ diesel::table! {
     font_awesome_icons (id) {
         id -> Int4,
         name -> Text,
-    }
-}
-
-diesel::table! {
-    item_categories (id) {
-        id -> Int4,
-        name -> Text,
         description -> Text,
-        created_by -> Int4,
-        created_at -> Timestamp,
-        updated_by -> Int4,
-        updated_at -> Timestamp,
-    }
-}
-
-diesel::table! {
-    item_category_relationships (id) {
-        id -> Int4,
-        parent_id -> Int4,
-        child_id -> Int4,
-        added_by -> Int4,
-    }
-}
-
-diesel::table! {
-    item_category_units (id) {
-        id -> Int4,
-        item_category_id -> Int4,
-        unit_id -> Int4,
-    }
-}
-
-diesel::table! {
-    item_locations (id) {
-        id -> Uuid,
-        item_id -> Nullable<Uuid>,
-        located_by -> Nullable<Int4>,
-        located_at -> Timestamp,
-        location_id -> Nullable<Uuid>,
-    }
-}
-
-diesel::table! {
-    item_units (id) {
-        id -> Uuid,
-        item_id -> Uuid,
-        unit_id -> Int4,
-    }
-}
-
-diesel::table! {
-    items (id) {
-        id -> Uuid,
-        parent_id -> Nullable<Uuid>,
-    }
-}
-
-diesel::table! {
-    locations (id) {
-        id -> Uuid,
-        latitude_degrees -> Nullable<Int4>,
-        latitude_minutes -> Nullable<Int4>,
-        latitude_seconds -> Nullable<Int4>,
-        longitude_degrees -> Nullable<Int4>,
-        longitude_minutes -> Nullable<Int4>,
-        longitude_seconds -> Nullable<Int4>,
-        altitude -> Nullable<Int4>,
-        address -> Nullable<Text>,
-        geolocalization_device_id -> Nullable<Uuid>,
-        altitude_device_id -> Nullable<Uuid>,
-        parent_location_id -> Nullable<Uuid>,
     }
 }
 
@@ -216,7 +90,7 @@ diesel::table! {
         id -> Int4,
         #[max_length = 255]
         name -> Varchar,
-        font_awesome_icon_id -> Int4,
+        icon_id -> Int4,
         color_id -> Int4,
         #[max_length = 255]
         client_id_var_name -> Varchar,
@@ -226,17 +100,6 @@ diesel::table! {
         oauth_url -> Varchar,
         #[max_length = 255]
         scope -> Varchar,
-    }
-}
-
-diesel::table! {
-    manufactured_item_categories (id) {
-        id -> Int4,
-        cost -> Int4,
-        cost_per_day -> Int4,
-        #[max_length = 3]
-        currency -> Varchar,
-        manifacturer_id -> Int4,
     }
 }
 
@@ -265,43 +128,11 @@ diesel::table! {
 }
 
 diesel::table! {
-    primary_user_emails (id) {
-        id -> Int4,
-    }
-}
-
-diesel::table! {
-    procedures (id) {
-        id -> Int4,
-        name -> Text,
-        description -> Nullable<Text>,
-        created_by -> Int4,
-        created_at -> Timestamp,
-        updated_by -> Int4,
-        updated_at -> Timestamp,
-    }
-}
-
-diesel::table! {
-    project_requirements (id) {
-        id -> Int4,
-        created_by -> Int4,
-        created_at -> Timestamp,
-        updated_by -> Int4,
-        updated_at -> Timestamp,
-        project_id -> Int4,
-        item_category_id -> Int4,
-        quantity -> Int4,
-        unit_id -> Nullable<Int4>,
-    }
-}
-
-diesel::table! {
     project_states (id) {
         id -> Int4,
         name -> Text,
         description -> Text,
-        font_awesome_icon_id -> Int4,
+        icon_id -> Int4,
         color_id -> Int4,
     }
 }
@@ -313,6 +144,8 @@ diesel::table! {
         description -> Text,
         public -> Bool,
         state_id -> Int4,
+        icon_id -> Int4,
+        color_id -> Int4,
         parent_project_id -> Nullable<Int4>,
         budget -> Nullable<Float8>,
         expenses -> Nullable<Float8>,
@@ -326,15 +159,77 @@ diesel::table! {
 }
 
 diesel::table! {
-    roles (id) {
-        id -> Int4,
-        name -> Text,
+    projects_teams_role_invitations (table_id, team_id) {
+        table_id -> Int4,
+        team_id -> Int4,
+        role_id -> Int4,
+        created_by -> Int4,
+        created_at -> Timestamp,
     }
 }
 
 diesel::table! {
-    sample_bio_ott_taxon_items (id) {
-        id -> Uuid,
+    projects_teams_role_requests (table_id, team_id) {
+        table_id -> Int4,
+        team_id -> Int4,
+        role_id -> Int4,
+        created_by -> Int4,
+        created_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    projects_teams_roles (table_id, team_id) {
+        table_id -> Int4,
+        team_id -> Int4,
+        role_id -> Int4,
+        created_by -> Int4,
+        created_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    projects_users_role_invitations (table_id, user_id) {
+        table_id -> Int4,
+        user_id -> Int4,
+        role_id -> Int4,
+        created_by -> Int4,
+        created_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    projects_users_role_requests (table_id, user_id) {
+        table_id -> Int4,
+        user_id -> Int4,
+        role_id -> Int4,
+        created_by -> Int4,
+        created_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    projects_users_roles (table_id, user_id) {
+        table_id -> Int4,
+        user_id -> Int4,
+        role_id -> Int4,
+        created_by -> Int4,
+        created_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    roles (id) {
+        id -> Int4,
+        name -> Text,
+        description -> Text,
+        icon_id -> Int4,
+        color_id -> Int4,
+    }
+}
+
+diesel::table! {
+    sample_bio_ott_taxon_items (sample_id, taxon_id) {
         created_by -> Int4,
         created_at -> Timestamp,
         updated_by -> Int4,
@@ -349,14 +244,13 @@ diesel::table! {
         id -> Int4,
         name -> Text,
         description -> Text,
-        font_awesome_icon_id -> Int4,
+        icon_id -> Int4,
         color_id -> Int4,
     }
 }
 
 diesel::table! {
-    sampled_individual_bio_ott_taxon_items (id) {
-        id -> Uuid,
+    sampled_individual_bio_ott_taxon_items (sampled_individual_id, taxon_id) {
         created_by -> Int4,
         created_at -> Timestamp,
         updated_by -> Int4,
@@ -373,8 +267,67 @@ diesel::table! {
         created_at -> Timestamp,
         updated_by -> Int4,
         updated_at -> Timestamp,
-        name -> Nullable<Text>,
         tagged -> Bool,
+    }
+}
+
+diesel::table! {
+    sampled_individuals_teams_role_invitations (table_id, team_id) {
+        table_id -> Uuid,
+        team_id -> Int4,
+        role_id -> Int4,
+        created_by -> Int4,
+        created_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    sampled_individuals_teams_role_requests (table_id, team_id) {
+        table_id -> Uuid,
+        team_id -> Int4,
+        role_id -> Int4,
+        created_by -> Int4,
+        created_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    sampled_individuals_teams_roles (table_id, team_id) {
+        table_id -> Uuid,
+        team_id -> Int4,
+        role_id -> Int4,
+        created_by -> Int4,
+        created_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    sampled_individuals_users_role_invitations (table_id, user_id) {
+        table_id -> Uuid,
+        user_id -> Int4,
+        role_id -> Int4,
+        created_by -> Int4,
+        created_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    sampled_individuals_users_role_requests (table_id, user_id) {
+        table_id -> Uuid,
+        user_id -> Int4,
+        role_id -> Int4,
+        created_by -> Int4,
+        created_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    sampled_individuals_users_roles (table_id, user_id) {
+        table_id -> Uuid,
+        user_id -> Int4,
+        role_id -> Int4,
+        created_by -> Int4,
+        created_at -> Timestamp,
     }
 }
 
@@ -386,20 +339,67 @@ diesel::table! {
         created_at -> Timestamp,
         updated_by -> Int4,
         updated_at -> Timestamp,
-        procedure_id -> Uuid,
         state -> Int4,
     }
 }
 
 diesel::table! {
-    sampling_procedures (id) {
-        id -> Uuid,
-        name -> Text,
-        description -> Nullable<Text>,
+    samples_teams_role_invitations (table_id, team_id) {
+        table_id -> Uuid,
+        team_id -> Int4,
+        role_id -> Int4,
         created_by -> Int4,
         created_at -> Timestamp,
-        updated_by -> Int4,
-        updated_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    samples_teams_role_requests (table_id, team_id) {
+        table_id -> Uuid,
+        team_id -> Int4,
+        role_id -> Int4,
+        created_by -> Int4,
+        created_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    samples_teams_roles (table_id, team_id) {
+        table_id -> Uuid,
+        team_id -> Int4,
+        role_id -> Int4,
+        created_by -> Int4,
+        created_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    samples_users_role_invitations (table_id, user_id) {
+        table_id -> Uuid,
+        user_id -> Int4,
+        role_id -> Int4,
+        created_by -> Int4,
+        created_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    samples_users_role_requests (table_id, user_id) {
+        table_id -> Uuid,
+        user_id -> Int4,
+        role_id -> Int4,
+        created_by -> Int4,
+        created_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    samples_users_roles (table_id, user_id) {
+        table_id -> Uuid,
+        user_id -> Int4,
+        role_id -> Int4,
+        created_by -> Int4,
+        created_at -> Timestamp,
     }
 }
 
@@ -422,11 +422,71 @@ diesel::table! {
 }
 
 diesel::table! {
+    spectra_collections_teams_role_invitations (table_id, team_id) {
+        table_id -> Int4,
+        team_id -> Int4,
+        role_id -> Int4,
+        created_by -> Int4,
+        created_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    spectra_collections_teams_role_requests (table_id, team_id) {
+        table_id -> Int4,
+        team_id -> Int4,
+        role_id -> Int4,
+        created_by -> Int4,
+        created_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    spectra_collections_teams_roles (table_id, team_id) {
+        table_id -> Int4,
+        team_id -> Int4,
+        role_id -> Int4,
+        created_by -> Int4,
+        created_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    spectra_collections_users_role_invitations (table_id, user_id) {
+        table_id -> Int4,
+        user_id -> Int4,
+        role_id -> Int4,
+        created_by -> Int4,
+        created_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    spectra_collections_users_role_requests (table_id, user_id) {
+        table_id -> Int4,
+        user_id -> Int4,
+        role_id -> Int4,
+        created_by -> Int4,
+        created_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    spectra_collections_users_roles (table_id, user_id) {
+        table_id -> Int4,
+        user_id -> Int4,
+        role_id -> Int4,
+        created_by -> Int4,
+        created_at -> Timestamp,
+    }
+}
+
+diesel::table! {
     team_states (id) {
         id -> Int4,
         name -> Text,
         description -> Text,
-        font_awesome_icon_id -> Int4,
+        icon_id -> Int4,
         color_id -> Int4,
     }
 }
@@ -436,11 +496,53 @@ diesel::table! {
         id -> Int4,
         name -> Text,
         description -> Text,
+        icon_id -> Int4,
+        color_id -> Int4,
         parent_team_id -> Nullable<Int4>,
         created_by -> Int4,
         created_at -> Timestamp,
         updated_by -> Int4,
         updated_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    teams_teams_role_invitations (table_id, team_id) {
+        table_id -> Int4,
+        team_id -> Int4,
+        role_id -> Int4,
+        created_by -> Int4,
+        created_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    teams_users_role_invitations (table_id, user_id) {
+        table_id -> Int4,
+        user_id -> Int4,
+        role_id -> Int4,
+        created_by -> Int4,
+        created_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    teams_users_role_requests (table_id, user_id) {
+        table_id -> Int4,
+        user_id -> Int4,
+        role_id -> Int4,
+        created_by -> Int4,
+        created_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    teams_users_roles (table_id, user_id) {
+        table_id -> Int4,
+        user_id -> Int4,
+        role_id -> Int4,
+        created_by -> Int4,
+        created_at -> Timestamp,
     }
 }
 
@@ -458,8 +560,10 @@ diesel::table! {
         id -> Int4,
         #[max_length = 255]
         email -> Varchar,
-        user_id -> Int4,
+        created_by -> Int4,
+        created_at -> Timestamp,
         login_provider_id -> Int4,
+        primary_email -> Bool,
     }
 }
 
@@ -469,96 +573,214 @@ diesel::table! {
         first_name -> Varchar,
         middle_name -> Nullable<Varchar>,
         last_name -> Varchar,
-        profile_picture -> Nullable<Bytea>,
+        profile_picture -> Bytea,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
 }
 
-diesel::joinable!(bio_ott_ranks -> font_awesome_icons (font_awesome_icon_id));
+diesel::table! {
+    users_users_role_invitations (table_id, user_id) {
+        table_id -> Int4,
+        user_id -> Int4,
+        role_id -> Int4,
+        created_by -> Int4,
+        created_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    users_users_role_requests (table_id, user_id) {
+        table_id -> Int4,
+        user_id -> Int4,
+        role_id -> Int4,
+        created_by -> Int4,
+        created_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    users_users_roles (table_id, user_id) {
+        table_id -> Int4,
+        user_id -> Int4,
+        role_id -> Int4,
+        created_by -> Int4,
+        created_at -> Timestamp,
+    }
+}
+
+diesel::joinable!(bio_ott_ranks -> colors (color_id));
+diesel::joinable!(bio_ott_ranks -> font_awesome_icons (icon_id));
 diesel::joinable!(bio_ott_taxon_items -> bio_ott_ranks (ott_rank_id));
 diesel::joinable!(bio_ott_taxon_items -> colors (color_id));
-diesel::joinable!(bio_ott_taxon_items -> font_awesome_icons (font_awesome_icon_id));
-diesel::joinable!(continuous_units -> units (id));
-diesel::joinable!(discrete_units -> units (id));
-diesel::joinable!(documents -> document_formats (format_id));
-diesel::joinable!(documents -> users (author_id));
-diesel::joinable!(item_category_relationships -> users (added_by));
-diesel::joinable!(item_category_units -> item_categories (item_category_id));
-diesel::joinable!(item_category_units -> units (unit_id));
-diesel::joinable!(item_locations -> items (item_id));
-diesel::joinable!(item_locations -> locations (location_id));
-diesel::joinable!(item_locations -> users (located_by));
-diesel::joinable!(item_units -> items (item_id));
-diesel::joinable!(item_units -> units (unit_id));
+diesel::joinable!(bio_ott_taxon_items -> font_awesome_icons (icon_id));
+diesel::joinable!(document_formats -> colors (color_id));
+diesel::joinable!(document_formats -> font_awesome_icons (icon_id));
 diesel::joinable!(login_providers -> colors (color_id));
-diesel::joinable!(login_providers -> font_awesome_icons (font_awesome_icon_id));
-diesel::joinable!(manufactured_item_categories -> organizations (manifacturer_id));
+diesel::joinable!(login_providers -> font_awesome_icons (icon_id));
 diesel::joinable!(notifications -> users (user_id));
 diesel::joinable!(organizations -> countries (country_id));
-diesel::joinable!(primary_user_emails -> user_emails (id));
-diesel::joinable!(project_requirements -> item_categories (item_category_id));
-diesel::joinable!(project_requirements -> projects (project_id));
-diesel::joinable!(project_requirements -> units (unit_id));
 diesel::joinable!(project_states -> colors (color_id));
-diesel::joinable!(project_states -> font_awesome_icons (font_awesome_icon_id));
+diesel::joinable!(project_states -> font_awesome_icons (icon_id));
+diesel::joinable!(projects -> colors (color_id));
+diesel::joinable!(projects -> font_awesome_icons (icon_id));
 diesel::joinable!(projects -> project_states (state_id));
+diesel::joinable!(projects_teams_role_invitations -> projects (table_id));
+diesel::joinable!(projects_teams_role_invitations -> roles (role_id));
+diesel::joinable!(projects_teams_role_invitations -> teams (team_id));
+diesel::joinable!(projects_teams_role_invitations -> users (created_by));
+diesel::joinable!(projects_teams_role_requests -> projects (table_id));
+diesel::joinable!(projects_teams_role_requests -> roles (role_id));
+diesel::joinable!(projects_teams_role_requests -> teams (team_id));
+diesel::joinable!(projects_teams_role_requests -> users (created_by));
+diesel::joinable!(projects_teams_roles -> projects (table_id));
+diesel::joinable!(projects_teams_roles -> roles (role_id));
+diesel::joinable!(projects_teams_roles -> teams (team_id));
+diesel::joinable!(projects_teams_roles -> users (created_by));
+diesel::joinable!(projects_users_role_invitations -> projects (table_id));
+diesel::joinable!(projects_users_role_invitations -> roles (role_id));
+diesel::joinable!(projects_users_role_requests -> projects (table_id));
+diesel::joinable!(projects_users_role_requests -> roles (role_id));
+diesel::joinable!(projects_users_roles -> projects (table_id));
+diesel::joinable!(projects_users_roles -> roles (role_id));
+diesel::joinable!(roles -> colors (color_id));
+diesel::joinable!(roles -> font_awesome_icons (icon_id));
 diesel::joinable!(sample_bio_ott_taxon_items -> bio_ott_taxon_items (taxon_id));
 diesel::joinable!(sample_bio_ott_taxon_items -> samples (sample_id));
 diesel::joinable!(sample_states -> colors (color_id));
-diesel::joinable!(sample_states -> font_awesome_icons (font_awesome_icon_id));
+diesel::joinable!(sample_states -> font_awesome_icons (icon_id));
 diesel::joinable!(sampled_individual_bio_ott_taxon_items -> bio_ott_taxon_items (taxon_id));
 diesel::joinable!(sampled_individual_bio_ott_taxon_items -> sampled_individuals (sampled_individual_id));
+diesel::joinable!(sampled_individuals_teams_role_invitations -> roles (role_id));
+diesel::joinable!(sampled_individuals_teams_role_invitations -> sampled_individuals (table_id));
+diesel::joinable!(sampled_individuals_teams_role_invitations -> teams (team_id));
+diesel::joinable!(sampled_individuals_teams_role_invitations -> users (created_by));
+diesel::joinable!(sampled_individuals_teams_role_requests -> roles (role_id));
+diesel::joinable!(sampled_individuals_teams_role_requests -> sampled_individuals (table_id));
+diesel::joinable!(sampled_individuals_teams_role_requests -> teams (team_id));
+diesel::joinable!(sampled_individuals_teams_role_requests -> users (created_by));
+diesel::joinable!(sampled_individuals_teams_roles -> roles (role_id));
+diesel::joinable!(sampled_individuals_teams_roles -> sampled_individuals (table_id));
+diesel::joinable!(sampled_individuals_teams_roles -> teams (team_id));
+diesel::joinable!(sampled_individuals_teams_roles -> users (created_by));
+diesel::joinable!(sampled_individuals_users_role_invitations -> roles (role_id));
+diesel::joinable!(sampled_individuals_users_role_invitations -> sampled_individuals (table_id));
+diesel::joinable!(sampled_individuals_users_role_requests -> roles (role_id));
+diesel::joinable!(sampled_individuals_users_role_requests -> sampled_individuals (table_id));
+diesel::joinable!(sampled_individuals_users_roles -> roles (role_id));
+diesel::joinable!(sampled_individuals_users_roles -> sampled_individuals (table_id));
 diesel::joinable!(samples -> sample_states (state));
-diesel::joinable!(samples -> sampling_procedures (procedure_id));
+diesel::joinable!(samples_teams_role_invitations -> roles (role_id));
+diesel::joinable!(samples_teams_role_invitations -> samples (table_id));
+diesel::joinable!(samples_teams_role_invitations -> teams (team_id));
+diesel::joinable!(samples_teams_role_invitations -> users (created_by));
+diesel::joinable!(samples_teams_role_requests -> roles (role_id));
+diesel::joinable!(samples_teams_role_requests -> samples (table_id));
+diesel::joinable!(samples_teams_role_requests -> teams (team_id));
+diesel::joinable!(samples_teams_role_requests -> users (created_by));
+diesel::joinable!(samples_teams_roles -> roles (role_id));
+diesel::joinable!(samples_teams_roles -> samples (table_id));
+diesel::joinable!(samples_teams_roles -> teams (team_id));
+diesel::joinable!(samples_teams_roles -> users (created_by));
+diesel::joinable!(samples_users_role_invitations -> roles (role_id));
+diesel::joinable!(samples_users_role_invitations -> samples (table_id));
+diesel::joinable!(samples_users_role_requests -> roles (role_id));
+diesel::joinable!(samples_users_role_requests -> samples (table_id));
+diesel::joinable!(samples_users_roles -> roles (role_id));
+diesel::joinable!(samples_users_roles -> samples (table_id));
 diesel::joinable!(spectra -> spectra_collections (spectra_collection_id));
 diesel::joinable!(spectra_collections -> samples (sample_id));
+diesel::joinable!(spectra_collections_teams_role_invitations -> roles (role_id));
+diesel::joinable!(spectra_collections_teams_role_invitations -> spectra_collections (table_id));
+diesel::joinable!(spectra_collections_teams_role_invitations -> teams (team_id));
+diesel::joinable!(spectra_collections_teams_role_invitations -> users (created_by));
+diesel::joinable!(spectra_collections_teams_role_requests -> roles (role_id));
+diesel::joinable!(spectra_collections_teams_role_requests -> spectra_collections (table_id));
+diesel::joinable!(spectra_collections_teams_role_requests -> teams (team_id));
+diesel::joinable!(spectra_collections_teams_role_requests -> users (created_by));
+diesel::joinable!(spectra_collections_teams_roles -> roles (role_id));
+diesel::joinable!(spectra_collections_teams_roles -> spectra_collections (table_id));
+diesel::joinable!(spectra_collections_teams_roles -> teams (team_id));
+diesel::joinable!(spectra_collections_teams_roles -> users (created_by));
+diesel::joinable!(spectra_collections_users_role_invitations -> roles (role_id));
+diesel::joinable!(spectra_collections_users_role_invitations -> spectra_collections (table_id));
+diesel::joinable!(spectra_collections_users_role_requests -> roles (role_id));
+diesel::joinable!(spectra_collections_users_role_requests -> spectra_collections (table_id));
+diesel::joinable!(spectra_collections_users_roles -> roles (role_id));
+diesel::joinable!(spectra_collections_users_roles -> spectra_collections (table_id));
 diesel::joinable!(team_states -> colors (color_id));
-diesel::joinable!(team_states -> font_awesome_icons (font_awesome_icon_id));
+diesel::joinable!(team_states -> font_awesome_icons (icon_id));
+diesel::joinable!(teams -> colors (color_id));
+diesel::joinable!(teams -> font_awesome_icons (icon_id));
+diesel::joinable!(teams_teams_role_invitations -> roles (role_id));
+diesel::joinable!(teams_teams_role_invitations -> users (created_by));
+diesel::joinable!(teams_users_role_invitations -> roles (role_id));
+diesel::joinable!(teams_users_role_invitations -> teams (table_id));
+diesel::joinable!(teams_users_role_requests -> roles (role_id));
+diesel::joinable!(teams_users_role_requests -> teams (table_id));
+diesel::joinable!(teams_users_roles -> roles (role_id));
+diesel::joinable!(teams_users_roles -> teams (table_id));
 diesel::joinable!(user_emails -> login_providers (login_provider_id));
-diesel::joinable!(user_emails -> users (user_id));
+diesel::joinable!(user_emails -> users (created_by));
+diesel::joinable!(users_users_role_invitations -> roles (role_id));
+diesel::joinable!(users_users_role_requests -> roles (role_id));
+diesel::joinable!(users_users_roles -> roles (role_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     bio_ott_ranks,
     bio_ott_taxon_items,
     colors,
-    container_horizontal_rules,
-    container_vertical_rules,
-    continuous_units,
     countries,
     derived_samples,
-    discrete_units,
     document_formats,
-    documents,
     font_awesome_icons,
-    item_categories,
-    item_category_relationships,
-    item_category_units,
-    item_locations,
-    item_units,
-    items,
-    locations,
     login_providers,
-    manufactured_item_categories,
     notifications,
     organizations,
-    primary_user_emails,
-    procedures,
-    project_requirements,
     project_states,
     projects,
+    projects_teams_role_invitations,
+    projects_teams_role_requests,
+    projects_teams_roles,
+    projects_users_role_invitations,
+    projects_users_role_requests,
+    projects_users_roles,
     roles,
     sample_bio_ott_taxon_items,
     sample_states,
     sampled_individual_bio_ott_taxon_items,
     sampled_individuals,
+    sampled_individuals_teams_role_invitations,
+    sampled_individuals_teams_role_requests,
+    sampled_individuals_teams_roles,
+    sampled_individuals_users_role_invitations,
+    sampled_individuals_users_role_requests,
+    sampled_individuals_users_roles,
     samples,
-    sampling_procedures,
+    samples_teams_role_invitations,
+    samples_teams_role_requests,
+    samples_teams_roles,
+    samples_users_role_invitations,
+    samples_users_role_requests,
+    samples_users_roles,
     spectra,
     spectra_collections,
+    spectra_collections_teams_role_invitations,
+    spectra_collections_teams_role_requests,
+    spectra_collections_teams_roles,
+    spectra_collections_users_role_invitations,
+    spectra_collections_users_role_requests,
+    spectra_collections_users_roles,
     team_states,
     teams,
+    teams_teams_role_invitations,
+    teams_users_role_invitations,
+    teams_users_role_requests,
+    teams_users_roles,
     units,
     user_emails,
     users,
+    users_users_role_invitations,
+    users_users_role_requests,
+    users_users_roles,
 );

@@ -22,10 +22,6 @@ impl RowToSearchableBadge for User {
         }
     }
 
-    fn matches(&self, query: &str) -> bool {
-        self.first_name == query
-    }
-
     fn similarity_score(&self, query: &str) -> isize {
         self.first_name.similarity_score(query)
     }
