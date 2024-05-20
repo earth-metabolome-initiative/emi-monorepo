@@ -1,6 +1,8 @@
 /// impl row to badge for project state
 /// add function components
-use crate::{components::database::row_to_searchable_badge::RowToSearchableBadge, traits::FormatMatch};
+use crate::{
+    components::database::row_to_searchable_badge::RowToSearchableBadge, traits::FormatMatch,
+};
 use web_common::database::NestedProject;
 use yew::prelude::*;
 
@@ -25,7 +27,7 @@ impl RowToSearchableBadge for NestedProject {
             </p>
         }
     }
-    
+
     fn similarity_score(&self, query: &str) -> isize {
         self.inner.name.similarity_score(query) + self.inner.description.similarity_score(query)
     }

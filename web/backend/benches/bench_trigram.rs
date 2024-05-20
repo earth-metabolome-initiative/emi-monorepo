@@ -206,14 +206,16 @@ fn postgres_similarity(c: &mut Criterion) {
     let pool: r2d2::Pool<ConnectionManager<PgConnection>> = r2d2::Pool::builder()
         // We set the maximum number of connections in the pool to 10
         .max_size(10)
-        .build(manager).unwrap();
+        .build(manager)
+        .unwrap();
 
     let mut connection = pool.get().unwrap();
 
     c.bench_function("postgres_similarity", |b| {
         b.iter(|| {
             let _ = BioOttTaxonItem::similarity_search("Acanthocephala", Some(10), &mut connection);
-            let _ = BioOttTaxonItem::similarity_search("Doggus Lionenus", Some(10), &mut connection);
+            let _ =
+                BioOttTaxonItem::similarity_search("Doggus Lionenus", Some(10), &mut connection);
             let _ = BioOttTaxonItem::similarity_search("Felis Caninus", Some(10), &mut connection);
         });
     });
@@ -228,15 +230,25 @@ fn postgres_word_similarity(c: &mut Criterion) {
     let pool: r2d2::Pool<ConnectionManager<PgConnection>> = r2d2::Pool::builder()
         // We set the maximum number of connections in the pool to 10
         .max_size(10)
-        .build(manager).unwrap();
+        .build(manager)
+        .unwrap();
 
     let mut connection = pool.get().unwrap();
 
     c.bench_function("postgres_word_similarity", |b| {
         b.iter(|| {
-            let _ = BioOttTaxonItem::word_similarity_search("Acanthocephala", Some(10), &mut connection);
-            let _ = BioOttTaxonItem::word_similarity_search("Doggus Lionenus", Some(10), &mut connection);
-            let _ = BioOttTaxonItem::word_similarity_search("Felis Caninus", Some(10), &mut connection);
+            let _ = BioOttTaxonItem::word_similarity_search(
+                "Acanthocephala",
+                Some(10),
+                &mut connection,
+            );
+            let _ = BioOttTaxonItem::word_similarity_search(
+                "Doggus Lionenus",
+                Some(10),
+                &mut connection,
+            );
+            let _ =
+                BioOttTaxonItem::word_similarity_search("Felis Caninus", Some(10), &mut connection);
         });
     });
 }
@@ -250,15 +262,28 @@ fn postgres_strict_word_similarity(c: &mut Criterion) {
     let pool: r2d2::Pool<ConnectionManager<PgConnection>> = r2d2::Pool::builder()
         // We set the maximum number of connections in the pool to 10
         .max_size(10)
-        .build(manager).unwrap();
+        .build(manager)
+        .unwrap();
 
     let mut connection = pool.get().unwrap();
 
     c.bench_function("postgres_strict_word_similarity", |b| {
         b.iter(|| {
-            let _ = BioOttTaxonItem::strict_word_similarity_search("Acanthocephala", Some(10), &mut connection);
-            let _ = BioOttTaxonItem::strict_word_similarity_search("Doggus Lionenus", Some(10), &mut connection);
-            let _ = BioOttTaxonItem::strict_word_similarity_search("Felis Caninus", Some(10), &mut connection);
+            let _ = BioOttTaxonItem::strict_word_similarity_search(
+                "Acanthocephala",
+                Some(10),
+                &mut connection,
+            );
+            let _ = BioOttTaxonItem::strict_word_similarity_search(
+                "Doggus Lionenus",
+                Some(10),
+                &mut connection,
+            );
+            let _ = BioOttTaxonItem::strict_word_similarity_search(
+                "Felis Caninus",
+                Some(10),
+                &mut connection,
+            );
         });
     });
 }

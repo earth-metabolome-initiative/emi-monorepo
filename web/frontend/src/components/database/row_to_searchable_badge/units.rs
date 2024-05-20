@@ -28,12 +28,14 @@ impl RowToSearchableBadge for Unit {
         }
     }
     fn similarity_score(&self, query: &str) -> isize {
-        self.name.similarity_score(query) + self.description.similarity_score(query) + self.symbol.similarity_score(query)
+        self.name.similarity_score(query)
+            + self.description.similarity_score(query)
+            + self.symbol.similarity_score(query)
     }
-fn primary_color_class(&self) -> &str {
+    fn primary_color_class(&self) -> &str {
         "grey"
     }
-fn description(&self) -> &str {
+    fn description(&self) -> &str {
         &self.description
     }
 }

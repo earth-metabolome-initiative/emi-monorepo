@@ -12,8 +12,8 @@ use crate::transactions::renormalize_user_emails::Emails;
 use diesel::connection::SimpleConnection; // Required for batch_execute
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
-use std::io::Cursor;
 use identicon_rs::Identicon;
+use std::io::Cursor;
 use web_common::database::{NewUser, NewUserEmail};
 
 /// Return a newly created user.
@@ -35,7 +35,6 @@ pub(crate) fn create_user(
     let chained_emails = user_emails.emails().join(", ");
     let identicon = Identicon::new(&chained_emails);
     let dynamic_image = identicon.generate_image().unwrap();
-
 
     // Write the image data into the buffer as PNG format
     let mut png_buffer = Cursor::new(Vec::new());

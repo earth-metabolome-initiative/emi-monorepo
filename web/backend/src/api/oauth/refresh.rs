@@ -62,9 +62,7 @@ pub async fn refresh_access_token(
 
     // If the token is expired, we return an error.
     if refresh_token.is_expired() {
-        return Err(
-            eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::Unauthorized)
-        );
+        return Err(eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::Unauthorized));
     }
 
     // Next up, we check whether the token is still present in the redis database.
@@ -72,9 +70,7 @@ pub async fn refresh_access_token(
 
     if is_still_present.map_or(true, |present| !present) {
         log::debug!("Refresh token not present in redis");
-        return Err(
-            eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::Unauthorized)
-        );
+        return Err(eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::Unauthorized));
     }
 
     // Finally, we get the user from the database, as while the user indeed seems
@@ -92,7 +88,9 @@ pub async fn refresh_access_token(
     let user = match User::get(refresh_token.user_id(), &mut connection) {
         Ok(user) => user,
         Err(_) => {
-            return Err(eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::Unauthorized));
+            return Err(
+                eliminate_cookies(HttpResponse::Unauthorized()).json(ApiError::Unauthorized)
+            );
         }
     };
 

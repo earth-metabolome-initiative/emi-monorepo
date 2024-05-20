@@ -29,7 +29,7 @@ impl From<Vec<u8>> for Image {
 impl From<&[u8]> for Image {
     fn from(data: &[u8]) -> Self {
         Self {
-            data: data.to_vec()
+            data: data.to_vec(),
         }
     }
 }

@@ -30,6 +30,43 @@ INPUT_TYPE_MAP = {
 }
 
 
+def is_error_vector(attribute: AttributeMetadata) -> bool:
+    """Checks whether the attribute is an error vector.
+
+    Parameters
+    ----------
+    attribute : AttributeMetadata
+        The attribute to check.
+
+    Returns
+    -------
+    bool
+        True if the attribute is an error vector, False otherwise.
+    """
+    assert isinstance(attribute, AttributeMetadata)
+    return (
+        attribute.name.startswith("errors_")
+        and attribute.data_type() == "Vec<ApiError>"
+    )
+
+
+def is_builder_reserved_attribute(attribute: AttributeMetadata) -> bool:
+    """Checks whether the attribute is a reserved attribute of the builder struct.
+
+    Parameters
+    ----------
+    attribute : AttributeMetadata
+        The attribute to check.
+
+    Returns
+    -------
+    bool
+        True if the attribute is a reserved attribute of the builder struct, False otherwise.
+    """
+    assert isinstance(attribute, AttributeMetadata)
+    return is_error_vector(attribute) or attribute.name in ("form_updated_at",)
+
+
 def write_frontend_builder_default_implementation(
     builder: StructMetadata,
     document: "io.TextIO",
@@ -67,13 +104,6 @@ def write_frontend_builder_default_implementation(
         # If this is an error vector, we set it to
         # an empty vector.
 
-        if (
-            attribute.name.startswith("errors_")
-            and attribute.data_type() == "Vec<ApiError>"
-        ):
-            document.write(f"            {attribute.name}: Vec::new(),\n")
-            continue
-
         # If this is the primary key, we set it to None.
         if attribute in primary_keys:
             document.write(f"            {attribute.name}: None,\n")
@@ -82,13 +112,8 @@ def write_frontend_builder_default_implementation(
         # If the current attribute does not exist in the flat struct,
         # we set it to None.
         if flat_variant.get_attribute_by_name(attribute.name) is None:
-            if attribute.optional:
-                document.write(f"            {attribute.name}: None,\n")
-            else:
-                # Otherwise, we set it to the default value of the data type.
-                document.write(
-                    f"            {attribute.name}: <{attribute.data_type()}>::default(),\n"
-                )
+            # Otherwise, we set it to the default value of the data type.
+            document.write(f"            {attribute.name}: Default::default(),\n")
             continue
 
         default_value = builder.table_metadata.get_default_column_value(
@@ -143,20 +168,14 @@ def write_frontend_builder_action_enumeration(
     derives = ", ".join(
         [derive for derive in builder.derives() if derive not in ("Store", "Default")]
     )
-    document.write(f"#[derive({derives})]\n" f"pub(super) enum {action_enum_name} {{\n")
+    document.write(f"#[derive({derives})]\npub(super) enum {action_enum_name} {{\n")
 
     for attribute in builder.attributes:
         if attribute in primary_keys:
             continue
 
         # We do not want to include the errors attribute in the builder actions.
-        if (
-            attribute.name.startswith("errors_")
-            and attribute.data_type() == "Vec<ApiError>"
-        ):
-            continue
-
-        if attribute.name == "form_updated_at":
+        if is_builder_reserved_attribute(attribute):
             continue
 
         if (
@@ -237,13 +256,7 @@ def write_frontend_builder_action_enumeration(
             continue
 
         # We do not want to include the errors attribute in the builder actions.
-        if (
-            attribute.name.startswith("errors_")
-            and attribute.data_type() == "Vec<ApiError>"
-        ):
-            continue
-
-        if attribute.name == "form_updated_at":
+        if is_builder_reserved_attribute(attribute):
             continue
 
         struct_attribute = richest_variant.get_attribute_by_name(attribute.name)
@@ -444,10 +457,7 @@ def write_frontend_form_builder_implementation(
     )
 
     error_vectors = [
-        attribute
-        for attribute in builder.attributes
-        if attribute.name.startswith("errors_")
-        and attribute.data_type() == "Vec<ApiError>"
+        attribute for attribute in builder.attributes if is_error_vector(attribute)
     ]
 
     assert (
@@ -484,15 +494,7 @@ def write_frontend_form_builder_implementation(
     named_option_requests: List[str] = []
 
     for attribute in builder.attributes:
-        if (
-            attribute.name.startswith("errors_")
-            and attribute.data_type() == "Vec<ApiError>"
-        ):
-            continue
-
-        if attribute.name == "form_updated_at":
-            # TODO: maybe use the updated_at column to set this value?
-            # There is the issue of the timezone to pick though.
+        if is_builder_reserved_attribute(attribute):
             continue
 
         if attribute in primary_keys:
@@ -608,18 +610,13 @@ def write_frontend_form_builder_implementation(
     # We implement the can submit method, which checks whether the form
     # contains errors as specified by the has_errors method, plus checks
     # that all non-optional fields are populated.
-    document.write(
-        "    fn can_submit(&self) -> bool {\n        !self.has_errors()\n"
-    )
+    document.write("    fn can_submit(&self) -> bool {\n        !self.has_errors()\n")
 
     for attribute in builder.attributes:
-        if attribute.name.startswith("errors_"):
+        if is_builder_reserved_attribute(attribute):
             continue
 
         if attribute in primary_keys:
-            continue
-
-        if attribute.name == "form_updated_at":
             continue
 
         struct_attribute = flat_variant.get_attribute_by_name(attribute.name)
@@ -1394,16 +1391,10 @@ def write_frontend_yew_form(
 
         for attribute in builder.attributes:
             # We do not want to include the errors attribute in the builder actions.
-            if (
-                attribute.name.startswith("errors_")
-                and attribute.data_type() == "Vec<ApiError>"
-            ):
+            if is_builder_reserved_attribute(attribute):
                 continue
 
             if attribute in primary_keys:
-                continue
-
-            if attribute.name == "form_updated_at":
                 continue
 
             if attribute.data_type() == "bool":
@@ -1444,16 +1435,10 @@ def write_frontend_yew_form(
 
         for attribute in builder.attributes:
 
-            if (
-                attribute.name.startswith("errors_")
-                and attribute.data_type() == "Vec<ApiError>"
-            ):
+            if is_builder_reserved_attribute(attribute):
                 continue
 
             if attribute in primary_keys:
-                continue
-
-            if attribute.name == "form_updated_at":
                 continue
 
             error_attribute = builder.get_attribute_by_name(f"errors_{attribute.name}")

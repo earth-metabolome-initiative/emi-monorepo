@@ -221,7 +221,10 @@ where
                     //     }
                     // }
 
-                    log::debug!("Updating the form with the received data, {:?}", richest_variant);
+                    log::debug!(
+                        "Updating the form with the received data, {:?}",
+                        richest_variant
+                    );
 
                     <<Data as FormBuildable>::Builder as FormBuilder>::update(
                         &ctx.props().builder_dispatch,

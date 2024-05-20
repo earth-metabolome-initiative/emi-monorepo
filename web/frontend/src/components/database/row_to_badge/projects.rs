@@ -1,5 +1,8 @@
 use super::RowToBadge;
-use crate::{components::{database::row_to_searchable_badge::RowToSearchableBadge, PageLike}, router::AppRoute};
+use crate::{
+    components::{database::row_to_searchable_badge::RowToSearchableBadge, PageLike},
+    router::AppRoute,
+};
 use web_common::database::NestedProject;
 use yew_router::prelude::*;
 

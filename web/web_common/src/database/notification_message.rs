@@ -16,7 +16,7 @@ pub struct NotificationMessage {
 impl NotificationMessage {
     /// Create a new notification message.
     pub fn new(notification: Notification, row: Vec<u8>) -> Self {
-        Self { 
+        Self {
             id: notification.id,
             operation: notification.operation,
             table_name: notification.table_name,

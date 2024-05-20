@@ -29,7 +29,9 @@ impl GitHubConfig {
     ///
     /// A `Result` containing the `GitHubConfig` if the environment variables are set, or an error
     /// message if they are not.
-    pub fn from_env(pool: &Pool<ConnectionManager<PgConnection>>) -> Result<GitHubConfig, ApiError> {
+    pub fn from_env(
+        pool: &Pool<ConnectionManager<PgConnection>>,
+    ) -> Result<GitHubConfig, ApiError> {
         dotenvy::dotenv().ok();
         let client_secret = env::var("GITHUB_CLIENT_SECRET");
 
@@ -99,11 +101,9 @@ async fn github_oauth_handler(
 
     let github_config = GitHubConfig::from_env(&pool).unwrap();
 
-    let user_query = renormalize_user_emails(
-        github_config.provider_id,
-        emails_response.unwrap(),
-        &pool,
-    ).map_err(ApiError::from);
+    let user_query =
+        renormalize_user_emails(github_config.provider_id, emails_response.unwrap(), &pool)
+            .map_err(ApiError::from);
 
     if let Err(e) = user_query {
         return HttpResponse::InternalServerError().json(e);

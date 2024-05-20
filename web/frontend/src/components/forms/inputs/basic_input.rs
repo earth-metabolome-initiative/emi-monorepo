@@ -69,7 +69,7 @@ pub struct InputProp<Data: Inputtable> {
 
 impl<Data: Inputtable> InputProp<Data> {
     pub fn label(&self) -> String {
-        self.label.clone() 
+        self.label.clone()
     }
 
     pub fn normalized_label(&self) -> String {

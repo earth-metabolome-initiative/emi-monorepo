@@ -3,7 +3,6 @@ use uuid::Uuid;
 
 use super::selects::Select;
 
-
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, Copy)]
 pub enum PrimaryKey {
     Uuid(Uuid),
@@ -148,8 +147,6 @@ pub enum Operation {
 }
 
 impl Operation {
-   
-
     /// Returns whether the current operation is an insert.
     pub fn is_insert(&self) -> bool {
         match self {

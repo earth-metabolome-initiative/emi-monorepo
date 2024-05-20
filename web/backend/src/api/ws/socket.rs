@@ -238,7 +238,10 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                 }
                             }
                             web_common::database::Operation::Select(select) => match select {
-                                web_common::database::Select::CanView { table_name, primary_key } => {
+                                web_common::database::Select::CanView {
+                                    table_name,
+                                    primary_key,
+                                } => {
                                     let table: web_common::database::Table =
                                         match table_name.as_str().try_into() {
                                             Ok(table) => table,
@@ -267,7 +270,10 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                         }
                                     }
                                 }
-                                web_common::database::Select::CanUpdate { table_name, primary_key } => {
+                                web_common::database::Select::CanUpdate {
+                                    table_name,
+                                    primary_key,
+                                } => {
                                     let table: web_common::database::Table =
                                         match table_name.as_str().try_into() {
                                             Ok(table) => table,
@@ -296,7 +302,10 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                         }
                                     }
                                 }
-                                web_common::database::Select::CanDelete { table_name, primary_key } => {
+                                web_common::database::Select::CanDelete {
+                                    table_name,
+                                    primary_key,
+                                } => {
                                     let table: web_common::database::Table =
                                         match table_name.as_str().try_into() {
                                             Ok(table) => table,
@@ -357,7 +366,11 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                         }
                                     }
                                 }
-                                web_common::database::Select::SearchEditableTable { table_name, query, number_of_results } => {
+                                web_common::database::Select::SearchEditableTable {
+                                    table_name,
+                                    query,
+                                    number_of_results,
+                                } => {
                                     let table: web_common::database::Table =
                                         match table_name.as_str().try_into() {
                                             Ok(table) => table,
@@ -408,8 +421,11 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                         &mut self.diesel_connection,
                                     ) {
                                         Ok(record) => {
-                                            ctx.address()
-                                                .do_send(BackendMessage::GetTable(task_id, operation_name, record));
+                                            ctx.address().do_send(BackendMessage::GetTable(
+                                                task_id,
+                                                operation_name,
+                                                record,
+                                            ));
                                         }
                                         Err(err) => {
                                             ctx.address()
@@ -465,7 +481,12 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                         .unwrap(),
                                     ));
                                 }
-                                web_common::database::Select::AllByUpdatedAt { table_name, filter, limit, offset } => {
+                                web_common::database::Select::AllByUpdatedAt {
+                                    table_name,
+                                    filter,
+                                    limit,
+                                    offset,
+                                } => {
                                     let table: web_common::database::Table =
                                         match table_name.as_str().try_into() {
                                             Ok(table) => table,

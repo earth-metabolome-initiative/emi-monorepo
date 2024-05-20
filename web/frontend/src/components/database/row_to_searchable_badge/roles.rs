@@ -34,7 +34,7 @@ impl RowToSearchableBadge for NestedRole {
     fn primary_color_class(&self) -> &str {
         &self.color.name
     }
-    
+
     fn description(&self) -> &str {
         &self.inner.description
     }

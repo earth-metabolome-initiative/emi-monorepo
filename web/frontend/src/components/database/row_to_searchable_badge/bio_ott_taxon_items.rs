@@ -1,6 +1,8 @@
 /// impl row to badge for associated taxa
 /// add function components
-use crate::{components::database::row_to_searchable_badge::RowToSearchableBadge, traits::FormatMatch};
+use crate::{
+    components::database::row_to_searchable_badge::RowToSearchableBadge, traits::FormatMatch,
+};
 use web_common::database::NestedBioOttTaxonItem;
 use yew::prelude::*;
 

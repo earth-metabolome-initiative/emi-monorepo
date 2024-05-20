@@ -35,9 +35,7 @@ impl UserState {
     }
 
     pub fn has_incomplete_profile(&self) -> bool {
-        self.user
-            .as_ref()
-            .map_or(false, |user| false)
+        self.user.as_ref().map_or(false, |user| false)
     }
 }
 

@@ -38,7 +38,7 @@ pub struct WebsocketWorker {
 /// Messages from the frontend to the web-worker.
 pub enum ComponentMessage {
     Operation(Operation),
-    UserState(Option<User>)
+    UserState(Option<User>),
 }
 
 impl ComponentMessage {
@@ -59,7 +59,7 @@ impl ComponentMessage {
     pub(crate) fn all_by_updated_at<R: Tabular + Filtrable>(
         filter: Option<R::Filter>,
         limit: i64,
-        offset: i64
+        offset: i64,
     ) -> Self {
         Self::Operation(Operation::Select(Select::all_by_updated_at(
             R::TABLE,
@@ -186,7 +186,10 @@ impl WebsocketWorker {
                             } => {
                                 let table: Table = table_name.try_into().unwrap();
 
-                                match table.all(filter, Some(limit), Some(offset), &mut database).await {
+                                match table
+                                    .all(filter, Some(limit), Some(offset), &mut database)
+                                    .await
+                                {
                                     Ok(rows) => BackendMessage::AllTable(task_id, rows),
                                     Err(err) => BackendMessage::Error(task_id, err),
                                 }
@@ -200,7 +203,12 @@ impl WebsocketWorker {
                                 let table: Table = table_name.try_into().unwrap();
 
                                 match table
-                                    .all_by_updated_at(filter, Some(limit), Some(offset), &mut database)
+                                    .all_by_updated_at(
+                                        filter,
+                                        Some(limit),
+                                        Some(offset),
+                                        &mut database,
+                                    )
                                     .await
                                 {
                                     Ok(rows) => BackendMessage::AllTable(task_id, rows),
@@ -540,7 +548,6 @@ impl Worker for WebsocketWorker {
         frontend_message: Self::Input,
         subscriber_id: HandlerId,
     ) {
-
         scope.send_message(InternalMessage::Frontend(subscriber_id, frontend_message));
     }
 }

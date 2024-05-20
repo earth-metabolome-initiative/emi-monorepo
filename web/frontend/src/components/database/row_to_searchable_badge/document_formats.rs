@@ -29,7 +29,9 @@ impl RowToSearchableBadge for NestedDocumentFormat {
         }
     }
     fn similarity_score(&self, query: &str) -> isize {
-        self.inner.extension.similarity_score(query) + self.inner.mime_type.similarity_score(query) + self.inner.description.similarity_score(query)
+        self.inner.extension.similarity_score(query)
+            + self.inner.mime_type.similarity_score(query)
+            + self.inner.description.similarity_score(query)
     }
     fn primary_color_class(&self) -> &str {
         &self.color.name

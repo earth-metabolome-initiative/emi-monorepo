@@ -29,10 +29,10 @@ impl RowToSearchableBadge for NestedTeam {
     fn similarity_score(&self, query: &str) -> isize {
         self.inner.name.similarity_score(query) + self.inner.description.similarity_score(query)
     }
-fn primary_color_class(&self) -> &str {
+    fn primary_color_class(&self) -> &str {
         &self.color.name
     }
-fn description(&self) -> &str {
+    fn description(&self) -> &str {
         &self.inner.description
     }
 }

@@ -25,18 +25,18 @@
 //! transaction is rolled back, and the error is returned. If the closure returns Ok, the transaction is committed, and
 //! the Ok value is returned.
 use crate::models::*;
-use crate::transactions::create_user::create_user;
 use crate::new_variants::InsertRow;
-use web_common::api::ApiError;
+use crate::transactions::create_user::create_user;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
 use diesel::sql_query;
 use diesel::sql_types::Text;
 use email_address::EmailAddress;
+use web_common::api::ApiError;
 use web_common::database::NewUserEmail;
 
 pub(crate) struct Emails {
-    emails: Vec<String>
+    emails: Vec<String>,
 }
 
 impl Emails {

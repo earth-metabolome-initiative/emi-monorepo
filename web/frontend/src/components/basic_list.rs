@@ -20,7 +20,6 @@ pub struct BasicListProps<Page: Filtrable> {
     pub filters: Option<Page::Filter>,
 }
 
-
 pub struct BasicList<Page> {
     websocket: WorkerBridgeHandle<WebsocketWorker>,
     pages: Vec<Page>,

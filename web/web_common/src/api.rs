@@ -144,9 +144,12 @@ impl From<diesel::result::Error> for ApiError {
     fn from(e: diesel::result::Error) -> Self {
         log::error!("Database error: {:?}", e);
         match e {
-            diesel::result::Error::DatabaseError(diesel::result::DatabaseErrorKind::UniqueViolation, _) => {
-                Self::BadRequest(vec!["You are attempting to insert a duplicated entry".to_string()])
-            },
+            diesel::result::Error::DatabaseError(
+                diesel::result::DatabaseErrorKind::UniqueViolation,
+                _,
+            ) => Self::BadRequest(vec![
+                "You are attempting to insert a duplicated entry".to_string()
+            ]),
             diesel::result::Error::NotFound => Self::BadRequest(vec!["Not found".to_string()]),
             _ => Self::InternalServerError,
         }

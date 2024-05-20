@@ -13,6 +13,6 @@ pub fn configure(conf: &mut web::ServiceConfig) {
             .service(health_checker_handler)
             .configure(auth::configure)
             .configure(ws::configure)
-            .configure(oauth::configure)
+            .configure(oauth::configure),
     );
 }

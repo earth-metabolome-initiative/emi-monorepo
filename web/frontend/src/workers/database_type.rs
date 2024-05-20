@@ -1,7 +1,7 @@
 //! Submodule handling the database type.
-//! 
+//!
 //! # Implementative details
-//! The reason for this file being separated is that Rust Analyzer fails to 
+//! The reason for this file being separated is that Rust Analyzer fails to
 //! understand that the target architecture of this crate is WebAssembly,
 //! and as such it also fails to load IdbStorage.
 //! The crate is still compiled correctly, but the IDE is unable to provide

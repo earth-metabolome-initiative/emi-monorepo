@@ -35,7 +35,7 @@ impl RowToSearchableBadge for Color {
     fn primary_color_class(&self) -> &str {
         &self.name
     }
-    
+
     fn description(&self) -> &str {
         &self.description
     }

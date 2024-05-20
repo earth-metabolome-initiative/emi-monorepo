@@ -31,11 +31,11 @@ pub struct DerivedSampleBuilder {
 impl Default for DerivedSampleBuilder {
     fn default() -> Self {
         Self {
-            parent_sample: None,
-            child_sample: None,
-            errors_parent_sample: Vec::new(),
-            errors_child_sample: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            parent_sample: Default::default(),
+            child_sample: Default::default(),
+            errors_parent_sample: Default::default(),
+            errors_child_sample: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -211,22 +211,22 @@ impl Default for ProjectBuilder {
             expenses: None,
             expected_end_date: None,
             end_date: None,
-            state: None,
-            icon: None,
-            color: None,
-            parent_project: None,
-            errors_name: Vec::new(),
-            errors_description: Vec::new(),
-            errors_public: Vec::new(),
-            errors_budget: Vec::new(),
-            errors_expenses: Vec::new(),
-            errors_expected_end_date: Vec::new(),
-            errors_end_date: Vec::new(),
-            errors_state: Vec::new(),
-            errors_icon: Vec::new(),
-            errors_color: Vec::new(),
-            errors_parent_project: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            state: Default::default(),
+            icon: Default::default(),
+            color: Default::default(),
+            parent_project: Default::default(),
+            errors_name: Default::default(),
+            errors_description: Default::default(),
+            errors_public: Default::default(),
+            errors_budget: Default::default(),
+            errors_expenses: Default::default(),
+            errors_expected_end_date: Default::default(),
+            errors_end_date: Default::default(),
+            errors_state: Default::default(),
+            errors_icon: Default::default(),
+            errors_color: Default::default(),
+            errors_parent_project: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -700,13 +700,13 @@ pub struct ProjectsTeamsRoleInvitationBuilder {
 impl Default for ProjectsTeamsRoleInvitationBuilder {
     fn default() -> Self {
         Self {
-            table: None,
-            team: None,
-            role: None,
-            errors_table: Vec::new(),
-            errors_team: Vec::new(),
-            errors_role: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            table: Default::default(),
+            team: Default::default(),
+            role: Default::default(),
+            errors_table: Default::default(),
+            errors_team: Default::default(),
+            errors_role: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -881,13 +881,13 @@ pub struct ProjectsTeamsRoleRequestBuilder {
 impl Default for ProjectsTeamsRoleRequestBuilder {
     fn default() -> Self {
         Self {
-            table: None,
-            team: None,
-            role: None,
-            errors_table: Vec::new(),
-            errors_team: Vec::new(),
-            errors_role: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            table: Default::default(),
+            team: Default::default(),
+            role: Default::default(),
+            errors_table: Default::default(),
+            errors_team: Default::default(),
+            errors_role: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -1062,13 +1062,13 @@ pub struct ProjectsTeamsRoleBuilder {
 impl Default for ProjectsTeamsRoleBuilder {
     fn default() -> Self {
         Self {
-            table: None,
-            team: None,
-            role: None,
-            errors_table: Vec::new(),
-            errors_team: Vec::new(),
-            errors_role: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            table: Default::default(),
+            team: Default::default(),
+            role: Default::default(),
+            errors_table: Default::default(),
+            errors_team: Default::default(),
+            errors_role: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -1243,13 +1243,13 @@ pub struct ProjectsUsersRoleInvitationBuilder {
 impl Default for ProjectsUsersRoleInvitationBuilder {
     fn default() -> Self {
         Self {
-            table: None,
-            user: None,
-            role: None,
-            errors_table: Vec::new(),
-            errors_user: Vec::new(),
-            errors_role: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            table: Default::default(),
+            user: Default::default(),
+            role: Default::default(),
+            errors_table: Default::default(),
+            errors_user: Default::default(),
+            errors_role: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -1424,13 +1424,13 @@ pub struct ProjectsUsersRoleRequestBuilder {
 impl Default for ProjectsUsersRoleRequestBuilder {
     fn default() -> Self {
         Self {
-            table: None,
-            user: None,
-            role: None,
-            errors_table: Vec::new(),
-            errors_user: Vec::new(),
-            errors_role: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            table: Default::default(),
+            user: Default::default(),
+            role: Default::default(),
+            errors_table: Default::default(),
+            errors_user: Default::default(),
+            errors_role: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -1605,13 +1605,13 @@ pub struct ProjectsUsersRoleBuilder {
 impl Default for ProjectsUsersRoleBuilder {
     fn default() -> Self {
         Self {
-            table: None,
-            user: None,
-            role: None,
-            errors_table: Vec::new(),
-            errors_user: Vec::new(),
-            errors_role: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            table: Default::default(),
+            user: Default::default(),
+            role: Default::default(),
+            errors_table: Default::default(),
+            errors_user: Default::default(),
+            errors_role: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -1784,11 +1784,11 @@ pub struct SampleBioOttTaxonItemBuilder {
 impl Default for SampleBioOttTaxonItemBuilder {
     fn default() -> Self {
         Self {
-            sample: None,
-            taxon: None,
-            errors_sample: Vec::new(),
-            errors_taxon: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            sample: Default::default(),
+            taxon: Default::default(),
+            errors_sample: Default::default(),
+            errors_taxon: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -1936,11 +1936,11 @@ pub struct SampledIndividualBioOttTaxonItemBuilder {
 impl Default for SampledIndividualBioOttTaxonItemBuilder {
     fn default() -> Self {
         Self {
-            sampled_individual: None,
-            taxon: None,
-            errors_sampled_individual: Vec::new(),
-            errors_taxon: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            sampled_individual: Default::default(),
+            taxon: Default::default(),
+            errors_sampled_individual: Default::default(),
+            errors_taxon: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -2089,8 +2089,8 @@ impl Default for SampledIndividualBuilder {
         Self {
             id: None,
             tagged: Some(false),
-            errors_tagged: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            errors_tagged: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -2222,13 +2222,13 @@ pub struct SampledIndividualsTeamsRoleInvitationBuilder {
 impl Default for SampledIndividualsTeamsRoleInvitationBuilder {
     fn default() -> Self {
         Self {
-            table: None,
-            team: None,
-            role: None,
-            errors_table: Vec::new(),
-            errors_team: Vec::new(),
-            errors_role: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            table: Default::default(),
+            team: Default::default(),
+            role: Default::default(),
+            errors_table: Default::default(),
+            errors_team: Default::default(),
+            errors_role: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -2404,13 +2404,13 @@ pub struct SampledIndividualsTeamsRoleRequestBuilder {
 impl Default for SampledIndividualsTeamsRoleRequestBuilder {
     fn default() -> Self {
         Self {
-            table: None,
-            team: None,
-            role: None,
-            errors_table: Vec::new(),
-            errors_team: Vec::new(),
-            errors_role: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            table: Default::default(),
+            team: Default::default(),
+            role: Default::default(),
+            errors_table: Default::default(),
+            errors_team: Default::default(),
+            errors_role: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -2586,13 +2586,13 @@ pub struct SampledIndividualsTeamsRoleBuilder {
 impl Default for SampledIndividualsTeamsRoleBuilder {
     fn default() -> Self {
         Self {
-            table: None,
-            team: None,
-            role: None,
-            errors_table: Vec::new(),
-            errors_team: Vec::new(),
-            errors_role: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            table: Default::default(),
+            team: Default::default(),
+            role: Default::default(),
+            errors_table: Default::default(),
+            errors_team: Default::default(),
+            errors_role: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -2768,13 +2768,13 @@ pub struct SampledIndividualsUsersRoleInvitationBuilder {
 impl Default for SampledIndividualsUsersRoleInvitationBuilder {
     fn default() -> Self {
         Self {
-            table: None,
-            user: None,
-            role: None,
-            errors_table: Vec::new(),
-            errors_user: Vec::new(),
-            errors_role: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            table: Default::default(),
+            user: Default::default(),
+            role: Default::default(),
+            errors_table: Default::default(),
+            errors_user: Default::default(),
+            errors_role: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -2950,13 +2950,13 @@ pub struct SampledIndividualsUsersRoleRequestBuilder {
 impl Default for SampledIndividualsUsersRoleRequestBuilder {
     fn default() -> Self {
         Self {
-            table: None,
-            user: None,
-            role: None,
-            errors_table: Vec::new(),
-            errors_user: Vec::new(),
-            errors_role: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            table: Default::default(),
+            user: Default::default(),
+            role: Default::default(),
+            errors_table: Default::default(),
+            errors_user: Default::default(),
+            errors_role: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -3132,13 +3132,13 @@ pub struct SampledIndividualsUsersRoleBuilder {
 impl Default for SampledIndividualsUsersRoleBuilder {
     fn default() -> Self {
         Self {
-            table: None,
-            user: None,
-            role: None,
-            errors_table: Vec::new(),
-            errors_user: Vec::new(),
-            errors_role: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            table: Default::default(),
+            user: Default::default(),
+            role: Default::default(),
+            errors_table: Default::default(),
+            errors_user: Default::default(),
+            errors_role: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -3316,9 +3316,9 @@ impl Default for SampleBuilder {
             id: None,
             sampled_by: None,
             state: None,
-            errors_sampled_by: Vec::new(),
-            errors_state: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            errors_sampled_by: Default::default(),
+            errors_state: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -3493,13 +3493,13 @@ pub struct SamplesTeamsRoleInvitationBuilder {
 impl Default for SamplesTeamsRoleInvitationBuilder {
     fn default() -> Self {
         Self {
-            table: None,
-            team: None,
-            role: None,
-            errors_table: Vec::new(),
-            errors_team: Vec::new(),
-            errors_role: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            table: Default::default(),
+            team: Default::default(),
+            role: Default::default(),
+            errors_table: Default::default(),
+            errors_team: Default::default(),
+            errors_role: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -3675,13 +3675,13 @@ pub struct SamplesTeamsRoleRequestBuilder {
 impl Default for SamplesTeamsRoleRequestBuilder {
     fn default() -> Self {
         Self {
-            table: None,
-            team: None,
-            role: None,
-            errors_table: Vec::new(),
-            errors_team: Vec::new(),
-            errors_role: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            table: Default::default(),
+            team: Default::default(),
+            role: Default::default(),
+            errors_table: Default::default(),
+            errors_team: Default::default(),
+            errors_role: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -3857,13 +3857,13 @@ pub struct SamplesTeamsRoleBuilder {
 impl Default for SamplesTeamsRoleBuilder {
     fn default() -> Self {
         Self {
-            table: None,
-            team: None,
-            role: None,
-            errors_table: Vec::new(),
-            errors_team: Vec::new(),
-            errors_role: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            table: Default::default(),
+            team: Default::default(),
+            role: Default::default(),
+            errors_table: Default::default(),
+            errors_team: Default::default(),
+            errors_role: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -4039,13 +4039,13 @@ pub struct SamplesUsersRoleInvitationBuilder {
 impl Default for SamplesUsersRoleInvitationBuilder {
     fn default() -> Self {
         Self {
-            table: None,
-            user: None,
-            role: None,
-            errors_table: Vec::new(),
-            errors_user: Vec::new(),
-            errors_role: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            table: Default::default(),
+            user: Default::default(),
+            role: Default::default(),
+            errors_table: Default::default(),
+            errors_user: Default::default(),
+            errors_role: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -4221,13 +4221,13 @@ pub struct SamplesUsersRoleRequestBuilder {
 impl Default for SamplesUsersRoleRequestBuilder {
     fn default() -> Self {
         Self {
-            table: None,
-            user: None,
-            role: None,
-            errors_table: Vec::new(),
-            errors_user: Vec::new(),
-            errors_role: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            table: Default::default(),
+            user: Default::default(),
+            role: Default::default(),
+            errors_table: Default::default(),
+            errors_user: Default::default(),
+            errors_role: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -4403,13 +4403,13 @@ pub struct SamplesUsersRoleBuilder {
 impl Default for SamplesUsersRoleBuilder {
     fn default() -> Self {
         Self {
-            table: None,
-            user: None,
-            role: None,
-            errors_table: Vec::new(),
-            errors_user: Vec::new(),
-            errors_role: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            table: Default::default(),
+            user: Default::default(),
+            role: Default::default(),
+            errors_table: Default::default(),
+            errors_user: Default::default(),
+            errors_role: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -4583,9 +4583,9 @@ impl Default for SpectraCollectionBuilder {
     fn default() -> Self {
         Self {
             id: None,
-            sample: None,
-            errors_sample: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            sample: Default::default(),
+            errors_sample: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -4756,13 +4756,13 @@ pub struct SpectraCollectionsTeamsRoleInvitationBuilder {
 impl Default for SpectraCollectionsTeamsRoleInvitationBuilder {
     fn default() -> Self {
         Self {
-            table: None,
-            team: None,
-            role: None,
-            errors_table: Vec::new(),
-            errors_team: Vec::new(),
-            errors_role: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            table: Default::default(),
+            team: Default::default(),
+            role: Default::default(),
+            errors_table: Default::default(),
+            errors_team: Default::default(),
+            errors_role: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -4938,13 +4938,13 @@ pub struct SpectraCollectionsTeamsRoleRequestBuilder {
 impl Default for SpectraCollectionsTeamsRoleRequestBuilder {
     fn default() -> Self {
         Self {
-            table: None,
-            team: None,
-            role: None,
-            errors_table: Vec::new(),
-            errors_team: Vec::new(),
-            errors_role: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            table: Default::default(),
+            team: Default::default(),
+            role: Default::default(),
+            errors_table: Default::default(),
+            errors_team: Default::default(),
+            errors_role: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -5120,13 +5120,13 @@ pub struct SpectraCollectionsTeamsRoleBuilder {
 impl Default for SpectraCollectionsTeamsRoleBuilder {
     fn default() -> Self {
         Self {
-            table: None,
-            team: None,
-            role: None,
-            errors_table: Vec::new(),
-            errors_team: Vec::new(),
-            errors_role: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            table: Default::default(),
+            team: Default::default(),
+            role: Default::default(),
+            errors_table: Default::default(),
+            errors_team: Default::default(),
+            errors_role: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -5302,13 +5302,13 @@ pub struct SpectraCollectionsUsersRoleInvitationBuilder {
 impl Default for SpectraCollectionsUsersRoleInvitationBuilder {
     fn default() -> Self {
         Self {
-            table: None,
-            user: None,
-            role: None,
-            errors_table: Vec::new(),
-            errors_user: Vec::new(),
-            errors_role: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            table: Default::default(),
+            user: Default::default(),
+            role: Default::default(),
+            errors_table: Default::default(),
+            errors_user: Default::default(),
+            errors_role: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -5484,13 +5484,13 @@ pub struct SpectraCollectionsUsersRoleRequestBuilder {
 impl Default for SpectraCollectionsUsersRoleRequestBuilder {
     fn default() -> Self {
         Self {
-            table: None,
-            user: None,
-            role: None,
-            errors_table: Vec::new(),
-            errors_user: Vec::new(),
-            errors_role: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            table: Default::default(),
+            user: Default::default(),
+            role: Default::default(),
+            errors_table: Default::default(),
+            errors_user: Default::default(),
+            errors_role: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -5666,13 +5666,13 @@ pub struct SpectraCollectionsUsersRoleBuilder {
 impl Default for SpectraCollectionsUsersRoleBuilder {
     fn default() -> Self {
         Self {
-            table: None,
-            user: None,
-            role: None,
-            errors_table: Vec::new(),
-            errors_user: Vec::new(),
-            errors_role: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            table: Default::default(),
+            user: Default::default(),
+            role: Default::default(),
+            errors_table: Default::default(),
+            errors_user: Default::default(),
+            errors_role: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -5856,15 +5856,15 @@ impl Default for TeamBuilder {
             id: None,
             name: None,
             description: None,
-            icon: None,
-            color: None,
-            parent_team: None,
-            errors_name: Vec::new(),
-            errors_description: Vec::new(),
-            errors_icon: Vec::new(),
-            errors_color: Vec::new(),
-            errors_parent_team: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            icon: Default::default(),
+            color: Default::default(),
+            parent_team: Default::default(),
+            errors_name: Default::default(),
+            errors_description: Default::default(),
+            errors_icon: Default::default(),
+            errors_color: Default::default(),
+            errors_parent_team: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -6165,13 +6165,13 @@ pub struct TeamsTeamsRoleInvitationBuilder {
 impl Default for TeamsTeamsRoleInvitationBuilder {
     fn default() -> Self {
         Self {
-            table: None,
-            team: None,
-            role: None,
-            errors_table: Vec::new(),
-            errors_team: Vec::new(),
-            errors_role: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            table: Default::default(),
+            team: Default::default(),
+            role: Default::default(),
+            errors_table: Default::default(),
+            errors_team: Default::default(),
+            errors_role: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -6346,13 +6346,13 @@ pub struct TeamsUsersRoleInvitationBuilder {
 impl Default for TeamsUsersRoleInvitationBuilder {
     fn default() -> Self {
         Self {
-            table: None,
-            user: None,
-            role: None,
-            errors_table: Vec::new(),
-            errors_user: Vec::new(),
-            errors_role: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            table: Default::default(),
+            user: Default::default(),
+            role: Default::default(),
+            errors_table: Default::default(),
+            errors_user: Default::default(),
+            errors_role: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -6527,13 +6527,13 @@ pub struct TeamsUsersRoleRequestBuilder {
 impl Default for TeamsUsersRoleRequestBuilder {
     fn default() -> Self {
         Self {
-            table: None,
-            user: None,
-            role: None,
-            errors_table: Vec::new(),
-            errors_user: Vec::new(),
-            errors_role: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            table: Default::default(),
+            user: Default::default(),
+            role: Default::default(),
+            errors_table: Default::default(),
+            errors_user: Default::default(),
+            errors_role: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -6708,13 +6708,13 @@ pub struct TeamsUsersRoleBuilder {
 impl Default for TeamsUsersRoleBuilder {
     fn default() -> Self {
         Self {
-            table: None,
-            user: None,
-            role: None,
-            errors_table: Vec::new(),
-            errors_user: Vec::new(),
-            errors_role: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            table: Default::default(),
+            user: Default::default(),
+            role: Default::default(),
+            errors_table: Default::default(),
+            errors_user: Default::default(),
+            errors_role: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -6897,11 +6897,11 @@ impl Default for UserBuilder {
             middle_name: None,
             last_name: None,
             profile_picture: None,
-            errors_first_name: Vec::new(),
-            errors_middle_name: Vec::new(),
-            errors_last_name: Vec::new(),
-            errors_profile_picture: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            errors_first_name: Default::default(),
+            errors_middle_name: Default::default(),
+            errors_last_name: Default::default(),
+            errors_profile_picture: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -7145,13 +7145,13 @@ pub struct UsersUsersRoleInvitationBuilder {
 impl Default for UsersUsersRoleInvitationBuilder {
     fn default() -> Self {
         Self {
-            table: None,
-            user: None,
-            role: None,
-            errors_table: Vec::new(),
-            errors_user: Vec::new(),
-            errors_role: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            table: Default::default(),
+            user: Default::default(),
+            role: Default::default(),
+            errors_table: Default::default(),
+            errors_user: Default::default(),
+            errors_role: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -7326,13 +7326,13 @@ pub struct UsersUsersRoleRequestBuilder {
 impl Default for UsersUsersRoleRequestBuilder {
     fn default() -> Self {
         Self {
-            table: None,
-            user: None,
-            role: None,
-            errors_table: Vec::new(),
-            errors_user: Vec::new(),
-            errors_role: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            table: Default::default(),
+            user: Default::default(),
+            role: Default::default(),
+            errors_table: Default::default(),
+            errors_user: Default::default(),
+            errors_role: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
@@ -7507,13 +7507,13 @@ pub struct UsersUsersRoleBuilder {
 impl Default for UsersUsersRoleBuilder {
     fn default() -> Self {
         Self {
-            table: None,
-            user: None,
-            role: None,
-            errors_table: Vec::new(),
-            errors_user: Vec::new(),
-            errors_role: Vec::new(),
-            form_updated_at: <NaiveDateTime>::default(),
+            table: Default::default(),
+            user: Default::default(),
+            role: Default::default(),
+            errors_table: Default::default(),
+            errors_user: Default::default(),
+            errors_role: Default::default(),
+            form_updated_at: Default::default(),
         }
     }
 }
