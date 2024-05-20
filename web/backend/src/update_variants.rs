@@ -9,7 +9,6 @@ use diesel::r2d2::PooledConnection;
 use diesel::r2d2::ConnectionManager;
 use uuid::Uuid;
 use chrono::NaiveDateTime;
-
 /// Trait providing the update method for the update variants.
 pub(super) trait UpdateRow {
     /// The intermediate representation of the row.

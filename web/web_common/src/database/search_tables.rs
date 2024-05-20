@@ -3,6 +3,7 @@
 //! This module is automatically generated. Do not write anything here.
 
 use crate::database::*;
+
 pub trait Searchable<const EDIT: bool> {
     fn search_task(query: String, limit: u32) -> super::Select;
 }
