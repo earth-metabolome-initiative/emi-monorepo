@@ -2,7 +2,6 @@
 
 import os
 import io
-import copy
 import shutil
 from typing import List, Dict
 from dotenv import load_dotenv
@@ -137,11 +136,9 @@ def write_backend_structs(
         file.write("#![allow(unused)]\n" "#![allow(clippy::all)]\n\n")
 
         # Then, we write the import statements.
-        for import_statement in imports:
-            file.write(f"{import_statement}\n")
+        file.write("\n".join(imports) + "\n\n")
 
         # Then, we write the structs.
-        file.write("\n")
 
         for struct in tqdm(
             struct_metadatas,
@@ -4507,10 +4504,7 @@ def write_diesel_new_structs(
         "use chrono::NaiveDateTime;",
     ]
 
-    for import_statement in imports:
-        document.write(f"{import_statement}\n")
-
-    document.write("\n")
+    document.write("\n".join(imports) + "\n")
 
     # Since the new variants are defined in the web_common crate, in order to
     # implement methods for the backend we need to import the new variants from
@@ -4572,7 +4566,7 @@ def write_diesel_new_structs(
                 f"to the attribute in the database im the table {struct.table_name}."
             )
 
-            assert not isinstance(creator_user_id_attribute, StructMetadata)
+            assert not creator_user_id_attribute.has_struct_data_type()
 
         intermediate_struct_name = f"Intermediate{struct.name}"
 
@@ -4769,7 +4763,7 @@ def write_diesel_update_structs(
             f"/// Intermediate representation of the update variant {struct.name}.\n"
             "#[derive(Identifiable, AsChangeset)]\n"
             f"#[diesel(table_name = {struct.table_name})]\n"
-            f"#[diesel(treat_none_as_null = true)]\n"
+            "#[diesel(treat_none_as_null = true)]\n"
             f"#[diesel(primary_key({struct.get_formatted_primary_keys(include_prefix=False, include_parenthesis=False)}))]\n"
             f"pub(super) struct {intermediate_struct_name} {{\n"
         )
