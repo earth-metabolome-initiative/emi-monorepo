@@ -140,6 +140,7 @@ impl From<NestedBioOttRank> for web_common::database::nested_models::NestedBioOt
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedBioOttTaxonItem {
     pub inner: BioOttTaxonItem,
+    pub color: Color,
     pub ott_rank: NestedBioOttRank,
     pub domain: Option<BioOttTaxonItem>,
     pub kingdom: Option<BioOttTaxonItem>,
@@ -150,7 +151,6 @@ pub struct NestedBioOttTaxonItem {
     pub genus: Option<BioOttTaxonItem>,
     pub parent: BioOttTaxonItem,
     pub icon: FontAwesomeIcon,
-    pub color: Color,
 }
 
 impl NestedBioOttTaxonItem {
@@ -164,6 +164,7 @@ impl NestedBioOttTaxonItem {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
+            color: Color::get(flat_variant.color_id, connection)?,
             ott_rank: NestedBioOttRank::get(flat_variant.ott_rank_id, connection)?,
             domain: flat_variant.domain_id.map(|flat_variant| BioOttTaxonItem::get(flat_variant, connection)).transpose()?,
             kingdom: flat_variant.kingdom_id.map(|flat_variant| BioOttTaxonItem::get(flat_variant, connection)).transpose()?,
@@ -174,7 +175,6 @@ impl NestedBioOttTaxonItem {
             genus: flat_variant.genus_id.map(|flat_variant| BioOttTaxonItem::get(flat_variant, connection)).transpose()?,
             parent: BioOttTaxonItem::get(flat_variant.parent_id, connection)?,
             icon: FontAwesomeIcon::get(flat_variant.icon_id, connection)?,
-            color: Color::get(flat_variant.color_id, connection)?,
                 inner: flat_variant,
         })
     }
@@ -270,6 +270,7 @@ impl From<web_common::database::nested_models::NestedBioOttTaxonItem> for Nested
     fn from(item: web_common::database::nested_models::NestedBioOttTaxonItem) -> Self {
         Self {
             inner: item.inner.into(),
+            color: item.color.into(),
             ott_rank: item.ott_rank.into(),
             domain: item.domain.map(|item| item.into()),
             kingdom: item.kingdom.map(|item| item.into()),
@@ -280,7 +281,6 @@ impl From<web_common::database::nested_models::NestedBioOttTaxonItem> for Nested
             genus: item.genus.map(|item| item.into()),
             parent: item.parent.into(),
             icon: item.icon.into(),
-            color: item.color.into(),
         }
     }
 }
@@ -288,6 +288,7 @@ impl From<NestedBioOttTaxonItem> for web_common::database::nested_models::Nested
     fn from(item: NestedBioOttTaxonItem) -> Self {
         Self {
             inner: item.inner.into(),
+            color: item.color.into(),
             ott_rank: item.ott_rank.into(),
             domain: item.domain.map(|item| item.into()),
             kingdom: item.kingdom.map(|item| item.into()),
@@ -298,7 +299,6 @@ impl From<NestedBioOttTaxonItem> for web_common::database::nested_models::Nested
             genus: item.genus.map(|item| item.into()),
             parent: item.parent.into(),
             icon: item.icon.into(),
-            color: item.color.into(),
         }
     }
 }
@@ -306,7 +306,6 @@ impl From<NestedBioOttTaxonItem> for web_common::database::nested_models::Nested
 pub struct NestedDerivedSample {
     pub inner: DerivedSample,
     pub created_by: User,
-    pub updated_by: User,
     pub parent_sample: NestedSample,
     pub child_sample: NestedSample,
 }
@@ -323,7 +322,6 @@ impl NestedDerivedSample {
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
             created_by: User::get(flat_variant.created_by, connection)?,
-            updated_by: User::get(flat_variant.updated_by, connection)?,
             parent_sample: NestedSample::get(flat_variant.parent_sample_id, connection)?,
             child_sample: NestedSample::get(flat_variant.child_sample_id, connection)?,
                 inner: flat_variant,
@@ -348,23 +346,6 @@ impl NestedDerivedSample {
     }
 }
 impl NestedDerivedSample {
-    /// Get all the nested structs from the database ordered by the `updated_at` column.
-    ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all_by_updated_at(
-        filter: Option<&web_common::database::DerivedSampleFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        DerivedSample::all_by_updated_at(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedDerivedSample {
     /// Get the nested struct from the provided primary key.
     ///
     /// # Arguments
@@ -383,7 +364,6 @@ impl From<web_common::database::nested_models::NestedDerivedSample> for NestedDe
         Self {
             inner: item.inner.into(),
             created_by: item.created_by.into(),
-            updated_by: item.updated_by.into(),
             parent_sample: item.parent_sample.into(),
             child_sample: item.child_sample.into(),
         }
@@ -394,7 +374,6 @@ impl From<NestedDerivedSample> for web_common::database::nested_models::NestedDe
         Self {
             inner: item.inner.into(),
             created_by: item.created_by.into(),
-            updated_by: item.updated_by.into(),
             parent_sample: item.parent_sample.into(),
             child_sample: item.child_sample.into(),
         }
@@ -1945,7 +1924,6 @@ impl From<NestedRole> for web_common::database::nested_models::NestedRole {
 pub struct NestedSampleBioOttTaxonItem {
     pub inner: SampleBioOttTaxonItem,
     pub created_by: User,
-    pub updated_by: User,
     pub sample: NestedSample,
     pub taxon: NestedBioOttTaxonItem,
 }
@@ -1962,7 +1940,6 @@ impl NestedSampleBioOttTaxonItem {
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
             created_by: User::get(flat_variant.created_by, connection)?,
-            updated_by: User::get(flat_variant.updated_by, connection)?,
             sample: NestedSample::get(flat_variant.sample_id, connection)?,
             taxon: NestedBioOttTaxonItem::get(flat_variant.taxon_id, connection)?,
                 inner: flat_variant,
@@ -1987,23 +1964,6 @@ impl NestedSampleBioOttTaxonItem {
     }
 }
 impl NestedSampleBioOttTaxonItem {
-    /// Get all the nested structs from the database ordered by the `updated_at` column.
-    ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all_by_updated_at(
-        filter: Option<&web_common::database::SampleBioOttTaxonItemFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampleBioOttTaxonItem::all_by_updated_at(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedSampleBioOttTaxonItem {
     /// Get the nested struct from the provided primary key.
     ///
     /// # Arguments
@@ -2022,7 +1982,6 @@ impl From<web_common::database::nested_models::NestedSampleBioOttTaxonItem> for 
         Self {
             inner: item.inner.into(),
             created_by: item.created_by.into(),
-            updated_by: item.updated_by.into(),
             sample: item.sample.into(),
             taxon: item.taxon.into(),
         }
@@ -2033,7 +1992,6 @@ impl From<NestedSampleBioOttTaxonItem> for web_common::database::nested_models::
         Self {
             inner: item.inner.into(),
             created_by: item.created_by.into(),
-            updated_by: item.updated_by.into(),
             sample: item.sample.into(),
             taxon: item.taxon.into(),
         }
@@ -2186,7 +2144,6 @@ impl From<NestedSampleState> for web_common::database::nested_models::NestedSamp
 pub struct NestedSampledIndividualBioOttTaxonItem {
     pub inner: SampledIndividualBioOttTaxonItem,
     pub created_by: User,
-    pub updated_by: User,
     pub sampled_individual: NestedSampledIndividual,
     pub taxon: NestedBioOttTaxonItem,
 }
@@ -2203,7 +2160,6 @@ impl NestedSampledIndividualBioOttTaxonItem {
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
             created_by: User::get(flat_variant.created_by, connection)?,
-            updated_by: User::get(flat_variant.updated_by, connection)?,
             sampled_individual: NestedSampledIndividual::get(flat_variant.sampled_individual_id, connection)?,
             taxon: NestedBioOttTaxonItem::get(flat_variant.taxon_id, connection)?,
                 inner: flat_variant,
@@ -2228,23 +2184,6 @@ impl NestedSampledIndividualBioOttTaxonItem {
     }
 }
 impl NestedSampledIndividualBioOttTaxonItem {
-    /// Get all the nested structs from the database ordered by the `updated_at` column.
-    ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all_by_updated_at(
-        filter: Option<&web_common::database::SampledIndividualBioOttTaxonItemFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampledIndividualBioOttTaxonItem::all_by_updated_at(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedSampledIndividualBioOttTaxonItem {
     /// Get the nested struct from the provided primary key.
     ///
     /// # Arguments
@@ -2263,7 +2202,6 @@ impl From<web_common::database::nested_models::NestedSampledIndividualBioOttTaxo
         Self {
             inner: item.inner.into(),
             created_by: item.created_by.into(),
-            updated_by: item.updated_by.into(),
             sampled_individual: item.sampled_individual.into(),
             taxon: item.taxon.into(),
         }
@@ -2274,7 +2212,6 @@ impl From<NestedSampledIndividualBioOttTaxonItem> for web_common::database::nest
         Self {
             inner: item.inner.into(),
             created_by: item.created_by.into(),
-            updated_by: item.updated_by.into(),
             sampled_individual: item.sampled_individual.into(),
             taxon: item.taxon.into(),
         }

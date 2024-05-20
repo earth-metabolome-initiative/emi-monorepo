@@ -29,6 +29,39 @@ pub(super) trait InsertRow {
     ) -> Result<Self::Flat, diesel::result::Error>;
 }
 
+/// Intermediate representation of the new variant NewDerivedSample.
+#[derive(Insertable)]
+#[diesel(table_name = derived_samples)]
+pub(super) struct IntermediateNewDerivedSample {
+    created_by: i32,
+    parent_sample_id: Uuid,
+    child_sample_id: Uuid,
+}
+
+impl InsertRow for web_common::database::NewDerivedSample {
+    type Intermediate = IntermediateNewDerivedSample;
+    type Flat = DerivedSample;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewDerivedSample {
+            created_by: user_id,
+            parent_sample_id: self.parent_sample_id,
+            child_sample_id: self.child_sample_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::derived_samples;
+        diesel::insert_into(derived_samples::dsl::derived_samples)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
 /// Intermediate representation of the new variant NewProject.
 #[derive(Insertable)]
 #[diesel(table_name = projects)]
@@ -82,6 +115,282 @@ impl InsertRow for web_common::database::NewProject {
     }
 }
 
+/// Intermediate representation of the new variant NewProjectsTeamsRoleInvitation.
+#[derive(Insertable)]
+#[diesel(table_name = projects_teams_role_invitations)]
+pub(super) struct IntermediateNewProjectsTeamsRoleInvitation {
+    created_by: i32,
+    table_id: i32,
+    team_id: i32,
+    role_id: i32,
+}
+
+impl InsertRow for web_common::database::NewProjectsTeamsRoleInvitation {
+    type Intermediate = IntermediateNewProjectsTeamsRoleInvitation;
+    type Flat = ProjectsTeamsRoleInvitation;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewProjectsTeamsRoleInvitation {
+            created_by: user_id,
+            table_id: self.table_id,
+            team_id: self.team_id,
+            role_id: self.role_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::projects_teams_role_invitations;
+        diesel::insert_into(projects_teams_role_invitations::dsl::projects_teams_role_invitations)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
+/// Intermediate representation of the new variant NewProjectsTeamsRoleRequest.
+#[derive(Insertable)]
+#[diesel(table_name = projects_teams_role_requests)]
+pub(super) struct IntermediateNewProjectsTeamsRoleRequest {
+    created_by: i32,
+    table_id: i32,
+    team_id: i32,
+    role_id: i32,
+}
+
+impl InsertRow for web_common::database::NewProjectsTeamsRoleRequest {
+    type Intermediate = IntermediateNewProjectsTeamsRoleRequest;
+    type Flat = ProjectsTeamsRoleRequest;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewProjectsTeamsRoleRequest {
+            created_by: user_id,
+            table_id: self.table_id,
+            team_id: self.team_id,
+            role_id: self.role_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::projects_teams_role_requests;
+        diesel::insert_into(projects_teams_role_requests::dsl::projects_teams_role_requests)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
+/// Intermediate representation of the new variant NewProjectsTeamsRole.
+#[derive(Insertable)]
+#[diesel(table_name = projects_teams_roles)]
+pub(super) struct IntermediateNewProjectsTeamsRole {
+    created_by: i32,
+    table_id: i32,
+    team_id: i32,
+    role_id: i32,
+}
+
+impl InsertRow for web_common::database::NewProjectsTeamsRole {
+    type Intermediate = IntermediateNewProjectsTeamsRole;
+    type Flat = ProjectsTeamsRole;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewProjectsTeamsRole {
+            created_by: user_id,
+            table_id: self.table_id,
+            team_id: self.team_id,
+            role_id: self.role_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::projects_teams_roles;
+        diesel::insert_into(projects_teams_roles::dsl::projects_teams_roles)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
+/// Intermediate representation of the new variant NewProjectsUsersRoleInvitation.
+#[derive(Insertable)]
+#[diesel(table_name = projects_users_role_invitations)]
+pub(super) struct IntermediateNewProjectsUsersRoleInvitation {
+    created_by: i32,
+    table_id: i32,
+    user_id: i32,
+    role_id: i32,
+}
+
+impl InsertRow for web_common::database::NewProjectsUsersRoleInvitation {
+    type Intermediate = IntermediateNewProjectsUsersRoleInvitation;
+    type Flat = ProjectsUsersRoleInvitation;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewProjectsUsersRoleInvitation {
+            created_by: user_id,
+            table_id: self.table_id,
+            user_id: self.user_id,
+            role_id: self.role_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::projects_users_role_invitations;
+        diesel::insert_into(projects_users_role_invitations::dsl::projects_users_role_invitations)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
+/// Intermediate representation of the new variant NewProjectsUsersRoleRequest.
+#[derive(Insertable)]
+#[diesel(table_name = projects_users_role_requests)]
+pub(super) struct IntermediateNewProjectsUsersRoleRequest {
+    created_by: i32,
+    table_id: i32,
+    user_id: i32,
+    role_id: i32,
+}
+
+impl InsertRow for web_common::database::NewProjectsUsersRoleRequest {
+    type Intermediate = IntermediateNewProjectsUsersRoleRequest;
+    type Flat = ProjectsUsersRoleRequest;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewProjectsUsersRoleRequest {
+            created_by: user_id,
+            table_id: self.table_id,
+            user_id: self.user_id,
+            role_id: self.role_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::projects_users_role_requests;
+        diesel::insert_into(projects_users_role_requests::dsl::projects_users_role_requests)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
+/// Intermediate representation of the new variant NewProjectsUsersRole.
+#[derive(Insertable)]
+#[diesel(table_name = projects_users_roles)]
+pub(super) struct IntermediateNewProjectsUsersRole {
+    created_by: i32,
+    table_id: i32,
+    user_id: i32,
+    role_id: i32,
+}
+
+impl InsertRow for web_common::database::NewProjectsUsersRole {
+    type Intermediate = IntermediateNewProjectsUsersRole;
+    type Flat = ProjectsUsersRole;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewProjectsUsersRole {
+            created_by: user_id,
+            table_id: self.table_id,
+            user_id: self.user_id,
+            role_id: self.role_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::projects_users_roles;
+        diesel::insert_into(projects_users_roles::dsl::projects_users_roles)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
+/// Intermediate representation of the new variant NewSampleBioOttTaxonItem.
+#[derive(Insertable)]
+#[diesel(table_name = sample_bio_ott_taxon_items)]
+pub(super) struct IntermediateNewSampleBioOttTaxonItem {
+    created_by: i32,
+    sample_id: Uuid,
+    taxon_id: i32,
+}
+
+impl InsertRow for web_common::database::NewSampleBioOttTaxonItem {
+    type Intermediate = IntermediateNewSampleBioOttTaxonItem;
+    type Flat = SampleBioOttTaxonItem;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewSampleBioOttTaxonItem {
+            created_by: user_id,
+            sample_id: self.sample_id,
+            taxon_id: self.taxon_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::sample_bio_ott_taxon_items;
+        diesel::insert_into(sample_bio_ott_taxon_items::dsl::sample_bio_ott_taxon_items)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
+/// Intermediate representation of the new variant NewSampledIndividualBioOttTaxonItem.
+#[derive(Insertable)]
+#[diesel(table_name = sampled_individual_bio_ott_taxon_items)]
+pub(super) struct IntermediateNewSampledIndividualBioOttTaxonItem {
+    created_by: i32,
+    sampled_individual_id: Uuid,
+    taxon_id: i32,
+}
+
+impl InsertRow for web_common::database::NewSampledIndividualBioOttTaxonItem {
+    type Intermediate = IntermediateNewSampledIndividualBioOttTaxonItem;
+    type Flat = SampledIndividualBioOttTaxonItem;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewSampledIndividualBioOttTaxonItem {
+            created_by: user_id,
+            sampled_individual_id: self.sampled_individual_id,
+            taxon_id: self.taxon_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::sampled_individual_bio_ott_taxon_items;
+        diesel::insert_into(sampled_individual_bio_ott_taxon_items::dsl::sampled_individual_bio_ott_taxon_items)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
 /// Intermediate representation of the new variant NewSampledIndividual.
 #[derive(Insertable)]
 #[diesel(table_name = sampled_individuals)]
@@ -112,6 +421,216 @@ impl InsertRow for web_common::database::NewSampledIndividual {
     ) -> Result<Self::Flat, diesel::result::Error> {
         use crate::schema::sampled_individuals;
         diesel::insert_into(sampled_individuals::dsl::sampled_individuals)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
+/// Intermediate representation of the new variant NewSampledIndividualsTeamsRoleInvitation.
+#[derive(Insertable)]
+#[diesel(table_name = sampled_individuals_teams_role_invitations)]
+pub(super) struct IntermediateNewSampledIndividualsTeamsRoleInvitation {
+    created_by: i32,
+    table_id: Uuid,
+    team_id: i32,
+    role_id: i32,
+}
+
+impl InsertRow for web_common::database::NewSampledIndividualsTeamsRoleInvitation {
+    type Intermediate = IntermediateNewSampledIndividualsTeamsRoleInvitation;
+    type Flat = SampledIndividualsTeamsRoleInvitation;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewSampledIndividualsTeamsRoleInvitation {
+            created_by: user_id,
+            table_id: self.table_id,
+            team_id: self.team_id,
+            role_id: self.role_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::sampled_individuals_teams_role_invitations;
+        diesel::insert_into(sampled_individuals_teams_role_invitations::dsl::sampled_individuals_teams_role_invitations)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
+/// Intermediate representation of the new variant NewSampledIndividualsTeamsRoleRequest.
+#[derive(Insertable)]
+#[diesel(table_name = sampled_individuals_teams_role_requests)]
+pub(super) struct IntermediateNewSampledIndividualsTeamsRoleRequest {
+    created_by: i32,
+    table_id: Uuid,
+    team_id: i32,
+    role_id: i32,
+}
+
+impl InsertRow for web_common::database::NewSampledIndividualsTeamsRoleRequest {
+    type Intermediate = IntermediateNewSampledIndividualsTeamsRoleRequest;
+    type Flat = SampledIndividualsTeamsRoleRequest;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewSampledIndividualsTeamsRoleRequest {
+            created_by: user_id,
+            table_id: self.table_id,
+            team_id: self.team_id,
+            role_id: self.role_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::sampled_individuals_teams_role_requests;
+        diesel::insert_into(sampled_individuals_teams_role_requests::dsl::sampled_individuals_teams_role_requests)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
+/// Intermediate representation of the new variant NewSampledIndividualsTeamsRole.
+#[derive(Insertable)]
+#[diesel(table_name = sampled_individuals_teams_roles)]
+pub(super) struct IntermediateNewSampledIndividualsTeamsRole {
+    created_by: i32,
+    table_id: Uuid,
+    team_id: i32,
+    role_id: i32,
+}
+
+impl InsertRow for web_common::database::NewSampledIndividualsTeamsRole {
+    type Intermediate = IntermediateNewSampledIndividualsTeamsRole;
+    type Flat = SampledIndividualsTeamsRole;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewSampledIndividualsTeamsRole {
+            created_by: user_id,
+            table_id: self.table_id,
+            team_id: self.team_id,
+            role_id: self.role_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::sampled_individuals_teams_roles;
+        diesel::insert_into(sampled_individuals_teams_roles::dsl::sampled_individuals_teams_roles)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
+/// Intermediate representation of the new variant NewSampledIndividualsUsersRoleInvitation.
+#[derive(Insertable)]
+#[diesel(table_name = sampled_individuals_users_role_invitations)]
+pub(super) struct IntermediateNewSampledIndividualsUsersRoleInvitation {
+    created_by: i32,
+    table_id: Uuid,
+    user_id: i32,
+    role_id: i32,
+}
+
+impl InsertRow for web_common::database::NewSampledIndividualsUsersRoleInvitation {
+    type Intermediate = IntermediateNewSampledIndividualsUsersRoleInvitation;
+    type Flat = SampledIndividualsUsersRoleInvitation;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewSampledIndividualsUsersRoleInvitation {
+            created_by: user_id,
+            table_id: self.table_id,
+            user_id: self.user_id,
+            role_id: self.role_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::sampled_individuals_users_role_invitations;
+        diesel::insert_into(sampled_individuals_users_role_invitations::dsl::sampled_individuals_users_role_invitations)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
+/// Intermediate representation of the new variant NewSampledIndividualsUsersRoleRequest.
+#[derive(Insertable)]
+#[diesel(table_name = sampled_individuals_users_role_requests)]
+pub(super) struct IntermediateNewSampledIndividualsUsersRoleRequest {
+    created_by: i32,
+    table_id: Uuid,
+    user_id: i32,
+    role_id: i32,
+}
+
+impl InsertRow for web_common::database::NewSampledIndividualsUsersRoleRequest {
+    type Intermediate = IntermediateNewSampledIndividualsUsersRoleRequest;
+    type Flat = SampledIndividualsUsersRoleRequest;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewSampledIndividualsUsersRoleRequest {
+            created_by: user_id,
+            table_id: self.table_id,
+            user_id: self.user_id,
+            role_id: self.role_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::sampled_individuals_users_role_requests;
+        diesel::insert_into(sampled_individuals_users_role_requests::dsl::sampled_individuals_users_role_requests)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
+/// Intermediate representation of the new variant NewSampledIndividualsUsersRole.
+#[derive(Insertable)]
+#[diesel(table_name = sampled_individuals_users_roles)]
+pub(super) struct IntermediateNewSampledIndividualsUsersRole {
+    created_by: i32,
+    table_id: Uuid,
+    user_id: i32,
+    role_id: i32,
+}
+
+impl InsertRow for web_common::database::NewSampledIndividualsUsersRole {
+    type Intermediate = IntermediateNewSampledIndividualsUsersRole;
+    type Flat = SampledIndividualsUsersRole;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewSampledIndividualsUsersRole {
+            created_by: user_id,
+            table_id: self.table_id,
+            user_id: self.user_id,
+            role_id: self.role_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::sampled_individuals_users_roles;
+        diesel::insert_into(sampled_individuals_users_roles::dsl::sampled_individuals_users_roles)
             .values(self.to_intermediate(user_id))
             .get_result(connection)
     }
@@ -154,6 +673,459 @@ impl InsertRow for web_common::database::NewSample {
     }
 }
 
+/// Intermediate representation of the new variant NewSamplesTeamsRoleInvitation.
+#[derive(Insertable)]
+#[diesel(table_name = samples_teams_role_invitations)]
+pub(super) struct IntermediateNewSamplesTeamsRoleInvitation {
+    created_by: i32,
+    table_id: Uuid,
+    team_id: i32,
+    role_id: i32,
+}
+
+impl InsertRow for web_common::database::NewSamplesTeamsRoleInvitation {
+    type Intermediate = IntermediateNewSamplesTeamsRoleInvitation;
+    type Flat = SamplesTeamsRoleInvitation;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewSamplesTeamsRoleInvitation {
+            created_by: user_id,
+            table_id: self.table_id,
+            team_id: self.team_id,
+            role_id: self.role_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::samples_teams_role_invitations;
+        diesel::insert_into(samples_teams_role_invitations::dsl::samples_teams_role_invitations)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
+/// Intermediate representation of the new variant NewSamplesTeamsRoleRequest.
+#[derive(Insertable)]
+#[diesel(table_name = samples_teams_role_requests)]
+pub(super) struct IntermediateNewSamplesTeamsRoleRequest {
+    created_by: i32,
+    table_id: Uuid,
+    team_id: i32,
+    role_id: i32,
+}
+
+impl InsertRow for web_common::database::NewSamplesTeamsRoleRequest {
+    type Intermediate = IntermediateNewSamplesTeamsRoleRequest;
+    type Flat = SamplesTeamsRoleRequest;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewSamplesTeamsRoleRequest {
+            created_by: user_id,
+            table_id: self.table_id,
+            team_id: self.team_id,
+            role_id: self.role_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::samples_teams_role_requests;
+        diesel::insert_into(samples_teams_role_requests::dsl::samples_teams_role_requests)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
+/// Intermediate representation of the new variant NewSamplesTeamsRole.
+#[derive(Insertable)]
+#[diesel(table_name = samples_teams_roles)]
+pub(super) struct IntermediateNewSamplesTeamsRole {
+    created_by: i32,
+    table_id: Uuid,
+    team_id: i32,
+    role_id: i32,
+}
+
+impl InsertRow for web_common::database::NewSamplesTeamsRole {
+    type Intermediate = IntermediateNewSamplesTeamsRole;
+    type Flat = SamplesTeamsRole;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewSamplesTeamsRole {
+            created_by: user_id,
+            table_id: self.table_id,
+            team_id: self.team_id,
+            role_id: self.role_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::samples_teams_roles;
+        diesel::insert_into(samples_teams_roles::dsl::samples_teams_roles)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
+/// Intermediate representation of the new variant NewSamplesUsersRoleInvitation.
+#[derive(Insertable)]
+#[diesel(table_name = samples_users_role_invitations)]
+pub(super) struct IntermediateNewSamplesUsersRoleInvitation {
+    created_by: i32,
+    table_id: Uuid,
+    user_id: i32,
+    role_id: i32,
+}
+
+impl InsertRow for web_common::database::NewSamplesUsersRoleInvitation {
+    type Intermediate = IntermediateNewSamplesUsersRoleInvitation;
+    type Flat = SamplesUsersRoleInvitation;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewSamplesUsersRoleInvitation {
+            created_by: user_id,
+            table_id: self.table_id,
+            user_id: self.user_id,
+            role_id: self.role_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::samples_users_role_invitations;
+        diesel::insert_into(samples_users_role_invitations::dsl::samples_users_role_invitations)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
+/// Intermediate representation of the new variant NewSamplesUsersRoleRequest.
+#[derive(Insertable)]
+#[diesel(table_name = samples_users_role_requests)]
+pub(super) struct IntermediateNewSamplesUsersRoleRequest {
+    created_by: i32,
+    table_id: Uuid,
+    user_id: i32,
+    role_id: i32,
+}
+
+impl InsertRow for web_common::database::NewSamplesUsersRoleRequest {
+    type Intermediate = IntermediateNewSamplesUsersRoleRequest;
+    type Flat = SamplesUsersRoleRequest;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewSamplesUsersRoleRequest {
+            created_by: user_id,
+            table_id: self.table_id,
+            user_id: self.user_id,
+            role_id: self.role_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::samples_users_role_requests;
+        diesel::insert_into(samples_users_role_requests::dsl::samples_users_role_requests)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
+/// Intermediate representation of the new variant NewSamplesUsersRole.
+#[derive(Insertable)]
+#[diesel(table_name = samples_users_roles)]
+pub(super) struct IntermediateNewSamplesUsersRole {
+    created_by: i32,
+    table_id: Uuid,
+    user_id: i32,
+    role_id: i32,
+}
+
+impl InsertRow for web_common::database::NewSamplesUsersRole {
+    type Intermediate = IntermediateNewSamplesUsersRole;
+    type Flat = SamplesUsersRole;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewSamplesUsersRole {
+            created_by: user_id,
+            table_id: self.table_id,
+            user_id: self.user_id,
+            role_id: self.role_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::samples_users_roles;
+        diesel::insert_into(samples_users_roles::dsl::samples_users_roles)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
+/// Intermediate representation of the new variant NewSpectraCollection.
+#[derive(Insertable)]
+#[diesel(table_name = spectra_collections)]
+pub(super) struct IntermediateNewSpectraCollection {
+    created_by: i32,
+    sample_id: Uuid,
+    updated_by: i32,
+}
+
+impl InsertRow for web_common::database::NewSpectraCollection {
+    type Intermediate = IntermediateNewSpectraCollection;
+    type Flat = SpectraCollection;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewSpectraCollection {
+            created_by: user_id,
+            sample_id: self.sample_id,
+            updated_by: user_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::spectra_collections;
+        diesel::insert_into(spectra_collections::dsl::spectra_collections)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
+/// Intermediate representation of the new variant NewSpectraCollectionsTeamsRoleInvitation.
+#[derive(Insertable)]
+#[diesel(table_name = spectra_collections_teams_role_invitations)]
+pub(super) struct IntermediateNewSpectraCollectionsTeamsRoleInvitation {
+    created_by: i32,
+    table_id: i32,
+    team_id: i32,
+    role_id: i32,
+}
+
+impl InsertRow for web_common::database::NewSpectraCollectionsTeamsRoleInvitation {
+    type Intermediate = IntermediateNewSpectraCollectionsTeamsRoleInvitation;
+    type Flat = SpectraCollectionsTeamsRoleInvitation;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewSpectraCollectionsTeamsRoleInvitation {
+            created_by: user_id,
+            table_id: self.table_id,
+            team_id: self.team_id,
+            role_id: self.role_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::spectra_collections_teams_role_invitations;
+        diesel::insert_into(spectra_collections_teams_role_invitations::dsl::spectra_collections_teams_role_invitations)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
+/// Intermediate representation of the new variant NewSpectraCollectionsTeamsRoleRequest.
+#[derive(Insertable)]
+#[diesel(table_name = spectra_collections_teams_role_requests)]
+pub(super) struct IntermediateNewSpectraCollectionsTeamsRoleRequest {
+    created_by: i32,
+    table_id: i32,
+    team_id: i32,
+    role_id: i32,
+}
+
+impl InsertRow for web_common::database::NewSpectraCollectionsTeamsRoleRequest {
+    type Intermediate = IntermediateNewSpectraCollectionsTeamsRoleRequest;
+    type Flat = SpectraCollectionsTeamsRoleRequest;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewSpectraCollectionsTeamsRoleRequest {
+            created_by: user_id,
+            table_id: self.table_id,
+            team_id: self.team_id,
+            role_id: self.role_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::spectra_collections_teams_role_requests;
+        diesel::insert_into(spectra_collections_teams_role_requests::dsl::spectra_collections_teams_role_requests)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
+/// Intermediate representation of the new variant NewSpectraCollectionsTeamsRole.
+#[derive(Insertable)]
+#[diesel(table_name = spectra_collections_teams_roles)]
+pub(super) struct IntermediateNewSpectraCollectionsTeamsRole {
+    created_by: i32,
+    table_id: i32,
+    team_id: i32,
+    role_id: i32,
+}
+
+impl InsertRow for web_common::database::NewSpectraCollectionsTeamsRole {
+    type Intermediate = IntermediateNewSpectraCollectionsTeamsRole;
+    type Flat = SpectraCollectionsTeamsRole;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewSpectraCollectionsTeamsRole {
+            created_by: user_id,
+            table_id: self.table_id,
+            team_id: self.team_id,
+            role_id: self.role_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::spectra_collections_teams_roles;
+        diesel::insert_into(spectra_collections_teams_roles::dsl::spectra_collections_teams_roles)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
+/// Intermediate representation of the new variant NewSpectraCollectionsUsersRoleInvitation.
+#[derive(Insertable)]
+#[diesel(table_name = spectra_collections_users_role_invitations)]
+pub(super) struct IntermediateNewSpectraCollectionsUsersRoleInvitation {
+    created_by: i32,
+    table_id: i32,
+    user_id: i32,
+    role_id: i32,
+}
+
+impl InsertRow for web_common::database::NewSpectraCollectionsUsersRoleInvitation {
+    type Intermediate = IntermediateNewSpectraCollectionsUsersRoleInvitation;
+    type Flat = SpectraCollectionsUsersRoleInvitation;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewSpectraCollectionsUsersRoleInvitation {
+            created_by: user_id,
+            table_id: self.table_id,
+            user_id: self.user_id,
+            role_id: self.role_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::spectra_collections_users_role_invitations;
+        diesel::insert_into(spectra_collections_users_role_invitations::dsl::spectra_collections_users_role_invitations)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
+/// Intermediate representation of the new variant NewSpectraCollectionsUsersRoleRequest.
+#[derive(Insertable)]
+#[diesel(table_name = spectra_collections_users_role_requests)]
+pub(super) struct IntermediateNewSpectraCollectionsUsersRoleRequest {
+    created_by: i32,
+    table_id: i32,
+    user_id: i32,
+    role_id: i32,
+}
+
+impl InsertRow for web_common::database::NewSpectraCollectionsUsersRoleRequest {
+    type Intermediate = IntermediateNewSpectraCollectionsUsersRoleRequest;
+    type Flat = SpectraCollectionsUsersRoleRequest;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewSpectraCollectionsUsersRoleRequest {
+            created_by: user_id,
+            table_id: self.table_id,
+            user_id: self.user_id,
+            role_id: self.role_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::spectra_collections_users_role_requests;
+        diesel::insert_into(spectra_collections_users_role_requests::dsl::spectra_collections_users_role_requests)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
+/// Intermediate representation of the new variant NewSpectraCollectionsUsersRole.
+#[derive(Insertable)]
+#[diesel(table_name = spectra_collections_users_roles)]
+pub(super) struct IntermediateNewSpectraCollectionsUsersRole {
+    created_by: i32,
+    table_id: i32,
+    user_id: i32,
+    role_id: i32,
+}
+
+impl InsertRow for web_common::database::NewSpectraCollectionsUsersRole {
+    type Intermediate = IntermediateNewSpectraCollectionsUsersRole;
+    type Flat = SpectraCollectionsUsersRole;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewSpectraCollectionsUsersRole {
+            created_by: user_id,
+            table_id: self.table_id,
+            user_id: self.user_id,
+            role_id: self.role_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::spectra_collections_users_roles;
+        diesel::insert_into(spectra_collections_users_roles::dsl::spectra_collections_users_roles)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
 /// Intermediate representation of the new variant NewTeam.
 #[derive(Insertable)]
 #[diesel(table_name = teams)]
@@ -190,6 +1162,146 @@ impl InsertRow for web_common::database::NewTeam {
     ) -> Result<Self::Flat, diesel::result::Error> {
         use crate::schema::teams;
         diesel::insert_into(teams::dsl::teams)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
+/// Intermediate representation of the new variant NewTeamsTeamsRoleInvitation.
+#[derive(Insertable)]
+#[diesel(table_name = teams_teams_role_invitations)]
+pub(super) struct IntermediateNewTeamsTeamsRoleInvitation {
+    created_by: i32,
+    table_id: i32,
+    team_id: i32,
+    role_id: i32,
+}
+
+impl InsertRow for web_common::database::NewTeamsTeamsRoleInvitation {
+    type Intermediate = IntermediateNewTeamsTeamsRoleInvitation;
+    type Flat = TeamsTeamsRoleInvitation;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewTeamsTeamsRoleInvitation {
+            created_by: user_id,
+            table_id: self.table_id,
+            team_id: self.team_id,
+            role_id: self.role_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::teams_teams_role_invitations;
+        diesel::insert_into(teams_teams_role_invitations::dsl::teams_teams_role_invitations)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
+/// Intermediate representation of the new variant NewTeamsUsersRoleInvitation.
+#[derive(Insertable)]
+#[diesel(table_name = teams_users_role_invitations)]
+pub(super) struct IntermediateNewTeamsUsersRoleInvitation {
+    created_by: i32,
+    table_id: i32,
+    user_id: i32,
+    role_id: i32,
+}
+
+impl InsertRow for web_common::database::NewTeamsUsersRoleInvitation {
+    type Intermediate = IntermediateNewTeamsUsersRoleInvitation;
+    type Flat = TeamsUsersRoleInvitation;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewTeamsUsersRoleInvitation {
+            created_by: user_id,
+            table_id: self.table_id,
+            user_id: self.user_id,
+            role_id: self.role_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::teams_users_role_invitations;
+        diesel::insert_into(teams_users_role_invitations::dsl::teams_users_role_invitations)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
+/// Intermediate representation of the new variant NewTeamsUsersRoleRequest.
+#[derive(Insertable)]
+#[diesel(table_name = teams_users_role_requests)]
+pub(super) struct IntermediateNewTeamsUsersRoleRequest {
+    created_by: i32,
+    table_id: i32,
+    user_id: i32,
+    role_id: i32,
+}
+
+impl InsertRow for web_common::database::NewTeamsUsersRoleRequest {
+    type Intermediate = IntermediateNewTeamsUsersRoleRequest;
+    type Flat = TeamsUsersRoleRequest;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewTeamsUsersRoleRequest {
+            created_by: user_id,
+            table_id: self.table_id,
+            user_id: self.user_id,
+            role_id: self.role_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::teams_users_role_requests;
+        diesel::insert_into(teams_users_role_requests::dsl::teams_users_role_requests)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
+/// Intermediate representation of the new variant NewTeamsUsersRole.
+#[derive(Insertable)]
+#[diesel(table_name = teams_users_roles)]
+pub(super) struct IntermediateNewTeamsUsersRole {
+    created_by: i32,
+    table_id: i32,
+    user_id: i32,
+    role_id: i32,
+}
+
+impl InsertRow for web_common::database::NewTeamsUsersRole {
+    type Intermediate = IntermediateNewTeamsUsersRole;
+    type Flat = TeamsUsersRole;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewTeamsUsersRole {
+            created_by: user_id,
+            table_id: self.table_id,
+            user_id: self.user_id,
+            role_id: self.role_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::teams_users_roles;
+        diesel::insert_into(teams_users_roles::dsl::teams_users_roles)
             .values(self.to_intermediate(user_id))
             .get_result(connection)
     }
@@ -262,6 +1374,111 @@ impl InsertRow for web_common::database::NewUser {
         assert_eq!(user_id, 0);
         diesel::insert_into(users::dsl::users)
             .values(self.to_intermediate(0))
+            .get_result(connection)
+    }
+}
+
+/// Intermediate representation of the new variant NewUsersUsersRoleInvitation.
+#[derive(Insertable)]
+#[diesel(table_name = users_users_role_invitations)]
+pub(super) struct IntermediateNewUsersUsersRoleInvitation {
+    created_by: i32,
+    table_id: i32,
+    user_id: i32,
+    role_id: i32,
+}
+
+impl InsertRow for web_common::database::NewUsersUsersRoleInvitation {
+    type Intermediate = IntermediateNewUsersUsersRoleInvitation;
+    type Flat = UsersUsersRoleInvitation;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewUsersUsersRoleInvitation {
+            created_by: user_id,
+            table_id: self.table_id,
+            user_id: self.user_id,
+            role_id: self.role_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::users_users_role_invitations;
+        diesel::insert_into(users_users_role_invitations::dsl::users_users_role_invitations)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
+/// Intermediate representation of the new variant NewUsersUsersRoleRequest.
+#[derive(Insertable)]
+#[diesel(table_name = users_users_role_requests)]
+pub(super) struct IntermediateNewUsersUsersRoleRequest {
+    created_by: i32,
+    table_id: i32,
+    user_id: i32,
+    role_id: i32,
+}
+
+impl InsertRow for web_common::database::NewUsersUsersRoleRequest {
+    type Intermediate = IntermediateNewUsersUsersRoleRequest;
+    type Flat = UsersUsersRoleRequest;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewUsersUsersRoleRequest {
+            created_by: user_id,
+            table_id: self.table_id,
+            user_id: self.user_id,
+            role_id: self.role_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::users_users_role_requests;
+        diesel::insert_into(users_users_role_requests::dsl::users_users_role_requests)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
+/// Intermediate representation of the new variant NewUsersUsersRole.
+#[derive(Insertable)]
+#[diesel(table_name = users_users_roles)]
+pub(super) struct IntermediateNewUsersUsersRole {
+    created_by: i32,
+    table_id: i32,
+    user_id: i32,
+    role_id: i32,
+}
+
+impl InsertRow for web_common::database::NewUsersUsersRole {
+    type Intermediate = IntermediateNewUsersUsersRole;
+    type Flat = UsersUsersRole;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewUsersUsersRole {
+            created_by: user_id,
+            table_id: self.table_id,
+            user_id: self.user_id,
+            role_id: self.role_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::users_users_roles;
+        diesel::insert_into(users_users_roles::dsl::users_users_roles)
+            .values(self.to_intermediate(user_id))
             .get_result(connection)
     }
 }

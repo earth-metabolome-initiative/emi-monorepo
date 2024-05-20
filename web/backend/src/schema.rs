@@ -57,8 +57,6 @@ diesel::table! {
     derived_samples (parent_sample_id, child_sample_id) {
         created_by -> Int4,
         created_at -> Timestamp,
-        updated_by -> Int4,
-        updated_at -> Timestamp,
         parent_sample_id -> Uuid,
         child_sample_id -> Uuid,
     }
@@ -232,8 +230,6 @@ diesel::table! {
     sample_bio_ott_taxon_items (sample_id, taxon_id) {
         created_by -> Int4,
         created_at -> Timestamp,
-        updated_by -> Int4,
-        updated_at -> Timestamp,
         sample_id -> Uuid,
         taxon_id -> Int4,
     }
@@ -253,8 +249,6 @@ diesel::table! {
     sampled_individual_bio_ott_taxon_items (sampled_individual_id, taxon_id) {
         created_by -> Int4,
         created_at -> Timestamp,
-        updated_by -> Int4,
-        updated_at -> Timestamp,
         sampled_individual_id -> Uuid,
         taxon_id -> Int4,
     }
@@ -614,6 +608,7 @@ diesel::joinable!(bio_ott_ranks -> font_awesome_icons (icon_id));
 diesel::joinable!(bio_ott_taxon_items -> bio_ott_ranks (ott_rank_id));
 diesel::joinable!(bio_ott_taxon_items -> colors (color_id));
 diesel::joinable!(bio_ott_taxon_items -> font_awesome_icons (icon_id));
+diesel::joinable!(derived_samples -> users (created_by));
 diesel::joinable!(document_formats -> colors (color_id));
 diesel::joinable!(document_formats -> font_awesome_icons (icon_id));
 diesel::joinable!(login_providers -> colors (color_id));
@@ -647,10 +642,12 @@ diesel::joinable!(roles -> colors (color_id));
 diesel::joinable!(roles -> font_awesome_icons (icon_id));
 diesel::joinable!(sample_bio_ott_taxon_items -> bio_ott_taxon_items (taxon_id));
 diesel::joinable!(sample_bio_ott_taxon_items -> samples (sample_id));
+diesel::joinable!(sample_bio_ott_taxon_items -> users (created_by));
 diesel::joinable!(sample_states -> colors (color_id));
 diesel::joinable!(sample_states -> font_awesome_icons (icon_id));
 diesel::joinable!(sampled_individual_bio_ott_taxon_items -> bio_ott_taxon_items (taxon_id));
 diesel::joinable!(sampled_individual_bio_ott_taxon_items -> sampled_individuals (sampled_individual_id));
+diesel::joinable!(sampled_individual_bio_ott_taxon_items -> users (created_by));
 diesel::joinable!(sampled_individuals_teams_role_invitations -> roles (role_id));
 diesel::joinable!(sampled_individuals_teams_role_invitations -> sampled_individuals (table_id));
 diesel::joinable!(sampled_individuals_teams_role_invitations -> teams (team_id));

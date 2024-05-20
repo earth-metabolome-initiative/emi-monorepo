@@ -30,6 +30,7 @@ impl BioOttRankFilter {
 
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct BioOttTaxonItemFilter {
+    pub color_id: Option<i32>,
     pub ott_rank_id: Option<i32>,
     pub domain_id: Option<i32>,
     pub kingdom_id: Option<i32>,
@@ -40,7 +41,6 @@ pub struct BioOttTaxonItemFilter {
     pub genus_id: Option<i32>,
     pub parent_id: Option<i32>,
     pub icon_id: Option<i32>,
-    pub color_id: Option<i32>,
 }
 
 
@@ -49,6 +49,10 @@ impl BioOttTaxonItemFilter {
 
     pub fn as_filter_expression(&self) -> gluesql::core::ast_builder::ExprNode<'_> {
         let mut filter: gluesql::core::ast_builder::ExprNode<'_> = gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
+        if let Some(color_id) = &self.color_id {
+            filter = filter.and(gluesql::core::ast_builder::col("bio_ott_taxon_items.color_id").eq(color_id.to_string()));
+        }
+
         if let Some(ott_rank_id) = &self.ott_rank_id {
             filter = filter.and(gluesql::core::ast_builder::col("bio_ott_taxon_items.ott_rank_id").eq(ott_rank_id.to_string()));
         }
@@ -89,10 +93,6 @@ impl BioOttTaxonItemFilter {
             filter = filter.and(gluesql::core::ast_builder::col("bio_ott_taxon_items.icon_id").eq(icon_id.to_string()));
         }
 
-        if let Some(color_id) = &self.color_id {
-            filter = filter.and(gluesql::core::ast_builder::col("bio_ott_taxon_items.color_id").eq(color_id.to_string()));
-        }
-
         filter
     }
 }
@@ -100,7 +100,6 @@ impl BioOttTaxonItemFilter {
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct DerivedSampleFilter {
     pub created_by: Option<i32>,
-    pub updated_by: Option<i32>,
     pub parent_sample_id: Option<Uuid>,
     pub child_sample_id: Option<Uuid>,
 }
@@ -113,10 +112,6 @@ impl DerivedSampleFilter {
         let mut filter: gluesql::core::ast_builder::ExprNode<'_> = gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
         if let Some(created_by) = &self.created_by {
             filter = filter.and(gluesql::core::ast_builder::col("derived_samples.created_by").eq(created_by.to_string()));
-        }
-
-        if let Some(updated_by) = &self.updated_by {
-            filter = filter.and(gluesql::core::ast_builder::col("derived_samples.updated_by").eq(updated_by.to_string()));
         }
 
         if let Some(parent_sample_id) = &self.parent_sample_id {
@@ -516,7 +511,6 @@ impl RoleFilter {
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct SampleBioOttTaxonItemFilter {
     pub created_by: Option<i32>,
-    pub updated_by: Option<i32>,
     pub sample_id: Option<Uuid>,
     pub taxon_id: Option<i32>,
 }
@@ -529,10 +523,6 @@ impl SampleBioOttTaxonItemFilter {
         let mut filter: gluesql::core::ast_builder::ExprNode<'_> = gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
         if let Some(created_by) = &self.created_by {
             filter = filter.and(gluesql::core::ast_builder::col("sample_bio_ott_taxon_items.created_by").eq(created_by.to_string()));
-        }
-
-        if let Some(updated_by) = &self.updated_by {
-            filter = filter.and(gluesql::core::ast_builder::col("sample_bio_ott_taxon_items.updated_by").eq(updated_by.to_string()));
         }
 
         if let Some(sample_id) = &self.sample_id {
@@ -574,7 +564,6 @@ impl SampleStateFilter {
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct SampledIndividualBioOttTaxonItemFilter {
     pub created_by: Option<i32>,
-    pub updated_by: Option<i32>,
     pub sampled_individual_id: Option<Uuid>,
     pub taxon_id: Option<i32>,
 }
@@ -587,10 +576,6 @@ impl SampledIndividualBioOttTaxonItemFilter {
         let mut filter: gluesql::core::ast_builder::ExprNode<'_> = gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
         if let Some(created_by) = &self.created_by {
             filter = filter.and(gluesql::core::ast_builder::col("sampled_individual_bio_ott_taxon_items.created_by").eq(created_by.to_string()));
-        }
-
-        if let Some(updated_by) = &self.updated_by {
-            filter = filter.and(gluesql::core::ast_builder::col("sampled_individual_bio_ott_taxon_items.updated_by").eq(updated_by.to_string()));
         }
 
         if let Some(sampled_individual_id) = &self.sampled_individual_id {

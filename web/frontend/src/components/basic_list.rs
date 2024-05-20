@@ -97,7 +97,11 @@ impl<Page: Filtrable + PageLike + RowToBadge> Component for BasicList<Page> {
     fn view(&self, ctx: &Context<Self>) -> Html {
         html! {
             <div class="section_explorer">
-                <h2>{Page::section()}</h2>
+                if ctx.props().filters.is_some() {
+                    <h3>{Page::section()}</h3>
+                } else {
+                    <h2>{Page::section()}</h2>
+                }
                 <ul>
                 { for self.pages.iter().map(|page| html!{<li>{page.to_badge()}</li>}) }
                 if self.no_more_pages {

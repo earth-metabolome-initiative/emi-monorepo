@@ -93,6 +93,7 @@ impl NestedBioOttRank {
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedBioOttTaxonItem {
     pub inner: BioOttTaxonItem,
+    pub color: Color,
     pub ott_rank: NestedBioOttRank,
     pub domain: Option<BioOttTaxonItem>,
     pub kingdom: Option<BioOttTaxonItem>,
@@ -103,7 +104,6 @@ pub struct NestedBioOttTaxonItem {
     pub genus: Option<BioOttTaxonItem>,
     pub parent: BioOttTaxonItem,
     pub icon: FontAwesomeIcon,
-    pub color: Color,
 }
 
 impl Tabular for NestedBioOttTaxonItem {
@@ -124,6 +124,7 @@ impl NestedBioOttTaxonItem {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
+            color: Color::get(flat_variant.color_id, connection).await?.unwrap(),
             ott_rank: NestedBioOttRank::get(flat_variant.ott_rank_id, connection).await?.unwrap(),
             domain: if let Some(domain_id) = flat_variant.domain_id { BioOttTaxonItem::get(domain_id, connection).await? } else { None },
             kingdom: if let Some(kingdom_id) = flat_variant.kingdom_id { BioOttTaxonItem::get(kingdom_id, connection).await? } else { None },
@@ -134,7 +135,6 @@ impl NestedBioOttTaxonItem {
             genus: if let Some(genus_id) = flat_variant.genus_id { BioOttTaxonItem::get(genus_id, connection).await? } else { None },
             parent: BioOttTaxonItem::get(flat_variant.parent_id, connection).await?.unwrap(),
             icon: FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap(),
-            color: Color::get(flat_variant.color_id, connection).await?.unwrap(),
             inner: flat_variant,
         })
     }
@@ -187,6 +187,7 @@ impl NestedBioOttTaxonItem {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         self.inner.update_or_insert(connection).await?;
+        self.color.update_or_insert(connection).await?;
         self.ott_rank.update_or_insert(connection).await?;
         if let Some(domain) = self.domain {
             domain.update_or_insert(connection).await?;
@@ -211,7 +212,6 @@ impl NestedBioOttTaxonItem {
         }
         self.parent.update_or_insert(connection).await?;
         self.icon.update_or_insert(connection).await?;
-        self.color.update_or_insert(connection).await?;
         Ok(())
     }
 }
@@ -219,7 +219,6 @@ impl NestedBioOttTaxonItem {
 pub struct NestedDerivedSample {
     pub inner: DerivedSample,
     pub created_by: User,
-    pub updated_by: User,
     pub parent_sample: NestedSample,
     pub child_sample: NestedSample,
 }
@@ -243,7 +242,6 @@ impl NestedDerivedSample {
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
             created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
-            updated_by: User::get(flat_variant.updated_by, connection).await?.unwrap(),
             parent_sample: NestedSample::get(flat_variant.parent_sample_id, connection).await?.unwrap(),
             child_sample: NestedSample::get(flat_variant.child_sample_id, connection).await?.unwrap(),
             inner: flat_variant,
@@ -287,28 +285,6 @@ impl NestedDerivedSample {
          }
          Ok(nested_structs)
     }
-    /// Get all the nested structs from the database ordered by the `updated_at` column.
-    ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return.
-    /// * `offset` - The number of rows to skip.
-    /// * `connection` - The database connection.
-    pub async fn all_by_updated_at<C>(
-        filter: Option<&DerivedSampleFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        let flat_variants = DerivedSample::all_by_updated_at(filter, limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_variants.len());
-         for flat_variant in flat_variants {
-             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
-         }
-         Ok(nested_structs)
-    }
     /// Update or insert the nested struct into the database.
     ///
     /// # Arguments
@@ -321,7 +297,6 @@ impl NestedDerivedSample {
     {
         self.inner.update_or_insert(connection).await?;
         self.created_by.update_or_insert(connection).await?;
-        self.updated_by.update_or_insert(connection).await?;
         self.parent_sample.update_or_insert(connection).await?;
         self.child_sample.update_or_insert(connection).await?;
         Ok(())
@@ -1489,7 +1464,6 @@ impl NestedRole {
 pub struct NestedSampleBioOttTaxonItem {
     pub inner: SampleBioOttTaxonItem,
     pub created_by: User,
-    pub updated_by: User,
     pub sample: NestedSample,
     pub taxon: NestedBioOttTaxonItem,
 }
@@ -1513,7 +1487,6 @@ impl NestedSampleBioOttTaxonItem {
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
             created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
-            updated_by: User::get(flat_variant.updated_by, connection).await?.unwrap(),
             sample: NestedSample::get(flat_variant.sample_id, connection).await?.unwrap(),
             taxon: NestedBioOttTaxonItem::get(flat_variant.taxon_id, connection).await?.unwrap(),
             inner: flat_variant,
@@ -1557,28 +1530,6 @@ impl NestedSampleBioOttTaxonItem {
          }
          Ok(nested_structs)
     }
-    /// Get all the nested structs from the database ordered by the `updated_at` column.
-    ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return.
-    /// * `offset` - The number of rows to skip.
-    /// * `connection` - The database connection.
-    pub async fn all_by_updated_at<C>(
-        filter: Option<&SampleBioOttTaxonItemFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        let flat_variants = SampleBioOttTaxonItem::all_by_updated_at(filter, limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_variants.len());
-         for flat_variant in flat_variants {
-             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
-         }
-         Ok(nested_structs)
-    }
     /// Update or insert the nested struct into the database.
     ///
     /// # Arguments
@@ -1591,7 +1542,6 @@ impl NestedSampleBioOttTaxonItem {
     {
         self.inner.update_or_insert(connection).await?;
         self.created_by.update_or_insert(connection).await?;
-        self.updated_by.update_or_insert(connection).await?;
         self.sample.update_or_insert(connection).await?;
         self.taxon.update_or_insert(connection).await?;
         Ok(())
@@ -1685,7 +1635,6 @@ impl NestedSampleState {
 pub struct NestedSampledIndividualBioOttTaxonItem {
     pub inner: SampledIndividualBioOttTaxonItem,
     pub created_by: User,
-    pub updated_by: User,
     pub sampled_individual: NestedSampledIndividual,
     pub taxon: NestedBioOttTaxonItem,
 }
@@ -1709,7 +1658,6 @@ impl NestedSampledIndividualBioOttTaxonItem {
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
             created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
-            updated_by: User::get(flat_variant.updated_by, connection).await?.unwrap(),
             sampled_individual: NestedSampledIndividual::get(flat_variant.sampled_individual_id, connection).await?.unwrap(),
             taxon: NestedBioOttTaxonItem::get(flat_variant.taxon_id, connection).await?.unwrap(),
             inner: flat_variant,
@@ -1753,28 +1701,6 @@ impl NestedSampledIndividualBioOttTaxonItem {
          }
          Ok(nested_structs)
     }
-    /// Get all the nested structs from the database ordered by the `updated_at` column.
-    ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return.
-    /// * `offset` - The number of rows to skip.
-    /// * `connection` - The database connection.
-    pub async fn all_by_updated_at<C>(
-        filter: Option<&SampledIndividualBioOttTaxonItemFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        let flat_variants = SampledIndividualBioOttTaxonItem::all_by_updated_at(filter, limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_variants.len());
-         for flat_variant in flat_variants {
-             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
-         }
-         Ok(nested_structs)
-    }
     /// Update or insert the nested struct into the database.
     ///
     /// # Arguments
@@ -1787,7 +1713,6 @@ impl NestedSampledIndividualBioOttTaxonItem {
     {
         self.inner.update_or_insert(connection).await?;
         self.created_by.update_or_insert(connection).await?;
-        self.updated_by.update_or_insert(connection).await?;
         self.sampled_individual.update_or_insert(connection).await?;
         self.taxon.update_or_insert(connection).await?;
         Ok(())

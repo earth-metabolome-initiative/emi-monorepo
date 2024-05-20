@@ -1,4 +1,0 @@
--- Drop the `sample_bio_ott_taxon_items_updated_at_trigger` trigger on the sample_bio_ott_taxon_items table.
-
-DROP TRIGGER sample_bio_ott_taxon_items_updated_at_trigger ON sample_bio_ott_taxon_items;
-DROP FUNCTION sample_bio_ott_taxon_items_updated_at_trigger;

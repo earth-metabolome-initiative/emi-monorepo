@@ -1066,8 +1066,6 @@ impl Country {
 pub struct DerivedSample {
     pub created_by: i32,
     pub created_at: NaiveDateTime,
-    pub updated_by: i32,
-    pub updated_at: NaiveDateTime,
     pub parent_sample_id: Uuid,
     pub child_sample_id: Uuid,
 }
@@ -1085,8 +1083,6 @@ impl DerivedSample {
         vec![
             gluesql::core::ast_builder::num(self.created_by),
             gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
-            gluesql::core::ast_builder::num(self.updated_by),
-            gluesql::core::ast_builder::timestamp(self.updated_at.to_string()),
             gluesql::core::ast_builder::uuid(self.parent_sample_id.to_string()),
             gluesql::core::ast_builder::uuid(self.child_sample_id.to_string()),
         ]
@@ -1108,7 +1104,7 @@ impl DerivedSample {
         use gluesql::core::ast_builder::*;
         table("derived_samples")
             .insert()
-            .columns("created_by, created_at, updated_by, updated_at, parent_sample_id, child_sample_id")
+            .columns("created_by, created_at, parent_sample_id, child_sample_id")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -1135,7 +1131,7 @@ impl DerivedSample {
             .select()
             .filter(col("parent_sample_id").eq(parent_sample_id.to_string()))
             .filter(col("child_sample_id").eq(child_sample_id.to_string()))
-            .project("created_by, created_at, updated_by, updated_at, parent_sample_id, child_sample_id")
+            .project("created_by, created_at, parent_sample_id, child_sample_id")
             .limit(1)
             .execute(connection)
             .await?;
@@ -1206,8 +1202,6 @@ impl DerivedSample {
             .update()        
 .set("created_by", gluesql::core::ast_builder::num(self.created_by))        
 .set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
-.set("updated_by", gluesql::core::ast_builder::num(self.updated_by))        
-.set("updated_at", gluesql::core::ast_builder::timestamp(self.updated_at.to_string()))        
 .set("parent_sample_id", gluesql::core::ast_builder::uuid(self.parent_sample_id.to_string()))        
 .set("child_sample_id", gluesql::core::ast_builder::uuid(self.child_sample_id.to_string()))            .execute(connection)
             .await
@@ -1257,38 +1251,7 @@ impl DerivedSample {
         let select_row = table("derived_samples")
             .select()
             .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
-           .project("created_by, created_at, updated_by, updated_at, parent_sample_id, child_sample_id")
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .execute(connection)
-            .await?;
-        Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>())
-    }
-    /// Get all DerivedSample from the database ordered by the `updated_at` column.
-    ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of results, by default `10`.
-    /// * `offset` - The offset of the results, by default `0`.
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn all_by_updated_at<C>(
-        filter: Option<&DerivedSampleFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("derived_samples")
-            .select()
-            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
-           .project("created_by, created_at, updated_by, updated_at, parent_sample_id, child_sample_id")
-            .order_by("updated_at desc")
+           .project("created_by, created_at, parent_sample_id, child_sample_id")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -1306,14 +1269,6 @@ impl DerivedSample {
             },
             created_at: match row.get("created_at").unwrap() {
                 gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
-                _ => unreachable!("Expected Timestamp")
-            },
-            updated_by: match row.get("updated_by").unwrap() {
-                gluesql::prelude::Value::I32(updated_by) => updated_by.clone(),
-                _ => unreachable!("Expected I32")
-            },
-            updated_at: match row.get("updated_at").unwrap() {
-                gluesql::prelude::Value::Timestamp(updated_at) => updated_at.clone(),
                 _ => unreachable!("Expected Timestamp")
             },
             parent_sample_id: match row.get("parent_sample_id").unwrap() {
@@ -4660,8 +4615,6 @@ impl Role {
 pub struct SampleBioOttTaxonItem {
     pub created_by: i32,
     pub created_at: NaiveDateTime,
-    pub updated_by: i32,
-    pub updated_at: NaiveDateTime,
     pub sample_id: Uuid,
     pub taxon_id: i32,
 }
@@ -4679,8 +4632,6 @@ impl SampleBioOttTaxonItem {
         vec![
             gluesql::core::ast_builder::num(self.created_by),
             gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
-            gluesql::core::ast_builder::num(self.updated_by),
-            gluesql::core::ast_builder::timestamp(self.updated_at.to_string()),
             gluesql::core::ast_builder::uuid(self.sample_id.to_string()),
             gluesql::core::ast_builder::num(self.taxon_id),
         ]
@@ -4702,7 +4653,7 @@ impl SampleBioOttTaxonItem {
         use gluesql::core::ast_builder::*;
         table("sample_bio_ott_taxon_items")
             .insert()
-            .columns("created_by, created_at, updated_by, updated_at, sample_id, taxon_id")
+            .columns("created_by, created_at, sample_id, taxon_id")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -4729,7 +4680,7 @@ impl SampleBioOttTaxonItem {
             .select()
             .filter(col("sample_id").eq(sample_id.to_string()))
             .filter(col("taxon_id").eq(taxon_id.to_string()))
-            .project("created_by, created_at, updated_by, updated_at, sample_id, taxon_id")
+            .project("created_by, created_at, sample_id, taxon_id")
             .limit(1)
             .execute(connection)
             .await?;
@@ -4800,8 +4751,6 @@ impl SampleBioOttTaxonItem {
             .update()        
 .set("created_by", gluesql::core::ast_builder::num(self.created_by))        
 .set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
-.set("updated_by", gluesql::core::ast_builder::num(self.updated_by))        
-.set("updated_at", gluesql::core::ast_builder::timestamp(self.updated_at.to_string()))        
 .set("sample_id", gluesql::core::ast_builder::uuid(self.sample_id.to_string()))        
 .set("taxon_id", gluesql::core::ast_builder::num(self.taxon_id))            .execute(connection)
             .await
@@ -4851,38 +4800,7 @@ impl SampleBioOttTaxonItem {
         let select_row = table("sample_bio_ott_taxon_items")
             .select()
             .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
-           .project("created_by, created_at, updated_by, updated_at, sample_id, taxon_id")
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .execute(connection)
-            .await?;
-        Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>())
-    }
-    /// Get all SampleBioOttTaxonItem from the database ordered by the `updated_at` column.
-    ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of results, by default `10`.
-    /// * `offset` - The offset of the results, by default `0`.
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn all_by_updated_at<C>(
-        filter: Option<&SampleBioOttTaxonItemFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("sample_bio_ott_taxon_items")
-            .select()
-            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
-           .project("created_by, created_at, updated_by, updated_at, sample_id, taxon_id")
-            .order_by("updated_at desc")
+           .project("created_by, created_at, sample_id, taxon_id")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -4900,14 +4818,6 @@ impl SampleBioOttTaxonItem {
             },
             created_at: match row.get("created_at").unwrap() {
                 gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
-                _ => unreachable!("Expected Timestamp")
-            },
-            updated_by: match row.get("updated_by").unwrap() {
-                gluesql::prelude::Value::I32(updated_by) => updated_by.clone(),
-                _ => unreachable!("Expected I32")
-            },
-            updated_at: match row.get("updated_at").unwrap() {
-                gluesql::prelude::Value::Timestamp(updated_at) => updated_at.clone(),
                 _ => unreachable!("Expected Timestamp")
             },
             sample_id: match row.get("sample_id").unwrap() {
@@ -5150,8 +5060,6 @@ impl SampleState {
 pub struct SampledIndividualBioOttTaxonItem {
     pub created_by: i32,
     pub created_at: NaiveDateTime,
-    pub updated_by: i32,
-    pub updated_at: NaiveDateTime,
     pub sampled_individual_id: Uuid,
     pub taxon_id: i32,
 }
@@ -5169,8 +5077,6 @@ impl SampledIndividualBioOttTaxonItem {
         vec![
             gluesql::core::ast_builder::num(self.created_by),
             gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
-            gluesql::core::ast_builder::num(self.updated_by),
-            gluesql::core::ast_builder::timestamp(self.updated_at.to_string()),
             gluesql::core::ast_builder::uuid(self.sampled_individual_id.to_string()),
             gluesql::core::ast_builder::num(self.taxon_id),
         ]
@@ -5192,7 +5098,7 @@ impl SampledIndividualBioOttTaxonItem {
         use gluesql::core::ast_builder::*;
         table("sampled_individual_bio_ott_taxon_items")
             .insert()
-            .columns("created_by, created_at, updated_by, updated_at, sampled_individual_id, taxon_id")
+            .columns("created_by, created_at, sampled_individual_id, taxon_id")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -5219,7 +5125,7 @@ impl SampledIndividualBioOttTaxonItem {
             .select()
             .filter(col("sampled_individual_id").eq(sampled_individual_id.to_string()))
             .filter(col("taxon_id").eq(taxon_id.to_string()))
-            .project("created_by, created_at, updated_by, updated_at, sampled_individual_id, taxon_id")
+            .project("created_by, created_at, sampled_individual_id, taxon_id")
             .limit(1)
             .execute(connection)
             .await?;
@@ -5290,8 +5196,6 @@ impl SampledIndividualBioOttTaxonItem {
             .update()        
 .set("created_by", gluesql::core::ast_builder::num(self.created_by))        
 .set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
-.set("updated_by", gluesql::core::ast_builder::num(self.updated_by))        
-.set("updated_at", gluesql::core::ast_builder::timestamp(self.updated_at.to_string()))        
 .set("sampled_individual_id", gluesql::core::ast_builder::uuid(self.sampled_individual_id.to_string()))        
 .set("taxon_id", gluesql::core::ast_builder::num(self.taxon_id))            .execute(connection)
             .await
@@ -5341,38 +5245,7 @@ impl SampledIndividualBioOttTaxonItem {
         let select_row = table("sampled_individual_bio_ott_taxon_items")
             .select()
             .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
-           .project("created_by, created_at, updated_by, updated_at, sampled_individual_id, taxon_id")
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .execute(connection)
-            .await?;
-        Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>())
-    }
-    /// Get all SampledIndividualBioOttTaxonItem from the database ordered by the `updated_at` column.
-    ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of results, by default `10`.
-    /// * `offset` - The offset of the results, by default `0`.
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn all_by_updated_at<C>(
-        filter: Option<&SampledIndividualBioOttTaxonItemFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("sampled_individual_bio_ott_taxon_items")
-            .select()
-            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
-           .project("created_by, created_at, updated_by, updated_at, sampled_individual_id, taxon_id")
-            .order_by("updated_at desc")
+           .project("created_by, created_at, sampled_individual_id, taxon_id")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -5390,14 +5263,6 @@ impl SampledIndividualBioOttTaxonItem {
             },
             created_at: match row.get("created_at").unwrap() {
                 gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
-                _ => unreachable!("Expected Timestamp")
-            },
-            updated_by: match row.get("updated_by").unwrap() {
-                gluesql::prelude::Value::I32(updated_by) => updated_by.clone(),
-                _ => unreachable!("Expected I32")
-            },
-            updated_at: match row.get("updated_at").unwrap() {
-                gluesql::prelude::Value::Timestamp(updated_at) => updated_at.clone(),
                 _ => unreachable!("Expected Timestamp")
             },
             sampled_individual_id: match row.get("sampled_individual_id").unwrap() {

@@ -1,12 +1,14 @@
 """Submodule providing a class for struct metadata."""
 
-from typing import List, Optional, Union, Tuple
+from typing import List, Optional, Union, Tuple, Dict
 import re
 from functools import cache
-from constraint_checkers.find_foreign_keys import TableMetadata
+from constraint_checkers.find_foreign_keys import TableMetadata, find_foreign_keys
+from constraint_checkers.indices import PGIndices, find_pg_trgm_indices
 
 
 class AttributeMetadata:
+    """Class representing the metadata of an attribute."""
 
     def __init__(
         self,
@@ -170,7 +172,7 @@ class AttributeMetadata:
         """Returns the name of the attribute eventually without the _id suffix."""
         if self.name.endswith("_id"):
             return self.name[:-3]
-        return self.name  
+        return self.name
 
     def capitalized_normalized_name(self) -> str:
         """Returns the name of the attribute eventually without the _id suffix."""
@@ -178,6 +180,9 @@ class AttributeMetadata:
 
     def __repr__(self) -> str:
         return f"AttributeMetadata({self.name}, {self.data_type()}, {self.optional})"
+
+    def __hash__(self) -> int:
+        return hash((self.name, self.data_type()))
 
     def get_attribute_path(self, attribute: "AttributeMetadata") -> str:
         """Returns the path to the attribute.
@@ -218,12 +223,19 @@ class AttributeMetadata:
 class StructMetadata:
     """Class representing the metadata of a struct."""
 
-    def __init__(
-        self, struct_name: str, table_name: str, table_metadata: TableMetadata
-    ):
+    table_metadata: TableMetadata = None
+    pg_indices: PGIndices = None
+
+    def __init__(self, struct_name: str, table_name: str):
+        if StructMetadata.table_metadata is None:
+            StructMetadata.table_metadata = find_foreign_keys()
+        if StructMetadata.pg_indices is None:
+            StructMetadata.pg_indices = find_pg_trgm_indices(
+                tables_metadata=StructMetadata.table_metadata
+            )
+
         self.name = struct_name
         self.table_name = table_name
-        self.table_metadata = table_metadata
         self.attributes: List[AttributeMetadata] = []
         self._derives: List[str] = []
         self._decorators: List[str] = []
@@ -232,6 +244,7 @@ class StructMetadata:
         self._new_variant: Optional[StructMetadata] = None
         self._update_variant: Optional[StructMetadata] = None
         self._filter_variant: Optional[StructMetadata] = None
+        self._child_variants: Dict[(str, AttributeMetadata), StructMetadata] = {}
 
     def human_readable_name(self) -> str:
         """Returns the human readable name of the struct.
@@ -329,15 +342,17 @@ class StructMetadata:
             encountered_tables = set()
 
             for attribute in self.get_foreign_keys():
-                foreign_key_table = self.table_metadata.get_foreign_key_table_name(
-                    self.table_name, attribute.name
+                foreign_key_table = (
+                    StructMetadata.table_metadata.get_foreign_key_table_name(
+                        self.table_name, attribute.name
+                    )
                 )
                 if foreign_key_table in encountered_tables:
                     continue
 
                 encountered_tables.add(foreign_key_table)
-                foreign_key_flat_variant = self.table_metadata.get_flat_variant(
-                    foreign_key_table
+                foreign_key_flat_variant = (
+                    StructMetadata.table_metadata.get_flat_variant(foreign_key_table)
                 )
                 file.write(
                     f"#[diesel(belongs_to({foreign_key_flat_variant}, foreign_key = {attribute.name}))]\n"
@@ -492,6 +507,25 @@ class StructMetadata:
                 f"The attribute {attribute_metadata.name} is already in the struct {self.name}."
             )
 
+        if attribute_metadata.has_struct_data_type():
+            if not (
+                attribute_metadata.name == "inner"
+                and attribute_metadata.raw_data_type() == self._flat_variant
+            ):
+                inner_attribute = self._flat_variant.get_attribute_by_name(
+                    attribute_metadata.name
+                )
+                if inner_attribute is None:
+                    inner_attribute = self._flat_variant.get_attribute_by_name(
+                        f"{attribute_metadata.name}_id"
+                    )
+                if inner_attribute is None:
+                    raise ValueError(
+                        f"The attribute {attribute_metadata.name} is not in the struct {self.name}."
+                    )
+                foreign_struct: StructMetadata = attribute_metadata.raw_data_type()
+                foreign_struct.register_child_variant(inner_attribute, self)
+
         self.attributes.append(attribute_metadata)
 
     def add_derive(self, derive: str):
@@ -543,7 +577,9 @@ class StructMetadata:
         if self._flat_variant is not None:
             return self._flat_variant.get_foreign_keys()
 
-        foreign_key_names = self.table_metadata.get_foreign_keys(self.table_name)
+        foreign_key_names = StructMetadata.table_metadata.get_foreign_keys(
+            self.table_name
+        )
 
         foreign_keys = []
 
@@ -557,6 +593,50 @@ class StructMetadata:
             foreign_keys.append(attribute)
 
         return foreign_keys
+
+    def register_child_variant(
+        self, attribute: AttributeMetadata, child_variant: "StructMetadata"
+    ):
+        """Registers a child variant for the struct.
+
+        Parameters
+        ----------
+        attribute : AttributeMetadata
+            The attribute that is a foreign key.
+        child_variant : StructMetadata
+            The child variant to register.
+        """
+        assert not attribute.has_struct_data_type()
+        assert attribute in child_variant.get_foreign_keys()
+        if self._flat_variant is not None:
+            self._flat_variant.register_child_variant(attribute, child_variant)
+            return
+
+        key = (child_variant.table_name, attribute)
+
+        if key in self._child_variants and self._child_variants[key] != child_variant:
+            if child_variant.name.endswith("Builder"):
+                return
+            raise ValueError(
+                f"The attribute {attribute.name} is already associated with a child variant in the struct {self.name}. "
+                f"The child variant is {self._child_variants[key].name}. "
+                f"The new child variant is {child_variant.name}."
+            )
+
+        self._child_variants[key] = child_variant
+
+    @cache
+    def get_child_structs(self) -> Dict[AttributeMetadata, "StructMetadata"]:
+        """Returns the child foreign keys of the struct.
+
+        Implementation details
+        -----------------------
+        This method returns the child foreign keys of the struct.
+        """
+        if self._flat_variant is not None:
+            return self._flat_variant.get_child_foreign_keys()
+
+        return self._child_variants
 
     def get_manually_determined_foreign_keys(self) -> List[AttributeMetadata]:
         """Returns the manually determined foreign keys of the struct.
@@ -587,7 +667,7 @@ class StructMetadata:
         if self._flat_variant is not None:
             return self._flat_variant.get_primary_keys()
 
-        primary_keys = self.table_metadata.get_primary_key_names_and_types(
+        primary_keys = StructMetadata.table_metadata.get_primary_key_names_and_types(
             self.table_name
         )
 
@@ -617,7 +697,10 @@ class StructMetadata:
         a UUID.
         """
         primary_keys = self.get_primary_keys()
-        return all(attribute.data_type() == "Uuid" for attribute in primary_keys)
+        return (
+            all(attribute.data_type() == "Uuid" for attribute in primary_keys)
+            and len(primary_keys) == 1
+        )
 
     def derives(self, diesel: Optional[str] = None) -> List[str]:
         """Returns the list of derives for the struct.
@@ -756,7 +839,7 @@ class StructMetadata:
 
     def has_associated_roles(self) -> bool:
         """Returns whether there is a roles table associated with the struct."""
-        return self.table_metadata.has_associated_roles(self.table_name)
+        return StructMetadata.table_metadata.has_associated_roles(self.table_name)
 
     def has_public_column(self) -> bool:
         """Returns whether the struct has a public column."""
@@ -816,6 +899,44 @@ class StructMetadata:
 
         return self._filter_variant
 
+    def is_searchable(self) -> bool:
+        """Returns whether the struct is searchable.
+
+        Implementation details
+        -----------------------
+        A struct is searchable if it has a trigram index on the table.
+        """
+        return StructMetadata.pg_indices.has_table(self.table_name)
+
+    def get_opaque_foreign_keys(self) -> List[AttributeMetadata]:
+        """Returns list of foreign keys that are not searchable.
+
+        Implementation details
+        -----------------------
+        This method returns the foreign keys that are not searchable,
+        i.e. that do not implement a trigram index in the database.
+        """
+        return [
+            attribute
+            for attribute in self.get_foreign_keys()
+            if not StructMetadata.pg_indices.has_table(
+                StructMetadata.table_metadata.get_foreign_key_table_name(
+                    self.table_name, attribute.name
+                )
+            )
+        ]
+
+    def has_opaque_foreign_keys(self) -> bool:
+        """Returns whether the struct has opaque foreign keys.
+
+        Implementation details
+        -----------------------
+        This method returns whether the struct has foreign keys that
+        are not searchable, i.e. that do not implement a trigram index
+        in the database.
+        """
+        return len(self.get_opaque_foreign_keys()) > 0
+
     def get_unique_constraints(self) -> List[List[AttributeMetadata]]:
         """Returns the unique constraints of the struct.
 
@@ -827,7 +948,7 @@ class StructMetadata:
             return self._flat_variant.get_unique_constraints()
 
         unique_constraints: List[Tuple[str]] = (
-            self.table_metadata.get_unique_constraint_columns(self.table_name)
+            StructMetadata.table_metadata.get_unique_constraint_columns(self.table_name)
         )
 
         unique_constraints_attributes: List[List[AttributeMetadata]] = []

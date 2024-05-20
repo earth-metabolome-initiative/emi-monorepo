@@ -43,6 +43,11 @@ pub fn sidebar(props: &SidebarProps) -> Html {
                             {"Samples"}
                         </Link<AppRoute>>
                     </li>
+                    <li class={if route == AppRoute::SpectraCollections { "active" } else { "" }}>
+                        <Link<AppRoute> to={AppRoute::SpectraCollections}>
+                            {"Spectra collections"}
+                        </Link<AppRoute>>
+                    </li>
                     <li class={if route == AppRoute::Teams { "active" } else { "" }}>
                         <Link<AppRoute> to={AppRoute::Teams}>
                             {"Teams"}

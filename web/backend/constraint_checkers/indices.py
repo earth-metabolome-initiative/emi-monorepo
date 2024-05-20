@@ -83,9 +83,6 @@ def find_pg_trgm_indices(
     indices = cursor.fetchall()
     pg_indices = []
     for index in indices:
-        sanitized_coumn_names = []
-        table_name = index[1]
-        table_columns = tables_metadata.get_columns(table_name)
         arguments = index[2]
 
         index_type = None

@@ -28,7 +28,6 @@ def create_filter_structs(flat_variants: List[StructMetadata]) -> List[StructMet
         filter_struct = StructMetadata(
             flat_variant.name + "Filter",
             table_name=flat_variant.table_name,
-            table_metadata=flat_variant.table_metadata,
         )
 
         for foreign_key in flat_variant.get_foreign_keys():

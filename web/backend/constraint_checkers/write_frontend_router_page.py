@@ -67,7 +67,26 @@ def write_frontend_sidebar(builders: List[StructMetadata]):
         "                <ul>\n"
     )
 
+    deny_list = [
+        "roles",
+        "invitations",
+        "requests",
+    ]
+
     for builder in builders:
+
+        found_skip = False
+        for deny in deny_list:
+            if builder.table_name.endswith(deny):
+                found_skip = True
+                break
+        
+        if found_skip:
+            continue
+
+        if builder.is_junktion_table():
+            continue
+
         document.write(
             f'                    <li class={{if route == AppRoute::{builder.get_capitalized_table_name()} {{ "active" }} else {{ "" }}}}>\n'
             f"                        <Link<AppRoute> to={{AppRoute::{builder.get_capitalized_table_name()}}}>\n"
@@ -136,7 +155,6 @@ def write_frontend_router_page(builders: List[StructMetadata]):
         "use crate::pages::*;",
         "use uuid::Uuid;",
         "use crate::components::BasicList;",
-        "use crate::components::BasicPage;",
         "use web_common::database::*;",
         "use crate::components::forms::automatic_forms::*;",
     ]
@@ -149,10 +167,28 @@ def write_frontend_router_page(builders: List[StructMetadata]):
 
     enum_variants = []
 
+    deny_list = [
+        "roles",
+        "invitations",
+        "requests",
+    ]
+
     for builder in builders:
         flat_variant = builder.get_flat_variant()
         richest_variant = builder.get_richest_variant()
         primary_keys = flat_variant.get_primary_keys()
+
+        found_skip = False
+        for deny in deny_list:
+            if builder.table_name.endswith(deny):
+                found_skip = True
+                break
+        
+        if found_skip:
+            continue
+
+        if builder.is_junktion_table():
+            continue
 
         ids_url = "".join([f"/:{primary_key.name}" for primary_key in primary_keys])
         ids_struct = ", ".join(
@@ -248,15 +284,26 @@ def write_frontend_router_page(builders: List[StructMetadata]):
     for builder in builders:
         flat_variant = builder.get_flat_variant()
         richest_variant = builder.get_richest_variant()
-
         primary_keys = flat_variant.get_primary_keys()
+
+        found_skip = False
+        for deny in deny_list:
+            if builder.table_name.endswith(deny):
+                found_skip = True
+                break
+        
+        if found_skip:
+            continue
+
+        if builder.is_junktion_table():
+            continue
 
         document.write(
             f"        AppRoute::{builder.get_capitalized_table_name()} => {{\n"
             f"            html! {{ <BasicList<{richest_variant.name}> /> }}\n"
             f"        }}\n"
-            f"        AppRoute::{builder.get_capitalized_table_name()}View{{{flat_variant.get_formatted_primary_keys(include_prefix=False)}}} => {{\n"
-            f"            html! {{ <BasicPage<{richest_variant.name}> id={{PrimaryKey::from({flat_variant.get_formatted_primary_keys(include_prefix=False)})}} /> }}\n"
+            f"        AppRoute::{builder.get_capitalized_table_name()}View{{{flat_variant.get_formatted_primary_keys(include_prefix=False, include_parenthesis=False)}}} => {{\n"
+            f"            html! {{ <{flat_variant.name}Page id={{{flat_variant.get_formatted_primary_keys(include_prefix=False)}}} /> }}\n"
             f"        }}\n"
         )
 
@@ -309,7 +356,7 @@ def write_frontend_router_page(builders: List[StructMetadata]):
                 for primary_key in primary_keys
             )
             document.write(
-                f"        AppRoute::{builder.get_capitalized_table_name()}Update{{{flat_variant.get_formatted_primary_keys(include_prefix=False)}}} => {{\n"
+                f"        AppRoute::{builder.get_capitalized_table_name()}Update{{{flat_variant.get_formatted_primary_keys(include_prefix=False, include_parenthesis=False)}}} => {{\n"
                 f"            html! {{ <Update{flat_variant.name}Form {form_primary_key_properties} /> }}\n"
                 f"        }}\n"
             )

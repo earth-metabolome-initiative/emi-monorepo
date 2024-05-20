@@ -25,6 +25,11 @@ from constraint_checkers.ensure_roles_tables import (
 from constraint_checkers.regroup_tables import regroup_tables
 from constraint_checkers.parent_circularity_trigger import check_parent_circularity_trigger
 from constraint_checkers.create_filter_structs import create_filter_structs
+from constraint_checkers.ensures_migrations_simmetry import ensures_migrations_simmetry
+from constraint_checkers.ensures_gluesql_compliance import ensures_gluesql_compliance
+from constraint_checkers.check_for_common_typos_in_migrations import check_for_common_typos_in_migrations
+from constraint_checkers.generate_table_schema import generate_table_schema
+from constraint_checkers.write_frontend_forms import write_frontend_forms
 
 
 __all__ = [
@@ -39,5 +44,22 @@ __all__ = [
     "handle_minimal_revertion",
     "write_frontend_pages",
     "regroup_tables",
-    "create_filter_structs"
+    "create_filter_structs",
+    "StructMetadata",
+    "AttributeMetadata",
+    "replace_serial_indices",
+    "write_frontend_router_page",
+    "PGIndex",
+    "PGIndices",
+    "find_pg_trgm_indices",
+    "enforce_migration_naming_convention",
+    "generate_view_schema",
+    "ensure_tables_have_creation_notification_trigger",
+    "ensure_updatable_tables_have_roles_tables",
+    "check_parent_circularity_trigger",
+    "ensures_migrations_simmetry",
+    "ensures_gluesql_compliance",
+    "check_for_common_typos_in_migrations",
+    "generate_table_schema",
+    "write_frontend_forms"
 ]

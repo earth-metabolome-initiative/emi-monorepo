@@ -18,6 +18,159 @@ use crate::workers::ws_worker::ComponentMessage;
 use web_common::custom_validators::Image;
 use web_common::file_formats::GenericFileFormat;
 
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
+pub struct DerivedSampleBuilder {
+    pub parent_sample: Option<NestedSample>,
+    pub child_sample: Option<NestedSample>,
+    pub errors_parent_sample: Vec<ApiError>,
+    pub errors_child_sample: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for DerivedSampleBuilder {
+    fn default() -> Self {
+        Self {
+            parent_sample: None,
+            child_sample: None,
+            errors_parent_sample: Vec::new(),
+            errors_child_sample: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
+}
+
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub(super) enum DerivedSampleActions {
+    SetParentSample(Option<NestedSample>),
+    SetChildSample(Option<NestedSample>),
+}
+
+impl FromOperation for DerivedSampleActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "parent_sample" => DerivedSampleActions::SetParentSample(Some(bincode::deserialize(&row).unwrap())),
+            "child_sample" => DerivedSampleActions::SetChildSample(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
+}
+
+impl Reducer<DerivedSampleBuilder> for DerivedSampleActions {
+    fn apply(self, mut state: std::rc::Rc<DerivedSampleBuilder>) -> std::rc::Rc<DerivedSampleBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            DerivedSampleActions::SetParentSample(parent_sample) => 'parent_sample: {
+                state_mut.errors_parent_sample.clear();
+        if parent_sample.is_none() {
+            state_mut.errors_parent_sample.push(ApiError::BadRequest(vec![
+                "The Parent sample field is required.".to_string()
+             ]));
+            state_mut.parent_sample = None;
+             break 'parent_sample;
+        }
+                state_mut.parent_sample = parent_sample;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'parent_sample;
+            }
+            DerivedSampleActions::SetChildSample(child_sample) => 'child_sample: {
+                state_mut.errors_child_sample.clear();
+        if child_sample.is_none() {
+            state_mut.errors_child_sample.push(ApiError::BadRequest(vec![
+                "The Child sample field is required.".to_string()
+             ]));
+            state_mut.child_sample = None;
+             break 'child_sample;
+        }
+                state_mut.child_sample = child_sample;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'child_sample;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for DerivedSampleBuilder {
+    type Actions = DerivedSampleActions;
+
+    type RichVariant = NestedDerivedSample;
+
+    fn has_errors(&self) -> bool {
+!self.errors_parent_sample.is_empty() || !self.errors_child_sample.is_empty()
+    }
+
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.apply(DerivedSampleActions::SetParentSample(Some(richest_variant.parent_sample)));
+        dispatcher.apply(DerivedSampleActions::SetChildSample(Some(richest_variant.child_sample)));
+        vec![]
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.parent_sample.is_some()
+        && self.child_sample.is_some()
+    }
+
+}
+
+impl From<DerivedSampleBuilder> for NewDerivedSample {
+    fn from(builder: DerivedSampleBuilder) -> Self {
+        Self {
+            parent_sample_id: builder.parent_sample.as_ref().map(|parent_sample| parent_sample.inner.id).unwrap(),
+            child_sample_id: builder.child_sample.as_ref().map(|child_sample| child_sample.inner.id).unwrap(),
+        }
+    }
+}
+impl FormBuildable for NewDerivedSample {
+    type Builder = DerivedSampleBuilder;
+    fn title() -> &'static str {
+        "Derived sample"
+    }
+    fn task_target() -> &'static str {
+        "Derived sample"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        false
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateDerivedSampleFormProp {
+    pub parent_sample_id: Uuid,
+    pub child_sample_id: Uuid,
+}
+
+#[function_component(CreateDerivedSampleForm)]
+pub fn create_derived_sample_form(props: &CreateDerivedSampleFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<DerivedSampleBuilder>();
+    named_requests.push(ComponentMessage::get_named::<&str, Sample>("parent_sample", props.parent_sample_id.into()));
+    named_requests.push(ComponentMessage::get_named::<&str, Sample>("child_sample", props.child_sample_id.into()));
+    let set_parent_sample = builder_dispatch.apply_callback(|parent_sample: Option<NestedSample>| DerivedSampleActions::SetParentSample(parent_sample));
+    let set_child_sample = builder_dispatch.apply_callback(|child_sample: Option<NestedSample>| DerivedSampleActions::SetChildSample(child_sample));
+    html! {
+        <BasicForm<NewDerivedSample>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+if let Some(parent_sample) = builder_store.parent_sample.as_ref() {
+    <span>{"TODO Selected parent_sample"}</span>
+} else {
+    <></>
+}
+if let Some(child_sample) = builder_store.child_sample.as_ref() {
+    <span>{"TODO Selected child_sample"}</span>
+} else {
+    <></>
+}
+        </BasicForm<NewDerivedSample>>
+    }
+}
 #[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct ProjectBuilder {
@@ -339,23 +492,20 @@ impl FormBuilder for ProjectBuilder {
 !self.errors_name.is_empty() || !self.errors_description.is_empty() || !self.errors_public.is_empty() || !self.errors_budget.is_empty() || !self.errors_expenses.is_empty() || !self.errors_expected_end_date.is_empty() || !self.errors_end_date.is_empty() || !self.errors_state.is_empty() || !self.errors_icon.is_empty() || !self.errors_color.is_empty() || !self.errors_parent_project.is_empty()
     }
 
-    fn id(&self) -> Option<PrimaryKey> {
-        self.id.map(|id| id.into())
-    }
-
-    fn update(dispatcher: &Dispatch<Self>, rich_variant: Self::RichVariant) -> Vec<ComponentMessage> {
-    dispatcher.apply(ProjectActions::SetName(Some(rich_variant.inner.name.to_string())));
-    dispatcher.apply(ProjectActions::SetDescription(Some(rich_variant.inner.description.to_string())));
-        dispatcher.apply(ProjectActions::SetPublic(Some(rich_variant.inner.public)));    dispatcher.apply(ProjectActions::SetBudget(rich_variant.inner.budget.map(|budget| budget.to_string())));
-    dispatcher.apply(ProjectActions::SetExpenses(rich_variant.inner.expenses.map(|expenses| expenses.to_string())));
-    dispatcher.apply(ProjectActions::SetExpectedEndDate(rich_variant.inner.expected_end_date.map(|expected_end_date| expected_end_date.to_string())));
-    dispatcher.apply(ProjectActions::SetEndDate(rich_variant.inner.end_date.map(|end_date| end_date.to_string())));
-        dispatcher.apply(ProjectActions::SetState(Some(rich_variant.state)));
-        dispatcher.apply(ProjectActions::SetIcon(Some(rich_variant.icon)));
-        dispatcher.apply(ProjectActions::SetColor(Some(rich_variant.color)));
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.reduce_mut(|state| {state.id = Some(richest_variant.inner.id);});
+    dispatcher.apply(ProjectActions::SetName(Some(richest_variant.inner.name.to_string())));
+    dispatcher.apply(ProjectActions::SetDescription(Some(richest_variant.inner.description.to_string())));
+        dispatcher.apply(ProjectActions::SetPublic(Some(richest_variant.inner.public)));    dispatcher.apply(ProjectActions::SetBudget(richest_variant.inner.budget.map(|budget| budget.to_string())));
+    dispatcher.apply(ProjectActions::SetExpenses(richest_variant.inner.expenses.map(|expenses| expenses.to_string())));
+    dispatcher.apply(ProjectActions::SetExpectedEndDate(richest_variant.inner.expected_end_date.map(|expected_end_date| expected_end_date.to_string())));
+    dispatcher.apply(ProjectActions::SetEndDate(richest_variant.inner.end_date.map(|end_date| end_date.to_string())));
+        dispatcher.apply(ProjectActions::SetState(Some(richest_variant.state)));
+        dispatcher.apply(ProjectActions::SetIcon(Some(richest_variant.icon)));
+        dispatcher.apply(ProjectActions::SetColor(Some(richest_variant.color)));
         let mut named_requests = Vec::new();
-        if let Some(parent_project_id) = rich_variant.inner.parent_project_id {
-    named_requests.push(ComponentMessage::get_named::<&str, NewProject>("parent_project", parent_project_id.into()));
+        if let Some(parent_project_id) = richest_variant.inner.parent_project_id {
+    named_requests.push(ComponentMessage::get_named::<&str, Project>("parent_project", parent_project_id.into()));
  } else {
     dispatcher.apply(ProjectActions::SetParentProject(None));
  }
@@ -443,12 +593,12 @@ impl FormBuildable for UpdateProject {
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct CreateProjectFormProp {
-     #[prop_or_default]
-    pub state_id: Option<i32>,
-     #[prop_or_default]
-    pub icon_id: Option<i32>,
-     #[prop_or_default]
-    pub color_id: Option<i32>,
+     #[prop_or(1)]
+     pub state_id: i32,
+     #[prop_or(415)]
+     pub icon_id: i32,
+     #[prop_or(1)]
+     pub color_id: i32,
      #[prop_or_default]
     pub parent_project_id: Option<i32>,
 }
@@ -457,26 +607,11 @@ pub struct CreateProjectFormProp {
 pub fn create_project_form(props: &CreateProjectFormProp) -> Html {
      let mut named_requests: Vec<ComponentMessage> = Vec::new();
     let (builder_store, builder_dispatch) = use_store::<ProjectBuilder>();
-    if let Some(state_id) = props.state_id {
-         named_requests.push(ComponentMessage::get_named::<&str, ProjectState>("state", state_id.into()));
-    } else {
-         // Default value for projects.state_id is 1.
-         named_requests.push(ComponentMessage::get_named::<&str, ProjectState>("state", 1.into()));
-    }
-    if let Some(icon_id) = props.icon_id {
-         named_requests.push(ComponentMessage::get_named::<&str, FontAwesomeIcon>("icon", icon_id.into()));
-    } else {
-         // Default value for projects.icon_id is 415.
-         named_requests.push(ComponentMessage::get_named::<&str, FontAwesomeIcon>("icon", 415.into()));
-    }
-    if let Some(color_id) = props.color_id {
-         named_requests.push(ComponentMessage::get_named::<&str, Color>("color", color_id.into()));
-    } else {
-         // Default value for projects.color_id is 1.
-         named_requests.push(ComponentMessage::get_named::<&str, Color>("color", 1.into()));
-    }
-    if let Some(parent_project_id) = props.parent_project_id {
-         named_requests.push(ComponentMessage::get_named::<&str, NewProject>("parent_project", parent_project_id.into()));
+    named_requests.push(ComponentMessage::get_named::<&str, ProjectState>("state", props.state_id.into()));
+    named_requests.push(ComponentMessage::get_named::<&str, FontAwesomeIcon>("icon", props.icon_id.into()));
+    named_requests.push(ComponentMessage::get_named::<&str, Color>("color", props.color_id.into()));
+   if let Some(parent_project_id) = props.parent_project_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Project>("parent_project", parent_project_id.into()));
     }
     let set_name = builder_dispatch.apply_callback(|name: Option<String>| ProjectActions::SetName(name));
     let set_description = builder_dispatch.apply_callback(|description: Option<String>| ProjectActions::SetDescription(description));
@@ -550,6 +685,1396 @@ pub fn update_project_form(props: &UpdateProjectFormProp) -> Html {
         </BasicForm<UpdateProject>>
     }
 }
+#[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
+pub struct ProjectsTeamsRoleInvitationBuilder {
+    pub table: Option<NestedProject>,
+    pub team: Option<NestedTeam>,
+    pub role: Option<NestedRole>,
+    pub errors_table: Vec<ApiError>,
+    pub errors_team: Vec<ApiError>,
+    pub errors_role: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for ProjectsTeamsRoleInvitationBuilder {
+    fn default() -> Self {
+        Self {
+            table: None,
+            team: None,
+            role: None,
+            errors_table: Vec::new(),
+            errors_team: Vec::new(),
+            errors_role: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
+}
+
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub(super) enum ProjectsTeamsRoleInvitationActions {
+    SetTable(Option<NestedProject>),
+    SetTeam(Option<NestedTeam>),
+    SetRole(Option<NestedRole>),
+}
+
+impl FromOperation for ProjectsTeamsRoleInvitationActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "table" => ProjectsTeamsRoleInvitationActions::SetTable(Some(bincode::deserialize(&row).unwrap())),
+            "team" => ProjectsTeamsRoleInvitationActions::SetTeam(Some(bincode::deserialize(&row).unwrap())),
+            "role" => ProjectsTeamsRoleInvitationActions::SetRole(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
+}
+
+impl Reducer<ProjectsTeamsRoleInvitationBuilder> for ProjectsTeamsRoleInvitationActions {
+    fn apply(self, mut state: std::rc::Rc<ProjectsTeamsRoleInvitationBuilder>) -> std::rc::Rc<ProjectsTeamsRoleInvitationBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            ProjectsTeamsRoleInvitationActions::SetTable(table) => 'table: {
+                state_mut.errors_table.clear();
+        if table.is_none() {
+            state_mut.errors_table.push(ApiError::BadRequest(vec![
+                "The Table field is required.".to_string()
+             ]));
+            state_mut.table = None;
+             break 'table;
+        }
+                state_mut.table = table;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'table;
+            }
+            ProjectsTeamsRoleInvitationActions::SetTeam(team) => 'team: {
+                state_mut.errors_team.clear();
+        if team.is_none() {
+            state_mut.errors_team.push(ApiError::BadRequest(vec![
+                "The Team field is required.".to_string()
+             ]));
+            state_mut.team = None;
+             break 'team;
+        }
+                state_mut.team = team;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'team;
+            }
+            ProjectsTeamsRoleInvitationActions::SetRole(role) => 'role: {
+                state_mut.errors_role.clear();
+        if role.is_none() {
+            state_mut.errors_role.push(ApiError::BadRequest(vec![
+                "The Role field is required.".to_string()
+             ]));
+            state_mut.role = None;
+             break 'role;
+        }
+                state_mut.role = role;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'role;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for ProjectsTeamsRoleInvitationBuilder {
+    type Actions = ProjectsTeamsRoleInvitationActions;
+
+    type RichVariant = NestedProjectsTeamsRoleInvitation;
+
+    fn has_errors(&self) -> bool {
+!self.errors_table.is_empty() || !self.errors_team.is_empty() || !self.errors_role.is_empty()
+    }
+
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.apply(ProjectsTeamsRoleInvitationActions::SetTable(Some(richest_variant.table)));
+        dispatcher.apply(ProjectsTeamsRoleInvitationActions::SetTeam(Some(richest_variant.team)));
+        dispatcher.apply(ProjectsTeamsRoleInvitationActions::SetRole(Some(richest_variant.role)));
+        vec![]
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.table.is_some()
+        && self.team.is_some()
+        && self.role.is_some()
+    }
+
+}
+
+impl From<ProjectsTeamsRoleInvitationBuilder> for NewProjectsTeamsRoleInvitation {
+    fn from(builder: ProjectsTeamsRoleInvitationBuilder) -> Self {
+        Self {
+            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
+            team_id: builder.team.as_ref().map(|team| team.inner.id).unwrap(),
+            role_id: builder.role.unwrap().inner.id,
+        }
+    }
+}
+impl FormBuildable for NewProjectsTeamsRoleInvitation {
+    type Builder = ProjectsTeamsRoleInvitationBuilder;
+    fn title() -> &'static str {
+        "Projects teams role invitation"
+    }
+    fn task_target() -> &'static str {
+        "Projects teams role invitation"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        false
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateProjectsTeamsRoleInvitationFormProp {
+     #[prop_or_default]
+    pub table_id: Option<i32>,
+     #[prop_or_default]
+    pub team_id: Option<i32>,
+     #[prop_or_default]
+    pub role_id: Option<i32>,
+}
+
+#[function_component(CreateProjectsTeamsRoleInvitationForm)]
+pub fn create_projects_teams_role_invitation_form(props: &CreateProjectsTeamsRoleInvitationFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<ProjectsTeamsRoleInvitationBuilder>();
+   if let Some(table_id) = props.table_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Project>("table", table_id.into()));
+    }
+   if let Some(team_id) = props.team_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Team>("team", team_id.into()));
+    }
+   if let Some(role_id) = props.role_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Role>("role", role_id.into()));
+    }
+    let set_table = builder_dispatch.apply_callback(|table: Option<NestedProject>| ProjectsTeamsRoleInvitationActions::SetTable(table));
+    let set_team = builder_dispatch.apply_callback(|team: Option<NestedTeam>| ProjectsTeamsRoleInvitationActions::SetTeam(team));
+    let set_role = builder_dispatch.apply_callback(|role: Option<NestedRole>| ProjectsTeamsRoleInvitationActions::SetRole(role));
+    html! {
+        <BasicForm<NewProjectsTeamsRoleInvitation>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+            <Datalist<NestedProject, true> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" />
+            <Datalist<NestedTeam, true> builder={set_team} optional={false} errors={builder_store.errors_team.clone()} value={builder_store.team.clone()} label="Team" />
+            <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
+        </BasicForm<NewProjectsTeamsRoleInvitation>>
+    }
+}
+#[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
+pub struct ProjectsTeamsRoleRequestBuilder {
+    pub table: Option<NestedProject>,
+    pub team: Option<NestedTeam>,
+    pub role: Option<NestedRole>,
+    pub errors_table: Vec<ApiError>,
+    pub errors_team: Vec<ApiError>,
+    pub errors_role: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for ProjectsTeamsRoleRequestBuilder {
+    fn default() -> Self {
+        Self {
+            table: None,
+            team: None,
+            role: None,
+            errors_table: Vec::new(),
+            errors_team: Vec::new(),
+            errors_role: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
+}
+
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub(super) enum ProjectsTeamsRoleRequestActions {
+    SetTable(Option<NestedProject>),
+    SetTeam(Option<NestedTeam>),
+    SetRole(Option<NestedRole>),
+}
+
+impl FromOperation for ProjectsTeamsRoleRequestActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "table" => ProjectsTeamsRoleRequestActions::SetTable(Some(bincode::deserialize(&row).unwrap())),
+            "team" => ProjectsTeamsRoleRequestActions::SetTeam(Some(bincode::deserialize(&row).unwrap())),
+            "role" => ProjectsTeamsRoleRequestActions::SetRole(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
+}
+
+impl Reducer<ProjectsTeamsRoleRequestBuilder> for ProjectsTeamsRoleRequestActions {
+    fn apply(self, mut state: std::rc::Rc<ProjectsTeamsRoleRequestBuilder>) -> std::rc::Rc<ProjectsTeamsRoleRequestBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            ProjectsTeamsRoleRequestActions::SetTable(table) => 'table: {
+                state_mut.errors_table.clear();
+        if table.is_none() {
+            state_mut.errors_table.push(ApiError::BadRequest(vec![
+                "The Table field is required.".to_string()
+             ]));
+            state_mut.table = None;
+             break 'table;
+        }
+                state_mut.table = table;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'table;
+            }
+            ProjectsTeamsRoleRequestActions::SetTeam(team) => 'team: {
+                state_mut.errors_team.clear();
+        if team.is_none() {
+            state_mut.errors_team.push(ApiError::BadRequest(vec![
+                "The Team field is required.".to_string()
+             ]));
+            state_mut.team = None;
+             break 'team;
+        }
+                state_mut.team = team;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'team;
+            }
+            ProjectsTeamsRoleRequestActions::SetRole(role) => 'role: {
+                state_mut.errors_role.clear();
+        if role.is_none() {
+            state_mut.errors_role.push(ApiError::BadRequest(vec![
+                "The Role field is required.".to_string()
+             ]));
+            state_mut.role = None;
+             break 'role;
+        }
+                state_mut.role = role;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'role;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for ProjectsTeamsRoleRequestBuilder {
+    type Actions = ProjectsTeamsRoleRequestActions;
+
+    type RichVariant = NestedProjectsTeamsRoleRequest;
+
+    fn has_errors(&self) -> bool {
+!self.errors_table.is_empty() || !self.errors_team.is_empty() || !self.errors_role.is_empty()
+    }
+
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.apply(ProjectsTeamsRoleRequestActions::SetTable(Some(richest_variant.table)));
+        dispatcher.apply(ProjectsTeamsRoleRequestActions::SetTeam(Some(richest_variant.team)));
+        dispatcher.apply(ProjectsTeamsRoleRequestActions::SetRole(Some(richest_variant.role)));
+        vec![]
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.table.is_some()
+        && self.team.is_some()
+        && self.role.is_some()
+    }
+
+}
+
+impl From<ProjectsTeamsRoleRequestBuilder> for NewProjectsTeamsRoleRequest {
+    fn from(builder: ProjectsTeamsRoleRequestBuilder) -> Self {
+        Self {
+            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
+            team_id: builder.team.as_ref().map(|team| team.inner.id).unwrap(),
+            role_id: builder.role.unwrap().inner.id,
+        }
+    }
+}
+impl FormBuildable for NewProjectsTeamsRoleRequest {
+    type Builder = ProjectsTeamsRoleRequestBuilder;
+    fn title() -> &'static str {
+        "Projects teams role request"
+    }
+    fn task_target() -> &'static str {
+        "Projects teams role request"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        false
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateProjectsTeamsRoleRequestFormProp {
+     #[prop_or_default]
+    pub table_id: Option<i32>,
+     #[prop_or_default]
+    pub team_id: Option<i32>,
+     #[prop_or_default]
+    pub role_id: Option<i32>,
+}
+
+#[function_component(CreateProjectsTeamsRoleRequestForm)]
+pub fn create_projects_teams_role_request_form(props: &CreateProjectsTeamsRoleRequestFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<ProjectsTeamsRoleRequestBuilder>();
+   if let Some(table_id) = props.table_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Project>("table", table_id.into()));
+    }
+   if let Some(team_id) = props.team_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Team>("team", team_id.into()));
+    }
+   if let Some(role_id) = props.role_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Role>("role", role_id.into()));
+    }
+    let set_table = builder_dispatch.apply_callback(|table: Option<NestedProject>| ProjectsTeamsRoleRequestActions::SetTable(table));
+    let set_team = builder_dispatch.apply_callback(|team: Option<NestedTeam>| ProjectsTeamsRoleRequestActions::SetTeam(team));
+    let set_role = builder_dispatch.apply_callback(|role: Option<NestedRole>| ProjectsTeamsRoleRequestActions::SetRole(role));
+    html! {
+        <BasicForm<NewProjectsTeamsRoleRequest>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+            <Datalist<NestedProject, true> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" />
+            <Datalist<NestedTeam, true> builder={set_team} optional={false} errors={builder_store.errors_team.clone()} value={builder_store.team.clone()} label="Team" />
+            <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
+        </BasicForm<NewProjectsTeamsRoleRequest>>
+    }
+}
+#[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
+pub struct ProjectsTeamsRoleBuilder {
+    pub table: Option<NestedProject>,
+    pub team: Option<NestedTeam>,
+    pub role: Option<NestedRole>,
+    pub errors_table: Vec<ApiError>,
+    pub errors_team: Vec<ApiError>,
+    pub errors_role: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for ProjectsTeamsRoleBuilder {
+    fn default() -> Self {
+        Self {
+            table: None,
+            team: None,
+            role: None,
+            errors_table: Vec::new(),
+            errors_team: Vec::new(),
+            errors_role: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
+}
+
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub(super) enum ProjectsTeamsRoleActions {
+    SetTable(Option<NestedProject>),
+    SetTeam(Option<NestedTeam>),
+    SetRole(Option<NestedRole>),
+}
+
+impl FromOperation for ProjectsTeamsRoleActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "table" => ProjectsTeamsRoleActions::SetTable(Some(bincode::deserialize(&row).unwrap())),
+            "team" => ProjectsTeamsRoleActions::SetTeam(Some(bincode::deserialize(&row).unwrap())),
+            "role" => ProjectsTeamsRoleActions::SetRole(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
+}
+
+impl Reducer<ProjectsTeamsRoleBuilder> for ProjectsTeamsRoleActions {
+    fn apply(self, mut state: std::rc::Rc<ProjectsTeamsRoleBuilder>) -> std::rc::Rc<ProjectsTeamsRoleBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            ProjectsTeamsRoleActions::SetTable(table) => 'table: {
+                state_mut.errors_table.clear();
+        if table.is_none() {
+            state_mut.errors_table.push(ApiError::BadRequest(vec![
+                "The Table field is required.".to_string()
+             ]));
+            state_mut.table = None;
+             break 'table;
+        }
+                state_mut.table = table;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'table;
+            }
+            ProjectsTeamsRoleActions::SetTeam(team) => 'team: {
+                state_mut.errors_team.clear();
+        if team.is_none() {
+            state_mut.errors_team.push(ApiError::BadRequest(vec![
+                "The Team field is required.".to_string()
+             ]));
+            state_mut.team = None;
+             break 'team;
+        }
+                state_mut.team = team;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'team;
+            }
+            ProjectsTeamsRoleActions::SetRole(role) => 'role: {
+                state_mut.errors_role.clear();
+        if role.is_none() {
+            state_mut.errors_role.push(ApiError::BadRequest(vec![
+                "The Role field is required.".to_string()
+             ]));
+            state_mut.role = None;
+             break 'role;
+        }
+                state_mut.role = role;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'role;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for ProjectsTeamsRoleBuilder {
+    type Actions = ProjectsTeamsRoleActions;
+
+    type RichVariant = NestedProjectsTeamsRole;
+
+    fn has_errors(&self) -> bool {
+!self.errors_table.is_empty() || !self.errors_team.is_empty() || !self.errors_role.is_empty()
+    }
+
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.apply(ProjectsTeamsRoleActions::SetTable(Some(richest_variant.table)));
+        dispatcher.apply(ProjectsTeamsRoleActions::SetTeam(Some(richest_variant.team)));
+        dispatcher.apply(ProjectsTeamsRoleActions::SetRole(Some(richest_variant.role)));
+        vec![]
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.table.is_some()
+        && self.team.is_some()
+        && self.role.is_some()
+    }
+
+}
+
+impl From<ProjectsTeamsRoleBuilder> for NewProjectsTeamsRole {
+    fn from(builder: ProjectsTeamsRoleBuilder) -> Self {
+        Self {
+            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
+            team_id: builder.team.as_ref().map(|team| team.inner.id).unwrap(),
+            role_id: builder.role.unwrap().inner.id,
+        }
+    }
+}
+impl FormBuildable for NewProjectsTeamsRole {
+    type Builder = ProjectsTeamsRoleBuilder;
+    fn title() -> &'static str {
+        "Projects teams role"
+    }
+    fn task_target() -> &'static str {
+        "Projects teams role"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        false
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateProjectsTeamsRoleFormProp {
+     #[prop_or_default]
+    pub table_id: Option<i32>,
+     #[prop_or_default]
+    pub team_id: Option<i32>,
+     #[prop_or_default]
+    pub role_id: Option<i32>,
+}
+
+#[function_component(CreateProjectsTeamsRoleForm)]
+pub fn create_projects_teams_role_form(props: &CreateProjectsTeamsRoleFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<ProjectsTeamsRoleBuilder>();
+   if let Some(table_id) = props.table_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Project>("table", table_id.into()));
+    }
+   if let Some(team_id) = props.team_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Team>("team", team_id.into()));
+    }
+   if let Some(role_id) = props.role_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Role>("role", role_id.into()));
+    }
+    let set_table = builder_dispatch.apply_callback(|table: Option<NestedProject>| ProjectsTeamsRoleActions::SetTable(table));
+    let set_team = builder_dispatch.apply_callback(|team: Option<NestedTeam>| ProjectsTeamsRoleActions::SetTeam(team));
+    let set_role = builder_dispatch.apply_callback(|role: Option<NestedRole>| ProjectsTeamsRoleActions::SetRole(role));
+    html! {
+        <BasicForm<NewProjectsTeamsRole>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+            <Datalist<NestedProject, true> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" />
+            <Datalist<NestedTeam, true> builder={set_team} optional={false} errors={builder_store.errors_team.clone()} value={builder_store.team.clone()} label="Team" />
+            <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
+        </BasicForm<NewProjectsTeamsRole>>
+    }
+}
+#[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
+pub struct ProjectsUsersRoleInvitationBuilder {
+    pub table: Option<NestedProject>,
+    pub user: Option<User>,
+    pub role: Option<NestedRole>,
+    pub errors_table: Vec<ApiError>,
+    pub errors_user: Vec<ApiError>,
+    pub errors_role: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for ProjectsUsersRoleInvitationBuilder {
+    fn default() -> Self {
+        Self {
+            table: None,
+            user: None,
+            role: None,
+            errors_table: Vec::new(),
+            errors_user: Vec::new(),
+            errors_role: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
+}
+
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub(super) enum ProjectsUsersRoleInvitationActions {
+    SetTable(Option<NestedProject>),
+    SetUser(Option<User>),
+    SetRole(Option<NestedRole>),
+}
+
+impl FromOperation for ProjectsUsersRoleInvitationActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "table" => ProjectsUsersRoleInvitationActions::SetTable(Some(bincode::deserialize(&row).unwrap())),
+            "user" => ProjectsUsersRoleInvitationActions::SetUser(Some(bincode::deserialize(&row).unwrap())),
+            "role" => ProjectsUsersRoleInvitationActions::SetRole(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
+}
+
+impl Reducer<ProjectsUsersRoleInvitationBuilder> for ProjectsUsersRoleInvitationActions {
+    fn apply(self, mut state: std::rc::Rc<ProjectsUsersRoleInvitationBuilder>) -> std::rc::Rc<ProjectsUsersRoleInvitationBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            ProjectsUsersRoleInvitationActions::SetTable(table) => 'table: {
+                state_mut.errors_table.clear();
+        if table.is_none() {
+            state_mut.errors_table.push(ApiError::BadRequest(vec![
+                "The Table field is required.".to_string()
+             ]));
+            state_mut.table = None;
+             break 'table;
+        }
+                state_mut.table = table;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'table;
+            }
+            ProjectsUsersRoleInvitationActions::SetUser(user) => 'user: {
+                state_mut.errors_user.clear();
+        if user.is_none() {
+            state_mut.errors_user.push(ApiError::BadRequest(vec![
+                "The User field is required.".to_string()
+             ]));
+            state_mut.user = None;
+             break 'user;
+        }
+                state_mut.user = user;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'user;
+            }
+            ProjectsUsersRoleInvitationActions::SetRole(role) => 'role: {
+                state_mut.errors_role.clear();
+        if role.is_none() {
+            state_mut.errors_role.push(ApiError::BadRequest(vec![
+                "The Role field is required.".to_string()
+             ]));
+            state_mut.role = None;
+             break 'role;
+        }
+                state_mut.role = role;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'role;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for ProjectsUsersRoleInvitationBuilder {
+    type Actions = ProjectsUsersRoleInvitationActions;
+
+    type RichVariant = NestedProjectsUsersRoleInvitation;
+
+    fn has_errors(&self) -> bool {
+!self.errors_table.is_empty() || !self.errors_user.is_empty() || !self.errors_role.is_empty()
+    }
+
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.apply(ProjectsUsersRoleInvitationActions::SetTable(Some(richest_variant.table)));
+        dispatcher.apply(ProjectsUsersRoleInvitationActions::SetUser(Some(richest_variant.user)));
+        dispatcher.apply(ProjectsUsersRoleInvitationActions::SetRole(Some(richest_variant.role)));
+        vec![]
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.table.is_some()
+        && self.user.is_some()
+        && self.role.is_some()
+    }
+
+}
+
+impl From<ProjectsUsersRoleInvitationBuilder> for NewProjectsUsersRoleInvitation {
+    fn from(builder: ProjectsUsersRoleInvitationBuilder) -> Self {
+        Self {
+            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
+            user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
+            role_id: builder.role.unwrap().inner.id,
+        }
+    }
+}
+impl FormBuildable for NewProjectsUsersRoleInvitation {
+    type Builder = ProjectsUsersRoleInvitationBuilder;
+    fn title() -> &'static str {
+        "Projects users role invitation"
+    }
+    fn task_target() -> &'static str {
+        "Projects users role invitation"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        false
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateProjectsUsersRoleInvitationFormProp {
+     #[prop_or_default]
+    pub table_id: Option<i32>,
+     #[prop_or_default]
+    pub user_id: Option<i32>,
+     #[prop_or_default]
+    pub role_id: Option<i32>,
+}
+
+#[function_component(CreateProjectsUsersRoleInvitationForm)]
+pub fn create_projects_users_role_invitation_form(props: &CreateProjectsUsersRoleInvitationFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<ProjectsUsersRoleInvitationBuilder>();
+   if let Some(table_id) = props.table_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Project>("table", table_id.into()));
+    }
+   if let Some(user_id) = props.user_id {
+         named_requests.push(ComponentMessage::get_named::<&str, User>("user", user_id.into()));
+    }
+   if let Some(role_id) = props.role_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Role>("role", role_id.into()));
+    }
+    let set_table = builder_dispatch.apply_callback(|table: Option<NestedProject>| ProjectsUsersRoleInvitationActions::SetTable(table));
+    let set_user = builder_dispatch.apply_callback(|user: Option<User>| ProjectsUsersRoleInvitationActions::SetUser(user));
+    let set_role = builder_dispatch.apply_callback(|role: Option<NestedRole>| ProjectsUsersRoleInvitationActions::SetRole(role));
+    html! {
+        <BasicForm<NewProjectsUsersRoleInvitation>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+            <Datalist<NestedProject, true> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" />
+            <Datalist<User, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" />
+            <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
+        </BasicForm<NewProjectsUsersRoleInvitation>>
+    }
+}
+#[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
+pub struct ProjectsUsersRoleRequestBuilder {
+    pub table: Option<NestedProject>,
+    pub user: Option<User>,
+    pub role: Option<NestedRole>,
+    pub errors_table: Vec<ApiError>,
+    pub errors_user: Vec<ApiError>,
+    pub errors_role: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for ProjectsUsersRoleRequestBuilder {
+    fn default() -> Self {
+        Self {
+            table: None,
+            user: None,
+            role: None,
+            errors_table: Vec::new(),
+            errors_user: Vec::new(),
+            errors_role: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
+}
+
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub(super) enum ProjectsUsersRoleRequestActions {
+    SetTable(Option<NestedProject>),
+    SetUser(Option<User>),
+    SetRole(Option<NestedRole>),
+}
+
+impl FromOperation for ProjectsUsersRoleRequestActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "table" => ProjectsUsersRoleRequestActions::SetTable(Some(bincode::deserialize(&row).unwrap())),
+            "user" => ProjectsUsersRoleRequestActions::SetUser(Some(bincode::deserialize(&row).unwrap())),
+            "role" => ProjectsUsersRoleRequestActions::SetRole(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
+}
+
+impl Reducer<ProjectsUsersRoleRequestBuilder> for ProjectsUsersRoleRequestActions {
+    fn apply(self, mut state: std::rc::Rc<ProjectsUsersRoleRequestBuilder>) -> std::rc::Rc<ProjectsUsersRoleRequestBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            ProjectsUsersRoleRequestActions::SetTable(table) => 'table: {
+                state_mut.errors_table.clear();
+        if table.is_none() {
+            state_mut.errors_table.push(ApiError::BadRequest(vec![
+                "The Table field is required.".to_string()
+             ]));
+            state_mut.table = None;
+             break 'table;
+        }
+                state_mut.table = table;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'table;
+            }
+            ProjectsUsersRoleRequestActions::SetUser(user) => 'user: {
+                state_mut.errors_user.clear();
+        if user.is_none() {
+            state_mut.errors_user.push(ApiError::BadRequest(vec![
+                "The User field is required.".to_string()
+             ]));
+            state_mut.user = None;
+             break 'user;
+        }
+                state_mut.user = user;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'user;
+            }
+            ProjectsUsersRoleRequestActions::SetRole(role) => 'role: {
+                state_mut.errors_role.clear();
+        if role.is_none() {
+            state_mut.errors_role.push(ApiError::BadRequest(vec![
+                "The Role field is required.".to_string()
+             ]));
+            state_mut.role = None;
+             break 'role;
+        }
+                state_mut.role = role;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'role;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for ProjectsUsersRoleRequestBuilder {
+    type Actions = ProjectsUsersRoleRequestActions;
+
+    type RichVariant = NestedProjectsUsersRoleRequest;
+
+    fn has_errors(&self) -> bool {
+!self.errors_table.is_empty() || !self.errors_user.is_empty() || !self.errors_role.is_empty()
+    }
+
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.apply(ProjectsUsersRoleRequestActions::SetTable(Some(richest_variant.table)));
+        dispatcher.apply(ProjectsUsersRoleRequestActions::SetUser(Some(richest_variant.user)));
+        dispatcher.apply(ProjectsUsersRoleRequestActions::SetRole(Some(richest_variant.role)));
+        vec![]
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.table.is_some()
+        && self.user.is_some()
+        && self.role.is_some()
+    }
+
+}
+
+impl From<ProjectsUsersRoleRequestBuilder> for NewProjectsUsersRoleRequest {
+    fn from(builder: ProjectsUsersRoleRequestBuilder) -> Self {
+        Self {
+            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
+            user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
+            role_id: builder.role.unwrap().inner.id,
+        }
+    }
+}
+impl FormBuildable for NewProjectsUsersRoleRequest {
+    type Builder = ProjectsUsersRoleRequestBuilder;
+    fn title() -> &'static str {
+        "Projects users role request"
+    }
+    fn task_target() -> &'static str {
+        "Projects users role request"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        false
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateProjectsUsersRoleRequestFormProp {
+     #[prop_or_default]
+    pub table_id: Option<i32>,
+     #[prop_or_default]
+    pub user_id: Option<i32>,
+     #[prop_or_default]
+    pub role_id: Option<i32>,
+}
+
+#[function_component(CreateProjectsUsersRoleRequestForm)]
+pub fn create_projects_users_role_request_form(props: &CreateProjectsUsersRoleRequestFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<ProjectsUsersRoleRequestBuilder>();
+   if let Some(table_id) = props.table_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Project>("table", table_id.into()));
+    }
+   if let Some(user_id) = props.user_id {
+         named_requests.push(ComponentMessage::get_named::<&str, User>("user", user_id.into()));
+    }
+   if let Some(role_id) = props.role_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Role>("role", role_id.into()));
+    }
+    let set_table = builder_dispatch.apply_callback(|table: Option<NestedProject>| ProjectsUsersRoleRequestActions::SetTable(table));
+    let set_user = builder_dispatch.apply_callback(|user: Option<User>| ProjectsUsersRoleRequestActions::SetUser(user));
+    let set_role = builder_dispatch.apply_callback(|role: Option<NestedRole>| ProjectsUsersRoleRequestActions::SetRole(role));
+    html! {
+        <BasicForm<NewProjectsUsersRoleRequest>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+            <Datalist<NestedProject, true> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" />
+            <Datalist<User, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" />
+            <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
+        </BasicForm<NewProjectsUsersRoleRequest>>
+    }
+}
+#[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
+pub struct ProjectsUsersRoleBuilder {
+    pub table: Option<NestedProject>,
+    pub user: Option<User>,
+    pub role: Option<NestedRole>,
+    pub errors_table: Vec<ApiError>,
+    pub errors_user: Vec<ApiError>,
+    pub errors_role: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for ProjectsUsersRoleBuilder {
+    fn default() -> Self {
+        Self {
+            table: None,
+            user: None,
+            role: None,
+            errors_table: Vec::new(),
+            errors_user: Vec::new(),
+            errors_role: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
+}
+
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub(super) enum ProjectsUsersRoleActions {
+    SetTable(Option<NestedProject>),
+    SetUser(Option<User>),
+    SetRole(Option<NestedRole>),
+}
+
+impl FromOperation for ProjectsUsersRoleActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "table" => ProjectsUsersRoleActions::SetTable(Some(bincode::deserialize(&row).unwrap())),
+            "user" => ProjectsUsersRoleActions::SetUser(Some(bincode::deserialize(&row).unwrap())),
+            "role" => ProjectsUsersRoleActions::SetRole(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
+}
+
+impl Reducer<ProjectsUsersRoleBuilder> for ProjectsUsersRoleActions {
+    fn apply(self, mut state: std::rc::Rc<ProjectsUsersRoleBuilder>) -> std::rc::Rc<ProjectsUsersRoleBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            ProjectsUsersRoleActions::SetTable(table) => 'table: {
+                state_mut.errors_table.clear();
+        if table.is_none() {
+            state_mut.errors_table.push(ApiError::BadRequest(vec![
+                "The Table field is required.".to_string()
+             ]));
+            state_mut.table = None;
+             break 'table;
+        }
+                state_mut.table = table;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'table;
+            }
+            ProjectsUsersRoleActions::SetUser(user) => 'user: {
+                state_mut.errors_user.clear();
+        if user.is_none() {
+            state_mut.errors_user.push(ApiError::BadRequest(vec![
+                "The User field is required.".to_string()
+             ]));
+            state_mut.user = None;
+             break 'user;
+        }
+                state_mut.user = user;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'user;
+            }
+            ProjectsUsersRoleActions::SetRole(role) => 'role: {
+                state_mut.errors_role.clear();
+        if role.is_none() {
+            state_mut.errors_role.push(ApiError::BadRequest(vec![
+                "The Role field is required.".to_string()
+             ]));
+            state_mut.role = None;
+             break 'role;
+        }
+                state_mut.role = role;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'role;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for ProjectsUsersRoleBuilder {
+    type Actions = ProjectsUsersRoleActions;
+
+    type RichVariant = NestedProjectsUsersRole;
+
+    fn has_errors(&self) -> bool {
+!self.errors_table.is_empty() || !self.errors_user.is_empty() || !self.errors_role.is_empty()
+    }
+
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.apply(ProjectsUsersRoleActions::SetTable(Some(richest_variant.table)));
+        dispatcher.apply(ProjectsUsersRoleActions::SetUser(Some(richest_variant.user)));
+        dispatcher.apply(ProjectsUsersRoleActions::SetRole(Some(richest_variant.role)));
+        vec![]
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.table.is_some()
+        && self.user.is_some()
+        && self.role.is_some()
+    }
+
+}
+
+impl From<ProjectsUsersRoleBuilder> for NewProjectsUsersRole {
+    fn from(builder: ProjectsUsersRoleBuilder) -> Self {
+        Self {
+            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
+            user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
+            role_id: builder.role.unwrap().inner.id,
+        }
+    }
+}
+impl FormBuildable for NewProjectsUsersRole {
+    type Builder = ProjectsUsersRoleBuilder;
+    fn title() -> &'static str {
+        "Projects users role"
+    }
+    fn task_target() -> &'static str {
+        "Projects users role"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        false
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateProjectsUsersRoleFormProp {
+     #[prop_or_default]
+    pub table_id: Option<i32>,
+     #[prop_or_default]
+    pub user_id: Option<i32>,
+     #[prop_or_default]
+    pub role_id: Option<i32>,
+}
+
+#[function_component(CreateProjectsUsersRoleForm)]
+pub fn create_projects_users_role_form(props: &CreateProjectsUsersRoleFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<ProjectsUsersRoleBuilder>();
+   if let Some(table_id) = props.table_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Project>("table", table_id.into()));
+    }
+   if let Some(user_id) = props.user_id {
+         named_requests.push(ComponentMessage::get_named::<&str, User>("user", user_id.into()));
+    }
+   if let Some(role_id) = props.role_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Role>("role", role_id.into()));
+    }
+    let set_table = builder_dispatch.apply_callback(|table: Option<NestedProject>| ProjectsUsersRoleActions::SetTable(table));
+    let set_user = builder_dispatch.apply_callback(|user: Option<User>| ProjectsUsersRoleActions::SetUser(user));
+    let set_role = builder_dispatch.apply_callback(|role: Option<NestedRole>| ProjectsUsersRoleActions::SetRole(role));
+    html! {
+        <BasicForm<NewProjectsUsersRole>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+            <Datalist<NestedProject, true> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" />
+            <Datalist<User, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" />
+            <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
+        </BasicForm<NewProjectsUsersRole>>
+    }
+}
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
+pub struct SampleBioOttTaxonItemBuilder {
+    pub sample: Option<NestedSample>,
+    pub taxon: Option<NestedBioOttTaxonItem>,
+    pub errors_sample: Vec<ApiError>,
+    pub errors_taxon: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for SampleBioOttTaxonItemBuilder {
+    fn default() -> Self {
+        Self {
+            sample: None,
+            taxon: None,
+            errors_sample: Vec::new(),
+            errors_taxon: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
+}
+
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub(super) enum SampleBioOttTaxonItemActions {
+    SetSample(Option<NestedSample>),
+    SetTaxon(Option<NestedBioOttTaxonItem>),
+}
+
+impl FromOperation for SampleBioOttTaxonItemActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "sample" => SampleBioOttTaxonItemActions::SetSample(Some(bincode::deserialize(&row).unwrap())),
+            "taxon" => SampleBioOttTaxonItemActions::SetTaxon(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
+}
+
+impl Reducer<SampleBioOttTaxonItemBuilder> for SampleBioOttTaxonItemActions {
+    fn apply(self, mut state: std::rc::Rc<SampleBioOttTaxonItemBuilder>) -> std::rc::Rc<SampleBioOttTaxonItemBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            SampleBioOttTaxonItemActions::SetSample(sample) => 'sample: {
+                state_mut.errors_sample.clear();
+        if sample.is_none() {
+            state_mut.errors_sample.push(ApiError::BadRequest(vec![
+                "The Sample field is required.".to_string()
+             ]));
+            state_mut.sample = None;
+             break 'sample;
+        }
+                state_mut.sample = sample;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'sample;
+            }
+            SampleBioOttTaxonItemActions::SetTaxon(taxon) => 'taxon: {
+                state_mut.errors_taxon.clear();
+        if taxon.is_none() {
+            state_mut.errors_taxon.push(ApiError::BadRequest(vec![
+                "The Taxon field is required.".to_string()
+             ]));
+            state_mut.taxon = None;
+             break 'taxon;
+        }
+                state_mut.taxon = taxon;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'taxon;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for SampleBioOttTaxonItemBuilder {
+    type Actions = SampleBioOttTaxonItemActions;
+
+    type RichVariant = NestedSampleBioOttTaxonItem;
+
+    fn has_errors(&self) -> bool {
+!self.errors_sample.is_empty() || !self.errors_taxon.is_empty()
+    }
+
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.apply(SampleBioOttTaxonItemActions::SetSample(Some(richest_variant.sample)));
+        dispatcher.apply(SampleBioOttTaxonItemActions::SetTaxon(Some(richest_variant.taxon)));
+        vec![]
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.sample.is_some()
+        && self.taxon.is_some()
+    }
+
+}
+
+impl From<SampleBioOttTaxonItemBuilder> for NewSampleBioOttTaxonItem {
+    fn from(builder: SampleBioOttTaxonItemBuilder) -> Self {
+        Self {
+            sample_id: builder.sample.as_ref().map(|sample| sample.inner.id).unwrap(),
+            taxon_id: builder.taxon.as_ref().map(|taxon| taxon.inner.id).unwrap(),
+        }
+    }
+}
+impl FormBuildable for NewSampleBioOttTaxonItem {
+    type Builder = SampleBioOttTaxonItemBuilder;
+    fn title() -> &'static str {
+        "Sample bio ott taxon item"
+    }
+    fn task_target() -> &'static str {
+        "Sample bio ott taxon item"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        false
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateSampleBioOttTaxonItemFormProp {
+    pub sample_id: Uuid,
+     #[prop_or_default]
+    pub taxon_id: Option<i32>,
+}
+
+#[function_component(CreateSampleBioOttTaxonItemForm)]
+pub fn create_sample_bio_ott_taxon_item_form(props: &CreateSampleBioOttTaxonItemFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<SampleBioOttTaxonItemBuilder>();
+    named_requests.push(ComponentMessage::get_named::<&str, Sample>("sample", props.sample_id.into()));
+   if let Some(taxon_id) = props.taxon_id {
+         named_requests.push(ComponentMessage::get_named::<&str, BioOttTaxonItem>("taxon", taxon_id.into()));
+    }
+    let set_sample = builder_dispatch.apply_callback(|sample: Option<NestedSample>| SampleBioOttTaxonItemActions::SetSample(sample));
+    let set_taxon = builder_dispatch.apply_callback(|taxon: Option<NestedBioOttTaxonItem>| SampleBioOttTaxonItemActions::SetTaxon(taxon));
+    html! {
+        <BasicForm<NewSampleBioOttTaxonItem>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+if let Some(sample) = builder_store.sample.as_ref() {
+    <span>{"TODO Selected sample"}</span>
+} else {
+    <></>
+}
+            <Datalist<NestedBioOttTaxonItem, false> builder={set_taxon} optional={false} errors={builder_store.errors_taxon.clone()} value={builder_store.taxon.clone()} label="Taxon" />
+        </BasicForm<NewSampleBioOttTaxonItem>>
+    }
+}
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
+pub struct SampledIndividualBioOttTaxonItemBuilder {
+    pub sampled_individual: Option<NestedSampledIndividual>,
+    pub taxon: Option<NestedBioOttTaxonItem>,
+    pub errors_sampled_individual: Vec<ApiError>,
+    pub errors_taxon: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for SampledIndividualBioOttTaxonItemBuilder {
+    fn default() -> Self {
+        Self {
+            sampled_individual: None,
+            taxon: None,
+            errors_sampled_individual: Vec::new(),
+            errors_taxon: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
+}
+
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub(super) enum SampledIndividualBioOttTaxonItemActions {
+    SetSampledIndividual(Option<NestedSampledIndividual>),
+    SetTaxon(Option<NestedBioOttTaxonItem>),
+}
+
+impl FromOperation for SampledIndividualBioOttTaxonItemActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "sampled_individual" => SampledIndividualBioOttTaxonItemActions::SetSampledIndividual(Some(bincode::deserialize(&row).unwrap())),
+            "taxon" => SampledIndividualBioOttTaxonItemActions::SetTaxon(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
+}
+
+impl Reducer<SampledIndividualBioOttTaxonItemBuilder> for SampledIndividualBioOttTaxonItemActions {
+    fn apply(self, mut state: std::rc::Rc<SampledIndividualBioOttTaxonItemBuilder>) -> std::rc::Rc<SampledIndividualBioOttTaxonItemBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            SampledIndividualBioOttTaxonItemActions::SetSampledIndividual(sampled_individual) => 'sampled_individual: {
+                state_mut.errors_sampled_individual.clear();
+        if sampled_individual.is_none() {
+            state_mut.errors_sampled_individual.push(ApiError::BadRequest(vec![
+                "The Sampled individual field is required.".to_string()
+             ]));
+            state_mut.sampled_individual = None;
+             break 'sampled_individual;
+        }
+                state_mut.sampled_individual = sampled_individual;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'sampled_individual;
+            }
+            SampledIndividualBioOttTaxonItemActions::SetTaxon(taxon) => 'taxon: {
+                state_mut.errors_taxon.clear();
+        if taxon.is_none() {
+            state_mut.errors_taxon.push(ApiError::BadRequest(vec![
+                "The Taxon field is required.".to_string()
+             ]));
+            state_mut.taxon = None;
+             break 'taxon;
+        }
+                state_mut.taxon = taxon;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'taxon;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for SampledIndividualBioOttTaxonItemBuilder {
+    type Actions = SampledIndividualBioOttTaxonItemActions;
+
+    type RichVariant = NestedSampledIndividualBioOttTaxonItem;
+
+    fn has_errors(&self) -> bool {
+!self.errors_sampled_individual.is_empty() || !self.errors_taxon.is_empty()
+    }
+
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.apply(SampledIndividualBioOttTaxonItemActions::SetSampledIndividual(Some(richest_variant.sampled_individual)));
+        dispatcher.apply(SampledIndividualBioOttTaxonItemActions::SetTaxon(Some(richest_variant.taxon)));
+        vec![]
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.sampled_individual.is_some()
+        && self.taxon.is_some()
+    }
+
+}
+
+impl From<SampledIndividualBioOttTaxonItemBuilder> for NewSampledIndividualBioOttTaxonItem {
+    fn from(builder: SampledIndividualBioOttTaxonItemBuilder) -> Self {
+        Self {
+            sampled_individual_id: builder.sampled_individual.as_ref().map(|sampled_individual| sampled_individual.inner.id).unwrap(),
+            taxon_id: builder.taxon.as_ref().map(|taxon| taxon.inner.id).unwrap(),
+        }
+    }
+}
+impl FormBuildable for NewSampledIndividualBioOttTaxonItem {
+    type Builder = SampledIndividualBioOttTaxonItemBuilder;
+    fn title() -> &'static str {
+        "Sampled individual bio ott taxon item"
+    }
+    fn task_target() -> &'static str {
+        "Sampled individual bio ott taxon item"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        false
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateSampledIndividualBioOttTaxonItemFormProp {
+    pub sampled_individual_id: Uuid,
+     #[prop_or_default]
+    pub taxon_id: Option<i32>,
+}
+
+#[function_component(CreateSampledIndividualBioOttTaxonItemForm)]
+pub fn create_sampled_individual_bio_ott_taxon_item_form(props: &CreateSampledIndividualBioOttTaxonItemFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<SampledIndividualBioOttTaxonItemBuilder>();
+    named_requests.push(ComponentMessage::get_named::<&str, SampledIndividual>("sampled_individual", props.sampled_individual_id.into()));
+   if let Some(taxon_id) = props.taxon_id {
+         named_requests.push(ComponentMessage::get_named::<&str, BioOttTaxonItem>("taxon", taxon_id.into()));
+    }
+    let set_sampled_individual = builder_dispatch.apply_callback(|sampled_individual: Option<NestedSampledIndividual>| SampledIndividualBioOttTaxonItemActions::SetSampledIndividual(sampled_individual));
+    let set_taxon = builder_dispatch.apply_callback(|taxon: Option<NestedBioOttTaxonItem>| SampledIndividualBioOttTaxonItemActions::SetTaxon(taxon));
+    html! {
+        <BasicForm<NewSampledIndividualBioOttTaxonItem>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+if let Some(sampled_individual) = builder_store.sampled_individual.as_ref() {
+    <span>{"TODO Selected sampled_individual"}</span>
+} else {
+    <></>
+}
+            <Datalist<NestedBioOttTaxonItem, false> builder={set_taxon} optional={false} errors={builder_store.errors_taxon.clone()} value={builder_store.taxon.clone()} label="Taxon" />
+        </BasicForm<NewSampledIndividualBioOttTaxonItem>>
+    }
+}
 #[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct SampledIndividualBuilder {
@@ -612,12 +2137,9 @@ impl FormBuilder for SampledIndividualBuilder {
 !self.errors_tagged.is_empty()
     }
 
-    fn id(&self) -> Option<PrimaryKey> {
-        self.id.map(|id| id.into())
-    }
-
-    fn update(dispatcher: &Dispatch<Self>, rich_variant: Self::RichVariant) -> Vec<ComponentMessage> {
-        dispatcher.apply(SampledIndividualActions::SetTagged(Some(rich_variant.inner.tagged)));        vec![]
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.reduce_mut(|state| {state.id = Some(richest_variant.inner.id);});
+        dispatcher.apply(SampledIndividualActions::SetTagged(Some(richest_variant.inner.tagged)));        vec![]
     }
 
     fn can_submit(&self) -> bool {
@@ -683,6 +2205,1098 @@ pub fn update_sampled_individual_form(props: &UpdateSampledIndividualFormProp) -
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <Checkbox label="Tagged" errors={builder_store.errors_tagged.clone()} builder={set_tagged} value={builder_store.tagged.unwrap_or(false)} />
         </BasicForm<NewSampledIndividual>>
+    }
+}
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
+pub struct SampledIndividualsTeamsRoleInvitationBuilder {
+    pub table: Option<NestedSampledIndividual>,
+    pub team: Option<NestedTeam>,
+    pub role: Option<NestedRole>,
+    pub errors_table: Vec<ApiError>,
+    pub errors_team: Vec<ApiError>,
+    pub errors_role: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for SampledIndividualsTeamsRoleInvitationBuilder {
+    fn default() -> Self {
+        Self {
+            table: None,
+            team: None,
+            role: None,
+            errors_table: Vec::new(),
+            errors_team: Vec::new(),
+            errors_role: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
+}
+
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub(super) enum SampledIndividualsTeamsRoleInvitationActions {
+    SetTable(Option<NestedSampledIndividual>),
+    SetTeam(Option<NestedTeam>),
+    SetRole(Option<NestedRole>),
+}
+
+impl FromOperation for SampledIndividualsTeamsRoleInvitationActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "table" => SampledIndividualsTeamsRoleInvitationActions::SetTable(Some(bincode::deserialize(&row).unwrap())),
+            "team" => SampledIndividualsTeamsRoleInvitationActions::SetTeam(Some(bincode::deserialize(&row).unwrap())),
+            "role" => SampledIndividualsTeamsRoleInvitationActions::SetRole(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
+}
+
+impl Reducer<SampledIndividualsTeamsRoleInvitationBuilder> for SampledIndividualsTeamsRoleInvitationActions {
+    fn apply(self, mut state: std::rc::Rc<SampledIndividualsTeamsRoleInvitationBuilder>) -> std::rc::Rc<SampledIndividualsTeamsRoleInvitationBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            SampledIndividualsTeamsRoleInvitationActions::SetTable(table) => 'table: {
+                state_mut.errors_table.clear();
+        if table.is_none() {
+            state_mut.errors_table.push(ApiError::BadRequest(vec![
+                "The Table field is required.".to_string()
+             ]));
+            state_mut.table = None;
+             break 'table;
+        }
+                state_mut.table = table;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'table;
+            }
+            SampledIndividualsTeamsRoleInvitationActions::SetTeam(team) => 'team: {
+                state_mut.errors_team.clear();
+        if team.is_none() {
+            state_mut.errors_team.push(ApiError::BadRequest(vec![
+                "The Team field is required.".to_string()
+             ]));
+            state_mut.team = None;
+             break 'team;
+        }
+                state_mut.team = team;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'team;
+            }
+            SampledIndividualsTeamsRoleInvitationActions::SetRole(role) => 'role: {
+                state_mut.errors_role.clear();
+        if role.is_none() {
+            state_mut.errors_role.push(ApiError::BadRequest(vec![
+                "The Role field is required.".to_string()
+             ]));
+            state_mut.role = None;
+             break 'role;
+        }
+                state_mut.role = role;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'role;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for SampledIndividualsTeamsRoleInvitationBuilder {
+    type Actions = SampledIndividualsTeamsRoleInvitationActions;
+
+    type RichVariant = NestedSampledIndividualsTeamsRoleInvitation;
+
+    fn has_errors(&self) -> bool {
+!self.errors_table.is_empty() || !self.errors_team.is_empty() || !self.errors_role.is_empty()
+    }
+
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.apply(SampledIndividualsTeamsRoleInvitationActions::SetTable(Some(richest_variant.table)));
+        dispatcher.apply(SampledIndividualsTeamsRoleInvitationActions::SetTeam(Some(richest_variant.team)));
+        dispatcher.apply(SampledIndividualsTeamsRoleInvitationActions::SetRole(Some(richest_variant.role)));
+        vec![]
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.table.is_some()
+        && self.team.is_some()
+        && self.role.is_some()
+    }
+
+}
+
+impl From<SampledIndividualsTeamsRoleInvitationBuilder> for NewSampledIndividualsTeamsRoleInvitation {
+    fn from(builder: SampledIndividualsTeamsRoleInvitationBuilder) -> Self {
+        Self {
+            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
+            team_id: builder.team.as_ref().map(|team| team.inner.id).unwrap(),
+            role_id: builder.role.unwrap().inner.id,
+        }
+    }
+}
+impl FormBuildable for NewSampledIndividualsTeamsRoleInvitation {
+    type Builder = SampledIndividualsTeamsRoleInvitationBuilder;
+    fn title() -> &'static str {
+        "Sampled individuals teams role invitation"
+    }
+    fn task_target() -> &'static str {
+        "Sampled individuals teams role invitation"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        false
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateSampledIndividualsTeamsRoleInvitationFormProp {
+    pub table_id: Uuid,
+     #[prop_or_default]
+    pub team_id: Option<i32>,
+     #[prop_or_default]
+    pub role_id: Option<i32>,
+}
+
+#[function_component(CreateSampledIndividualsTeamsRoleInvitationForm)]
+pub fn create_sampled_individuals_teams_role_invitation_form(props: &CreateSampledIndividualsTeamsRoleInvitationFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<SampledIndividualsTeamsRoleInvitationBuilder>();
+    named_requests.push(ComponentMessage::get_named::<&str, SampledIndividual>("table", props.table_id.into()));
+   if let Some(team_id) = props.team_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Team>("team", team_id.into()));
+    }
+   if let Some(role_id) = props.role_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Role>("role", role_id.into()));
+    }
+    let set_table = builder_dispatch.apply_callback(|table: Option<NestedSampledIndividual>| SampledIndividualsTeamsRoleInvitationActions::SetTable(table));
+    let set_team = builder_dispatch.apply_callback(|team: Option<NestedTeam>| SampledIndividualsTeamsRoleInvitationActions::SetTeam(team));
+    let set_role = builder_dispatch.apply_callback(|role: Option<NestedRole>| SampledIndividualsTeamsRoleInvitationActions::SetRole(role));
+    html! {
+        <BasicForm<NewSampledIndividualsTeamsRoleInvitation>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+if let Some(table) = builder_store.table.as_ref() {
+    <span>{"TODO Selected table"}</span>
+} else {
+    <></>
+}
+            <Datalist<NestedTeam, true> builder={set_team} optional={false} errors={builder_store.errors_team.clone()} value={builder_store.team.clone()} label="Team" />
+            <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
+        </BasicForm<NewSampledIndividualsTeamsRoleInvitation>>
+    }
+}
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
+pub struct SampledIndividualsTeamsRoleRequestBuilder {
+    pub table: Option<NestedSampledIndividual>,
+    pub team: Option<NestedTeam>,
+    pub role: Option<NestedRole>,
+    pub errors_table: Vec<ApiError>,
+    pub errors_team: Vec<ApiError>,
+    pub errors_role: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for SampledIndividualsTeamsRoleRequestBuilder {
+    fn default() -> Self {
+        Self {
+            table: None,
+            team: None,
+            role: None,
+            errors_table: Vec::new(),
+            errors_team: Vec::new(),
+            errors_role: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
+}
+
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub(super) enum SampledIndividualsTeamsRoleRequestActions {
+    SetTable(Option<NestedSampledIndividual>),
+    SetTeam(Option<NestedTeam>),
+    SetRole(Option<NestedRole>),
+}
+
+impl FromOperation for SampledIndividualsTeamsRoleRequestActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "table" => SampledIndividualsTeamsRoleRequestActions::SetTable(Some(bincode::deserialize(&row).unwrap())),
+            "team" => SampledIndividualsTeamsRoleRequestActions::SetTeam(Some(bincode::deserialize(&row).unwrap())),
+            "role" => SampledIndividualsTeamsRoleRequestActions::SetRole(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
+}
+
+impl Reducer<SampledIndividualsTeamsRoleRequestBuilder> for SampledIndividualsTeamsRoleRequestActions {
+    fn apply(self, mut state: std::rc::Rc<SampledIndividualsTeamsRoleRequestBuilder>) -> std::rc::Rc<SampledIndividualsTeamsRoleRequestBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            SampledIndividualsTeamsRoleRequestActions::SetTable(table) => 'table: {
+                state_mut.errors_table.clear();
+        if table.is_none() {
+            state_mut.errors_table.push(ApiError::BadRequest(vec![
+                "The Table field is required.".to_string()
+             ]));
+            state_mut.table = None;
+             break 'table;
+        }
+                state_mut.table = table;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'table;
+            }
+            SampledIndividualsTeamsRoleRequestActions::SetTeam(team) => 'team: {
+                state_mut.errors_team.clear();
+        if team.is_none() {
+            state_mut.errors_team.push(ApiError::BadRequest(vec![
+                "The Team field is required.".to_string()
+             ]));
+            state_mut.team = None;
+             break 'team;
+        }
+                state_mut.team = team;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'team;
+            }
+            SampledIndividualsTeamsRoleRequestActions::SetRole(role) => 'role: {
+                state_mut.errors_role.clear();
+        if role.is_none() {
+            state_mut.errors_role.push(ApiError::BadRequest(vec![
+                "The Role field is required.".to_string()
+             ]));
+            state_mut.role = None;
+             break 'role;
+        }
+                state_mut.role = role;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'role;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for SampledIndividualsTeamsRoleRequestBuilder {
+    type Actions = SampledIndividualsTeamsRoleRequestActions;
+
+    type RichVariant = NestedSampledIndividualsTeamsRoleRequest;
+
+    fn has_errors(&self) -> bool {
+!self.errors_table.is_empty() || !self.errors_team.is_empty() || !self.errors_role.is_empty()
+    }
+
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.apply(SampledIndividualsTeamsRoleRequestActions::SetTable(Some(richest_variant.table)));
+        dispatcher.apply(SampledIndividualsTeamsRoleRequestActions::SetTeam(Some(richest_variant.team)));
+        dispatcher.apply(SampledIndividualsTeamsRoleRequestActions::SetRole(Some(richest_variant.role)));
+        vec![]
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.table.is_some()
+        && self.team.is_some()
+        && self.role.is_some()
+    }
+
+}
+
+impl From<SampledIndividualsTeamsRoleRequestBuilder> for NewSampledIndividualsTeamsRoleRequest {
+    fn from(builder: SampledIndividualsTeamsRoleRequestBuilder) -> Self {
+        Self {
+            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
+            team_id: builder.team.as_ref().map(|team| team.inner.id).unwrap(),
+            role_id: builder.role.unwrap().inner.id,
+        }
+    }
+}
+impl FormBuildable for NewSampledIndividualsTeamsRoleRequest {
+    type Builder = SampledIndividualsTeamsRoleRequestBuilder;
+    fn title() -> &'static str {
+        "Sampled individuals teams role request"
+    }
+    fn task_target() -> &'static str {
+        "Sampled individuals teams role request"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        false
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateSampledIndividualsTeamsRoleRequestFormProp {
+    pub table_id: Uuid,
+     #[prop_or_default]
+    pub team_id: Option<i32>,
+     #[prop_or_default]
+    pub role_id: Option<i32>,
+}
+
+#[function_component(CreateSampledIndividualsTeamsRoleRequestForm)]
+pub fn create_sampled_individuals_teams_role_request_form(props: &CreateSampledIndividualsTeamsRoleRequestFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<SampledIndividualsTeamsRoleRequestBuilder>();
+    named_requests.push(ComponentMessage::get_named::<&str, SampledIndividual>("table", props.table_id.into()));
+   if let Some(team_id) = props.team_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Team>("team", team_id.into()));
+    }
+   if let Some(role_id) = props.role_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Role>("role", role_id.into()));
+    }
+    let set_table = builder_dispatch.apply_callback(|table: Option<NestedSampledIndividual>| SampledIndividualsTeamsRoleRequestActions::SetTable(table));
+    let set_team = builder_dispatch.apply_callback(|team: Option<NestedTeam>| SampledIndividualsTeamsRoleRequestActions::SetTeam(team));
+    let set_role = builder_dispatch.apply_callback(|role: Option<NestedRole>| SampledIndividualsTeamsRoleRequestActions::SetRole(role));
+    html! {
+        <BasicForm<NewSampledIndividualsTeamsRoleRequest>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+if let Some(table) = builder_store.table.as_ref() {
+    <span>{"TODO Selected table"}</span>
+} else {
+    <></>
+}
+            <Datalist<NestedTeam, true> builder={set_team} optional={false} errors={builder_store.errors_team.clone()} value={builder_store.team.clone()} label="Team" />
+            <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
+        </BasicForm<NewSampledIndividualsTeamsRoleRequest>>
+    }
+}
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
+pub struct SampledIndividualsTeamsRoleBuilder {
+    pub table: Option<NestedSampledIndividual>,
+    pub team: Option<NestedTeam>,
+    pub role: Option<NestedRole>,
+    pub errors_table: Vec<ApiError>,
+    pub errors_team: Vec<ApiError>,
+    pub errors_role: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for SampledIndividualsTeamsRoleBuilder {
+    fn default() -> Self {
+        Self {
+            table: None,
+            team: None,
+            role: None,
+            errors_table: Vec::new(),
+            errors_team: Vec::new(),
+            errors_role: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
+}
+
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub(super) enum SampledIndividualsTeamsRoleActions {
+    SetTable(Option<NestedSampledIndividual>),
+    SetTeam(Option<NestedTeam>),
+    SetRole(Option<NestedRole>),
+}
+
+impl FromOperation for SampledIndividualsTeamsRoleActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "table" => SampledIndividualsTeamsRoleActions::SetTable(Some(bincode::deserialize(&row).unwrap())),
+            "team" => SampledIndividualsTeamsRoleActions::SetTeam(Some(bincode::deserialize(&row).unwrap())),
+            "role" => SampledIndividualsTeamsRoleActions::SetRole(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
+}
+
+impl Reducer<SampledIndividualsTeamsRoleBuilder> for SampledIndividualsTeamsRoleActions {
+    fn apply(self, mut state: std::rc::Rc<SampledIndividualsTeamsRoleBuilder>) -> std::rc::Rc<SampledIndividualsTeamsRoleBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            SampledIndividualsTeamsRoleActions::SetTable(table) => 'table: {
+                state_mut.errors_table.clear();
+        if table.is_none() {
+            state_mut.errors_table.push(ApiError::BadRequest(vec![
+                "The Table field is required.".to_string()
+             ]));
+            state_mut.table = None;
+             break 'table;
+        }
+                state_mut.table = table;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'table;
+            }
+            SampledIndividualsTeamsRoleActions::SetTeam(team) => 'team: {
+                state_mut.errors_team.clear();
+        if team.is_none() {
+            state_mut.errors_team.push(ApiError::BadRequest(vec![
+                "The Team field is required.".to_string()
+             ]));
+            state_mut.team = None;
+             break 'team;
+        }
+                state_mut.team = team;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'team;
+            }
+            SampledIndividualsTeamsRoleActions::SetRole(role) => 'role: {
+                state_mut.errors_role.clear();
+        if role.is_none() {
+            state_mut.errors_role.push(ApiError::BadRequest(vec![
+                "The Role field is required.".to_string()
+             ]));
+            state_mut.role = None;
+             break 'role;
+        }
+                state_mut.role = role;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'role;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for SampledIndividualsTeamsRoleBuilder {
+    type Actions = SampledIndividualsTeamsRoleActions;
+
+    type RichVariant = NestedSampledIndividualsTeamsRole;
+
+    fn has_errors(&self) -> bool {
+!self.errors_table.is_empty() || !self.errors_team.is_empty() || !self.errors_role.is_empty()
+    }
+
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.apply(SampledIndividualsTeamsRoleActions::SetTable(Some(richest_variant.table)));
+        dispatcher.apply(SampledIndividualsTeamsRoleActions::SetTeam(Some(richest_variant.team)));
+        dispatcher.apply(SampledIndividualsTeamsRoleActions::SetRole(Some(richest_variant.role)));
+        vec![]
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.table.is_some()
+        && self.team.is_some()
+        && self.role.is_some()
+    }
+
+}
+
+impl From<SampledIndividualsTeamsRoleBuilder> for NewSampledIndividualsTeamsRole {
+    fn from(builder: SampledIndividualsTeamsRoleBuilder) -> Self {
+        Self {
+            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
+            team_id: builder.team.as_ref().map(|team| team.inner.id).unwrap(),
+            role_id: builder.role.unwrap().inner.id,
+        }
+    }
+}
+impl FormBuildable for NewSampledIndividualsTeamsRole {
+    type Builder = SampledIndividualsTeamsRoleBuilder;
+    fn title() -> &'static str {
+        "Sampled individuals teams role"
+    }
+    fn task_target() -> &'static str {
+        "Sampled individuals teams role"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        false
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateSampledIndividualsTeamsRoleFormProp {
+    pub table_id: Uuid,
+     #[prop_or_default]
+    pub team_id: Option<i32>,
+     #[prop_or_default]
+    pub role_id: Option<i32>,
+}
+
+#[function_component(CreateSampledIndividualsTeamsRoleForm)]
+pub fn create_sampled_individuals_teams_role_form(props: &CreateSampledIndividualsTeamsRoleFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<SampledIndividualsTeamsRoleBuilder>();
+    named_requests.push(ComponentMessage::get_named::<&str, SampledIndividual>("table", props.table_id.into()));
+   if let Some(team_id) = props.team_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Team>("team", team_id.into()));
+    }
+   if let Some(role_id) = props.role_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Role>("role", role_id.into()));
+    }
+    let set_table = builder_dispatch.apply_callback(|table: Option<NestedSampledIndividual>| SampledIndividualsTeamsRoleActions::SetTable(table));
+    let set_team = builder_dispatch.apply_callback(|team: Option<NestedTeam>| SampledIndividualsTeamsRoleActions::SetTeam(team));
+    let set_role = builder_dispatch.apply_callback(|role: Option<NestedRole>| SampledIndividualsTeamsRoleActions::SetRole(role));
+    html! {
+        <BasicForm<NewSampledIndividualsTeamsRole>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+if let Some(table) = builder_store.table.as_ref() {
+    <span>{"TODO Selected table"}</span>
+} else {
+    <></>
+}
+            <Datalist<NestedTeam, true> builder={set_team} optional={false} errors={builder_store.errors_team.clone()} value={builder_store.team.clone()} label="Team" />
+            <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
+        </BasicForm<NewSampledIndividualsTeamsRole>>
+    }
+}
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
+pub struct SampledIndividualsUsersRoleInvitationBuilder {
+    pub table: Option<NestedSampledIndividual>,
+    pub user: Option<User>,
+    pub role: Option<NestedRole>,
+    pub errors_table: Vec<ApiError>,
+    pub errors_user: Vec<ApiError>,
+    pub errors_role: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for SampledIndividualsUsersRoleInvitationBuilder {
+    fn default() -> Self {
+        Self {
+            table: None,
+            user: None,
+            role: None,
+            errors_table: Vec::new(),
+            errors_user: Vec::new(),
+            errors_role: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
+}
+
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub(super) enum SampledIndividualsUsersRoleInvitationActions {
+    SetTable(Option<NestedSampledIndividual>),
+    SetUser(Option<User>),
+    SetRole(Option<NestedRole>),
+}
+
+impl FromOperation for SampledIndividualsUsersRoleInvitationActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "table" => SampledIndividualsUsersRoleInvitationActions::SetTable(Some(bincode::deserialize(&row).unwrap())),
+            "user" => SampledIndividualsUsersRoleInvitationActions::SetUser(Some(bincode::deserialize(&row).unwrap())),
+            "role" => SampledIndividualsUsersRoleInvitationActions::SetRole(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
+}
+
+impl Reducer<SampledIndividualsUsersRoleInvitationBuilder> for SampledIndividualsUsersRoleInvitationActions {
+    fn apply(self, mut state: std::rc::Rc<SampledIndividualsUsersRoleInvitationBuilder>) -> std::rc::Rc<SampledIndividualsUsersRoleInvitationBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            SampledIndividualsUsersRoleInvitationActions::SetTable(table) => 'table: {
+                state_mut.errors_table.clear();
+        if table.is_none() {
+            state_mut.errors_table.push(ApiError::BadRequest(vec![
+                "The Table field is required.".to_string()
+             ]));
+            state_mut.table = None;
+             break 'table;
+        }
+                state_mut.table = table;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'table;
+            }
+            SampledIndividualsUsersRoleInvitationActions::SetUser(user) => 'user: {
+                state_mut.errors_user.clear();
+        if user.is_none() {
+            state_mut.errors_user.push(ApiError::BadRequest(vec![
+                "The User field is required.".to_string()
+             ]));
+            state_mut.user = None;
+             break 'user;
+        }
+                state_mut.user = user;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'user;
+            }
+            SampledIndividualsUsersRoleInvitationActions::SetRole(role) => 'role: {
+                state_mut.errors_role.clear();
+        if role.is_none() {
+            state_mut.errors_role.push(ApiError::BadRequest(vec![
+                "The Role field is required.".to_string()
+             ]));
+            state_mut.role = None;
+             break 'role;
+        }
+                state_mut.role = role;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'role;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for SampledIndividualsUsersRoleInvitationBuilder {
+    type Actions = SampledIndividualsUsersRoleInvitationActions;
+
+    type RichVariant = NestedSampledIndividualsUsersRoleInvitation;
+
+    fn has_errors(&self) -> bool {
+!self.errors_table.is_empty() || !self.errors_user.is_empty() || !self.errors_role.is_empty()
+    }
+
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.apply(SampledIndividualsUsersRoleInvitationActions::SetTable(Some(richest_variant.table)));
+        dispatcher.apply(SampledIndividualsUsersRoleInvitationActions::SetUser(Some(richest_variant.user)));
+        dispatcher.apply(SampledIndividualsUsersRoleInvitationActions::SetRole(Some(richest_variant.role)));
+        vec![]
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.table.is_some()
+        && self.user.is_some()
+        && self.role.is_some()
+    }
+
+}
+
+impl From<SampledIndividualsUsersRoleInvitationBuilder> for NewSampledIndividualsUsersRoleInvitation {
+    fn from(builder: SampledIndividualsUsersRoleInvitationBuilder) -> Self {
+        Self {
+            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
+            user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
+            role_id: builder.role.unwrap().inner.id,
+        }
+    }
+}
+impl FormBuildable for NewSampledIndividualsUsersRoleInvitation {
+    type Builder = SampledIndividualsUsersRoleInvitationBuilder;
+    fn title() -> &'static str {
+        "Sampled individuals users role invitation"
+    }
+    fn task_target() -> &'static str {
+        "Sampled individuals users role invitation"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        false
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateSampledIndividualsUsersRoleInvitationFormProp {
+    pub table_id: Uuid,
+     #[prop_or_default]
+    pub user_id: Option<i32>,
+     #[prop_or_default]
+    pub role_id: Option<i32>,
+}
+
+#[function_component(CreateSampledIndividualsUsersRoleInvitationForm)]
+pub fn create_sampled_individuals_users_role_invitation_form(props: &CreateSampledIndividualsUsersRoleInvitationFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<SampledIndividualsUsersRoleInvitationBuilder>();
+    named_requests.push(ComponentMessage::get_named::<&str, SampledIndividual>("table", props.table_id.into()));
+   if let Some(user_id) = props.user_id {
+         named_requests.push(ComponentMessage::get_named::<&str, User>("user", user_id.into()));
+    }
+   if let Some(role_id) = props.role_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Role>("role", role_id.into()));
+    }
+    let set_table = builder_dispatch.apply_callback(|table: Option<NestedSampledIndividual>| SampledIndividualsUsersRoleInvitationActions::SetTable(table));
+    let set_user = builder_dispatch.apply_callback(|user: Option<User>| SampledIndividualsUsersRoleInvitationActions::SetUser(user));
+    let set_role = builder_dispatch.apply_callback(|role: Option<NestedRole>| SampledIndividualsUsersRoleInvitationActions::SetRole(role));
+    html! {
+        <BasicForm<NewSampledIndividualsUsersRoleInvitation>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+if let Some(table) = builder_store.table.as_ref() {
+    <span>{"TODO Selected table"}</span>
+} else {
+    <></>
+}
+            <Datalist<User, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" />
+            <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
+        </BasicForm<NewSampledIndividualsUsersRoleInvitation>>
+    }
+}
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
+pub struct SampledIndividualsUsersRoleRequestBuilder {
+    pub table: Option<NestedSampledIndividual>,
+    pub user: Option<User>,
+    pub role: Option<NestedRole>,
+    pub errors_table: Vec<ApiError>,
+    pub errors_user: Vec<ApiError>,
+    pub errors_role: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for SampledIndividualsUsersRoleRequestBuilder {
+    fn default() -> Self {
+        Self {
+            table: None,
+            user: None,
+            role: None,
+            errors_table: Vec::new(),
+            errors_user: Vec::new(),
+            errors_role: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
+}
+
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub(super) enum SampledIndividualsUsersRoleRequestActions {
+    SetTable(Option<NestedSampledIndividual>),
+    SetUser(Option<User>),
+    SetRole(Option<NestedRole>),
+}
+
+impl FromOperation for SampledIndividualsUsersRoleRequestActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "table" => SampledIndividualsUsersRoleRequestActions::SetTable(Some(bincode::deserialize(&row).unwrap())),
+            "user" => SampledIndividualsUsersRoleRequestActions::SetUser(Some(bincode::deserialize(&row).unwrap())),
+            "role" => SampledIndividualsUsersRoleRequestActions::SetRole(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
+}
+
+impl Reducer<SampledIndividualsUsersRoleRequestBuilder> for SampledIndividualsUsersRoleRequestActions {
+    fn apply(self, mut state: std::rc::Rc<SampledIndividualsUsersRoleRequestBuilder>) -> std::rc::Rc<SampledIndividualsUsersRoleRequestBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            SampledIndividualsUsersRoleRequestActions::SetTable(table) => 'table: {
+                state_mut.errors_table.clear();
+        if table.is_none() {
+            state_mut.errors_table.push(ApiError::BadRequest(vec![
+                "The Table field is required.".to_string()
+             ]));
+            state_mut.table = None;
+             break 'table;
+        }
+                state_mut.table = table;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'table;
+            }
+            SampledIndividualsUsersRoleRequestActions::SetUser(user) => 'user: {
+                state_mut.errors_user.clear();
+        if user.is_none() {
+            state_mut.errors_user.push(ApiError::BadRequest(vec![
+                "The User field is required.".to_string()
+             ]));
+            state_mut.user = None;
+             break 'user;
+        }
+                state_mut.user = user;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'user;
+            }
+            SampledIndividualsUsersRoleRequestActions::SetRole(role) => 'role: {
+                state_mut.errors_role.clear();
+        if role.is_none() {
+            state_mut.errors_role.push(ApiError::BadRequest(vec![
+                "The Role field is required.".to_string()
+             ]));
+            state_mut.role = None;
+             break 'role;
+        }
+                state_mut.role = role;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'role;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for SampledIndividualsUsersRoleRequestBuilder {
+    type Actions = SampledIndividualsUsersRoleRequestActions;
+
+    type RichVariant = NestedSampledIndividualsUsersRoleRequest;
+
+    fn has_errors(&self) -> bool {
+!self.errors_table.is_empty() || !self.errors_user.is_empty() || !self.errors_role.is_empty()
+    }
+
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.apply(SampledIndividualsUsersRoleRequestActions::SetTable(Some(richest_variant.table)));
+        dispatcher.apply(SampledIndividualsUsersRoleRequestActions::SetUser(Some(richest_variant.user)));
+        dispatcher.apply(SampledIndividualsUsersRoleRequestActions::SetRole(Some(richest_variant.role)));
+        vec![]
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.table.is_some()
+        && self.user.is_some()
+        && self.role.is_some()
+    }
+
+}
+
+impl From<SampledIndividualsUsersRoleRequestBuilder> for NewSampledIndividualsUsersRoleRequest {
+    fn from(builder: SampledIndividualsUsersRoleRequestBuilder) -> Self {
+        Self {
+            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
+            user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
+            role_id: builder.role.unwrap().inner.id,
+        }
+    }
+}
+impl FormBuildable for NewSampledIndividualsUsersRoleRequest {
+    type Builder = SampledIndividualsUsersRoleRequestBuilder;
+    fn title() -> &'static str {
+        "Sampled individuals users role request"
+    }
+    fn task_target() -> &'static str {
+        "Sampled individuals users role request"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        false
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateSampledIndividualsUsersRoleRequestFormProp {
+    pub table_id: Uuid,
+     #[prop_or_default]
+    pub user_id: Option<i32>,
+     #[prop_or_default]
+    pub role_id: Option<i32>,
+}
+
+#[function_component(CreateSampledIndividualsUsersRoleRequestForm)]
+pub fn create_sampled_individuals_users_role_request_form(props: &CreateSampledIndividualsUsersRoleRequestFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<SampledIndividualsUsersRoleRequestBuilder>();
+    named_requests.push(ComponentMessage::get_named::<&str, SampledIndividual>("table", props.table_id.into()));
+   if let Some(user_id) = props.user_id {
+         named_requests.push(ComponentMessage::get_named::<&str, User>("user", user_id.into()));
+    }
+   if let Some(role_id) = props.role_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Role>("role", role_id.into()));
+    }
+    let set_table = builder_dispatch.apply_callback(|table: Option<NestedSampledIndividual>| SampledIndividualsUsersRoleRequestActions::SetTable(table));
+    let set_user = builder_dispatch.apply_callback(|user: Option<User>| SampledIndividualsUsersRoleRequestActions::SetUser(user));
+    let set_role = builder_dispatch.apply_callback(|role: Option<NestedRole>| SampledIndividualsUsersRoleRequestActions::SetRole(role));
+    html! {
+        <BasicForm<NewSampledIndividualsUsersRoleRequest>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+if let Some(table) = builder_store.table.as_ref() {
+    <span>{"TODO Selected table"}</span>
+} else {
+    <></>
+}
+            <Datalist<User, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" />
+            <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
+        </BasicForm<NewSampledIndividualsUsersRoleRequest>>
+    }
+}
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
+pub struct SampledIndividualsUsersRoleBuilder {
+    pub table: Option<NestedSampledIndividual>,
+    pub user: Option<User>,
+    pub role: Option<NestedRole>,
+    pub errors_table: Vec<ApiError>,
+    pub errors_user: Vec<ApiError>,
+    pub errors_role: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for SampledIndividualsUsersRoleBuilder {
+    fn default() -> Self {
+        Self {
+            table: None,
+            user: None,
+            role: None,
+            errors_table: Vec::new(),
+            errors_user: Vec::new(),
+            errors_role: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
+}
+
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub(super) enum SampledIndividualsUsersRoleActions {
+    SetTable(Option<NestedSampledIndividual>),
+    SetUser(Option<User>),
+    SetRole(Option<NestedRole>),
+}
+
+impl FromOperation for SampledIndividualsUsersRoleActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "table" => SampledIndividualsUsersRoleActions::SetTable(Some(bincode::deserialize(&row).unwrap())),
+            "user" => SampledIndividualsUsersRoleActions::SetUser(Some(bincode::deserialize(&row).unwrap())),
+            "role" => SampledIndividualsUsersRoleActions::SetRole(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
+}
+
+impl Reducer<SampledIndividualsUsersRoleBuilder> for SampledIndividualsUsersRoleActions {
+    fn apply(self, mut state: std::rc::Rc<SampledIndividualsUsersRoleBuilder>) -> std::rc::Rc<SampledIndividualsUsersRoleBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            SampledIndividualsUsersRoleActions::SetTable(table) => 'table: {
+                state_mut.errors_table.clear();
+        if table.is_none() {
+            state_mut.errors_table.push(ApiError::BadRequest(vec![
+                "The Table field is required.".to_string()
+             ]));
+            state_mut.table = None;
+             break 'table;
+        }
+                state_mut.table = table;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'table;
+            }
+            SampledIndividualsUsersRoleActions::SetUser(user) => 'user: {
+                state_mut.errors_user.clear();
+        if user.is_none() {
+            state_mut.errors_user.push(ApiError::BadRequest(vec![
+                "The User field is required.".to_string()
+             ]));
+            state_mut.user = None;
+             break 'user;
+        }
+                state_mut.user = user;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'user;
+            }
+            SampledIndividualsUsersRoleActions::SetRole(role) => 'role: {
+                state_mut.errors_role.clear();
+        if role.is_none() {
+            state_mut.errors_role.push(ApiError::BadRequest(vec![
+                "The Role field is required.".to_string()
+             ]));
+            state_mut.role = None;
+             break 'role;
+        }
+                state_mut.role = role;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'role;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for SampledIndividualsUsersRoleBuilder {
+    type Actions = SampledIndividualsUsersRoleActions;
+
+    type RichVariant = NestedSampledIndividualsUsersRole;
+
+    fn has_errors(&self) -> bool {
+!self.errors_table.is_empty() || !self.errors_user.is_empty() || !self.errors_role.is_empty()
+    }
+
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.apply(SampledIndividualsUsersRoleActions::SetTable(Some(richest_variant.table)));
+        dispatcher.apply(SampledIndividualsUsersRoleActions::SetUser(Some(richest_variant.user)));
+        dispatcher.apply(SampledIndividualsUsersRoleActions::SetRole(Some(richest_variant.role)));
+        vec![]
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.table.is_some()
+        && self.user.is_some()
+        && self.role.is_some()
+    }
+
+}
+
+impl From<SampledIndividualsUsersRoleBuilder> for NewSampledIndividualsUsersRole {
+    fn from(builder: SampledIndividualsUsersRoleBuilder) -> Self {
+        Self {
+            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
+            user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
+            role_id: builder.role.unwrap().inner.id,
+        }
+    }
+}
+impl FormBuildable for NewSampledIndividualsUsersRole {
+    type Builder = SampledIndividualsUsersRoleBuilder;
+    fn title() -> &'static str {
+        "Sampled individuals users role"
+    }
+    fn task_target() -> &'static str {
+        "Sampled individuals users role"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        false
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateSampledIndividualsUsersRoleFormProp {
+    pub table_id: Uuid,
+     #[prop_or_default]
+    pub user_id: Option<i32>,
+     #[prop_or_default]
+    pub role_id: Option<i32>,
+}
+
+#[function_component(CreateSampledIndividualsUsersRoleForm)]
+pub fn create_sampled_individuals_users_role_form(props: &CreateSampledIndividualsUsersRoleFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<SampledIndividualsUsersRoleBuilder>();
+    named_requests.push(ComponentMessage::get_named::<&str, SampledIndividual>("table", props.table_id.into()));
+   if let Some(user_id) = props.user_id {
+         named_requests.push(ComponentMessage::get_named::<&str, User>("user", user_id.into()));
+    }
+   if let Some(role_id) = props.role_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Role>("role", role_id.into()));
+    }
+    let set_table = builder_dispatch.apply_callback(|table: Option<NestedSampledIndividual>| SampledIndividualsUsersRoleActions::SetTable(table));
+    let set_user = builder_dispatch.apply_callback(|user: Option<User>| SampledIndividualsUsersRoleActions::SetUser(user));
+    let set_role = builder_dispatch.apply_callback(|role: Option<NestedRole>| SampledIndividualsUsersRoleActions::SetRole(role));
+    html! {
+        <BasicForm<NewSampledIndividualsUsersRole>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+if let Some(table) = builder_store.table.as_ref() {
+    <span>{"TODO Selected table"}</span>
+} else {
+    <></>
+}
+            <Datalist<User, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" />
+            <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
+        </BasicForm<NewSampledIndividualsUsersRole>>
     }
 }
 #[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
@@ -770,13 +3384,10 @@ impl FormBuilder for SampleBuilder {
 !self.errors_sampled_by.is_empty() || !self.errors_state.is_empty()
     }
 
-    fn id(&self) -> Option<PrimaryKey> {
-        self.id.map(|id| id.into())
-    }
-
-    fn update(dispatcher: &Dispatch<Self>, rich_variant: Self::RichVariant) -> Vec<ComponentMessage> {
-        dispatcher.apply(SampleActions::SetSampledBy(Some(rich_variant.sampled_by)));
-        dispatcher.apply(SampleActions::SetState(Some(rich_variant.state)));
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.reduce_mut(|state| {state.id = Some(richest_variant.inner.id);});
+        dispatcher.apply(SampleActions::SetSampledBy(Some(richest_variant.sampled_by)));
+        dispatcher.apply(SampleActions::SetState(Some(richest_variant.state)));
         vec![]
     }
 
@@ -825,11 +3436,11 @@ pub struct CreateSampleFormProp {
 pub fn create_sample_form(props: &CreateSampleFormProp) -> Html {
      let mut named_requests: Vec<ComponentMessage> = Vec::new();
     let (builder_store, builder_dispatch) = use_store::<SampleBuilder>();
-    if let Some(sampled_by) = props.sampled_by {
-         named_requests.push(ComponentMessage::get_named::<&str, NewSample>("sampled_by", sampled_by.into()));
+   if let Some(sampled_by) = props.sampled_by {
+         named_requests.push(ComponentMessage::get_named::<&str, User>("sampled_by", sampled_by.into()));
     }
-    if let Some(state) = props.state {
-         named_requests.push(ComponentMessage::get_named::<&str, NewSample>("state", state.into()));
+   if let Some(state) = props.state {
+         named_requests.push(ComponentMessage::get_named::<&str, SampleState>("state", state.into()));
     }
     let set_sampled_by = builder_dispatch.apply_callback(|sampled_by: Option<User>| SampleActions::SetSampledBy(sampled_by));
     let set_state = builder_dispatch.apply_callback(|state: Option<NestedSampleState>| SampleActions::SetState(state));
@@ -865,6 +3476,2361 @@ pub fn update_sample_form(props: &UpdateSampleFormProp) -> Html {
             <Datalist<User, false> builder={set_sampled_by} optional={false} errors={builder_store.errors_sampled_by.clone()} value={builder_store.sampled_by.clone()} label="Sampled by" />
             <Datalist<NestedSampleState, false> builder={set_state} optional={false} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" />
         </BasicForm<NewSample>>
+    }
+}
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
+pub struct SamplesTeamsRoleInvitationBuilder {
+    pub table: Option<NestedSample>,
+    pub team: Option<NestedTeam>,
+    pub role: Option<NestedRole>,
+    pub errors_table: Vec<ApiError>,
+    pub errors_team: Vec<ApiError>,
+    pub errors_role: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for SamplesTeamsRoleInvitationBuilder {
+    fn default() -> Self {
+        Self {
+            table: None,
+            team: None,
+            role: None,
+            errors_table: Vec::new(),
+            errors_team: Vec::new(),
+            errors_role: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
+}
+
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub(super) enum SamplesTeamsRoleInvitationActions {
+    SetTable(Option<NestedSample>),
+    SetTeam(Option<NestedTeam>),
+    SetRole(Option<NestedRole>),
+}
+
+impl FromOperation for SamplesTeamsRoleInvitationActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "table" => SamplesTeamsRoleInvitationActions::SetTable(Some(bincode::deserialize(&row).unwrap())),
+            "team" => SamplesTeamsRoleInvitationActions::SetTeam(Some(bincode::deserialize(&row).unwrap())),
+            "role" => SamplesTeamsRoleInvitationActions::SetRole(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
+}
+
+impl Reducer<SamplesTeamsRoleInvitationBuilder> for SamplesTeamsRoleInvitationActions {
+    fn apply(self, mut state: std::rc::Rc<SamplesTeamsRoleInvitationBuilder>) -> std::rc::Rc<SamplesTeamsRoleInvitationBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            SamplesTeamsRoleInvitationActions::SetTable(table) => 'table: {
+                state_mut.errors_table.clear();
+        if table.is_none() {
+            state_mut.errors_table.push(ApiError::BadRequest(vec![
+                "The Table field is required.".to_string()
+             ]));
+            state_mut.table = None;
+             break 'table;
+        }
+                state_mut.table = table;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'table;
+            }
+            SamplesTeamsRoleInvitationActions::SetTeam(team) => 'team: {
+                state_mut.errors_team.clear();
+        if team.is_none() {
+            state_mut.errors_team.push(ApiError::BadRequest(vec![
+                "The Team field is required.".to_string()
+             ]));
+            state_mut.team = None;
+             break 'team;
+        }
+                state_mut.team = team;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'team;
+            }
+            SamplesTeamsRoleInvitationActions::SetRole(role) => 'role: {
+                state_mut.errors_role.clear();
+        if role.is_none() {
+            state_mut.errors_role.push(ApiError::BadRequest(vec![
+                "The Role field is required.".to_string()
+             ]));
+            state_mut.role = None;
+             break 'role;
+        }
+                state_mut.role = role;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'role;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for SamplesTeamsRoleInvitationBuilder {
+    type Actions = SamplesTeamsRoleInvitationActions;
+
+    type RichVariant = NestedSamplesTeamsRoleInvitation;
+
+    fn has_errors(&self) -> bool {
+!self.errors_table.is_empty() || !self.errors_team.is_empty() || !self.errors_role.is_empty()
+    }
+
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.apply(SamplesTeamsRoleInvitationActions::SetTable(Some(richest_variant.table)));
+        dispatcher.apply(SamplesTeamsRoleInvitationActions::SetTeam(Some(richest_variant.team)));
+        dispatcher.apply(SamplesTeamsRoleInvitationActions::SetRole(Some(richest_variant.role)));
+        vec![]
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.table.is_some()
+        && self.team.is_some()
+        && self.role.is_some()
+    }
+
+}
+
+impl From<SamplesTeamsRoleInvitationBuilder> for NewSamplesTeamsRoleInvitation {
+    fn from(builder: SamplesTeamsRoleInvitationBuilder) -> Self {
+        Self {
+            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
+            team_id: builder.team.as_ref().map(|team| team.inner.id).unwrap(),
+            role_id: builder.role.unwrap().inner.id,
+        }
+    }
+}
+impl FormBuildable for NewSamplesTeamsRoleInvitation {
+    type Builder = SamplesTeamsRoleInvitationBuilder;
+    fn title() -> &'static str {
+        "Samples teams role invitation"
+    }
+    fn task_target() -> &'static str {
+        "Samples teams role invitation"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        false
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateSamplesTeamsRoleInvitationFormProp {
+    pub table_id: Uuid,
+     #[prop_or_default]
+    pub team_id: Option<i32>,
+     #[prop_or_default]
+    pub role_id: Option<i32>,
+}
+
+#[function_component(CreateSamplesTeamsRoleInvitationForm)]
+pub fn create_samples_teams_role_invitation_form(props: &CreateSamplesTeamsRoleInvitationFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<SamplesTeamsRoleInvitationBuilder>();
+    named_requests.push(ComponentMessage::get_named::<&str, Sample>("table", props.table_id.into()));
+   if let Some(team_id) = props.team_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Team>("team", team_id.into()));
+    }
+   if let Some(role_id) = props.role_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Role>("role", role_id.into()));
+    }
+    let set_table = builder_dispatch.apply_callback(|table: Option<NestedSample>| SamplesTeamsRoleInvitationActions::SetTable(table));
+    let set_team = builder_dispatch.apply_callback(|team: Option<NestedTeam>| SamplesTeamsRoleInvitationActions::SetTeam(team));
+    let set_role = builder_dispatch.apply_callback(|role: Option<NestedRole>| SamplesTeamsRoleInvitationActions::SetRole(role));
+    html! {
+        <BasicForm<NewSamplesTeamsRoleInvitation>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+if let Some(table) = builder_store.table.as_ref() {
+    <span>{"TODO Selected table"}</span>
+} else {
+    <></>
+}
+            <Datalist<NestedTeam, true> builder={set_team} optional={false} errors={builder_store.errors_team.clone()} value={builder_store.team.clone()} label="Team" />
+            <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
+        </BasicForm<NewSamplesTeamsRoleInvitation>>
+    }
+}
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
+pub struct SamplesTeamsRoleRequestBuilder {
+    pub table: Option<NestedSample>,
+    pub team: Option<NestedTeam>,
+    pub role: Option<NestedRole>,
+    pub errors_table: Vec<ApiError>,
+    pub errors_team: Vec<ApiError>,
+    pub errors_role: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for SamplesTeamsRoleRequestBuilder {
+    fn default() -> Self {
+        Self {
+            table: None,
+            team: None,
+            role: None,
+            errors_table: Vec::new(),
+            errors_team: Vec::new(),
+            errors_role: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
+}
+
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub(super) enum SamplesTeamsRoleRequestActions {
+    SetTable(Option<NestedSample>),
+    SetTeam(Option<NestedTeam>),
+    SetRole(Option<NestedRole>),
+}
+
+impl FromOperation for SamplesTeamsRoleRequestActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "table" => SamplesTeamsRoleRequestActions::SetTable(Some(bincode::deserialize(&row).unwrap())),
+            "team" => SamplesTeamsRoleRequestActions::SetTeam(Some(bincode::deserialize(&row).unwrap())),
+            "role" => SamplesTeamsRoleRequestActions::SetRole(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
+}
+
+impl Reducer<SamplesTeamsRoleRequestBuilder> for SamplesTeamsRoleRequestActions {
+    fn apply(self, mut state: std::rc::Rc<SamplesTeamsRoleRequestBuilder>) -> std::rc::Rc<SamplesTeamsRoleRequestBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            SamplesTeamsRoleRequestActions::SetTable(table) => 'table: {
+                state_mut.errors_table.clear();
+        if table.is_none() {
+            state_mut.errors_table.push(ApiError::BadRequest(vec![
+                "The Table field is required.".to_string()
+             ]));
+            state_mut.table = None;
+             break 'table;
+        }
+                state_mut.table = table;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'table;
+            }
+            SamplesTeamsRoleRequestActions::SetTeam(team) => 'team: {
+                state_mut.errors_team.clear();
+        if team.is_none() {
+            state_mut.errors_team.push(ApiError::BadRequest(vec![
+                "The Team field is required.".to_string()
+             ]));
+            state_mut.team = None;
+             break 'team;
+        }
+                state_mut.team = team;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'team;
+            }
+            SamplesTeamsRoleRequestActions::SetRole(role) => 'role: {
+                state_mut.errors_role.clear();
+        if role.is_none() {
+            state_mut.errors_role.push(ApiError::BadRequest(vec![
+                "The Role field is required.".to_string()
+             ]));
+            state_mut.role = None;
+             break 'role;
+        }
+                state_mut.role = role;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'role;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for SamplesTeamsRoleRequestBuilder {
+    type Actions = SamplesTeamsRoleRequestActions;
+
+    type RichVariant = NestedSamplesTeamsRoleRequest;
+
+    fn has_errors(&self) -> bool {
+!self.errors_table.is_empty() || !self.errors_team.is_empty() || !self.errors_role.is_empty()
+    }
+
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.apply(SamplesTeamsRoleRequestActions::SetTable(Some(richest_variant.table)));
+        dispatcher.apply(SamplesTeamsRoleRequestActions::SetTeam(Some(richest_variant.team)));
+        dispatcher.apply(SamplesTeamsRoleRequestActions::SetRole(Some(richest_variant.role)));
+        vec![]
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.table.is_some()
+        && self.team.is_some()
+        && self.role.is_some()
+    }
+
+}
+
+impl From<SamplesTeamsRoleRequestBuilder> for NewSamplesTeamsRoleRequest {
+    fn from(builder: SamplesTeamsRoleRequestBuilder) -> Self {
+        Self {
+            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
+            team_id: builder.team.as_ref().map(|team| team.inner.id).unwrap(),
+            role_id: builder.role.unwrap().inner.id,
+        }
+    }
+}
+impl FormBuildable for NewSamplesTeamsRoleRequest {
+    type Builder = SamplesTeamsRoleRequestBuilder;
+    fn title() -> &'static str {
+        "Samples teams role request"
+    }
+    fn task_target() -> &'static str {
+        "Samples teams role request"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        false
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateSamplesTeamsRoleRequestFormProp {
+    pub table_id: Uuid,
+     #[prop_or_default]
+    pub team_id: Option<i32>,
+     #[prop_or_default]
+    pub role_id: Option<i32>,
+}
+
+#[function_component(CreateSamplesTeamsRoleRequestForm)]
+pub fn create_samples_teams_role_request_form(props: &CreateSamplesTeamsRoleRequestFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<SamplesTeamsRoleRequestBuilder>();
+    named_requests.push(ComponentMessage::get_named::<&str, Sample>("table", props.table_id.into()));
+   if let Some(team_id) = props.team_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Team>("team", team_id.into()));
+    }
+   if let Some(role_id) = props.role_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Role>("role", role_id.into()));
+    }
+    let set_table = builder_dispatch.apply_callback(|table: Option<NestedSample>| SamplesTeamsRoleRequestActions::SetTable(table));
+    let set_team = builder_dispatch.apply_callback(|team: Option<NestedTeam>| SamplesTeamsRoleRequestActions::SetTeam(team));
+    let set_role = builder_dispatch.apply_callback(|role: Option<NestedRole>| SamplesTeamsRoleRequestActions::SetRole(role));
+    html! {
+        <BasicForm<NewSamplesTeamsRoleRequest>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+if let Some(table) = builder_store.table.as_ref() {
+    <span>{"TODO Selected table"}</span>
+} else {
+    <></>
+}
+            <Datalist<NestedTeam, true> builder={set_team} optional={false} errors={builder_store.errors_team.clone()} value={builder_store.team.clone()} label="Team" />
+            <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
+        </BasicForm<NewSamplesTeamsRoleRequest>>
+    }
+}
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
+pub struct SamplesTeamsRoleBuilder {
+    pub table: Option<NestedSample>,
+    pub team: Option<NestedTeam>,
+    pub role: Option<NestedRole>,
+    pub errors_table: Vec<ApiError>,
+    pub errors_team: Vec<ApiError>,
+    pub errors_role: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for SamplesTeamsRoleBuilder {
+    fn default() -> Self {
+        Self {
+            table: None,
+            team: None,
+            role: None,
+            errors_table: Vec::new(),
+            errors_team: Vec::new(),
+            errors_role: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
+}
+
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub(super) enum SamplesTeamsRoleActions {
+    SetTable(Option<NestedSample>),
+    SetTeam(Option<NestedTeam>),
+    SetRole(Option<NestedRole>),
+}
+
+impl FromOperation for SamplesTeamsRoleActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "table" => SamplesTeamsRoleActions::SetTable(Some(bincode::deserialize(&row).unwrap())),
+            "team" => SamplesTeamsRoleActions::SetTeam(Some(bincode::deserialize(&row).unwrap())),
+            "role" => SamplesTeamsRoleActions::SetRole(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
+}
+
+impl Reducer<SamplesTeamsRoleBuilder> for SamplesTeamsRoleActions {
+    fn apply(self, mut state: std::rc::Rc<SamplesTeamsRoleBuilder>) -> std::rc::Rc<SamplesTeamsRoleBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            SamplesTeamsRoleActions::SetTable(table) => 'table: {
+                state_mut.errors_table.clear();
+        if table.is_none() {
+            state_mut.errors_table.push(ApiError::BadRequest(vec![
+                "The Table field is required.".to_string()
+             ]));
+            state_mut.table = None;
+             break 'table;
+        }
+                state_mut.table = table;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'table;
+            }
+            SamplesTeamsRoleActions::SetTeam(team) => 'team: {
+                state_mut.errors_team.clear();
+        if team.is_none() {
+            state_mut.errors_team.push(ApiError::BadRequest(vec![
+                "The Team field is required.".to_string()
+             ]));
+            state_mut.team = None;
+             break 'team;
+        }
+                state_mut.team = team;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'team;
+            }
+            SamplesTeamsRoleActions::SetRole(role) => 'role: {
+                state_mut.errors_role.clear();
+        if role.is_none() {
+            state_mut.errors_role.push(ApiError::BadRequest(vec![
+                "The Role field is required.".to_string()
+             ]));
+            state_mut.role = None;
+             break 'role;
+        }
+                state_mut.role = role;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'role;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for SamplesTeamsRoleBuilder {
+    type Actions = SamplesTeamsRoleActions;
+
+    type RichVariant = NestedSamplesTeamsRole;
+
+    fn has_errors(&self) -> bool {
+!self.errors_table.is_empty() || !self.errors_team.is_empty() || !self.errors_role.is_empty()
+    }
+
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.apply(SamplesTeamsRoleActions::SetTable(Some(richest_variant.table)));
+        dispatcher.apply(SamplesTeamsRoleActions::SetTeam(Some(richest_variant.team)));
+        dispatcher.apply(SamplesTeamsRoleActions::SetRole(Some(richest_variant.role)));
+        vec![]
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.table.is_some()
+        && self.team.is_some()
+        && self.role.is_some()
+    }
+
+}
+
+impl From<SamplesTeamsRoleBuilder> for NewSamplesTeamsRole {
+    fn from(builder: SamplesTeamsRoleBuilder) -> Self {
+        Self {
+            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
+            team_id: builder.team.as_ref().map(|team| team.inner.id).unwrap(),
+            role_id: builder.role.unwrap().inner.id,
+        }
+    }
+}
+impl FormBuildable for NewSamplesTeamsRole {
+    type Builder = SamplesTeamsRoleBuilder;
+    fn title() -> &'static str {
+        "Samples teams role"
+    }
+    fn task_target() -> &'static str {
+        "Samples teams role"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        false
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateSamplesTeamsRoleFormProp {
+    pub table_id: Uuid,
+     #[prop_or_default]
+    pub team_id: Option<i32>,
+     #[prop_or_default]
+    pub role_id: Option<i32>,
+}
+
+#[function_component(CreateSamplesTeamsRoleForm)]
+pub fn create_samples_teams_role_form(props: &CreateSamplesTeamsRoleFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<SamplesTeamsRoleBuilder>();
+    named_requests.push(ComponentMessage::get_named::<&str, Sample>("table", props.table_id.into()));
+   if let Some(team_id) = props.team_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Team>("team", team_id.into()));
+    }
+   if let Some(role_id) = props.role_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Role>("role", role_id.into()));
+    }
+    let set_table = builder_dispatch.apply_callback(|table: Option<NestedSample>| SamplesTeamsRoleActions::SetTable(table));
+    let set_team = builder_dispatch.apply_callback(|team: Option<NestedTeam>| SamplesTeamsRoleActions::SetTeam(team));
+    let set_role = builder_dispatch.apply_callback(|role: Option<NestedRole>| SamplesTeamsRoleActions::SetRole(role));
+    html! {
+        <BasicForm<NewSamplesTeamsRole>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+if let Some(table) = builder_store.table.as_ref() {
+    <span>{"TODO Selected table"}</span>
+} else {
+    <></>
+}
+            <Datalist<NestedTeam, true> builder={set_team} optional={false} errors={builder_store.errors_team.clone()} value={builder_store.team.clone()} label="Team" />
+            <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
+        </BasicForm<NewSamplesTeamsRole>>
+    }
+}
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
+pub struct SamplesUsersRoleInvitationBuilder {
+    pub table: Option<NestedSample>,
+    pub user: Option<User>,
+    pub role: Option<NestedRole>,
+    pub errors_table: Vec<ApiError>,
+    pub errors_user: Vec<ApiError>,
+    pub errors_role: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for SamplesUsersRoleInvitationBuilder {
+    fn default() -> Self {
+        Self {
+            table: None,
+            user: None,
+            role: None,
+            errors_table: Vec::new(),
+            errors_user: Vec::new(),
+            errors_role: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
+}
+
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub(super) enum SamplesUsersRoleInvitationActions {
+    SetTable(Option<NestedSample>),
+    SetUser(Option<User>),
+    SetRole(Option<NestedRole>),
+}
+
+impl FromOperation for SamplesUsersRoleInvitationActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "table" => SamplesUsersRoleInvitationActions::SetTable(Some(bincode::deserialize(&row).unwrap())),
+            "user" => SamplesUsersRoleInvitationActions::SetUser(Some(bincode::deserialize(&row).unwrap())),
+            "role" => SamplesUsersRoleInvitationActions::SetRole(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
+}
+
+impl Reducer<SamplesUsersRoleInvitationBuilder> for SamplesUsersRoleInvitationActions {
+    fn apply(self, mut state: std::rc::Rc<SamplesUsersRoleInvitationBuilder>) -> std::rc::Rc<SamplesUsersRoleInvitationBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            SamplesUsersRoleInvitationActions::SetTable(table) => 'table: {
+                state_mut.errors_table.clear();
+        if table.is_none() {
+            state_mut.errors_table.push(ApiError::BadRequest(vec![
+                "The Table field is required.".to_string()
+             ]));
+            state_mut.table = None;
+             break 'table;
+        }
+                state_mut.table = table;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'table;
+            }
+            SamplesUsersRoleInvitationActions::SetUser(user) => 'user: {
+                state_mut.errors_user.clear();
+        if user.is_none() {
+            state_mut.errors_user.push(ApiError::BadRequest(vec![
+                "The User field is required.".to_string()
+             ]));
+            state_mut.user = None;
+             break 'user;
+        }
+                state_mut.user = user;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'user;
+            }
+            SamplesUsersRoleInvitationActions::SetRole(role) => 'role: {
+                state_mut.errors_role.clear();
+        if role.is_none() {
+            state_mut.errors_role.push(ApiError::BadRequest(vec![
+                "The Role field is required.".to_string()
+             ]));
+            state_mut.role = None;
+             break 'role;
+        }
+                state_mut.role = role;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'role;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for SamplesUsersRoleInvitationBuilder {
+    type Actions = SamplesUsersRoleInvitationActions;
+
+    type RichVariant = NestedSamplesUsersRoleInvitation;
+
+    fn has_errors(&self) -> bool {
+!self.errors_table.is_empty() || !self.errors_user.is_empty() || !self.errors_role.is_empty()
+    }
+
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.apply(SamplesUsersRoleInvitationActions::SetTable(Some(richest_variant.table)));
+        dispatcher.apply(SamplesUsersRoleInvitationActions::SetUser(Some(richest_variant.user)));
+        dispatcher.apply(SamplesUsersRoleInvitationActions::SetRole(Some(richest_variant.role)));
+        vec![]
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.table.is_some()
+        && self.user.is_some()
+        && self.role.is_some()
+    }
+
+}
+
+impl From<SamplesUsersRoleInvitationBuilder> for NewSamplesUsersRoleInvitation {
+    fn from(builder: SamplesUsersRoleInvitationBuilder) -> Self {
+        Self {
+            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
+            user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
+            role_id: builder.role.unwrap().inner.id,
+        }
+    }
+}
+impl FormBuildable for NewSamplesUsersRoleInvitation {
+    type Builder = SamplesUsersRoleInvitationBuilder;
+    fn title() -> &'static str {
+        "Samples users role invitation"
+    }
+    fn task_target() -> &'static str {
+        "Samples users role invitation"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        false
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateSamplesUsersRoleInvitationFormProp {
+    pub table_id: Uuid,
+     #[prop_or_default]
+    pub user_id: Option<i32>,
+     #[prop_or_default]
+    pub role_id: Option<i32>,
+}
+
+#[function_component(CreateSamplesUsersRoleInvitationForm)]
+pub fn create_samples_users_role_invitation_form(props: &CreateSamplesUsersRoleInvitationFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<SamplesUsersRoleInvitationBuilder>();
+    named_requests.push(ComponentMessage::get_named::<&str, Sample>("table", props.table_id.into()));
+   if let Some(user_id) = props.user_id {
+         named_requests.push(ComponentMessage::get_named::<&str, User>("user", user_id.into()));
+    }
+   if let Some(role_id) = props.role_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Role>("role", role_id.into()));
+    }
+    let set_table = builder_dispatch.apply_callback(|table: Option<NestedSample>| SamplesUsersRoleInvitationActions::SetTable(table));
+    let set_user = builder_dispatch.apply_callback(|user: Option<User>| SamplesUsersRoleInvitationActions::SetUser(user));
+    let set_role = builder_dispatch.apply_callback(|role: Option<NestedRole>| SamplesUsersRoleInvitationActions::SetRole(role));
+    html! {
+        <BasicForm<NewSamplesUsersRoleInvitation>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+if let Some(table) = builder_store.table.as_ref() {
+    <span>{"TODO Selected table"}</span>
+} else {
+    <></>
+}
+            <Datalist<User, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" />
+            <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
+        </BasicForm<NewSamplesUsersRoleInvitation>>
+    }
+}
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
+pub struct SamplesUsersRoleRequestBuilder {
+    pub table: Option<NestedSample>,
+    pub user: Option<User>,
+    pub role: Option<NestedRole>,
+    pub errors_table: Vec<ApiError>,
+    pub errors_user: Vec<ApiError>,
+    pub errors_role: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for SamplesUsersRoleRequestBuilder {
+    fn default() -> Self {
+        Self {
+            table: None,
+            user: None,
+            role: None,
+            errors_table: Vec::new(),
+            errors_user: Vec::new(),
+            errors_role: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
+}
+
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub(super) enum SamplesUsersRoleRequestActions {
+    SetTable(Option<NestedSample>),
+    SetUser(Option<User>),
+    SetRole(Option<NestedRole>),
+}
+
+impl FromOperation for SamplesUsersRoleRequestActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "table" => SamplesUsersRoleRequestActions::SetTable(Some(bincode::deserialize(&row).unwrap())),
+            "user" => SamplesUsersRoleRequestActions::SetUser(Some(bincode::deserialize(&row).unwrap())),
+            "role" => SamplesUsersRoleRequestActions::SetRole(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
+}
+
+impl Reducer<SamplesUsersRoleRequestBuilder> for SamplesUsersRoleRequestActions {
+    fn apply(self, mut state: std::rc::Rc<SamplesUsersRoleRequestBuilder>) -> std::rc::Rc<SamplesUsersRoleRequestBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            SamplesUsersRoleRequestActions::SetTable(table) => 'table: {
+                state_mut.errors_table.clear();
+        if table.is_none() {
+            state_mut.errors_table.push(ApiError::BadRequest(vec![
+                "The Table field is required.".to_string()
+             ]));
+            state_mut.table = None;
+             break 'table;
+        }
+                state_mut.table = table;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'table;
+            }
+            SamplesUsersRoleRequestActions::SetUser(user) => 'user: {
+                state_mut.errors_user.clear();
+        if user.is_none() {
+            state_mut.errors_user.push(ApiError::BadRequest(vec![
+                "The User field is required.".to_string()
+             ]));
+            state_mut.user = None;
+             break 'user;
+        }
+                state_mut.user = user;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'user;
+            }
+            SamplesUsersRoleRequestActions::SetRole(role) => 'role: {
+                state_mut.errors_role.clear();
+        if role.is_none() {
+            state_mut.errors_role.push(ApiError::BadRequest(vec![
+                "The Role field is required.".to_string()
+             ]));
+            state_mut.role = None;
+             break 'role;
+        }
+                state_mut.role = role;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'role;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for SamplesUsersRoleRequestBuilder {
+    type Actions = SamplesUsersRoleRequestActions;
+
+    type RichVariant = NestedSamplesUsersRoleRequest;
+
+    fn has_errors(&self) -> bool {
+!self.errors_table.is_empty() || !self.errors_user.is_empty() || !self.errors_role.is_empty()
+    }
+
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.apply(SamplesUsersRoleRequestActions::SetTable(Some(richest_variant.table)));
+        dispatcher.apply(SamplesUsersRoleRequestActions::SetUser(Some(richest_variant.user)));
+        dispatcher.apply(SamplesUsersRoleRequestActions::SetRole(Some(richest_variant.role)));
+        vec![]
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.table.is_some()
+        && self.user.is_some()
+        && self.role.is_some()
+    }
+
+}
+
+impl From<SamplesUsersRoleRequestBuilder> for NewSamplesUsersRoleRequest {
+    fn from(builder: SamplesUsersRoleRequestBuilder) -> Self {
+        Self {
+            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
+            user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
+            role_id: builder.role.unwrap().inner.id,
+        }
+    }
+}
+impl FormBuildable for NewSamplesUsersRoleRequest {
+    type Builder = SamplesUsersRoleRequestBuilder;
+    fn title() -> &'static str {
+        "Samples users role request"
+    }
+    fn task_target() -> &'static str {
+        "Samples users role request"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        false
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateSamplesUsersRoleRequestFormProp {
+    pub table_id: Uuid,
+     #[prop_or_default]
+    pub user_id: Option<i32>,
+     #[prop_or_default]
+    pub role_id: Option<i32>,
+}
+
+#[function_component(CreateSamplesUsersRoleRequestForm)]
+pub fn create_samples_users_role_request_form(props: &CreateSamplesUsersRoleRequestFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<SamplesUsersRoleRequestBuilder>();
+    named_requests.push(ComponentMessage::get_named::<&str, Sample>("table", props.table_id.into()));
+   if let Some(user_id) = props.user_id {
+         named_requests.push(ComponentMessage::get_named::<&str, User>("user", user_id.into()));
+    }
+   if let Some(role_id) = props.role_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Role>("role", role_id.into()));
+    }
+    let set_table = builder_dispatch.apply_callback(|table: Option<NestedSample>| SamplesUsersRoleRequestActions::SetTable(table));
+    let set_user = builder_dispatch.apply_callback(|user: Option<User>| SamplesUsersRoleRequestActions::SetUser(user));
+    let set_role = builder_dispatch.apply_callback(|role: Option<NestedRole>| SamplesUsersRoleRequestActions::SetRole(role));
+    html! {
+        <BasicForm<NewSamplesUsersRoleRequest>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+if let Some(table) = builder_store.table.as_ref() {
+    <span>{"TODO Selected table"}</span>
+} else {
+    <></>
+}
+            <Datalist<User, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" />
+            <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
+        </BasicForm<NewSamplesUsersRoleRequest>>
+    }
+}
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
+pub struct SamplesUsersRoleBuilder {
+    pub table: Option<NestedSample>,
+    pub user: Option<User>,
+    pub role: Option<NestedRole>,
+    pub errors_table: Vec<ApiError>,
+    pub errors_user: Vec<ApiError>,
+    pub errors_role: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for SamplesUsersRoleBuilder {
+    fn default() -> Self {
+        Self {
+            table: None,
+            user: None,
+            role: None,
+            errors_table: Vec::new(),
+            errors_user: Vec::new(),
+            errors_role: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
+}
+
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub(super) enum SamplesUsersRoleActions {
+    SetTable(Option<NestedSample>),
+    SetUser(Option<User>),
+    SetRole(Option<NestedRole>),
+}
+
+impl FromOperation for SamplesUsersRoleActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "table" => SamplesUsersRoleActions::SetTable(Some(bincode::deserialize(&row).unwrap())),
+            "user" => SamplesUsersRoleActions::SetUser(Some(bincode::deserialize(&row).unwrap())),
+            "role" => SamplesUsersRoleActions::SetRole(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
+}
+
+impl Reducer<SamplesUsersRoleBuilder> for SamplesUsersRoleActions {
+    fn apply(self, mut state: std::rc::Rc<SamplesUsersRoleBuilder>) -> std::rc::Rc<SamplesUsersRoleBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            SamplesUsersRoleActions::SetTable(table) => 'table: {
+                state_mut.errors_table.clear();
+        if table.is_none() {
+            state_mut.errors_table.push(ApiError::BadRequest(vec![
+                "The Table field is required.".to_string()
+             ]));
+            state_mut.table = None;
+             break 'table;
+        }
+                state_mut.table = table;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'table;
+            }
+            SamplesUsersRoleActions::SetUser(user) => 'user: {
+                state_mut.errors_user.clear();
+        if user.is_none() {
+            state_mut.errors_user.push(ApiError::BadRequest(vec![
+                "The User field is required.".to_string()
+             ]));
+            state_mut.user = None;
+             break 'user;
+        }
+                state_mut.user = user;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'user;
+            }
+            SamplesUsersRoleActions::SetRole(role) => 'role: {
+                state_mut.errors_role.clear();
+        if role.is_none() {
+            state_mut.errors_role.push(ApiError::BadRequest(vec![
+                "The Role field is required.".to_string()
+             ]));
+            state_mut.role = None;
+             break 'role;
+        }
+                state_mut.role = role;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'role;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for SamplesUsersRoleBuilder {
+    type Actions = SamplesUsersRoleActions;
+
+    type RichVariant = NestedSamplesUsersRole;
+
+    fn has_errors(&self) -> bool {
+!self.errors_table.is_empty() || !self.errors_user.is_empty() || !self.errors_role.is_empty()
+    }
+
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.apply(SamplesUsersRoleActions::SetTable(Some(richest_variant.table)));
+        dispatcher.apply(SamplesUsersRoleActions::SetUser(Some(richest_variant.user)));
+        dispatcher.apply(SamplesUsersRoleActions::SetRole(Some(richest_variant.role)));
+        vec![]
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.table.is_some()
+        && self.user.is_some()
+        && self.role.is_some()
+    }
+
+}
+
+impl From<SamplesUsersRoleBuilder> for NewSamplesUsersRole {
+    fn from(builder: SamplesUsersRoleBuilder) -> Self {
+        Self {
+            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
+            user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
+            role_id: builder.role.unwrap().inner.id,
+        }
+    }
+}
+impl FormBuildable for NewSamplesUsersRole {
+    type Builder = SamplesUsersRoleBuilder;
+    fn title() -> &'static str {
+        "Samples users role"
+    }
+    fn task_target() -> &'static str {
+        "Samples users role"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        false
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateSamplesUsersRoleFormProp {
+    pub table_id: Uuid,
+     #[prop_or_default]
+    pub user_id: Option<i32>,
+     #[prop_or_default]
+    pub role_id: Option<i32>,
+}
+
+#[function_component(CreateSamplesUsersRoleForm)]
+pub fn create_samples_users_role_form(props: &CreateSamplesUsersRoleFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<SamplesUsersRoleBuilder>();
+    named_requests.push(ComponentMessage::get_named::<&str, Sample>("table", props.table_id.into()));
+   if let Some(user_id) = props.user_id {
+         named_requests.push(ComponentMessage::get_named::<&str, User>("user", user_id.into()));
+    }
+   if let Some(role_id) = props.role_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Role>("role", role_id.into()));
+    }
+    let set_table = builder_dispatch.apply_callback(|table: Option<NestedSample>| SamplesUsersRoleActions::SetTable(table));
+    let set_user = builder_dispatch.apply_callback(|user: Option<User>| SamplesUsersRoleActions::SetUser(user));
+    let set_role = builder_dispatch.apply_callback(|role: Option<NestedRole>| SamplesUsersRoleActions::SetRole(role));
+    html! {
+        <BasicForm<NewSamplesUsersRole>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+if let Some(table) = builder_store.table.as_ref() {
+    <span>{"TODO Selected table"}</span>
+} else {
+    <></>
+}
+            <Datalist<User, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" />
+            <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
+        </BasicForm<NewSamplesUsersRole>>
+    }
+}
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
+pub struct SpectraCollectionBuilder {
+    pub id: Option<i32>,
+    pub sample: Option<NestedSample>,
+    pub errors_sample: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for SpectraCollectionBuilder {
+    fn default() -> Self {
+        Self {
+            id: None,
+            sample: None,
+            errors_sample: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
+}
+
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub(super) enum SpectraCollectionActions {
+    SetSample(Option<NestedSample>),
+}
+
+impl FromOperation for SpectraCollectionActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "sample" => SpectraCollectionActions::SetSample(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
+}
+
+impl Reducer<SpectraCollectionBuilder> for SpectraCollectionActions {
+    fn apply(self, mut state: std::rc::Rc<SpectraCollectionBuilder>) -> std::rc::Rc<SpectraCollectionBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            SpectraCollectionActions::SetSample(sample) => 'sample: {
+                state_mut.errors_sample.clear();
+        if sample.is_none() {
+            state_mut.errors_sample.push(ApiError::BadRequest(vec![
+                "The Sample field is required.".to_string()
+             ]));
+            state_mut.sample = None;
+             break 'sample;
+        }
+                state_mut.sample = sample;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'sample;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for SpectraCollectionBuilder {
+    type Actions = SpectraCollectionActions;
+
+    type RichVariant = NestedSpectraCollection;
+
+    fn has_errors(&self) -> bool {
+!self.errors_sample.is_empty()
+    }
+
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.reduce_mut(|state| {state.id = Some(richest_variant.inner.id);});
+        dispatcher.apply(SpectraCollectionActions::SetSample(Some(richest_variant.sample)));
+        vec![]
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.sample.is_some()
+    }
+
+}
+
+impl From<SpectraCollectionBuilder> for NewSpectraCollection {
+    fn from(builder: SpectraCollectionBuilder) -> Self {
+        Self {
+            sample_id: builder.sample.unwrap().inner.id,
+        }
+    }
+}
+impl From<SpectraCollectionBuilder> for UpdateSpectraCollection {
+    fn from(builder: SpectraCollectionBuilder) -> Self {
+        Self {
+            id: builder.id.unwrap(),
+            sample_id: builder.sample.unwrap().inner.id,
+        }
+    }
+}
+impl FormBuildable for NewSpectraCollection {
+    type Builder = SpectraCollectionBuilder;
+    fn title() -> &'static str {
+        "Spectra collection"
+    }
+    fn task_target() -> &'static str {
+        "Spectra collection"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        false
+    }
+}
+
+impl FormBuildable for UpdateSpectraCollection {
+    type Builder = SpectraCollectionBuilder;
+    fn title() -> &'static str {
+        "Spectra collection"
+    }
+    fn task_target() -> &'static str {
+        "Spectra collection"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        true
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateSpectraCollectionFormProp {
+    pub sample_id: Uuid,
+}
+
+#[function_component(CreateSpectraCollectionForm)]
+pub fn create_spectra_collection_form(props: &CreateSpectraCollectionFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<SpectraCollectionBuilder>();
+    named_requests.push(ComponentMessage::get_named::<&str, Sample>("sample", props.sample_id.into()));
+    let set_sample = builder_dispatch.apply_callback(|sample: Option<NestedSample>| SpectraCollectionActions::SetSample(sample));
+    html! {
+        <BasicForm<NewSpectraCollection>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+if let Some(sample) = builder_store.sample.as_ref() {
+    <span>{"TODO Selected sample"}</span>
+} else {
+    <></>
+}
+        </BasicForm<NewSpectraCollection>>
+    }
+}
+#[derive(Clone, PartialEq, Properties)]
+pub struct UpdateSpectraCollectionFormProp {
+    pub id: i32,
+}
+
+#[function_component(UpdateSpectraCollectionForm)]
+pub fn update_spectra_collection_form(props: &UpdateSpectraCollectionFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<SpectraCollectionBuilder>();
+    // We push the ID of the row to the named requests.
+    let props = props.clone();
+   named_requests.push(ComponentMessage::get::<UpdateSpectraCollection>(props.id.into()));
+    let set_sample = builder_dispatch.apply_callback(|sample: Option<NestedSample>| SpectraCollectionActions::SetSample(sample));
+    html! {
+        <BasicForm<UpdateSpectraCollection>
+            method={FormMethod::PUT}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+<p>{"Sample id has to be selected with a ScannerInput, which is not yet available."}</p>
+        </BasicForm<UpdateSpectraCollection>>
+    }
+}
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
+pub struct SpectraCollectionsTeamsRoleInvitationBuilder {
+    pub table: Option<NestedSpectraCollection>,
+    pub team: Option<NestedTeam>,
+    pub role: Option<NestedRole>,
+    pub errors_table: Vec<ApiError>,
+    pub errors_team: Vec<ApiError>,
+    pub errors_role: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for SpectraCollectionsTeamsRoleInvitationBuilder {
+    fn default() -> Self {
+        Self {
+            table: None,
+            team: None,
+            role: None,
+            errors_table: Vec::new(),
+            errors_team: Vec::new(),
+            errors_role: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
+}
+
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub(super) enum SpectraCollectionsTeamsRoleInvitationActions {
+    SetTable(Option<NestedSpectraCollection>),
+    SetTeam(Option<NestedTeam>),
+    SetRole(Option<NestedRole>),
+}
+
+impl FromOperation for SpectraCollectionsTeamsRoleInvitationActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "table" => SpectraCollectionsTeamsRoleInvitationActions::SetTable(Some(bincode::deserialize(&row).unwrap())),
+            "team" => SpectraCollectionsTeamsRoleInvitationActions::SetTeam(Some(bincode::deserialize(&row).unwrap())),
+            "role" => SpectraCollectionsTeamsRoleInvitationActions::SetRole(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
+}
+
+impl Reducer<SpectraCollectionsTeamsRoleInvitationBuilder> for SpectraCollectionsTeamsRoleInvitationActions {
+    fn apply(self, mut state: std::rc::Rc<SpectraCollectionsTeamsRoleInvitationBuilder>) -> std::rc::Rc<SpectraCollectionsTeamsRoleInvitationBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            SpectraCollectionsTeamsRoleInvitationActions::SetTable(table) => 'table: {
+                state_mut.errors_table.clear();
+        if table.is_none() {
+            state_mut.errors_table.push(ApiError::BadRequest(vec![
+                "The Table field is required.".to_string()
+             ]));
+            state_mut.table = None;
+             break 'table;
+        }
+                state_mut.table = table;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'table;
+            }
+            SpectraCollectionsTeamsRoleInvitationActions::SetTeam(team) => 'team: {
+                state_mut.errors_team.clear();
+        if team.is_none() {
+            state_mut.errors_team.push(ApiError::BadRequest(vec![
+                "The Team field is required.".to_string()
+             ]));
+            state_mut.team = None;
+             break 'team;
+        }
+                state_mut.team = team;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'team;
+            }
+            SpectraCollectionsTeamsRoleInvitationActions::SetRole(role) => 'role: {
+                state_mut.errors_role.clear();
+        if role.is_none() {
+            state_mut.errors_role.push(ApiError::BadRequest(vec![
+                "The Role field is required.".to_string()
+             ]));
+            state_mut.role = None;
+             break 'role;
+        }
+                state_mut.role = role;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'role;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for SpectraCollectionsTeamsRoleInvitationBuilder {
+    type Actions = SpectraCollectionsTeamsRoleInvitationActions;
+
+    type RichVariant = NestedSpectraCollectionsTeamsRoleInvitation;
+
+    fn has_errors(&self) -> bool {
+!self.errors_table.is_empty() || !self.errors_team.is_empty() || !self.errors_role.is_empty()
+    }
+
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.apply(SpectraCollectionsTeamsRoleInvitationActions::SetTable(Some(richest_variant.table)));
+        dispatcher.apply(SpectraCollectionsTeamsRoleInvitationActions::SetTeam(Some(richest_variant.team)));
+        dispatcher.apply(SpectraCollectionsTeamsRoleInvitationActions::SetRole(Some(richest_variant.role)));
+        vec![]
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.table.is_some()
+        && self.team.is_some()
+        && self.role.is_some()
+    }
+
+}
+
+impl From<SpectraCollectionsTeamsRoleInvitationBuilder> for NewSpectraCollectionsTeamsRoleInvitation {
+    fn from(builder: SpectraCollectionsTeamsRoleInvitationBuilder) -> Self {
+        Self {
+            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
+            team_id: builder.team.as_ref().map(|team| team.inner.id).unwrap(),
+            role_id: builder.role.unwrap().inner.id,
+        }
+    }
+}
+impl FormBuildable for NewSpectraCollectionsTeamsRoleInvitation {
+    type Builder = SpectraCollectionsTeamsRoleInvitationBuilder;
+    fn title() -> &'static str {
+        "Spectra collections teams role invitation"
+    }
+    fn task_target() -> &'static str {
+        "Spectra collections teams role invitation"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        false
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateSpectraCollectionsTeamsRoleInvitationFormProp {
+    pub table_id: i32,
+     #[prop_or_default]
+    pub team_id: Option<i32>,
+     #[prop_or_default]
+    pub role_id: Option<i32>,
+}
+
+#[function_component(CreateSpectraCollectionsTeamsRoleInvitationForm)]
+pub fn create_spectra_collections_teams_role_invitation_form(props: &CreateSpectraCollectionsTeamsRoleInvitationFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<SpectraCollectionsTeamsRoleInvitationBuilder>();
+    named_requests.push(ComponentMessage::get_named::<&str, SpectraCollection>("table", props.table_id.into()));
+   if let Some(team_id) = props.team_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Team>("team", team_id.into()));
+    }
+   if let Some(role_id) = props.role_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Role>("role", role_id.into()));
+    }
+    let set_table = builder_dispatch.apply_callback(|table: Option<NestedSpectraCollection>| SpectraCollectionsTeamsRoleInvitationActions::SetTable(table));
+    let set_team = builder_dispatch.apply_callback(|team: Option<NestedTeam>| SpectraCollectionsTeamsRoleInvitationActions::SetTeam(team));
+    let set_role = builder_dispatch.apply_callback(|role: Option<NestedRole>| SpectraCollectionsTeamsRoleInvitationActions::SetRole(role));
+    html! {
+        <BasicForm<NewSpectraCollectionsTeamsRoleInvitation>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+if let Some(table) = builder_store.table.as_ref() {
+    <span>{"TODO Selected table"}</span>
+} else {
+    <></>
+}
+            <Datalist<NestedTeam, true> builder={set_team} optional={false} errors={builder_store.errors_team.clone()} value={builder_store.team.clone()} label="Team" />
+            <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
+        </BasicForm<NewSpectraCollectionsTeamsRoleInvitation>>
+    }
+}
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
+pub struct SpectraCollectionsTeamsRoleRequestBuilder {
+    pub table: Option<NestedSpectraCollection>,
+    pub team: Option<NestedTeam>,
+    pub role: Option<NestedRole>,
+    pub errors_table: Vec<ApiError>,
+    pub errors_team: Vec<ApiError>,
+    pub errors_role: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for SpectraCollectionsTeamsRoleRequestBuilder {
+    fn default() -> Self {
+        Self {
+            table: None,
+            team: None,
+            role: None,
+            errors_table: Vec::new(),
+            errors_team: Vec::new(),
+            errors_role: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
+}
+
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub(super) enum SpectraCollectionsTeamsRoleRequestActions {
+    SetTable(Option<NestedSpectraCollection>),
+    SetTeam(Option<NestedTeam>),
+    SetRole(Option<NestedRole>),
+}
+
+impl FromOperation for SpectraCollectionsTeamsRoleRequestActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "table" => SpectraCollectionsTeamsRoleRequestActions::SetTable(Some(bincode::deserialize(&row).unwrap())),
+            "team" => SpectraCollectionsTeamsRoleRequestActions::SetTeam(Some(bincode::deserialize(&row).unwrap())),
+            "role" => SpectraCollectionsTeamsRoleRequestActions::SetRole(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
+}
+
+impl Reducer<SpectraCollectionsTeamsRoleRequestBuilder> for SpectraCollectionsTeamsRoleRequestActions {
+    fn apply(self, mut state: std::rc::Rc<SpectraCollectionsTeamsRoleRequestBuilder>) -> std::rc::Rc<SpectraCollectionsTeamsRoleRequestBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            SpectraCollectionsTeamsRoleRequestActions::SetTable(table) => 'table: {
+                state_mut.errors_table.clear();
+        if table.is_none() {
+            state_mut.errors_table.push(ApiError::BadRequest(vec![
+                "The Table field is required.".to_string()
+             ]));
+            state_mut.table = None;
+             break 'table;
+        }
+                state_mut.table = table;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'table;
+            }
+            SpectraCollectionsTeamsRoleRequestActions::SetTeam(team) => 'team: {
+                state_mut.errors_team.clear();
+        if team.is_none() {
+            state_mut.errors_team.push(ApiError::BadRequest(vec![
+                "The Team field is required.".to_string()
+             ]));
+            state_mut.team = None;
+             break 'team;
+        }
+                state_mut.team = team;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'team;
+            }
+            SpectraCollectionsTeamsRoleRequestActions::SetRole(role) => 'role: {
+                state_mut.errors_role.clear();
+        if role.is_none() {
+            state_mut.errors_role.push(ApiError::BadRequest(vec![
+                "The Role field is required.".to_string()
+             ]));
+            state_mut.role = None;
+             break 'role;
+        }
+                state_mut.role = role;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'role;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for SpectraCollectionsTeamsRoleRequestBuilder {
+    type Actions = SpectraCollectionsTeamsRoleRequestActions;
+
+    type RichVariant = NestedSpectraCollectionsTeamsRoleRequest;
+
+    fn has_errors(&self) -> bool {
+!self.errors_table.is_empty() || !self.errors_team.is_empty() || !self.errors_role.is_empty()
+    }
+
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.apply(SpectraCollectionsTeamsRoleRequestActions::SetTable(Some(richest_variant.table)));
+        dispatcher.apply(SpectraCollectionsTeamsRoleRequestActions::SetTeam(Some(richest_variant.team)));
+        dispatcher.apply(SpectraCollectionsTeamsRoleRequestActions::SetRole(Some(richest_variant.role)));
+        vec![]
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.table.is_some()
+        && self.team.is_some()
+        && self.role.is_some()
+    }
+
+}
+
+impl From<SpectraCollectionsTeamsRoleRequestBuilder> for NewSpectraCollectionsTeamsRoleRequest {
+    fn from(builder: SpectraCollectionsTeamsRoleRequestBuilder) -> Self {
+        Self {
+            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
+            team_id: builder.team.as_ref().map(|team| team.inner.id).unwrap(),
+            role_id: builder.role.unwrap().inner.id,
+        }
+    }
+}
+impl FormBuildable for NewSpectraCollectionsTeamsRoleRequest {
+    type Builder = SpectraCollectionsTeamsRoleRequestBuilder;
+    fn title() -> &'static str {
+        "Spectra collections teams role request"
+    }
+    fn task_target() -> &'static str {
+        "Spectra collections teams role request"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        false
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateSpectraCollectionsTeamsRoleRequestFormProp {
+    pub table_id: i32,
+     #[prop_or_default]
+    pub team_id: Option<i32>,
+     #[prop_or_default]
+    pub role_id: Option<i32>,
+}
+
+#[function_component(CreateSpectraCollectionsTeamsRoleRequestForm)]
+pub fn create_spectra_collections_teams_role_request_form(props: &CreateSpectraCollectionsTeamsRoleRequestFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<SpectraCollectionsTeamsRoleRequestBuilder>();
+    named_requests.push(ComponentMessage::get_named::<&str, SpectraCollection>("table", props.table_id.into()));
+   if let Some(team_id) = props.team_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Team>("team", team_id.into()));
+    }
+   if let Some(role_id) = props.role_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Role>("role", role_id.into()));
+    }
+    let set_table = builder_dispatch.apply_callback(|table: Option<NestedSpectraCollection>| SpectraCollectionsTeamsRoleRequestActions::SetTable(table));
+    let set_team = builder_dispatch.apply_callback(|team: Option<NestedTeam>| SpectraCollectionsTeamsRoleRequestActions::SetTeam(team));
+    let set_role = builder_dispatch.apply_callback(|role: Option<NestedRole>| SpectraCollectionsTeamsRoleRequestActions::SetRole(role));
+    html! {
+        <BasicForm<NewSpectraCollectionsTeamsRoleRequest>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+if let Some(table) = builder_store.table.as_ref() {
+    <span>{"TODO Selected table"}</span>
+} else {
+    <></>
+}
+            <Datalist<NestedTeam, true> builder={set_team} optional={false} errors={builder_store.errors_team.clone()} value={builder_store.team.clone()} label="Team" />
+            <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
+        </BasicForm<NewSpectraCollectionsTeamsRoleRequest>>
+    }
+}
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
+pub struct SpectraCollectionsTeamsRoleBuilder {
+    pub table: Option<NestedSpectraCollection>,
+    pub team: Option<NestedTeam>,
+    pub role: Option<NestedRole>,
+    pub errors_table: Vec<ApiError>,
+    pub errors_team: Vec<ApiError>,
+    pub errors_role: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for SpectraCollectionsTeamsRoleBuilder {
+    fn default() -> Self {
+        Self {
+            table: None,
+            team: None,
+            role: None,
+            errors_table: Vec::new(),
+            errors_team: Vec::new(),
+            errors_role: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
+}
+
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub(super) enum SpectraCollectionsTeamsRoleActions {
+    SetTable(Option<NestedSpectraCollection>),
+    SetTeam(Option<NestedTeam>),
+    SetRole(Option<NestedRole>),
+}
+
+impl FromOperation for SpectraCollectionsTeamsRoleActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "table" => SpectraCollectionsTeamsRoleActions::SetTable(Some(bincode::deserialize(&row).unwrap())),
+            "team" => SpectraCollectionsTeamsRoleActions::SetTeam(Some(bincode::deserialize(&row).unwrap())),
+            "role" => SpectraCollectionsTeamsRoleActions::SetRole(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
+}
+
+impl Reducer<SpectraCollectionsTeamsRoleBuilder> for SpectraCollectionsTeamsRoleActions {
+    fn apply(self, mut state: std::rc::Rc<SpectraCollectionsTeamsRoleBuilder>) -> std::rc::Rc<SpectraCollectionsTeamsRoleBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            SpectraCollectionsTeamsRoleActions::SetTable(table) => 'table: {
+                state_mut.errors_table.clear();
+        if table.is_none() {
+            state_mut.errors_table.push(ApiError::BadRequest(vec![
+                "The Table field is required.".to_string()
+             ]));
+            state_mut.table = None;
+             break 'table;
+        }
+                state_mut.table = table;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'table;
+            }
+            SpectraCollectionsTeamsRoleActions::SetTeam(team) => 'team: {
+                state_mut.errors_team.clear();
+        if team.is_none() {
+            state_mut.errors_team.push(ApiError::BadRequest(vec![
+                "The Team field is required.".to_string()
+             ]));
+            state_mut.team = None;
+             break 'team;
+        }
+                state_mut.team = team;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'team;
+            }
+            SpectraCollectionsTeamsRoleActions::SetRole(role) => 'role: {
+                state_mut.errors_role.clear();
+        if role.is_none() {
+            state_mut.errors_role.push(ApiError::BadRequest(vec![
+                "The Role field is required.".to_string()
+             ]));
+            state_mut.role = None;
+             break 'role;
+        }
+                state_mut.role = role;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'role;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for SpectraCollectionsTeamsRoleBuilder {
+    type Actions = SpectraCollectionsTeamsRoleActions;
+
+    type RichVariant = NestedSpectraCollectionsTeamsRole;
+
+    fn has_errors(&self) -> bool {
+!self.errors_table.is_empty() || !self.errors_team.is_empty() || !self.errors_role.is_empty()
+    }
+
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.apply(SpectraCollectionsTeamsRoleActions::SetTable(Some(richest_variant.table)));
+        dispatcher.apply(SpectraCollectionsTeamsRoleActions::SetTeam(Some(richest_variant.team)));
+        dispatcher.apply(SpectraCollectionsTeamsRoleActions::SetRole(Some(richest_variant.role)));
+        vec![]
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.table.is_some()
+        && self.team.is_some()
+        && self.role.is_some()
+    }
+
+}
+
+impl From<SpectraCollectionsTeamsRoleBuilder> for NewSpectraCollectionsTeamsRole {
+    fn from(builder: SpectraCollectionsTeamsRoleBuilder) -> Self {
+        Self {
+            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
+            team_id: builder.team.as_ref().map(|team| team.inner.id).unwrap(),
+            role_id: builder.role.unwrap().inner.id,
+        }
+    }
+}
+impl FormBuildable for NewSpectraCollectionsTeamsRole {
+    type Builder = SpectraCollectionsTeamsRoleBuilder;
+    fn title() -> &'static str {
+        "Spectra collections teams role"
+    }
+    fn task_target() -> &'static str {
+        "Spectra collections teams role"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        false
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateSpectraCollectionsTeamsRoleFormProp {
+    pub table_id: i32,
+     #[prop_or_default]
+    pub team_id: Option<i32>,
+     #[prop_or_default]
+    pub role_id: Option<i32>,
+}
+
+#[function_component(CreateSpectraCollectionsTeamsRoleForm)]
+pub fn create_spectra_collections_teams_role_form(props: &CreateSpectraCollectionsTeamsRoleFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<SpectraCollectionsTeamsRoleBuilder>();
+    named_requests.push(ComponentMessage::get_named::<&str, SpectraCollection>("table", props.table_id.into()));
+   if let Some(team_id) = props.team_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Team>("team", team_id.into()));
+    }
+   if let Some(role_id) = props.role_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Role>("role", role_id.into()));
+    }
+    let set_table = builder_dispatch.apply_callback(|table: Option<NestedSpectraCollection>| SpectraCollectionsTeamsRoleActions::SetTable(table));
+    let set_team = builder_dispatch.apply_callback(|team: Option<NestedTeam>| SpectraCollectionsTeamsRoleActions::SetTeam(team));
+    let set_role = builder_dispatch.apply_callback(|role: Option<NestedRole>| SpectraCollectionsTeamsRoleActions::SetRole(role));
+    html! {
+        <BasicForm<NewSpectraCollectionsTeamsRole>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+if let Some(table) = builder_store.table.as_ref() {
+    <span>{"TODO Selected table"}</span>
+} else {
+    <></>
+}
+            <Datalist<NestedTeam, true> builder={set_team} optional={false} errors={builder_store.errors_team.clone()} value={builder_store.team.clone()} label="Team" />
+            <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
+        </BasicForm<NewSpectraCollectionsTeamsRole>>
+    }
+}
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
+pub struct SpectraCollectionsUsersRoleInvitationBuilder {
+    pub table: Option<NestedSpectraCollection>,
+    pub user: Option<User>,
+    pub role: Option<NestedRole>,
+    pub errors_table: Vec<ApiError>,
+    pub errors_user: Vec<ApiError>,
+    pub errors_role: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for SpectraCollectionsUsersRoleInvitationBuilder {
+    fn default() -> Self {
+        Self {
+            table: None,
+            user: None,
+            role: None,
+            errors_table: Vec::new(),
+            errors_user: Vec::new(),
+            errors_role: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
+}
+
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub(super) enum SpectraCollectionsUsersRoleInvitationActions {
+    SetTable(Option<NestedSpectraCollection>),
+    SetUser(Option<User>),
+    SetRole(Option<NestedRole>),
+}
+
+impl FromOperation for SpectraCollectionsUsersRoleInvitationActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "table" => SpectraCollectionsUsersRoleInvitationActions::SetTable(Some(bincode::deserialize(&row).unwrap())),
+            "user" => SpectraCollectionsUsersRoleInvitationActions::SetUser(Some(bincode::deserialize(&row).unwrap())),
+            "role" => SpectraCollectionsUsersRoleInvitationActions::SetRole(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
+}
+
+impl Reducer<SpectraCollectionsUsersRoleInvitationBuilder> for SpectraCollectionsUsersRoleInvitationActions {
+    fn apply(self, mut state: std::rc::Rc<SpectraCollectionsUsersRoleInvitationBuilder>) -> std::rc::Rc<SpectraCollectionsUsersRoleInvitationBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            SpectraCollectionsUsersRoleInvitationActions::SetTable(table) => 'table: {
+                state_mut.errors_table.clear();
+        if table.is_none() {
+            state_mut.errors_table.push(ApiError::BadRequest(vec![
+                "The Table field is required.".to_string()
+             ]));
+            state_mut.table = None;
+             break 'table;
+        }
+                state_mut.table = table;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'table;
+            }
+            SpectraCollectionsUsersRoleInvitationActions::SetUser(user) => 'user: {
+                state_mut.errors_user.clear();
+        if user.is_none() {
+            state_mut.errors_user.push(ApiError::BadRequest(vec![
+                "The User field is required.".to_string()
+             ]));
+            state_mut.user = None;
+             break 'user;
+        }
+                state_mut.user = user;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'user;
+            }
+            SpectraCollectionsUsersRoleInvitationActions::SetRole(role) => 'role: {
+                state_mut.errors_role.clear();
+        if role.is_none() {
+            state_mut.errors_role.push(ApiError::BadRequest(vec![
+                "The Role field is required.".to_string()
+             ]));
+            state_mut.role = None;
+             break 'role;
+        }
+                state_mut.role = role;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'role;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for SpectraCollectionsUsersRoleInvitationBuilder {
+    type Actions = SpectraCollectionsUsersRoleInvitationActions;
+
+    type RichVariant = NestedSpectraCollectionsUsersRoleInvitation;
+
+    fn has_errors(&self) -> bool {
+!self.errors_table.is_empty() || !self.errors_user.is_empty() || !self.errors_role.is_empty()
+    }
+
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.apply(SpectraCollectionsUsersRoleInvitationActions::SetTable(Some(richest_variant.table)));
+        dispatcher.apply(SpectraCollectionsUsersRoleInvitationActions::SetUser(Some(richest_variant.user)));
+        dispatcher.apply(SpectraCollectionsUsersRoleInvitationActions::SetRole(Some(richest_variant.role)));
+        vec![]
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.table.is_some()
+        && self.user.is_some()
+        && self.role.is_some()
+    }
+
+}
+
+impl From<SpectraCollectionsUsersRoleInvitationBuilder> for NewSpectraCollectionsUsersRoleInvitation {
+    fn from(builder: SpectraCollectionsUsersRoleInvitationBuilder) -> Self {
+        Self {
+            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
+            user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
+            role_id: builder.role.unwrap().inner.id,
+        }
+    }
+}
+impl FormBuildable for NewSpectraCollectionsUsersRoleInvitation {
+    type Builder = SpectraCollectionsUsersRoleInvitationBuilder;
+    fn title() -> &'static str {
+        "Spectra collections users role invitation"
+    }
+    fn task_target() -> &'static str {
+        "Spectra collections users role invitation"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        false
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateSpectraCollectionsUsersRoleInvitationFormProp {
+    pub table_id: i32,
+     #[prop_or_default]
+    pub user_id: Option<i32>,
+     #[prop_or_default]
+    pub role_id: Option<i32>,
+}
+
+#[function_component(CreateSpectraCollectionsUsersRoleInvitationForm)]
+pub fn create_spectra_collections_users_role_invitation_form(props: &CreateSpectraCollectionsUsersRoleInvitationFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<SpectraCollectionsUsersRoleInvitationBuilder>();
+    named_requests.push(ComponentMessage::get_named::<&str, SpectraCollection>("table", props.table_id.into()));
+   if let Some(user_id) = props.user_id {
+         named_requests.push(ComponentMessage::get_named::<&str, User>("user", user_id.into()));
+    }
+   if let Some(role_id) = props.role_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Role>("role", role_id.into()));
+    }
+    let set_table = builder_dispatch.apply_callback(|table: Option<NestedSpectraCollection>| SpectraCollectionsUsersRoleInvitationActions::SetTable(table));
+    let set_user = builder_dispatch.apply_callback(|user: Option<User>| SpectraCollectionsUsersRoleInvitationActions::SetUser(user));
+    let set_role = builder_dispatch.apply_callback(|role: Option<NestedRole>| SpectraCollectionsUsersRoleInvitationActions::SetRole(role));
+    html! {
+        <BasicForm<NewSpectraCollectionsUsersRoleInvitation>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+if let Some(table) = builder_store.table.as_ref() {
+    <span>{"TODO Selected table"}</span>
+} else {
+    <></>
+}
+            <Datalist<User, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" />
+            <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
+        </BasicForm<NewSpectraCollectionsUsersRoleInvitation>>
+    }
+}
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
+pub struct SpectraCollectionsUsersRoleRequestBuilder {
+    pub table: Option<NestedSpectraCollection>,
+    pub user: Option<User>,
+    pub role: Option<NestedRole>,
+    pub errors_table: Vec<ApiError>,
+    pub errors_user: Vec<ApiError>,
+    pub errors_role: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for SpectraCollectionsUsersRoleRequestBuilder {
+    fn default() -> Self {
+        Self {
+            table: None,
+            user: None,
+            role: None,
+            errors_table: Vec::new(),
+            errors_user: Vec::new(),
+            errors_role: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
+}
+
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub(super) enum SpectraCollectionsUsersRoleRequestActions {
+    SetTable(Option<NestedSpectraCollection>),
+    SetUser(Option<User>),
+    SetRole(Option<NestedRole>),
+}
+
+impl FromOperation for SpectraCollectionsUsersRoleRequestActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "table" => SpectraCollectionsUsersRoleRequestActions::SetTable(Some(bincode::deserialize(&row).unwrap())),
+            "user" => SpectraCollectionsUsersRoleRequestActions::SetUser(Some(bincode::deserialize(&row).unwrap())),
+            "role" => SpectraCollectionsUsersRoleRequestActions::SetRole(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
+}
+
+impl Reducer<SpectraCollectionsUsersRoleRequestBuilder> for SpectraCollectionsUsersRoleRequestActions {
+    fn apply(self, mut state: std::rc::Rc<SpectraCollectionsUsersRoleRequestBuilder>) -> std::rc::Rc<SpectraCollectionsUsersRoleRequestBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            SpectraCollectionsUsersRoleRequestActions::SetTable(table) => 'table: {
+                state_mut.errors_table.clear();
+        if table.is_none() {
+            state_mut.errors_table.push(ApiError::BadRequest(vec![
+                "The Table field is required.".to_string()
+             ]));
+            state_mut.table = None;
+             break 'table;
+        }
+                state_mut.table = table;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'table;
+            }
+            SpectraCollectionsUsersRoleRequestActions::SetUser(user) => 'user: {
+                state_mut.errors_user.clear();
+        if user.is_none() {
+            state_mut.errors_user.push(ApiError::BadRequest(vec![
+                "The User field is required.".to_string()
+             ]));
+            state_mut.user = None;
+             break 'user;
+        }
+                state_mut.user = user;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'user;
+            }
+            SpectraCollectionsUsersRoleRequestActions::SetRole(role) => 'role: {
+                state_mut.errors_role.clear();
+        if role.is_none() {
+            state_mut.errors_role.push(ApiError::BadRequest(vec![
+                "The Role field is required.".to_string()
+             ]));
+            state_mut.role = None;
+             break 'role;
+        }
+                state_mut.role = role;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'role;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for SpectraCollectionsUsersRoleRequestBuilder {
+    type Actions = SpectraCollectionsUsersRoleRequestActions;
+
+    type RichVariant = NestedSpectraCollectionsUsersRoleRequest;
+
+    fn has_errors(&self) -> bool {
+!self.errors_table.is_empty() || !self.errors_user.is_empty() || !self.errors_role.is_empty()
+    }
+
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.apply(SpectraCollectionsUsersRoleRequestActions::SetTable(Some(richest_variant.table)));
+        dispatcher.apply(SpectraCollectionsUsersRoleRequestActions::SetUser(Some(richest_variant.user)));
+        dispatcher.apply(SpectraCollectionsUsersRoleRequestActions::SetRole(Some(richest_variant.role)));
+        vec![]
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.table.is_some()
+        && self.user.is_some()
+        && self.role.is_some()
+    }
+
+}
+
+impl From<SpectraCollectionsUsersRoleRequestBuilder> for NewSpectraCollectionsUsersRoleRequest {
+    fn from(builder: SpectraCollectionsUsersRoleRequestBuilder) -> Self {
+        Self {
+            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
+            user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
+            role_id: builder.role.unwrap().inner.id,
+        }
+    }
+}
+impl FormBuildable for NewSpectraCollectionsUsersRoleRequest {
+    type Builder = SpectraCollectionsUsersRoleRequestBuilder;
+    fn title() -> &'static str {
+        "Spectra collections users role request"
+    }
+    fn task_target() -> &'static str {
+        "Spectra collections users role request"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        false
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateSpectraCollectionsUsersRoleRequestFormProp {
+    pub table_id: i32,
+     #[prop_or_default]
+    pub user_id: Option<i32>,
+     #[prop_or_default]
+    pub role_id: Option<i32>,
+}
+
+#[function_component(CreateSpectraCollectionsUsersRoleRequestForm)]
+pub fn create_spectra_collections_users_role_request_form(props: &CreateSpectraCollectionsUsersRoleRequestFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<SpectraCollectionsUsersRoleRequestBuilder>();
+    named_requests.push(ComponentMessage::get_named::<&str, SpectraCollection>("table", props.table_id.into()));
+   if let Some(user_id) = props.user_id {
+         named_requests.push(ComponentMessage::get_named::<&str, User>("user", user_id.into()));
+    }
+   if let Some(role_id) = props.role_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Role>("role", role_id.into()));
+    }
+    let set_table = builder_dispatch.apply_callback(|table: Option<NestedSpectraCollection>| SpectraCollectionsUsersRoleRequestActions::SetTable(table));
+    let set_user = builder_dispatch.apply_callback(|user: Option<User>| SpectraCollectionsUsersRoleRequestActions::SetUser(user));
+    let set_role = builder_dispatch.apply_callback(|role: Option<NestedRole>| SpectraCollectionsUsersRoleRequestActions::SetRole(role));
+    html! {
+        <BasicForm<NewSpectraCollectionsUsersRoleRequest>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+if let Some(table) = builder_store.table.as_ref() {
+    <span>{"TODO Selected table"}</span>
+} else {
+    <></>
+}
+            <Datalist<User, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" />
+            <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
+        </BasicForm<NewSpectraCollectionsUsersRoleRequest>>
+    }
+}
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
+pub struct SpectraCollectionsUsersRoleBuilder {
+    pub table: Option<NestedSpectraCollection>,
+    pub user: Option<User>,
+    pub role: Option<NestedRole>,
+    pub errors_table: Vec<ApiError>,
+    pub errors_user: Vec<ApiError>,
+    pub errors_role: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for SpectraCollectionsUsersRoleBuilder {
+    fn default() -> Self {
+        Self {
+            table: None,
+            user: None,
+            role: None,
+            errors_table: Vec::new(),
+            errors_user: Vec::new(),
+            errors_role: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
+}
+
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub(super) enum SpectraCollectionsUsersRoleActions {
+    SetTable(Option<NestedSpectraCollection>),
+    SetUser(Option<User>),
+    SetRole(Option<NestedRole>),
+}
+
+impl FromOperation for SpectraCollectionsUsersRoleActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "table" => SpectraCollectionsUsersRoleActions::SetTable(Some(bincode::deserialize(&row).unwrap())),
+            "user" => SpectraCollectionsUsersRoleActions::SetUser(Some(bincode::deserialize(&row).unwrap())),
+            "role" => SpectraCollectionsUsersRoleActions::SetRole(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
+}
+
+impl Reducer<SpectraCollectionsUsersRoleBuilder> for SpectraCollectionsUsersRoleActions {
+    fn apply(self, mut state: std::rc::Rc<SpectraCollectionsUsersRoleBuilder>) -> std::rc::Rc<SpectraCollectionsUsersRoleBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            SpectraCollectionsUsersRoleActions::SetTable(table) => 'table: {
+                state_mut.errors_table.clear();
+        if table.is_none() {
+            state_mut.errors_table.push(ApiError::BadRequest(vec![
+                "The Table field is required.".to_string()
+             ]));
+            state_mut.table = None;
+             break 'table;
+        }
+                state_mut.table = table;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'table;
+            }
+            SpectraCollectionsUsersRoleActions::SetUser(user) => 'user: {
+                state_mut.errors_user.clear();
+        if user.is_none() {
+            state_mut.errors_user.push(ApiError::BadRequest(vec![
+                "The User field is required.".to_string()
+             ]));
+            state_mut.user = None;
+             break 'user;
+        }
+                state_mut.user = user;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'user;
+            }
+            SpectraCollectionsUsersRoleActions::SetRole(role) => 'role: {
+                state_mut.errors_role.clear();
+        if role.is_none() {
+            state_mut.errors_role.push(ApiError::BadRequest(vec![
+                "The Role field is required.".to_string()
+             ]));
+            state_mut.role = None;
+             break 'role;
+        }
+                state_mut.role = role;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'role;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for SpectraCollectionsUsersRoleBuilder {
+    type Actions = SpectraCollectionsUsersRoleActions;
+
+    type RichVariant = NestedSpectraCollectionsUsersRole;
+
+    fn has_errors(&self) -> bool {
+!self.errors_table.is_empty() || !self.errors_user.is_empty() || !self.errors_role.is_empty()
+    }
+
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.apply(SpectraCollectionsUsersRoleActions::SetTable(Some(richest_variant.table)));
+        dispatcher.apply(SpectraCollectionsUsersRoleActions::SetUser(Some(richest_variant.user)));
+        dispatcher.apply(SpectraCollectionsUsersRoleActions::SetRole(Some(richest_variant.role)));
+        vec![]
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.table.is_some()
+        && self.user.is_some()
+        && self.role.is_some()
+    }
+
+}
+
+impl From<SpectraCollectionsUsersRoleBuilder> for NewSpectraCollectionsUsersRole {
+    fn from(builder: SpectraCollectionsUsersRoleBuilder) -> Self {
+        Self {
+            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
+            user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
+            role_id: builder.role.unwrap().inner.id,
+        }
+    }
+}
+impl FormBuildable for NewSpectraCollectionsUsersRole {
+    type Builder = SpectraCollectionsUsersRoleBuilder;
+    fn title() -> &'static str {
+        "Spectra collections users role"
+    }
+    fn task_target() -> &'static str {
+        "Spectra collections users role"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        false
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateSpectraCollectionsUsersRoleFormProp {
+    pub table_id: i32,
+     #[prop_or_default]
+    pub user_id: Option<i32>,
+     #[prop_or_default]
+    pub role_id: Option<i32>,
+}
+
+#[function_component(CreateSpectraCollectionsUsersRoleForm)]
+pub fn create_spectra_collections_users_role_form(props: &CreateSpectraCollectionsUsersRoleFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<SpectraCollectionsUsersRoleBuilder>();
+    named_requests.push(ComponentMessage::get_named::<&str, SpectraCollection>("table", props.table_id.into()));
+   if let Some(user_id) = props.user_id {
+         named_requests.push(ComponentMessage::get_named::<&str, User>("user", user_id.into()));
+    }
+   if let Some(role_id) = props.role_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Role>("role", role_id.into()));
+    }
+    let set_table = builder_dispatch.apply_callback(|table: Option<NestedSpectraCollection>| SpectraCollectionsUsersRoleActions::SetTable(table));
+    let set_user = builder_dispatch.apply_callback(|user: Option<User>| SpectraCollectionsUsersRoleActions::SetUser(user));
+    let set_role = builder_dispatch.apply_callback(|role: Option<NestedRole>| SpectraCollectionsUsersRoleActions::SetRole(role));
+    html! {
+        <BasicForm<NewSpectraCollectionsUsersRole>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+if let Some(table) = builder_store.table.as_ref() {
+    <span>{"TODO Selected table"}</span>
+} else {
+    <></>
+}
+            <Datalist<User, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" />
+            <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
+        </BasicForm<NewSpectraCollectionsUsersRole>>
     }
 }
 #[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
@@ -1033,18 +5999,15 @@ impl FormBuilder for TeamBuilder {
 !self.errors_name.is_empty() || !self.errors_description.is_empty() || !self.errors_icon.is_empty() || !self.errors_color.is_empty() || !self.errors_parent_team.is_empty()
     }
 
-    fn id(&self) -> Option<PrimaryKey> {
-        self.id.map(|id| id.into())
-    }
-
-    fn update(dispatcher: &Dispatch<Self>, rich_variant: Self::RichVariant) -> Vec<ComponentMessage> {
-    dispatcher.apply(TeamActions::SetName(Some(rich_variant.inner.name.to_string())));
-    dispatcher.apply(TeamActions::SetDescription(Some(rich_variant.inner.description.to_string())));
-        dispatcher.apply(TeamActions::SetIcon(Some(rich_variant.icon)));
-        dispatcher.apply(TeamActions::SetColor(Some(rich_variant.color)));
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.reduce_mut(|state| {state.id = Some(richest_variant.inner.id);});
+    dispatcher.apply(TeamActions::SetName(Some(richest_variant.inner.name.to_string())));
+    dispatcher.apply(TeamActions::SetDescription(Some(richest_variant.inner.description.to_string())));
+        dispatcher.apply(TeamActions::SetIcon(Some(richest_variant.icon)));
+        dispatcher.apply(TeamActions::SetColor(Some(richest_variant.color)));
         let mut named_requests = Vec::new();
-        if let Some(parent_team_id) = rich_variant.inner.parent_team_id {
-    named_requests.push(ComponentMessage::get_named::<&str, NewTeam>("parent_team", parent_team_id.into()));
+        if let Some(parent_team_id) = richest_variant.inner.parent_team_id {
+    named_requests.push(ComponentMessage::get_named::<&str, Team>("parent_team", parent_team_id.into()));
  } else {
     dispatcher.apply(TeamActions::SetParentTeam(None));
  }
@@ -1130,14 +6093,14 @@ pub struct CreateTeamFormProp {
 pub fn create_team_form(props: &CreateTeamFormProp) -> Html {
      let mut named_requests: Vec<ComponentMessage> = Vec::new();
     let (builder_store, builder_dispatch) = use_store::<TeamBuilder>();
-    if let Some(icon_id) = props.icon_id {
-         named_requests.push(ComponentMessage::get_named::<&str, NewTeam>("icon", icon_id.into()));
+   if let Some(icon_id) = props.icon_id {
+         named_requests.push(ComponentMessage::get_named::<&str, FontAwesomeIcon>("icon", icon_id.into()));
     }
-    if let Some(color_id) = props.color_id {
-         named_requests.push(ComponentMessage::get_named::<&str, NewTeam>("color", color_id.into()));
+   if let Some(color_id) = props.color_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Color>("color", color_id.into()));
     }
-    if let Some(parent_team_id) = props.parent_team_id {
-         named_requests.push(ComponentMessage::get_named::<&str, NewTeam>("parent_team", parent_team_id.into()));
+   if let Some(parent_team_id) = props.parent_team_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Team>("parent_team", parent_team_id.into()));
     }
     let set_name = builder_dispatch.apply_callback(|name: Option<String>| TeamActions::SetName(name));
     let set_description = builder_dispatch.apply_callback(|description: Option<String>| TeamActions::SetDescription(description));
@@ -1185,6 +6148,730 @@ pub fn update_team_form(props: &UpdateTeamFormProp) -> Html {
             <Datalist<Color, false> builder={set_color} optional={false} errors={builder_store.errors_color.clone()} value={builder_store.color.clone()} label="Color" />
             <Datalist<NestedTeam, true> builder={set_parent_team} optional={true} errors={builder_store.errors_parent_team.clone()} value={builder_store.parent_team.clone()} label="Parent team" />
         </BasicForm<UpdateTeam>>
+    }
+}
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
+pub struct TeamsTeamsRoleInvitationBuilder {
+    pub table: Option<NestedTeam>,
+    pub team: Option<NestedTeam>,
+    pub role: Option<NestedRole>,
+    pub errors_table: Vec<ApiError>,
+    pub errors_team: Vec<ApiError>,
+    pub errors_role: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for TeamsTeamsRoleInvitationBuilder {
+    fn default() -> Self {
+        Self {
+            table: None,
+            team: None,
+            role: None,
+            errors_table: Vec::new(),
+            errors_team: Vec::new(),
+            errors_role: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
+}
+
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub(super) enum TeamsTeamsRoleInvitationActions {
+    SetTable(Option<NestedTeam>),
+    SetTeam(Option<NestedTeam>),
+    SetRole(Option<NestedRole>),
+}
+
+impl FromOperation for TeamsTeamsRoleInvitationActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "table" => TeamsTeamsRoleInvitationActions::SetTable(Some(bincode::deserialize(&row).unwrap())),
+            "team" => TeamsTeamsRoleInvitationActions::SetTeam(Some(bincode::deserialize(&row).unwrap())),
+            "role" => TeamsTeamsRoleInvitationActions::SetRole(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
+}
+
+impl Reducer<TeamsTeamsRoleInvitationBuilder> for TeamsTeamsRoleInvitationActions {
+    fn apply(self, mut state: std::rc::Rc<TeamsTeamsRoleInvitationBuilder>) -> std::rc::Rc<TeamsTeamsRoleInvitationBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            TeamsTeamsRoleInvitationActions::SetTable(table) => 'table: {
+                state_mut.errors_table.clear();
+        if table.is_none() {
+            state_mut.errors_table.push(ApiError::BadRequest(vec![
+                "The Table field is required.".to_string()
+             ]));
+            state_mut.table = None;
+             break 'table;
+        }
+                state_mut.table = table;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'table;
+            }
+            TeamsTeamsRoleInvitationActions::SetTeam(team) => 'team: {
+                state_mut.errors_team.clear();
+        if team.is_none() {
+            state_mut.errors_team.push(ApiError::BadRequest(vec![
+                "The Team field is required.".to_string()
+             ]));
+            state_mut.team = None;
+             break 'team;
+        }
+                state_mut.team = team;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'team;
+            }
+            TeamsTeamsRoleInvitationActions::SetRole(role) => 'role: {
+                state_mut.errors_role.clear();
+        if role.is_none() {
+            state_mut.errors_role.push(ApiError::BadRequest(vec![
+                "The Role field is required.".to_string()
+             ]));
+            state_mut.role = None;
+             break 'role;
+        }
+                state_mut.role = role;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'role;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for TeamsTeamsRoleInvitationBuilder {
+    type Actions = TeamsTeamsRoleInvitationActions;
+
+    type RichVariant = NestedTeamsTeamsRoleInvitation;
+
+    fn has_errors(&self) -> bool {
+!self.errors_table.is_empty() || !self.errors_team.is_empty() || !self.errors_role.is_empty()
+    }
+
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.apply(TeamsTeamsRoleInvitationActions::SetTable(Some(richest_variant.table)));
+        dispatcher.apply(TeamsTeamsRoleInvitationActions::SetTeam(Some(richest_variant.team)));
+        dispatcher.apply(TeamsTeamsRoleInvitationActions::SetRole(Some(richest_variant.role)));
+        vec![]
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.table.is_some()
+        && self.team.is_some()
+        && self.role.is_some()
+    }
+
+}
+
+impl From<TeamsTeamsRoleInvitationBuilder> for NewTeamsTeamsRoleInvitation {
+    fn from(builder: TeamsTeamsRoleInvitationBuilder) -> Self {
+        Self {
+            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
+            team_id: builder.team.as_ref().map(|team| team.inner.id).unwrap(),
+            role_id: builder.role.unwrap().inner.id,
+        }
+    }
+}
+impl FormBuildable for NewTeamsTeamsRoleInvitation {
+    type Builder = TeamsTeamsRoleInvitationBuilder;
+    fn title() -> &'static str {
+        "Teams teams role invitation"
+    }
+    fn task_target() -> &'static str {
+        "Teams teams role invitation"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        false
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateTeamsTeamsRoleInvitationFormProp {
+     #[prop_or_default]
+    pub table_id: Option<i32>,
+     #[prop_or_default]
+    pub team_id: Option<i32>,
+     #[prop_or_default]
+    pub role_id: Option<i32>,
+}
+
+#[function_component(CreateTeamsTeamsRoleInvitationForm)]
+pub fn create_teams_teams_role_invitation_form(props: &CreateTeamsTeamsRoleInvitationFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<TeamsTeamsRoleInvitationBuilder>();
+   if let Some(table_id) = props.table_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Team>("table", table_id.into()));
+    }
+   if let Some(team_id) = props.team_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Team>("team", team_id.into()));
+    }
+   if let Some(role_id) = props.role_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Role>("role", role_id.into()));
+    }
+    let set_table = builder_dispatch.apply_callback(|table: Option<NestedTeam>| TeamsTeamsRoleInvitationActions::SetTable(table));
+    let set_team = builder_dispatch.apply_callback(|team: Option<NestedTeam>| TeamsTeamsRoleInvitationActions::SetTeam(team));
+    let set_role = builder_dispatch.apply_callback(|role: Option<NestedRole>| TeamsTeamsRoleInvitationActions::SetRole(role));
+    html! {
+        <BasicForm<NewTeamsTeamsRoleInvitation>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+            <Datalist<NestedTeam, true> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" />
+            <Datalist<NestedTeam, true> builder={set_team} optional={false} errors={builder_store.errors_team.clone()} value={builder_store.team.clone()} label="Team" />
+            <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
+        </BasicForm<NewTeamsTeamsRoleInvitation>>
+    }
+}
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
+pub struct TeamsUsersRoleInvitationBuilder {
+    pub table: Option<NestedTeam>,
+    pub user: Option<User>,
+    pub role: Option<NestedRole>,
+    pub errors_table: Vec<ApiError>,
+    pub errors_user: Vec<ApiError>,
+    pub errors_role: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for TeamsUsersRoleInvitationBuilder {
+    fn default() -> Self {
+        Self {
+            table: None,
+            user: None,
+            role: None,
+            errors_table: Vec::new(),
+            errors_user: Vec::new(),
+            errors_role: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
+}
+
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub(super) enum TeamsUsersRoleInvitationActions {
+    SetTable(Option<NestedTeam>),
+    SetUser(Option<User>),
+    SetRole(Option<NestedRole>),
+}
+
+impl FromOperation for TeamsUsersRoleInvitationActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "table" => TeamsUsersRoleInvitationActions::SetTable(Some(bincode::deserialize(&row).unwrap())),
+            "user" => TeamsUsersRoleInvitationActions::SetUser(Some(bincode::deserialize(&row).unwrap())),
+            "role" => TeamsUsersRoleInvitationActions::SetRole(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
+}
+
+impl Reducer<TeamsUsersRoleInvitationBuilder> for TeamsUsersRoleInvitationActions {
+    fn apply(self, mut state: std::rc::Rc<TeamsUsersRoleInvitationBuilder>) -> std::rc::Rc<TeamsUsersRoleInvitationBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            TeamsUsersRoleInvitationActions::SetTable(table) => 'table: {
+                state_mut.errors_table.clear();
+        if table.is_none() {
+            state_mut.errors_table.push(ApiError::BadRequest(vec![
+                "The Table field is required.".to_string()
+             ]));
+            state_mut.table = None;
+             break 'table;
+        }
+                state_mut.table = table;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'table;
+            }
+            TeamsUsersRoleInvitationActions::SetUser(user) => 'user: {
+                state_mut.errors_user.clear();
+        if user.is_none() {
+            state_mut.errors_user.push(ApiError::BadRequest(vec![
+                "The User field is required.".to_string()
+             ]));
+            state_mut.user = None;
+             break 'user;
+        }
+                state_mut.user = user;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'user;
+            }
+            TeamsUsersRoleInvitationActions::SetRole(role) => 'role: {
+                state_mut.errors_role.clear();
+        if role.is_none() {
+            state_mut.errors_role.push(ApiError::BadRequest(vec![
+                "The Role field is required.".to_string()
+             ]));
+            state_mut.role = None;
+             break 'role;
+        }
+                state_mut.role = role;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'role;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for TeamsUsersRoleInvitationBuilder {
+    type Actions = TeamsUsersRoleInvitationActions;
+
+    type RichVariant = NestedTeamsUsersRoleInvitation;
+
+    fn has_errors(&self) -> bool {
+!self.errors_table.is_empty() || !self.errors_user.is_empty() || !self.errors_role.is_empty()
+    }
+
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.apply(TeamsUsersRoleInvitationActions::SetTable(Some(richest_variant.table)));
+        dispatcher.apply(TeamsUsersRoleInvitationActions::SetUser(Some(richest_variant.user)));
+        dispatcher.apply(TeamsUsersRoleInvitationActions::SetRole(Some(richest_variant.role)));
+        vec![]
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.table.is_some()
+        && self.user.is_some()
+        && self.role.is_some()
+    }
+
+}
+
+impl From<TeamsUsersRoleInvitationBuilder> for NewTeamsUsersRoleInvitation {
+    fn from(builder: TeamsUsersRoleInvitationBuilder) -> Self {
+        Self {
+            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
+            user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
+            role_id: builder.role.unwrap().inner.id,
+        }
+    }
+}
+impl FormBuildable for NewTeamsUsersRoleInvitation {
+    type Builder = TeamsUsersRoleInvitationBuilder;
+    fn title() -> &'static str {
+        "Teams users role invitation"
+    }
+    fn task_target() -> &'static str {
+        "Teams users role invitation"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        false
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateTeamsUsersRoleInvitationFormProp {
+     #[prop_or_default]
+    pub table_id: Option<i32>,
+     #[prop_or_default]
+    pub user_id: Option<i32>,
+     #[prop_or_default]
+    pub role_id: Option<i32>,
+}
+
+#[function_component(CreateTeamsUsersRoleInvitationForm)]
+pub fn create_teams_users_role_invitation_form(props: &CreateTeamsUsersRoleInvitationFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<TeamsUsersRoleInvitationBuilder>();
+   if let Some(table_id) = props.table_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Team>("table", table_id.into()));
+    }
+   if let Some(user_id) = props.user_id {
+         named_requests.push(ComponentMessage::get_named::<&str, User>("user", user_id.into()));
+    }
+   if let Some(role_id) = props.role_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Role>("role", role_id.into()));
+    }
+    let set_table = builder_dispatch.apply_callback(|table: Option<NestedTeam>| TeamsUsersRoleInvitationActions::SetTable(table));
+    let set_user = builder_dispatch.apply_callback(|user: Option<User>| TeamsUsersRoleInvitationActions::SetUser(user));
+    let set_role = builder_dispatch.apply_callback(|role: Option<NestedRole>| TeamsUsersRoleInvitationActions::SetRole(role));
+    html! {
+        <BasicForm<NewTeamsUsersRoleInvitation>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+            <Datalist<NestedTeam, true> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" />
+            <Datalist<User, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" />
+            <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
+        </BasicForm<NewTeamsUsersRoleInvitation>>
+    }
+}
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
+pub struct TeamsUsersRoleRequestBuilder {
+    pub table: Option<NestedTeam>,
+    pub user: Option<User>,
+    pub role: Option<NestedRole>,
+    pub errors_table: Vec<ApiError>,
+    pub errors_user: Vec<ApiError>,
+    pub errors_role: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for TeamsUsersRoleRequestBuilder {
+    fn default() -> Self {
+        Self {
+            table: None,
+            user: None,
+            role: None,
+            errors_table: Vec::new(),
+            errors_user: Vec::new(),
+            errors_role: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
+}
+
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub(super) enum TeamsUsersRoleRequestActions {
+    SetTable(Option<NestedTeam>),
+    SetUser(Option<User>),
+    SetRole(Option<NestedRole>),
+}
+
+impl FromOperation for TeamsUsersRoleRequestActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "table" => TeamsUsersRoleRequestActions::SetTable(Some(bincode::deserialize(&row).unwrap())),
+            "user" => TeamsUsersRoleRequestActions::SetUser(Some(bincode::deserialize(&row).unwrap())),
+            "role" => TeamsUsersRoleRequestActions::SetRole(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
+}
+
+impl Reducer<TeamsUsersRoleRequestBuilder> for TeamsUsersRoleRequestActions {
+    fn apply(self, mut state: std::rc::Rc<TeamsUsersRoleRequestBuilder>) -> std::rc::Rc<TeamsUsersRoleRequestBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            TeamsUsersRoleRequestActions::SetTable(table) => 'table: {
+                state_mut.errors_table.clear();
+        if table.is_none() {
+            state_mut.errors_table.push(ApiError::BadRequest(vec![
+                "The Table field is required.".to_string()
+             ]));
+            state_mut.table = None;
+             break 'table;
+        }
+                state_mut.table = table;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'table;
+            }
+            TeamsUsersRoleRequestActions::SetUser(user) => 'user: {
+                state_mut.errors_user.clear();
+        if user.is_none() {
+            state_mut.errors_user.push(ApiError::BadRequest(vec![
+                "The User field is required.".to_string()
+             ]));
+            state_mut.user = None;
+             break 'user;
+        }
+                state_mut.user = user;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'user;
+            }
+            TeamsUsersRoleRequestActions::SetRole(role) => 'role: {
+                state_mut.errors_role.clear();
+        if role.is_none() {
+            state_mut.errors_role.push(ApiError::BadRequest(vec![
+                "The Role field is required.".to_string()
+             ]));
+            state_mut.role = None;
+             break 'role;
+        }
+                state_mut.role = role;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'role;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for TeamsUsersRoleRequestBuilder {
+    type Actions = TeamsUsersRoleRequestActions;
+
+    type RichVariant = NestedTeamsUsersRoleRequest;
+
+    fn has_errors(&self) -> bool {
+!self.errors_table.is_empty() || !self.errors_user.is_empty() || !self.errors_role.is_empty()
+    }
+
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.apply(TeamsUsersRoleRequestActions::SetTable(Some(richest_variant.table)));
+        dispatcher.apply(TeamsUsersRoleRequestActions::SetUser(Some(richest_variant.user)));
+        dispatcher.apply(TeamsUsersRoleRequestActions::SetRole(Some(richest_variant.role)));
+        vec![]
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.table.is_some()
+        && self.user.is_some()
+        && self.role.is_some()
+    }
+
+}
+
+impl From<TeamsUsersRoleRequestBuilder> for NewTeamsUsersRoleRequest {
+    fn from(builder: TeamsUsersRoleRequestBuilder) -> Self {
+        Self {
+            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
+            user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
+            role_id: builder.role.unwrap().inner.id,
+        }
+    }
+}
+impl FormBuildable for NewTeamsUsersRoleRequest {
+    type Builder = TeamsUsersRoleRequestBuilder;
+    fn title() -> &'static str {
+        "Teams users role request"
+    }
+    fn task_target() -> &'static str {
+        "Teams users role request"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        false
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateTeamsUsersRoleRequestFormProp {
+     #[prop_or_default]
+    pub table_id: Option<i32>,
+     #[prop_or_default]
+    pub user_id: Option<i32>,
+     #[prop_or_default]
+    pub role_id: Option<i32>,
+}
+
+#[function_component(CreateTeamsUsersRoleRequestForm)]
+pub fn create_teams_users_role_request_form(props: &CreateTeamsUsersRoleRequestFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<TeamsUsersRoleRequestBuilder>();
+   if let Some(table_id) = props.table_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Team>("table", table_id.into()));
+    }
+   if let Some(user_id) = props.user_id {
+         named_requests.push(ComponentMessage::get_named::<&str, User>("user", user_id.into()));
+    }
+   if let Some(role_id) = props.role_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Role>("role", role_id.into()));
+    }
+    let set_table = builder_dispatch.apply_callback(|table: Option<NestedTeam>| TeamsUsersRoleRequestActions::SetTable(table));
+    let set_user = builder_dispatch.apply_callback(|user: Option<User>| TeamsUsersRoleRequestActions::SetUser(user));
+    let set_role = builder_dispatch.apply_callback(|role: Option<NestedRole>| TeamsUsersRoleRequestActions::SetRole(role));
+    html! {
+        <BasicForm<NewTeamsUsersRoleRequest>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+            <Datalist<NestedTeam, true> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" />
+            <Datalist<User, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" />
+            <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
+        </BasicForm<NewTeamsUsersRoleRequest>>
+    }
+}
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
+pub struct TeamsUsersRoleBuilder {
+    pub table: Option<NestedTeam>,
+    pub user: Option<User>,
+    pub role: Option<NestedRole>,
+    pub errors_table: Vec<ApiError>,
+    pub errors_user: Vec<ApiError>,
+    pub errors_role: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for TeamsUsersRoleBuilder {
+    fn default() -> Self {
+        Self {
+            table: None,
+            user: None,
+            role: None,
+            errors_table: Vec::new(),
+            errors_user: Vec::new(),
+            errors_role: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
+}
+
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub(super) enum TeamsUsersRoleActions {
+    SetTable(Option<NestedTeam>),
+    SetUser(Option<User>),
+    SetRole(Option<NestedRole>),
+}
+
+impl FromOperation for TeamsUsersRoleActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "table" => TeamsUsersRoleActions::SetTable(Some(bincode::deserialize(&row).unwrap())),
+            "user" => TeamsUsersRoleActions::SetUser(Some(bincode::deserialize(&row).unwrap())),
+            "role" => TeamsUsersRoleActions::SetRole(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
+}
+
+impl Reducer<TeamsUsersRoleBuilder> for TeamsUsersRoleActions {
+    fn apply(self, mut state: std::rc::Rc<TeamsUsersRoleBuilder>) -> std::rc::Rc<TeamsUsersRoleBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            TeamsUsersRoleActions::SetTable(table) => 'table: {
+                state_mut.errors_table.clear();
+        if table.is_none() {
+            state_mut.errors_table.push(ApiError::BadRequest(vec![
+                "The Table field is required.".to_string()
+             ]));
+            state_mut.table = None;
+             break 'table;
+        }
+                state_mut.table = table;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'table;
+            }
+            TeamsUsersRoleActions::SetUser(user) => 'user: {
+                state_mut.errors_user.clear();
+        if user.is_none() {
+            state_mut.errors_user.push(ApiError::BadRequest(vec![
+                "The User field is required.".to_string()
+             ]));
+            state_mut.user = None;
+             break 'user;
+        }
+                state_mut.user = user;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'user;
+            }
+            TeamsUsersRoleActions::SetRole(role) => 'role: {
+                state_mut.errors_role.clear();
+        if role.is_none() {
+            state_mut.errors_role.push(ApiError::BadRequest(vec![
+                "The Role field is required.".to_string()
+             ]));
+            state_mut.role = None;
+             break 'role;
+        }
+                state_mut.role = role;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'role;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for TeamsUsersRoleBuilder {
+    type Actions = TeamsUsersRoleActions;
+
+    type RichVariant = NestedTeamsUsersRole;
+
+    fn has_errors(&self) -> bool {
+!self.errors_table.is_empty() || !self.errors_user.is_empty() || !self.errors_role.is_empty()
+    }
+
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.apply(TeamsUsersRoleActions::SetTable(Some(richest_variant.table)));
+        dispatcher.apply(TeamsUsersRoleActions::SetUser(Some(richest_variant.user)));
+        dispatcher.apply(TeamsUsersRoleActions::SetRole(Some(richest_variant.role)));
+        vec![]
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.table.is_some()
+        && self.user.is_some()
+        && self.role.is_some()
+    }
+
+}
+
+impl From<TeamsUsersRoleBuilder> for NewTeamsUsersRole {
+    fn from(builder: TeamsUsersRoleBuilder) -> Self {
+        Self {
+            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
+            user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
+            role_id: builder.role.unwrap().inner.id,
+        }
+    }
+}
+impl FormBuildable for NewTeamsUsersRole {
+    type Builder = TeamsUsersRoleBuilder;
+    fn title() -> &'static str {
+        "Teams users role"
+    }
+    fn task_target() -> &'static str {
+        "Teams users role"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        false
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateTeamsUsersRoleFormProp {
+     #[prop_or_default]
+    pub table_id: Option<i32>,
+     #[prop_or_default]
+    pub user_id: Option<i32>,
+     #[prop_or_default]
+    pub role_id: Option<i32>,
+}
+
+#[function_component(CreateTeamsUsersRoleForm)]
+pub fn create_teams_users_role_form(props: &CreateTeamsUsersRoleFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<TeamsUsersRoleBuilder>();
+   if let Some(table_id) = props.table_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Team>("table", table_id.into()));
+    }
+   if let Some(user_id) = props.user_id {
+         named_requests.push(ComponentMessage::get_named::<&str, User>("user", user_id.into()));
+    }
+   if let Some(role_id) = props.role_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Role>("role", role_id.into()));
+    }
+    let set_table = builder_dispatch.apply_callback(|table: Option<NestedTeam>| TeamsUsersRoleActions::SetTable(table));
+    let set_user = builder_dispatch.apply_callback(|user: Option<User>| TeamsUsersRoleActions::SetUser(user));
+    let set_role = builder_dispatch.apply_callback(|role: Option<NestedRole>| TeamsUsersRoleActions::SetRole(role));
+    html! {
+        <BasicForm<NewTeamsUsersRole>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+            <Datalist<NestedTeam, true> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" />
+            <Datalist<User, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" />
+            <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
+        </BasicForm<NewTeamsUsersRole>>
     }
 }
 #[derive(Store, Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
@@ -1326,15 +7013,12 @@ impl FormBuilder for UserBuilder {
 !self.errors_first_name.is_empty() || !self.errors_middle_name.is_empty() || !self.errors_last_name.is_empty() || !self.errors_profile_picture.is_empty()
     }
 
-    fn id(&self) -> Option<PrimaryKey> {
-        self.id.map(|id| id.into())
-    }
-
-    fn update(dispatcher: &Dispatch<Self>, rich_variant: Self::RichVariant) -> Vec<ComponentMessage> {
-        dispatcher.apply(UserActions::SetFirstName(Some(rich_variant.first_name)));
-        dispatcher.apply(UserActions::SetMiddleName(rich_variant.middle_name));
-        dispatcher.apply(UserActions::SetLastName(Some(rich_variant.last_name)));
-        dispatcher.apply(UserActions::SetProfilePicture(Some(rich_variant.profile_picture)));
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.reduce_mut(|state| {state.id = Some(richest_variant.id);});
+        dispatcher.apply(UserActions::SetFirstName(Some(richest_variant.first_name)));
+        dispatcher.apply(UserActions::SetMiddleName(richest_variant.middle_name));
+        dispatcher.apply(UserActions::SetLastName(Some(richest_variant.last_name)));
+        dispatcher.apply(UserActions::SetProfilePicture(Some(richest_variant.profile_picture)));
         vec![]
     }
 
@@ -1444,5 +7128,548 @@ pub fn update_user_form(props: &UpdateUserFormProp) -> Html {
             <BasicInput<String> label="Last name" optional={false} errors={builder_store.errors_last_name.clone()} builder={set_last_name} value={builder_store.last_name.clone()} />
             <FileInput<Image> label="Profile picture" optional={false} errors={builder_store.errors_profile_picture.clone()} builder={set_profile_picture} allowed_formats={vec![GenericFileFormat::Image]} value={builder_store.profile_picture.clone().map(|profile_picture| profile_picture.into())} />
         </BasicForm<UpdateUser>>
+    }
+}
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
+pub struct UsersUsersRoleInvitationBuilder {
+    pub table: Option<User>,
+    pub user: Option<User>,
+    pub role: Option<NestedRole>,
+    pub errors_table: Vec<ApiError>,
+    pub errors_user: Vec<ApiError>,
+    pub errors_role: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for UsersUsersRoleInvitationBuilder {
+    fn default() -> Self {
+        Self {
+            table: None,
+            user: None,
+            role: None,
+            errors_table: Vec::new(),
+            errors_user: Vec::new(),
+            errors_role: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
+}
+
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub(super) enum UsersUsersRoleInvitationActions {
+    SetTable(Option<User>),
+    SetUser(Option<User>),
+    SetRole(Option<NestedRole>),
+}
+
+impl FromOperation for UsersUsersRoleInvitationActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "table" => UsersUsersRoleInvitationActions::SetTable(Some(bincode::deserialize(&row).unwrap())),
+            "user" => UsersUsersRoleInvitationActions::SetUser(Some(bincode::deserialize(&row).unwrap())),
+            "role" => UsersUsersRoleInvitationActions::SetRole(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
+}
+
+impl Reducer<UsersUsersRoleInvitationBuilder> for UsersUsersRoleInvitationActions {
+    fn apply(self, mut state: std::rc::Rc<UsersUsersRoleInvitationBuilder>) -> std::rc::Rc<UsersUsersRoleInvitationBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            UsersUsersRoleInvitationActions::SetTable(table) => 'table: {
+                state_mut.errors_table.clear();
+        if table.is_none() {
+            state_mut.errors_table.push(ApiError::BadRequest(vec![
+                "The Table field is required.".to_string()
+             ]));
+            state_mut.table = None;
+             break 'table;
+        }
+                state_mut.table = table;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'table;
+            }
+            UsersUsersRoleInvitationActions::SetUser(user) => 'user: {
+                state_mut.errors_user.clear();
+        if user.is_none() {
+            state_mut.errors_user.push(ApiError::BadRequest(vec![
+                "The User field is required.".to_string()
+             ]));
+            state_mut.user = None;
+             break 'user;
+        }
+                state_mut.user = user;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'user;
+            }
+            UsersUsersRoleInvitationActions::SetRole(role) => 'role: {
+                state_mut.errors_role.clear();
+        if role.is_none() {
+            state_mut.errors_role.push(ApiError::BadRequest(vec![
+                "The Role field is required.".to_string()
+             ]));
+            state_mut.role = None;
+             break 'role;
+        }
+                state_mut.role = role;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'role;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for UsersUsersRoleInvitationBuilder {
+    type Actions = UsersUsersRoleInvitationActions;
+
+    type RichVariant = NestedUsersUsersRoleInvitation;
+
+    fn has_errors(&self) -> bool {
+!self.errors_table.is_empty() || !self.errors_user.is_empty() || !self.errors_role.is_empty()
+    }
+
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.apply(UsersUsersRoleInvitationActions::SetTable(Some(richest_variant.table)));
+        dispatcher.apply(UsersUsersRoleInvitationActions::SetUser(Some(richest_variant.user)));
+        dispatcher.apply(UsersUsersRoleInvitationActions::SetRole(Some(richest_variant.role)));
+        vec![]
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.table.is_some()
+        && self.user.is_some()
+        && self.role.is_some()
+    }
+
+}
+
+impl From<UsersUsersRoleInvitationBuilder> for NewUsersUsersRoleInvitation {
+    fn from(builder: UsersUsersRoleInvitationBuilder) -> Self {
+        Self {
+            table_id: builder.table.as_ref().map(|table| table.id).unwrap(),
+            user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
+            role_id: builder.role.unwrap().inner.id,
+        }
+    }
+}
+impl FormBuildable for NewUsersUsersRoleInvitation {
+    type Builder = UsersUsersRoleInvitationBuilder;
+    fn title() -> &'static str {
+        "Users users role invitation"
+    }
+    fn task_target() -> &'static str {
+        "Users users role invitation"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        false
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateUsersUsersRoleInvitationFormProp {
+     #[prop_or_default]
+    pub table_id: Option<i32>,
+     #[prop_or_default]
+    pub user_id: Option<i32>,
+     #[prop_or_default]
+    pub role_id: Option<i32>,
+}
+
+#[function_component(CreateUsersUsersRoleInvitationForm)]
+pub fn create_users_users_role_invitation_form(props: &CreateUsersUsersRoleInvitationFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<UsersUsersRoleInvitationBuilder>();
+   if let Some(table_id) = props.table_id {
+         named_requests.push(ComponentMessage::get_named::<&str, User>("table", table_id.into()));
+    }
+   if let Some(user_id) = props.user_id {
+         named_requests.push(ComponentMessage::get_named::<&str, User>("user", user_id.into()));
+    }
+   if let Some(role_id) = props.role_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Role>("role", role_id.into()));
+    }
+    let set_table = builder_dispatch.apply_callback(|table: Option<User>| UsersUsersRoleInvitationActions::SetTable(table));
+    let set_user = builder_dispatch.apply_callback(|user: Option<User>| UsersUsersRoleInvitationActions::SetUser(user));
+    let set_role = builder_dispatch.apply_callback(|role: Option<NestedRole>| UsersUsersRoleInvitationActions::SetRole(role));
+    html! {
+        <BasicForm<NewUsersUsersRoleInvitation>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+            <Datalist<User, false> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" />
+            <Datalist<User, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" />
+            <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
+        </BasicForm<NewUsersUsersRoleInvitation>>
+    }
+}
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
+pub struct UsersUsersRoleRequestBuilder {
+    pub table: Option<User>,
+    pub user: Option<User>,
+    pub role: Option<NestedRole>,
+    pub errors_table: Vec<ApiError>,
+    pub errors_user: Vec<ApiError>,
+    pub errors_role: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for UsersUsersRoleRequestBuilder {
+    fn default() -> Self {
+        Self {
+            table: None,
+            user: None,
+            role: None,
+            errors_table: Vec::new(),
+            errors_user: Vec::new(),
+            errors_role: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
+}
+
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub(super) enum UsersUsersRoleRequestActions {
+    SetTable(Option<User>),
+    SetUser(Option<User>),
+    SetRole(Option<NestedRole>),
+}
+
+impl FromOperation for UsersUsersRoleRequestActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "table" => UsersUsersRoleRequestActions::SetTable(Some(bincode::deserialize(&row).unwrap())),
+            "user" => UsersUsersRoleRequestActions::SetUser(Some(bincode::deserialize(&row).unwrap())),
+            "role" => UsersUsersRoleRequestActions::SetRole(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
+}
+
+impl Reducer<UsersUsersRoleRequestBuilder> for UsersUsersRoleRequestActions {
+    fn apply(self, mut state: std::rc::Rc<UsersUsersRoleRequestBuilder>) -> std::rc::Rc<UsersUsersRoleRequestBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            UsersUsersRoleRequestActions::SetTable(table) => 'table: {
+                state_mut.errors_table.clear();
+        if table.is_none() {
+            state_mut.errors_table.push(ApiError::BadRequest(vec![
+                "The Table field is required.".to_string()
+             ]));
+            state_mut.table = None;
+             break 'table;
+        }
+                state_mut.table = table;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'table;
+            }
+            UsersUsersRoleRequestActions::SetUser(user) => 'user: {
+                state_mut.errors_user.clear();
+        if user.is_none() {
+            state_mut.errors_user.push(ApiError::BadRequest(vec![
+                "The User field is required.".to_string()
+             ]));
+            state_mut.user = None;
+             break 'user;
+        }
+                state_mut.user = user;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'user;
+            }
+            UsersUsersRoleRequestActions::SetRole(role) => 'role: {
+                state_mut.errors_role.clear();
+        if role.is_none() {
+            state_mut.errors_role.push(ApiError::BadRequest(vec![
+                "The Role field is required.".to_string()
+             ]));
+            state_mut.role = None;
+             break 'role;
+        }
+                state_mut.role = role;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'role;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for UsersUsersRoleRequestBuilder {
+    type Actions = UsersUsersRoleRequestActions;
+
+    type RichVariant = NestedUsersUsersRoleRequest;
+
+    fn has_errors(&self) -> bool {
+!self.errors_table.is_empty() || !self.errors_user.is_empty() || !self.errors_role.is_empty()
+    }
+
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.apply(UsersUsersRoleRequestActions::SetTable(Some(richest_variant.table)));
+        dispatcher.apply(UsersUsersRoleRequestActions::SetUser(Some(richest_variant.user)));
+        dispatcher.apply(UsersUsersRoleRequestActions::SetRole(Some(richest_variant.role)));
+        vec![]
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.table.is_some()
+        && self.user.is_some()
+        && self.role.is_some()
+    }
+
+}
+
+impl From<UsersUsersRoleRequestBuilder> for NewUsersUsersRoleRequest {
+    fn from(builder: UsersUsersRoleRequestBuilder) -> Self {
+        Self {
+            table_id: builder.table.as_ref().map(|table| table.id).unwrap(),
+            user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
+            role_id: builder.role.unwrap().inner.id,
+        }
+    }
+}
+impl FormBuildable for NewUsersUsersRoleRequest {
+    type Builder = UsersUsersRoleRequestBuilder;
+    fn title() -> &'static str {
+        "Users users role request"
+    }
+    fn task_target() -> &'static str {
+        "Users users role request"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        false
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateUsersUsersRoleRequestFormProp {
+     #[prop_or_default]
+    pub table_id: Option<i32>,
+     #[prop_or_default]
+    pub user_id: Option<i32>,
+     #[prop_or_default]
+    pub role_id: Option<i32>,
+}
+
+#[function_component(CreateUsersUsersRoleRequestForm)]
+pub fn create_users_users_role_request_form(props: &CreateUsersUsersRoleRequestFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<UsersUsersRoleRequestBuilder>();
+   if let Some(table_id) = props.table_id {
+         named_requests.push(ComponentMessage::get_named::<&str, User>("table", table_id.into()));
+    }
+   if let Some(user_id) = props.user_id {
+         named_requests.push(ComponentMessage::get_named::<&str, User>("user", user_id.into()));
+    }
+   if let Some(role_id) = props.role_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Role>("role", role_id.into()));
+    }
+    let set_table = builder_dispatch.apply_callback(|table: Option<User>| UsersUsersRoleRequestActions::SetTable(table));
+    let set_user = builder_dispatch.apply_callback(|user: Option<User>| UsersUsersRoleRequestActions::SetUser(user));
+    let set_role = builder_dispatch.apply_callback(|role: Option<NestedRole>| UsersUsersRoleRequestActions::SetRole(role));
+    html! {
+        <BasicForm<NewUsersUsersRoleRequest>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+            <Datalist<User, false> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" />
+            <Datalist<User, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" />
+            <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
+        </BasicForm<NewUsersUsersRoleRequest>>
+    }
+}
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
+pub struct UsersUsersRoleBuilder {
+    pub table: Option<User>,
+    pub user: Option<User>,
+    pub role: Option<NestedRole>,
+    pub errors_table: Vec<ApiError>,
+    pub errors_user: Vec<ApiError>,
+    pub errors_role: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for UsersUsersRoleBuilder {
+    fn default() -> Self {
+        Self {
+            table: None,
+            user: None,
+            role: None,
+            errors_table: Vec::new(),
+            errors_user: Vec::new(),
+            errors_role: Vec::new(),
+            form_updated_at: <NaiveDateTime>::default(),
+        }
+    }
+}
+
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub(super) enum UsersUsersRoleActions {
+    SetTable(Option<User>),
+    SetUser(Option<User>),
+    SetRole(Option<NestedRole>),
+}
+
+impl FromOperation for UsersUsersRoleActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "table" => UsersUsersRoleActions::SetTable(Some(bincode::deserialize(&row).unwrap())),
+            "user" => UsersUsersRoleActions::SetUser(Some(bincode::deserialize(&row).unwrap())),
+            "role" => UsersUsersRoleActions::SetRole(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
+}
+
+impl Reducer<UsersUsersRoleBuilder> for UsersUsersRoleActions {
+    fn apply(self, mut state: std::rc::Rc<UsersUsersRoleBuilder>) -> std::rc::Rc<UsersUsersRoleBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            UsersUsersRoleActions::SetTable(table) => 'table: {
+                state_mut.errors_table.clear();
+        if table.is_none() {
+            state_mut.errors_table.push(ApiError::BadRequest(vec![
+                "The Table field is required.".to_string()
+             ]));
+            state_mut.table = None;
+             break 'table;
+        }
+                state_mut.table = table;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'table;
+            }
+            UsersUsersRoleActions::SetUser(user) => 'user: {
+                state_mut.errors_user.clear();
+        if user.is_none() {
+            state_mut.errors_user.push(ApiError::BadRequest(vec![
+                "The User field is required.".to_string()
+             ]));
+            state_mut.user = None;
+             break 'user;
+        }
+                state_mut.user = user;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'user;
+            }
+            UsersUsersRoleActions::SetRole(role) => 'role: {
+                state_mut.errors_role.clear();
+        if role.is_none() {
+            state_mut.errors_role.push(ApiError::BadRequest(vec![
+                "The Role field is required.".to_string()
+             ]));
+            state_mut.role = None;
+             break 'role;
+        }
+                state_mut.role = role;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'role;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for UsersUsersRoleBuilder {
+    type Actions = UsersUsersRoleActions;
+
+    type RichVariant = NestedUsersUsersRole;
+
+    fn has_errors(&self) -> bool {
+!self.errors_table.is_empty() || !self.errors_user.is_empty() || !self.errors_role.is_empty()
+    }
+
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.apply(UsersUsersRoleActions::SetTable(Some(richest_variant.table)));
+        dispatcher.apply(UsersUsersRoleActions::SetUser(Some(richest_variant.user)));
+        dispatcher.apply(UsersUsersRoleActions::SetRole(Some(richest_variant.role)));
+        vec![]
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.table.is_some()
+        && self.user.is_some()
+        && self.role.is_some()
+    }
+
+}
+
+impl From<UsersUsersRoleBuilder> for NewUsersUsersRole {
+    fn from(builder: UsersUsersRoleBuilder) -> Self {
+        Self {
+            table_id: builder.table.as_ref().map(|table| table.id).unwrap(),
+            user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
+            role_id: builder.role.unwrap().inner.id,
+        }
+    }
+}
+impl FormBuildable for NewUsersUsersRole {
+    type Builder = UsersUsersRoleBuilder;
+    fn title() -> &'static str {
+        "Users users role"
+    }
+    fn task_target() -> &'static str {
+        "Users users role"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        false
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateUsersUsersRoleFormProp {
+     #[prop_or_default]
+    pub table_id: Option<i32>,
+     #[prop_or_default]
+    pub user_id: Option<i32>,
+     #[prop_or_default]
+    pub role_id: Option<i32>,
+}
+
+#[function_component(CreateUsersUsersRoleForm)]
+pub fn create_users_users_role_form(props: &CreateUsersUsersRoleFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<UsersUsersRoleBuilder>();
+   if let Some(table_id) = props.table_id {
+         named_requests.push(ComponentMessage::get_named::<&str, User>("table", table_id.into()));
+    }
+   if let Some(user_id) = props.user_id {
+         named_requests.push(ComponentMessage::get_named::<&str, User>("user", user_id.into()));
+    }
+   if let Some(role_id) = props.role_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Role>("role", role_id.into()));
+    }
+    let set_table = builder_dispatch.apply_callback(|table: Option<User>| UsersUsersRoleActions::SetTable(table));
+    let set_user = builder_dispatch.apply_callback(|user: Option<User>| UsersUsersRoleActions::SetUser(user));
+    let set_role = builder_dispatch.apply_callback(|role: Option<NestedRole>| UsersUsersRoleActions::SetRole(role));
+    html! {
+        <BasicForm<NewUsersUsersRole>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+            <Datalist<User, false> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" />
+            <Datalist<User, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" />
+            <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
+        </BasicForm<NewUsersUsersRole>>
     }
 }

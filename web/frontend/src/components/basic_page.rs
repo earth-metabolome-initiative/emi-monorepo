@@ -53,6 +53,42 @@ impl PageLike for NestedProject {
     }
 }
 
+impl PageLike for NestedSpectraCollection {
+    fn title(&self) -> String {
+        format!("Spectra collection {}", self.inner.id)
+    }
+
+    fn id(&self) -> PrimaryKey {
+        self.inner.id.into()
+    }
+
+    fn update_path(&self) -> Option<AppRoute> {
+        Some(AppRoute::SpectraCollectionsUpdate { id: self.inner.id })
+    }
+
+    fn create_path() -> Option<AppRoute> {
+        Some(AppRoute::SpectraCollectionsNew)
+    }
+}
+
+impl PageLike for NestedSpectra {
+    fn title(&self) -> String {
+        format!("Spectra {}", self.inner.id)
+    }
+
+    fn id(&self) -> PrimaryKey {
+        self.inner.id.into()
+    }
+
+    fn update_path(&self) -> Option<AppRoute> {
+        None
+    }
+
+    fn create_path() -> Option<AppRoute> {
+        None
+    }
+}
+
 impl PageLike for NestedSampledIndividual {
     fn title(&self) -> String {
         format!("Sampled individual {}", self.inner.id)
@@ -131,6 +167,7 @@ where
     Page: PageLike,
 {
     pub id: PrimaryKey,
+    pub children: Html,
     #[prop_or_default]
     _phantom: std::marker::PhantomData<Page>,
 }
@@ -142,6 +179,7 @@ where
 {
     pub id: PrimaryKey,
     pub navigator: yew_router::navigator::Navigator,
+    pub children: Html,
     #[prop_or_default]
     _phantom: std::marker::PhantomData<Page>,
 }
@@ -273,6 +311,7 @@ impl<Page: PageLike> Component for InnerBasicPage<Page> {
                         <></>
                     }
                     <div class="clear"></div>
+                    { ctx.props().children.clone() }
                 </div>
             }
         } else {
@@ -287,6 +326,8 @@ impl<Page: PageLike> Component for InnerBasicPage<Page> {
 pub fn basic_page<Page: PageLike>(props: &PageProps<Page>) -> Html {
     let navigator = use_navigator().unwrap();
     html! {
-        <InnerBasicPage<Page> id={props.id} navigator={navigator} />
+        <InnerBasicPage<Page> id={props.id} navigator={navigator} >
+            { props.children.clone() }
+        </InnerBasicPage<Page>>
     }
 }

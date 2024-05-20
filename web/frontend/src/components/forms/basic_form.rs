@@ -48,18 +48,11 @@ pub(super) trait FormBuilder:
     /// necessary to complete the update.
     ///
     /// # Arguments
-    /// * `rich_variant` - The data to use to update the form builder.
+    /// * `richest_variant` - The data to use to update the form builder.
     fn update(
         dispatcher: &Dispatch<Self>,
-        rich_variant: Self::RichVariant,
+        richest_variant: Self::RichVariant,
     ) -> Vec<ComponentMessage>;
-
-    /// Returns the (optional) id of the object being built.
-    ///
-    /// # Implementative details
-    /// The ID is optional because it is only present when the form is being used to update an existing object.
-    /// If the form is being used to insert a new object, the ID is not present, i.e. it is `None`.
-    fn id(&self) -> Option<PrimaryKey>;
 }
 
 /// Trait defining something that can be built by a form.
@@ -206,13 +199,33 @@ where
                     )
                 } else {
                     log::info!("Received a row from the backend for an unknown operation");
-                    let rich_variant: <<Data as FormBuildable>::Builder as FormBuilder>::RichVariant = bincode::deserialize(&row).unwrap();
+                    let richest_variant: <<Data as FormBuildable>::Builder as FormBuilder>::RichVariant = bincode::deserialize(&row).unwrap();
 
-                    log::debug!("Updating the form with the received data, {:?}", rich_variant);
+                    // if ctx.props().method.is_update() {
+                    //     if let Some(id) = ctx.props().builder.id() {
+                    //         match ctx.props().method {
+                    //             FormMethod::POST => {}
+                    //             FormMethod::GET => {
+                    //                 ctx.link()
+                    //                     .send_message(ComponentMessage::can_view::<Data>(id));
+                    //             }
+                    //             FormMethod::PUT => {
+                    //                 ctx.link()
+                    //                     .send_message(ComponentMessage::can_update::<Data>(id));
+                    //             }
+                    //             FormMethod::DELETE => {
+                    //                 ctx.link()
+                    //                     .send_message(ComponentMessage::can_delete::<Data>(id));
+                    //             }
+                    //         }
+                    //     }
+                    // }
+
+                    log::debug!("Updating the form with the received data, {:?}", richest_variant);
 
                     <<Data as FormBuildable>::Builder as FormBuilder>::update(
                         &ctx.props().builder_dispatch,
-                        rich_variant,
+                        richest_variant,
                     )
                     .into_iter()
                     .for_each(|message| {
@@ -270,25 +283,6 @@ where
             }
             for operation in ctx.props().named_requests.iter() {
                 ctx.link().send_message(operation.clone());
-            }
-            if ctx.props().method.is_update() {
-                if let Some(id) = ctx.props().builder.id() {
-                    match ctx.props().method {
-                        FormMethod::POST => {}
-                        FormMethod::GET => {
-                            ctx.link()
-                                .send_message(ComponentMessage::can_view::<Data>(id));
-                        }
-                        FormMethod::PUT => {
-                            ctx.link()
-                                .send_message(ComponentMessage::can_update::<Data>(id));
-                        }
-                        FormMethod::DELETE => {
-                            ctx.link()
-                                .send_message(ComponentMessage::can_delete::<Data>(id));
-                        }
-                    }
-                }
             }
         }
     }

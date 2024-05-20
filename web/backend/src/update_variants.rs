@@ -82,6 +82,39 @@ impl UpdateRow for web_common::database::UpdateProject {
     }
 }
 
+/// Intermediate representation of the update variant UpdateSpectraCollection.
+#[derive(Identifiable, AsChangeset)]
+#[diesel(table_name = spectra_collections)]
+#[diesel(treat_none_as_null = true)]
+#[diesel(primary_key(id))]
+pub(super) struct IntermediateUpdateSpectraCollection {
+    updated_by: i32,
+    id: i32,
+    sample_id: Uuid,
+}
+
+impl UpdateRow for web_common::database::UpdateSpectraCollection {
+    type Intermediate = IntermediateUpdateSpectraCollection;
+    type Flat = SpectraCollection;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateUpdateSpectraCollection {
+            updated_by: user_id,
+            id: self.id,
+            sample_id: self.sample_id,
+        }
+    }
+
+    fn update(
+        self,
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        self.to_intermediate(user_id)
+            .save_changes(connection)
+    }
+}
+
 /// Intermediate representation of the update variant UpdateTeam.
 #[derive(Identifiable, AsChangeset)]
 #[diesel(table_name = teams)]

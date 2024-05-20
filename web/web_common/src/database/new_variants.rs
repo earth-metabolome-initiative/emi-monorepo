@@ -7,6 +7,15 @@ use serde::{Deserialize, Serialize};
 use chrono::NaiveDateTime;
 use super::*;
 
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewDerivedSample {
+    pub parent_sample_id: Uuid,
+    pub child_sample_id: Uuid,
+}
+
+impl Tabular for NewDerivedSample {
+    const TABLE: Table = Table::DerivedSamples;
+}
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewProject {
     pub name: String,
@@ -26,6 +35,84 @@ impl Tabular for NewProject {
     const TABLE: Table = Table::Projects;
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewProjectsTeamsRoleInvitation {
+    pub table_id: i32,
+    pub team_id: i32,
+    pub role_id: i32,
+}
+
+impl Tabular for NewProjectsTeamsRoleInvitation {
+    const TABLE: Table = Table::ProjectsTeamsRoleInvitations;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewProjectsTeamsRoleRequest {
+    pub table_id: i32,
+    pub team_id: i32,
+    pub role_id: i32,
+}
+
+impl Tabular for NewProjectsTeamsRoleRequest {
+    const TABLE: Table = Table::ProjectsTeamsRoleRequests;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewProjectsTeamsRole {
+    pub table_id: i32,
+    pub team_id: i32,
+    pub role_id: i32,
+}
+
+impl Tabular for NewProjectsTeamsRole {
+    const TABLE: Table = Table::ProjectsTeamsRoles;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewProjectsUsersRoleInvitation {
+    pub table_id: i32,
+    pub user_id: i32,
+    pub role_id: i32,
+}
+
+impl Tabular for NewProjectsUsersRoleInvitation {
+    const TABLE: Table = Table::ProjectsUsersRoleInvitations;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewProjectsUsersRoleRequest {
+    pub table_id: i32,
+    pub user_id: i32,
+    pub role_id: i32,
+}
+
+impl Tabular for NewProjectsUsersRoleRequest {
+    const TABLE: Table = Table::ProjectsUsersRoleRequests;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewProjectsUsersRole {
+    pub table_id: i32,
+    pub user_id: i32,
+    pub role_id: i32,
+}
+
+impl Tabular for NewProjectsUsersRole {
+    const TABLE: Table = Table::ProjectsUsersRoles;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewSampleBioOttTaxonItem {
+    pub sample_id: Uuid,
+    pub taxon_id: i32,
+}
+
+impl Tabular for NewSampleBioOttTaxonItem {
+    const TABLE: Table = Table::SampleBioOttTaxonItems;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewSampledIndividualBioOttTaxonItem {
+    pub sampled_individual_id: Uuid,
+    pub taxon_id: i32,
+}
+
+impl Tabular for NewSampledIndividualBioOttTaxonItem {
+    const TABLE: Table = Table::SampledIndividualBioOttTaxonItems;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewSampledIndividual {
     pub id: Uuid,
     pub tagged: bool,
@@ -39,9 +126,9 @@ impl NewSampledIndividual {
     pub fn into_row(self, created_by: i32) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
             gluesql::core::ast_builder::num(created_by),
-            gluesql::core::ast_builder::num(created_by),
             gluesql::core::ast_builder::uuid(self.id.to_string()),
             (self.tagged.into()),
+            gluesql::core::ast_builder::num(created_by),
         ]
     }
 
@@ -64,7 +151,7 @@ impl NewSampledIndividual {
         let id = self.id;
         table("sampled_individuals")
             .insert()
-            .columns("created_by,updated_by,id,tagged")
+            .columns("created_by,id,tagged,updated_by")
             .values(vec![self.into_row(created_by)])
             .execute(connection)
             .await
@@ -105,6 +192,66 @@ impl NewSampledIndividual {
 
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewSampledIndividualsTeamsRoleInvitation {
+    pub table_id: Uuid,
+    pub team_id: i32,
+    pub role_id: i32,
+}
+
+impl Tabular for NewSampledIndividualsTeamsRoleInvitation {
+    const TABLE: Table = Table::SampledIndividualsTeamsRoleInvitations;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewSampledIndividualsTeamsRoleRequest {
+    pub table_id: Uuid,
+    pub team_id: i32,
+    pub role_id: i32,
+}
+
+impl Tabular for NewSampledIndividualsTeamsRoleRequest {
+    const TABLE: Table = Table::SampledIndividualsTeamsRoleRequests;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewSampledIndividualsTeamsRole {
+    pub table_id: Uuid,
+    pub team_id: i32,
+    pub role_id: i32,
+}
+
+impl Tabular for NewSampledIndividualsTeamsRole {
+    const TABLE: Table = Table::SampledIndividualsTeamsRoles;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewSampledIndividualsUsersRoleInvitation {
+    pub table_id: Uuid,
+    pub user_id: i32,
+    pub role_id: i32,
+}
+
+impl Tabular for NewSampledIndividualsUsersRoleInvitation {
+    const TABLE: Table = Table::SampledIndividualsUsersRoleInvitations;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewSampledIndividualsUsersRoleRequest {
+    pub table_id: Uuid,
+    pub user_id: i32,
+    pub role_id: i32,
+}
+
+impl Tabular for NewSampledIndividualsUsersRoleRequest {
+    const TABLE: Table = Table::SampledIndividualsUsersRoleRequests;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewSampledIndividualsUsersRole {
+    pub table_id: Uuid,
+    pub user_id: i32,
+    pub role_id: i32,
+}
+
+impl Tabular for NewSampledIndividualsUsersRole {
+    const TABLE: Table = Table::SampledIndividualsUsersRoles;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewSample {
     pub id: Uuid,
     pub sampled_by: i32,
@@ -119,10 +266,10 @@ impl NewSample {
     pub fn into_row(self, created_by: i32) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
             gluesql::core::ast_builder::num(created_by),
-            gluesql::core::ast_builder::num(created_by),
             gluesql::core::ast_builder::uuid(self.id.to_string()),
             gluesql::core::ast_builder::num(self.sampled_by),
             gluesql::core::ast_builder::num(self.state),
+            gluesql::core::ast_builder::num(created_by),
         ]
     }
 
@@ -145,7 +292,7 @@ impl NewSample {
         let id = self.id;
         table("samples")
             .insert()
-            .columns("created_by,updated_by,id,sampled_by,state")
+            .columns("created_by,id,sampled_by,state,updated_by")
             .values(vec![self.into_row(created_by)])
             .execute(connection)
             .await
@@ -187,6 +334,134 @@ impl NewSample {
 
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewSamplesTeamsRoleInvitation {
+    pub table_id: Uuid,
+    pub team_id: i32,
+    pub role_id: i32,
+}
+
+impl Tabular for NewSamplesTeamsRoleInvitation {
+    const TABLE: Table = Table::SamplesTeamsRoleInvitations;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewSamplesTeamsRoleRequest {
+    pub table_id: Uuid,
+    pub team_id: i32,
+    pub role_id: i32,
+}
+
+impl Tabular for NewSamplesTeamsRoleRequest {
+    const TABLE: Table = Table::SamplesTeamsRoleRequests;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewSamplesTeamsRole {
+    pub table_id: Uuid,
+    pub team_id: i32,
+    pub role_id: i32,
+}
+
+impl Tabular for NewSamplesTeamsRole {
+    const TABLE: Table = Table::SamplesTeamsRoles;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewSamplesUsersRoleInvitation {
+    pub table_id: Uuid,
+    pub user_id: i32,
+    pub role_id: i32,
+}
+
+impl Tabular for NewSamplesUsersRoleInvitation {
+    const TABLE: Table = Table::SamplesUsersRoleInvitations;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewSamplesUsersRoleRequest {
+    pub table_id: Uuid,
+    pub user_id: i32,
+    pub role_id: i32,
+}
+
+impl Tabular for NewSamplesUsersRoleRequest {
+    const TABLE: Table = Table::SamplesUsersRoleRequests;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewSamplesUsersRole {
+    pub table_id: Uuid,
+    pub user_id: i32,
+    pub role_id: i32,
+}
+
+impl Tabular for NewSamplesUsersRole {
+    const TABLE: Table = Table::SamplesUsersRoles;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewSpectraCollection {
+    pub sample_id: Uuid,
+}
+
+impl Tabular for NewSpectraCollection {
+    const TABLE: Table = Table::SpectraCollections;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewSpectraCollectionsTeamsRoleInvitation {
+    pub table_id: i32,
+    pub team_id: i32,
+    pub role_id: i32,
+}
+
+impl Tabular for NewSpectraCollectionsTeamsRoleInvitation {
+    const TABLE: Table = Table::SpectraCollectionsTeamsRoleInvitations;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewSpectraCollectionsTeamsRoleRequest {
+    pub table_id: i32,
+    pub team_id: i32,
+    pub role_id: i32,
+}
+
+impl Tabular for NewSpectraCollectionsTeamsRoleRequest {
+    const TABLE: Table = Table::SpectraCollectionsTeamsRoleRequests;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewSpectraCollectionsTeamsRole {
+    pub table_id: i32,
+    pub team_id: i32,
+    pub role_id: i32,
+}
+
+impl Tabular for NewSpectraCollectionsTeamsRole {
+    const TABLE: Table = Table::SpectraCollectionsTeamsRoles;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewSpectraCollectionsUsersRoleInvitation {
+    pub table_id: i32,
+    pub user_id: i32,
+    pub role_id: i32,
+}
+
+impl Tabular for NewSpectraCollectionsUsersRoleInvitation {
+    const TABLE: Table = Table::SpectraCollectionsUsersRoleInvitations;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewSpectraCollectionsUsersRoleRequest {
+    pub table_id: i32,
+    pub user_id: i32,
+    pub role_id: i32,
+}
+
+impl Tabular for NewSpectraCollectionsUsersRoleRequest {
+    const TABLE: Table = Table::SpectraCollectionsUsersRoleRequests;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewSpectraCollectionsUsersRole {
+    pub table_id: i32,
+    pub user_id: i32,
+    pub role_id: i32,
+}
+
+impl Tabular for NewSpectraCollectionsUsersRole {
+    const TABLE: Table = Table::SpectraCollectionsUsersRoles;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewTeam {
     pub name: String,
     pub description: String,
@@ -197,6 +472,46 @@ pub struct NewTeam {
 
 impl Tabular for NewTeam {
     const TABLE: Table = Table::Teams;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewTeamsTeamsRoleInvitation {
+    pub table_id: i32,
+    pub team_id: i32,
+    pub role_id: i32,
+}
+
+impl Tabular for NewTeamsTeamsRoleInvitation {
+    const TABLE: Table = Table::TeamsTeamsRoleInvitations;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewTeamsUsersRoleInvitation {
+    pub table_id: i32,
+    pub user_id: i32,
+    pub role_id: i32,
+}
+
+impl Tabular for NewTeamsUsersRoleInvitation {
+    const TABLE: Table = Table::TeamsUsersRoleInvitations;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewTeamsUsersRoleRequest {
+    pub table_id: i32,
+    pub user_id: i32,
+    pub role_id: i32,
+}
+
+impl Tabular for NewTeamsUsersRoleRequest {
+    const TABLE: Table = Table::TeamsUsersRoleRequests;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewTeamsUsersRole {
+    pub table_id: i32,
+    pub user_id: i32,
+    pub role_id: i32,
+}
+
+impl Tabular for NewTeamsUsersRole {
+    const TABLE: Table = Table::TeamsUsersRoles;
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewUserEmail {
@@ -218,4 +533,34 @@ pub struct NewUser {
 
 impl Tabular for NewUser {
     const TABLE: Table = Table::Users;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewUsersUsersRoleInvitation {
+    pub table_id: i32,
+    pub user_id: i32,
+    pub role_id: i32,
+}
+
+impl Tabular for NewUsersUsersRoleInvitation {
+    const TABLE: Table = Table::UsersUsersRoleInvitations;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewUsersUsersRoleRequest {
+    pub table_id: i32,
+    pub user_id: i32,
+    pub role_id: i32,
+}
+
+impl Tabular for NewUsersUsersRoleRequest {
+    const TABLE: Table = Table::UsersUsersRoleRequests;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewUsersUsersRole {
+    pub table_id: i32,
+    pub user_id: i32,
+    pub role_id: i32,
+}
+
+impl Tabular for NewUsersUsersRole {
+    const TABLE: Table = Table::UsersUsersRoles;
 }

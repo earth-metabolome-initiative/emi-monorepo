@@ -18,3 +18,5 @@ pub trait RowToBadge {
 }
 
 impl RowToBadge for NestedSampledIndividual {}
+impl RowToBadge for NestedSpectraCollection {}
+impl RowToBadge for NestedSpectra {}

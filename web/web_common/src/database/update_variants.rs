@@ -5,6 +5,7 @@
 
 use serde::{Deserialize, Serialize};
 use chrono::NaiveDateTime;
+use uuid::Uuid;
 use super::*;
 
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize, Default)]
@@ -103,6 +104,54 @@ impl UpdateProject {
             update_row = update_row.set("end_date", gluesql::core::ast_builder::timestamp(end_date.to_string()));
         }
             update_row.execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct UpdateSpectraCollection {
+    pub id: i32,
+    pub sample_id: Uuid,
+}
+
+impl Tabular for UpdateSpectraCollection {
+    const TABLE: Table = Table::SpectraCollections;
+}
+#[cfg(feature = "frontend")]
+impl UpdateSpectraCollection {
+    pub fn into_row(self, updated_by: i32) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::num(updated_by),
+            gluesql::core::ast_builder::num(self.id),
+            gluesql::core::ast_builder::uuid(self.sample_id.to_string()),
+        ]
+    }
+
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `user_id` - The ID of the user who is updating the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        user_id: i32,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("spectra_collections")
+            .update()        
+.set("id", gluesql::core::ast_builder::num(self.id))        
+.set("sample_id", gluesql::core::ast_builder::uuid(self.sample_id.to_string()))        
+.set("updated_by", gluesql::core::ast_builder::num(user_id))            .execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,

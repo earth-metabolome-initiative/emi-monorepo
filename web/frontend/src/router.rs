@@ -6,7 +6,6 @@ use yew_router::prelude::*;
 use crate::pages::*;
 use uuid::Uuid;
 use crate::components::BasicList;
-use crate::components::BasicPage;
 use web_common::database::*;
 use crate::components::forms::automatic_forms::*;
 
@@ -40,6 +39,16 @@ pub enum AppRoute {
     SamplesNewWithSampledBy{sampled_by: i32},
     #[at("/samples/:id/update")]
     SamplesUpdate{id: Uuid},
+    #[at("/spectra_collections")]
+    SpectraCollections,
+    #[at("/spectra_collections/:id")]
+    SpectraCollectionsView{id: i32},
+    #[at("/spectra_collections/new")]
+    SpectraCollectionsNew,
+    #[at("/spectra_collections/new/sample/:sample_id")]
+    SpectraCollectionsNewWithSample{sample_id: Uuid},
+    #[at("/spectra_collections/:id/update")]
+    SpectraCollectionsUpdate{id: i32},
     #[at("/teams")]
     Teams,
     #[at("/teams/:id")]
@@ -78,7 +87,7 @@ pub fn switch(route: AppRoute) -> Html {
             html! { <BasicList<NestedProject> /> }
         }
         AppRoute::ProjectsView{id} => {
-            html! { <BasicPage<NestedProject> id={PrimaryKey::from(id)} /> }
+            html! { <ProjectPage id={id} /> }
         }
         AppRoute::ProjectsNew => {
             html! { <CreateProjectForm /> }
@@ -93,7 +102,7 @@ pub fn switch(route: AppRoute) -> Html {
             html! { <BasicList<NestedSampledIndividual> /> }
         }
         AppRoute::SampledIndividualsView{id} => {
-            html! { <BasicPage<NestedSampledIndividual> id={PrimaryKey::from(id)} /> }
+            html! { <SampledIndividualPage id={id} /> }
         }
         AppRoute::SampledIndividualsNew => {
             html! { <CreateSampledIndividualForm /> }
@@ -105,7 +114,7 @@ pub fn switch(route: AppRoute) -> Html {
             html! { <BasicList<NestedSample> /> }
         }
         AppRoute::SamplesView{id} => {
-            html! { <BasicPage<NestedSample> id={PrimaryKey::from(id)} /> }
+            html! { <SamplePage id={id} /> }
         }
         AppRoute::SamplesNew => {
             html! { <CreateSampleForm /> }
@@ -116,11 +125,26 @@ pub fn switch(route: AppRoute) -> Html {
         AppRoute::SamplesUpdate{id} => {
             html! { <UpdateSampleForm id={id} /> }
         }
+        AppRoute::SpectraCollections => {
+            html! { <BasicList<NestedSpectraCollection> /> }
+        }
+        AppRoute::SpectraCollectionsView{id} => {
+            html! { <SpectraCollectionPage id={id} /> }
+        }
+        AppRoute::SpectraCollectionsNew => {
+            html! { <CreateSpectraCollectionForm /> }
+        }
+        AppRoute::SpectraCollectionsNewWithSample{sample_id} => {
+            html! { <CreateSpectraCollectionForm sample_id={sample_id} /> }
+        }
+        AppRoute::SpectraCollectionsUpdate{id} => {
+            html! { <UpdateSpectraCollectionForm id={id} /> }
+        }
         AppRoute::Teams => {
             html! { <BasicList<NestedTeam> /> }
         }
         AppRoute::TeamsView{id} => {
-            html! { <BasicPage<NestedTeam> id={PrimaryKey::from(id)} /> }
+            html! { <TeamPage id={id} /> }
         }
         AppRoute::TeamsNew => {
             html! { <CreateTeamForm /> }
@@ -135,7 +159,7 @@ pub fn switch(route: AppRoute) -> Html {
             html! { <BasicList<User> /> }
         }
         AppRoute::UsersView{id} => {
-            html! { <BasicPage<User> id={PrimaryKey::from(id)} /> }
+            html! { <UserPage id={id} /> }
         }
         AppRoute::UsersNew => {
             html! { <CreateUserForm /> }

@@ -1149,9 +1149,7 @@ impl AllByUpdatedAtTable for web_common::database::Table {
             web_common::database::Table::BioOttTaxonItems => unimplemented!("all_by_updated_at not implemented for bio_ott_taxon_items."),
             web_common::database::Table::Colors => unimplemented!("all_by_updated_at not implemented for colors."),
             web_common::database::Table::Countries => unimplemented!("all_by_updated_at not implemented for countries."),
-            web_common::database::Table::DerivedSamples => {let filter: Option<web_common::database::DerivedSampleFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::DerivedSampleFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
-NestedDerivedSample::all_by_updated_at(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
-},
+            web_common::database::Table::DerivedSamples => unimplemented!("all_by_updated_at not implemented for derived_samples."),
             web_common::database::Table::DocumentFormats => unimplemented!("all_by_updated_at not implemented for document_formats."),
             web_common::database::Table::FontAwesomeIcons => unimplemented!("all_by_updated_at not implemented for font_awesome_icons."),
             web_common::database::Table::LoginProviders => unimplemented!("all_by_updated_at not implemented for login_providers."),
@@ -1168,13 +1166,9 @@ NestedProject::all_by_updated_at(filter.as_ref(), limit, offset, connection)?.it
             web_common::database::Table::ProjectsUsersRoleRequests => unimplemented!("all_by_updated_at not implemented for projects_users_role_requests."),
             web_common::database::Table::ProjectsUsersRoles => unimplemented!("all_by_updated_at not implemented for projects_users_roles."),
             web_common::database::Table::Roles => unimplemented!("all_by_updated_at not implemented for roles."),
-            web_common::database::Table::SampleBioOttTaxonItems => {let filter: Option<web_common::database::SampleBioOttTaxonItemFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SampleBioOttTaxonItemFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
-NestedSampleBioOttTaxonItem::all_by_updated_at(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
-},
+            web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("all_by_updated_at not implemented for sample_bio_ott_taxon_items."),
             web_common::database::Table::SampleStates => unimplemented!("all_by_updated_at not implemented for sample_states."),
-            web_common::database::Table::SampledIndividualBioOttTaxonItems => {let filter: Option<web_common::database::SampledIndividualBioOttTaxonItemFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SampledIndividualBioOttTaxonItemFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
-NestedSampledIndividualBioOttTaxonItem::all_by_updated_at(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
-},
+            web_common::database::Table::SampledIndividualBioOttTaxonItems => unimplemented!("all_by_updated_at not implemented for sampled_individual_bio_ott_taxon_items."),
             web_common::database::Table::SampledIndividuals => {let filter: Option<web_common::database::SampledIndividualFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SampledIndividualFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
 NestedSampledIndividual::all_by_updated_at(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
 },
@@ -1302,7 +1296,12 @@ impl InsertableTable for web_common::database::Table {
             web_common::database::Table::SamplesUsersRoleRequests => unreachable!("Table `samples_users_role_requests` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::SamplesUsersRoles => unreachable!("Table `samples_users_roles` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::Spectra => unreachable!("Table `spectra` is not insertable as it does not have a known column associated to a creator user id."),
-            web_common::database::Table::SpectraCollections => todo!("Insert not implemented for spectra_collections."),
+            web_common::database::Table::SpectraCollections => {
+                let row: web_common::database::NewSpectraCollection = bincode::deserialize::<web_common::database::NewSpectraCollection>(&row).map_err(web_common::api::ApiError::from)?;
+                let inserted_row: crate::models::SpectraCollection = <web_common::database::NewSpectraCollection as InsertRow>::insert(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedSpectraCollection::from_flat(inserted_row, connection)?;
+                 bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
+            },
             web_common::database::Table::SpectraCollectionsTeamsRoleInvitations => unreachable!("Table `spectra_collections_teams_role_invitations` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::SpectraCollectionsTeamsRoleRequests => unreachable!("Table `spectra_collections_teams_role_requests` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::SpectraCollectionsTeamsRoles => unreachable!("Table `spectra_collections_teams_roles` is not insertable as it does not have a known column associated to a creator user id."),
@@ -1418,7 +1417,12 @@ impl UpdatableTable for web_common::database::Table {
             web_common::database::Table::SamplesUsersRoleRequests => unreachable!("Table `samples_users_role_requests` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::SamplesUsersRoles => unreachable!("Table `samples_users_roles` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::Spectra => unreachable!("Table `spectra` is not updatable as it does not have a known column associated to an updater user id."),
-            web_common::database::Table::SpectraCollections => todo!("Update not implemented for spectra_collections."),
+            web_common::database::Table::SpectraCollections => {
+                let row: web_common::database::UpdateSpectraCollection = bincode::deserialize::<web_common::database::UpdateSpectraCollection>(&row).map_err(web_common::api::ApiError::from)?;
+                let updated_row: crate::models::SpectraCollection = <web_common::database::UpdateSpectraCollection as UpdateRow>::update(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedSpectraCollection::from_flat(updated_row, connection)?;
+                 bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
+            },
             web_common::database::Table::SpectraCollectionsTeamsRoleInvitations => unreachable!("Table `spectra_collections_teams_role_invitations` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::SpectraCollectionsTeamsRoleRequests => unreachable!("Table `spectra_collections_teams_role_requests` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::SpectraCollectionsTeamsRoles => unreachable!("Table `spectra_collections_teams_roles` is not updatable as it does not have a known column associated to an updater user id."),

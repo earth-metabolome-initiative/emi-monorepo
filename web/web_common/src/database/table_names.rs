@@ -739,10 +739,7 @@ impl Table {
             Table::BioOttTaxonItems => unimplemented!("all_by_updated_at not implemented for bio_ott_taxon_items."),
             Table::Colors => unimplemented!("all_by_updated_at not implemented for colors."),
             Table::Countries => unimplemented!("all_by_updated_at not implemented for countries."),
-            Table::DerivedSamples => {
-                let filter: Option<DerivedSampleFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
-                crate::database::NestedDerivedSample::all_by_updated_at(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
-            },
+            Table::DerivedSamples => unimplemented!("all_by_updated_at not implemented for derived_samples."),
             Table::DocumentFormats => unimplemented!("all_by_updated_at not implemented for document_formats."),
             Table::FontAwesomeIcons => unimplemented!("all_by_updated_at not implemented for font_awesome_icons."),
             Table::LoginProviders => unimplemented!("all_by_updated_at not implemented for login_providers."),
@@ -760,15 +757,9 @@ impl Table {
             Table::ProjectsUsersRoleRequests => unimplemented!("all_by_updated_at not implemented for projects_users_role_requests."),
             Table::ProjectsUsersRoles => unimplemented!("all_by_updated_at not implemented for projects_users_roles."),
             Table::Roles => unimplemented!("all_by_updated_at not implemented for roles."),
-            Table::SampleBioOttTaxonItems => {
-                let filter: Option<SampleBioOttTaxonItemFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
-                crate::database::NestedSampleBioOttTaxonItem::all_by_updated_at(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
-            },
+            Table::SampleBioOttTaxonItems => unimplemented!("all_by_updated_at not implemented for sample_bio_ott_taxon_items."),
             Table::SampleStates => unimplemented!("all_by_updated_at not implemented for sample_states."),
-            Table::SampledIndividualBioOttTaxonItems => {
-                let filter: Option<SampledIndividualBioOttTaxonItemFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
-                crate::database::NestedSampledIndividualBioOttTaxonItem::all_by_updated_at(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
-            },
+            Table::SampledIndividualBioOttTaxonItems => unimplemented!("all_by_updated_at not implemented for sampled_individual_bio_ott_taxon_items."),
             Table::SampledIndividuals => {
                 let filter: Option<SampledIndividualFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
                 crate::database::NestedSampledIndividual::all_by_updated_at(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
@@ -842,7 +833,7 @@ impl Table {
             Table::BioOttTaxonItems => unimplemented!("Insert not implemented for bio_ott_taxon_items."),
             Table::Colors => unimplemented!("Insert not implemented for colors."),
             Table::Countries => unimplemented!("Insert not implemented for countries."),
-            Table::DerivedSamples => todo!("Insert not implemented for derived_samples."),
+            Table::DerivedSamples => unimplemented!("Insert not implemented for derived_samples in frontend as it does not have a UUID primary key."),
             Table::DocumentFormats => unimplemented!("Insert not implemented for document_formats."),
             Table::FontAwesomeIcons => unimplemented!("Insert not implemented for font_awesome_icons."),
             Table::LoginProviders => unimplemented!("Insert not implemented for login_providers."),
@@ -982,7 +973,14 @@ impl Table {
             Table::SamplesUsersRoleRequests => unimplemented!("Update not implemented for samples_users_role_requests."),
             Table::SamplesUsersRoles => unimplemented!("Update not implemented for samples_users_roles."),
             Table::Spectra => unimplemented!("Update not implemented for spectra."),
-            Table::SpectraCollections => todo!("Update not implemented for spectra_collections."),
+            Table::SpectraCollections => {
+                let update_row: super::UpdateSpectraCollection = bincode::deserialize::<super::UpdateSpectraCollection>(&update_row).map_err(crate::api::ApiError::from)?;
+                let id = update_row.id;
+                update_row.update(user_id, connection).await?;
+                let updated_row: super::SpectraCollection = super::SpectraCollection::get(id, connection).await?.unwrap();
+                let nested_row = super::NestedSpectraCollection::from_flat(updated_row, connection).await?;
+                 bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
+            },
             Table::SpectraCollectionsTeamsRoleInvitations => unimplemented!("Update not implemented for spectra_collections_teams_role_invitations."),
             Table::SpectraCollectionsTeamsRoleRequests => unimplemented!("Update not implemented for spectra_collections_teams_role_requests."),
             Table::SpectraCollectionsTeamsRoles => unimplemented!("Update not implemented for spectra_collections_teams_roles."),
