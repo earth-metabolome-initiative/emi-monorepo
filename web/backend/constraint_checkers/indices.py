@@ -2,6 +2,7 @@
 from typing import List
 from constraint_checkers.cursor import get_cursor
 from constraint_checkers.find_foreign_keys import TableMetadata
+from functools import cache
 
 class PGIndex:
 
@@ -29,6 +30,7 @@ class PGIndices:
     def tables(self) -> List[str]:
         return list(set(index.table_name for index in self.indices))
 
+    @cache
     def has_table(self, table_name: str) -> bool:
         if self.foreign_keys_information.is_view(table_name):
             view_columns = self.foreign_keys_information.extract_view_columns(
@@ -44,6 +46,7 @@ class PGIndices:
                 return True
         return False
 
+    @cache
     def get_table(self, table_name: str) -> PGIndex:
         if self.foreign_keys_information.is_view(table_name):
             view_columns = self.foreign_keys_information.extract_view_columns(

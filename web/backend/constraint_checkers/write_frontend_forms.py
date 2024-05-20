@@ -1330,14 +1330,7 @@ def write_frontend_yew_form(
                             "     #[prop_or_default]\n"
                             f"    pub {foreign_key.name}: Option<{foreign_key.data_type()}>,\n"
                         )
-                        properties_attributes.append(
-                            AttributeMetadata(
-                                original_name=foreign_key.original_name,
-                                name=foreign_key.name,
-                                data_type=foreign_key.raw_data_type(),
-                                optional=True,
-                            )
-                        )
+                        properties_attributes.append(foreign_key.as_option())
                     else:
                         assert not foreign_key.optional, (
                             f"The foreign key attribute {foreign_key.name} is optional, "

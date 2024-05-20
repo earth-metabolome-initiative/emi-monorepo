@@ -1,8 +1,7 @@
 """Submodule for creating structs using to define filter queries, both for Diesel and GlueSQL."""
 
 from typing import List
-import copy
-from constraint_checkers.struct_metadata import StructMetadata, AttributeMetadata
+from constraint_checkers.struct_metadata import StructMetadata
 
 
 def create_filter_structs(flat_variants: List[StructMetadata]) -> List[StructMetadata]:
@@ -26,15 +25,13 @@ def create_filter_structs(flat_variants: List[StructMetadata]) -> List[StructMet
         # filter struct for it.
 
         filter_struct = StructMetadata(
-            flat_variant.name + "Filter",
+            f"{flat_variant.name}Filter",
             table_name=flat_variant.table_name,
         )
 
         for foreign_key in flat_variant.get_foreign_keys():
-            assert isinstance(foreign_key, AttributeMetadata)
-            foreign_key = copy.deepcopy(foreign_key)
-            foreign_key.optional = True
-            filter_struct.add_attribute(foreign_key)
+            assert foreign_key.has_struct_data_type()
+            filter_struct.add_attribute(foreign_key.as_option())
 
         for derive in flat_variant.derives():
             filter_struct.add_derive(derive)

@@ -4048,9 +4048,7 @@ def derive_model_builders(
             if attribute.is_automatically_determined_column():
                 continue
 
-            attribute = copy.deepcopy(attribute)
-            attribute.optional = True
-            builder.add_attribute(attribute)
+            builder.add_attribute(attribute.as_option())
 
         if len(foreign_keys) > 0:
             assert richest_variant.is_nested()

@@ -39,6 +39,12 @@ class AttributeMetadata:
             reference=True,
         )
 
+    def as_option(self) -> "AttributeMetadata":
+        """Returns the attribute as an option."""
+        return AttributeMetadata(
+            self.original_name, self.name, self._data_type, True, reference=self.reference
+        )
+
     def is_undefined_nested_dependencies(self) -> bool:
         return not self.has_struct_data_type() and self.data_type().startswith("Nested")
 
