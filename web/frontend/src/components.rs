@@ -14,8 +14,8 @@ pub mod sidebar;
 pub mod basic_page;
 pub use basic_page::{BasicPage, PageLike};
 
-pub mod basic_pages;
-pub use basic_pages::BasicPages;
+pub mod basic_list;
+pub use basic_list::BasicList;
 
 pub use app::App;
 pub use error_page::ErrorPage;

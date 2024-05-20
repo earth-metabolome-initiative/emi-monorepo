@@ -185,3 +185,11 @@ class TableStructMetadata:
         a boolean and that is named "public".
         """
         return self.flat_variant.has_public_column()
+
+    def has_filter_variant(self) -> bool:
+        """Returns whether the table has a filter variant."""
+        return self.flat_variant.has_filter_variant()
+        
+    def get_filter_variant(self) -> StructMetadata:
+        """Returns the filter variant of the table."""
+        return self.flat_variant.get_filter_variant()

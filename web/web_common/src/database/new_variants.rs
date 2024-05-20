@@ -5,6 +5,7 @@
 use uuid::Uuid;
 use serde::{Deserialize, Serialize};
 use chrono::NaiveDateTime;
+use super::*;
 
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewProject {
@@ -21,12 +22,18 @@ pub struct NewProject {
     pub end_date: Option<NaiveDateTime>,
 }
 
+impl Tabular for NewProject {
+    const TABLE: Table = Table::Projects;
+}
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewSampledIndividual {
     pub id: Uuid,
     pub tagged: bool,
 }
 
+impl Tabular for NewSampledIndividual {
+    const TABLE: Table = Table::SampledIndividuals;
+}
 #[cfg(feature = "frontend")]
 impl NewSampledIndividual {
     pub fn into_row(self, created_by: i32) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
@@ -104,6 +111,9 @@ pub struct NewSample {
     pub state: i32,
 }
 
+impl Tabular for NewSample {
+    const TABLE: Table = Table::Samples;
+}
 #[cfg(feature = "frontend")]
 impl NewSample {
     pub fn into_row(self, created_by: i32) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
@@ -185,6 +195,9 @@ pub struct NewTeam {
     pub parent_team_id: Option<i32>,
 }
 
+impl Tabular for NewTeam {
+    const TABLE: Table = Table::Teams;
+}
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewUserEmail {
     pub email: String,
@@ -192,6 +205,9 @@ pub struct NewUserEmail {
     pub primary_email: bool,
 }
 
+impl Tabular for NewUserEmail {
+    const TABLE: Table = Table::UserEmails;
+}
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewUser {
     pub first_name: String,
@@ -200,3 +216,6 @@ pub struct NewUser {
     pub profile_picture: Vec<u8>,
 }
 
+impl Tabular for NewUser {
+    const TABLE: Table = Table::Users;
+}

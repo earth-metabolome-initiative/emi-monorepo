@@ -4,6 +4,7 @@ use crate::router::AppRoute;
 use crate::workers::ws_worker::{ComponentMessage, WebsocketMessage};
 use crate::workers::WebsocketWorker;
 use web_common::api::form_traits::FormMethod;
+use web_common::database::*;
 use yew::prelude::*;
 use yew_agent::prelude::WorkerBridgeHandle;
 use yew_agent::scope_ext::AgentScopeExt;
@@ -11,7 +12,16 @@ use yew_router::prelude::Link;
 
 use super::database::row_to_badge::RowToBadge;
 
-pub struct BasicPages<Page> {
+#[derive(Clone, Debug, PartialEq, Properties)]
+/// Properties for a BasicList component.
+pub struct BasicListProps<Page: Filtrable> {
+    /// The filters to apply to the list.
+    #[prop_or_default]
+    pub filters: Option<Page::Filter>,
+}
+
+
+pub struct BasicList<Page> {
     websocket: WorkerBridgeHandle<WebsocketWorker>,
     pages: Vec<Page>,
     no_more_pages: bool,
@@ -23,9 +33,9 @@ pub enum PagesMessage {
     LoadMore,
 }
 
-impl<Page: PageLike + RowToBadge> Component for BasicPages<Page> {
+impl<Page: Filtrable + PageLike + RowToBadge> Component for BasicList<Page> {
     type Message = PagesMessage;
-    type Properties = ();
+    type Properties = BasicListProps<Page>;
 
     fn create(ctx: &Context<Self>) -> Self {
         Self {
@@ -75,6 +85,7 @@ impl<Page: PageLike + RowToBadge> Component for BasicPages<Page> {
                 self.request_is_ongoing = true;
                 self.websocket
                     .send(ComponentMessage::all_by_updated_at::<Page>(
+                        ctx.props().filters.clone(),
                         10,
                         self.pages.len() as i64,
                     ));

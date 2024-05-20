@@ -2,7 +2,6 @@
 
 pub mod projects;
 pub mod samples;
-pub mod sampling_procedures;
 pub mod teams;
 pub mod users;
 use web_common::database::*;

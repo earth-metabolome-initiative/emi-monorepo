@@ -5,13 +5,12 @@
 use serde::{Deserialize, Serialize};
 use web_common::database::*;
 use yew::prelude::*;
-use yewdux::{use_dispatch, use_store_value, Reducer, Store};
+use yewdux::{use_store, Reducer, Store};
 use crate::components::forms::*;
 use web_common::api::form_traits::FormMethod;
 use std::rc::Rc;
 use uuid::Uuid;
 use std::ops::Deref;
-use crate::workers::ws_worker::Tabular;
 use yewdux::Dispatch;
 use chrono::NaiveDateTime;
 use web_common::api::ApiError;
@@ -30,10 +29,10 @@ pub struct ProjectBuilder {
     pub expenses: Option<f64>,
     pub expected_end_date: Option<NaiveDateTime>,
     pub end_date: Option<NaiveDateTime>,
-    pub parent_project: Option<NestedProject>,
     pub state: Option<NestedProjectState>,
     pub icon: Option<FontAwesomeIcon>,
     pub color: Option<Color>,
+    pub parent_project: Option<NestedProject>,
     pub errors_name: Vec<ApiError>,
     pub errors_description: Vec<ApiError>,
     pub errors_public: Vec<ApiError>,
@@ -41,10 +40,10 @@ pub struct ProjectBuilder {
     pub errors_expenses: Vec<ApiError>,
     pub errors_expected_end_date: Vec<ApiError>,
     pub errors_end_date: Vec<ApiError>,
-    pub errors_parent_project: Vec<ApiError>,
     pub errors_state: Vec<ApiError>,
     pub errors_icon: Vec<ApiError>,
     pub errors_color: Vec<ApiError>,
+    pub errors_parent_project: Vec<ApiError>,
     pub form_updated_at: NaiveDateTime,
 }
 
@@ -59,10 +58,10 @@ impl Default for ProjectBuilder {
             expenses: None,
             expected_end_date: None,
             end_date: None,
-            parent_project: None,
             state: None,
             icon: None,
             color: None,
+            parent_project: None,
             errors_name: Vec::new(),
             errors_description: Vec::new(),
             errors_public: Vec::new(),
@@ -70,10 +69,10 @@ impl Default for ProjectBuilder {
             errors_expenses: Vec::new(),
             errors_expected_end_date: Vec::new(),
             errors_end_date: Vec::new(),
-            errors_parent_project: Vec::new(),
             errors_state: Vec::new(),
             errors_icon: Vec::new(),
             errors_color: Vec::new(),
+            errors_parent_project: Vec::new(),
             form_updated_at: <NaiveDateTime>::default(),
         }
     }
@@ -88,15 +87,18 @@ pub(super) enum ProjectActions {
     SetExpenses(Option<String>),
     SetExpectedEndDate(Option<String>),
     SetEndDate(Option<String>),
-    SetParentProject(Option<NestedProject>),
     SetState(Option<NestedProjectState>),
     SetIcon(Option<FontAwesomeIcon>),
     SetColor(Option<Color>),
+    SetParentProject(Option<NestedProject>),
 }
 
 impl FromOperation for ProjectActions {
     fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
         match operation.as_ref() {
+            "state" => ProjectActions::SetState(Some(bincode::deserialize(&row).unwrap())),
+            "icon" => ProjectActions::SetIcon(Some(bincode::deserialize(&row).unwrap())),
+            "color" => ProjectActions::SetColor(Some(bincode::deserialize(&row).unwrap())),
             "parent_project" => ProjectActions::SetParentProject(Some(bincode::deserialize(&row).unwrap())),
             operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
         }
@@ -263,25 +265,6 @@ impl Reducer<ProjectBuilder> for ProjectActions {
                 // yet handling more corner cases, we always use the break here.
                 break 'end_date;
             }
-            ProjectActions::SetParentProject(parent_project) => 'parent_project: {
-                state_mut.errors_parent_project.clear();
-                match parent_project.as_ref() {
-                    Some(parent_project) => {
-                            if state_mut.id.map_or(false, |id| id == parent_project.inner.id)
-                        {
-                            state_mut.errors_parent_project.push(ApiError::BadRequest(vec![
-                                "The Parent project field must be distinct from the current value.".to_string()
-                             ]));
-                            break 'parent_project;
-                        }
-                    }
-                    None => (),
-                }
-                state_mut.parent_project = parent_project;
-                // To avoid having a codesmell relative to the cases where we are not
-                // yet handling more corner cases, we always use the break here.
-                break 'parent_project;
-            }
             ProjectActions::SetState(state) => 'state: {
                 state_mut.errors_state.clear();
         if state.is_none() {
@@ -324,6 +307,25 @@ impl Reducer<ProjectBuilder> for ProjectActions {
                 // yet handling more corner cases, we always use the break here.
                 break 'color;
             }
+            ProjectActions::SetParentProject(parent_project) => 'parent_project: {
+                state_mut.errors_parent_project.clear();
+                match parent_project.as_ref() {
+                    Some(parent_project) => {
+                            if state_mut.id.map_or(false, |id| id == parent_project.inner.id)
+                        {
+                            state_mut.errors_parent_project.push(ApiError::BadRequest(vec![
+                                "The Parent project field must be distinct from the current value.".to_string()
+                             ]));
+                            break 'parent_project;
+                        }
+                    }
+                    None => (),
+                }
+                state_mut.parent_project = parent_project;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'parent_project;
+            }
         }
         state
     }
@@ -334,7 +336,7 @@ impl FormBuilder for ProjectBuilder {
     type RichVariant = NestedProject;
 
     fn has_errors(&self) -> bool {
-!self.errors_name.is_empty() || !self.errors_description.is_empty() || !self.errors_public.is_empty() || !self.errors_budget.is_empty() || !self.errors_expenses.is_empty() || !self.errors_expected_end_date.is_empty() || !self.errors_end_date.is_empty() || !self.errors_parent_project.is_empty() || !self.errors_state.is_empty() || !self.errors_icon.is_empty() || !self.errors_color.is_empty()
+!self.errors_name.is_empty() || !self.errors_description.is_empty() || !self.errors_public.is_empty() || !self.errors_budget.is_empty() || !self.errors_expenses.is_empty() || !self.errors_expected_end_date.is_empty() || !self.errors_end_date.is_empty() || !self.errors_state.is_empty() || !self.errors_icon.is_empty() || !self.errors_color.is_empty() || !self.errors_parent_project.is_empty()
     }
 
     fn id(&self) -> Option<PrimaryKey> {
@@ -407,14 +409,6 @@ impl From<ProjectBuilder> for UpdateProject {
         }
     }
 }
-impl Tabular for NestedProject {
-    const TABLE: Table = Table::Projects;
-}
-
-impl Tabular for NewProject {
-    const TABLE: Table = Table::Projects;
-}
-
 impl FormBuildable for NewProject {
     type Builder = ProjectBuilder;
     fn title() -> &'static str {
@@ -429,10 +423,6 @@ impl FormBuildable for NewProject {
     fn can_operate_offline() -> bool {
         false
     }
-}
-
-impl Tabular for UpdateProject {
-    const TABLE: Table = Table::Projects;
 }
 
 impl FormBuildable for UpdateProject {
@@ -451,10 +441,43 @@ impl FormBuildable for UpdateProject {
     }
 }
 
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateProjectFormProp {
+     #[prop_or_default]
+    pub state_id: Option<i32>,
+     #[prop_or_default]
+    pub icon_id: Option<i32>,
+     #[prop_or_default]
+    pub color_id: Option<i32>,
+     #[prop_or_default]
+    pub parent_project_id: Option<i32>,
+}
+
 #[function_component(CreateProjectForm)]
-pub fn create_project_form() -> Html {
-    let builder_dispatch = use_dispatch::<ProjectBuilder>();
-    let builder_store = use_store_value::<ProjectBuilder>();
+pub fn create_project_form(props: &CreateProjectFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<ProjectBuilder>();
+    if let Some(state_id) = props.state_id {
+         named_requests.push(ComponentMessage::get_named::<&str, ProjectState>("state", state_id.into()));
+    } else {
+         // Default value for projects.state_id is 1.
+         named_requests.push(ComponentMessage::get_named::<&str, ProjectState>("state", 1.into()));
+    }
+    if let Some(icon_id) = props.icon_id {
+         named_requests.push(ComponentMessage::get_named::<&str, FontAwesomeIcon>("icon", icon_id.into()));
+    } else {
+         // Default value for projects.icon_id is 415.
+         named_requests.push(ComponentMessage::get_named::<&str, FontAwesomeIcon>("icon", 415.into()));
+    }
+    if let Some(color_id) = props.color_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Color>("color", color_id.into()));
+    } else {
+         // Default value for projects.color_id is 1.
+         named_requests.push(ComponentMessage::get_named::<&str, Color>("color", 1.into()));
+    }
+    if let Some(parent_project_id) = props.parent_project_id {
+         named_requests.push(ComponentMessage::get_named::<&str, NewProject>("parent_project", parent_project_id.into()));
+    }
     let set_name = builder_dispatch.apply_callback(|name: Option<String>| ProjectActions::SetName(name));
     let set_description = builder_dispatch.apply_callback(|description: Option<String>| ProjectActions::SetDescription(description));
     let set_public = builder_dispatch.apply_callback(|public: bool| ProjectActions::SetPublic(Some(public)));
@@ -462,12 +485,15 @@ pub fn create_project_form() -> Html {
     let set_expenses = builder_dispatch.apply_callback(|expenses: Option<String>| ProjectActions::SetExpenses(expenses));
     let set_expected_end_date = builder_dispatch.apply_callback(|expected_end_date: Option<String>| ProjectActions::SetExpectedEndDate(expected_end_date));
     let set_end_date = builder_dispatch.apply_callback(|end_date: Option<String>| ProjectActions::SetEndDate(end_date));
-    let set_parent_project = builder_dispatch.apply_callback(|parent_project: Option<NestedProject>| ProjectActions::SetParentProject(parent_project));
     let set_state = builder_dispatch.apply_callback(|state: Option<NestedProjectState>| ProjectActions::SetState(state));
     let set_icon = builder_dispatch.apply_callback(|icon: Option<FontAwesomeIcon>| ProjectActions::SetIcon(icon));
     let set_color = builder_dispatch.apply_callback(|color: Option<Color>| ProjectActions::SetColor(color));
+    let set_parent_project = builder_dispatch.apply_callback(|parent_project: Option<NestedProject>| ProjectActions::SetParentProject(parent_project));
     html! {
-        <BasicForm<NewProject> method={FormMethod::POST} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+        <BasicForm<NewProject>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Name" optional={false} errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
             <BasicInput<String> label="Description" optional={false} errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
             <Checkbox label="Public" errors={builder_store.errors_public.clone()} builder={set_public} value={builder_store.public.unwrap_or(false)} />
@@ -475,10 +501,10 @@ pub fn create_project_form() -> Html {
             <BasicInput<f64> label="Expenses" optional={true} errors={builder_store.errors_expenses.clone()} builder={set_expenses} value={builder_store.expenses.clone()} />
             <BasicInput<NaiveDateTime> label="Expected end date" optional={true} errors={builder_store.errors_expected_end_date.clone()} builder={set_expected_end_date} value={builder_store.expected_end_date.clone()} />
             <BasicInput<NaiveDateTime> label="End date" optional={true} errors={builder_store.errors_end_date.clone()} builder={set_end_date} value={builder_store.end_date.clone()} />
-            <Datalist<NestedProject, true> builder={set_parent_project} optional={true} errors={builder_store.errors_parent_project.clone()} value={builder_store.parent_project.clone()} label="Parent project" />
             <Datalist<NestedProjectState, false> builder={set_state} optional={false} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" />
             <Datalist<FontAwesomeIcon, false> builder={set_icon} optional={false} errors={builder_store.errors_icon.clone()} value={builder_store.icon.clone()} label="Icon" />
             <Datalist<Color, false> builder={set_color} optional={false} errors={builder_store.errors_color.clone()} value={builder_store.color.clone()} label="Color" />
+            <Datalist<NestedProject, true> builder={set_parent_project} optional={true} errors={builder_store.errors_parent_project.clone()} value={builder_store.parent_project.clone()} label="Parent project" />
         </BasicForm<NewProject>>
     }
 }
@@ -489,11 +515,11 @@ pub struct UpdateProjectFormProp {
 
 #[function_component(UpdateProjectForm)]
 pub fn update_project_form(props: &UpdateProjectFormProp) -> Html {
-    let builder_dispatch = use_dispatch::<ProjectBuilder>();
-     builder_dispatch.reduce_mut(|builder| {
-         builder.id = Some(props.id);
-     });
-    let builder_store = use_store_value::<ProjectBuilder>();
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<ProjectBuilder>();
+    // We push the ID of the row to the named requests.
+    let props = props.clone();
+   named_requests.push(ComponentMessage::get::<UpdateProject>(props.id.into()));
     let set_name = builder_dispatch.apply_callback(|name: Option<String>| ProjectActions::SetName(name));
     let set_description = builder_dispatch.apply_callback(|description: Option<String>| ProjectActions::SetDescription(description));
     let set_public = builder_dispatch.apply_callback(|public: bool| ProjectActions::SetPublic(Some(public)));
@@ -501,12 +527,15 @@ pub fn update_project_form(props: &UpdateProjectFormProp) -> Html {
     let set_expenses = builder_dispatch.apply_callback(|expenses: Option<String>| ProjectActions::SetExpenses(expenses));
     let set_expected_end_date = builder_dispatch.apply_callback(|expected_end_date: Option<String>| ProjectActions::SetExpectedEndDate(expected_end_date));
     let set_end_date = builder_dispatch.apply_callback(|end_date: Option<String>| ProjectActions::SetEndDate(end_date));
-    let set_parent_project = builder_dispatch.apply_callback(|parent_project: Option<NestedProject>| ProjectActions::SetParentProject(parent_project));
     let set_state = builder_dispatch.apply_callback(|state: Option<NestedProjectState>| ProjectActions::SetState(state));
     let set_icon = builder_dispatch.apply_callback(|icon: Option<FontAwesomeIcon>| ProjectActions::SetIcon(icon));
     let set_color = builder_dispatch.apply_callback(|color: Option<Color>| ProjectActions::SetColor(color));
+    let set_parent_project = builder_dispatch.apply_callback(|parent_project: Option<NestedProject>| ProjectActions::SetParentProject(parent_project));
     html! {
-        <BasicForm<UpdateProject> method={FormMethod::PUT} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+        <BasicForm<UpdateProject>
+            method={FormMethod::PUT}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Name" optional={false} errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
             <BasicInput<String> label="Description" optional={false} errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
             <Checkbox label="Public" errors={builder_store.errors_public.clone()} builder={set_public} value={builder_store.public.unwrap_or(false)} />
@@ -514,10 +543,10 @@ pub fn update_project_form(props: &UpdateProjectFormProp) -> Html {
             <BasicInput<f64> label="Expenses" optional={true} errors={builder_store.errors_expenses.clone()} builder={set_expenses} value={builder_store.expenses.clone()} />
             <BasicInput<NaiveDateTime> label="Expected end date" optional={true} errors={builder_store.errors_expected_end_date.clone()} builder={set_expected_end_date} value={builder_store.expected_end_date.clone()} />
             <BasicInput<NaiveDateTime> label="End date" optional={true} errors={builder_store.errors_end_date.clone()} builder={set_end_date} value={builder_store.end_date.clone()} />
-            <Datalist<NestedProject, true> builder={set_parent_project} optional={true} errors={builder_store.errors_parent_project.clone()} value={builder_store.parent_project.clone()} label="Parent project" />
             <Datalist<NestedProjectState, false> builder={set_state} optional={false} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" />
             <Datalist<FontAwesomeIcon, false> builder={set_icon} optional={false} errors={builder_store.errors_icon.clone()} value={builder_store.icon.clone()} label="Icon" />
             <Datalist<Color, false> builder={set_color} optional={false} errors={builder_store.errors_color.clone()} value={builder_store.color.clone()} label="Color" />
+            <Datalist<NestedProject, true> builder={set_parent_project} optional={true} errors={builder_store.errors_parent_project.clone()} value={builder_store.parent_project.clone()} label="Parent project" />
         </BasicForm<UpdateProject>>
     }
 }
@@ -606,14 +635,6 @@ impl From<SampledIndividualBuilder> for NewSampledIndividual {
         }
     }
 }
-impl Tabular for NestedSampledIndividual {
-    const TABLE: Table = Table::SampledIndividuals;
-}
-
-impl Tabular for NewSampledIndividual {
-    const TABLE: Table = Table::SampledIndividuals;
-}
-
 impl FormBuildable for NewSampledIndividual {
     type Builder = SampledIndividualBuilder;
     fn title() -> &'static str {
@@ -632,11 +653,12 @@ impl FormBuildable for NewSampledIndividual {
 
 #[function_component(CreateSampledIndividualForm)]
 pub fn create_sampled_individual_form() -> Html {
-    let builder_dispatch = use_dispatch::<SampledIndividualBuilder>();
-    let builder_store = use_store_value::<SampledIndividualBuilder>();
+    let (builder_store, builder_dispatch) = use_store::<SampledIndividualBuilder>();
     let set_tagged = builder_dispatch.apply_callback(|tagged: bool| SampledIndividualActions::SetTagged(Some(tagged)));
     html! {
-        <BasicForm<NewSampledIndividual> method={FormMethod::POST} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+        <BasicForm<NewSampledIndividual>
+            method={FormMethod::POST}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <Checkbox label="Tagged" errors={builder_store.errors_tagged.clone()} builder={set_tagged} value={builder_store.tagged.unwrap_or(false)} />
         </BasicForm<NewSampledIndividual>>
     }
@@ -648,14 +670,17 @@ pub struct UpdateSampledIndividualFormProp {
 
 #[function_component(UpdateSampledIndividualForm)]
 pub fn update_sampled_individual_form(props: &UpdateSampledIndividualFormProp) -> Html {
-    let builder_dispatch = use_dispatch::<SampledIndividualBuilder>();
-     builder_dispatch.reduce_mut(|builder| {
-         builder.id = Some(props.id);
-     });
-    let builder_store = use_store_value::<SampledIndividualBuilder>();
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<SampledIndividualBuilder>();
+    // We push the ID of the row to the named requests.
+    let props = props.clone();
+   named_requests.push(ComponentMessage::get::<NewSampledIndividual>(props.id.into()));
     let set_tagged = builder_dispatch.apply_callback(|tagged: bool| SampledIndividualActions::SetTagged(Some(tagged)));
     html! {
-        <BasicForm<NewSampledIndividual> method={FormMethod::PUT} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+        <BasicForm<NewSampledIndividual>
+            method={FormMethod::PUT}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <Checkbox label="Tagged" errors={builder_store.errors_tagged.clone()} builder={set_tagged} value={builder_store.tagged.unwrap_or(false)} />
         </BasicForm<NewSampledIndividual>>
     }
@@ -691,8 +716,12 @@ pub(super) enum SampleActions {
 }
 
 impl FromOperation for SampleActions {
-    fn from_operation<S: AsRef<str>>(_operation: S, _row: Vec<u8>) -> Self {
-        unreachable!("No operations are expected to be needed for the builder SampleBuilder.")
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "sampled_by" => SampleActions::SetSampledBy(Some(bincode::deserialize(&row).unwrap())),
+            "state" => SampleActions::SetState(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
     }
 }
 
@@ -768,14 +797,6 @@ impl From<SampleBuilder> for NewSample {
         }
     }
 }
-impl Tabular for NestedSample {
-    const TABLE: Table = Table::Samples;
-}
-
-impl Tabular for NewSample {
-    const TABLE: Table = Table::Samples;
-}
-
 impl FormBuildable for NewSample {
     type Builder = SampleBuilder;
     fn title() -> &'static str {
@@ -792,14 +813,31 @@ impl FormBuildable for NewSample {
     }
 }
 
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateSampleFormProp {
+     #[prop_or_default]
+    pub sampled_by: Option<i32>,
+     #[prop_or_default]
+    pub state: Option<i32>,
+}
+
 #[function_component(CreateSampleForm)]
-pub fn create_sample_form() -> Html {
-    let builder_dispatch = use_dispatch::<SampleBuilder>();
-    let builder_store = use_store_value::<SampleBuilder>();
+pub fn create_sample_form(props: &CreateSampleFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<SampleBuilder>();
+    if let Some(sampled_by) = props.sampled_by {
+         named_requests.push(ComponentMessage::get_named::<&str, NewSample>("sampled_by", sampled_by.into()));
+    }
+    if let Some(state) = props.state {
+         named_requests.push(ComponentMessage::get_named::<&str, NewSample>("state", state.into()));
+    }
     let set_sampled_by = builder_dispatch.apply_callback(|sampled_by: Option<User>| SampleActions::SetSampledBy(sampled_by));
     let set_state = builder_dispatch.apply_callback(|state: Option<NestedSampleState>| SampleActions::SetState(state));
     html! {
-        <BasicForm<NewSample> method={FormMethod::POST} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+        <BasicForm<NewSample>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <Datalist<User, false> builder={set_sampled_by} optional={false} errors={builder_store.errors_sampled_by.clone()} value={builder_store.sampled_by.clone()} label="Sampled by" />
             <Datalist<NestedSampleState, false> builder={set_state} optional={false} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" />
         </BasicForm<NewSample>>
@@ -812,15 +850,18 @@ pub struct UpdateSampleFormProp {
 
 #[function_component(UpdateSampleForm)]
 pub fn update_sample_form(props: &UpdateSampleFormProp) -> Html {
-    let builder_dispatch = use_dispatch::<SampleBuilder>();
-     builder_dispatch.reduce_mut(|builder| {
-         builder.id = Some(props.id);
-     });
-    let builder_store = use_store_value::<SampleBuilder>();
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<SampleBuilder>();
+    // We push the ID of the row to the named requests.
+    let props = props.clone();
+   named_requests.push(ComponentMessage::get::<NewSample>(props.id.into()));
     let set_sampled_by = builder_dispatch.apply_callback(|sampled_by: Option<User>| SampleActions::SetSampledBy(sampled_by));
     let set_state = builder_dispatch.apply_callback(|state: Option<NestedSampleState>| SampleActions::SetState(state));
     html! {
-        <BasicForm<NewSample> method={FormMethod::PUT} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+        <BasicForm<NewSample>
+            method={FormMethod::PUT}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <Datalist<User, false> builder={set_sampled_by} optional={false} errors={builder_store.errors_sampled_by.clone()} value={builder_store.sampled_by.clone()} label="Sampled by" />
             <Datalist<NestedSampleState, false> builder={set_state} optional={false} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" />
         </BasicForm<NewSample>>
@@ -874,6 +915,8 @@ pub(super) enum TeamActions {
 impl FromOperation for TeamActions {
     fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
         match operation.as_ref() {
+            "icon" => TeamActions::SetIcon(Some(bincode::deserialize(&row).unwrap())),
+            "color" => TeamActions::SetColor(Some(bincode::deserialize(&row).unwrap())),
             "parent_team" => TeamActions::SetParentTeam(Some(bincode::deserialize(&row).unwrap())),
             operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
         }
@@ -1041,14 +1084,6 @@ impl From<TeamBuilder> for UpdateTeam {
         }
     }
 }
-impl Tabular for NestedTeam {
-    const TABLE: Table = Table::Teams;
-}
-
-impl Tabular for NewTeam {
-    const TABLE: Table = Table::Teams;
-}
-
 impl FormBuildable for NewTeam {
     type Builder = TeamBuilder;
     fn title() -> &'static str {
@@ -1063,10 +1098,6 @@ impl FormBuildable for NewTeam {
     fn can_operate_offline() -> bool {
         false
     }
-}
-
-impl Tabular for UpdateTeam {
-    const TABLE: Table = Table::Teams;
 }
 
 impl FormBuildable for UpdateTeam {
@@ -1085,17 +1116,39 @@ impl FormBuildable for UpdateTeam {
     }
 }
 
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateTeamFormProp {
+     #[prop_or_default]
+    pub icon_id: Option<i32>,
+     #[prop_or_default]
+    pub color_id: Option<i32>,
+     #[prop_or_default]
+    pub parent_team_id: Option<i32>,
+}
+
 #[function_component(CreateTeamForm)]
-pub fn create_team_form() -> Html {
-    let builder_dispatch = use_dispatch::<TeamBuilder>();
-    let builder_store = use_store_value::<TeamBuilder>();
+pub fn create_team_form(props: &CreateTeamFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<TeamBuilder>();
+    if let Some(icon_id) = props.icon_id {
+         named_requests.push(ComponentMessage::get_named::<&str, NewTeam>("icon", icon_id.into()));
+    }
+    if let Some(color_id) = props.color_id {
+         named_requests.push(ComponentMessage::get_named::<&str, NewTeam>("color", color_id.into()));
+    }
+    if let Some(parent_team_id) = props.parent_team_id {
+         named_requests.push(ComponentMessage::get_named::<&str, NewTeam>("parent_team", parent_team_id.into()));
+    }
     let set_name = builder_dispatch.apply_callback(|name: Option<String>| TeamActions::SetName(name));
     let set_description = builder_dispatch.apply_callback(|description: Option<String>| TeamActions::SetDescription(description));
     let set_icon = builder_dispatch.apply_callback(|icon: Option<FontAwesomeIcon>| TeamActions::SetIcon(icon));
     let set_color = builder_dispatch.apply_callback(|color: Option<Color>| TeamActions::SetColor(color));
     let set_parent_team = builder_dispatch.apply_callback(|parent_team: Option<NestedTeam>| TeamActions::SetParentTeam(parent_team));
     html! {
-        <BasicForm<NewTeam> method={FormMethod::POST} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+        <BasicForm<NewTeam>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Name" optional={false} errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
             <BasicInput<String> label="Description" optional={false} errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
             <Datalist<FontAwesomeIcon, false> builder={set_icon} optional={false} errors={builder_store.errors_icon.clone()} value={builder_store.icon.clone()} label="Icon" />
@@ -1111,18 +1164,21 @@ pub struct UpdateTeamFormProp {
 
 #[function_component(UpdateTeamForm)]
 pub fn update_team_form(props: &UpdateTeamFormProp) -> Html {
-    let builder_dispatch = use_dispatch::<TeamBuilder>();
-     builder_dispatch.reduce_mut(|builder| {
-         builder.id = Some(props.id);
-     });
-    let builder_store = use_store_value::<TeamBuilder>();
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<TeamBuilder>();
+    // We push the ID of the row to the named requests.
+    let props = props.clone();
+   named_requests.push(ComponentMessage::get::<UpdateTeam>(props.id.into()));
     let set_name = builder_dispatch.apply_callback(|name: Option<String>| TeamActions::SetName(name));
     let set_description = builder_dispatch.apply_callback(|description: Option<String>| TeamActions::SetDescription(description));
     let set_icon = builder_dispatch.apply_callback(|icon: Option<FontAwesomeIcon>| TeamActions::SetIcon(icon));
     let set_color = builder_dispatch.apply_callback(|color: Option<Color>| TeamActions::SetColor(color));
     let set_parent_team = builder_dispatch.apply_callback(|parent_team: Option<NestedTeam>| TeamActions::SetParentTeam(parent_team));
     html! {
-        <BasicForm<UpdateTeam> method={FormMethod::PUT} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+        <BasicForm<UpdateTeam>
+            method={FormMethod::PUT}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Name" optional={false} errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
             <BasicInput<String> label="Description" optional={false} errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
             <Datalist<FontAwesomeIcon, false> builder={set_icon} optional={false} errors={builder_store.errors_icon.clone()} value={builder_store.icon.clone()} label="Icon" />
@@ -1312,14 +1368,6 @@ impl From<UserBuilder> for UpdateUser {
         }
     }
 }
-impl Tabular for User {
-    const TABLE: Table = Table::Users;
-}
-
-impl Tabular for NewUser {
-    const TABLE: Table = Table::Users;
-}
-
 impl FormBuildable for NewUser {
     type Builder = UserBuilder;
     fn title() -> &'static str {
@@ -1334,10 +1382,6 @@ impl FormBuildable for NewUser {
     fn can_operate_offline() -> bool {
         false
     }
-}
-
-impl Tabular for UpdateUser {
-    const TABLE: Table = Table::Users;
 }
 
 impl FormBuildable for UpdateUser {
@@ -1358,14 +1402,15 @@ impl FormBuildable for UpdateUser {
 
 #[function_component(CreateUserForm)]
 pub fn create_user_form() -> Html {
-    let builder_dispatch = use_dispatch::<UserBuilder>();
-    let builder_store = use_store_value::<UserBuilder>();
+    let (builder_store, builder_dispatch) = use_store::<UserBuilder>();
     let set_first_name = builder_dispatch.apply_callback(|first_name: Option<String>| UserActions::SetFirstName(first_name));
     let set_middle_name = builder_dispatch.apply_callback(|middle_name: Option<String>| UserActions::SetMiddleName(middle_name));
     let set_last_name = builder_dispatch.apply_callback(|last_name: Option<String>| UserActions::SetLastName(last_name));
     let set_profile_picture = builder_dispatch.apply_callback(|profile_picture: Option<Image>| UserActions::SetProfilePicture(profile_picture.map(|profile_picture| profile_picture.into())));
     html! {
-        <BasicForm<NewUser> method={FormMethod::POST} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+        <BasicForm<NewUser>
+            method={FormMethod::POST}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="First name" optional={false} errors={builder_store.errors_first_name.clone()} builder={set_first_name} value={builder_store.first_name.clone()} />
             <BasicInput<String> label="Middle name" optional={true} errors={builder_store.errors_middle_name.clone()} builder={set_middle_name} value={builder_store.middle_name.clone()} />
             <BasicInput<String> label="Last name" optional={false} errors={builder_store.errors_last_name.clone()} builder={set_last_name} value={builder_store.last_name.clone()} />
@@ -1380,17 +1425,20 @@ pub struct UpdateUserFormProp {
 
 #[function_component(UpdateUserForm)]
 pub fn update_user_form(props: &UpdateUserFormProp) -> Html {
-    let builder_dispatch = use_dispatch::<UserBuilder>();
-     builder_dispatch.reduce_mut(|builder| {
-         builder.id = Some(props.id);
-     });
-    let builder_store = use_store_value::<UserBuilder>();
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<UserBuilder>();
+    // We push the ID of the row to the named requests.
+    let props = props.clone();
+   named_requests.push(ComponentMessage::get::<UpdateUser>(props.id.into()));
     let set_first_name = builder_dispatch.apply_callback(|first_name: Option<String>| UserActions::SetFirstName(first_name));
     let set_middle_name = builder_dispatch.apply_callback(|middle_name: Option<String>| UserActions::SetMiddleName(middle_name));
     let set_last_name = builder_dispatch.apply_callback(|last_name: Option<String>| UserActions::SetLastName(last_name));
     let set_profile_picture = builder_dispatch.apply_callback(|profile_picture: Option<Image>| UserActions::SetProfilePicture(profile_picture.map(|profile_picture| profile_picture.into())));
     html! {
-        <BasicForm<UpdateUser> method={FormMethod::PUT} builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+        <BasicForm<UpdateUser>
+            method={FormMethod::PUT}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="First name" optional={false} errors={builder_store.errors_first_name.clone()} builder={set_first_name} value={builder_store.first_name.clone()} />
             <BasicInput<String> label="Middle name" optional={true} errors={builder_store.errors_middle_name.clone()} builder={set_middle_name} value={builder_store.middle_name.clone()} />
             <BasicInput<String> label="Last name" optional={false} errors={builder_store.errors_last_name.clone()} builder={set_last_name} value={builder_store.last_name.clone()} />

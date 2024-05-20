@@ -5,7 +5,7 @@ use yew::prelude::*;
 use yew_router::prelude::*;
 use crate::pages::*;
 use uuid::Uuid;
-use crate::components::BasicPages;
+use crate::components::BasicList;
 use crate::components::BasicPage;
 use web_common::database::*;
 use crate::components::forms::automatic_forms::*;
@@ -18,6 +18,8 @@ pub enum AppRoute {
     ProjectsView{id: i32},
     #[at("/projects/new")]
     ProjectsNew,
+    #[at("/projects/new/parent_project/:parent_project_id")]
+    ProjectsNewWithParentProject{parent_project_id: i32},
     #[at("/projects/:id/update")]
     ProjectsUpdate{id: i32},
     #[at("/sampled_individuals")]
@@ -34,6 +36,8 @@ pub enum AppRoute {
     SamplesView{id: Uuid},
     #[at("/samples/new")]
     SamplesNew,
+    #[at("/samples/new/sampled_by/:sampled_by")]
+    SamplesNewWithSampledBy{sampled_by: i32},
     #[at("/samples/:id/update")]
     SamplesUpdate{id: Uuid},
     #[at("/teams")]
@@ -42,6 +46,8 @@ pub enum AppRoute {
     TeamsView{id: i32},
     #[at("/teams/new")]
     TeamsNew,
+    #[at("/teams/new/parent_team/:parent_team_id")]
+    TeamsNewWithParentTeam{parent_team_id: i32},
     #[at("/teams/:id/update")]
     TeamsUpdate{id: i32},
     #[at("/users")]
@@ -69,7 +75,7 @@ pub enum AppRoute {
 pub fn switch(route: AppRoute) -> Html {
     match route {
         AppRoute::Projects => {
-            html! { <BasicPages<NestedProject> /> }
+            html! { <BasicList<NestedProject> /> }
         }
         AppRoute::ProjectsView{id} => {
             html! { <BasicPage<NestedProject> id={PrimaryKey::from(id)} /> }
@@ -77,11 +83,14 @@ pub fn switch(route: AppRoute) -> Html {
         AppRoute::ProjectsNew => {
             html! { <CreateProjectForm /> }
         }
+        AppRoute::ProjectsNewWithParentProject{parent_project_id} => {
+            html! { <CreateProjectForm parent_project_id={parent_project_id} /> }
+        }
         AppRoute::ProjectsUpdate{id} => {
             html! { <UpdateProjectForm id={id} /> }
         }
         AppRoute::SampledIndividuals => {
-            html! { <BasicPages<NestedSampledIndividual> /> }
+            html! { <BasicList<NestedSampledIndividual> /> }
         }
         AppRoute::SampledIndividualsView{id} => {
             html! { <BasicPage<NestedSampledIndividual> id={PrimaryKey::from(id)} /> }
@@ -93,7 +102,7 @@ pub fn switch(route: AppRoute) -> Html {
             html! { <UpdateSampledIndividualForm id={id} /> }
         }
         AppRoute::Samples => {
-            html! { <BasicPages<NestedSample> /> }
+            html! { <BasicList<NestedSample> /> }
         }
         AppRoute::SamplesView{id} => {
             html! { <BasicPage<NestedSample> id={PrimaryKey::from(id)} /> }
@@ -101,11 +110,14 @@ pub fn switch(route: AppRoute) -> Html {
         AppRoute::SamplesNew => {
             html! { <CreateSampleForm /> }
         }
+        AppRoute::SamplesNewWithSampledBy{sampled_by} => {
+            html! { <CreateSampleForm sampled_by={sampled_by} /> }
+        }
         AppRoute::SamplesUpdate{id} => {
             html! { <UpdateSampleForm id={id} /> }
         }
         AppRoute::Teams => {
-            html! { <BasicPages<NestedTeam> /> }
+            html! { <BasicList<NestedTeam> /> }
         }
         AppRoute::TeamsView{id} => {
             html! { <BasicPage<NestedTeam> id={PrimaryKey::from(id)} /> }
@@ -113,11 +125,14 @@ pub fn switch(route: AppRoute) -> Html {
         AppRoute::TeamsNew => {
             html! { <CreateTeamForm /> }
         }
+        AppRoute::TeamsNewWithParentTeam{parent_team_id} => {
+            html! { <CreateTeamForm parent_team_id={parent_team_id} /> }
+        }
         AppRoute::TeamsUpdate{id} => {
             html! { <UpdateTeamForm id={id} /> }
         }
         AppRoute::Users => {
-            html! { <BasicPages<User> /> }
+            html! { <BasicList<User> /> }
         }
         AppRoute::UsersView{id} => {
             html! { <BasicPage<User> id={PrimaryKey::from(id)} /> }

@@ -13,6 +13,7 @@ pub enum Select {
     },
     All {
         table_name: String,
+        filter: Option<Vec<u8>>,
         limit: i64,
         offset: i64,
     },
@@ -30,6 +31,7 @@ pub enum Select {
     },
     AllByUpdatedAt {
         table_name: String,
+        filter: Option<Vec<u8>>,
         limit: i64,
         offset: i64,
     },
@@ -106,7 +108,7 @@ impl Select {
     }
 
     /// Create a new `Select` editable search query for a given `Table`, query, and number of results.
-    /// 
+    ///
     /// # Arguments
     /// * `table` - The table to select from.
     /// * `query` - The query to search for.
@@ -120,11 +122,10 @@ impl Select {
     }
 
     /// Create a new `Select::CanView` query for a given `Table` and `PrimaryKey`.
-    /// 
+    ///
     /// # Arguments
     /// * `table` - The table to select from.
     /// * `primary_key` - The primary key to search for.
-    /// 
     pub fn can_view(table: super::Table, primary_key: PrimaryKey) -> Self {
         Self::CanView {
             table_name: table.into(),
@@ -133,11 +134,10 @@ impl Select {
     }
 
     /// Create a new `Select::CanUpdate` query for a given `Table` and `PrimaryKey`.
-    /// 
+    ///
     /// # Arguments
     /// * `table` - The table to select from.
     /// * `primary_key` - The primary key to search for.
-    /// 
     pub fn can_update(table: super::Table, primary_key: PrimaryKey) -> Self {
         Self::CanUpdate {
             table_name: table.into(),
@@ -146,11 +146,10 @@ impl Select {
     }
 
     /// Create a new `Select::CanDelete` query for a given `Table` and `PrimaryKey`.
-    /// 
+    ///
     /// # Arguments
     /// * `table` - The table to select from.
     /// * `primary_key` - The primary key to search for.
-    /// 
     pub fn can_delete(table: super::Table, primary_key: PrimaryKey) -> Self {
         Self::CanDelete {
             table_name: table.into(),
@@ -162,25 +161,34 @@ impl Select {
     ///
     /// # Arguments
     /// * `table` - The table to select from.
+    /// * `filter` - The filter to apply to the query.
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
-    pub fn all(table: super::Table, limit: i64, offset: i64) -> Self {
+    pub fn all(table: super::Table, filter: Option<Vec<u8>>, limit: i64, offset: i64) -> Self {
         Self::All {
             table_name: table.into(),
+            filter,
             limit,
             offset,
         }
     }
 
     /// Create a new `Select::AllByUpdatedAt` query for a given `Table`.
-    /// 
+    ///
     /// # Arguments
     /// * `table` - The table to select from.
+    /// * `filter` - The filter to apply to the query.
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
-    pub fn all_by_updated_at(table: super::Table, limit: i64, offset: i64) -> Self {
+    pub fn all_by_updated_at(
+        table: super::Table,
+        filter: Option<Vec<u8>>,
+        limit: i64,
+        offset: i64,
+    ) -> Self {
         Self::AllByUpdatedAt {
             table_name: table.into(),
+            filter,
             limit,
             offset,
         }

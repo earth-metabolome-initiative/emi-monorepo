@@ -5,8 +5,7 @@ use futures::{SinkExt, StreamExt};
 use gloo::timers::callback::Timeout;
 use gloo_net::websocket::futures::WebSocket;
 use gluesql::prelude::*;
-use web_common::database::PrimaryKey;
-use web_common::database::User;
+use web_common::database::*;
 // use sql_minifier::macros::load_sql;
 use serde::Deserialize;
 use serde::Serialize;
@@ -17,11 +16,6 @@ use web_common::api::ws::messages::BackendMessage;
 use web_common::api::ws::messages::CloseReason;
 use web_common::api::ws::messages::FrontendMessage;
 use web_common::api::ApiError;
-use web_common::database::Notification;
-use web_common::database::NotificationMessage;
-use web_common::database::Operation;
-use web_common::database::Select;
-use web_common::database::Table;
 use yew::platform::spawn_local;
 use yew_agent::worker::HandlerId;
 use yew_agent::worker::Worker;
@@ -40,16 +34,11 @@ pub struct WebsocketWorker {
     reconnection_attempt: u32,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 /// Messages from the frontend to the web-worker.
 pub enum ComponentMessage {
     Operation(Operation),
     UserState(Option<User>)
-}
-
-/// Trait defining a struct that is associated to a Table.
-pub trait Tabular {
-    const TABLE: Table;
 }
 
 impl ComponentMessage {
@@ -67,9 +56,14 @@ impl ComponentMessage {
         ))
     }
 
-    pub(crate) fn all_by_updated_at<R: Tabular>(limit: i64, offset: i64) -> Self {
+    pub(crate) fn all_by_updated_at<R: Tabular + Filtrable>(
+        filter: Option<R::Filter>,
+        limit: i64,
+        offset: i64
+    ) -> Self {
         Self::Operation(Operation::Select(Select::all_by_updated_at(
             R::TABLE,
+            filter.map(|filter| bincode::serialize(&filter).unwrap()),
             limit,
             offset,
         )))
@@ -186,25 +180,27 @@ impl WebsocketWorker {
                             }
                             Select::All {
                                 table_name,
+                                filter,
                                 limit,
                                 offset,
                             } => {
                                 let table: Table = table_name.try_into().unwrap();
 
-                                match table.all(Some(limit), Some(offset), &mut database).await {
+                                match table.all(filter, Some(limit), Some(offset), &mut database).await {
                                     Ok(rows) => BackendMessage::AllTable(task_id, rows),
                                     Err(err) => BackendMessage::Error(task_id, err),
                                 }
                             }
                             Select::AllByUpdatedAt {
                                 table_name,
+                                filter,
                                 limit,
                                 offset,
                             } => {
                                 let table: Table = table_name.try_into().unwrap();
 
                                 match table
-                                    .all_by_updated_at(Some(limit), Some(offset), &mut database)
+                                    .all_by_updated_at(filter, Some(limit), Some(offset), &mut database)
                                     .await
                                 {
                                     Ok(rows) => BackendMessage::AllTable(task_id, rows),
@@ -223,7 +219,7 @@ impl WebsocketWorker {
                                 // of the rows in the table and then we let the datalist UI component handle the
                                 // search directly. Still, just in case something unexpected happens, we limit the
                                 // number of rows returned to 1_000.
-                                match table.all(Some(1_000), None, &mut database).await {
+                                match table.all(None, Some(1_000), None, &mut database).await {
                                     Ok(rows) => BackendMessage::SearchTable(task_id, rows),
                                     Err(err) => BackendMessage::Error(task_id, err),
                                 }

@@ -14,7 +14,7 @@ class AttributeMetadata:
         name: str,
         data_type: Union[str, "StructMetadata"],
         optional: bool,
-        reference: bool = False
+        reference: bool = False,
     ):
         self.original_name = original_name
         self.name = name
@@ -30,7 +30,11 @@ class AttributeMetadata:
             )
 
         return AttributeMetadata(
-            self.original_name, self.name, self._data_type, self.optional, reference=True
+            self.original_name,
+            self.name,
+            self._data_type,
+            self.optional,
+            reference=True,
         )
 
     def is_undefined_nested_dependencies(self) -> bool:
@@ -162,6 +166,16 @@ class AttributeMetadata:
         """Returns whether the attribute is a UUID."""
         return self.data_type() == "Uuid"
 
+    def normalized_name(self) -> str:
+        """Returns the name of the attribute eventually without the _id suffix."""
+        if self.name.endswith("_id"):
+            return self.name[:-3]
+        return self.name  
+
+    def capitalized_normalized_name(self) -> str:
+        """Returns the name of the attribute eventually without the _id suffix."""
+        return "".join(word.capitalize() for word in self.normalized_name().split("_"))
+
     def __repr__(self) -> str:
         return f"AttributeMetadata({self.name}, {self.data_type()}, {self.optional})"
 
@@ -201,7 +215,6 @@ class AttributeMetadata:
         )
 
 
-
 class StructMetadata:
     """Class representing the metadata of a struct."""
 
@@ -218,6 +231,7 @@ class StructMetadata:
         self._richest_variant: Optional[StructMetadata] = None
         self._new_variant: Optional[StructMetadata] = None
         self._update_variant: Optional[StructMetadata] = None
+        self._filter_variant: Optional[StructMetadata] = None
 
     def human_readable_name(self) -> str:
         """Returns the human readable name of the struct.
@@ -362,7 +376,14 @@ class StructMetadata:
         self._flat_variant = struct
 
     def get_flat_variant(self) -> "StructMetadata":
+        """Returns the flat variant of the struct."""
         if self._flat_variant is None:
+            if self.is_nested():
+                raise ValueError(
+                    f"The struct {self.name} is nested but somehow the flat variant has not been set. "
+                    f"The table associated with the struct is {self.table_name}."
+                )
+
             raise ValueError("The flat variant has not been set.")
 
         return self._flat_variant
@@ -444,18 +465,16 @@ class StructMetadata:
         return None
 
     def capitalized_table_name(self) -> str:
+        """Returns the capitalized table name."""
         return "".join(word.capitalize() for word in self.table_name.split("_"))
 
     def is_nested(self) -> bool:
         """Returns whether the struct is nested."""
-        return any(
-            attribute.has_struct_data_type()
-            for attribute in self.attributes
-        )
+        return any(attribute.has_struct_data_type() for attribute in self.attributes)
 
     def add_attribute(self, attribute_metadata: AttributeMetadata):
         """Adds an attribute to the struct.
-        
+
         Parameters
         ----------
         attribute_metadata : AttributeMetadata
@@ -538,6 +557,20 @@ class StructMetadata:
             foreign_keys.append(attribute)
 
         return foreign_keys
+
+    def get_manually_determined_foreign_keys(self) -> List[AttributeMetadata]:
+        """Returns the manually determined foreign keys of the struct.
+
+        Implementation details
+        -----------------------
+        This method returns the foreign keys of the struct that have been
+        manually determined.
+        """
+        return [
+            attribute
+            for attribute in self.get_foreign_keys()
+            if not attribute.is_automatically_determined_column()
+        ]
 
     def has_foreign_keys(self) -> bool:
         """Returns whether the struct has foreign keys."""
@@ -717,6 +750,10 @@ class StructMetadata:
 
         return len(self.attributes) == len(foreign_keys)
 
+    def has_manually_determined_foreign_keys(self) -> bool:
+        """Returns whether the struct has manually determined foreign keys."""
+        return len(self.get_manually_determined_foreign_keys()) > 0
+
     def has_associated_roles(self) -> bool:
         """Returns whether there is a roles table associated with the struct."""
         return self.table_metadata.has_associated_roles(self.table_name)
@@ -731,6 +768,54 @@ class StructMetadata:
             for attribute in self.attributes
         )
 
+    def set_filter_variant(self, struct: "StructMetadata"):
+        """Sets the filter variant of the struct.
+
+        Parameters
+        ----------
+        struct : StructMetadata
+            The filter variant to set.
+
+        """
+        assert struct.table_name == self.table_name
+        assert not struct.is_nested()
+        assert not self.is_nested()
+        assert not self.has_filter_variant()
+        assert self.has_foreign_keys()
+        assert all(atttribute.optional for atttribute in struct.attributes)
+        assert all(
+            self.has_attribute(filter_attribute)
+            for filter_attribute in struct.attributes
+        )
+
+        self._filter_variant = struct
+
+    def has_filter_variant(self) -> bool:
+        """Returns whether the struct has a filter variant."""
+        if self._flat_variant is not None:
+            return self._flat_variant.has_filter_variant()
+
+        return self._filter_variant is not None
+
+    def get_filter_variant(self) -> "StructMetadata":
+        """Returns the filter variant of the struct."""
+        if self._flat_variant is not None:
+            return self._flat_variant.get_filter_variant()
+
+        if not self.has_foreign_keys():
+            raise ValueError(
+                f"The struct {self.name} associated with the table {self.table_name} "
+                "does not have any foreign keys, and as such, it cannot have a filter variant."
+            )
+
+        if self._filter_variant is None:
+            raise ValueError(
+                "The filter variant has not been set for the struct "
+                f"{self.name} associated with the table {self.table_name}."
+            )
+
+        return self._filter_variant
+
     def get_unique_constraints(self) -> List[List[AttributeMetadata]]:
         """Returns the unique constraints of the struct.
 
@@ -741,7 +826,9 @@ class StructMetadata:
         if self._flat_variant is not None:
             return self._flat_variant.get_unique_constraints()
 
-        unique_constraints: List[Tuple[str]] = self.table_metadata.get_unique_constraint_columns(self.table_name)
+        unique_constraints: List[Tuple[str]] = (
+            self.table_metadata.get_unique_constraint_columns(self.table_name)
+        )
 
         unique_constraints_attributes: List[List[AttributeMetadata]] = []
 

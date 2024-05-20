@@ -5,8 +5,7 @@
 use serde::Deserialize;
 use serde::Serialize;
 use uuid::Uuid;
-use super::tables::*;
-use super::views::*;
+use super::*;
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedBioOttRank {
     pub inner: BioOttRank,
@@ -14,6 +13,12 @@ pub struct NestedBioOttRank {
     pub color: Color,
 }
 
+impl Tabular for NestedBioOttRank {
+    const TABLE: Table = Table::BioOttRanks;
+}
+impl Filtrable for NestedBioOttRank {
+    type Filter = BioOttRankFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedBioOttRank {
     /// Convert the flat struct to the nested struct.
@@ -50,17 +55,19 @@ impl NestedBioOttRank {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&BioOttRankFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = BioOttRank::all(limit, offset, connection).await?;
+        let flat_variants = BioOttRank::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -99,6 +106,12 @@ pub struct NestedBioOttTaxonItem {
     pub color: Color,
 }
 
+impl Tabular for NestedBioOttTaxonItem {
+    const TABLE: Table = Table::BioOttTaxonItems;
+}
+impl Filtrable for NestedBioOttTaxonItem {
+    type Filter = BioOttTaxonItemFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedBioOttTaxonItem {
     /// Convert the flat struct to the nested struct.
@@ -144,17 +157,19 @@ impl NestedBioOttTaxonItem {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&BioOttTaxonItemFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = BioOttTaxonItem::all(limit, offset, connection).await?;
+        let flat_variants = BioOttTaxonItem::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -209,6 +224,12 @@ pub struct NestedDerivedSample {
     pub child_sample: NestedSample,
 }
 
+impl Tabular for NestedDerivedSample {
+    const TABLE: Table = Table::DerivedSamples;
+}
+impl Filtrable for NestedDerivedSample {
+    type Filter = DerivedSampleFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedDerivedSample {
     /// Convert the flat struct to the nested struct.
@@ -247,17 +268,19 @@ impl NestedDerivedSample {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&DerivedSampleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = DerivedSample::all(limit, offset, connection).await?;
+        let flat_variants = DerivedSample::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -267,17 +290,19 @@ impl NestedDerivedSample {
     /// Get all the nested structs from the database ordered by the `updated_at` column.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all_by_updated_at<C>(
+        filter: Option<&DerivedSampleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = DerivedSample::all_by_updated_at(limit, offset, connection).await?;
+        let flat_variants = DerivedSample::all_by_updated_at(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -309,6 +334,12 @@ pub struct NestedDocumentFormat {
     pub color: Color,
 }
 
+impl Tabular for NestedDocumentFormat {
+    const TABLE: Table = Table::DocumentFormats;
+}
+impl Filtrable for NestedDocumentFormat {
+    type Filter = DocumentFormatFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedDocumentFormat {
     /// Convert the flat struct to the nested struct.
@@ -345,17 +376,19 @@ impl NestedDocumentFormat {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&DocumentFormatFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = DocumentFormat::all(limit, offset, connection).await?;
+        let flat_variants = DocumentFormat::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -385,6 +418,12 @@ pub struct NestedLoginProvider {
     pub color: Color,
 }
 
+impl Tabular for NestedLoginProvider {
+    const TABLE: Table = Table::LoginProviders;
+}
+impl Filtrable for NestedLoginProvider {
+    type Filter = LoginProviderFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedLoginProvider {
     /// Convert the flat struct to the nested struct.
@@ -421,17 +460,19 @@ impl NestedLoginProvider {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&LoginProviderFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = LoginProvider::all(limit, offset, connection).await?;
+        let flat_variants = LoginProvider::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -460,6 +501,12 @@ pub struct NestedNotification {
     pub user: User,
 }
 
+impl Tabular for NestedNotification {
+    const TABLE: Table = Table::Notifications;
+}
+impl Filtrable for NestedNotification {
+    type Filter = NotificationFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedNotification {
     /// Convert the flat struct to the nested struct.
@@ -495,17 +542,19 @@ impl NestedNotification {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&NotificationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = Notification::all(limit, offset, connection).await?;
+        let flat_variants = Notification::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -533,6 +582,12 @@ pub struct NestedOrganization {
     pub country: Country,
 }
 
+impl Tabular for NestedOrganization {
+    const TABLE: Table = Table::Organizations;
+}
+impl Filtrable for NestedOrganization {
+    type Filter = OrganizationFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedOrganization {
     /// Convert the flat struct to the nested struct.
@@ -568,17 +623,19 @@ impl NestedOrganization {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&OrganizationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = Organization::all(limit, offset, connection).await?;
+        let flat_variants = Organization::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -607,6 +664,12 @@ pub struct NestedProjectState {
     pub color: Color,
 }
 
+impl Tabular for NestedProjectState {
+    const TABLE: Table = Table::ProjectStates;
+}
+impl Filtrable for NestedProjectState {
+    type Filter = ProjectStateFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedProjectState {
     /// Convert the flat struct to the nested struct.
@@ -643,17 +706,19 @@ impl NestedProjectState {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&ProjectStateFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = ProjectState::all(limit, offset, connection).await?;
+        let flat_variants = ProjectState::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -679,14 +744,20 @@ impl NestedProjectState {
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedProject {
     pub inner: Project,
-    pub parent_project: Option<Project>,
-    pub created_by: User,
-    pub updated_by: User,
     pub state: NestedProjectState,
     pub icon: FontAwesomeIcon,
     pub color: Color,
+    pub parent_project: Option<Project>,
+    pub created_by: User,
+    pub updated_by: User,
 }
 
+impl Tabular for NestedProject {
+    const TABLE: Table = Table::Projects;
+}
+impl Filtrable for NestedProject {
+    type Filter = ProjectFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedProject {
     /// Convert the flat struct to the nested struct.
@@ -699,12 +770,12 @@ impl NestedProject {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            parent_project: if let Some(parent_project_id) = flat_variant.parent_project_id { Project::get(parent_project_id, connection).await? } else { None },
-            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
-            updated_by: User::get(flat_variant.updated_by, connection).await?.unwrap(),
             state: NestedProjectState::get(flat_variant.state_id, connection).await?.unwrap(),
             icon: FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap(),
             color: Color::get(flat_variant.color_id, connection).await?.unwrap(),
+            parent_project: if let Some(parent_project_id) = flat_variant.parent_project_id { Project::get(parent_project_id, connection).await? } else { None },
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            updated_by: User::get(flat_variant.updated_by, connection).await?.unwrap(),
             inner: flat_variant,
         })
     }
@@ -727,17 +798,19 @@ impl NestedProject {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&ProjectFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = Project::all(limit, offset, connection).await?;
+        let flat_variants = Project::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -747,17 +820,19 @@ impl NestedProject {
     /// Get all the nested structs from the database ordered by the `updated_at` column.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all_by_updated_at<C>(
+        filter: Option<&ProjectFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = Project::all_by_updated_at(limit, offset, connection).await?;
+        let flat_variants = Project::all_by_updated_at(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -775,14 +850,14 @@ impl NestedProject {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         self.inner.update_or_insert(connection).await?;
+        self.state.update_or_insert(connection).await?;
+        self.icon.update_or_insert(connection).await?;
+        self.color.update_or_insert(connection).await?;
         if let Some(parent_project) = self.parent_project {
             parent_project.update_or_insert(connection).await?;
         }
         self.created_by.update_or_insert(connection).await?;
         self.updated_by.update_or_insert(connection).await?;
-        self.state.update_or_insert(connection).await?;
-        self.icon.update_or_insert(connection).await?;
-        self.color.update_or_insert(connection).await?;
         Ok(())
     }
 }
@@ -795,6 +870,12 @@ pub struct NestedProjectsTeamsRoleInvitation {
     pub created_by: User,
 }
 
+impl Tabular for NestedProjectsTeamsRoleInvitation {
+    const TABLE: Table = Table::ProjectsTeamsRoleInvitations;
+}
+impl Filtrable for NestedProjectsTeamsRoleInvitation {
+    type Filter = ProjectsTeamsRoleInvitationFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedProjectsTeamsRoleInvitation {
     /// Convert the flat struct to the nested struct.
@@ -833,17 +914,19 @@ impl NestedProjectsTeamsRoleInvitation {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&ProjectsTeamsRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = ProjectsTeamsRoleInvitation::all(limit, offset, connection).await?;
+        let flat_variants = ProjectsTeamsRoleInvitation::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -877,6 +960,12 @@ pub struct NestedProjectsTeamsRoleRequest {
     pub created_by: User,
 }
 
+impl Tabular for NestedProjectsTeamsRoleRequest {
+    const TABLE: Table = Table::ProjectsTeamsRoleRequests;
+}
+impl Filtrable for NestedProjectsTeamsRoleRequest {
+    type Filter = ProjectsTeamsRoleRequestFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedProjectsTeamsRoleRequest {
     /// Convert the flat struct to the nested struct.
@@ -915,17 +1004,19 @@ impl NestedProjectsTeamsRoleRequest {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&ProjectsTeamsRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = ProjectsTeamsRoleRequest::all(limit, offset, connection).await?;
+        let flat_variants = ProjectsTeamsRoleRequest::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -959,6 +1050,12 @@ pub struct NestedProjectsTeamsRole {
     pub created_by: User,
 }
 
+impl Tabular for NestedProjectsTeamsRole {
+    const TABLE: Table = Table::ProjectsTeamsRoles;
+}
+impl Filtrable for NestedProjectsTeamsRole {
+    type Filter = ProjectsTeamsRoleFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedProjectsTeamsRole {
     /// Convert the flat struct to the nested struct.
@@ -997,17 +1094,19 @@ impl NestedProjectsTeamsRole {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&ProjectsTeamsRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = ProjectsTeamsRole::all(limit, offset, connection).await?;
+        let flat_variants = ProjectsTeamsRole::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -1041,6 +1140,12 @@ pub struct NestedProjectsUsersRoleInvitation {
     pub created_by: User,
 }
 
+impl Tabular for NestedProjectsUsersRoleInvitation {
+    const TABLE: Table = Table::ProjectsUsersRoleInvitations;
+}
+impl Filtrable for NestedProjectsUsersRoleInvitation {
+    type Filter = ProjectsUsersRoleInvitationFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedProjectsUsersRoleInvitation {
     /// Convert the flat struct to the nested struct.
@@ -1079,17 +1184,19 @@ impl NestedProjectsUsersRoleInvitation {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&ProjectsUsersRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = ProjectsUsersRoleInvitation::all(limit, offset, connection).await?;
+        let flat_variants = ProjectsUsersRoleInvitation::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -1123,6 +1230,12 @@ pub struct NestedProjectsUsersRoleRequest {
     pub created_by: User,
 }
 
+impl Tabular for NestedProjectsUsersRoleRequest {
+    const TABLE: Table = Table::ProjectsUsersRoleRequests;
+}
+impl Filtrable for NestedProjectsUsersRoleRequest {
+    type Filter = ProjectsUsersRoleRequestFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedProjectsUsersRoleRequest {
     /// Convert the flat struct to the nested struct.
@@ -1161,17 +1274,19 @@ impl NestedProjectsUsersRoleRequest {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&ProjectsUsersRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = ProjectsUsersRoleRequest::all(limit, offset, connection).await?;
+        let flat_variants = ProjectsUsersRoleRequest::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -1205,6 +1320,12 @@ pub struct NestedProjectsUsersRole {
     pub created_by: User,
 }
 
+impl Tabular for NestedProjectsUsersRole {
+    const TABLE: Table = Table::ProjectsUsersRoles;
+}
+impl Filtrable for NestedProjectsUsersRole {
+    type Filter = ProjectsUsersRoleFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedProjectsUsersRole {
     /// Convert the flat struct to the nested struct.
@@ -1243,17 +1364,19 @@ impl NestedProjectsUsersRole {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&ProjectsUsersRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = ProjectsUsersRole::all(limit, offset, connection).await?;
+        let flat_variants = ProjectsUsersRole::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -1285,6 +1408,12 @@ pub struct NestedRole {
     pub color: Color,
 }
 
+impl Tabular for NestedRole {
+    const TABLE: Table = Table::Roles;
+}
+impl Filtrable for NestedRole {
+    type Filter = RoleFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedRole {
     /// Convert the flat struct to the nested struct.
@@ -1321,17 +1450,19 @@ impl NestedRole {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&RoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = Role::all(limit, offset, connection).await?;
+        let flat_variants = Role::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -1363,6 +1494,12 @@ pub struct NestedSampleBioOttTaxonItem {
     pub taxon: NestedBioOttTaxonItem,
 }
 
+impl Tabular for NestedSampleBioOttTaxonItem {
+    const TABLE: Table = Table::SampleBioOttTaxonItems;
+}
+impl Filtrable for NestedSampleBioOttTaxonItem {
+    type Filter = SampleBioOttTaxonItemFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedSampleBioOttTaxonItem {
     /// Convert the flat struct to the nested struct.
@@ -1401,17 +1538,19 @@ impl NestedSampleBioOttTaxonItem {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&SampleBioOttTaxonItemFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = SampleBioOttTaxonItem::all(limit, offset, connection).await?;
+        let flat_variants = SampleBioOttTaxonItem::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -1421,17 +1560,19 @@ impl NestedSampleBioOttTaxonItem {
     /// Get all the nested structs from the database ordered by the `updated_at` column.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all_by_updated_at<C>(
+        filter: Option<&SampleBioOttTaxonItemFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = SampleBioOttTaxonItem::all_by_updated_at(limit, offset, connection).await?;
+        let flat_variants = SampleBioOttTaxonItem::all_by_updated_at(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -1463,6 +1604,12 @@ pub struct NestedSampleState {
     pub color: Color,
 }
 
+impl Tabular for NestedSampleState {
+    const TABLE: Table = Table::SampleStates;
+}
+impl Filtrable for NestedSampleState {
+    type Filter = SampleStateFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedSampleState {
     /// Convert the flat struct to the nested struct.
@@ -1499,17 +1646,19 @@ impl NestedSampleState {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&SampleStateFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = SampleState::all(limit, offset, connection).await?;
+        let flat_variants = SampleState::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -1541,6 +1690,12 @@ pub struct NestedSampledIndividualBioOttTaxonItem {
     pub taxon: NestedBioOttTaxonItem,
 }
 
+impl Tabular for NestedSampledIndividualBioOttTaxonItem {
+    const TABLE: Table = Table::SampledIndividualBioOttTaxonItems;
+}
+impl Filtrable for NestedSampledIndividualBioOttTaxonItem {
+    type Filter = SampledIndividualBioOttTaxonItemFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedSampledIndividualBioOttTaxonItem {
     /// Convert the flat struct to the nested struct.
@@ -1579,17 +1734,19 @@ impl NestedSampledIndividualBioOttTaxonItem {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&SampledIndividualBioOttTaxonItemFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = SampledIndividualBioOttTaxonItem::all(limit, offset, connection).await?;
+        let flat_variants = SampledIndividualBioOttTaxonItem::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -1599,17 +1756,19 @@ impl NestedSampledIndividualBioOttTaxonItem {
     /// Get all the nested structs from the database ordered by the `updated_at` column.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all_by_updated_at<C>(
+        filter: Option<&SampledIndividualBioOttTaxonItemFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = SampledIndividualBioOttTaxonItem::all_by_updated_at(limit, offset, connection).await?;
+        let flat_variants = SampledIndividualBioOttTaxonItem::all_by_updated_at(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -1641,6 +1800,12 @@ pub struct NestedSampledIndividual {
     pub updated_by: User,
 }
 
+impl Tabular for NestedSampledIndividual {
+    const TABLE: Table = Table::SampledIndividuals;
+}
+impl Filtrable for NestedSampledIndividual {
+    type Filter = SampledIndividualFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedSampledIndividual {
     /// Convert the flat struct to the nested struct.
@@ -1677,17 +1842,19 @@ impl NestedSampledIndividual {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&SampledIndividualFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = SampledIndividual::all(limit, offset, connection).await?;
+        let flat_variants = SampledIndividual::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -1697,17 +1864,19 @@ impl NestedSampledIndividual {
     /// Get all the nested structs from the database ordered by the `updated_at` column.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all_by_updated_at<C>(
+        filter: Option<&SampledIndividualFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = SampledIndividual::all_by_updated_at(limit, offset, connection).await?;
+        let flat_variants = SampledIndividual::all_by_updated_at(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -1739,6 +1908,12 @@ pub struct NestedSampledIndividualsTeamsRoleInvitation {
     pub created_by: User,
 }
 
+impl Tabular for NestedSampledIndividualsTeamsRoleInvitation {
+    const TABLE: Table = Table::SampledIndividualsTeamsRoleInvitations;
+}
+impl Filtrable for NestedSampledIndividualsTeamsRoleInvitation {
+    type Filter = SampledIndividualsTeamsRoleInvitationFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedSampledIndividualsTeamsRoleInvitation {
     /// Convert the flat struct to the nested struct.
@@ -1777,17 +1952,19 @@ impl NestedSampledIndividualsTeamsRoleInvitation {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&SampledIndividualsTeamsRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = SampledIndividualsTeamsRoleInvitation::all(limit, offset, connection).await?;
+        let flat_variants = SampledIndividualsTeamsRoleInvitation::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -1821,6 +1998,12 @@ pub struct NestedSampledIndividualsTeamsRoleRequest {
     pub created_by: User,
 }
 
+impl Tabular for NestedSampledIndividualsTeamsRoleRequest {
+    const TABLE: Table = Table::SampledIndividualsTeamsRoleRequests;
+}
+impl Filtrable for NestedSampledIndividualsTeamsRoleRequest {
+    type Filter = SampledIndividualsTeamsRoleRequestFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedSampledIndividualsTeamsRoleRequest {
     /// Convert the flat struct to the nested struct.
@@ -1859,17 +2042,19 @@ impl NestedSampledIndividualsTeamsRoleRequest {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&SampledIndividualsTeamsRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = SampledIndividualsTeamsRoleRequest::all(limit, offset, connection).await?;
+        let flat_variants = SampledIndividualsTeamsRoleRequest::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -1903,6 +2088,12 @@ pub struct NestedSampledIndividualsTeamsRole {
     pub created_by: User,
 }
 
+impl Tabular for NestedSampledIndividualsTeamsRole {
+    const TABLE: Table = Table::SampledIndividualsTeamsRoles;
+}
+impl Filtrable for NestedSampledIndividualsTeamsRole {
+    type Filter = SampledIndividualsTeamsRoleFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedSampledIndividualsTeamsRole {
     /// Convert the flat struct to the nested struct.
@@ -1941,17 +2132,19 @@ impl NestedSampledIndividualsTeamsRole {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&SampledIndividualsTeamsRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = SampledIndividualsTeamsRole::all(limit, offset, connection).await?;
+        let flat_variants = SampledIndividualsTeamsRole::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -1985,6 +2178,12 @@ pub struct NestedSampledIndividualsUsersRoleInvitation {
     pub created_by: User,
 }
 
+impl Tabular for NestedSampledIndividualsUsersRoleInvitation {
+    const TABLE: Table = Table::SampledIndividualsUsersRoleInvitations;
+}
+impl Filtrable for NestedSampledIndividualsUsersRoleInvitation {
+    type Filter = SampledIndividualsUsersRoleInvitationFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedSampledIndividualsUsersRoleInvitation {
     /// Convert the flat struct to the nested struct.
@@ -2023,17 +2222,19 @@ impl NestedSampledIndividualsUsersRoleInvitation {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&SampledIndividualsUsersRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = SampledIndividualsUsersRoleInvitation::all(limit, offset, connection).await?;
+        let flat_variants = SampledIndividualsUsersRoleInvitation::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -2067,6 +2268,12 @@ pub struct NestedSampledIndividualsUsersRoleRequest {
     pub created_by: User,
 }
 
+impl Tabular for NestedSampledIndividualsUsersRoleRequest {
+    const TABLE: Table = Table::SampledIndividualsUsersRoleRequests;
+}
+impl Filtrable for NestedSampledIndividualsUsersRoleRequest {
+    type Filter = SampledIndividualsUsersRoleRequestFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedSampledIndividualsUsersRoleRequest {
     /// Convert the flat struct to the nested struct.
@@ -2105,17 +2312,19 @@ impl NestedSampledIndividualsUsersRoleRequest {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&SampledIndividualsUsersRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = SampledIndividualsUsersRoleRequest::all(limit, offset, connection).await?;
+        let flat_variants = SampledIndividualsUsersRoleRequest::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -2149,6 +2358,12 @@ pub struct NestedSampledIndividualsUsersRole {
     pub created_by: User,
 }
 
+impl Tabular for NestedSampledIndividualsUsersRole {
+    const TABLE: Table = Table::SampledIndividualsUsersRoles;
+}
+impl Filtrable for NestedSampledIndividualsUsersRole {
+    type Filter = SampledIndividualsUsersRoleFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedSampledIndividualsUsersRole {
     /// Convert the flat struct to the nested struct.
@@ -2187,17 +2402,19 @@ impl NestedSampledIndividualsUsersRole {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&SampledIndividualsUsersRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = SampledIndividualsUsersRole::all(limit, offset, connection).await?;
+        let flat_variants = SampledIndividualsUsersRole::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -2231,6 +2448,12 @@ pub struct NestedSample {
     pub state: NestedSampleState,
 }
 
+impl Tabular for NestedSample {
+    const TABLE: Table = Table::Samples;
+}
+impl Filtrable for NestedSample {
+    type Filter = SampleFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedSample {
     /// Convert the flat struct to the nested struct.
@@ -2269,17 +2492,19 @@ impl NestedSample {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&SampleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = Sample::all(limit, offset, connection).await?;
+        let flat_variants = Sample::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -2289,17 +2514,19 @@ impl NestedSample {
     /// Get all the nested structs from the database ordered by the `updated_at` column.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all_by_updated_at<C>(
+        filter: Option<&SampleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = Sample::all_by_updated_at(limit, offset, connection).await?;
+        let flat_variants = Sample::all_by_updated_at(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -2333,6 +2560,12 @@ pub struct NestedSamplesTeamsRoleInvitation {
     pub created_by: User,
 }
 
+impl Tabular for NestedSamplesTeamsRoleInvitation {
+    const TABLE: Table = Table::SamplesTeamsRoleInvitations;
+}
+impl Filtrable for NestedSamplesTeamsRoleInvitation {
+    type Filter = SamplesTeamsRoleInvitationFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedSamplesTeamsRoleInvitation {
     /// Convert the flat struct to the nested struct.
@@ -2371,17 +2604,19 @@ impl NestedSamplesTeamsRoleInvitation {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&SamplesTeamsRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = SamplesTeamsRoleInvitation::all(limit, offset, connection).await?;
+        let flat_variants = SamplesTeamsRoleInvitation::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -2415,6 +2650,12 @@ pub struct NestedSamplesTeamsRoleRequest {
     pub created_by: User,
 }
 
+impl Tabular for NestedSamplesTeamsRoleRequest {
+    const TABLE: Table = Table::SamplesTeamsRoleRequests;
+}
+impl Filtrable for NestedSamplesTeamsRoleRequest {
+    type Filter = SamplesTeamsRoleRequestFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedSamplesTeamsRoleRequest {
     /// Convert the flat struct to the nested struct.
@@ -2453,17 +2694,19 @@ impl NestedSamplesTeamsRoleRequest {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&SamplesTeamsRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = SamplesTeamsRoleRequest::all(limit, offset, connection).await?;
+        let flat_variants = SamplesTeamsRoleRequest::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -2497,6 +2740,12 @@ pub struct NestedSamplesTeamsRole {
     pub created_by: User,
 }
 
+impl Tabular for NestedSamplesTeamsRole {
+    const TABLE: Table = Table::SamplesTeamsRoles;
+}
+impl Filtrable for NestedSamplesTeamsRole {
+    type Filter = SamplesTeamsRoleFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedSamplesTeamsRole {
     /// Convert the flat struct to the nested struct.
@@ -2535,17 +2784,19 @@ impl NestedSamplesTeamsRole {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&SamplesTeamsRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = SamplesTeamsRole::all(limit, offset, connection).await?;
+        let flat_variants = SamplesTeamsRole::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -2579,6 +2830,12 @@ pub struct NestedSamplesUsersRoleInvitation {
     pub created_by: User,
 }
 
+impl Tabular for NestedSamplesUsersRoleInvitation {
+    const TABLE: Table = Table::SamplesUsersRoleInvitations;
+}
+impl Filtrable for NestedSamplesUsersRoleInvitation {
+    type Filter = SamplesUsersRoleInvitationFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedSamplesUsersRoleInvitation {
     /// Convert the flat struct to the nested struct.
@@ -2617,17 +2874,19 @@ impl NestedSamplesUsersRoleInvitation {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&SamplesUsersRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = SamplesUsersRoleInvitation::all(limit, offset, connection).await?;
+        let flat_variants = SamplesUsersRoleInvitation::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -2661,6 +2920,12 @@ pub struct NestedSamplesUsersRoleRequest {
     pub created_by: User,
 }
 
+impl Tabular for NestedSamplesUsersRoleRequest {
+    const TABLE: Table = Table::SamplesUsersRoleRequests;
+}
+impl Filtrable for NestedSamplesUsersRoleRequest {
+    type Filter = SamplesUsersRoleRequestFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedSamplesUsersRoleRequest {
     /// Convert the flat struct to the nested struct.
@@ -2699,17 +2964,19 @@ impl NestedSamplesUsersRoleRequest {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&SamplesUsersRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = SamplesUsersRoleRequest::all(limit, offset, connection).await?;
+        let flat_variants = SamplesUsersRoleRequest::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -2743,6 +3010,12 @@ pub struct NestedSamplesUsersRole {
     pub created_by: User,
 }
 
+impl Tabular for NestedSamplesUsersRole {
+    const TABLE: Table = Table::SamplesUsersRoles;
+}
+impl Filtrable for NestedSamplesUsersRole {
+    type Filter = SamplesUsersRoleFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedSamplesUsersRole {
     /// Convert the flat struct to the nested struct.
@@ -2781,17 +3054,19 @@ impl NestedSamplesUsersRole {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&SamplesUsersRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = SamplesUsersRole::all(limit, offset, connection).await?;
+        let flat_variants = SamplesUsersRole::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -2822,6 +3097,12 @@ pub struct NestedSpectra {
     pub spectra_collection: NestedSpectraCollection,
 }
 
+impl Tabular for NestedSpectra {
+    const TABLE: Table = Table::Spectra;
+}
+impl Filtrable for NestedSpectra {
+    type Filter = SpectraFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedSpectra {
     /// Convert the flat struct to the nested struct.
@@ -2857,17 +3138,19 @@ impl NestedSpectra {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&SpectraFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = Spectra::all(limit, offset, connection).await?;
+        let flat_variants = Spectra::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -2897,6 +3180,12 @@ pub struct NestedSpectraCollection {
     pub updated_by: User,
 }
 
+impl Tabular for NestedSpectraCollection {
+    const TABLE: Table = Table::SpectraCollections;
+}
+impl Filtrable for NestedSpectraCollection {
+    type Filter = SpectraCollectionFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedSpectraCollection {
     /// Convert the flat struct to the nested struct.
@@ -2934,17 +3223,19 @@ impl NestedSpectraCollection {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&SpectraCollectionFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = SpectraCollection::all(limit, offset, connection).await?;
+        let flat_variants = SpectraCollection::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -2954,17 +3245,19 @@ impl NestedSpectraCollection {
     /// Get all the nested structs from the database ordered by the `updated_at` column.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all_by_updated_at<C>(
+        filter: Option<&SpectraCollectionFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = SpectraCollection::all_by_updated_at(limit, offset, connection).await?;
+        let flat_variants = SpectraCollection::all_by_updated_at(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -2997,6 +3290,12 @@ pub struct NestedSpectraCollectionsTeamsRoleInvitation {
     pub created_by: User,
 }
 
+impl Tabular for NestedSpectraCollectionsTeamsRoleInvitation {
+    const TABLE: Table = Table::SpectraCollectionsTeamsRoleInvitations;
+}
+impl Filtrable for NestedSpectraCollectionsTeamsRoleInvitation {
+    type Filter = SpectraCollectionsTeamsRoleInvitationFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedSpectraCollectionsTeamsRoleInvitation {
     /// Convert the flat struct to the nested struct.
@@ -3035,17 +3334,19 @@ impl NestedSpectraCollectionsTeamsRoleInvitation {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&SpectraCollectionsTeamsRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = SpectraCollectionsTeamsRoleInvitation::all(limit, offset, connection).await?;
+        let flat_variants = SpectraCollectionsTeamsRoleInvitation::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -3079,6 +3380,12 @@ pub struct NestedSpectraCollectionsTeamsRoleRequest {
     pub created_by: User,
 }
 
+impl Tabular for NestedSpectraCollectionsTeamsRoleRequest {
+    const TABLE: Table = Table::SpectraCollectionsTeamsRoleRequests;
+}
+impl Filtrable for NestedSpectraCollectionsTeamsRoleRequest {
+    type Filter = SpectraCollectionsTeamsRoleRequestFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedSpectraCollectionsTeamsRoleRequest {
     /// Convert the flat struct to the nested struct.
@@ -3117,17 +3424,19 @@ impl NestedSpectraCollectionsTeamsRoleRequest {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&SpectraCollectionsTeamsRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = SpectraCollectionsTeamsRoleRequest::all(limit, offset, connection).await?;
+        let flat_variants = SpectraCollectionsTeamsRoleRequest::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -3161,6 +3470,12 @@ pub struct NestedSpectraCollectionsTeamsRole {
     pub created_by: User,
 }
 
+impl Tabular for NestedSpectraCollectionsTeamsRole {
+    const TABLE: Table = Table::SpectraCollectionsTeamsRoles;
+}
+impl Filtrable for NestedSpectraCollectionsTeamsRole {
+    type Filter = SpectraCollectionsTeamsRoleFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedSpectraCollectionsTeamsRole {
     /// Convert the flat struct to the nested struct.
@@ -3199,17 +3514,19 @@ impl NestedSpectraCollectionsTeamsRole {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&SpectraCollectionsTeamsRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = SpectraCollectionsTeamsRole::all(limit, offset, connection).await?;
+        let flat_variants = SpectraCollectionsTeamsRole::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -3243,6 +3560,12 @@ pub struct NestedSpectraCollectionsUsersRoleInvitation {
     pub created_by: User,
 }
 
+impl Tabular for NestedSpectraCollectionsUsersRoleInvitation {
+    const TABLE: Table = Table::SpectraCollectionsUsersRoleInvitations;
+}
+impl Filtrable for NestedSpectraCollectionsUsersRoleInvitation {
+    type Filter = SpectraCollectionsUsersRoleInvitationFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedSpectraCollectionsUsersRoleInvitation {
     /// Convert the flat struct to the nested struct.
@@ -3281,17 +3604,19 @@ impl NestedSpectraCollectionsUsersRoleInvitation {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&SpectraCollectionsUsersRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = SpectraCollectionsUsersRoleInvitation::all(limit, offset, connection).await?;
+        let flat_variants = SpectraCollectionsUsersRoleInvitation::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -3325,6 +3650,12 @@ pub struct NestedSpectraCollectionsUsersRoleRequest {
     pub created_by: User,
 }
 
+impl Tabular for NestedSpectraCollectionsUsersRoleRequest {
+    const TABLE: Table = Table::SpectraCollectionsUsersRoleRequests;
+}
+impl Filtrable for NestedSpectraCollectionsUsersRoleRequest {
+    type Filter = SpectraCollectionsUsersRoleRequestFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedSpectraCollectionsUsersRoleRequest {
     /// Convert the flat struct to the nested struct.
@@ -3363,17 +3694,19 @@ impl NestedSpectraCollectionsUsersRoleRequest {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&SpectraCollectionsUsersRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = SpectraCollectionsUsersRoleRequest::all(limit, offset, connection).await?;
+        let flat_variants = SpectraCollectionsUsersRoleRequest::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -3407,6 +3740,12 @@ pub struct NestedSpectraCollectionsUsersRole {
     pub created_by: User,
 }
 
+impl Tabular for NestedSpectraCollectionsUsersRole {
+    const TABLE: Table = Table::SpectraCollectionsUsersRoles;
+}
+impl Filtrable for NestedSpectraCollectionsUsersRole {
+    type Filter = SpectraCollectionsUsersRoleFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedSpectraCollectionsUsersRole {
     /// Convert the flat struct to the nested struct.
@@ -3445,17 +3784,19 @@ impl NestedSpectraCollectionsUsersRole {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&SpectraCollectionsUsersRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = SpectraCollectionsUsersRole::all(limit, offset, connection).await?;
+        let flat_variants = SpectraCollectionsUsersRole::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -3487,6 +3828,12 @@ pub struct NestedTeamState {
     pub color: Color,
 }
 
+impl Tabular for NestedTeamState {
+    const TABLE: Table = Table::TeamStates;
+}
+impl Filtrable for NestedTeamState {
+    type Filter = TeamStateFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedTeamState {
     /// Convert the flat struct to the nested struct.
@@ -3523,17 +3870,19 @@ impl NestedTeamState {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&TeamStateFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = TeamState::all(limit, offset, connection).await?;
+        let flat_variants = TeamState::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -3566,6 +3915,12 @@ pub struct NestedTeam {
     pub updated_by: User,
 }
 
+impl Tabular for NestedTeam {
+    const TABLE: Table = Table::Teams;
+}
+impl Filtrable for NestedTeam {
+    type Filter = TeamFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedTeam {
     /// Convert the flat struct to the nested struct.
@@ -3605,17 +3960,19 @@ impl NestedTeam {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&TeamFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = Team::all(limit, offset, connection).await?;
+        let flat_variants = Team::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -3625,17 +3982,19 @@ impl NestedTeam {
     /// Get all the nested structs from the database ordered by the `updated_at` column.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all_by_updated_at<C>(
+        filter: Option<&TeamFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = Team::all_by_updated_at(limit, offset, connection).await?;
+        let flat_variants = Team::all_by_updated_at(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -3672,6 +4031,12 @@ pub struct NestedTeamsTeamsRoleInvitation {
     pub created_by: User,
 }
 
+impl Tabular for NestedTeamsTeamsRoleInvitation {
+    const TABLE: Table = Table::TeamsTeamsRoleInvitations;
+}
+impl Filtrable for NestedTeamsTeamsRoleInvitation {
+    type Filter = TeamsTeamsRoleInvitationFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedTeamsTeamsRoleInvitation {
     /// Convert the flat struct to the nested struct.
@@ -3710,17 +4075,19 @@ impl NestedTeamsTeamsRoleInvitation {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&TeamsTeamsRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = TeamsTeamsRoleInvitation::all(limit, offset, connection).await?;
+        let flat_variants = TeamsTeamsRoleInvitation::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -3754,6 +4121,12 @@ pub struct NestedTeamsUsersRoleInvitation {
     pub created_by: User,
 }
 
+impl Tabular for NestedTeamsUsersRoleInvitation {
+    const TABLE: Table = Table::TeamsUsersRoleInvitations;
+}
+impl Filtrable for NestedTeamsUsersRoleInvitation {
+    type Filter = TeamsUsersRoleInvitationFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedTeamsUsersRoleInvitation {
     /// Convert the flat struct to the nested struct.
@@ -3792,17 +4165,19 @@ impl NestedTeamsUsersRoleInvitation {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&TeamsUsersRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = TeamsUsersRoleInvitation::all(limit, offset, connection).await?;
+        let flat_variants = TeamsUsersRoleInvitation::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -3836,6 +4211,12 @@ pub struct NestedTeamsUsersRoleRequest {
     pub created_by: User,
 }
 
+impl Tabular for NestedTeamsUsersRoleRequest {
+    const TABLE: Table = Table::TeamsUsersRoleRequests;
+}
+impl Filtrable for NestedTeamsUsersRoleRequest {
+    type Filter = TeamsUsersRoleRequestFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedTeamsUsersRoleRequest {
     /// Convert the flat struct to the nested struct.
@@ -3874,17 +4255,19 @@ impl NestedTeamsUsersRoleRequest {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&TeamsUsersRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = TeamsUsersRoleRequest::all(limit, offset, connection).await?;
+        let flat_variants = TeamsUsersRoleRequest::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -3918,6 +4301,12 @@ pub struct NestedTeamsUsersRole {
     pub created_by: User,
 }
 
+impl Tabular for NestedTeamsUsersRole {
+    const TABLE: Table = Table::TeamsUsersRoles;
+}
+impl Filtrable for NestedTeamsUsersRole {
+    type Filter = TeamsUsersRoleFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedTeamsUsersRole {
     /// Convert the flat struct to the nested struct.
@@ -3956,17 +4345,19 @@ impl NestedTeamsUsersRole {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&TeamsUsersRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = TeamsUsersRole::all(limit, offset, connection).await?;
+        let flat_variants = TeamsUsersRole::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -3998,6 +4389,12 @@ pub struct NestedUserEmail {
     pub login_provider: NestedLoginProvider,
 }
 
+impl Tabular for NestedUserEmail {
+    const TABLE: Table = Table::UserEmails;
+}
+impl Filtrable for NestedUserEmail {
+    type Filter = UserEmailFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedUserEmail {
     /// Convert the flat struct to the nested struct.
@@ -4034,17 +4431,19 @@ impl NestedUserEmail {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&UserEmailFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = UserEmail::all(limit, offset, connection).await?;
+        let flat_variants = UserEmail::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -4076,6 +4475,12 @@ pub struct NestedUsersUsersRoleInvitation {
     pub created_by: User,
 }
 
+impl Tabular for NestedUsersUsersRoleInvitation {
+    const TABLE: Table = Table::UsersUsersRoleInvitations;
+}
+impl Filtrable for NestedUsersUsersRoleInvitation {
+    type Filter = UsersUsersRoleInvitationFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedUsersUsersRoleInvitation {
     /// Convert the flat struct to the nested struct.
@@ -4114,17 +4519,19 @@ impl NestedUsersUsersRoleInvitation {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&UsersUsersRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = UsersUsersRoleInvitation::all(limit, offset, connection).await?;
+        let flat_variants = UsersUsersRoleInvitation::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -4158,6 +4565,12 @@ pub struct NestedUsersUsersRoleRequest {
     pub created_by: User,
 }
 
+impl Tabular for NestedUsersUsersRoleRequest {
+    const TABLE: Table = Table::UsersUsersRoleRequests;
+}
+impl Filtrable for NestedUsersUsersRoleRequest {
+    type Filter = UsersUsersRoleRequestFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedUsersUsersRoleRequest {
     /// Convert the flat struct to the nested struct.
@@ -4196,17 +4609,19 @@ impl NestedUsersUsersRoleRequest {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&UsersUsersRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = UsersUsersRoleRequest::all(limit, offset, connection).await?;
+        let flat_variants = UsersUsersRoleRequest::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);
@@ -4240,6 +4655,12 @@ pub struct NestedUsersUsersRole {
     pub created_by: User,
 }
 
+impl Tabular for NestedUsersUsersRole {
+    const TABLE: Table = Table::UsersUsersRoles;
+}
+impl Filtrable for NestedUsersUsersRole {
+    type Filter = UsersUsersRoleFilter;
+}
 #[cfg(feature = "frontend")]
 impl NestedUsersUsersRole {
     /// Convert the flat struct to the nested struct.
@@ -4278,17 +4699,19 @@ impl NestedUsersUsersRole {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
     pub async fn all<C>(
+        filter: Option<&UsersUsersRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        let flat_variants = UsersUsersRole::all(limit, offset, connection).await?;
+        let flat_variants = UsersUsersRole::all(filter, limit, offset, connection).await?;
          let mut nested_structs = Vec::with_capacity(flat_variants.len());
          for flat_variant in flat_variants {
              nested_structs.push(Self::from_flat(flat_variant, connection).await?);

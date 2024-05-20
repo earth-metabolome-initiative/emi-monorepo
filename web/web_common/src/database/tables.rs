@@ -2,14 +2,31 @@ use serde::Deserialize;
 use serde::Serialize;
 use uuid::Uuid;
 use chrono::NaiveDateTime;
+use crate::database::*;
+
+pub trait Tabular {
+    const TABLE: Table;
+}
+
+pub trait Filtrable: PartialEq {
+    type Filter: Serialize + PartialEq + Clone;
+}
+
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct BioOttRank {
     pub id: i32,
     pub name: String,
     pub description: String,
     pub icon_id: i32,
     pub color_id: i32,
+}
+
+impl Tabular for BioOttRank {
+    const TABLE: Table = Table::BioOttRanks;
+}
+
+impl Filtrable for BioOttRank {
+    type Filter = BioOttRankFilter;
 }
 #[cfg(feature = "frontend")]
 impl BioOttRank {
@@ -168,11 +185,13 @@ impl BioOttRank {
     /// Get all BioOttRank from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&BioOttRankFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -182,7 +201,8 @@ impl BioOttRank {
         use gluesql::core::ast_builder::*;
         let select_row = table("bio_ott_ranks")
             .select()
-            .project("id, name, description, icon_id, color_id")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("id, name, description, icon_id, color_id")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -218,7 +238,6 @@ impl BioOttRank {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct BioOttTaxonItem {
     pub id: i32,
     pub name: String,
@@ -239,6 +258,14 @@ pub struct BioOttTaxonItem {
     pub parent_id: i32,
     pub icon_id: i32,
     pub color_id: i32,
+}
+
+impl Tabular for BioOttTaxonItem {
+    const TABLE: Table = Table::BioOttTaxonItems;
+}
+
+impl Filtrable for BioOttTaxonItem {
+    type Filter = BioOttTaxonItemFilter;
 }
 #[cfg(feature = "frontend")]
 impl BioOttTaxonItem {
@@ -486,11 +513,13 @@ impl BioOttTaxonItem {
     /// Get all BioOttTaxonItem from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&BioOttTaxonItemFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -500,7 +529,8 @@ impl BioOttTaxonItem {
         use gluesql::core::ast_builder::*;
         let select_row = table("bio_ott_taxon_items")
             .select()
-            .project("id, name, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, icon_id, color_id")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("id, name, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, icon_id, color_id")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -604,12 +634,15 @@ impl BioOttTaxonItem {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Color {
     pub id: i32,
     pub name: String,
     pub hexadecimal_value: String,
     pub description: String,
+}
+
+impl Tabular for Color {
+    const TABLE: Table = Table::Colors;
 }
 #[cfg(feature = "frontend")]
 impl Color {
@@ -780,7 +813,7 @@ impl Color {
         use gluesql::core::ast_builder::*;
         let select_row = table("colors")
             .select()
-            .project("id, name, hexadecimal_value, description")
+           .project("id, name, hexadecimal_value, description")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -812,13 +845,16 @@ impl Color {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Country {
     pub id: i32,
     pub iso: String,
     pub emoji: String,
     pub unicode: String,
     pub name: String,
+}
+
+impl Tabular for Country {
+    const TABLE: Table = Table::Countries;
 }
 #[cfg(feature = "frontend")]
 impl Country {
@@ -991,7 +1027,7 @@ impl Country {
         use gluesql::core::ast_builder::*;
         let select_row = table("countries")
             .select()
-            .project("id, iso, emoji, unicode, name")
+           .project("id, iso, emoji, unicode, name")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -1027,7 +1063,6 @@ impl Country {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct DerivedSample {
     pub created_by: i32,
     pub created_at: NaiveDateTime,
@@ -1035,6 +1070,14 @@ pub struct DerivedSample {
     pub updated_at: NaiveDateTime,
     pub parent_sample_id: Uuid,
     pub child_sample_id: Uuid,
+}
+
+impl Tabular for DerivedSample {
+    const TABLE: Table = Table::DerivedSamples;
+}
+
+impl Filtrable for DerivedSample {
+    type Filter = DerivedSampleFilter;
 }
 #[cfg(feature = "frontend")]
 impl DerivedSample {
@@ -1197,11 +1240,13 @@ impl DerivedSample {
     /// Get all DerivedSample from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&DerivedSampleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -1211,7 +1256,8 @@ impl DerivedSample {
         use gluesql::core::ast_builder::*;
         let select_row = table("derived_samples")
             .select()
-            .project("created_by, created_at, updated_by, updated_at, parent_sample_id, child_sample_id")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("created_by, created_at, updated_by, updated_at, parent_sample_id, child_sample_id")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -1224,11 +1270,13 @@ impl DerivedSample {
     /// Get all DerivedSample from the database ordered by the `updated_at` column.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all_by_updated_at<C>(
+        filter: Option<&DerivedSampleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -1238,7 +1286,8 @@ impl DerivedSample {
         use gluesql::core::ast_builder::*;
         let select_row = table("derived_samples")
             .select()
-            .project("created_by, created_at, updated_by, updated_at, parent_sample_id, child_sample_id")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("created_by, created_at, updated_by, updated_at, parent_sample_id, child_sample_id")
             .order_by("updated_at desc")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -1279,7 +1328,6 @@ impl DerivedSample {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct DocumentFormat {
     pub id: i32,
     pub extension: String,
@@ -1287,6 +1335,14 @@ pub struct DocumentFormat {
     pub description: String,
     pub icon_id: i32,
     pub color_id: i32,
+}
+
+impl Tabular for DocumentFormat {
+    const TABLE: Table = Table::DocumentFormats;
+}
+
+impl Filtrable for DocumentFormat {
+    type Filter = DocumentFormatFilter;
 }
 #[cfg(feature = "frontend")]
 impl DocumentFormat {
@@ -1447,11 +1503,13 @@ impl DocumentFormat {
     /// Get all DocumentFormat from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&DocumentFormatFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -1461,7 +1519,8 @@ impl DocumentFormat {
         use gluesql::core::ast_builder::*;
         let select_row = table("document_formats")
             .select()
-            .project("id, extension, mime_type, description, icon_id, color_id")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("id, extension, mime_type, description, icon_id, color_id")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -1501,11 +1560,14 @@ impl DocumentFormat {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct FontAwesomeIcon {
     pub id: i32,
     pub name: String,
     pub description: String,
+}
+
+impl Tabular for FontAwesomeIcon {
+    const TABLE: Table = Table::FontAwesomeIcons;
 }
 #[cfg(feature = "frontend")]
 impl FontAwesomeIcon {
@@ -1674,7 +1736,7 @@ impl FontAwesomeIcon {
         use gluesql::core::ast_builder::*;
         let select_row = table("font_awesome_icons")
             .select()
-            .project("id, name, description")
+           .project("id, name, description")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -1702,7 +1764,6 @@ impl FontAwesomeIcon {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct LoginProvider {
     pub id: i32,
     pub name: String,
@@ -1712,6 +1773,14 @@ pub struct LoginProvider {
     pub redirect_uri_var_name: String,
     pub oauth_url: String,
     pub scope: String,
+}
+
+impl Tabular for LoginProvider {
+    const TABLE: Table = Table::LoginProviders;
+}
+
+impl Filtrable for LoginProvider {
+    type Filter = LoginProviderFilter;
 }
 #[cfg(feature = "frontend")]
 impl LoginProvider {
@@ -1876,11 +1945,13 @@ impl LoginProvider {
     /// Get all LoginProvider from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&LoginProviderFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -1890,7 +1961,8 @@ impl LoginProvider {
         use gluesql::core::ast_builder::*;
         let select_row = table("login_providers")
             .select()
-            .project("id, name, icon_id, color_id, client_id_var_name, redirect_uri_var_name, oauth_url, scope")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("id, name, icon_id, color_id, client_id_var_name, redirect_uri_var_name, oauth_url, scope")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -1938,7 +2010,6 @@ impl LoginProvider {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Notification {
     pub id: i32,
     pub user_id: i32,
@@ -1946,6 +2017,14 @@ pub struct Notification {
     pub table_name: String,
     pub record: String,
     pub read: bool,
+}
+
+impl Tabular for Notification {
+    const TABLE: Table = Table::Notifications;
+}
+
+impl Filtrable for Notification {
+    type Filter = NotificationFilter;
 }
 #[cfg(feature = "frontend")]
 impl Notification {
@@ -2106,11 +2185,13 @@ impl Notification {
     /// Get all Notification from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&NotificationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -2120,7 +2201,8 @@ impl Notification {
         use gluesql::core::ast_builder::*;
         let select_row = table("notifications")
             .select()
-            .project("id, user_id, operation, table_name, record, read")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("id, user_id, operation, table_name, record, read")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -2160,7 +2242,6 @@ impl Notification {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Organization {
     pub id: i32,
     pub name: String,
@@ -2168,6 +2249,14 @@ pub struct Organization {
     pub country_id: i32,
     pub state_province: Option<String>,
     pub domain: String,
+}
+
+impl Tabular for Organization {
+    const TABLE: Table = Table::Organizations;
+}
+
+impl Filtrable for Organization {
+    type Filter = OrganizationFilter;
 }
 #[cfg(feature = "frontend")]
 impl Organization {
@@ -2334,11 +2423,13 @@ impl Organization {
     /// Get all Organization from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&OrganizationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -2348,7 +2439,8 @@ impl Organization {
         use gluesql::core::ast_builder::*;
         let select_row = table("organizations")
             .select()
-            .project("id, name, url, country_id, state_province, domain")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("id, name, url, country_id, state_province, domain")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -2389,13 +2481,20 @@ impl Organization {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ProjectState {
     pub id: i32,
     pub name: String,
     pub description: String,
     pub icon_id: i32,
     pub color_id: i32,
+}
+
+impl Tabular for ProjectState {
+    const TABLE: Table = Table::ProjectStates;
+}
+
+impl Filtrable for ProjectState {
+    type Filter = ProjectStateFilter;
 }
 #[cfg(feature = "frontend")]
 impl ProjectState {
@@ -2554,11 +2653,13 @@ impl ProjectState {
     /// Get all ProjectState from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&ProjectStateFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -2568,7 +2669,8 @@ impl ProjectState {
         use gluesql::core::ast_builder::*;
         let select_row = table("project_states")
             .select()
-            .project("id, name, description, icon_id, color_id")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("id, name, description, icon_id, color_id")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -2604,7 +2706,6 @@ impl ProjectState {
     }
 }
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Project {
     pub id: i32,
     pub name: String,
@@ -2622,6 +2723,14 @@ pub struct Project {
     pub updated_at: NaiveDateTime,
     pub expected_end_date: Option<NaiveDateTime>,
     pub end_date: Option<NaiveDateTime>,
+}
+
+impl Tabular for Project {
+    const TABLE: Table = Table::Projects;
+}
+
+impl Filtrable for Project {
+    type Filter = ProjectFilter;
 }
 #[cfg(feature = "frontend")]
 impl Project {
@@ -2828,11 +2937,13 @@ impl Project {
     /// Get all Project from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&ProjectFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -2842,7 +2953,8 @@ impl Project {
         use gluesql::core::ast_builder::*;
         let select_row = table("projects")
             .select()
-            .project("id, name, description, public, state_id, icon_id, color_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("id, name, description, public, state_id, icon_id, color_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -2855,11 +2967,13 @@ impl Project {
     /// Get all Project from the database ordered by the `updated_at` column.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all_by_updated_at<C>(
+        filter: Option<&ProjectFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -2869,7 +2983,8 @@ impl Project {
         use gluesql::core::ast_builder::*;
         let select_row = table("projects")
             .select()
-            .project("id, name, description, public, state_id, icon_id, color_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("id, name, description, public, state_id, icon_id, color_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date")
             .order_by("updated_at desc")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -2955,13 +3070,20 @@ impl Project {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ProjectsTeamsRoleInvitation {
     pub table_id: i32,
     pub team_id: i32,
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
+}
+
+impl Tabular for ProjectsTeamsRoleInvitation {
+    const TABLE: Table = Table::ProjectsTeamsRoleInvitations;
+}
+
+impl Filtrable for ProjectsTeamsRoleInvitation {
+    type Filter = ProjectsTeamsRoleInvitationFilter;
 }
 #[cfg(feature = "frontend")]
 impl ProjectsTeamsRoleInvitation {
@@ -3122,11 +3244,13 @@ impl ProjectsTeamsRoleInvitation {
     /// Get all ProjectsTeamsRoleInvitation from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&ProjectsTeamsRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -3136,7 +3260,8 @@ impl ProjectsTeamsRoleInvitation {
         use gluesql::core::ast_builder::*;
         let select_row = table("projects_teams_role_invitations")
             .select()
-            .project("table_id, team_id, role_id, created_by, created_at")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("table_id, team_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -3172,13 +3297,20 @@ impl ProjectsTeamsRoleInvitation {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ProjectsTeamsRoleRequest {
     pub table_id: i32,
     pub team_id: i32,
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
+}
+
+impl Tabular for ProjectsTeamsRoleRequest {
+    const TABLE: Table = Table::ProjectsTeamsRoleRequests;
+}
+
+impl Filtrable for ProjectsTeamsRoleRequest {
+    type Filter = ProjectsTeamsRoleRequestFilter;
 }
 #[cfg(feature = "frontend")]
 impl ProjectsTeamsRoleRequest {
@@ -3339,11 +3471,13 @@ impl ProjectsTeamsRoleRequest {
     /// Get all ProjectsTeamsRoleRequest from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&ProjectsTeamsRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -3353,7 +3487,8 @@ impl ProjectsTeamsRoleRequest {
         use gluesql::core::ast_builder::*;
         let select_row = table("projects_teams_role_requests")
             .select()
-            .project("table_id, team_id, role_id, created_by, created_at")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("table_id, team_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -3389,13 +3524,20 @@ impl ProjectsTeamsRoleRequest {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ProjectsTeamsRole {
     pub table_id: i32,
     pub team_id: i32,
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
+}
+
+impl Tabular for ProjectsTeamsRole {
+    const TABLE: Table = Table::ProjectsTeamsRoles;
+}
+
+impl Filtrable for ProjectsTeamsRole {
+    type Filter = ProjectsTeamsRoleFilter;
 }
 #[cfg(feature = "frontend")]
 impl ProjectsTeamsRole {
@@ -3556,11 +3698,13 @@ impl ProjectsTeamsRole {
     /// Get all ProjectsTeamsRole from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&ProjectsTeamsRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -3570,7 +3714,8 @@ impl ProjectsTeamsRole {
         use gluesql::core::ast_builder::*;
         let select_row = table("projects_teams_roles")
             .select()
-            .project("table_id, team_id, role_id, created_by, created_at")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("table_id, team_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -3606,13 +3751,20 @@ impl ProjectsTeamsRole {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ProjectsUsersRoleInvitation {
     pub table_id: i32,
     pub user_id: i32,
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
+}
+
+impl Tabular for ProjectsUsersRoleInvitation {
+    const TABLE: Table = Table::ProjectsUsersRoleInvitations;
+}
+
+impl Filtrable for ProjectsUsersRoleInvitation {
+    type Filter = ProjectsUsersRoleInvitationFilter;
 }
 #[cfg(feature = "frontend")]
 impl ProjectsUsersRoleInvitation {
@@ -3773,11 +3925,13 @@ impl ProjectsUsersRoleInvitation {
     /// Get all ProjectsUsersRoleInvitation from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&ProjectsUsersRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -3787,7 +3941,8 @@ impl ProjectsUsersRoleInvitation {
         use gluesql::core::ast_builder::*;
         let select_row = table("projects_users_role_invitations")
             .select()
-            .project("table_id, user_id, role_id, created_by, created_at")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("table_id, user_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -3823,13 +3978,20 @@ impl ProjectsUsersRoleInvitation {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ProjectsUsersRoleRequest {
     pub table_id: i32,
     pub user_id: i32,
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
+}
+
+impl Tabular for ProjectsUsersRoleRequest {
+    const TABLE: Table = Table::ProjectsUsersRoleRequests;
+}
+
+impl Filtrable for ProjectsUsersRoleRequest {
+    type Filter = ProjectsUsersRoleRequestFilter;
 }
 #[cfg(feature = "frontend")]
 impl ProjectsUsersRoleRequest {
@@ -3990,11 +4152,13 @@ impl ProjectsUsersRoleRequest {
     /// Get all ProjectsUsersRoleRequest from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&ProjectsUsersRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -4004,7 +4168,8 @@ impl ProjectsUsersRoleRequest {
         use gluesql::core::ast_builder::*;
         let select_row = table("projects_users_role_requests")
             .select()
-            .project("table_id, user_id, role_id, created_by, created_at")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("table_id, user_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -4040,13 +4205,20 @@ impl ProjectsUsersRoleRequest {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct ProjectsUsersRole {
     pub table_id: i32,
     pub user_id: i32,
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
+}
+
+impl Tabular for ProjectsUsersRole {
+    const TABLE: Table = Table::ProjectsUsersRoles;
+}
+
+impl Filtrable for ProjectsUsersRole {
+    type Filter = ProjectsUsersRoleFilter;
 }
 #[cfg(feature = "frontend")]
 impl ProjectsUsersRole {
@@ -4207,11 +4379,13 @@ impl ProjectsUsersRole {
     /// Get all ProjectsUsersRole from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&ProjectsUsersRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -4221,7 +4395,8 @@ impl ProjectsUsersRole {
         use gluesql::core::ast_builder::*;
         let select_row = table("projects_users_roles")
             .select()
-            .project("table_id, user_id, role_id, created_by, created_at")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("table_id, user_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -4257,13 +4432,20 @@ impl ProjectsUsersRole {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Role {
     pub id: i32,
     pub name: String,
     pub description: String,
     pub icon_id: i32,
     pub color_id: i32,
+}
+
+impl Tabular for Role {
+    const TABLE: Table = Table::Roles;
+}
+
+impl Filtrable for Role {
+    type Filter = RoleFilter;
 }
 #[cfg(feature = "frontend")]
 impl Role {
@@ -4422,11 +4604,13 @@ impl Role {
     /// Get all Role from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&RoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -4436,7 +4620,8 @@ impl Role {
         use gluesql::core::ast_builder::*;
         let select_row = table("roles")
             .select()
-            .project("id, name, description, icon_id, color_id")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("id, name, description, icon_id, color_id")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -4472,7 +4657,6 @@ impl Role {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SampleBioOttTaxonItem {
     pub created_by: i32,
     pub created_at: NaiveDateTime,
@@ -4480,6 +4664,14 @@ pub struct SampleBioOttTaxonItem {
     pub updated_at: NaiveDateTime,
     pub sample_id: Uuid,
     pub taxon_id: i32,
+}
+
+impl Tabular for SampleBioOttTaxonItem {
+    const TABLE: Table = Table::SampleBioOttTaxonItems;
+}
+
+impl Filtrable for SampleBioOttTaxonItem {
+    type Filter = SampleBioOttTaxonItemFilter;
 }
 #[cfg(feature = "frontend")]
 impl SampleBioOttTaxonItem {
@@ -4642,11 +4834,13 @@ impl SampleBioOttTaxonItem {
     /// Get all SampleBioOttTaxonItem from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&SampleBioOttTaxonItemFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -4656,7 +4850,8 @@ impl SampleBioOttTaxonItem {
         use gluesql::core::ast_builder::*;
         let select_row = table("sample_bio_ott_taxon_items")
             .select()
-            .project("created_by, created_at, updated_by, updated_at, sample_id, taxon_id")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("created_by, created_at, updated_by, updated_at, sample_id, taxon_id")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -4669,11 +4864,13 @@ impl SampleBioOttTaxonItem {
     /// Get all SampleBioOttTaxonItem from the database ordered by the `updated_at` column.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all_by_updated_at<C>(
+        filter: Option<&SampleBioOttTaxonItemFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -4683,7 +4880,8 @@ impl SampleBioOttTaxonItem {
         use gluesql::core::ast_builder::*;
         let select_row = table("sample_bio_ott_taxon_items")
             .select()
-            .project("created_by, created_at, updated_by, updated_at, sample_id, taxon_id")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("created_by, created_at, updated_by, updated_at, sample_id, taxon_id")
             .order_by("updated_at desc")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -4724,13 +4922,20 @@ impl SampleBioOttTaxonItem {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SampleState {
     pub id: i32,
     pub name: String,
     pub description: String,
     pub icon_id: i32,
     pub color_id: i32,
+}
+
+impl Tabular for SampleState {
+    const TABLE: Table = Table::SampleStates;
+}
+
+impl Filtrable for SampleState {
+    type Filter = SampleStateFilter;
 }
 #[cfg(feature = "frontend")]
 impl SampleState {
@@ -4889,11 +5094,13 @@ impl SampleState {
     /// Get all SampleState from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&SampleStateFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -4903,7 +5110,8 @@ impl SampleState {
         use gluesql::core::ast_builder::*;
         let select_row = table("sample_states")
             .select()
-            .project("id, name, description, icon_id, color_id")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("id, name, description, icon_id, color_id")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -4939,7 +5147,6 @@ impl SampleState {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SampledIndividualBioOttTaxonItem {
     pub created_by: i32,
     pub created_at: NaiveDateTime,
@@ -4947,6 +5154,14 @@ pub struct SampledIndividualBioOttTaxonItem {
     pub updated_at: NaiveDateTime,
     pub sampled_individual_id: Uuid,
     pub taxon_id: i32,
+}
+
+impl Tabular for SampledIndividualBioOttTaxonItem {
+    const TABLE: Table = Table::SampledIndividualBioOttTaxonItems;
+}
+
+impl Filtrable for SampledIndividualBioOttTaxonItem {
+    type Filter = SampledIndividualBioOttTaxonItemFilter;
 }
 #[cfg(feature = "frontend")]
 impl SampledIndividualBioOttTaxonItem {
@@ -5109,11 +5324,13 @@ impl SampledIndividualBioOttTaxonItem {
     /// Get all SampledIndividualBioOttTaxonItem from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&SampledIndividualBioOttTaxonItemFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -5123,7 +5340,8 @@ impl SampledIndividualBioOttTaxonItem {
         use gluesql::core::ast_builder::*;
         let select_row = table("sampled_individual_bio_ott_taxon_items")
             .select()
-            .project("created_by, created_at, updated_by, updated_at, sampled_individual_id, taxon_id")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("created_by, created_at, updated_by, updated_at, sampled_individual_id, taxon_id")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -5136,11 +5354,13 @@ impl SampledIndividualBioOttTaxonItem {
     /// Get all SampledIndividualBioOttTaxonItem from the database ordered by the `updated_at` column.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all_by_updated_at<C>(
+        filter: Option<&SampledIndividualBioOttTaxonItemFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -5150,7 +5370,8 @@ impl SampledIndividualBioOttTaxonItem {
         use gluesql::core::ast_builder::*;
         let select_row = table("sampled_individual_bio_ott_taxon_items")
             .select()
-            .project("created_by, created_at, updated_by, updated_at, sampled_individual_id, taxon_id")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("created_by, created_at, updated_by, updated_at, sampled_individual_id, taxon_id")
             .order_by("updated_at desc")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -5191,7 +5412,6 @@ impl SampledIndividualBioOttTaxonItem {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SampledIndividual {
     pub id: Uuid,
     pub created_by: i32,
@@ -5199,6 +5419,14 @@ pub struct SampledIndividual {
     pub updated_by: i32,
     pub updated_at: NaiveDateTime,
     pub tagged: bool,
+}
+
+impl Tabular for SampledIndividual {
+    const TABLE: Table = Table::SampledIndividuals;
+}
+
+impl Filtrable for SampledIndividual {
+    type Filter = SampledIndividualFilter;
 }
 #[cfg(feature = "frontend")]
 impl SampledIndividual {
@@ -5359,11 +5587,13 @@ impl SampledIndividual {
     /// Get all SampledIndividual from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&SampledIndividualFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -5373,7 +5603,8 @@ impl SampledIndividual {
         use gluesql::core::ast_builder::*;
         let select_row = table("sampled_individuals")
             .select()
-            .project("id, created_by, created_at, updated_by, updated_at, tagged")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("id, created_by, created_at, updated_by, updated_at, tagged")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -5386,11 +5617,13 @@ impl SampledIndividual {
     /// Get all SampledIndividual from the database ordered by the `updated_at` column.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all_by_updated_at<C>(
+        filter: Option<&SampledIndividualFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -5400,7 +5633,8 @@ impl SampledIndividual {
         use gluesql::core::ast_builder::*;
         let select_row = table("sampled_individuals")
             .select()
-            .project("id, created_by, created_at, updated_by, updated_at, tagged")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("id, created_by, created_at, updated_by, updated_at, tagged")
             .order_by("updated_at desc")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -5441,13 +5675,20 @@ impl SampledIndividual {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SampledIndividualsTeamsRoleInvitation {
     pub table_id: Uuid,
     pub team_id: i32,
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
+}
+
+impl Tabular for SampledIndividualsTeamsRoleInvitation {
+    const TABLE: Table = Table::SampledIndividualsTeamsRoleInvitations;
+}
+
+impl Filtrable for SampledIndividualsTeamsRoleInvitation {
+    type Filter = SampledIndividualsTeamsRoleInvitationFilter;
 }
 #[cfg(feature = "frontend")]
 impl SampledIndividualsTeamsRoleInvitation {
@@ -5608,11 +5849,13 @@ impl SampledIndividualsTeamsRoleInvitation {
     /// Get all SampledIndividualsTeamsRoleInvitation from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&SampledIndividualsTeamsRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -5622,7 +5865,8 @@ impl SampledIndividualsTeamsRoleInvitation {
         use gluesql::core::ast_builder::*;
         let select_row = table("sampled_individuals_teams_role_invitations")
             .select()
-            .project("table_id, team_id, role_id, created_by, created_at")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("table_id, team_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -5658,13 +5902,20 @@ impl SampledIndividualsTeamsRoleInvitation {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SampledIndividualsTeamsRoleRequest {
     pub table_id: Uuid,
     pub team_id: i32,
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
+}
+
+impl Tabular for SampledIndividualsTeamsRoleRequest {
+    const TABLE: Table = Table::SampledIndividualsTeamsRoleRequests;
+}
+
+impl Filtrable for SampledIndividualsTeamsRoleRequest {
+    type Filter = SampledIndividualsTeamsRoleRequestFilter;
 }
 #[cfg(feature = "frontend")]
 impl SampledIndividualsTeamsRoleRequest {
@@ -5825,11 +6076,13 @@ impl SampledIndividualsTeamsRoleRequest {
     /// Get all SampledIndividualsTeamsRoleRequest from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&SampledIndividualsTeamsRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -5839,7 +6092,8 @@ impl SampledIndividualsTeamsRoleRequest {
         use gluesql::core::ast_builder::*;
         let select_row = table("sampled_individuals_teams_role_requests")
             .select()
-            .project("table_id, team_id, role_id, created_by, created_at")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("table_id, team_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -5875,13 +6129,20 @@ impl SampledIndividualsTeamsRoleRequest {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SampledIndividualsTeamsRole {
     pub table_id: Uuid,
     pub team_id: i32,
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
+}
+
+impl Tabular for SampledIndividualsTeamsRole {
+    const TABLE: Table = Table::SampledIndividualsTeamsRoles;
+}
+
+impl Filtrable for SampledIndividualsTeamsRole {
+    type Filter = SampledIndividualsTeamsRoleFilter;
 }
 #[cfg(feature = "frontend")]
 impl SampledIndividualsTeamsRole {
@@ -6042,11 +6303,13 @@ impl SampledIndividualsTeamsRole {
     /// Get all SampledIndividualsTeamsRole from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&SampledIndividualsTeamsRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -6056,7 +6319,8 @@ impl SampledIndividualsTeamsRole {
         use gluesql::core::ast_builder::*;
         let select_row = table("sampled_individuals_teams_roles")
             .select()
-            .project("table_id, team_id, role_id, created_by, created_at")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("table_id, team_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -6092,13 +6356,20 @@ impl SampledIndividualsTeamsRole {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SampledIndividualsUsersRoleInvitation {
     pub table_id: Uuid,
     pub user_id: i32,
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
+}
+
+impl Tabular for SampledIndividualsUsersRoleInvitation {
+    const TABLE: Table = Table::SampledIndividualsUsersRoleInvitations;
+}
+
+impl Filtrable for SampledIndividualsUsersRoleInvitation {
+    type Filter = SampledIndividualsUsersRoleInvitationFilter;
 }
 #[cfg(feature = "frontend")]
 impl SampledIndividualsUsersRoleInvitation {
@@ -6259,11 +6530,13 @@ impl SampledIndividualsUsersRoleInvitation {
     /// Get all SampledIndividualsUsersRoleInvitation from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&SampledIndividualsUsersRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -6273,7 +6546,8 @@ impl SampledIndividualsUsersRoleInvitation {
         use gluesql::core::ast_builder::*;
         let select_row = table("sampled_individuals_users_role_invitations")
             .select()
-            .project("table_id, user_id, role_id, created_by, created_at")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("table_id, user_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -6309,13 +6583,20 @@ impl SampledIndividualsUsersRoleInvitation {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SampledIndividualsUsersRoleRequest {
     pub table_id: Uuid,
     pub user_id: i32,
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
+}
+
+impl Tabular for SampledIndividualsUsersRoleRequest {
+    const TABLE: Table = Table::SampledIndividualsUsersRoleRequests;
+}
+
+impl Filtrable for SampledIndividualsUsersRoleRequest {
+    type Filter = SampledIndividualsUsersRoleRequestFilter;
 }
 #[cfg(feature = "frontend")]
 impl SampledIndividualsUsersRoleRequest {
@@ -6476,11 +6757,13 @@ impl SampledIndividualsUsersRoleRequest {
     /// Get all SampledIndividualsUsersRoleRequest from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&SampledIndividualsUsersRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -6490,7 +6773,8 @@ impl SampledIndividualsUsersRoleRequest {
         use gluesql::core::ast_builder::*;
         let select_row = table("sampled_individuals_users_role_requests")
             .select()
-            .project("table_id, user_id, role_id, created_by, created_at")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("table_id, user_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -6526,13 +6810,20 @@ impl SampledIndividualsUsersRoleRequest {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SampledIndividualsUsersRole {
     pub table_id: Uuid,
     pub user_id: i32,
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
+}
+
+impl Tabular for SampledIndividualsUsersRole {
+    const TABLE: Table = Table::SampledIndividualsUsersRoles;
+}
+
+impl Filtrable for SampledIndividualsUsersRole {
+    type Filter = SampledIndividualsUsersRoleFilter;
 }
 #[cfg(feature = "frontend")]
 impl SampledIndividualsUsersRole {
@@ -6693,11 +6984,13 @@ impl SampledIndividualsUsersRole {
     /// Get all SampledIndividualsUsersRole from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&SampledIndividualsUsersRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -6707,7 +7000,8 @@ impl SampledIndividualsUsersRole {
         use gluesql::core::ast_builder::*;
         let select_row = table("sampled_individuals_users_roles")
             .select()
-            .project("table_id, user_id, role_id, created_by, created_at")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("table_id, user_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -6743,7 +7037,6 @@ impl SampledIndividualsUsersRole {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Sample {
     pub id: Uuid,
     pub created_by: i32,
@@ -6752,6 +7045,14 @@ pub struct Sample {
     pub updated_by: i32,
     pub updated_at: NaiveDateTime,
     pub state: i32,
+}
+
+impl Tabular for Sample {
+    const TABLE: Table = Table::Samples;
+}
+
+impl Filtrable for Sample {
+    type Filter = SampleFilter;
 }
 #[cfg(feature = "frontend")]
 impl Sample {
@@ -6914,11 +7215,13 @@ impl Sample {
     /// Get all Sample from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&SampleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -6928,7 +7231,8 @@ impl Sample {
         use gluesql::core::ast_builder::*;
         let select_row = table("samples")
             .select()
-            .project("id, created_by, sampled_by, created_at, updated_by, updated_at, state")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("id, created_by, sampled_by, created_at, updated_by, updated_at, state")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -6941,11 +7245,13 @@ impl Sample {
     /// Get all Sample from the database ordered by the `updated_at` column.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all_by_updated_at<C>(
+        filter: Option<&SampleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -6955,7 +7261,8 @@ impl Sample {
         use gluesql::core::ast_builder::*;
         let select_row = table("samples")
             .select()
-            .project("id, created_by, sampled_by, created_at, updated_by, updated_at, state")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("id, created_by, sampled_by, created_at, updated_by, updated_at, state")
             .order_by("updated_at desc")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -7000,13 +7307,20 @@ impl Sample {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SamplesTeamsRoleInvitation {
     pub table_id: Uuid,
     pub team_id: i32,
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
+}
+
+impl Tabular for SamplesTeamsRoleInvitation {
+    const TABLE: Table = Table::SamplesTeamsRoleInvitations;
+}
+
+impl Filtrable for SamplesTeamsRoleInvitation {
+    type Filter = SamplesTeamsRoleInvitationFilter;
 }
 #[cfg(feature = "frontend")]
 impl SamplesTeamsRoleInvitation {
@@ -7167,11 +7481,13 @@ impl SamplesTeamsRoleInvitation {
     /// Get all SamplesTeamsRoleInvitation from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&SamplesTeamsRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -7181,7 +7497,8 @@ impl SamplesTeamsRoleInvitation {
         use gluesql::core::ast_builder::*;
         let select_row = table("samples_teams_role_invitations")
             .select()
-            .project("table_id, team_id, role_id, created_by, created_at")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("table_id, team_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -7217,13 +7534,20 @@ impl SamplesTeamsRoleInvitation {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SamplesTeamsRoleRequest {
     pub table_id: Uuid,
     pub team_id: i32,
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
+}
+
+impl Tabular for SamplesTeamsRoleRequest {
+    const TABLE: Table = Table::SamplesTeamsRoleRequests;
+}
+
+impl Filtrable for SamplesTeamsRoleRequest {
+    type Filter = SamplesTeamsRoleRequestFilter;
 }
 #[cfg(feature = "frontend")]
 impl SamplesTeamsRoleRequest {
@@ -7384,11 +7708,13 @@ impl SamplesTeamsRoleRequest {
     /// Get all SamplesTeamsRoleRequest from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&SamplesTeamsRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -7398,7 +7724,8 @@ impl SamplesTeamsRoleRequest {
         use gluesql::core::ast_builder::*;
         let select_row = table("samples_teams_role_requests")
             .select()
-            .project("table_id, team_id, role_id, created_by, created_at")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("table_id, team_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -7434,13 +7761,20 @@ impl SamplesTeamsRoleRequest {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SamplesTeamsRole {
     pub table_id: Uuid,
     pub team_id: i32,
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
+}
+
+impl Tabular for SamplesTeamsRole {
+    const TABLE: Table = Table::SamplesTeamsRoles;
+}
+
+impl Filtrable for SamplesTeamsRole {
+    type Filter = SamplesTeamsRoleFilter;
 }
 #[cfg(feature = "frontend")]
 impl SamplesTeamsRole {
@@ -7601,11 +7935,13 @@ impl SamplesTeamsRole {
     /// Get all SamplesTeamsRole from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&SamplesTeamsRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -7615,7 +7951,8 @@ impl SamplesTeamsRole {
         use gluesql::core::ast_builder::*;
         let select_row = table("samples_teams_roles")
             .select()
-            .project("table_id, team_id, role_id, created_by, created_at")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("table_id, team_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -7651,13 +7988,20 @@ impl SamplesTeamsRole {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SamplesUsersRoleInvitation {
     pub table_id: Uuid,
     pub user_id: i32,
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
+}
+
+impl Tabular for SamplesUsersRoleInvitation {
+    const TABLE: Table = Table::SamplesUsersRoleInvitations;
+}
+
+impl Filtrable for SamplesUsersRoleInvitation {
+    type Filter = SamplesUsersRoleInvitationFilter;
 }
 #[cfg(feature = "frontend")]
 impl SamplesUsersRoleInvitation {
@@ -7818,11 +8162,13 @@ impl SamplesUsersRoleInvitation {
     /// Get all SamplesUsersRoleInvitation from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&SamplesUsersRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -7832,7 +8178,8 @@ impl SamplesUsersRoleInvitation {
         use gluesql::core::ast_builder::*;
         let select_row = table("samples_users_role_invitations")
             .select()
-            .project("table_id, user_id, role_id, created_by, created_at")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("table_id, user_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -7868,13 +8215,20 @@ impl SamplesUsersRoleInvitation {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SamplesUsersRoleRequest {
     pub table_id: Uuid,
     pub user_id: i32,
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
+}
+
+impl Tabular for SamplesUsersRoleRequest {
+    const TABLE: Table = Table::SamplesUsersRoleRequests;
+}
+
+impl Filtrable for SamplesUsersRoleRequest {
+    type Filter = SamplesUsersRoleRequestFilter;
 }
 #[cfg(feature = "frontend")]
 impl SamplesUsersRoleRequest {
@@ -8035,11 +8389,13 @@ impl SamplesUsersRoleRequest {
     /// Get all SamplesUsersRoleRequest from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&SamplesUsersRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -8049,7 +8405,8 @@ impl SamplesUsersRoleRequest {
         use gluesql::core::ast_builder::*;
         let select_row = table("samples_users_role_requests")
             .select()
-            .project("table_id, user_id, role_id, created_by, created_at")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("table_id, user_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -8085,13 +8442,20 @@ impl SamplesUsersRoleRequest {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SamplesUsersRole {
     pub table_id: Uuid,
     pub user_id: i32,
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
+}
+
+impl Tabular for SamplesUsersRole {
+    const TABLE: Table = Table::SamplesUsersRoles;
+}
+
+impl Filtrable for SamplesUsersRole {
+    type Filter = SamplesUsersRoleFilter;
 }
 #[cfg(feature = "frontend")]
 impl SamplesUsersRole {
@@ -8252,11 +8616,13 @@ impl SamplesUsersRole {
     /// Get all SamplesUsersRole from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&SamplesUsersRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -8266,7 +8632,8 @@ impl SamplesUsersRole {
         use gluesql::core::ast_builder::*;
         let select_row = table("samples_users_roles")
             .select()
-            .project("table_id, user_id, role_id, created_by, created_at")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("table_id, user_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -8302,10 +8669,17 @@ impl SamplesUsersRole {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Spectra {
     pub id: i32,
     pub spectra_collection_id: i32,
+}
+
+impl Tabular for Spectra {
+    const TABLE: Table = Table::Spectra;
+}
+
+impl Filtrable for Spectra {
+    type Filter = SpectraFilter;
 }
 #[cfg(feature = "frontend")]
 impl Spectra {
@@ -8458,11 +8832,13 @@ impl Spectra {
     /// Get all Spectra from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&SpectraFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -8472,7 +8848,8 @@ impl Spectra {
         use gluesql::core::ast_builder::*;
         let select_row = table("spectra")
             .select()
-            .project("id, spectra_collection_id")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("id, spectra_collection_id")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -8496,7 +8873,6 @@ impl Spectra {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SpectraCollection {
     pub id: i32,
     pub sample_id: Uuid,
@@ -8504,6 +8880,14 @@ pub struct SpectraCollection {
     pub created_at: NaiveDateTime,
     pub updated_by: i32,
     pub updated_at: NaiveDateTime,
+}
+
+impl Tabular for SpectraCollection {
+    const TABLE: Table = Table::SpectraCollections;
+}
+
+impl Filtrable for SpectraCollection {
+    type Filter = SpectraCollectionFilter;
 }
 #[cfg(feature = "frontend")]
 impl SpectraCollection {
@@ -8664,11 +9048,13 @@ impl SpectraCollection {
     /// Get all SpectraCollection from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&SpectraCollectionFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -8678,7 +9064,8 @@ impl SpectraCollection {
         use gluesql::core::ast_builder::*;
         let select_row = table("spectra_collections")
             .select()
-            .project("id, sample_id, created_by, created_at, updated_by, updated_at")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("id, sample_id, created_by, created_at, updated_by, updated_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -8691,11 +9078,13 @@ impl SpectraCollection {
     /// Get all SpectraCollection from the database ordered by the `updated_at` column.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all_by_updated_at<C>(
+        filter: Option<&SpectraCollectionFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -8705,7 +9094,8 @@ impl SpectraCollection {
         use gluesql::core::ast_builder::*;
         let select_row = table("spectra_collections")
             .select()
-            .project("id, sample_id, created_by, created_at, updated_by, updated_at")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("id, sample_id, created_by, created_at, updated_by, updated_at")
             .order_by("updated_at desc")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -8746,13 +9136,20 @@ impl SpectraCollection {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SpectraCollectionsTeamsRoleInvitation {
     pub table_id: i32,
     pub team_id: i32,
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
+}
+
+impl Tabular for SpectraCollectionsTeamsRoleInvitation {
+    const TABLE: Table = Table::SpectraCollectionsTeamsRoleInvitations;
+}
+
+impl Filtrable for SpectraCollectionsTeamsRoleInvitation {
+    type Filter = SpectraCollectionsTeamsRoleInvitationFilter;
 }
 #[cfg(feature = "frontend")]
 impl SpectraCollectionsTeamsRoleInvitation {
@@ -8913,11 +9310,13 @@ impl SpectraCollectionsTeamsRoleInvitation {
     /// Get all SpectraCollectionsTeamsRoleInvitation from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&SpectraCollectionsTeamsRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -8927,7 +9326,8 @@ impl SpectraCollectionsTeamsRoleInvitation {
         use gluesql::core::ast_builder::*;
         let select_row = table("spectra_collections_teams_role_invitations")
             .select()
-            .project("table_id, team_id, role_id, created_by, created_at")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("table_id, team_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -8963,13 +9363,20 @@ impl SpectraCollectionsTeamsRoleInvitation {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SpectraCollectionsTeamsRoleRequest {
     pub table_id: i32,
     pub team_id: i32,
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
+}
+
+impl Tabular for SpectraCollectionsTeamsRoleRequest {
+    const TABLE: Table = Table::SpectraCollectionsTeamsRoleRequests;
+}
+
+impl Filtrable for SpectraCollectionsTeamsRoleRequest {
+    type Filter = SpectraCollectionsTeamsRoleRequestFilter;
 }
 #[cfg(feature = "frontend")]
 impl SpectraCollectionsTeamsRoleRequest {
@@ -9130,11 +9537,13 @@ impl SpectraCollectionsTeamsRoleRequest {
     /// Get all SpectraCollectionsTeamsRoleRequest from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&SpectraCollectionsTeamsRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -9144,7 +9553,8 @@ impl SpectraCollectionsTeamsRoleRequest {
         use gluesql::core::ast_builder::*;
         let select_row = table("spectra_collections_teams_role_requests")
             .select()
-            .project("table_id, team_id, role_id, created_by, created_at")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("table_id, team_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -9180,13 +9590,20 @@ impl SpectraCollectionsTeamsRoleRequest {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SpectraCollectionsTeamsRole {
     pub table_id: i32,
     pub team_id: i32,
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
+}
+
+impl Tabular for SpectraCollectionsTeamsRole {
+    const TABLE: Table = Table::SpectraCollectionsTeamsRoles;
+}
+
+impl Filtrable for SpectraCollectionsTeamsRole {
+    type Filter = SpectraCollectionsTeamsRoleFilter;
 }
 #[cfg(feature = "frontend")]
 impl SpectraCollectionsTeamsRole {
@@ -9347,11 +9764,13 @@ impl SpectraCollectionsTeamsRole {
     /// Get all SpectraCollectionsTeamsRole from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&SpectraCollectionsTeamsRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -9361,7 +9780,8 @@ impl SpectraCollectionsTeamsRole {
         use gluesql::core::ast_builder::*;
         let select_row = table("spectra_collections_teams_roles")
             .select()
-            .project("table_id, team_id, role_id, created_by, created_at")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("table_id, team_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -9397,13 +9817,20 @@ impl SpectraCollectionsTeamsRole {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SpectraCollectionsUsersRoleInvitation {
     pub table_id: i32,
     pub user_id: i32,
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
+}
+
+impl Tabular for SpectraCollectionsUsersRoleInvitation {
+    const TABLE: Table = Table::SpectraCollectionsUsersRoleInvitations;
+}
+
+impl Filtrable for SpectraCollectionsUsersRoleInvitation {
+    type Filter = SpectraCollectionsUsersRoleInvitationFilter;
 }
 #[cfg(feature = "frontend")]
 impl SpectraCollectionsUsersRoleInvitation {
@@ -9564,11 +9991,13 @@ impl SpectraCollectionsUsersRoleInvitation {
     /// Get all SpectraCollectionsUsersRoleInvitation from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&SpectraCollectionsUsersRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -9578,7 +10007,8 @@ impl SpectraCollectionsUsersRoleInvitation {
         use gluesql::core::ast_builder::*;
         let select_row = table("spectra_collections_users_role_invitations")
             .select()
-            .project("table_id, user_id, role_id, created_by, created_at")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("table_id, user_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -9614,13 +10044,20 @@ impl SpectraCollectionsUsersRoleInvitation {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SpectraCollectionsUsersRoleRequest {
     pub table_id: i32,
     pub user_id: i32,
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
+}
+
+impl Tabular for SpectraCollectionsUsersRoleRequest {
+    const TABLE: Table = Table::SpectraCollectionsUsersRoleRequests;
+}
+
+impl Filtrable for SpectraCollectionsUsersRoleRequest {
+    type Filter = SpectraCollectionsUsersRoleRequestFilter;
 }
 #[cfg(feature = "frontend")]
 impl SpectraCollectionsUsersRoleRequest {
@@ -9781,11 +10218,13 @@ impl SpectraCollectionsUsersRoleRequest {
     /// Get all SpectraCollectionsUsersRoleRequest from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&SpectraCollectionsUsersRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -9795,7 +10234,8 @@ impl SpectraCollectionsUsersRoleRequest {
         use gluesql::core::ast_builder::*;
         let select_row = table("spectra_collections_users_role_requests")
             .select()
-            .project("table_id, user_id, role_id, created_by, created_at")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("table_id, user_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -9831,13 +10271,20 @@ impl SpectraCollectionsUsersRoleRequest {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct SpectraCollectionsUsersRole {
     pub table_id: i32,
     pub user_id: i32,
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
+}
+
+impl Tabular for SpectraCollectionsUsersRole {
+    const TABLE: Table = Table::SpectraCollectionsUsersRoles;
+}
+
+impl Filtrable for SpectraCollectionsUsersRole {
+    type Filter = SpectraCollectionsUsersRoleFilter;
 }
 #[cfg(feature = "frontend")]
 impl SpectraCollectionsUsersRole {
@@ -9998,11 +10445,13 @@ impl SpectraCollectionsUsersRole {
     /// Get all SpectraCollectionsUsersRole from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&SpectraCollectionsUsersRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -10012,7 +10461,8 @@ impl SpectraCollectionsUsersRole {
         use gluesql::core::ast_builder::*;
         let select_row = table("spectra_collections_users_roles")
             .select()
-            .project("table_id, user_id, role_id, created_by, created_at")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("table_id, user_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -10048,13 +10498,20 @@ impl SpectraCollectionsUsersRole {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct TeamState {
     pub id: i32,
     pub name: String,
     pub description: String,
     pub icon_id: i32,
     pub color_id: i32,
+}
+
+impl Tabular for TeamState {
+    const TABLE: Table = Table::TeamStates;
+}
+
+impl Filtrable for TeamState {
+    type Filter = TeamStateFilter;
 }
 #[cfg(feature = "frontend")]
 impl TeamState {
@@ -10213,11 +10670,13 @@ impl TeamState {
     /// Get all TeamState from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&TeamStateFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -10227,7 +10686,8 @@ impl TeamState {
         use gluesql::core::ast_builder::*;
         let select_row = table("team_states")
             .select()
-            .project("id, name, description, icon_id, color_id")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("id, name, description, icon_id, color_id")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -10263,7 +10723,6 @@ impl TeamState {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Team {
     pub id: i32,
     pub name: String,
@@ -10275,6 +10734,14 @@ pub struct Team {
     pub created_at: NaiveDateTime,
     pub updated_by: i32,
     pub updated_at: NaiveDateTime,
+}
+
+impl Tabular for Team {
+    const TABLE: Table = Table::Teams;
+}
+
+impl Filtrable for Team {
+    type Filter = TeamFilter;
 }
 #[cfg(feature = "frontend")]
 impl Team {
@@ -10449,11 +10916,13 @@ impl Team {
     /// Get all Team from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&TeamFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -10463,7 +10932,8 @@ impl Team {
         use gluesql::core::ast_builder::*;
         let select_row = table("teams")
             .select()
-            .project("id, name, description, icon_id, color_id, parent_team_id, created_by, created_at, updated_by, updated_at")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("id, name, description, icon_id, color_id, parent_team_id, created_by, created_at, updated_by, updated_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -10476,11 +10946,13 @@ impl Team {
     /// Get all Team from the database ordered by the `updated_at` column.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all_by_updated_at<C>(
+        filter: Option<&TeamFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -10490,7 +10962,8 @@ impl Team {
         use gluesql::core::ast_builder::*;
         let select_row = table("teams")
             .select()
-            .project("id, name, description, icon_id, color_id, parent_team_id, created_by, created_at, updated_by, updated_at")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("id, name, description, icon_id, color_id, parent_team_id, created_by, created_at, updated_by, updated_at")
             .order_by("updated_at desc")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -10548,13 +11021,20 @@ impl Team {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct TeamsTeamsRoleInvitation {
     pub table_id: i32,
     pub team_id: i32,
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
+}
+
+impl Tabular for TeamsTeamsRoleInvitation {
+    const TABLE: Table = Table::TeamsTeamsRoleInvitations;
+}
+
+impl Filtrable for TeamsTeamsRoleInvitation {
+    type Filter = TeamsTeamsRoleInvitationFilter;
 }
 #[cfg(feature = "frontend")]
 impl TeamsTeamsRoleInvitation {
@@ -10715,11 +11195,13 @@ impl TeamsTeamsRoleInvitation {
     /// Get all TeamsTeamsRoleInvitation from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&TeamsTeamsRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -10729,7 +11211,8 @@ impl TeamsTeamsRoleInvitation {
         use gluesql::core::ast_builder::*;
         let select_row = table("teams_teams_role_invitations")
             .select()
-            .project("table_id, team_id, role_id, created_by, created_at")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("table_id, team_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -10765,13 +11248,20 @@ impl TeamsTeamsRoleInvitation {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct TeamsUsersRoleInvitation {
     pub table_id: i32,
     pub user_id: i32,
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
+}
+
+impl Tabular for TeamsUsersRoleInvitation {
+    const TABLE: Table = Table::TeamsUsersRoleInvitations;
+}
+
+impl Filtrable for TeamsUsersRoleInvitation {
+    type Filter = TeamsUsersRoleInvitationFilter;
 }
 #[cfg(feature = "frontend")]
 impl TeamsUsersRoleInvitation {
@@ -10932,11 +11422,13 @@ impl TeamsUsersRoleInvitation {
     /// Get all TeamsUsersRoleInvitation from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&TeamsUsersRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -10946,7 +11438,8 @@ impl TeamsUsersRoleInvitation {
         use gluesql::core::ast_builder::*;
         let select_row = table("teams_users_role_invitations")
             .select()
-            .project("table_id, user_id, role_id, created_by, created_at")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("table_id, user_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -10982,13 +11475,20 @@ impl TeamsUsersRoleInvitation {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct TeamsUsersRoleRequest {
     pub table_id: i32,
     pub user_id: i32,
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
+}
+
+impl Tabular for TeamsUsersRoleRequest {
+    const TABLE: Table = Table::TeamsUsersRoleRequests;
+}
+
+impl Filtrable for TeamsUsersRoleRequest {
+    type Filter = TeamsUsersRoleRequestFilter;
 }
 #[cfg(feature = "frontend")]
 impl TeamsUsersRoleRequest {
@@ -11149,11 +11649,13 @@ impl TeamsUsersRoleRequest {
     /// Get all TeamsUsersRoleRequest from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&TeamsUsersRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -11163,7 +11665,8 @@ impl TeamsUsersRoleRequest {
         use gluesql::core::ast_builder::*;
         let select_row = table("teams_users_role_requests")
             .select()
-            .project("table_id, user_id, role_id, created_by, created_at")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("table_id, user_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -11199,13 +11702,20 @@ impl TeamsUsersRoleRequest {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct TeamsUsersRole {
     pub table_id: i32,
     pub user_id: i32,
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
+}
+
+impl Tabular for TeamsUsersRole {
+    const TABLE: Table = Table::TeamsUsersRoles;
+}
+
+impl Filtrable for TeamsUsersRole {
+    type Filter = TeamsUsersRoleFilter;
 }
 #[cfg(feature = "frontend")]
 impl TeamsUsersRole {
@@ -11366,11 +11876,13 @@ impl TeamsUsersRole {
     /// Get all TeamsUsersRole from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&TeamsUsersRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -11380,7 +11892,8 @@ impl TeamsUsersRole {
         use gluesql::core::ast_builder::*;
         let select_row = table("teams_users_roles")
             .select()
-            .project("table_id, user_id, role_id, created_by, created_at")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("table_id, user_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -11416,12 +11929,15 @@ impl TeamsUsersRole {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct Unit {
     pub id: i32,
     pub name: String,
     pub description: String,
     pub symbol: String,
+}
+
+impl Tabular for Unit {
+    const TABLE: Table = Table::Units;
 }
 #[cfg(feature = "frontend")]
 impl Unit {
@@ -11592,7 +12108,7 @@ impl Unit {
         use gluesql::core::ast_builder::*;
         let select_row = table("units")
             .select()
-            .project("id, name, description, symbol")
+           .project("id, name, description, symbol")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -11624,7 +12140,6 @@ impl Unit {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct UserEmail {
     pub id: i32,
     pub email: String,
@@ -11632,6 +12147,14 @@ pub struct UserEmail {
     pub created_at: NaiveDateTime,
     pub login_provider_id: i32,
     pub primary_email: bool,
+}
+
+impl Tabular for UserEmail {
+    const TABLE: Table = Table::UserEmails;
+}
+
+impl Filtrable for UserEmail {
+    type Filter = UserEmailFilter;
 }
 #[cfg(feature = "frontend")]
 impl UserEmail {
@@ -11792,11 +12315,13 @@ impl UserEmail {
     /// Get all UserEmail from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&UserEmailFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -11806,7 +12331,8 @@ impl UserEmail {
         use gluesql::core::ast_builder::*;
         let select_row = table("user_emails")
             .select()
-            .project("id, email, created_by, created_at, login_provider_id, primary_email")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("id, email, created_by, created_at, login_provider_id, primary_email")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -11846,7 +12372,6 @@ impl UserEmail {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct User {
     pub id: i32,
     pub first_name: String,
@@ -11855,6 +12380,14 @@ pub struct User {
     pub profile_picture: Vec<u8>,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
+}
+
+impl Tabular for User {
+    const TABLE: Table = Table::Users;
+}
+
+impl Filtrable for User {
+    type Filter = EmptyFilter;
 }
 #[cfg(feature = "frontend")]
 impl User {
@@ -12037,7 +12570,7 @@ impl User {
         use gluesql::core::ast_builder::*;
         let select_row = table("users")
             .select()
-            .project("id, first_name, middle_name, last_name, profile_picture, created_at, updated_at")
+           .project("id, first_name, middle_name, last_name, profile_picture, created_at, updated_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -12064,7 +12597,7 @@ impl User {
         use gluesql::core::ast_builder::*;
         let select_row = table("users")
             .select()
-            .project("id, first_name, middle_name, last_name, profile_picture, created_at, updated_at")
+           .project("id, first_name, middle_name, last_name, profile_picture, created_at, updated_at")
             .order_by("updated_at desc")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -12110,13 +12643,20 @@ impl User {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct UsersUsersRoleInvitation {
     pub table_id: i32,
     pub user_id: i32,
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
+}
+
+impl Tabular for UsersUsersRoleInvitation {
+    const TABLE: Table = Table::UsersUsersRoleInvitations;
+}
+
+impl Filtrable for UsersUsersRoleInvitation {
+    type Filter = UsersUsersRoleInvitationFilter;
 }
 #[cfg(feature = "frontend")]
 impl UsersUsersRoleInvitation {
@@ -12277,11 +12817,13 @@ impl UsersUsersRoleInvitation {
     /// Get all UsersUsersRoleInvitation from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&UsersUsersRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -12291,7 +12833,8 @@ impl UsersUsersRoleInvitation {
         use gluesql::core::ast_builder::*;
         let select_row = table("users_users_role_invitations")
             .select()
-            .project("table_id, user_id, role_id, created_by, created_at")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("table_id, user_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -12327,13 +12870,20 @@ impl UsersUsersRoleInvitation {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct UsersUsersRoleRequest {
     pub table_id: i32,
     pub user_id: i32,
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
+}
+
+impl Tabular for UsersUsersRoleRequest {
+    const TABLE: Table = Table::UsersUsersRoleRequests;
+}
+
+impl Filtrable for UsersUsersRoleRequest {
+    type Filter = UsersUsersRoleRequestFilter;
 }
 #[cfg(feature = "frontend")]
 impl UsersUsersRoleRequest {
@@ -12494,11 +13044,13 @@ impl UsersUsersRoleRequest {
     /// Get all UsersUsersRoleRequest from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&UsersUsersRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -12508,7 +13060,8 @@ impl UsersUsersRoleRequest {
         use gluesql::core::ast_builder::*;
         let select_row = table("users_users_role_requests")
             .select()
-            .project("table_id, user_id, role_id, created_by, created_at")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("table_id, user_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -12544,13 +13097,20 @@ impl UsersUsersRoleRequest {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]
 pub struct UsersUsersRole {
     pub table_id: i32,
     pub user_id: i32,
     pub role_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
+}
+
+impl Tabular for UsersUsersRole {
+    const TABLE: Table = Table::UsersUsersRoles;
+}
+
+impl Filtrable for UsersUsersRole {
+    type Filter = UsersUsersRoleFilter;
 }
 #[cfg(feature = "frontend")]
 impl UsersUsersRole {
@@ -12711,11 +13271,13 @@ impl UsersUsersRole {
     /// Get all UsersUsersRole from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&UsersUsersRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -12725,7 +13287,8 @@ impl UsersUsersRole {
         use gluesql::core::ast_builder::*;
         let select_row = table("users_users_roles")
             .select()
-            .project("table_id, user_id, role_id, created_by, created_at")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("table_id, user_id, role_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)

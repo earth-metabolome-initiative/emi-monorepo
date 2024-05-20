@@ -1,5 +1,5 @@
 use super::RowToBadge;
-use crate::{components::PageLike, router::AppRoute};
+use crate::{components::{database::row_to_searchable_badge::RowToSearchableBadge, PageLike}, router::AppRoute};
 use web_common::database::NestedProject;
 use yew_router::prelude::*;
 
@@ -14,7 +14,8 @@ impl RowToBadge for NestedProject {
 
                 // Print out the sample state, procedure, sampled by
                 <div class="sample-info">
-                    <span> {self.state.inner.name.clone()}</span>
+                    {self.state.to_selected_datalist_badge()}
+                    <span title="Created by">{self.created_by.to_selected_datalist_badge()}</span>
                 </div>
             </div>
         }

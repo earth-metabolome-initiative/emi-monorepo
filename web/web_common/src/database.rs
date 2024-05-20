@@ -22,3 +22,5 @@ pub use new_variants::*;
 pub mod update_variants;
 pub use update_variants::*;
 pub mod model_impls;
+pub mod filter_structs;
+pub use filter_structs::*;

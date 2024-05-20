@@ -64,17 +64,27 @@ impl BioOttRank {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::BioOttRankFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::bio_ott_ranks;
-        bio_ott_ranks::dsl::bio_ott_ranks
+        let mut query = bio_ott_ranks::dsl::bio_ott_ranks
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(bio_ott_ranks::dsl::icon_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.color_id) {
+            query = query.filter(bio_ott_ranks::dsl::color_id.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -126,7 +136,7 @@ impl BioOttRank {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id FROM bio_ott_ranks ",
@@ -155,7 +165,7 @@ impl BioOttRank {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id FROM bio_ott_ranks ",
@@ -184,7 +194,7 @@ impl BioOttRank {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id FROM bio_ott_ranks ",
@@ -282,17 +292,54 @@ impl BioOttTaxonItem {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::BioOttTaxonItemFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::bio_ott_taxon_items;
-        bio_ott_taxon_items::dsl::bio_ott_taxon_items
+        let mut query = bio_ott_taxon_items::dsl::bio_ott_taxon_items
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.ott_rank_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::ott_rank_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.domain_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::domain_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.kingdom_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::kingdom_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.phylum_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::phylum_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.class_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::class_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.order_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::order_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.family_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::family_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.genus_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::genus_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.parent_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::parent_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::icon_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.color_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::color_id.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -344,7 +391,7 @@ impl BioOttTaxonItem {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, icon_id, color_id FROM bio_ott_taxon_items ",
@@ -373,7 +420,7 @@ impl BioOttTaxonItem {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, icon_id, color_id FROM bio_ott_taxon_items ",
@@ -402,7 +449,7 @@ impl BioOttTaxonItem {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, icon_id, color_id FROM bio_ott_taxon_items ",
@@ -860,17 +907,33 @@ impl DerivedSample {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::DerivedSampleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::derived_samples;
-        derived_samples::dsl::derived_samples
+        let mut query = derived_samples::dsl::derived_samples
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(derived_samples::dsl::created_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(derived_samples::dsl::updated_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.parent_sample_id) {
+            query = query.filter(derived_samples::dsl::parent_sample_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.child_sample_id) {
+            query = query.filter(derived_samples::dsl::child_sample_id.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -878,17 +941,33 @@ impl DerivedSample {
     /// Get all of the structs from the database ordered by the updated_at column.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all_by_updated_at(
+        filter: Option<&web_common::database::DerivedSampleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::derived_samples;
-        derived_samples::dsl::derived_samples
+        let mut query = derived_samples::dsl::derived_samples
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(derived_samples::dsl::created_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(derived_samples::dsl::updated_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.parent_sample_id) {
+            query = query.filter(derived_samples::dsl::parent_sample_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.child_sample_id) {
+            query = query.filter(derived_samples::dsl::child_sample_id.eq(value));
+        }
+        query
             .order_by(derived_samples::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -955,17 +1034,27 @@ impl DocumentFormat {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::DocumentFormatFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::document_formats;
-        document_formats::dsl::document_formats
+        let mut query = document_formats::dsl::document_formats
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(document_formats::dsl::icon_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.color_id) {
+            query = query.filter(document_formats::dsl::color_id.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -1017,7 +1106,7 @@ impl DocumentFormat {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, extension, mime_type, description, icon_id, color_id FROM document_formats ",
@@ -1046,7 +1135,7 @@ impl DocumentFormat {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, extension, mime_type, description, icon_id, color_id FROM document_formats ",
@@ -1075,7 +1164,7 @@ impl DocumentFormat {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, extension, mime_type, description, icon_id, color_id FROM document_formats ",
@@ -1304,17 +1393,27 @@ impl LoginProvider {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::LoginProviderFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::login_providers;
-        login_providers::dsl::login_providers
+        let mut query = login_providers::dsl::login_providers
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(login_providers::dsl::icon_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.color_id) {
+            query = query.filter(login_providers::dsl::color_id.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -1423,17 +1522,24 @@ impl Notification {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::NotificationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::notifications;
-        notifications::dsl::notifications
+        let mut query = notifications::dsl::notifications
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.user_id) {
+            query = query.filter(notifications::dsl::user_id.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -1497,17 +1603,24 @@ impl Organization {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::OrganizationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::organizations;
-        organizations::dsl::organizations
+        let mut query = organizations::dsl::organizations
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.country_id) {
+            query = query.filter(organizations::dsl::country_id.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -1595,7 +1708,7 @@ impl Organization {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, url, country_id, state_province, domain FROM organizations ",
@@ -1624,7 +1737,7 @@ impl Organization {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, url, country_id, state_province, domain FROM organizations ",
@@ -1653,7 +1766,7 @@ impl Organization {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, url, country_id, state_province, domain FROM organizations ",
@@ -1707,17 +1820,27 @@ impl ProjectState {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::ProjectStateFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::project_states;
-        project_states::dsl::project_states
+        let mut query = project_states::dsl::project_states
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(project_states::dsl::icon_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.color_id) {
+            query = query.filter(project_states::dsl::color_id.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -1799,7 +1922,7 @@ impl ProjectState {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id FROM project_states ",
@@ -1828,7 +1951,7 @@ impl ProjectState {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id FROM project_states ",
@@ -1857,7 +1980,7 @@ impl ProjectState {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id FROM project_states ",
@@ -1872,11 +1995,11 @@ impl ProjectState {
 }
 #[derive(Queryable, Debug, Identifiable, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = projects)]
-#[diesel(belongs_to(Project, foreign_key = parent_project_id))]
-#[diesel(belongs_to(User, foreign_key = created_by))]
 #[diesel(belongs_to(ProjectState, foreign_key = state_id))]
 #[diesel(belongs_to(FontAwesomeIcon, foreign_key = icon_id))]
 #[diesel(belongs_to(Color, foreign_key = color_id))]
+#[diesel(belongs_to(Project, foreign_key = parent_project_id))]
+#[diesel(belongs_to(User, foreign_key = created_by))]
 #[diesel(primary_key(id))]
 pub struct Project {
     pub id: i32,
@@ -2098,17 +2221,39 @@ impl Project {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::ProjectFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::projects;
-        projects::dsl::projects
+        let mut query = projects::dsl::projects
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.state_id) {
+            query = query.filter(projects::dsl::state_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(projects::dsl::icon_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.color_id) {
+            query = query.filter(projects::dsl::color_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.parent_project_id) {
+            query = query.filter(projects::dsl::parent_project_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects::dsl::created_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(projects::dsl::updated_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -2117,18 +2262,20 @@ impl Project {
     ///
     /// # Arguments
     /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all_editables(
         author_user_id: i32,
+        filter: Option<&web_common::database::ProjectFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::projects;
-        projects::dsl::projects
+        let mut query = projects::dsl::projects
            .filter(projects::dsl::created_by.eq(author_user_id))
             .or_filter(
                projects::dsl::id.eq_any(
@@ -2150,6 +2297,26 @@ impl Project {
                            )),
                    ),
             )
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.state_id) {
+            query = query.filter(projects::dsl::state_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(projects::dsl::icon_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.color_id) {
+            query = query.filter(projects::dsl::color_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.parent_project_id) {
+            query = query.filter(projects::dsl::parent_project_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects::dsl::created_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(projects::dsl::updated_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -2157,17 +2324,39 @@ impl Project {
     /// Get all of the structs from the database ordered by the updated_at column.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all_by_updated_at(
+        filter: Option<&web_common::database::ProjectFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::projects;
-        projects::dsl::projects
+        let mut query = projects::dsl::projects
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.state_id) {
+            query = query.filter(projects::dsl::state_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(projects::dsl::icon_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.color_id) {
+            query = query.filter(projects::dsl::color_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.parent_project_id) {
+            query = query.filter(projects::dsl::parent_project_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects::dsl::created_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(projects::dsl::updated_by.eq(value));
+        }
+        query
             .order_by(projects::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -2282,7 +2471,7 @@ impl Project {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, public, state_id, icon_id, color_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date FROM projects ",
@@ -2313,7 +2502,7 @@ impl Project {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all_editables(author_user_id, Some(limit as i64), None, connection);
+            return Self::all_editables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, public, state_id, icon_id, color_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date FROM projects ",
@@ -2352,7 +2541,7 @@ impl Project {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, public, state_id, icon_id, color_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date FROM projects ",
@@ -2383,7 +2572,7 @@ impl Project {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all_editables(author_user_id, Some(limit as i64), None, connection);
+            return Self::all_editables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, public, state_id, icon_id, color_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date FROM projects ",
@@ -2422,7 +2611,7 @@ impl Project {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, public, state_id, icon_id, color_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date FROM projects ",
@@ -2453,7 +2642,7 @@ impl Project {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all_editables(author_user_id, Some(limit as i64), None, connection);
+            return Self::all_editables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, public, state_id, icon_id, color_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date FROM projects ",
@@ -2519,17 +2708,33 @@ impl ProjectsTeamsRoleInvitation {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::ProjectsTeamsRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::projects_teams_role_invitations;
-        projects_teams_role_invitations::dsl::projects_teams_role_invitations
+        let mut query = projects_teams_role_invitations::dsl::projects_teams_role_invitations
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.table_id) {
+            query = query.filter(projects_teams_role_invitations::dsl::table_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.team_id) {
+            query = query.filter(projects_teams_role_invitations::dsl::team_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.role_id) {
+            query = query.filter(projects_teams_role_invitations::dsl::role_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects_teams_role_invitations::dsl::created_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -2594,17 +2799,33 @@ impl ProjectsTeamsRoleRequest {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::ProjectsTeamsRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::projects_teams_role_requests;
-        projects_teams_role_requests::dsl::projects_teams_role_requests
+        let mut query = projects_teams_role_requests::dsl::projects_teams_role_requests
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.table_id) {
+            query = query.filter(projects_teams_role_requests::dsl::table_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.team_id) {
+            query = query.filter(projects_teams_role_requests::dsl::team_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.role_id) {
+            query = query.filter(projects_teams_role_requests::dsl::role_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects_teams_role_requests::dsl::created_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -2669,17 +2890,33 @@ impl ProjectsTeamsRole {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::ProjectsTeamsRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::projects_teams_roles;
-        projects_teams_roles::dsl::projects_teams_roles
+        let mut query = projects_teams_roles::dsl::projects_teams_roles
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.table_id) {
+            query = query.filter(projects_teams_roles::dsl::table_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.team_id) {
+            query = query.filter(projects_teams_roles::dsl::team_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.role_id) {
+            query = query.filter(projects_teams_roles::dsl::role_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects_teams_roles::dsl::created_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -2743,17 +2980,33 @@ impl ProjectsUsersRoleInvitation {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::ProjectsUsersRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::projects_users_role_invitations;
-        projects_users_role_invitations::dsl::projects_users_role_invitations
+        let mut query = projects_users_role_invitations::dsl::projects_users_role_invitations
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.table_id) {
+            query = query.filter(projects_users_role_invitations::dsl::table_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.user_id) {
+            query = query.filter(projects_users_role_invitations::dsl::user_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.role_id) {
+            query = query.filter(projects_users_role_invitations::dsl::role_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects_users_role_invitations::dsl::created_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -2817,17 +3070,33 @@ impl ProjectsUsersRoleRequest {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::ProjectsUsersRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::projects_users_role_requests;
-        projects_users_role_requests::dsl::projects_users_role_requests
+        let mut query = projects_users_role_requests::dsl::projects_users_role_requests
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.table_id) {
+            query = query.filter(projects_users_role_requests::dsl::table_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.user_id) {
+            query = query.filter(projects_users_role_requests::dsl::user_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.role_id) {
+            query = query.filter(projects_users_role_requests::dsl::role_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects_users_role_requests::dsl::created_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -2891,17 +3160,33 @@ impl ProjectsUsersRole {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::ProjectsUsersRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::projects_users_roles;
-        projects_users_roles::dsl::projects_users_roles
+        let mut query = projects_users_roles::dsl::projects_users_roles
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.table_id) {
+            query = query.filter(projects_users_roles::dsl::table_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.user_id) {
+            query = query.filter(projects_users_roles::dsl::user_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.role_id) {
+            query = query.filter(projects_users_roles::dsl::role_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects_users_roles::dsl::created_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -2964,17 +3249,27 @@ impl Role {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::RoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::roles;
-        roles::dsl::roles
+        let mut query = roles::dsl::roles
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(roles::dsl::icon_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.color_id) {
+            query = query.filter(roles::dsl::color_id.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -3071,7 +3366,7 @@ impl Role {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id FROM roles ",
@@ -3100,7 +3395,7 @@ impl Role {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id FROM roles ",
@@ -3129,7 +3424,7 @@ impl Role {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id FROM roles ",
@@ -3187,17 +3482,33 @@ impl SampleBioOttTaxonItem {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::SampleBioOttTaxonItemFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::sample_bio_ott_taxon_items;
-        sample_bio_ott_taxon_items::dsl::sample_bio_ott_taxon_items
+        let mut query = sample_bio_ott_taxon_items::dsl::sample_bio_ott_taxon_items
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(sample_bio_ott_taxon_items::dsl::created_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(sample_bio_ott_taxon_items::dsl::updated_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.sample_id) {
+            query = query.filter(sample_bio_ott_taxon_items::dsl::sample_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.taxon_id) {
+            query = query.filter(sample_bio_ott_taxon_items::dsl::taxon_id.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -3205,17 +3516,33 @@ impl SampleBioOttTaxonItem {
     /// Get all of the structs from the database ordered by the updated_at column.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all_by_updated_at(
+        filter: Option<&web_common::database::SampleBioOttTaxonItemFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::sample_bio_ott_taxon_items;
-        sample_bio_ott_taxon_items::dsl::sample_bio_ott_taxon_items
+        let mut query = sample_bio_ott_taxon_items::dsl::sample_bio_ott_taxon_items
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(sample_bio_ott_taxon_items::dsl::created_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(sample_bio_ott_taxon_items::dsl::updated_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.sample_id) {
+            query = query.filter(sample_bio_ott_taxon_items::dsl::sample_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.taxon_id) {
+            query = query.filter(sample_bio_ott_taxon_items::dsl::taxon_id.eq(value));
+        }
+        query
             .order_by(sample_bio_ott_taxon_items::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -3279,17 +3606,27 @@ impl SampleState {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::SampleStateFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::sample_states;
-        sample_states::dsl::sample_states
+        let mut query = sample_states::dsl::sample_states
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(sample_states::dsl::icon_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.color_id) {
+            query = query.filter(sample_states::dsl::color_id.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -3356,7 +3693,7 @@ impl SampleState {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id FROM sample_states ",
@@ -3385,7 +3722,7 @@ impl SampleState {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id FROM sample_states ",
@@ -3414,7 +3751,7 @@ impl SampleState {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id FROM sample_states ",
@@ -3472,17 +3809,33 @@ impl SampledIndividualBioOttTaxonItem {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::SampledIndividualBioOttTaxonItemFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::sampled_individual_bio_ott_taxon_items;
-        sampled_individual_bio_ott_taxon_items::dsl::sampled_individual_bio_ott_taxon_items
+        let mut query = sampled_individual_bio_ott_taxon_items::dsl::sampled_individual_bio_ott_taxon_items
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(sampled_individual_bio_ott_taxon_items::dsl::created_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(sampled_individual_bio_ott_taxon_items::dsl::updated_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.sampled_individual_id) {
+            query = query.filter(sampled_individual_bio_ott_taxon_items::dsl::sampled_individual_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.taxon_id) {
+            query = query.filter(sampled_individual_bio_ott_taxon_items::dsl::taxon_id.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -3490,17 +3843,33 @@ impl SampledIndividualBioOttTaxonItem {
     /// Get all of the structs from the database ordered by the updated_at column.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all_by_updated_at(
+        filter: Option<&web_common::database::SampledIndividualBioOttTaxonItemFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::sampled_individual_bio_ott_taxon_items;
-        sampled_individual_bio_ott_taxon_items::dsl::sampled_individual_bio_ott_taxon_items
+        let mut query = sampled_individual_bio_ott_taxon_items::dsl::sampled_individual_bio_ott_taxon_items
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(sampled_individual_bio_ott_taxon_items::dsl::created_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(sampled_individual_bio_ott_taxon_items::dsl::updated_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.sampled_individual_id) {
+            query = query.filter(sampled_individual_bio_ott_taxon_items::dsl::sampled_individual_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.taxon_id) {
+            query = query.filter(sampled_individual_bio_ott_taxon_items::dsl::taxon_id.eq(value));
+        }
+        query
             .order_by(sampled_individual_bio_ott_taxon_items::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -3717,17 +4086,27 @@ impl SampledIndividual {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::SampledIndividualFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::sampled_individuals;
-        sampled_individuals::dsl::sampled_individuals
+        let mut query = sampled_individuals::dsl::sampled_individuals
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(sampled_individuals::dsl::created_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(sampled_individuals::dsl::updated_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -3736,18 +4115,20 @@ impl SampledIndividual {
     ///
     /// # Arguments
     /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all_editables(
         author_user_id: i32,
+        filter: Option<&web_common::database::SampledIndividualFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::sampled_individuals;
-        sampled_individuals::dsl::sampled_individuals
+        let mut query = sampled_individuals::dsl::sampled_individuals
            .filter(sampled_individuals::dsl::created_by.eq(author_user_id))
             .or_filter(
                sampled_individuals::dsl::id.eq_any(
@@ -3769,6 +4150,14 @@ impl SampledIndividual {
                            )),
                    ),
             )
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(sampled_individuals::dsl::created_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(sampled_individuals::dsl::updated_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -3776,17 +4165,27 @@ impl SampledIndividual {
     /// Get all of the structs from the database ordered by the updated_at column.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all_by_updated_at(
+        filter: Option<&web_common::database::SampledIndividualFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::sampled_individuals;
-        sampled_individuals::dsl::sampled_individuals
+        let mut query = sampled_individuals::dsl::sampled_individuals
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(sampled_individuals::dsl::created_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(sampled_individuals::dsl::updated_by.eq(value));
+        }
+        query
             .order_by(sampled_individuals::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -3883,17 +4282,33 @@ impl SampledIndividualsTeamsRoleInvitation {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::SampledIndividualsTeamsRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::sampled_individuals_teams_role_invitations;
-        sampled_individuals_teams_role_invitations::dsl::sampled_individuals_teams_role_invitations
+        let mut query = sampled_individuals_teams_role_invitations::dsl::sampled_individuals_teams_role_invitations
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.table_id) {
+            query = query.filter(sampled_individuals_teams_role_invitations::dsl::table_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.team_id) {
+            query = query.filter(sampled_individuals_teams_role_invitations::dsl::team_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.role_id) {
+            query = query.filter(sampled_individuals_teams_role_invitations::dsl::role_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(sampled_individuals_teams_role_invitations::dsl::created_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -3958,17 +4373,33 @@ impl SampledIndividualsTeamsRoleRequest {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::SampledIndividualsTeamsRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::sampled_individuals_teams_role_requests;
-        sampled_individuals_teams_role_requests::dsl::sampled_individuals_teams_role_requests
+        let mut query = sampled_individuals_teams_role_requests::dsl::sampled_individuals_teams_role_requests
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.table_id) {
+            query = query.filter(sampled_individuals_teams_role_requests::dsl::table_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.team_id) {
+            query = query.filter(sampled_individuals_teams_role_requests::dsl::team_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.role_id) {
+            query = query.filter(sampled_individuals_teams_role_requests::dsl::role_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(sampled_individuals_teams_role_requests::dsl::created_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -4033,17 +4464,33 @@ impl SampledIndividualsTeamsRole {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::SampledIndividualsTeamsRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::sampled_individuals_teams_roles;
-        sampled_individuals_teams_roles::dsl::sampled_individuals_teams_roles
+        let mut query = sampled_individuals_teams_roles::dsl::sampled_individuals_teams_roles
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.table_id) {
+            query = query.filter(sampled_individuals_teams_roles::dsl::table_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.team_id) {
+            query = query.filter(sampled_individuals_teams_roles::dsl::team_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.role_id) {
+            query = query.filter(sampled_individuals_teams_roles::dsl::role_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(sampled_individuals_teams_roles::dsl::created_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -4107,17 +4554,33 @@ impl SampledIndividualsUsersRoleInvitation {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::SampledIndividualsUsersRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::sampled_individuals_users_role_invitations;
-        sampled_individuals_users_role_invitations::dsl::sampled_individuals_users_role_invitations
+        let mut query = sampled_individuals_users_role_invitations::dsl::sampled_individuals_users_role_invitations
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.table_id) {
+            query = query.filter(sampled_individuals_users_role_invitations::dsl::table_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.user_id) {
+            query = query.filter(sampled_individuals_users_role_invitations::dsl::user_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.role_id) {
+            query = query.filter(sampled_individuals_users_role_invitations::dsl::role_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(sampled_individuals_users_role_invitations::dsl::created_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -4181,17 +4644,33 @@ impl SampledIndividualsUsersRoleRequest {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::SampledIndividualsUsersRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::sampled_individuals_users_role_requests;
-        sampled_individuals_users_role_requests::dsl::sampled_individuals_users_role_requests
+        let mut query = sampled_individuals_users_role_requests::dsl::sampled_individuals_users_role_requests
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.table_id) {
+            query = query.filter(sampled_individuals_users_role_requests::dsl::table_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.user_id) {
+            query = query.filter(sampled_individuals_users_role_requests::dsl::user_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.role_id) {
+            query = query.filter(sampled_individuals_users_role_requests::dsl::role_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(sampled_individuals_users_role_requests::dsl::created_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -4255,17 +4734,33 @@ impl SampledIndividualsUsersRole {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::SampledIndividualsUsersRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::sampled_individuals_users_roles;
-        sampled_individuals_users_roles::dsl::sampled_individuals_users_roles
+        let mut query = sampled_individuals_users_roles::dsl::sampled_individuals_users_roles
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.table_id) {
+            query = query.filter(sampled_individuals_users_roles::dsl::table_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.user_id) {
+            query = query.filter(sampled_individuals_users_roles::dsl::user_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.role_id) {
+            query = query.filter(sampled_individuals_users_roles::dsl::role_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(sampled_individuals_users_roles::dsl::created_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -4485,17 +4980,33 @@ impl Sample {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::SampleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::samples;
-        samples::dsl::samples
+        let mut query = samples::dsl::samples
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(samples::dsl::created_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.sampled_by) {
+            query = query.filter(samples::dsl::sampled_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(samples::dsl::updated_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.state) {
+            query = query.filter(samples::dsl::state.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -4504,18 +5015,20 @@ impl Sample {
     ///
     /// # Arguments
     /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all_editables(
         author_user_id: i32,
+        filter: Option<&web_common::database::SampleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::samples;
-        samples::dsl::samples
+        let mut query = samples::dsl::samples
            .filter(samples::dsl::created_by.eq(author_user_id))
             .or_filter(
                samples::dsl::id.eq_any(
@@ -4537,6 +5050,20 @@ impl Sample {
                            )),
                    ),
             )
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(samples::dsl::created_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.sampled_by) {
+            query = query.filter(samples::dsl::sampled_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(samples::dsl::updated_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.state) {
+            query = query.filter(samples::dsl::state.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -4544,17 +5071,33 @@ impl Sample {
     /// Get all of the structs from the database ordered by the updated_at column.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all_by_updated_at(
+        filter: Option<&web_common::database::SampleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::samples;
-        samples::dsl::samples
+        let mut query = samples::dsl::samples
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(samples::dsl::created_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.sampled_by) {
+            query = query.filter(samples::dsl::sampled_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(samples::dsl::updated_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.state) {
+            query = query.filter(samples::dsl::state.eq(value));
+        }
+        query
             .order_by(samples::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -4651,17 +5194,33 @@ impl SamplesTeamsRoleInvitation {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::SamplesTeamsRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::samples_teams_role_invitations;
-        samples_teams_role_invitations::dsl::samples_teams_role_invitations
+        let mut query = samples_teams_role_invitations::dsl::samples_teams_role_invitations
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.table_id) {
+            query = query.filter(samples_teams_role_invitations::dsl::table_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.team_id) {
+            query = query.filter(samples_teams_role_invitations::dsl::team_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.role_id) {
+            query = query.filter(samples_teams_role_invitations::dsl::role_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(samples_teams_role_invitations::dsl::created_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -4726,17 +5285,33 @@ impl SamplesTeamsRoleRequest {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::SamplesTeamsRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::samples_teams_role_requests;
-        samples_teams_role_requests::dsl::samples_teams_role_requests
+        let mut query = samples_teams_role_requests::dsl::samples_teams_role_requests
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.table_id) {
+            query = query.filter(samples_teams_role_requests::dsl::table_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.team_id) {
+            query = query.filter(samples_teams_role_requests::dsl::team_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.role_id) {
+            query = query.filter(samples_teams_role_requests::dsl::role_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(samples_teams_role_requests::dsl::created_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -4801,17 +5376,33 @@ impl SamplesTeamsRole {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::SamplesTeamsRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::samples_teams_roles;
-        samples_teams_roles::dsl::samples_teams_roles
+        let mut query = samples_teams_roles::dsl::samples_teams_roles
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.table_id) {
+            query = query.filter(samples_teams_roles::dsl::table_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.team_id) {
+            query = query.filter(samples_teams_roles::dsl::team_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.role_id) {
+            query = query.filter(samples_teams_roles::dsl::role_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(samples_teams_roles::dsl::created_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -4875,17 +5466,33 @@ impl SamplesUsersRoleInvitation {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::SamplesUsersRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::samples_users_role_invitations;
-        samples_users_role_invitations::dsl::samples_users_role_invitations
+        let mut query = samples_users_role_invitations::dsl::samples_users_role_invitations
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.table_id) {
+            query = query.filter(samples_users_role_invitations::dsl::table_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.user_id) {
+            query = query.filter(samples_users_role_invitations::dsl::user_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.role_id) {
+            query = query.filter(samples_users_role_invitations::dsl::role_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(samples_users_role_invitations::dsl::created_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -4949,17 +5556,33 @@ impl SamplesUsersRoleRequest {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::SamplesUsersRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::samples_users_role_requests;
-        samples_users_role_requests::dsl::samples_users_role_requests
+        let mut query = samples_users_role_requests::dsl::samples_users_role_requests
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.table_id) {
+            query = query.filter(samples_users_role_requests::dsl::table_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.user_id) {
+            query = query.filter(samples_users_role_requests::dsl::user_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.role_id) {
+            query = query.filter(samples_users_role_requests::dsl::role_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(samples_users_role_requests::dsl::created_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -5023,17 +5646,33 @@ impl SamplesUsersRole {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::SamplesUsersRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::samples_users_roles;
-        samples_users_roles::dsl::samples_users_roles
+        let mut query = samples_users_roles::dsl::samples_users_roles
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.table_id) {
+            query = query.filter(samples_users_roles::dsl::table_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.user_id) {
+            query = query.filter(samples_users_roles::dsl::user_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.role_id) {
+            query = query.filter(samples_users_roles::dsl::role_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(samples_users_roles::dsl::created_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -5086,17 +5725,24 @@ impl Spectra {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::SpectraFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::spectra;
-        spectra::dsl::spectra
+        let mut query = spectra::dsl::spectra
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.spectra_collection_id) {
+            query = query.filter(spectra::dsl::spectra_collection_id.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -5312,17 +5958,30 @@ impl SpectraCollection {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::SpectraCollectionFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::spectra_collections;
-        spectra_collections::dsl::spectra_collections
+        let mut query = spectra_collections::dsl::spectra_collections
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.sample_id) {
+            query = query.filter(spectra_collections::dsl::sample_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(spectra_collections::dsl::created_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(spectra_collections::dsl::updated_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -5331,18 +5990,20 @@ impl SpectraCollection {
     ///
     /// # Arguments
     /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all_editables(
         author_user_id: i32,
+        filter: Option<&web_common::database::SpectraCollectionFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::spectra_collections;
-        spectra_collections::dsl::spectra_collections
+        let mut query = spectra_collections::dsl::spectra_collections
            .filter(spectra_collections::dsl::created_by.eq(author_user_id))
             .or_filter(
                spectra_collections::dsl::id.eq_any(
@@ -5364,6 +6025,17 @@ impl SpectraCollection {
                            )),
                    ),
             )
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.sample_id) {
+            query = query.filter(spectra_collections::dsl::sample_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(spectra_collections::dsl::created_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(spectra_collections::dsl::updated_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -5371,17 +6043,30 @@ impl SpectraCollection {
     /// Get all of the structs from the database ordered by the updated_at column.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all_by_updated_at(
+        filter: Option<&web_common::database::SpectraCollectionFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::spectra_collections;
-        spectra_collections::dsl::spectra_collections
+        let mut query = spectra_collections::dsl::spectra_collections
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.sample_id) {
+            query = query.filter(spectra_collections::dsl::sample_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(spectra_collections::dsl::created_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(spectra_collections::dsl::updated_by.eq(value));
+        }
+        query
             .order_by(spectra_collections::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -5478,17 +6163,33 @@ impl SpectraCollectionsTeamsRoleInvitation {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::SpectraCollectionsTeamsRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::spectra_collections_teams_role_invitations;
-        spectra_collections_teams_role_invitations::dsl::spectra_collections_teams_role_invitations
+        let mut query = spectra_collections_teams_role_invitations::dsl::spectra_collections_teams_role_invitations
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.table_id) {
+            query = query.filter(spectra_collections_teams_role_invitations::dsl::table_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.team_id) {
+            query = query.filter(spectra_collections_teams_role_invitations::dsl::team_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.role_id) {
+            query = query.filter(spectra_collections_teams_role_invitations::dsl::role_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(spectra_collections_teams_role_invitations::dsl::created_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -5553,17 +6254,33 @@ impl SpectraCollectionsTeamsRoleRequest {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::SpectraCollectionsTeamsRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::spectra_collections_teams_role_requests;
-        spectra_collections_teams_role_requests::dsl::spectra_collections_teams_role_requests
+        let mut query = spectra_collections_teams_role_requests::dsl::spectra_collections_teams_role_requests
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.table_id) {
+            query = query.filter(spectra_collections_teams_role_requests::dsl::table_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.team_id) {
+            query = query.filter(spectra_collections_teams_role_requests::dsl::team_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.role_id) {
+            query = query.filter(spectra_collections_teams_role_requests::dsl::role_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(spectra_collections_teams_role_requests::dsl::created_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -5628,17 +6345,33 @@ impl SpectraCollectionsTeamsRole {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::SpectraCollectionsTeamsRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::spectra_collections_teams_roles;
-        spectra_collections_teams_roles::dsl::spectra_collections_teams_roles
+        let mut query = spectra_collections_teams_roles::dsl::spectra_collections_teams_roles
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.table_id) {
+            query = query.filter(spectra_collections_teams_roles::dsl::table_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.team_id) {
+            query = query.filter(spectra_collections_teams_roles::dsl::team_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.role_id) {
+            query = query.filter(spectra_collections_teams_roles::dsl::role_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(spectra_collections_teams_roles::dsl::created_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -5702,17 +6435,33 @@ impl SpectraCollectionsUsersRoleInvitation {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::SpectraCollectionsUsersRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::spectra_collections_users_role_invitations;
-        spectra_collections_users_role_invitations::dsl::spectra_collections_users_role_invitations
+        let mut query = spectra_collections_users_role_invitations::dsl::spectra_collections_users_role_invitations
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.table_id) {
+            query = query.filter(spectra_collections_users_role_invitations::dsl::table_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.user_id) {
+            query = query.filter(spectra_collections_users_role_invitations::dsl::user_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.role_id) {
+            query = query.filter(spectra_collections_users_role_invitations::dsl::role_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(spectra_collections_users_role_invitations::dsl::created_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -5776,17 +6525,33 @@ impl SpectraCollectionsUsersRoleRequest {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::SpectraCollectionsUsersRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::spectra_collections_users_role_requests;
-        spectra_collections_users_role_requests::dsl::spectra_collections_users_role_requests
+        let mut query = spectra_collections_users_role_requests::dsl::spectra_collections_users_role_requests
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.table_id) {
+            query = query.filter(spectra_collections_users_role_requests::dsl::table_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.user_id) {
+            query = query.filter(spectra_collections_users_role_requests::dsl::user_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.role_id) {
+            query = query.filter(spectra_collections_users_role_requests::dsl::role_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(spectra_collections_users_role_requests::dsl::created_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -5850,17 +6615,33 @@ impl SpectraCollectionsUsersRole {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::SpectraCollectionsUsersRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::spectra_collections_users_roles;
-        spectra_collections_users_roles::dsl::spectra_collections_users_roles
+        let mut query = spectra_collections_users_roles::dsl::spectra_collections_users_roles
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.table_id) {
+            query = query.filter(spectra_collections_users_roles::dsl::table_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.user_id) {
+            query = query.filter(spectra_collections_users_roles::dsl::user_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.role_id) {
+            query = query.filter(spectra_collections_users_roles::dsl::role_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(spectra_collections_users_roles::dsl::created_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -5923,17 +6704,27 @@ impl TeamState {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::TeamStateFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::team_states;
-        team_states::dsl::team_states
+        let mut query = team_states::dsl::team_states
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(team_states::dsl::icon_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.color_id) {
+            query = query.filter(team_states::dsl::color_id.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -6015,7 +6806,7 @@ impl TeamState {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id FROM team_states ",
@@ -6044,7 +6835,7 @@ impl TeamState {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id FROM team_states ",
@@ -6073,7 +6864,7 @@ impl TeamState {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id FROM team_states ",
@@ -6282,17 +7073,36 @@ impl Team {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::TeamFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::teams;
-        teams::dsl::teams
+        let mut query = teams::dsl::teams
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(teams::dsl::icon_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.color_id) {
+            query = query.filter(teams::dsl::color_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.parent_team_id) {
+            query = query.filter(teams::dsl::parent_team_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(teams::dsl::created_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(teams::dsl::updated_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -6301,18 +7111,20 @@ impl Team {
     ///
     /// # Arguments
     /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all_editables(
         author_user_id: i32,
+        filter: Option<&web_common::database::TeamFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::teams;
-        teams::dsl::teams
+        let mut query = teams::dsl::teams
            .filter(teams::dsl::created_by.eq(author_user_id))
             .or_filter(
                teams::dsl::id.eq_any(
@@ -6322,6 +7134,23 @@ impl Team {
                        .and(teams_users_roles::dsl::role_id.le(2)),
                )),
             )
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(teams::dsl::icon_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.color_id) {
+            query = query.filter(teams::dsl::color_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.parent_team_id) {
+            query = query.filter(teams::dsl::parent_team_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(teams::dsl::created_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(teams::dsl::updated_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -6329,17 +7158,36 @@ impl Team {
     /// Get all of the structs from the database ordered by the updated_at column.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all_by_updated_at(
+        filter: Option<&web_common::database::TeamFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::teams;
-        teams::dsl::teams
+        let mut query = teams::dsl::teams
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(teams::dsl::icon_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.color_id) {
+            query = query.filter(teams::dsl::color_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.parent_team_id) {
+            query = query.filter(teams::dsl::parent_team_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(teams::dsl::created_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(teams::dsl::updated_by.eq(value));
+        }
+        query
             .order_by(teams::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -6454,7 +7302,7 @@ impl Team {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id, parent_team_id, created_by, created_at, updated_by, updated_at FROM teams ",
@@ -6485,7 +7333,7 @@ impl Team {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all_editables(author_user_id, Some(limit as i64), None, connection);
+            return Self::all_editables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id, parent_team_id, created_by, created_at, updated_by, updated_at FROM teams ",
@@ -6524,7 +7372,7 @@ impl Team {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id, parent_team_id, created_by, created_at, updated_by, updated_at FROM teams ",
@@ -6555,7 +7403,7 @@ impl Team {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all_editables(author_user_id, Some(limit as i64), None, connection);
+            return Self::all_editables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id, parent_team_id, created_by, created_at, updated_by, updated_at FROM teams ",
@@ -6594,7 +7442,7 @@ impl Team {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id, parent_team_id, created_by, created_at, updated_by, updated_at FROM teams ",
@@ -6625,7 +7473,7 @@ impl Team {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all_editables(author_user_id, Some(limit as i64), None, connection);
+            return Self::all_editables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id, parent_team_id, created_by, created_at, updated_by, updated_at FROM teams ",
@@ -6690,17 +7538,33 @@ impl TeamsTeamsRoleInvitation {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::TeamsTeamsRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::teams_teams_role_invitations;
-        teams_teams_role_invitations::dsl::teams_teams_role_invitations
+        let mut query = teams_teams_role_invitations::dsl::teams_teams_role_invitations
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.table_id) {
+            query = query.filter(teams_teams_role_invitations::dsl::table_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.team_id) {
+            query = query.filter(teams_teams_role_invitations::dsl::team_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.role_id) {
+            query = query.filter(teams_teams_role_invitations::dsl::role_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(teams_teams_role_invitations::dsl::created_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -6764,17 +7628,33 @@ impl TeamsUsersRoleInvitation {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::TeamsUsersRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::teams_users_role_invitations;
-        teams_users_role_invitations::dsl::teams_users_role_invitations
+        let mut query = teams_users_role_invitations::dsl::teams_users_role_invitations
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.table_id) {
+            query = query.filter(teams_users_role_invitations::dsl::table_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.user_id) {
+            query = query.filter(teams_users_role_invitations::dsl::user_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.role_id) {
+            query = query.filter(teams_users_role_invitations::dsl::role_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(teams_users_role_invitations::dsl::created_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -6838,17 +7718,33 @@ impl TeamsUsersRoleRequest {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::TeamsUsersRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::teams_users_role_requests;
-        teams_users_role_requests::dsl::teams_users_role_requests
+        let mut query = teams_users_role_requests::dsl::teams_users_role_requests
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.table_id) {
+            query = query.filter(teams_users_role_requests::dsl::table_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.user_id) {
+            query = query.filter(teams_users_role_requests::dsl::user_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.role_id) {
+            query = query.filter(teams_users_role_requests::dsl::role_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(teams_users_role_requests::dsl::created_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -6912,17 +7808,33 @@ impl TeamsUsersRole {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::TeamsUsersRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::teams_users_roles;
-        teams_users_roles::dsl::teams_users_roles
+        let mut query = teams_users_roles::dsl::teams_users_roles
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.table_id) {
+            query = query.filter(teams_users_roles::dsl::table_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.user_id) {
+            query = query.filter(teams_users_roles::dsl::user_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.role_id) {
+            query = query.filter(teams_users_roles::dsl::role_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(teams_users_roles::dsl::created_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -7157,17 +8069,27 @@ impl UserEmail {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::UserEmailFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::user_emails;
-        user_emails::dsl::user_emails
+        let mut query = user_emails::dsl::user_emails
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(user_emails::dsl::created_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.login_provider_id) {
+            query = query.filter(user_emails::dsl::login_provider_id.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -7429,17 +8351,33 @@ impl UsersUsersRoleInvitation {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::UsersUsersRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::users_users_role_invitations;
-        users_users_role_invitations::dsl::users_users_role_invitations
+        let mut query = users_users_role_invitations::dsl::users_users_role_invitations
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.table_id) {
+            query = query.filter(users_users_role_invitations::dsl::table_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.user_id) {
+            query = query.filter(users_users_role_invitations::dsl::user_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.role_id) {
+            query = query.filter(users_users_role_invitations::dsl::role_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(users_users_role_invitations::dsl::created_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -7502,17 +8440,33 @@ impl UsersUsersRoleRequest {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::UsersUsersRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::users_users_role_requests;
-        users_users_role_requests::dsl::users_users_role_requests
+        let mut query = users_users_role_requests::dsl::users_users_role_requests
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.table_id) {
+            query = query.filter(users_users_role_requests::dsl::table_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.user_id) {
+            query = query.filter(users_users_role_requests::dsl::user_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.role_id) {
+            query = query.filter(users_users_role_requests::dsl::role_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(users_users_role_requests::dsl::created_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -7575,17 +8529,33 @@ impl UsersUsersRole {
     /// Get all of the structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all(
+        filter: Option<&web_common::database::UsersUsersRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::users_users_roles;
-        users_users_roles::dsl::users_users_roles
+        let mut query = users_users_roles::dsl::users_users_roles
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.table_id) {
+            query = query.filter(users_users_roles::dsl::table_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.user_id) {
+            query = query.filter(users_users_roles::dsl::user_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.role_id) {
+            query = query.filter(users_users_roles::dsl::role_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(users_users_roles::dsl::created_by.eq(value));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)

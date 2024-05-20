@@ -36,7 +36,7 @@ from constraint_checkers import (
 )
 from constraint_checkers.regroup_tables import regroup_tables
 from constraint_checkers import generate_view_schema
-from constraint_checkers import check_parent_circularity_trigger
+from constraint_checkers import check_parent_circularity_trigger, create_filter_structs
 
 
 TEXTUAL_DATA_TYPES = ["String"]
@@ -432,6 +432,11 @@ def write_backend_structs(
                         "    /// * `author_user_id` - The ID of the user who is performing the search.\n"
                     )
 
+                if struct.has_filter_variant():
+                    file.write(
+                        "    /// * `filter` - The optional filter to apply to the query.\n"
+                    )
+
                 file.write(
                     "    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.\n"
                     "    /// * `offset` - The number of structs to skip. By default, this is 0.\n"
@@ -444,6 +449,10 @@ def write_backend_structs(
                     )
                 else:
                     file.write("    pub fn all(\n")
+
+                if struct.has_filter_variant():
+                    filter_struct = struct.get_filter_variant()
+                    file.write(f"        filter: Option<&web_common::database::{filter_struct.name}>,\n")
                 file.write(
                     "        limit: Option<i64>,\n"
                     "        offset: Option<i64>,\n"
@@ -458,7 +467,14 @@ def write_backend_structs(
                     )
                 # If the limit is None, we do not apply any limit to the query.
 
-                file.write(f"        {struct.table_name}::dsl::{struct.table_name}\n")
+                if struct.has_filter_variant():
+                    file.write(
+                        f"        let mut query = {struct.table_name}::dsl::{struct.table_name}\n"
+                    )
+                else:
+                    file.write(
+                        f"        {struct.table_name}::dsl::{struct.table_name}\n"
+                    )
 
                 if editable_variant:
                     file.write(
@@ -487,6 +503,25 @@ def write_backend_structs(
                             "                   ),\n"
                             "            )\n"
                         )
+
+                if struct.has_filter_variant():
+                    # We need to filter the query by the filter struct,
+                    # but these filters are composed by several optional fields
+                    # and therefore we need to box the query and apply the filters
+                    # only if they are not None.
+                    file.write("            .into_boxed();\n")
+
+                    filter_struct = struct.get_filter_variant()
+
+                    for filter_attribute in filter_struct.attributes:
+                        file.write(
+                            f"        if let Some(value) = filter.and_then(|f| f.{filter_attribute.name}) {{\n"
+                            f"            query = query.filter({filter_struct.table_name}::dsl::{filter_attribute.name}.eq(value));\n"
+                            "        }\n"
+                        )
+
+                    file.write("        query\n")
+
                 file.write(
                     "            .offset(offset.unwrap_or(0))\n"
                     "            .limit(limit.unwrap_or(10))\n"
@@ -504,11 +539,25 @@ def write_backend_structs(
                     "    /// Get all of the structs from the database ordered by the updated_at column.\n"
                     "    ///\n"
                     "    /// # Arguments\n"
+                )
+
+                if struct.has_filter_variant():
+                    file.write(
+                        "    /// * `filter` - The optional filter to apply to the query.\n"
+                    )
+
+                file.write(
                     "    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.\n"
                     "    /// * `offset` - The number of structs to skip. By default, this is 0.\n"
                     "    /// * `connection` - The connection to the database.\n"
                     "    ///\n"
                     "    pub fn all_by_updated_at(\n"
+                )
+                if struct.has_filter_variant():
+                    filter_struct = struct.get_filter_variant()
+                    file.write(f"        filter: Option<&web_common::database::{filter_struct.name}>,\n")
+
+                file.write(
                     "        limit: Option<i64>,\n"
                     "        offset: Option<i64>,\n"
                     "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
@@ -520,8 +569,27 @@ def write_backend_structs(
                     file.write(
                         f"        use crate::views::schema::{struct.table_name};\n"
                     )
+                if struct.has_filter_variant():
+                    filter_struct = struct.get_filter_variant()
+                    file.write(
+                        f"        let mut query = {struct.table_name}::dsl::{struct.table_name}\n"
+                        "            .into_boxed();\n"
+                    )
+
+                    for filter_attribute in filter_struct.attributes:
+                        file.write(
+                            f"        if let Some(value) = filter.and_then(|f| f.{filter_attribute.name}) {{\n"
+                            f"            query = query.filter({filter_struct.table_name}::dsl::{filter_attribute.name}.eq(value));\n"
+                            "        }\n"
+                        )
+
+                    file.write("        query\n")
+                else:
+                    file.write(
+                        f"        {struct.table_name}::dsl::{struct.table_name}\n"
+                    )
+
                 file.write(
-                    f"        {struct.table_name}::dsl::{struct.table_name}\n"
                     f"            .order_by({struct.table_name}::dsl::updated_at.desc())\n"
                     "            .offset(offset.unwrap_or(0))\n"
                     "            .limit(limit.unwrap_or(10))\n"
@@ -715,13 +783,23 @@ def write_backend_structs(
                             "        if query.is_empty() {\n"
                         )
                         if editable_filter:
-                            file.write(
-                                "            return Self::all_editables(author_user_id, Some(limit as i64), None, connection);\n"
-                            )
+                            if struct.has_filter_variant():
+                                file.write(
+                                    "            return Self::all_editables(author_user_id, None, Some(limit as i64), None, connection);\n"
+                                )
+                            else:
+                                file.write(
+                                    "            return Self::all_editables(author_user_id, Some(limit as i64), None, connection);\n"
+                                )
                         else:
-                            file.write(
-                                "            return Self::all(Some(limit as i64), None, connection);\n"
-                            )
+                            if struct.has_filter_variant():
+                                file.write(
+                                    "            return Self::all(None, Some(limit as i64), None, connection);\n"
+                                )
+                            else:
+                                file.write(
+                                    "            return Self::all(Some(limit as i64), None, connection);\n"
+                                )
                         file.write("        }\n")
 
                         joined_field_names = ", ".join(
@@ -1026,6 +1104,7 @@ def write_web_common_structs(
         "use serde::Serialize;",
         "use uuid::Uuid;",
         "use chrono::NaiveDateTime;",
+        "use crate::database::*;",
     ]
 
     document = open(f"../web_common/src/database/{target}.rs", "w", encoding="utf8")
@@ -1033,28 +1112,46 @@ def write_web_common_structs(
     for import_statament in imports:
         document.write(f"{import_statament}\n")
 
+    # First, we define the Tabular & Filtrable traits which we will implement for all of the
+    # structs.
+    if target == "tables":
+        document.write(
+            "\npub trait Tabular {\n"
+            "    const TABLE: Table;\n"
+            "}\n\n"
+            "pub trait Filtrable: PartialEq {\n"
+            "    type Filter: Serialize + PartialEq + Clone;\n"
+            "}\n\n"
+        )
+
     for struct in tqdm(
         structs,
         desc="Writing frontend structs",
         unit="struct",
         leave=False,
     ):
-        document.write("#[derive(")
-        document.write(", ".join(struct.derives()))
-        document.write(")]\n")
-        # We also write conditional derives for the frontend feature
-        # that ask for the `frontend` feature to be enabled and derive
-        # the yew::html::Properties trait for the struct.
-        document.write(
-            '#[cfg_attr(feature = "frontend", derive(yew::html::Properties))]\n'
-        )
+        # We write the struct definition.
+        struct.write_to(document)
 
-        document.write(f"pub struct {struct.name} {{\n")
-        for attribute in struct.attributes:
-            document.write(
-                f"    pub {attribute.name}: {attribute.format_data_type()},\n"
-            )
+        # We implement the Tabular trait for the struct. This trait
+        # is used to convert the struct into a Table variant.
+        
+        document.write(f"impl Tabular for {struct.name} {{\n")
+        document.write(f"    const TABLE: Table = Table::{struct.capitalized_table_name()};\n")
         document.write("}\n")
+
+        # We implement the Filtrable trait for the struct. This trait
+        # is used to provide the informations on the filter struct that
+        # can be used to filter the struct in the database.
+        if struct.has_filter_variant():
+            filter_struct = struct.get_filter_variant()
+            document.write(f"\nimpl Filtrable for {struct.name} {{\n")
+            document.write(f"    type Filter = {filter_struct.name};\n")
+            document.write("}\n")
+        elif struct.table_name == "users":
+            document.write(f"\nimpl Filtrable for {struct.name} {{\n")
+            document.write("    type Filter = EmptyFilter;\n")
+            document.write("}\n")
 
         # This variant of the struct implementation is only
         # available when in the web_common is enabled the frontend
@@ -1122,7 +1219,9 @@ def write_web_common_structs(
             "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
         )
         document.write("    {\n")
-        document.write("        use gluesql::core::ast_builder::*;\n")
+        document.write(
+            "        use gluesql::core::ast_builder::*;\n"
+        )
         # We use the AST builder as much as possible so to avoid SQL injection attacks.
         document.write(f'        table("{struct.table_name}")\n')
         document.write("            .insert()\n")
@@ -1272,11 +1371,20 @@ def write_web_common_structs(
             f"    /// Get all {struct.name} from the database.\n"
             "    ///\n"
             "    /// # Arguments\n"
+        )
+        if struct.has_filter_variant():
+            document.write("    /// * `filter` - The filter to apply to the results.\n")
+        document.write(
             "    /// * `limit` - The maximum number of results, by default `10`.\n"
             "    /// * `offset` - The offset of the results, by default `0`.\n"
             "    /// * `connection` - The connection to the database.\n"
             "    ///\n"
             "    pub async fn all<C>(\n"
+        )
+        if struct.has_filter_variant():
+            filter_variant = struct.get_filter_variant()
+            document.write(f"        filter: Option<&{filter_variant.name}>,\n")
+        document.write(
             "        limit: Option<i64>,\n"
             "        offset: Option<i64>,\n"
             "        connection: &mut gluesql::prelude::Glue<C>,\n"
@@ -1286,7 +1394,13 @@ def write_web_common_structs(
             "        use gluesql::core::ast_builder::*;\n"
             f'        let select_row = table("{struct.table_name}")\n'
             "            .select()\n"
-            f'            .project("{columns}")\n'
+        )
+        if struct.has_filter_variant():
+            document.write(
+                "            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))\n"
+            )
+        document.write(
+            f'           .project("{columns}")\n'
             "            .offset(offset.unwrap_or(0))\n"
             "            .limit(limit.unwrap_or(10))\n"
             "            .execute(connection)\n"
@@ -1306,11 +1420,22 @@ def write_web_common_structs(
                 f"    /// Get all {struct.name} from the database ordered by the `updated_at` column.\n"
                 "    ///\n"
                 "    /// # Arguments\n"
+            )
+            if struct.has_filter_variant():
+                document.write(
+                    "    /// * `filter` - The filter to apply to the results.\n"
+                )
+            document.write(
                 "    /// * `limit` - The maximum number of results, by default `10`.\n"
                 "    /// * `offset` - The offset of the results, by default `0`.\n"
                 "    /// * `connection` - The connection to the database.\n"
                 "    ///\n"
                 "    pub async fn all_by_updated_at<C>(\n"
+            )
+            if struct.has_filter_variant():
+                filter_variant = struct.get_filter_variant()
+                document.write(f"        filter: Option<&{filter_variant.name}>,\n")
+            document.write(
                 "        limit: Option<i64>,\n"
                 "        offset: Option<i64>,\n"
                 "        connection: &mut gluesql::prelude::Glue<C>,\n"
@@ -1320,7 +1445,13 @@ def write_web_common_structs(
                 "        use gluesql::core::ast_builder::*;\n"
                 f'        let select_row = table("{struct.table_name}")\n'
                 "            .select()\n"
-                f'            .project("{columns}")\n'
+            )
+            if struct.has_filter_variant():
+                document.write(
+                    "            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))\n"
+                )
+            document.write(
+                f'           .project("{columns}")\n'
                 '            .order_by("updated_at desc")\n'
                 "            .offset(offset.unwrap_or(0))\n"
                 "            .limit(limit.unwrap_or(10))\n"
@@ -1443,6 +1574,7 @@ def get_view_names() -> List[str]:
 
 
 def map_postgres_to_rust_type(pg_type):
+    """Map the Postgres type to the Rust type."""
     pg_to_rust_types = {
         "uuid": "diesel::sql_types::Uuid",
         "text": "diesel::sql_types::Text",
@@ -1723,11 +1855,8 @@ def generate_nested_structs(
                 struct.table_name, attribute.name
             )
 
-            normalized_attribute_name = attribute.name
+            normalized_attribute_name = attribute.normalized_name()
             foreign_struct = get_struct_by_table_name(foreign_key_table_name)
-
-            if normalized_attribute_name.endswith("_id"):
-                normalized_attribute_name = normalized_attribute_name[:-3]
 
             if (
                 struct.name == foreign_struct.name
@@ -1881,18 +2010,35 @@ def generate_nested_structs(
             "    /// Get all the nested structs from the database.\n"
             "    ///\n"
             "    /// # Arguments\n"
+        )
+        if nested_struct.has_filter_variant():
+            document.write("    /// * `filter` - The filter to apply to the results.\n")
+        document.write(
             "    /// * `limit` - The maximum number of rows to return. By default `10`.\n"
             "    /// * `offset` - The offset of the rows to return. By default `0`.\n"
             "    /// * `connection` - The database connection.\n"
             "    pub fn all(\n"
+        )
+        if nested_struct.has_filter_variant():
+            filter_variant = nested_struct.get_filter_variant()
+            document.write(
+                f"        filter: Option<&web_common::database::{filter_variant.name}>,\n"
+            )
+        document.write(
             "        limit: Option<i64>,\n"
             "        offset: Option<i64>,\n"
             "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
             "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
-            f"        {flat_variant.name}::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()\n"
-            "    }\n"
-            "}\n"
         )
+        if nested_struct.has_filter_variant():
+            document.write(
+                f"        {flat_variant.name}::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()\n"
+            )
+        else:
+            document.write(
+                f"        {flat_variant.name}::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()\n"
+            )
+        document.write("    }\n}\n")
 
         if nested_struct.has_associated_roles() and nested_struct.table_name != "users":
             document.write(
@@ -1901,19 +2047,38 @@ def generate_nested_structs(
                 "    ///\n"
                 "    /// # Arguments\n"
                 "    /// * `author_user_id` - The user id.\n"
+            )
+            if nested_struct.has_filter_variant():
+                document.write(
+                    "    /// * `filter` - The filter to apply to the results.\n"
+                )
+            document.write(
                 "    /// * `limit` - The maximum number of rows to return. By default `10`.\n"
                 "    /// * `offset` - The offset of the rows to return. By default `0`.\n"
                 "    /// * `connection` - The database connection.\n"
                 "    pub fn all_editables(\n"
                 "        author_user_id: i32,\n"
+            )
+            if nested_struct.has_filter_variant():
+                filter_variant = nested_struct.get_filter_variant()
+                document.write(
+                    f"        filter: Option<&web_common::database::{filter_variant.name}>,\n"
+                )
+            document.write(
                 "        limit: Option<i64>,\n"
                 "        offset: Option<i64>,\n"
                 "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
                 "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
-                f"        {flat_variant.name}::all_editables(author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()\n"
-                "    }\n"
-                "}\n"
             )
+            if nested_struct.has_filter_variant():
+                document.write(
+                    f"        {flat_variant.name}::all_editables(author_user_id, filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()\n"
+                )
+            else:
+                document.write(
+                    f"        {flat_variant.name}::all_editables(author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()\n"
+                )
+            document.write("    }\n}\n")
 
         # Then, for all the tables that have an updated_at column, we implement the
         # `all_by_updated_at` method, which returns all of the nested structs ordered
@@ -1924,18 +2089,37 @@ def generate_nested_structs(
                 "    /// Get all the nested structs from the database ordered by the `updated_at` column.\n"
                 "    ///\n"
                 "    /// # Arguments\n"
+            )
+            if nested_struct.has_filter_variant():
+                document.write(
+                    "    /// * `filter` - The filter to apply to the results.\n"
+                )
+            document.write(
                 "    /// * `limit` - The maximum number of rows to return. By default `10`.\n"
                 "    /// * `offset` - The offset of the rows to return. By default `0`.\n"
                 "    /// * `connection` - The database connection.\n"
                 "    pub fn all_by_updated_at(\n"
+            )
+            if nested_struct.has_filter_variant():
+                filter_variant = nested_struct.get_filter_variant()
+                document.write(
+                    f"        filter: Option<&web_common::database::{filter_variant.name}>,\n"
+                )
+            document.write(
                 "        limit: Option<i64>,\n"
                 "        offset: Option<i64>,\n"
                 "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
                 "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
-                f"        {flat_variant.name}::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()\n"
-                "    }\n"
-                "}\n"
             )
+            if nested_struct.has_filter_variant():
+                document.write(
+                    f"        {flat_variant.name}::all_by_updated_at(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()\n"
+                )
+            else:
+                document.write(
+                    f"        {flat_variant.name}::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()\n"
+                )
+            document.write("    }\n}\n")
 
         document.write(
             f"impl {nested_struct.name} {{\n"
@@ -2124,24 +2308,39 @@ def write_web_common_nested_structs(
         "use serde::Deserialize;",
         "use serde::Serialize;",
         "use uuid::Uuid;",
-        "use super::tables::*;",
-        "use super::views::*;",
+        "use super::*;",
     ]
 
     for import_statement in imports:
         document.write(f"{import_statement}\n")
 
-    for struct_metadata in nested_structs:
-        struct_metadata.write_to(document)
+    for nested_struct in nested_structs:
+        nested_struct.write_to(document)
+
+        document.write(
+            f"impl Tabular for {nested_struct.name} {{\n"
+            f"    const TABLE: Table = Table::{nested_struct.capitalized_table_name()};\n"
+            "}\n"
+        )
+
+        if nested_struct.has_filter_variant():
+            filter_variant = nested_struct.get_filter_variant()
+
+            document.write(
+                f"impl Filtrable for {nested_struct.name} {{\n"
+                f"    type Filter = {filter_variant.name};\n"
+                "}\n"
+            )
+            
 
         # We implement the `get` method for the struct when the frontend feature
         # is enabled using GlueSQL. This method will be extremely similar to the
         # `get` method for the Diesel-based approach of the backend.
 
-        flat_variant = struct_metadata.get_flat_variant()
+        flat_variant = nested_struct.get_flat_variant()
 
         document.write(
-            f'#[cfg(feature = "frontend")]\n' f"impl {struct_metadata.name} {{\n"
+            f'#[cfg(feature = "frontend")]\n' f"impl {nested_struct.name} {{\n"
         )
 
         # First, we implement the `from_flat` method that will be used to convert
@@ -2159,11 +2358,11 @@ def write_web_common_nested_structs(
             "    ) -> Result<Self, gluesql::prelude::Error> {\n"
             "        Ok(Self {\n"
         )
-        for attribute in struct_metadata.attributes:
+        for attribute in nested_struct.attributes:
             if attribute.name == "inner":
                 continue
             if (
-                attribute.data_type() == struct_metadata.name
+                attribute.data_type() == nested_struct.name
                 or flat_variant.has_attribute(attribute)
             ):
                 document.write(
@@ -2179,8 +2378,8 @@ def write_web_common_nested_structs(
                     f"            {attribute.name}: {attribute.data_type()}::get(flat_variant.{attribute.original_name}, connection).await?.unwrap(),\n"
                 )
 
-        if any(attribute.name == "inner" for attribute in struct_metadata.attributes):
-            document.write(f"            inner: flat_variant,\n")
+        if any(attribute.name == "inner" for attribute in nested_struct.attributes):
+            document.write("            inner: flat_variant,\n")
 
         document.write("        })\n" "    }\n")
 
@@ -2212,17 +2411,35 @@ def write_web_common_nested_structs(
             "    /// Get all the nested structs from the database.\n"
             "    ///\n"
             "    /// # Arguments\n"
+        )
+        if nested_struct.has_filter_variant():
+            document.write("    /// * `filter` - The filter to apply to the results.\n")
+        document.write(
             "    /// * `limit` - The maximum number of rows to return.\n"
             "    /// * `offset` - The number of rows to skip.\n"
             "    /// * `connection` - The database connection.\n"
             "    pub async fn all<C>(\n"
+        )
+        if nested_struct.has_filter_variant():
+            filter_variant = nested_struct.get_filter_variant()
+            document.write(f"        filter: Option<&{filter_variant.name}>,\n")
+        document.write(
             "        limit: Option<i64>,\n"
             "        offset: Option<i64>,\n"
             "        connection: &mut gluesql::prelude::Glue<C>,\n"
             "    ) -> Result<Vec<Self>, gluesql::prelude::Error> where\n"
             "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
             "    {\n"
-            f"        let flat_variants = {flat_variant.name}::all(limit, offset, connection).await?;\n"
+        )
+        if nested_struct.has_filter_variant():
+            document.write(
+                f"        let flat_variants = {flat_variant.name}::all(filter, limit, offset, connection).await?;\n"
+            )
+        else:
+            document.write(
+                f"        let flat_variants = {flat_variant.name}::all(None, limit, offset, connection).await?;\n"
+            )
+        document.write(
             "         let mut nested_structs = Vec::with_capacity(flat_variants.len());\n"
             "         for flat_variant in flat_variants {\n"
             "             nested_structs.push(Self::from_flat(flat_variant, connection).await?);\n"
@@ -2240,17 +2457,37 @@ def write_web_common_nested_structs(
                 "    /// Get all the nested structs from the database ordered by the `updated_at` column.\n"
                 "    ///\n"
                 "    /// # Arguments\n"
+            )
+            if nested_struct.has_filter_variant():
+                document.write(
+                    "    /// * `filter` - The filter to apply to the results.\n"
+                )
+            document.write(
                 "    /// * `limit` - The maximum number of rows to return.\n"
                 "    /// * `offset` - The number of rows to skip.\n"
                 "    /// * `connection` - The database connection.\n"
                 "    pub async fn all_by_updated_at<C>(\n"
+            )
+            if nested_struct.has_filter_variant():
+                filter_variant = nested_struct.get_filter_variant()
+                document.write(f"        filter: Option<&{filter_variant.name}>,\n")
+            document.write(
                 "        limit: Option<i64>,\n"
                 "        offset: Option<i64>,\n"
                 "        connection: &mut gluesql::prelude::Glue<C>,\n"
                 "    ) -> Result<Vec<Self>, gluesql::prelude::Error> where\n"
                 "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
                 "    {\n"
-                f"        let flat_variants = {flat_variant.name}::all_by_updated_at(limit, offset, connection).await?;\n"
+            )
+            if nested_struct.has_filter_variant():
+                document.write(
+                    f"        let flat_variants = {flat_variant.name}::all_by_updated_at(filter, limit, offset, connection).await?;\n"
+                )
+            else:
+                document.write(
+                    f"        let flat_variants = {flat_variant.name}::all_by_updated_at(None, limit, offset, connection).await?;\n"
+                )
+            document.write(
                 "         let mut nested_structs = Vec::with_capacity(flat_variants.len());\n"
                 "         for flat_variant in flat_variants {\n"
                 "             nested_structs.push(Self::from_flat(flat_variant, connection).await?);\n"
@@ -2276,8 +2513,8 @@ def write_web_common_nested_structs(
             "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
             "    {\n"
         )
-        for attribute in struct_metadata.attributes:
-            assert isinstance(attribute.raw_data_type(), StructMetadata)
+        for attribute in nested_struct.attributes:
+            assert attribute.has_struct_data_type()
 
             if attribute.optional:
                 document.write(
@@ -2303,10 +2540,7 @@ def write_webcommons_table_names_enumeration(
     update_model_structs: List[StructMetadata],
     tables_metadata: TableMetadata,
 ) -> List[TableStructMetadata]:
-    imports = [
-        "use serde::Deserialize;",
-        "use serde::Serialize;",
-    ]
+    imports = ["use serde::Deserialize;", "use serde::Serialize;", "use super::*;"]
 
     # The derives to apply to the structs in the `src/database/tables.rs` document
     derives = ["Deserialize", "Serialize", "Clone", "Debug", "PartialEq", "Eq", "Copy"]
@@ -2315,9 +2549,9 @@ def write_webcommons_table_names_enumeration(
     # so to make sure that the relative path to the `web_common` crate
     # is correct.
     if not os.getcwd().endswith("backend"):
-        raise Exception("This script must be executed in the `backend` crate.")
+        raise RuntimeError("This script must be executed in the `backend` crate.")
 
-    document = open(f"../web_common/src/database/table_names.rs", "w", encoding="utf8")
+    document = open("../web_common/src/database/table_names.rs", "w", encoding="utf8")
 
     # Preliminarly, we write a docstring at the very head
     # of this submodule to explain what it does and warn the
@@ -2501,6 +2735,7 @@ def write_webcommons_table_names_enumeration(
         "    /// Get all the rows from the table.\n"
         "    ///\n"
         "    /// # Arguments\n"
+        "    /// * `filter` - The filter to apply to the rows.\n"
         "    /// * `limit` - The maximum number of rows to return.\n"
         "    /// * `offset` - The number of rows to skip. By default `0`.\n"
         "    /// * `connection` - The database connection.\n"
@@ -2509,6 +2744,7 @@ def write_webcommons_table_names_enumeration(
         "    /// A vector of the rows of the table.\n"
         "    pub async fn all<C>(\n"
         "        &self,\n"
+        "        filter: Option<Vec<u8>>,\n"
         "        limit: Option<i64>,\n"
         "        offset: Option<i64>,\n"
         "        connection: &mut gluesql::prelude::Glue<C>,\n"
@@ -2519,9 +2755,20 @@ def write_webcommons_table_names_enumeration(
     )
 
     for table in tables:
-        document.write(
-            f"            Table::{table.camel_cased()} => crate::database::{table.richest_struct_name()}::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),\n"
-        )
+        document.write(f"            Table::{table.camel_cased()} => {{\n")
+        if table.has_filter_variant():
+            filter_variant = table.get_filter_variant()
+            document.write(
+                f"                let filter: Option<{filter_variant.name}> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;\n"
+                f"                crate::database::{table.richest_struct_name()}::all(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()\n"
+            )
+        else:
+            document.write(
+                '                 assert!(filter.is_none(), "Filter not implemented for this table.");\n'
+                f"                crate::database::{table.richest_struct_name()}::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()\n"
+            )
+
+        document.write("            },\n")
 
     document.write("        }\n    }\n")
 
@@ -2534,6 +2781,7 @@ def write_webcommons_table_names_enumeration(
         "    /// Get all the rows from the table ordered by the `updated_at` column.\n"
         "    ///\n"
         "    /// # Arguments\n"
+        "    /// * `filter` - The filter to apply to the rows.\n"
         "    /// * `limit` - The maximum number of rows to return.\n"
         "    /// * `offset` - The number of rows to skip. By default `0`.\n"
         "    /// * `connection` - The database connection.\n"
@@ -2542,6 +2790,7 @@ def write_webcommons_table_names_enumeration(
         "    /// A vector of the rows of the table.\n"
         "    pub async fn all_by_updated_at<C>(\n"
         "        &self,\n"
+        "        filter: Option<Vec<u8>>,\n"
         "        limit: Option<i64>,\n"
         "        offset: Option<i64>,\n"
         "        connection: &mut gluesql::prelude::Glue<C>,\n"
@@ -2553,9 +2802,19 @@ def write_webcommons_table_names_enumeration(
 
     for table in tables:
         if table.has_updated_at_column():
-            document.write(
-                f"            Table::{table.camel_cased()} => crate::database::{table.richest_struct_name()}::all_by_updated_at(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect(),\n"
-            )
+            document.write(f"            Table::{table.camel_cased()} => {{\n")
+            if table.has_filter_variant():
+                filter_variant = table.get_filter_variant()
+                document.write(
+                    f"                let filter: Option<{filter_variant.name}> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;\n"
+                    f"                crate::database::{table.richest_struct_name()}::all_by_updated_at(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()\n"
+                )
+            else:
+                document.write(
+                    '                 assert!(filter.is_none(), "Filter not implemented for this table.");\n'
+                    f"                crate::database::{table.richest_struct_name()}::all_by_updated_at(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()\n"
+                )
+            document.write("            },\n")
         else:
             document.write(
                 f'            Table::{table.camel_cased()} => unimplemented!("all_by_updated_at not implemented for {table.name}."),\n'
@@ -3188,6 +3447,7 @@ def write_diesel_table_names_enumeration(
         "    /// Get all the rows from the table.\n"
         "    ///\n"
         "    /// # Arguments\n"
+        "    /// * `filter` - The filter to apply to the rows.\n"
         "    /// * `limit` - The maximum number of rows to return.\n"
         "    /// * `offset` - The number of rows to skip.\n"
         "    /// * `connection` - The database connection.\n"
@@ -3196,6 +3456,7 @@ def write_diesel_table_names_enumeration(
         "    /// A vector of the rows of the table.\n"
         "    fn all(\n"
         "         &self,\n"
+        "         filter: Option<Vec<u8>>,\n"
         "         limit: Option<i64>,\n"
         "         offset: Option<i64>,\n"
         "         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
@@ -3207,6 +3468,7 @@ def write_diesel_table_names_enumeration(
         "impl AllTable for web_common::database::Table {\n\n"
         "    fn all(\n"
         "        &self,\n"
+        "        filter: Option<Vec<u8>>,\n"
         "        limit: Option<i64>,\n"
         "        offset: Option<i64>,\n"
         "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
@@ -3216,10 +3478,22 @@ def write_diesel_table_names_enumeration(
 
     for table in tables:
         document.write(
-            f"            web_common::database::Table::{table.camel_cased()} => {table.richest_struct_name()}::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),\n"
+            f"            web_common::database::Table::{table.camel_cased()} => {{"
         )
+        if table.has_filter_variant():
+            filter_variant = table.get_filter_variant()
+            document.write(
+                f"let filter: Option<web_common::database::{filter_variant.name}> = filter.map(|filter| bincode::deserialize::<web_common::database::{filter_variant.name}>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;\n"
+                f"{table.richest_struct_name()}::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()\n"
+            )
+        else:
+            document.write(
+                f'assert!(filter.is_none(), "Filter not implemented for {table.name}.");\n'
+                f"{table.richest_struct_name()}::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()\n"
+            )
+        document.write("},\n")
 
-    document.write("        }\n    }\n}\n")
+    document.write("        }\n" "    }\n" "}\n")
 
     # We define a trait for the Table enum, which provides the all_by_updated_at method.
     # The method receives a connection to the database and returns a Result, where the Ok
@@ -3234,6 +3508,7 @@ def write_diesel_table_names_enumeration(
         "    /// Get all the rows from the table ordered by the `updated_at` column.\n"
         "    ///\n"
         "    /// # Arguments\n"
+        "    /// * `filter` - The filter to apply to the rows.\n"
         "    /// * `limit` - The maximum number of rows to return.\n"
         "    /// * `offset` - The number of rows to skip.\n"
         "    /// * `connection` - The database connection.\n"
@@ -3242,6 +3517,7 @@ def write_diesel_table_names_enumeration(
         "    /// A vector of the rows of the table.\n"
         "    fn all_by_updated_at(\n"
         "         &self,\n"
+        "         filter: Option<Vec<u8>>,\n"
         "         limit: Option<i64>,\n"
         "         offset: Option<i64>,\n"
         "         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
@@ -3258,6 +3534,7 @@ def write_diesel_table_names_enumeration(
         "impl AllByUpdatedAtTable for web_common::database::Table {\n\n"
         "    fn all_by_updated_at(\n"
         "        &self,\n"
+        "        filter: Option<Vec<u8>>,\n"
         "        limit: Option<i64>,\n"
         "        offset: Option<i64>,\n"
         "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
@@ -3268,8 +3545,20 @@ def write_diesel_table_names_enumeration(
     for table in tables:
         if table.has_updated_at_column():
             document.write(
-                f"            web_common::database::Table::{table.camel_cased()} => {table.richest_struct_name()}::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),\n"
+                f"            web_common::database::Table::{table.camel_cased()} => {{"
             )
+            if table.has_filter_variant():
+                filter_variant = table.get_filter_variant()
+                document.write(
+                    f"let filter: Option<web_common::database::{filter_variant.name}> = filter.map(|filter| bincode::deserialize::<web_common::database::{filter_variant.name}>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;\n"
+                    f"{table.richest_struct_name()}::all_by_updated_at(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()\n"
+                )
+            else:
+                document.write(
+                    f'assert!(filter.is_none(), "Filter not implemented for {table.name}.");\n'
+                    f"{table.richest_struct_name()}::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()\n"
+                )
+            document.write("},\n")
         else:
             document.write(
                 f'            web_common::database::Table::{table.camel_cased()} => unimplemented!("all_by_updated_at not implemented for {table.name}."),\n'
@@ -3960,6 +4249,7 @@ def write_web_common_new_structs(
         "use uuid::Uuid;",
         "use serde::{Deserialize, Serialize};",
         "use chrono::NaiveDateTime;",
+        "use super::*;"
     ]
 
     for import_statement in imports:
@@ -3976,6 +4266,15 @@ def write_web_common_new_structs(
         assert struct.is_new_variant()
 
         struct.write_to(document)
+
+        # We implement the Tabular trait for the new struct. This trait
+        # is used to display the new struct in a table format in the frontend.
+
+        document.write(
+            f"impl Tabular for {struct.name} {{\n"
+            f"    const TABLE: Table = Table::{struct.capitalized_table_name()};\n"
+            "}\n"
+        )
 
         if not struct.has_uuid_primary_key():
             continue
@@ -4118,6 +4417,7 @@ def write_web_common_update_structs(
     imports = [
         "use serde::{Deserialize, Serialize};",
         "use chrono::NaiveDateTime;",
+        "use super::*;"
     ]
 
     for import_statement in imports:
@@ -4134,6 +4434,15 @@ def write_web_common_update_structs(
         assert struct.is_update_variant()
 
         struct.write_to(document)
+
+        # We implement the Tabular trait for the new struct. This trait
+        # is used to display the new struct in a table format in the frontend.
+
+        document.write(
+            f"impl Tabular for {struct.name} {{\n"
+            f"    const TABLE: Table = Table::{struct.capitalized_table_name()};\n"
+            "}\n"
+        )
 
         # When the frontend flag is enables, we implement the insert method for the new flat struct.
         # This method receives the user id of the user inserting the row and the connection to the database.
@@ -4680,8 +4989,6 @@ def write_frontend_builder_action_enumeration(
     )
     document.write(f"#[derive({derives})]\n" f"pub(super) enum {action_enum_name} {{\n")
 
-    attributes_requiring_operations: List[AttributeMetadata] = []
-
     for attribute in builder.attributes:
         if attribute in primary_keys:
             continue
@@ -4696,18 +5003,14 @@ def write_frontend_builder_action_enumeration(
         if attribute.name == "form_updated_at":
             continue
 
-        if attribute.data_type() == rich_variant.name:
-            assert rich_variant.is_nested()
-            attributes_requiring_operations.append(attribute)
-
         if (
             attribute.data_type() in INPUT_TYPE_MAP
             or attribute.data_type() == "NaiveDateTime"
         ):
-            document.write(f"    Set{attribute.capitalized_name()}(Option<String>),\n")
+            document.write(f"    Set{attribute.capitalized_normalized_name()}(Option<String>),\n")
         else:
             document.write(
-                f"    Set{attribute.capitalized_name()}({attribute.format_data_type()}),\n"
+                f"    Set{attribute.capitalized_normalized_name()}({attribute.format_data_type()}),\n"
             )
 
     document.write("}\n\n")
@@ -4726,7 +5029,7 @@ def write_frontend_builder_action_enumeration(
 
     document.write(f"impl FromOperation for {action_enum_name} {{\n")
 
-    if len(attributes_requiring_operations) == 0:
+    if not flat_variant.has_manually_determined_foreign_keys():
         document.write(
             "    fn from_operation<S: AsRef<str>>(_operation: S, _row: Vec<u8>) -> Self {\n"
             f'        unreachable!("No operations are expected to be needed for the builder {builder.name}.")\n'
@@ -4737,9 +5040,9 @@ def write_frontend_builder_action_enumeration(
             "        match operation.as_ref() {\n"
         )
 
-        for attribute in attributes_requiring_operations:
+        for foreign_key in flat_variant.get_manually_determined_foreign_keys():
             document.write(
-                f'            "{attribute.name}" => {action_enum_name}::Set{attribute.capitalized_name()}(Some(bincode::deserialize(&row).unwrap())),\n'
+                f'            "{foreign_key.normalized_name()}" => {action_enum_name}::Set{foreign_key.capitalized_normalized_name()}(Some(bincode::deserialize(&row).unwrap())),\n'
             )
 
         document.write(
@@ -4795,7 +5098,7 @@ def write_frontend_builder_action_enumeration(
         ), f"Attribute {attribute.name} not found in the struct {flat_variant.name}."
 
         document.write(
-            f"            {action_enum_name}::Set{attribute.capitalized_name()}({attribute.name}) => '{attribute.name}: {{\n"
+            f"            {action_enum_name}::Set{attribute.capitalized_normalized_name()}({attribute.name}) => '{attribute.name}: {{\n"
         )
 
         # First we clear out the existing errors associated with the attribute.
@@ -5068,7 +5371,7 @@ def write_frontend_form_builder_implementation(
                         f"if let Some({flat_attribute.name}) = rich_variant.inner.{flat_attribute.name} {{\n"
                         f'    named_requests.push(ComponentMessage::get_named::<&str, {variants[0].name}>("{attribute.name}", {flat_attribute.name}.into()));\n'
                         " } else {\n"
-                        f"    dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_name()}(None));\n"
+                        f"    dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}(None));\n"
                         " }\n"
                     )
                 )
@@ -5083,11 +5386,11 @@ def write_frontend_form_builder_implementation(
         if struct_attribute is not None:
             if struct_attribute.optional:
                 document.write(
-                    f"        dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_name()}(rich_variant.{attribute.name}));\n"
+                    f"        dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}(rich_variant.{attribute.name}));\n"
                 )
             else:
                 document.write(
-                    f"        dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_name()}(Some(rich_variant.{attribute.name})));\n"
+                    f"        dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}(Some(rich_variant.{attribute.name})));\n"
                 )
         else:
             struct_attribute = flat_variant.get_attribute_by_name(attribute.name)
@@ -5099,19 +5402,19 @@ def write_frontend_form_builder_implementation(
                 ):
                     if struct_attribute.optional:
                         document.write(
-                            f"    dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_name()}(rich_variant.inner.{attribute.name}.map(|{attribute.name}| {attribute.name}.to_string())));\n"
+                            f"    dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}(rich_variant.inner.{attribute.name}.map(|{attribute.name}| {attribute.name}.to_string())));\n"
                         )
                     else:
                         document.write(
-                            f"    dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_name()}(Some(rich_variant.inner.{attribute.name}.to_string())));\n"
+                            f"    dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}(Some(rich_variant.inner.{attribute.name}.to_string())));\n"
                         )
                 elif struct_attribute.optional:
                     document.write(
-                        f"        dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_name()}(rich_variant.inner.{attribute.name}));\n"
+                        f"        dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}(rich_variant.inner.{attribute.name}));\n"
                     )
                 else:
                     document.write(
-                        f"        dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_name()}(Some(rich_variant.inner.{attribute.name})));"
+                        f"        dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}(Some(rich_variant.inner.{attribute.name})));"
                     )
             else:
                 raise RuntimeError(
@@ -5212,10 +5515,7 @@ def write_frontend_form_builder_implementation(
             # 2. The attribute is present in the builder, and is a nested attribute, so we need to recover the inner attribute.
             # 3. The attribute is not present in the builder, so we need to check whether the normalized version, with the _id suffix, is present.
 
-            builder_attribute = builder.get_attribute_by_name(attribute.name)
-
-            if builder_attribute is None and attribute.name.endswith("_id"):
-                builder_attribute = builder.get_attribute_by_name(attribute.name[:-3])
+            builder_attribute = builder.get_attribute_by_name(attribute.normalized_name())
 
             if builder_attribute is None:
 
@@ -5611,7 +5911,9 @@ def handle_missing_row_to_searchable_badge_implementation(
                 if struct.get_attribute_by_name("color") is not None:
                     font_awesome_icon = '<i class={format!("{} {}", self.icon.name, self.color.name)}></i>'
                 else:
-                    font_awesome_icon = '<i class={format!("{} grey", self.icon.name)}></i>'
+                    font_awesome_icon = (
+                        '<i class={format!("{} grey", self.icon.name)}></i>'
+                    )
             else:
                 font_awesome_icon = '<i class="fas fa-question grey"></i>'
 
@@ -5813,34 +6115,64 @@ def write_frontend_yew_form(
                     f"    pub {primary_key.name}: {primary_key.format_data_type()},\n"
                 )
             document.write("}\n\n")
+        elif method == "POST" and flat_variant.has_manually_determined_foreign_keys():
+            document.write(
+                f"#[derive(Clone, PartialEq, Properties)]\n"
+                f"pub struct {form_component_name}Prop {{\n"
+            )
+            for foreign_key in flat_variant.get_manually_determined_foreign_keys():
+                document.write(
+                    "     #[prop_or_default]\n"
+                    f"    pub {foreign_key.name}: Option<{foreign_key.data_type()}>,\n"
+                )
+            document.write("}\n\n")
 
-        document.write(f"#[function_component({form_component_name})]\n")
-
-        if method == "PUT":
-            # We need to generate the form method that will receive the ID of the row.
+        document.write(
+            f"#[function_component({form_component_name})]\n"
+        )
+        if method == "PUT" or flat_variant.has_manually_determined_foreign_keys():
             document.write(
                 f"pub fn {form_method_name}(props: &{form_component_name}Prop) -> Html {{\n"
+            "     let mut named_requests: Vec<ComponentMessage> = Vec::new();\n"
             )
         else:
-            # We generate the form method that will not receive the ID of the row.
             document.write(f"pub fn {form_method_name}() -> Html {{\n")
-
         document.write(
-            f"    let builder_dispatch = use_dispatch::<{builder.name}>();\n"
+            f"    let (builder_store, builder_dispatch) = use_store::<{builder.name}>();\n"
         )
 
         if method == "PUT":
-            document.write("     builder_dispatch.reduce_mut(|builder| {\n")
-            for primary_key in primary_keys:
-                document.write(
-                    f"         builder.{primary_key.name} = Some(props.{primary_key.name});\n"
+            document.write(
+                "    // We push the ID of the row to the named requests.\n"
+                "    let props = props.clone();\n"
+                f"   named_requests.push(ComponentMessage::get::<{variant.name}>({flat_variant.get_formatted_primary_keys(include_prefix=True, prefix='props')}.into()));\n"
+            )
+        elif method == "POST":
+            for foreign_key in flat_variant.get_manually_determined_foreign_keys():
+                default_value = flat_variant.table_metadata.get_default_column_value(
+                    builder.table_name, foreign_key.name
                 )
-            document.write("     });\n")
-
-        document.write(
-            f"    let builder_store = use_store_value::<{builder.name}>();\n"
-        )
-
+                foreign_key_struct = rich_variant.get_attribute_by_name(foreign_key.normalized_name()).raw_data_type()
+                
+                if foreign_key_struct.is_nested():
+                    foreign_key_struct = foreign_key_struct.get_flat_variant()
+                
+                if default_value is not None:
+                    document.write(
+                        f"    if let Some({foreign_key.name}) = props.{foreign_key.name} {{\n"
+                        f"         named_requests.push(ComponentMessage::get_named::<&str, {foreign_key_struct.name}>(\"{foreign_key.normalized_name()}\", {foreign_key.name}.into()));\n"
+                        "    } else {\n"
+                        f"         // Default value for {builder.table_name}.{foreign_key.name} is {default_value}.\n"
+                        f"         named_requests.push(ComponentMessage::get_named::<&str, {foreign_key_struct.name}>(\"{foreign_key.normalized_name()}\", {default_value}.into()));\n"
+                        "    }\n"
+                    )
+                else:
+                    document.write(
+                        f"    if let Some({foreign_key.name}) = props.{foreign_key.name} {{\n"
+                        f"         named_requests.push(ComponentMessage::get_named::<&str, {variant.name}>(\"{foreign_key.normalized_name()}\", {foreign_key.name}.into()));\n"
+                        "    }\n"
+                    )
+        
         for attribute in builder.attributes:
             # We do not want to include the errors attribute in the builder actions.
             if (
@@ -5857,19 +6189,19 @@ def write_frontend_yew_form(
 
             if attribute.data_type() == "bool":
                 document.write(
-                    f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: bool| {flat_variant.name}Actions::Set{attribute.capitalized_name()}(Some({attribute.name})));\n"
+                    f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: bool| {flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}(Some({attribute.name})));\n"
                 )
             elif (
                 attribute.data_type() in INPUT_TYPE_MAP
                 or attribute.data_type() == "NaiveDateTime"
             ):
                 document.write(
-                    f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: Option<String>| {flat_variant.name}Actions::Set{attribute.capitalized_name()}({attribute.name}));\n"
+                    f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: Option<String>| {flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}({attribute.name}));\n"
                 )
             elif attribute.data_type() == "Vec<u8>":
                 if "picture" in attribute.name:
                     document.write(
-                        f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: Option<Image>| {flat_variant.name}Actions::Set{attribute.capitalized_name()}({attribute.name}.map(|{attribute.name}| {attribute.name}.into())));\n"
+                        f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: Option<Image>| {flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}({attribute.name}.map(|{attribute.name}| {attribute.name}.into())));\n"
                     )
                 else:
                     raise RuntimeError(
@@ -5877,12 +6209,20 @@ def write_frontend_yew_form(
                     )
             else:
                 document.write(
-                    f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: {attribute.format_data_type()}| {flat_variant.name}Actions::Set{attribute.capitalized_name()}({attribute.name}));\n"
+                    f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: {attribute.format_data_type()}| {flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}({attribute.name}));\n"
                 )
 
         document.write(
             "    html! {\n"
-            f"        <BasicForm<{variant.name}> method={{FormMethod::{method}}} builder={{builder_store.deref().clone()}} builder_dispatch={{builder_dispatch}}>\n"
+            f"        <BasicForm<{variant.name}>\n"
+            f"            method={{FormMethod::{method}}}\n"
+        )
+        if method == "PUT" or flat_variant.has_manually_determined_foreign_keys():
+            document.write(
+                f"            named_requests={{named_requests}}\n"
+            )
+        document.write(
+            f"            builder={{builder_store.deref().clone()}} builder_dispatch={{builder_dispatch}}>\n"
         )
 
         for attribute in builder.attributes:
@@ -6016,21 +6356,7 @@ def write_frontend_form_buildable_implementation(
         if not update_variant.is_new_variant():
             variants.append(update_variant)
 
-    # We implement the Tabular trait for the struct.
-    document.write(
-        f"impl Tabular for {rich_variant.name} {{\n"
-        f"    const TABLE: Table = Table::{rich_variant.get_capitalized_table_name()};\n"
-        "}\n\n"
-    )
-
     for variant in variants:
-        # We implement the Tabular trait for the struct.
-        document.write(
-            f"impl Tabular for {variant.name} {{\n"
-            f"    const TABLE: Table = Table::{flat_variant.get_capitalized_table_name()};\n"
-            "}\n\n"
-        )
-
         # We implement the FormBuildable trait for the struct.
         document.write(
             f"impl FormBuildable for {variant.name} {{\n"
@@ -6079,13 +6405,12 @@ def write_frontend_forms(
         "use serde::{Deserialize, Serialize};",
         "use web_common::database::*;",
         "use yew::prelude::*;",
-        "use yewdux::{use_dispatch, use_store_value, Reducer, Store};",
+        "use yewdux::{use_store, Reducer, Store};",
         "use crate::components::forms::*;",
         "use web_common::api::form_traits::FormMethod;",
         "use std::rc::Rc;",
         "use uuid::Uuid;",
         "use std::ops::Deref;",
-        "use crate::workers::ws_worker::Tabular;",
         "use yewdux::Dispatch;",
         "use chrono::NaiveDateTime;",
         "use web_common::api::ApiError;",
@@ -6331,6 +6656,15 @@ if __name__ == "__main__":
     view_structs: List[StructMetadata] = extract_structs(
         "src/views/views.rs", table_metadata=tables_metadata
     )
+
+    print(
+        f"Extracted {len(table_structs)} tables and {len(view_structs)} views from the backend."
+    )
+
+    filter_structs: List[StructMetadata] = create_filter_structs(
+        table_structs + view_structs
+    )
+    print(f"Generated {len(filter_structs)} filter structs.")
 
     write_backend_structs("src/models.rs", "tables", table_structs, tables_metadata)
     write_backend_structs("src/views/views.rs", "views", view_structs, tables_metadata)

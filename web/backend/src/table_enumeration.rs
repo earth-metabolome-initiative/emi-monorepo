@@ -917,6 +917,7 @@ pub trait AllTable {
     /// Get all the rows from the table.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the rows.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
@@ -925,6 +926,7 @@ pub trait AllTable {
     /// A vector of the rows of the table.
     fn all(
          &self,
+         filter: Option<Vec<u8>>,
          limit: Option<i64>,
          offset: Option<i64>,
          connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -935,67 +937,180 @@ impl AllTable for web_common::database::Table {
 
     fn all(
         &self,
+        filter: Option<Vec<u8>>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Vec<u8>>, web_common::api::ApiError> {
         match self {
-            web_common::database::Table::BioOttRanks => NestedBioOttRank::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::BioOttTaxonItems => NestedBioOttTaxonItem::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::Colors => Color::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::Countries => Country::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::DerivedSamples => NestedDerivedSample::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::DocumentFormats => NestedDocumentFormat::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::FontAwesomeIcons => FontAwesomeIcon::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::LoginProviders => NestedLoginProvider::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::Notifications => NestedNotification::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::Organizations => NestedOrganization::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::ProjectStates => NestedProjectState::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::Projects => NestedProject::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::ProjectsTeamsRoleInvitations => NestedProjectsTeamsRoleInvitation::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::ProjectsTeamsRoleRequests => NestedProjectsTeamsRoleRequest::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::ProjectsTeamsRoles => NestedProjectsTeamsRole::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::ProjectsUsersRoleInvitations => NestedProjectsUsersRoleInvitation::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::ProjectsUsersRoleRequests => NestedProjectsUsersRoleRequest::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::ProjectsUsersRoles => NestedProjectsUsersRole::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::Roles => NestedRole::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::SampleBioOttTaxonItems => NestedSampleBioOttTaxonItem::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::SampleStates => NestedSampleState::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::SampledIndividualBioOttTaxonItems => NestedSampledIndividualBioOttTaxonItem::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::SampledIndividuals => NestedSampledIndividual::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::SampledIndividualsTeamsRoleInvitations => NestedSampledIndividualsTeamsRoleInvitation::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::SampledIndividualsTeamsRoleRequests => NestedSampledIndividualsTeamsRoleRequest::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::SampledIndividualsTeamsRoles => NestedSampledIndividualsTeamsRole::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::SampledIndividualsUsersRoleInvitations => NestedSampledIndividualsUsersRoleInvitation::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::SampledIndividualsUsersRoleRequests => NestedSampledIndividualsUsersRoleRequest::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::SampledIndividualsUsersRoles => NestedSampledIndividualsUsersRole::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::Samples => NestedSample::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::SamplesTeamsRoleInvitations => NestedSamplesTeamsRoleInvitation::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::SamplesTeamsRoleRequests => NestedSamplesTeamsRoleRequest::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::SamplesTeamsRoles => NestedSamplesTeamsRole::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::SamplesUsersRoleInvitations => NestedSamplesUsersRoleInvitation::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::SamplesUsersRoleRequests => NestedSamplesUsersRoleRequest::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::SamplesUsersRoles => NestedSamplesUsersRole::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::Spectra => NestedSpectra::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::SpectraCollections => NestedSpectraCollection::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::SpectraCollectionsTeamsRoleInvitations => NestedSpectraCollectionsTeamsRoleInvitation::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::SpectraCollectionsTeamsRoleRequests => NestedSpectraCollectionsTeamsRoleRequest::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::SpectraCollectionsTeamsRoles => NestedSpectraCollectionsTeamsRole::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::SpectraCollectionsUsersRoleInvitations => NestedSpectraCollectionsUsersRoleInvitation::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::SpectraCollectionsUsersRoleRequests => NestedSpectraCollectionsUsersRoleRequest::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::SpectraCollectionsUsersRoles => NestedSpectraCollectionsUsersRole::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::TeamStates => NestedTeamState::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::Teams => NestedTeam::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::TeamsTeamsRoleInvitations => NestedTeamsTeamsRoleInvitation::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::TeamsUsersRoleInvitations => NestedTeamsUsersRoleInvitation::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::TeamsUsersRoleRequests => NestedTeamsUsersRoleRequest::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::TeamsUsersRoles => NestedTeamsUsersRole::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::Units => Unit::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::UserEmails => NestedUserEmail::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::Users => User::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::UsersUsersRoleInvitations => NestedUsersUsersRoleInvitation::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::UsersUsersRoleRequests => NestedUsersUsersRoleRequest::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::UsersUsersRoles => NestedUsersUsersRole::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::BioOttRanks => {let filter: Option<web_common::database::BioOttRankFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::BioOttRankFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedBioOttRank::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::BioOttTaxonItems => {let filter: Option<web_common::database::BioOttTaxonItemFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::BioOttTaxonItemFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedBioOttTaxonItem::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::Colors => {assert!(filter.is_none(), "Filter not implemented for colors.");
+Color::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::Countries => {assert!(filter.is_none(), "Filter not implemented for countries.");
+Country::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::DerivedSamples => {let filter: Option<web_common::database::DerivedSampleFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::DerivedSampleFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedDerivedSample::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::DocumentFormats => {let filter: Option<web_common::database::DocumentFormatFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::DocumentFormatFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedDocumentFormat::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::FontAwesomeIcons => {assert!(filter.is_none(), "Filter not implemented for font_awesome_icons.");
+FontAwesomeIcon::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::LoginProviders => {let filter: Option<web_common::database::LoginProviderFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::LoginProviderFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedLoginProvider::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::Notifications => {let filter: Option<web_common::database::NotificationFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::NotificationFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedNotification::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::Organizations => {let filter: Option<web_common::database::OrganizationFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::OrganizationFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedOrganization::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::ProjectStates => {let filter: Option<web_common::database::ProjectStateFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::ProjectStateFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedProjectState::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::Projects => {let filter: Option<web_common::database::ProjectFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::ProjectFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedProject::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::ProjectsTeamsRoleInvitations => {let filter: Option<web_common::database::ProjectsTeamsRoleInvitationFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::ProjectsTeamsRoleInvitationFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedProjectsTeamsRoleInvitation::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::ProjectsTeamsRoleRequests => {let filter: Option<web_common::database::ProjectsTeamsRoleRequestFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::ProjectsTeamsRoleRequestFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedProjectsTeamsRoleRequest::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::ProjectsTeamsRoles => {let filter: Option<web_common::database::ProjectsTeamsRoleFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::ProjectsTeamsRoleFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedProjectsTeamsRole::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::ProjectsUsersRoleInvitations => {let filter: Option<web_common::database::ProjectsUsersRoleInvitationFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::ProjectsUsersRoleInvitationFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedProjectsUsersRoleInvitation::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::ProjectsUsersRoleRequests => {let filter: Option<web_common::database::ProjectsUsersRoleRequestFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::ProjectsUsersRoleRequestFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedProjectsUsersRoleRequest::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::ProjectsUsersRoles => {let filter: Option<web_common::database::ProjectsUsersRoleFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::ProjectsUsersRoleFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedProjectsUsersRole::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::Roles => {let filter: Option<web_common::database::RoleFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::RoleFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedRole::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::SampleBioOttTaxonItems => {let filter: Option<web_common::database::SampleBioOttTaxonItemFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SampleBioOttTaxonItemFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedSampleBioOttTaxonItem::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::SampleStates => {let filter: Option<web_common::database::SampleStateFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SampleStateFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedSampleState::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::SampledIndividualBioOttTaxonItems => {let filter: Option<web_common::database::SampledIndividualBioOttTaxonItemFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SampledIndividualBioOttTaxonItemFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedSampledIndividualBioOttTaxonItem::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::SampledIndividuals => {let filter: Option<web_common::database::SampledIndividualFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SampledIndividualFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedSampledIndividual::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::SampledIndividualsTeamsRoleInvitations => {let filter: Option<web_common::database::SampledIndividualsTeamsRoleInvitationFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SampledIndividualsTeamsRoleInvitationFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedSampledIndividualsTeamsRoleInvitation::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::SampledIndividualsTeamsRoleRequests => {let filter: Option<web_common::database::SampledIndividualsTeamsRoleRequestFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SampledIndividualsTeamsRoleRequestFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedSampledIndividualsTeamsRoleRequest::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::SampledIndividualsTeamsRoles => {let filter: Option<web_common::database::SampledIndividualsTeamsRoleFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SampledIndividualsTeamsRoleFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedSampledIndividualsTeamsRole::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::SampledIndividualsUsersRoleInvitations => {let filter: Option<web_common::database::SampledIndividualsUsersRoleInvitationFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SampledIndividualsUsersRoleInvitationFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedSampledIndividualsUsersRoleInvitation::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::SampledIndividualsUsersRoleRequests => {let filter: Option<web_common::database::SampledIndividualsUsersRoleRequestFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SampledIndividualsUsersRoleRequestFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedSampledIndividualsUsersRoleRequest::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::SampledIndividualsUsersRoles => {let filter: Option<web_common::database::SampledIndividualsUsersRoleFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SampledIndividualsUsersRoleFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedSampledIndividualsUsersRole::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::Samples => {let filter: Option<web_common::database::SampleFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SampleFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedSample::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::SamplesTeamsRoleInvitations => {let filter: Option<web_common::database::SamplesTeamsRoleInvitationFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SamplesTeamsRoleInvitationFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedSamplesTeamsRoleInvitation::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::SamplesTeamsRoleRequests => {let filter: Option<web_common::database::SamplesTeamsRoleRequestFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SamplesTeamsRoleRequestFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedSamplesTeamsRoleRequest::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::SamplesTeamsRoles => {let filter: Option<web_common::database::SamplesTeamsRoleFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SamplesTeamsRoleFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedSamplesTeamsRole::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::SamplesUsersRoleInvitations => {let filter: Option<web_common::database::SamplesUsersRoleInvitationFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SamplesUsersRoleInvitationFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedSamplesUsersRoleInvitation::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::SamplesUsersRoleRequests => {let filter: Option<web_common::database::SamplesUsersRoleRequestFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SamplesUsersRoleRequestFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedSamplesUsersRoleRequest::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::SamplesUsersRoles => {let filter: Option<web_common::database::SamplesUsersRoleFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SamplesUsersRoleFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedSamplesUsersRole::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::Spectra => {let filter: Option<web_common::database::SpectraFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SpectraFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedSpectra::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::SpectraCollections => {let filter: Option<web_common::database::SpectraCollectionFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SpectraCollectionFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedSpectraCollection::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::SpectraCollectionsTeamsRoleInvitations => {let filter: Option<web_common::database::SpectraCollectionsTeamsRoleInvitationFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SpectraCollectionsTeamsRoleInvitationFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedSpectraCollectionsTeamsRoleInvitation::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::SpectraCollectionsTeamsRoleRequests => {let filter: Option<web_common::database::SpectraCollectionsTeamsRoleRequestFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SpectraCollectionsTeamsRoleRequestFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedSpectraCollectionsTeamsRoleRequest::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::SpectraCollectionsTeamsRoles => {let filter: Option<web_common::database::SpectraCollectionsTeamsRoleFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SpectraCollectionsTeamsRoleFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedSpectraCollectionsTeamsRole::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::SpectraCollectionsUsersRoleInvitations => {let filter: Option<web_common::database::SpectraCollectionsUsersRoleInvitationFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SpectraCollectionsUsersRoleInvitationFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedSpectraCollectionsUsersRoleInvitation::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::SpectraCollectionsUsersRoleRequests => {let filter: Option<web_common::database::SpectraCollectionsUsersRoleRequestFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SpectraCollectionsUsersRoleRequestFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedSpectraCollectionsUsersRoleRequest::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::SpectraCollectionsUsersRoles => {let filter: Option<web_common::database::SpectraCollectionsUsersRoleFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SpectraCollectionsUsersRoleFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedSpectraCollectionsUsersRole::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::TeamStates => {let filter: Option<web_common::database::TeamStateFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::TeamStateFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedTeamState::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::Teams => {let filter: Option<web_common::database::TeamFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::TeamFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedTeam::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::TeamsTeamsRoleInvitations => {let filter: Option<web_common::database::TeamsTeamsRoleInvitationFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::TeamsTeamsRoleInvitationFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedTeamsTeamsRoleInvitation::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::TeamsUsersRoleInvitations => {let filter: Option<web_common::database::TeamsUsersRoleInvitationFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::TeamsUsersRoleInvitationFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedTeamsUsersRoleInvitation::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::TeamsUsersRoleRequests => {let filter: Option<web_common::database::TeamsUsersRoleRequestFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::TeamsUsersRoleRequestFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedTeamsUsersRoleRequest::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::TeamsUsersRoles => {let filter: Option<web_common::database::TeamsUsersRoleFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::TeamsUsersRoleFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedTeamsUsersRole::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::Units => {assert!(filter.is_none(), "Filter not implemented for units.");
+Unit::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::UserEmails => {let filter: Option<web_common::database::UserEmailFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::UserEmailFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedUserEmail::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::Users => {assert!(filter.is_none(), "Filter not implemented for users.");
+User::all(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::UsersUsersRoleInvitations => {let filter: Option<web_common::database::UsersUsersRoleInvitationFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::UsersUsersRoleInvitationFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedUsersUsersRoleInvitation::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::UsersUsersRoleRequests => {let filter: Option<web_common::database::UsersUsersRoleRequestFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::UsersUsersRoleRequestFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedUsersUsersRoleRequest::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::UsersUsersRoles => {let filter: Option<web_common::database::UsersUsersRoleFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::UsersUsersRoleFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedUsersUsersRole::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
         }
     }
 }
@@ -1004,6 +1119,7 @@ pub trait AllByUpdatedAtTable {
     /// Get all the rows from the table ordered by the `updated_at` column.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the rows.
     /// * `limit` - The maximum number of rows to return.
     /// * `offset` - The number of rows to skip.
     /// * `connection` - The database connection.
@@ -1012,6 +1128,7 @@ pub trait AllByUpdatedAtTable {
     /// A vector of the rows of the table.
     fn all_by_updated_at(
          &self,
+         filter: Option<Vec<u8>>,
          limit: Option<i64>,
          offset: Option<i64>,
          connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -1022,6 +1139,7 @@ impl AllByUpdatedAtTable for web_common::database::Table {
 
     fn all_by_updated_at(
         &self,
+        filter: Option<Vec<u8>>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -1031,14 +1149,18 @@ impl AllByUpdatedAtTable for web_common::database::Table {
             web_common::database::Table::BioOttTaxonItems => unimplemented!("all_by_updated_at not implemented for bio_ott_taxon_items."),
             web_common::database::Table::Colors => unimplemented!("all_by_updated_at not implemented for colors."),
             web_common::database::Table::Countries => unimplemented!("all_by_updated_at not implemented for countries."),
-            web_common::database::Table::DerivedSamples => NestedDerivedSample::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::DerivedSamples => {let filter: Option<web_common::database::DerivedSampleFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::DerivedSampleFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedDerivedSample::all_by_updated_at(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
             web_common::database::Table::DocumentFormats => unimplemented!("all_by_updated_at not implemented for document_formats."),
             web_common::database::Table::FontAwesomeIcons => unimplemented!("all_by_updated_at not implemented for font_awesome_icons."),
             web_common::database::Table::LoginProviders => unimplemented!("all_by_updated_at not implemented for login_providers."),
             web_common::database::Table::Notifications => unimplemented!("all_by_updated_at not implemented for notifications."),
             web_common::database::Table::Organizations => unimplemented!("all_by_updated_at not implemented for organizations."),
             web_common::database::Table::ProjectStates => unimplemented!("all_by_updated_at not implemented for project_states."),
-            web_common::database::Table::Projects => NestedProject::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::Projects => {let filter: Option<web_common::database::ProjectFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::ProjectFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedProject::all_by_updated_at(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
             web_common::database::Table::ProjectsTeamsRoleInvitations => unimplemented!("all_by_updated_at not implemented for projects_teams_role_invitations."),
             web_common::database::Table::ProjectsTeamsRoleRequests => unimplemented!("all_by_updated_at not implemented for projects_teams_role_requests."),
             web_common::database::Table::ProjectsTeamsRoles => unimplemented!("all_by_updated_at not implemented for projects_teams_roles."),
@@ -1046,17 +1168,25 @@ impl AllByUpdatedAtTable for web_common::database::Table {
             web_common::database::Table::ProjectsUsersRoleRequests => unimplemented!("all_by_updated_at not implemented for projects_users_role_requests."),
             web_common::database::Table::ProjectsUsersRoles => unimplemented!("all_by_updated_at not implemented for projects_users_roles."),
             web_common::database::Table::Roles => unimplemented!("all_by_updated_at not implemented for roles."),
-            web_common::database::Table::SampleBioOttTaxonItems => NestedSampleBioOttTaxonItem::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::SampleBioOttTaxonItems => {let filter: Option<web_common::database::SampleBioOttTaxonItemFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SampleBioOttTaxonItemFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedSampleBioOttTaxonItem::all_by_updated_at(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
             web_common::database::Table::SampleStates => unimplemented!("all_by_updated_at not implemented for sample_states."),
-            web_common::database::Table::SampledIndividualBioOttTaxonItems => NestedSampledIndividualBioOttTaxonItem::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::SampledIndividuals => NestedSampledIndividual::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::SampledIndividualBioOttTaxonItems => {let filter: Option<web_common::database::SampledIndividualBioOttTaxonItemFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SampledIndividualBioOttTaxonItemFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedSampledIndividualBioOttTaxonItem::all_by_updated_at(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::SampledIndividuals => {let filter: Option<web_common::database::SampledIndividualFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SampledIndividualFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedSampledIndividual::all_by_updated_at(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
             web_common::database::Table::SampledIndividualsTeamsRoleInvitations => unimplemented!("all_by_updated_at not implemented for sampled_individuals_teams_role_invitations."),
             web_common::database::Table::SampledIndividualsTeamsRoleRequests => unimplemented!("all_by_updated_at not implemented for sampled_individuals_teams_role_requests."),
             web_common::database::Table::SampledIndividualsTeamsRoles => unimplemented!("all_by_updated_at not implemented for sampled_individuals_teams_roles."),
             web_common::database::Table::SampledIndividualsUsersRoleInvitations => unimplemented!("all_by_updated_at not implemented for sampled_individuals_users_role_invitations."),
             web_common::database::Table::SampledIndividualsUsersRoleRequests => unimplemented!("all_by_updated_at not implemented for sampled_individuals_users_role_requests."),
             web_common::database::Table::SampledIndividualsUsersRoles => unimplemented!("all_by_updated_at not implemented for sampled_individuals_users_roles."),
-            web_common::database::Table::Samples => NestedSample::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::Samples => {let filter: Option<web_common::database::SampleFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SampleFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedSample::all_by_updated_at(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
             web_common::database::Table::SamplesTeamsRoleInvitations => unimplemented!("all_by_updated_at not implemented for samples_teams_role_invitations."),
             web_common::database::Table::SamplesTeamsRoleRequests => unimplemented!("all_by_updated_at not implemented for samples_teams_role_requests."),
             web_common::database::Table::SamplesTeamsRoles => unimplemented!("all_by_updated_at not implemented for samples_teams_roles."),
@@ -1064,7 +1194,9 @@ impl AllByUpdatedAtTable for web_common::database::Table {
             web_common::database::Table::SamplesUsersRoleRequests => unimplemented!("all_by_updated_at not implemented for samples_users_role_requests."),
             web_common::database::Table::SamplesUsersRoles => unimplemented!("all_by_updated_at not implemented for samples_users_roles."),
             web_common::database::Table::Spectra => unimplemented!("all_by_updated_at not implemented for spectra."),
-            web_common::database::Table::SpectraCollections => NestedSpectraCollection::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::SpectraCollections => {let filter: Option<web_common::database::SpectraCollectionFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SpectraCollectionFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedSpectraCollection::all_by_updated_at(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
             web_common::database::Table::SpectraCollectionsTeamsRoleInvitations => unimplemented!("all_by_updated_at not implemented for spectra_collections_teams_role_invitations."),
             web_common::database::Table::SpectraCollectionsTeamsRoleRequests => unimplemented!("all_by_updated_at not implemented for spectra_collections_teams_role_requests."),
             web_common::database::Table::SpectraCollectionsTeamsRoles => unimplemented!("all_by_updated_at not implemented for spectra_collections_teams_roles."),
@@ -1072,14 +1204,18 @@ impl AllByUpdatedAtTable for web_common::database::Table {
             web_common::database::Table::SpectraCollectionsUsersRoleRequests => unimplemented!("all_by_updated_at not implemented for spectra_collections_users_role_requests."),
             web_common::database::Table::SpectraCollectionsUsersRoles => unimplemented!("all_by_updated_at not implemented for spectra_collections_users_roles."),
             web_common::database::Table::TeamStates => unimplemented!("all_by_updated_at not implemented for team_states."),
-            web_common::database::Table::Teams => NestedTeam::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::Teams => {let filter: Option<web_common::database::TeamFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::TeamFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedTeam::all_by_updated_at(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
             web_common::database::Table::TeamsTeamsRoleInvitations => unimplemented!("all_by_updated_at not implemented for teams_teams_role_invitations."),
             web_common::database::Table::TeamsUsersRoleInvitations => unimplemented!("all_by_updated_at not implemented for teams_users_role_invitations."),
             web_common::database::Table::TeamsUsersRoleRequests => unimplemented!("all_by_updated_at not implemented for teams_users_role_requests."),
             web_common::database::Table::TeamsUsersRoles => unimplemented!("all_by_updated_at not implemented for teams_users_roles."),
             web_common::database::Table::Units => unimplemented!("all_by_updated_at not implemented for units."),
             web_common::database::Table::UserEmails => unimplemented!("all_by_updated_at not implemented for user_emails."),
-            web_common::database::Table::Users => User::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::Users => {assert!(filter.is_none(), "Filter not implemented for users.");
+User::all_by_updated_at(limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
             web_common::database::Table::UsersUsersRoleInvitations => unimplemented!("all_by_updated_at not implemented for users_users_role_invitations."),
             web_common::database::Table::UsersUsersRoleRequests => unimplemented!("all_by_updated_at not implemented for users_users_role_requests."),
             web_common::database::Table::UsersUsersRoles => unimplemented!("all_by_updated_at not implemented for users_users_roles."),

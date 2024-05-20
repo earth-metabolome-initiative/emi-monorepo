@@ -3,9 +3,10 @@ use std::rc::Rc;
 
 use crate::router::AppRoute;
 use crate::stores::user_state::UserState;
-use crate::workers::ws_worker::{ComponentMessage, Tabular, WebsocketMessage};
+use crate::workers::ws_worker::{ComponentMessage, WebsocketMessage};
 use crate::workers::WebsocketWorker;
 use serde::de::DeserializeOwned;
+use serde::Serialize;
 use web_common::api::form_traits::FormMethod;
 use web_common::database::PrimaryKey;
 use web_common::database::*;

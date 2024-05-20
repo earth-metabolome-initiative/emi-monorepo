@@ -5,6 +5,7 @@
 
 use serde::{Deserialize, Serialize};
 use chrono::NaiveDateTime;
+use super::*;
 
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct UpdateProject {
@@ -22,6 +23,9 @@ pub struct UpdateProject {
     pub end_date: Option<NaiveDateTime>,
 }
 
+impl Tabular for UpdateProject {
+    const TABLE: Table = Table::Projects;
+}
 #[cfg(feature = "frontend")]
 impl UpdateProject {
     pub fn into_row(self, updated_by: i32) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
@@ -117,6 +121,9 @@ pub struct UpdateTeam {
     pub parent_team_id: Option<i32>,
 }
 
+impl Tabular for UpdateTeam {
+    const TABLE: Table = Table::Teams;
+}
 #[cfg(feature = "frontend")]
 impl UpdateTeam {
     pub fn into_row(self, updated_by: i32) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
@@ -179,6 +186,9 @@ pub struct UpdateUser {
     pub profile_picture: Vec<u8>,
 }
 
+impl Tabular for UpdateUser {
+    const TABLE: Table = Table::Users;
+}
 #[cfg(feature = "frontend")]
 impl UpdateUser {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {

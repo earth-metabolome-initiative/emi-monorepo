@@ -419,6 +419,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                 }
                                 web_common::database::Select::All {
                                     table_name,
+                                    filter,
                                     limit,
                                     offset,
                                 } => {
@@ -456,6 +457,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                         task_id,
                                         <Table as AllTable>::all(
                                             &table,
+                                            filter,
                                             Some(limit),
                                             Some(offset),
                                             &mut self.diesel_connection,
@@ -463,7 +465,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                         .unwrap(),
                                     ));
                                 }
-                                web_common::database::Select::AllByUpdatedAt { table_name, limit, offset } => {
+                                web_common::database::Select::AllByUpdatedAt { table_name, filter, limit, offset } => {
                                     let table: web_common::database::Table =
                                         match table_name.as_str().try_into() {
                                             Ok(table) => table,
@@ -498,6 +500,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                         task_id,
                                         <Table as AllByUpdatedAtTable>::all_by_updated_at(
                                             &table,
+                                            filter,
                                             Some(limit),
                                             Some(offset),
                                             &mut self.diesel_connection,

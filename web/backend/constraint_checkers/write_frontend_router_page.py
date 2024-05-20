@@ -1,7 +1,7 @@
 """Submodule writing frontend router page to the filesystem."""
 
 from typing import List
-from constraint_checkers.struct_metadata import StructMetadata
+from constraint_checkers.struct_metadata import StructMetadata, AttributeMetadata
 
 
 def write_frontend_sidebar(builders: List[StructMetadata]):
@@ -135,7 +135,7 @@ def write_frontend_router_page(builders: List[StructMetadata]):
         "use yew_router::prelude::*;",
         "use crate::pages::*;",
         "use uuid::Uuid;",
-        "use crate::components::BasicPages;",
+        "use crate::components::BasicList;",
         "use crate::components::BasicPage;",
         "use web_common::database::*;",
         "use crate::components::forms::automatic_forms::*;",
@@ -144,11 +144,14 @@ def write_frontend_router_page(builders: List[StructMetadata]):
     document.write("\n".join(imports) + "\n\n")
 
     document.write(
-        "#[derive(Debug, Clone, Copy, PartialEq, Routable)]\n" "pub enum AppRoute {\n"
+        "#[derive(Debug, Clone, Copy, PartialEq, Routable)]\npub enum AppRoute {\n"
     )
+
+    enum_variants = []
 
     for builder in builders:
         flat_variant = builder.get_flat_variant()
+        richest_variant = builder.get_richest_variant()
         primary_keys = flat_variant.get_primary_keys()
 
         ids_url = "".join([f"/:{primary_key.name}" for primary_key in primary_keys])
@@ -166,6 +169,11 @@ def write_frontend_router_page(builders: List[StructMetadata]):
             f"    {builder.get_capitalized_table_name()}View{{{ids_struct}}},\n"
         )
 
+        enum_variants.extend([
+            builder.get_capitalized_table_name(),
+            f"{builder.get_capitalized_table_name()}View",
+        ])
+
         if flat_variant.is_insertable():
             # We also add the /new sub-route
             document.write(
@@ -173,12 +181,44 @@ def write_frontend_router_page(builders: List[StructMetadata]):
                 f"    {builder.get_capitalized_table_name()}New,\n"
             )
 
+            enum_variants.append(f"{builder.get_capitalized_table_name()}New")
+
+            for foreign_key in flat_variant.get_foreign_keys():
+                # We retrieve from the rich variant the struct associated with the foreign key.
+                normalized_foreign_key_name = foreign_key.normalized_name()
+                foreign_key_attribute: AttributeMetadata = richest_variant.get_attribute_by_name(normalized_foreign_key_name)
+
+                assert foreign_key_attribute.has_struct_data_type()
+
+                if foreign_key.is_automatically_determined_column():
+                    continue
+
+                foreign_key_struct: StructMetadata = foreign_key_attribute.raw_data_type()
+
+                if not foreign_key_struct.is_updatable():
+                    continue
+
+                capitalized_normalized_foreign_key_name = "".join(
+                    word.capitalize() for word in normalized_foreign_key_name.split("_")
+                )
+
+                enum_variant_name = f"{builder.get_capitalized_table_name()}NewWith{capitalized_normalized_foreign_key_name}"
+
+                document.write(
+                    f'    #[at("/{builder.table_name}/new/{normalized_foreign_key_name}/:{foreign_key.name}")]\n'
+                    f"    {enum_variant_name}{{{foreign_key.name}: {foreign_key.data_type()}}},\n"
+                )
+
+                enum_variants.append(enum_variant_name)
+
         if flat_variant.is_updatable():
             # We also add the /update sub-route
             document.write(
                 f'    #[at("/{builder.table_name}{ids_url}/update")]\n'
                 f"    {builder.get_capitalized_table_name()}Update{{{ids_struct}}},\n"
             )
+
+            enum_variants.append(f"{builder.get_capitalized_table_name()}Update")
 
     # Last, we insert the additional pages.
     document.write(
@@ -203,6 +243,8 @@ def write_frontend_router_page(builders: List[StructMetadata]):
         "    match route {\n"
     )
 
+    covered_variants = []
+
     for builder in builders:
         flat_variant = builder.get_flat_variant()
         richest_variant = builder.get_richest_variant()
@@ -211,12 +253,17 @@ def write_frontend_router_page(builders: List[StructMetadata]):
 
         document.write(
             f"        AppRoute::{builder.get_capitalized_table_name()} => {{\n"
-            f"            html! {{ <BasicPages<{richest_variant.name}> /> }}\n"
+            f"            html! {{ <BasicList<{richest_variant.name}> /> }}\n"
             f"        }}\n"
             f"        AppRoute::{builder.get_capitalized_table_name()}View{{{flat_variant.get_formatted_primary_keys(include_prefix=False)}}} => {{\n"
             f"            html! {{ <BasicPage<{richest_variant.name}> id={{PrimaryKey::from({flat_variant.get_formatted_primary_keys(include_prefix=False)})}} /> }}\n"
             f"        }}\n"
         )
+
+        covered_variants.extend([
+            builder.get_capitalized_table_name(),
+            f"{builder.get_capitalized_table_name()}View",
+        ])
 
         if flat_variant.is_insertable():
             document.write(
@@ -224,6 +271,37 @@ def write_frontend_router_page(builders: List[StructMetadata]):
                 f"            html! {{ <Create{flat_variant.name}Form /> }}\n"
                 f"        }}\n"
             )
+
+            covered_variants.append(f"{builder.get_capitalized_table_name()}New")
+
+            for foreign_key in flat_variant.get_foreign_keys():
+                # We retrieve from the rich variant the struct associated with the foreign key.
+                normalized_foreign_key_name = foreign_key.normalized_name()
+                foreign_key_attribute: AttributeMetadata = richest_variant.get_attribute_by_name(normalized_foreign_key_name)
+
+                assert foreign_key_attribute.has_struct_data_type()
+
+                if foreign_key.is_automatically_determined_column():
+                    continue
+
+                foreign_key_struct: StructMetadata = foreign_key_attribute.raw_data_type()
+
+                if not foreign_key_struct.is_updatable():
+                    continue
+
+                capitalized_normalized_foreign_key_name = "".join(
+                    word.capitalize() for word in normalized_foreign_key_name.split("_")
+                )
+
+                enum_variant_name = f"{builder.get_capitalized_table_name()}NewWith{capitalized_normalized_foreign_key_name}"
+
+                document.write(
+                f"        AppRoute::{enum_variant_name}{{{foreign_key.name}}} => {{\n"
+                f"            html! {{ <Create{flat_variant.name}Form {foreign_key.name}={{{foreign_key.name}}} /> }}\n"
+                f"        }}\n"
+                )
+
+                covered_variants.append(enum_variant_name)
 
         if flat_variant.is_updatable():
             form_primary_key_properties = " ".join(
@@ -235,6 +313,15 @@ def write_frontend_router_page(builders: List[StructMetadata]):
                 f"            html! {{ <Update{flat_variant.name}Form {form_primary_key_properties} /> }}\n"
                 f"        }}\n"
             )
+
+            covered_variants.append(f"{builder.get_capitalized_table_name()}Update")
+
+    
+    for expected_variant in enum_variants:
+        assert expected_variant in covered_variants, f"Expected variant {expected_variant} not covered."
+
+    for expected_variant in covered_variants:
+        assert expected_variant in enum_variants, f"Variant {expected_variant} not expected."
 
     document.write(
         "        AppRoute::Home => {\n"

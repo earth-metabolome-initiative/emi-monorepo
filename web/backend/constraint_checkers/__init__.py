@@ -24,6 +24,7 @@ from constraint_checkers.ensure_roles_tables import (
 )
 from constraint_checkers.regroup_tables import regroup_tables
 from constraint_checkers.parent_circularity_trigger import check_parent_circularity_trigger
+from constraint_checkers.create_filter_structs import create_filter_structs
 
 
 __all__ = [
@@ -37,5 +38,6 @@ __all__ = [
     "ensure_updated_at_columns",
     "handle_minimal_revertion",
     "write_frontend_pages",
-    "regroup_tables"
+    "regroup_tables",
+    "create_filter_structs"
 ]

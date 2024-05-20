@@ -36,15 +36,17 @@ impl NestedBioOttRank {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::BioOttRankFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        BioOttRank::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        BioOttRank::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedBioOttRank {
@@ -181,15 +183,17 @@ impl NestedBioOttTaxonItem {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::BioOttTaxonItemFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        BioOttTaxonItem::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        BioOttTaxonItem::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedBioOttTaxonItem {
@@ -330,30 +334,34 @@ impl NestedDerivedSample {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::DerivedSampleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        DerivedSample::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        DerivedSample::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedDerivedSample {
     /// Get all the nested structs from the database ordered by the `updated_at` column.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all_by_updated_at(
+        filter: Option<&web_common::database::DerivedSampleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        DerivedSample::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        DerivedSample::all_by_updated_at(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedDerivedSample {
@@ -420,15 +428,17 @@ impl NestedDocumentFormat {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::DocumentFormatFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        DocumentFormat::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        DocumentFormat::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedDocumentFormat {
@@ -547,15 +557,17 @@ impl NestedLoginProvider {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::LoginProviderFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        LoginProvider::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        LoginProvider::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedLoginProvider {
@@ -658,15 +670,17 @@ impl NestedNotification {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::NotificationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        Notification::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        Notification::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedNotification {
@@ -725,15 +739,17 @@ impl NestedOrganization {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::OrganizationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        Organization::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        Organization::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedOrganization {
@@ -882,15 +898,17 @@ impl NestedProjectState {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::ProjectStateFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        ProjectState::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        ProjectState::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedProjectState {
@@ -1012,12 +1030,12 @@ impl From<NestedProjectState> for web_common::database::nested_models::NestedPro
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedProject {
     pub inner: Project,
-    pub parent_project: Option<Project>,
-    pub created_by: User,
-    pub updated_by: User,
     pub state: NestedProjectState,
     pub icon: FontAwesomeIcon,
     pub color: Color,
+    pub parent_project: Option<Project>,
+    pub created_by: User,
+    pub updated_by: User,
 }
 
 impl NestedProject {
@@ -1031,12 +1049,12 @@ impl NestedProject {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            parent_project: flat_variant.parent_project_id.map(|flat_variant| Project::get(flat_variant, connection)).transpose()?,
-            created_by: User::get(flat_variant.created_by, connection)?,
-            updated_by: User::get(flat_variant.updated_by, connection)?,
             state: NestedProjectState::get(flat_variant.state_id, connection)?,
             icon: FontAwesomeIcon::get(flat_variant.icon_id, connection)?,
             color: Color::get(flat_variant.color_id, connection)?,
+            parent_project: flat_variant.parent_project_id.map(|flat_variant| Project::get(flat_variant, connection)).transpose()?,
+            created_by: User::get(flat_variant.created_by, connection)?,
+            updated_by: User::get(flat_variant.updated_by, connection)?,
                 inner: flat_variant,
         })
     }
@@ -1045,15 +1063,17 @@ impl NestedProject {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::ProjectFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        Project::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        Project::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedProject {
@@ -1061,31 +1081,35 @@ impl NestedProject {
     ///
     /// # Arguments
     /// * `author_user_id` - The user id.
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all_editables(
         author_user_id: i32,
+        filter: Option<&web_common::database::ProjectFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        Project::all_editables(author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        Project::all_editables(author_user_id, filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedProject {
     /// Get all the nested structs from the database ordered by the `updated_at` column.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all_by_updated_at(
+        filter: Option<&web_common::database::ProjectFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        Project::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        Project::all_by_updated_at(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedProject {
@@ -1238,12 +1262,12 @@ impl From<web_common::database::nested_models::NestedProject> for NestedProject 
     fn from(item: web_common::database::nested_models::NestedProject) -> Self {
         Self {
             inner: item.inner.into(),
-            parent_project: item.parent_project.map(|item| item.into()),
-            created_by: item.created_by.into(),
-            updated_by: item.updated_by.into(),
             state: item.state.into(),
             icon: item.icon.into(),
             color: item.color.into(),
+            parent_project: item.parent_project.map(|item| item.into()),
+            created_by: item.created_by.into(),
+            updated_by: item.updated_by.into(),
         }
     }
 }
@@ -1251,12 +1275,12 @@ impl From<NestedProject> for web_common::database::nested_models::NestedProject 
     fn from(item: NestedProject) -> Self {
         Self {
             inner: item.inner.into(),
-            parent_project: item.parent_project.map(|item| item.into()),
-            created_by: item.created_by.into(),
-            updated_by: item.updated_by.into(),
             state: item.state.into(),
             icon: item.icon.into(),
             color: item.color.into(),
+            parent_project: item.parent_project.map(|item| item.into()),
+            created_by: item.created_by.into(),
+            updated_by: item.updated_by.into(),
         }
     }
 }
@@ -1292,15 +1316,17 @@ impl NestedProjectsTeamsRoleInvitation {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::ProjectsTeamsRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        ProjectsTeamsRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        ProjectsTeamsRoleInvitation::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedProjectsTeamsRoleInvitation {
@@ -1371,15 +1397,17 @@ impl NestedProjectsTeamsRoleRequest {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::ProjectsTeamsRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        ProjectsTeamsRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        ProjectsTeamsRoleRequest::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedProjectsTeamsRoleRequest {
@@ -1450,15 +1478,17 @@ impl NestedProjectsTeamsRole {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::ProjectsTeamsRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        ProjectsTeamsRole::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        ProjectsTeamsRole::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedProjectsTeamsRole {
@@ -1529,15 +1559,17 @@ impl NestedProjectsUsersRoleInvitation {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::ProjectsUsersRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        ProjectsUsersRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        ProjectsUsersRoleInvitation::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedProjectsUsersRoleInvitation {
@@ -1608,15 +1640,17 @@ impl NestedProjectsUsersRoleRequest {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::ProjectsUsersRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        ProjectsUsersRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        ProjectsUsersRoleRequest::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedProjectsUsersRoleRequest {
@@ -1687,15 +1721,17 @@ impl NestedProjectsUsersRole {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::ProjectsUsersRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        ProjectsUsersRole::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        ProjectsUsersRole::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedProjectsUsersRole {
@@ -1762,15 +1798,17 @@ impl NestedRole {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::RoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        Role::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        Role::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedRole {
@@ -1935,30 +1973,34 @@ impl NestedSampleBioOttTaxonItem {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::SampleBioOttTaxonItemFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampleBioOttTaxonItem::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        SampleBioOttTaxonItem::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSampleBioOttTaxonItem {
     /// Get all the nested structs from the database ordered by the `updated_at` column.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all_by_updated_at(
+        filter: Option<&web_common::database::SampleBioOttTaxonItemFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampleBioOttTaxonItem::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        SampleBioOttTaxonItem::all_by_updated_at(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSampleBioOttTaxonItem {
@@ -2025,15 +2067,17 @@ impl NestedSampleState {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::SampleStateFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampleState::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        SampleState::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSampleState {
@@ -2170,30 +2214,34 @@ impl NestedSampledIndividualBioOttTaxonItem {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::SampledIndividualBioOttTaxonItemFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampledIndividualBioOttTaxonItem::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        SampledIndividualBioOttTaxonItem::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSampledIndividualBioOttTaxonItem {
     /// Get all the nested structs from the database ordered by the `updated_at` column.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all_by_updated_at(
+        filter: Option<&web_common::database::SampledIndividualBioOttTaxonItemFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampledIndividualBioOttTaxonItem::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        SampledIndividualBioOttTaxonItem::all_by_updated_at(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSampledIndividualBioOttTaxonItem {
@@ -2260,15 +2308,17 @@ impl NestedSampledIndividual {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::SampledIndividualFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampledIndividual::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        SampledIndividual::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSampledIndividual {
@@ -2276,31 +2326,35 @@ impl NestedSampledIndividual {
     ///
     /// # Arguments
     /// * `author_user_id` - The user id.
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all_editables(
         author_user_id: i32,
+        filter: Option<&web_common::database::SampledIndividualFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampledIndividual::all_editables(author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        SampledIndividual::all_editables(author_user_id, filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSampledIndividual {
     /// Get all the nested structs from the database ordered by the `updated_at` column.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all_by_updated_at(
+        filter: Option<&web_common::database::SampledIndividualFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampledIndividual::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        SampledIndividual::all_by_updated_at(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSampledIndividual {
@@ -2367,15 +2421,17 @@ impl NestedSampledIndividualsTeamsRoleInvitation {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::SampledIndividualsTeamsRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampledIndividualsTeamsRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        SampledIndividualsTeamsRoleInvitation::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSampledIndividualsTeamsRoleInvitation {
@@ -2446,15 +2502,17 @@ impl NestedSampledIndividualsTeamsRoleRequest {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::SampledIndividualsTeamsRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampledIndividualsTeamsRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        SampledIndividualsTeamsRoleRequest::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSampledIndividualsTeamsRoleRequest {
@@ -2525,15 +2583,17 @@ impl NestedSampledIndividualsTeamsRole {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::SampledIndividualsTeamsRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampledIndividualsTeamsRole::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        SampledIndividualsTeamsRole::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSampledIndividualsTeamsRole {
@@ -2604,15 +2664,17 @@ impl NestedSampledIndividualsUsersRoleInvitation {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::SampledIndividualsUsersRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampledIndividualsUsersRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        SampledIndividualsUsersRoleInvitation::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSampledIndividualsUsersRoleInvitation {
@@ -2683,15 +2745,17 @@ impl NestedSampledIndividualsUsersRoleRequest {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::SampledIndividualsUsersRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampledIndividualsUsersRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        SampledIndividualsUsersRoleRequest::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSampledIndividualsUsersRoleRequest {
@@ -2762,15 +2826,17 @@ impl NestedSampledIndividualsUsersRole {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::SampledIndividualsUsersRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampledIndividualsUsersRole::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        SampledIndividualsUsersRole::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSampledIndividualsUsersRole {
@@ -2841,15 +2907,17 @@ impl NestedSample {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::SampleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        Sample::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        Sample::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSample {
@@ -2857,31 +2925,35 @@ impl NestedSample {
     ///
     /// # Arguments
     /// * `author_user_id` - The user id.
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all_editables(
         author_user_id: i32,
+        filter: Option<&web_common::database::SampleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        Sample::all_editables(author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        Sample::all_editables(author_user_id, filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSample {
     /// Get all the nested structs from the database ordered by the `updated_at` column.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all_by_updated_at(
+        filter: Option<&web_common::database::SampleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        Sample::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        Sample::all_by_updated_at(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSample {
@@ -2952,15 +3024,17 @@ impl NestedSamplesTeamsRoleInvitation {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::SamplesTeamsRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SamplesTeamsRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        SamplesTeamsRoleInvitation::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSamplesTeamsRoleInvitation {
@@ -3031,15 +3105,17 @@ impl NestedSamplesTeamsRoleRequest {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::SamplesTeamsRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SamplesTeamsRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        SamplesTeamsRoleRequest::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSamplesTeamsRoleRequest {
@@ -3110,15 +3186,17 @@ impl NestedSamplesTeamsRole {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::SamplesTeamsRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SamplesTeamsRole::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        SamplesTeamsRole::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSamplesTeamsRole {
@@ -3189,15 +3267,17 @@ impl NestedSamplesUsersRoleInvitation {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::SamplesUsersRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SamplesUsersRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        SamplesUsersRoleInvitation::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSamplesUsersRoleInvitation {
@@ -3268,15 +3348,17 @@ impl NestedSamplesUsersRoleRequest {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::SamplesUsersRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SamplesUsersRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        SamplesUsersRoleRequest::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSamplesUsersRoleRequest {
@@ -3347,15 +3429,17 @@ impl NestedSamplesUsersRole {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::SamplesUsersRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SamplesUsersRole::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        SamplesUsersRole::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSamplesUsersRole {
@@ -3420,15 +3504,17 @@ impl NestedSpectra {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::SpectraFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        Spectra::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        Spectra::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSpectra {
@@ -3491,15 +3577,17 @@ impl NestedSpectraCollection {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::SpectraCollectionFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SpectraCollection::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        SpectraCollection::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSpectraCollection {
@@ -3507,31 +3595,35 @@ impl NestedSpectraCollection {
     ///
     /// # Arguments
     /// * `author_user_id` - The user id.
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all_editables(
         author_user_id: i32,
+        filter: Option<&web_common::database::SpectraCollectionFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SpectraCollection::all_editables(author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        SpectraCollection::all_editables(author_user_id, filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSpectraCollection {
     /// Get all the nested structs from the database ordered by the `updated_at` column.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all_by_updated_at(
+        filter: Option<&web_common::database::SpectraCollectionFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SpectraCollection::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        SpectraCollection::all_by_updated_at(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSpectraCollection {
@@ -3600,15 +3692,17 @@ impl NestedSpectraCollectionsTeamsRoleInvitation {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::SpectraCollectionsTeamsRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SpectraCollectionsTeamsRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        SpectraCollectionsTeamsRoleInvitation::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSpectraCollectionsTeamsRoleInvitation {
@@ -3679,15 +3773,17 @@ impl NestedSpectraCollectionsTeamsRoleRequest {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::SpectraCollectionsTeamsRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SpectraCollectionsTeamsRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        SpectraCollectionsTeamsRoleRequest::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSpectraCollectionsTeamsRoleRequest {
@@ -3758,15 +3854,17 @@ impl NestedSpectraCollectionsTeamsRole {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::SpectraCollectionsTeamsRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SpectraCollectionsTeamsRole::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        SpectraCollectionsTeamsRole::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSpectraCollectionsTeamsRole {
@@ -3837,15 +3935,17 @@ impl NestedSpectraCollectionsUsersRoleInvitation {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::SpectraCollectionsUsersRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SpectraCollectionsUsersRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        SpectraCollectionsUsersRoleInvitation::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSpectraCollectionsUsersRoleInvitation {
@@ -3916,15 +4016,17 @@ impl NestedSpectraCollectionsUsersRoleRequest {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::SpectraCollectionsUsersRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SpectraCollectionsUsersRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        SpectraCollectionsUsersRoleRequest::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSpectraCollectionsUsersRoleRequest {
@@ -3995,15 +4097,17 @@ impl NestedSpectraCollectionsUsersRole {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::SpectraCollectionsUsersRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        SpectraCollectionsUsersRole::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        SpectraCollectionsUsersRole::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedSpectraCollectionsUsersRole {
@@ -4070,15 +4174,17 @@ impl NestedTeamState {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::TeamStateFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        TeamState::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        TeamState::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedTeamState {
@@ -4231,15 +4337,17 @@ impl NestedTeam {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::TeamFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        Team::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        Team::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedTeam {
@@ -4247,31 +4355,35 @@ impl NestedTeam {
     ///
     /// # Arguments
     /// * `author_user_id` - The user id.
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all_editables(
         author_user_id: i32,
+        filter: Option<&web_common::database::TeamFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        Team::all_editables(author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        Team::all_editables(author_user_id, filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedTeam {
     /// Get all the nested structs from the database ordered by the `updated_at` column.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all_by_updated_at(
+        filter: Option<&web_common::database::TeamFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        Team::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        Team::all_by_updated_at(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedTeam {
@@ -4476,15 +4588,17 @@ impl NestedTeamsTeamsRoleInvitation {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::TeamsTeamsRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        TeamsTeamsRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        TeamsTeamsRoleInvitation::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedTeamsTeamsRoleInvitation {
@@ -4555,15 +4669,17 @@ impl NestedTeamsUsersRoleInvitation {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::TeamsUsersRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        TeamsUsersRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        TeamsUsersRoleInvitation::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedTeamsUsersRoleInvitation {
@@ -4634,15 +4750,17 @@ impl NestedTeamsUsersRoleRequest {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::TeamsUsersRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        TeamsUsersRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        TeamsUsersRoleRequest::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedTeamsUsersRoleRequest {
@@ -4713,15 +4831,17 @@ impl NestedTeamsUsersRole {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::TeamsUsersRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        TeamsUsersRole::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        TeamsUsersRole::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedTeamsUsersRole {
@@ -4788,15 +4908,17 @@ impl NestedUserEmail {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::UserEmailFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        UserEmail::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        UserEmail::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedUserEmail {
@@ -4879,15 +5001,17 @@ impl NestedUsersUsersRoleInvitation {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::UsersUsersRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        UsersUsersRoleInvitation::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        UsersUsersRoleInvitation::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedUsersUsersRoleInvitation {
@@ -4958,15 +5082,17 @@ impl NestedUsersUsersRoleRequest {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::UsersUsersRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        UsersUsersRoleRequest::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        UsersUsersRoleRequest::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedUsersUsersRoleRequest {
@@ -5037,15 +5163,17 @@ impl NestedUsersUsersRole {
     /// Get all the nested structs from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of rows to return. By default `10`.
     /// * `offset` - The offset of the rows to return. By default `0`.
     /// * `connection` - The database connection.
     pub fn all(
+        filter: Option<&web_common::database::UsersUsersRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        UsersUsersRole::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+        UsersUsersRole::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl NestedUsersUsersRole {

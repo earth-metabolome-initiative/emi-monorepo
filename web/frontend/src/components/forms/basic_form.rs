@@ -4,7 +4,6 @@ use crate::components::forms::InputErrors;
 use crate::cookies::is_logged_in;
 use crate::router::AppRoute;
 use crate::stores::user_state::UserState;
-use crate::workers::ws_worker::Tabular;
 use crate::workers::ws_worker::{ComponentMessage, WebsocketMessage};
 use crate::workers::WebsocketWorker;
 use gloo::timers::callback::Timeout;
@@ -14,7 +13,7 @@ use std::fmt::Debug;
 use std::rc::Rc;
 use web_common::api::form_traits::FormMethod;
 use web_common::api::ApiError;
-use web_common::database::PrimaryKey;
+use web_common::database::*;
 use yew::prelude::*;
 use yew_agent::prelude::WorkerBridgeHandle;
 use yew_agent::scope_ext::AgentScopeExt;
@@ -95,6 +94,7 @@ where
 {
     pub builder: Data::Builder,
     pub builder_dispatch: Dispatch<Data::Builder>,
+    pub named_requests: Vec<ComponentMessage>,
     pub children: Html,
     pub method: FormMethod,
     pub navigator: yew_router::navigator::Navigator,
@@ -107,6 +107,8 @@ where
 {
     pub builder: Data::Builder,
     pub builder_dispatch: Dispatch<Data::Builder>,
+    #[prop_or_default]
+    pub named_requests: Vec<ComponentMessage>,
     pub children: Html,
     pub method: FormMethod,
 }
@@ -266,9 +268,11 @@ where
                     *state = Default::default();
                 });
             }
+            for operation in ctx.props().named_requests.iter() {
+                ctx.link().send_message(operation.clone());
+            }
             if ctx.props().method.is_update() {
                 if let Some(id) = ctx.props().builder.id() {
-                    ctx.link().send_message(ComponentMessage::get::<Data>(id));
                     match ctx.props().method {
                         FormMethod::POST => {}
                         FormMethod::GET => {
@@ -402,7 +406,7 @@ where
 {
     let navigator = use_navigator().unwrap();
     html! {
-        <InnerBasicForm<Data> navigator={navigator} method={props.method.clone()} builder={props.builder.clone()} builder_dispatch={props.builder_dispatch.clone()}>
+        <InnerBasicForm<Data> navigator={navigator} named_requests={props.named_requests.clone()} method={props.method.clone()} builder={props.builder.clone()} builder_dispatch={props.builder_dispatch.clone()}>
             { props.children.clone() }
         </InnerBasicForm<Data>>
     }
