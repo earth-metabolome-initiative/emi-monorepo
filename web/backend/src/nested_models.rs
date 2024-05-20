@@ -8,6 +8,7 @@ use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::PooledConnection;
 use uuid::Uuid;
 use crate::models::*;
+
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedBioOttRank {
     pub inner: BioOttRank,

@@ -360,6 +360,11 @@ class StructMetadata:
                 foreign_key_flat_variant = (
                     StructMetadata.table_metadata.get_flat_variant(foreign_key_table)
                 )
+
+                assert foreign_key_flat_variant is not None, (
+                    f"The foreign key flat variant for the table {foreign_key_table} "
+                    "is not defined."
+                )
                 file.write(
                     f"#[diesel(belongs_to({foreign_key_flat_variant}, foreign_key = {attribute.name}))]\n"
                 )
@@ -392,6 +397,7 @@ class StructMetadata:
         )
 
     def set_flat_variant(self, struct: "StructMetadata"):
+        """Sets the flat variant of the struct."""
         assert struct.table_name == self.table_name
         assert not struct.is_nested()
         self._flat_variant = struct

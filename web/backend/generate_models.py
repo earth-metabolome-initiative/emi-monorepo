@@ -856,15 +856,13 @@ def write_backend_structs(
             file.write("}\n")
 
 
-def extract_structs(path: str, table_metadata: TableMetadata) -> List[StructMetadata]:
+def extract_structs(path: str) -> List[StructMetadata]:
     """Extract the structs from the Rust file at the given path.
 
     Parameters
     ----------
     path : str
         The path to the Rust file.
-    table_metadata : TableMetadata
-        The metadata of the tables in the database.
     """
     # A dictionary to store the table names and their
     # respective structs.
@@ -930,7 +928,7 @@ def extract_structs(path: str, table_metadata: TableMetadata) -> List[StructMeta
             # in the line.
             if "}" in line:
                 inside_struct = False
-                table_metadata.register_flat_variant(
+                struct_metadata.table_metadata.register_flat_variant(
                     struct_metadata.table_name, struct_metadata.name
                 )
                 struct_metadatas.append(struct_metadata)
@@ -1550,35 +1548,6 @@ def get_view_names() -> List[str]:
     return view_names
 
 
-def map_postgres_to_rust_type(pg_type):
-    """Map the Postgres type to the Rust type."""
-    pg_to_rust_types = {
-        "uuid": "diesel::sql_types::Uuid",
-        "text": "diesel::sql_types::Text",
-        "timestamp without time zone": "diesel::sql_types::Timestamp",
-        "character varying": "diesel::sql_types::Text",
-        "integer": "diesel::sql_types::Integer",
-    }
-
-    if pg_type in pg_to_rust_types:
-        return pg_to_rust_types[pg_type]
-
-    raise NotImplementedError(f'Postgres type "{pg_type}" is not supported.')
-
-
-def generate_diesel_schema(view_name: str, columns: List[ViewColumn]) -> str:
-    schema_code = "diesel::table! {\n"
-    schema_code += f"    {view_name} (id) {{\n"
-    for column in columns:
-        if column.nullable:
-            schema_code += f"        {column.alias_name} -> diesel::sql_types::Nullable<{map_postgres_to_rust_type(column.data_type)}>,\n"
-        else:
-            schema_code += f"        {column.alias_name} -> {map_postgres_to_rust_type(column.data_type)},\n"
-    schema_code += "    }\n"
-    schema_code += "}\n"
-    return schema_code
-
-
 def check_schema_completion():
     """Check the view schema completion.
 
@@ -1598,9 +1567,7 @@ def check_schema_completion():
             )
 
 
-def generate_view_structs(
-    table_metadata: TableMetadata,
-):
+def generate_view_structs():
     """Generate the view structs.
 
     Implementative details
@@ -1745,7 +1712,7 @@ def generate_view_structs(
 
 
 def generate_nested_structs(
-    path: str, struct_metadatas: List[StructMetadata], tables_metadata: TableMetadata
+    path: str, struct_metadatas: List[StructMetadata]
 ) -> List[StructMetadata]:
     """Generate the nested structs.
 
@@ -1760,8 +1727,6 @@ def generate_nested_structs(
     For each table, we query the postgres to get the foreign keys. We then generate the nested
     structs for the referenced tables. The nested structs are written to the file `src/models.rs`.
     """
-    similarity_indices: PGIndices = find_pg_trgm_indices(tables_metadata)
-
     # We open the file to write the nested structs
     document = open(path, "w", encoding="utf8")
 
@@ -1786,8 +1751,7 @@ def generate_nested_structs(
         # "use crate::views::views::*;",
     ]
 
-    for import_statement in imports:
-        document.write(f"{import_statement}\n")
+    document.write("\n".join(imports) + "\n\n")
 
     def get_struct_by_table_name(table_name: str) -> StructMetadata:
         for struct in struct_metadatas:
@@ -1825,7 +1789,7 @@ def generate_nested_structs(
             # with the foreign struct. This struct may be also nested if the foreign
             # table has foreign keys, which we check by using the `has_foreign_keys`
             # method of the `tables_metadata` object.
-            foreign_key_table_name = tables_metadata.get_foreign_key_table_name(
+            foreign_key_table_name = struct.table_metadata.get_foreign_key_table_name(
                 struct.table_name, attribute.name
             )
 
@@ -2059,7 +2023,7 @@ def generate_nested_structs(
         # Then, for all the tables that have an updated_at column, we implement the
         # `all_by_updated_at` method, which returns all of the nested structs ordered
         # by the `updated_at` column.
-        if tables_metadata.has_updated_at_column(flat_variant.table_name):
+        if flat_variant.table_metadata.has_updated_at_column(flat_variant.table_name):
             document.write(
                 f"impl {nested_struct.name} {{\n"
                 "    /// Get all the nested structs from the database ordered by the `updated_at` column.\n"
@@ -2176,7 +2140,7 @@ def generate_nested_structs(
         # calls search on the flat version of the struct and then iterates on the
         # primary keys of the results and constructs the nested structs by calling
         # the `get` method several times.
-        if similarity_indices.has_table(flat_variant.table_name):
+        if flat_variant.is_searchable():
             for method_name, _, _ in PGIndices.SIMILARITY_METHODS:
                 document.write(
                     f"impl {nested_struct.name} {{\n"
@@ -2259,7 +2223,7 @@ def generate_nested_structs(
 
 
 def write_web_common_nested_structs(
-    path: str, nested_structs: List[StructMetadata], table_metadata: TableMetadata
+    path: str, nested_structs: List[StructMetadata]
 ):
     """Writes the nested structs to the web_common crate."""
 
@@ -2287,8 +2251,7 @@ def write_web_common_nested_structs(
         "use super::*;",
     ]
 
-    for import_statement in imports:
-        document.write(f"{import_statement}\n")
+    document.write("\n".join(imports) + "\n\n")
 
     for nested_struct in nested_structs:
         nested_struct.write_to(document)
@@ -2315,7 +2278,7 @@ def write_web_common_nested_structs(
         flat_variant = nested_struct.get_flat_variant()
 
         document.write(
-            f'#[cfg(feature = "frontend")]\n' f"impl {nested_struct.name} {{\n"
+            f"#[cfg(feature = \"frontend\")]\nimpl {nested_struct.name} {{\n"
         )
 
         # First, we implement the `from_flat` method that will be used to convert
@@ -2356,7 +2319,7 @@ def write_web_common_nested_structs(
         if any(attribute.name == "inner" for attribute in nested_struct.attributes):
             document.write("            inner: flat_variant,\n")
 
-        document.write("        })\n" "    }\n")
+        document.write("        })\n    }\n")
 
         document.write(
             "    /// Get the nested struct from the provided primary key.\n"
@@ -2427,7 +2390,7 @@ def write_web_common_nested_structs(
         # is enabled using GlueSQL. This method will be extremely similar to the `all_by_updated_at`
         # method for the Diesel-based approach of the backend.
 
-        if table_metadata.has_updated_at_column(flat_variant.table_name):
+        if flat_variant.table_metadata.has_updated_at_column(flat_variant.table_name):
             document.write(
                 "    /// Get all the nested structs from the database ordered by the `updated_at` column.\n"
                 "    ///\n"
@@ -4858,15 +4821,11 @@ if __name__ == "__main__":
     print("Generated view schema.")
     check_schema_completion()
     print("Checked schema completion.")
-    generate_view_structs(tables_metadata)
+    generate_view_structs()
     print("Generated view structs.")
 
-    table_structs: List[StructMetadata] = extract_structs(
-        "src/models.rs", table_metadata=tables_metadata
-    )
-    view_structs: List[StructMetadata] = extract_structs(
-        "src/views/views.rs", table_metadata=tables_metadata
-    )
+    table_structs: List[StructMetadata] = extract_structs("src/models.rs")
+    view_structs: List[StructMetadata] = extract_structs("src/views/views.rs")
 
     print(
         f"Extracted {len(table_structs)} tables and {len(view_structs)} views from the backend."
@@ -4888,7 +4847,7 @@ if __name__ == "__main__":
     print("Generated web common structs.")
 
     nested_structs: List[StructMetadata] = generate_nested_structs(
-        "src/nested_models.rs", table_structs + view_structs, tables_metadata
+        "src/nested_models.rs", table_structs + view_structs
     )
     print(f"Generated {len(nested_structs)} nested structs for backend.")
 
@@ -4910,7 +4869,7 @@ if __name__ == "__main__":
     write_diesel_table_names_enumeration(tables, tables_metadata)
     print("Generated table names enumeration for diesel.")
 
-    write_web_common_nested_structs("nested_models.rs", nested_structs, tables_metadata)
+    write_web_common_nested_structs("nested_models.rs", nested_structs)
     print("Generated nested structs for web_common.")
 
     write_web_common_search_trait_implementations(

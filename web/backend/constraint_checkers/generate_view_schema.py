@@ -1,7 +1,8 @@
 """Submodule containing the generation of the view schema."""
+
 from typing import List
 from constraint_checkers.cursor import get_cursor
-from constraint_checkers.find_foreign_keys import TableMetadata
+from constraint_checkers.find_foreign_keys import TableMetadata, ViewColumn
 
 
 def get_views(cursor) -> List[str]:
@@ -11,6 +12,37 @@ def get_views(cursor) -> List[str]:
     )
     views = cursor.fetchall()
     return views
+
+
+def map_postgres_to_rust_type(pg_type):
+    """Map the Postgres type to the Rust type."""
+    pg_to_rust_types = {
+        "uuid": "diesel::sql_types::Uuid",
+        "text": "diesel::sql_types::Text",
+        "timestamp without time zone": "diesel::sql_types::Timestamp",
+        "character varying": "diesel::sql_types::Text",
+        "integer": "diesel::sql_types::Integer",
+    }
+
+    if pg_type in pg_to_rust_types:
+        return pg_to_rust_types[pg_type]
+
+    raise NotImplementedError(f'Postgres type "{pg_type}" is not supported.')
+
+
+def generate_diesel_schema(view_name: str, columns: List[ViewColumn]) -> str:
+    """Generate Diesel schema code for a view."""
+
+    schema_code = "diesel::table! {\n"
+    schema_code += f"    {view_name} (id) {{\n"
+    for column in columns:
+        if column.nullable:
+            schema_code += f"        {column.alias_name} -> diesel::sql_types::Nullable<{map_postgres_to_rust_type(column.data_type)}>,\n"
+        else:
+            schema_code += f"        {column.alias_name} -> {map_postgres_to_rust_type(column.data_type)},\n"
+    schema_code += "    }\n"
+    schema_code += "}\n"
+    return schema_code
 
 
 def generate_view_schema(

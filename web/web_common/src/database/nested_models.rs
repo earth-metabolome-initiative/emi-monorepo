@@ -6,6 +6,7 @@ use serde::Deserialize;
 use serde::Serialize;
 use uuid::Uuid;
 use super::*;
+
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedBioOttRank {
     pub inner: BioOttRank,
