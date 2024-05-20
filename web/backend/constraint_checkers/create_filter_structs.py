@@ -30,7 +30,7 @@ def create_filter_structs(flat_variants: List[StructMetadata]) -> List[StructMet
         )
 
         for foreign_key in flat_variant.get_foreign_keys():
-            assert foreign_key.has_struct_data_type()
+            assert not foreign_key.has_struct_data_type()
             filter_struct.add_attribute(foreign_key.as_option())
 
         for derive in flat_variant.derives():

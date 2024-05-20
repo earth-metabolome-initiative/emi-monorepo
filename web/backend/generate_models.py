@@ -243,7 +243,7 @@ def write_backend_structs(
                         f"                               {struct.table_name}_teams_roles::table\n"
                         f"                                   .select({struct.table_name}_teams_roles::dsl::table_id)\n"
                         f"                                   .filter({struct.table_name}_teams_roles::dsl::role_id.le(role_id))\n"
-                        f"                                   .inner_join(teams_users_roles::table.on(\n"
+                        "                                   .inner_join(teams_users_roles::table.on(\n"
                         f"                                       {struct.table_name}_teams_roles::dsl::team_id.eq(teams_users_roles::dsl::table_id)\n"
                         "                                           .and(teams_users_roles::dsl::user_id.eq(author_user_id))\n"
                         "                                           .and(teams_users_roles::dsl::role_id.le(role_id)),\n"
@@ -474,7 +474,7 @@ def write_backend_structs(
                             f"                       {struct.table_name}_teams_roles::table\n"
                             f"                           .select({struct.table_name}_teams_roles::dsl::table_id)\n"
                             f"                           .filter({struct.table_name}_teams_roles::dsl::role_id.le(2))\n"
-                            f"                           .inner_join(teams_users_roles::table.on(\n"
+                            "                           .inner_join(teams_users_roles::table.on(\n"
                             f"                               {struct.table_name}_teams_roles::dsl::team_id.eq(teams_users_roles::dsl::table_id)\n"
                             "                                   .and(teams_users_roles::dsl::user_id.eq(author_user_id))\n"
                             "                                   .and(teams_users_roles::dsl::role_id.le(2)),\n"
@@ -727,7 +727,7 @@ def write_backend_structs(
                             file.write(
                                 f"    /// Search for the struct by a given string by Postgres's `{method_name}`.\n"
                             )
-                        file.write("    ///\n" "    /// # Arguments\n")
+                        file.write("    ///\n    /// # Arguments\n")
 
                         if editable_filter:
                             # In the editable filter version we also receive in input the author_user_id
@@ -798,14 +798,14 @@ def write_backend_structs(
                                 f'            "OR {struct.table_name}.id IN ",\n'
                                 f'            "(SELECT {struct.table_name}_teams_roles.table_id FROM {struct.table_name}_teams_roles ",\n'
                                 f'            "WHERE {struct.table_name}_teams_roles.role_id <= 2 AND {struct.table_name}_teams_roles.table_id IN ",\n'
-                                f'            "(SELECT teams_users_roles.table_id FROM teams_users_roles ",\n'
-                                f'            "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2)) ",\n'
+                                '            "(SELECT teams_users_roles.table_id FROM teams_users_roles ",\n'
+                                '            "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2)) ",\n'
                             )
 
                         if table_type == "views":
                             file.write(
                                 "        let similarity_query = concat!(\n"
-                                f'            "WITH selected_ids AS (",\n'
+                                '            "WITH selected_ids AS (",\n'
                                 f'            "SELECT {similarity_index.table_name}.{primary_key.name} AS id FROM {similarity_index.table_name} ",\n'
                             )
                             if similarity_index.is_gin():
@@ -1062,7 +1062,6 @@ def write_update_method_for_gluesql(
 def write_web_common_structs(
     structs: List[StructMetadata],
     target: str,
-    enumeration: str,
     table_metadata: TableMetadata,
 ):
     """Write the structs in the target file in the `web_common` crate.
@@ -1073,8 +1072,6 @@ def write_web_common_structs(
         The list of structs to write in the target file.
     target : str
         The path where to write the structs in the `web_common` crate.
-    enumeration : str
-        The name of the enumeration to write in the target file.
     table_metadata : TableMetadata
         The metadata of the tables.
     """
@@ -3044,10 +3041,7 @@ def write_diesel_table_names_enumeration(
         "use crate::update_variants::UpdateRow;",
     ]
 
-    for import_statement in imports:
-        document.write(f"{import_statement}\n")
-
-    document.write("\n")
+    document.write("\n".join(imports) + "\n\n")
 
     search_indices: PGIndices = find_pg_trgm_indices(tables_metadata)
 
@@ -3121,7 +3115,7 @@ def write_diesel_table_names_enumeration(
                     f'            web_common::database::Table::{table.camel_cased()} => unimplemented!("Table `{table.name}` does not have a GIN similarity index."),\n'
                 )
 
-        document.write("        }\n" "    }\n")
+        document.write("        }\n    }\n")
 
         document.write(
             f"    fn {similarity_method}_search_editables(&self, user_id: i32, query: &str, limit: Option<i32>, connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>) -> Result<Vec<Vec<u8>>, web_common::api::ApiError> {{\n"
@@ -3746,8 +3740,15 @@ def write_diesel_table_names_enumeration(
 
 def write_web_common_search_trait_implementations(
     struct_metadatas: List[StructMetadata],
-    table_metadata: TableMetadata,
 ):
+    """Writes the Searchable trait implementations for the structs.
+
+    Parameters
+    ----------
+    struct_metadatas : List[StructMetadata]
+        The list of the StructMetadata objects.
+
+    """
     # We check that we are currently executing in the `backend` crate
     # so to make sure that the relative path to the `web_common` crate
     # is correct.
@@ -3755,7 +3756,6 @@ def write_web_common_search_trait_implementations(
         raise RuntimeError("This script must be executed in the `backend` crate.")
 
     document = open("../web_common/src/database/search_tables.rs", "w", encoding="utf8")
-    similarity_indices: PGIndices = find_pg_trgm_indices(table_metadata)
 
     imports = [
         "use crate::database::*;",
@@ -3785,11 +3785,11 @@ def write_web_common_search_trait_implementations(
     )
 
     for struct in struct_metadatas:
-        if similarity_indices.has_table(struct.table_name):
+        if struct.is_searchable():
             document.write(
                 f"impl Searchable<false> for {struct.name} {{\n"
                 "    fn search_task(query: String, limit: u32) -> super::Select {\n"
-                f"        super::Select::search(\n"
+                "        super::Select::search(\n"
                 f"             Table::{struct.capitalized_table_name()},\n"
                 "              query,\n"
                 "              limit,\n"
@@ -3817,7 +3817,6 @@ def write_web_common_search_trait_implementations(
 
 def derive_new_models(
     struct_metadatas: List[StructMetadata],
-    table_metadata: TableMetadata,
 ) -> List[StructMetadata]:
     """Returns list of the New{Model} structs.
 
@@ -4884,8 +4883,8 @@ if __name__ == "__main__":
         f"Generated {len(table_structs)} tables and {len(view_structs)} views implementations for backend."
     )
 
-    write_web_common_structs(table_structs, "tables", "Table", tables_metadata)
-    write_web_common_structs(view_structs, "views", "View", tables_metadata)
+    write_web_common_structs(table_structs, "tables", tables_metadata)
+    write_web_common_structs(view_structs, "views", tables_metadata)
     print("Generated web common structs.")
 
     nested_structs: List[StructMetadata] = generate_nested_structs(
@@ -4893,7 +4892,7 @@ if __name__ == "__main__":
     )
     print(f"Generated {len(nested_structs)} nested structs for backend.")
 
-    new_model_structs = derive_new_models(table_structs, tables_metadata)
+    new_model_structs = derive_new_models(table_structs)
     print(f"Derived {len(new_model_structs)} structs for the New versions")
 
     update_model_structs = derive_update_models(table_structs)
@@ -4916,7 +4915,6 @@ if __name__ == "__main__":
 
     write_web_common_search_trait_implementations(
         nested_structs + table_structs + view_structs,
-        tables_metadata,
     )
     print("Generated search trait implementations for web_common.")
 

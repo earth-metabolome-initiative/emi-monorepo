@@ -9,7 +9,6 @@ use diesel::r2d2::PooledConnection;
 use diesel::r2d2::ConnectionManager;
 use uuid::Uuid;
 use chrono::NaiveDateTime;
-
 /// Trait providing the insert method for the new variants.
 pub(super) trait InsertRow {
     /// The intermediate representation of the row.
