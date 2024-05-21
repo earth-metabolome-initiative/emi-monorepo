@@ -17,8 +17,7 @@ from constraint_checkers import handle_minimal_revertion
 from constraint_checkers import (
     replace_serial_indices,
     PGIndex,
-    PGIndices,
-    find_search_indices,
+    PGIndices
 )
 from constraint_checkers import TableStructMetadata, StructMetadata, AttributeMetadata
 from constraint_checkers import write_frontend_pages, write_frontend_router_page
@@ -130,7 +129,7 @@ def write_backend_structs(
         )
 
         # First, we write out the macros for clippy.
-        file.write("#![allow(unused)]\n" "#![allow(clippy::all)]\n\n")
+        file.write("#![allow(unused)]\n#![allow(clippy::all)]\n\n")
 
         # Then, we write the import statements.
         file.write("\n".join(imports) + "\n\n")
@@ -158,11 +157,11 @@ def write_backend_structs(
                 impl_from_line.format(struct_name=struct.name, table_type=table_type)
             )
             file.write(
-                f"    fn from(item: {struct.name}) -> Self {{\n" "        Self {\n"
+                f"    fn from(item: {struct.name}) -> Self {{\n        Self {{\n"
             )
             for attribute in struct.attributes:
                 file.write(f"            {attribute.name}: item.{attribute.name},\n")
-            file.write("        }\n" "    }\n" "}\n\n")
+            file.write("        }\n    }\n}\n\n")
 
             file.write(
                 reverse_from.format(struct_name=struct.name, table_type=table_type)
@@ -173,7 +172,7 @@ def write_backend_structs(
             )
             for attribute in struct.attributes:
                 file.write(f"            {attribute.name}: item.{attribute.name},\n")
-            file.write("        }\n" "    }\n" "}\n\n")
+            file.write("        }\n    }\n}\n\n")
 
             # We now generate the `get` method for the diesel struct.
             # This method receives the ID of the struct and returns the
@@ -400,7 +399,7 @@ def write_backend_structs(
                     )
                 else:
                     file.write("    /// Get all of the structs from the database.\n")
-                file.write("    ///\n" "    /// # Arguments\n")
+                file.write("    ///\n    /// # Arguments\n")
 
                 if editable_variant:
                     file.write(
@@ -621,7 +620,7 @@ def write_backend_structs(
                     file.write(
                         f"            .filter({struct.table_name}::dsl::{primary_key.name}.eq({primary_key.name}))\n"
                     )
-                file.write("        ).execute(connection)\n" "    }\n")
+                file.write("        ).execute(connection)\n    }\n")
 
             file.write(
                 "    /// Get the struct from the database by its ID.\n"
@@ -704,7 +703,7 @@ def write_backend_structs(
                         file.write(
                             f"            .filter({struct.table_name}::dsl::{unique_column.name}.eq({unique_column.name}))\n"
                         )
-                    file.write("            .first::<Self>(connection)\n" "    }\n")
+                    file.write("            .first::<Self>(connection)\n    }\n")
 
             # If this table implements the `pg_trgm` index, we also
             # provide the `search` method to search for the struct
