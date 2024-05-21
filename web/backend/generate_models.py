@@ -14,11 +14,7 @@ from constraint_checkers import (
 )
 from constraint_checkers import ensure_created_at_columns, ensure_updated_at_columns
 from constraint_checkers import handle_minimal_revertion
-from constraint_checkers import (
-    replace_serial_indices,
-    PGIndex,
-    PGIndices
-)
+from constraint_checkers import replace_serial_indices, PGIndex, PGIndices
 from constraint_checkers import TableStructMetadata, StructMetadata, AttributeMetadata
 from constraint_checkers import write_frontend_pages, write_frontend_router_page
 from constraint_checkers import (
@@ -37,6 +33,8 @@ from constraint_checkers import (
 from constraint_checkers import (
     check_for_common_typos_in_migrations,
     write_frontend_forms,
+    check_schema_completion,
+    generate_view_structs,
 )
 
 
@@ -60,13 +58,6 @@ GLUESQL_TYPES_MAPPING = {
     "DateTime<Utc>": "gluesql::core::ast_builder::timestamp({}.to_string())",
     "Vec<u8>": "gluesql::core::ast_builder::bytea({})",
 }
-
-
-def struct_name_from_table_name(table_name: str) -> str:
-    """Convert the table name to the struct name."""
-    if table_name.endswith("s"):
-        table_name = table_name[:-1]
-    return "".join(word.capitalize() for word in table_name.split("_"))
 
 
 def sql_type_to_rust_type(sql_type: str) -> str:
@@ -214,9 +205,9 @@ def write_backend_structs(
                     "    ) -> Result<bool, diesel::result::Error> {\n"
                     f"        diesel::select(diesel::dsl::exists({struct.table_name}::dsl::{struct.table_name}\n"
                 )
-                assert len(primary_keys) == 1, (
-                    "The has_role_by_id method is only implemented for tables with a single primary key."
-                )
+                assert (
+                    len(primary_keys) == 1
+                ), "The has_role_by_id method is only implemented for tables with a single primary key."
                 primary_key = primary_keys[0]
                 file.write(
                     f"            .filter({struct.table_name}::dsl::{primary_key.name}.eq({primary_key.name}))\n"
@@ -454,9 +445,9 @@ def write_backend_structs(
 
                 if editable_variant:
                     primary_keys = struct.get_primary_keys()
-                    assert len(primary_keys) == 1, (
-                        "The all_editables method is only implemented for tables with a single primary key."
-                    )
+                    assert (
+                        len(primary_keys) == 1
+                    ), "The all_editables method is only implemented for tables with a single primary key."
                     primary_key = primary_keys[0]
 
                     file.write(
@@ -832,9 +823,7 @@ def write_backend_structs(
                                 )
                                 if editable_filter:
                                     file.write(f'"AND ",\n {editable_where_clause}')
-                                file.write(
-                                    '            "LIMIT $2",\n'
-                                )
+                                file.write('            "LIMIT $2",\n')
                             else:
                                 raise RuntimeError(
                                     "The similarity index must be either GIN or GIST."
@@ -875,9 +864,7 @@ def write_backend_structs(
                                 )
                                 if editable_filter:
                                     file.write(f'"AND ",\n {editable_where_clause}')
-                                file.write(
-                                    '            "LIMIT $2;"\n'
-                                )
+                                file.write('            "LIMIT $2;"\n')
                             else:
                                 raise RuntimeError(
                                     "The similarity index must be either GIN or GIST."
@@ -1560,198 +1547,10 @@ def write_web_common_structs(
                     f"Found an unsupported attribute type for the struct {struct.name}: {attribute.data_type()} "
                     f"for the attribute {attribute.name}."
                 )
-        document.write("        }\n")
-        document.write("    }\n")
+        document.write("        }\n    }\n}\n")
 
-        # And finally we close the struct implementation
-        document.write("}\n")
-
+    document.flush()
     document.close()
-
-
-def get_view_names() -> List[str]:
-    """Returns list of view names.
-
-    Implementative details
-    -------------------------
-    The view names are extracted from the `migrations` directory. The view names are extracted
-    from the `up.sql` file in each of the directories. The view names are extracted by searching
-    for the `CREATE VIEW` statements in the SQL file.
-    """
-    view_names = []
-    for directory in os.listdir("migrations"):
-        if not os.path.isdir(f"migrations/{directory}"):
-            continue
-        with open(f"migrations/{directory}/up.sql", "r", encoding="utf8") as file:
-            content = file.read()
-        for line in content.split("\n"):
-            if "CREATE VIEW" in line or "CREATE MATERIALIZED VIEW" in line:
-                view_name = line.rsplit(" ", maxsplit=2)[1]
-                view_names.append(view_name)
-    return view_names
-
-
-def check_schema_completion():
-    """Check the view schema completion.
-
-    Implementative details
-    -------------------------
-    Diesel does not support the `CREATE VIEW` statements, and as such we need to manually
-    create the views in the schema file `src/views/schema.rs`. This script check that all
-    of the view names are present in the schema file.
-    """
-    view_names = get_view_names()
-    with open("src/views/schema.rs", "r", encoding="utf8") as file:
-        content = file.read()
-    for view_name in view_names:
-        if view_name not in content:
-            raise NotImplementedError(
-                f"View {view_name} is not present in the schema file."
-            )
-
-
-def generate_view_structs():
-    """Generate the view structs.
-
-    Implementative details
-    -------------------------
-    Since Diesel solely supports the generation of the table structs, we need to use
-    this custom script to generate the view structs. The view structs are generated
-    starting from the schema file `src/views/schema.rs` and are written to the file
-    `src/views/views.rs`. The view structs are generated by copying the views structs
-    defined in the views schema, with the data types appropriately changed to match the
-    view schema.
-
-    An example of a schema entry is:
-
-    ```rust
-    diesel::table! {
-        users_view (id) {
-            id -> Uuid,
-            first_name -> Nullable<Text>,
-            middle_name -> Nullable<Text>,
-            last_name -> Nullable<Text>,
-            created_at -> Timestamp,
-            updated_at -> Timestamp,
-        }
-    }
-    ```
-    """
-
-    with open("src/views/schema.rs", "r", encoding="utf8") as file:
-        schema = file.read()
-
-    views = open("src/views/views.rs", "w", encoding="utf8")
-
-    if len(schema) == 0:
-        views.close()
-        return
-
-    data_types = {
-        "diesel::sql_types::Uuid": "Uuid",
-        "diesel::sql_types::Text": "String",
-        "diesel::sql_types::Timestamp": "NaiveDateTime",
-        "diesel::sql_types::Integer": "i32",
-    }
-
-    imports = [
-        "use serde::Deserialize;",
-        "use serde::Serialize;",
-        "use diesel::Queryable;",
-        "use diesel::QueryableByName;",
-        "use uuid::Uuid;",
-        "use chrono::NaiveDateTime;",
-        "use diesel::r2d2::PooledConnection;",
-        "use diesel::r2d2::ConnectionManager;",
-        "use diesel::prelude::*;",
-    ]
-
-    derives = [
-        "Deserialize",
-        "Serialize",
-        "Debug",
-        "PartialEq",
-        "Queryable",
-        "QueryableByName",
-    ]
-
-    for import_statement in imports:
-        views.write(f"{import_statement}\n")
-
-    last_line_was_table = False
-    brackets_count = 0
-    view_structs = []
-
-    for line in schema.split("\n"):
-        if "{" in line:
-            brackets_count += 1
-        if "}" in line:
-            brackets_count -= 1
-
-        if last_line_was_table:
-            view_name = line.split("(")[0].strip(" ")
-            view_struct = StructMetadata(
-                struct_name=struct_name_from_table_name(view_name),
-                table_name=view_name,
-            )
-            view_structs.append(view_struct)
-
-        if "diesel::table! {" in line:
-            last_line_was_table = True
-            continue
-
-        last_line_was_table = False
-
-        if "->" in line:
-            (attribute, data_type) = line.strip(" ,").split(" -> ")
-            optional = False
-            if "Nullable<" in data_type:
-                optional = True
-                data_type = data_type.split("Nullable<", maxsplit=1)[1].strip(">")
-            view_struct.add_attribute(
-                AttributeMetadata(
-                    original_name=attribute,
-                    name=attribute,
-                    data_type=data_types[data_type],
-                    optional=optional,
-                )
-            )
-
-        # If we have found the end of the struct, we write the struct
-        # to the file.
-        if brackets_count == 0 and view_name is not None:
-            # First, we generate the derives.
-            for derive in derives:
-                view_struct.add_derive(derive)
-
-            views.write("#[derive(")
-            views.write(", ".join(view_struct.derives()))
-            views.write(")]\n")
-
-            # Then, we write the table_name attribute to link
-            # the struct to the view.
-            views.write(
-                f"#[diesel(table_name = crate::views::schema::{view_struct.table_name})]\n"
-            )
-
-            # We write the struct definition
-            views.write(f"pub struct {view_struct.name} {{\n")
-            for attribute in view_struct.attributes:
-                views.write(
-                    f"    pub {attribute.name}: {attribute.format_data_type()},\n"
-                )
-            views.write("}\n\n")
-
-        if brackets_count == 0:
-            view_name = None
-
-    view_names_from_sql = get_view_names()
-    for view_struct in view_structs:
-        assert (
-            view_struct.table_name in view_names_from_sql
-        ), f'View "{view_struct.table_name}" is not present in the "schema.rs" file.'
-
-    views.close()
 
 
 def generate_nested_structs(

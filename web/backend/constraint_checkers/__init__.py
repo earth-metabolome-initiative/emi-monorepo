@@ -30,6 +30,7 @@ from constraint_checkers.ensures_gluesql_compliance import ensures_gluesql_compl
 from constraint_checkers.check_for_common_typos_in_migrations import check_for_common_typos_in_migrations
 from constraint_checkers.generate_table_schema import generate_table_schema
 from constraint_checkers.write_frontend_forms import write_frontend_forms
+from constraint_checkers.generate_view_struct import generate_view_structs, check_schema_completion
 
 
 __all__ = [
@@ -61,5 +62,7 @@ __all__ = [
     "ensures_gluesql_compliance",
     "check_for_common_typos_in_migrations",
     "generate_table_schema",
-    "write_frontend_forms"
+    "write_frontend_forms",
+    "generate_view_structs",
+    "check_schema_completion",
 ]
