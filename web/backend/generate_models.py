@@ -11,7 +11,6 @@ from constraint_checkers import (
     find_foreign_keys,
     ensures_all_update_at_trigger_exists,
     TableMetadata,
-    ViewColumn,
 )
 from constraint_checkers import ensure_created_at_columns, ensure_updated_at_columns
 from constraint_checkers import handle_minimal_revertion
@@ -19,7 +18,7 @@ from constraint_checkers import (
     replace_serial_indices,
     PGIndex,
     PGIndices,
-    find_pg_trgm_indices,
+    find_search_indices,
 )
 from constraint_checkers import TableStructMetadata, StructMetadata, AttributeMetadata
 from constraint_checkers import write_frontend_pages, write_frontend_router_page
@@ -90,8 +89,6 @@ def write_backend_structs(
 
     if len(struct_metadatas) == 0:
         return
-
-    similarity_indices: PGIndices = find_pg_trgm_indices(table_metadata)
 
     # After each struct ends, as defined by the `}` character, after
     # we have found a `struct` keyword, we write the `From` implementation
@@ -218,15 +215,16 @@ def write_backend_structs(
                     "    ) -> Result<bool, diesel::result::Error> {\n"
                     f"        diesel::select(diesel::dsl::exists({struct.table_name}::dsl::{struct.table_name}\n"
                 )
-                for primary_key in primary_keys:
-                    file.write(
-                        f"            .filter({struct.table_name}::dsl::{primary_key.name}.eq({primary_key.name}))\n"
-                    )
+                assert len(primary_keys) == 1, (
+                    "The has_role_by_id method is only implemented for tables with a single primary key."
+                )
+                primary_key = primary_keys[0]
                 file.write(
+                    f"            .filter({struct.table_name}::dsl::{primary_key.name}.eq({primary_key.name}))\n"
                     f"           .filter({struct.table_name}::dsl::created_by.eq(author_user_id))\n"
                     "            .or_filter(\n"
-                    f"               {struct.table_name}::dsl::id.eq(id)\n"
-                    f"                   .and({struct.table_name}::dsl::id.eq_any(\n"
+                    f"               {struct.table_name}::dsl::{primary_key.name}.eq({primary_key.name})\n"
+                    f"                   .and({struct.table_name}::dsl::{primary_key.name}.eq_any(\n"
                     f"                       {struct.table_name}_users_roles::table\n"
                     f"                           .select({struct.table_name}_users_roles::dsl::table_id)\n"
                     f"                           .filter({struct.table_name}_users_roles::dsl::user_id.eq(author_user_id)\n"
@@ -238,8 +236,8 @@ def write_backend_structs(
                 if struct.table_name != "teams":
                     file.write(
                         "                    .or_filter(\n"
-                        f"                       {struct.table_name}::dsl::id.eq(id)\n"
-                        f"                           .and({struct.table_name}::dsl::id.eq_any(\n"
+                        f"                       {struct.table_name}::dsl::{primary_key.name}.eq({primary_key.name})\n"
+                        f"                           .and({struct.table_name}::dsl::{primary_key.name}.eq_any(\n"
                         f"                               {struct.table_name}_teams_roles::table\n"
                         f"                                   .select({struct.table_name}_teams_roles::dsl::table_id)\n"
                         f"                                   .filter({struct.table_name}_teams_roles::dsl::role_id.le(role_id))\n"
@@ -456,10 +454,16 @@ def write_backend_structs(
                     )
 
                 if editable_variant:
+                    primary_keys = struct.get_primary_keys()
+                    assert len(primary_keys) == 1, (
+                        "The all_editables method is only implemented for tables with a single primary key."
+                    )
+                    primary_key = primary_keys[0]
+
                     file.write(
                         f"           .filter({struct.table_name}::dsl::created_by.eq(author_user_id))\n"
                         "            .or_filter(\n"
-                        f"               {struct.table_name}::dsl::id.eq_any(\n"
+                        f"               {struct.table_name}::dsl::{primary_key.name}.eq_any(\n"
                         f"                   {struct.table_name}_users_roles::table\n"
                         f"                       .select({struct.table_name}_users_roles::dsl::table_id)\n"
                         f"                       .filter({struct.table_name}_users_roles::dsl::user_id.eq(author_user_id)\n"
@@ -470,7 +474,7 @@ def write_backend_structs(
                     if struct.table_name != "teams":
                         file.write(
                             "                .or_filter(\n"
-                            f"                   {struct.table_name}::dsl::id.eq_any(\n"
+                            f"                   {struct.table_name}::dsl::{primary_key.name}.eq_any(\n"
                             f"                       {struct.table_name}_teams_roles::table\n"
                             f"                           .select({struct.table_name}_teams_roles::dsl::table_id)\n"
                             f"                           .filter({struct.table_name}_teams_roles::dsl::role_id.le(2))\n"
@@ -706,9 +710,21 @@ def write_backend_structs(
             # provide the `search` method to search for the struct
             # by a given string. The method also receives a limit
             # parameter to limit the number of results.
-            if similarity_indices.has_table(struct.table_name):
-                similarity_index: PGIndex = similarity_indices.get_table(
+            if struct.is_searchable():
+                similarity_index: PGIndex = struct.pg_indices.get_table(
                     struct.table_name
+                )
+
+                editable_where_clause = (
+                    f'            "{struct.table_name}.created_by = $3 ",\n'
+                    f'            "OR {struct.table_name}.id IN ",\n'
+                    f'            "(SELECT {struct.table_name}_users_roles.table FROM {struct.table_name}_users_roles ",\n'
+                    f'            "WHERE {struct.table_name}_users_roles.user_id = $3 AND {struct.table_name}_users_roles.role_id <= 2) ",\n'
+                    f'            "OR {struct.table_name}.id IN ",\n'
+                    f'            "(SELECT {struct.table_name}_teams_roles.table_id FROM {struct.table_name}_teams_roles ",\n'
+                    f'            "WHERE {struct.table_name}_teams_roles.role_id <= 2 AND {struct.table_name}_teams_roles.table_id IN ",\n'
+                    '            "(SELECT teams_users_roles.table_id FROM teams_users_roles ",\n'
+                    '            "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2)) ",\n'
                 )
 
                 for (
@@ -787,21 +803,6 @@ def write_backend_structs(
                             attribute.name for attribute in struct.attributes
                         )
 
-                        editable_where_clause = ""
-
-                        if editable_filter:
-                            editable_where_clause = (
-                                f'            "AND {struct.table_name}.created_by = $3 ",\n'
-                                f'            "OR {struct.table_name}.id IN ",\n'
-                                f'            "(SELECT {struct.table_name}_users_roles.table FROM {struct.table_name}_users_roles ",\n'
-                                f'            "WHERE {struct.table_name}_users_roles.user_id = $3 AND {struct.table_name}_users_roles.role_id <= 2) ",\n'
-                                f'            "OR {struct.table_name}.id IN ",\n'
-                                f'            "(SELECT {struct.table_name}_teams_roles.table_id FROM {struct.table_name}_teams_roles ",\n'
-                                f'            "WHERE {struct.table_name}_teams_roles.role_id <= 2 AND {struct.table_name}_teams_roles.table_id IN ",\n'
-                                '            "(SELECT teams_users_roles.table_id FROM teams_users_roles ",\n'
-                                '            "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2)) ",\n'
-                            )
-
                         if table_type == "views":
                             file.write(
                                 "        let similarity_query = concat!(\n"
@@ -811,12 +812,33 @@ def write_backend_structs(
                             if similarity_index.is_gin():
                                 file.write(
                                     f'            "WHERE $1 {similarity_operator} {similarity_index.arguments} ",\n'
-                                    f"{editable_where_clause}"
+                                )
+                                if editable_filter:
+                                    file.write(f'"AND ",\n {editable_where_clause}')
+                                file.write(
                                     f'            "ORDER BY {method_name}($1, {similarity_index.arguments}) DESC LIMIT $2",\n'
                                 )
-                            else:
+                            elif similarity_index.is_gist():
+                                if editable_filter:
+                                    file.write(
+                                        f'            "WHERE {editable_where_clause} ",\n'
+                                    )
                                 file.write(
                                     f'            "ORDER BY $1 {distance_operator} {similarity_index.arguments} LIMIT $2",\n'
+                                )
+                            elif similarity_index.is_btree():
+                                # In the case of a btree, we simply search the prefix of the string.
+                                file.write(
+                                    f'            "WHERE {similarity_index.arguments} LIKE $1% ",\n'
+                                )
+                                if editable_filter:
+                                    file.write(f'"AND ",\n {editable_where_clause}')
+                                file.write(
+                                    '            "LIMIT $2",\n'
+                                )
+                            else:
+                                raise RuntimeError(
+                                    "The similarity index must be either GIN or GIST."
                                 )
                             file.write(
                                 '         ")",\n'
@@ -832,12 +854,34 @@ def write_backend_structs(
                             if similarity_index.is_gin():
                                 file.write(
                                     f'            "WHERE $1 {similarity_operator} {similarity_index.arguments} ",\n'
-                                    f"{editable_where_clause}"
+                                )
+                                if editable_filter:
+                                    file.write(f'"AND ",\n {editable_where_clause}')
+
+                                file.write(
                                     f'            "ORDER BY {method_name}($1, {similarity_index.arguments}) DESC LIMIT $2",\n'
                                 )
-                            else:
+                            elif similarity_index.is_gist():
+                                if editable_filter:
+                                    file.write(
+                                        f'            "WHERE {editable_where_clause} ",\n'
+                                    )
                                 file.write(
                                     f'            "ORDER BY $1 {distance_operator} {similarity_index.arguments} LIMIT $2;"\n'
+                                )
+                            elif similarity_index.is_btree():
+                                # In the case of a btree, we simply search the prefix of the string.
+                                file.write(
+                                    f'            "WHERE {similarity_index.arguments} LIKE $1% ",\n'
+                                )
+                                if editable_filter:
+                                    file.write(f'"AND ",\n {editable_where_clause}')
+                                file.write(
+                                    '            "LIMIT $2;"\n'
+                                )
+                            else:
+                                raise RuntimeError(
+                                    "The similarity index must be either GIN or GIST."
                                 )
                             file.write("        );\n")
 
@@ -850,7 +894,7 @@ def write_backend_structs(
                             file.write(
                                 "            .bind::<diesel::sql_types::Integer, _>(author_user_id)\n"
                             )
-                        file.write("            .load(connection)\n" "}\n")
+                        file.write("            .load(connection)\n}\n")
 
             # Finally, we cluse the struct implementation.
             file.write("}\n")
@@ -1656,8 +1700,8 @@ def generate_view_structs():
         if "diesel::table! {" in line:
             last_line_was_table = True
             continue
-        else:
-            last_line_was_table = False
+
+        last_line_was_table = False
 
         if "->" in line:
             (attribute, data_type) = line.strip(" ,").split(" -> ")
@@ -2996,8 +3040,6 @@ def write_diesel_table_names_enumeration(
 
     document.write("\n".join(imports) + "\n\n")
 
-    search_indices: PGIndices = find_pg_trgm_indices(tables_metadata)
-
     # We start with the first trait, the SearchableTable trait, which provides
     # a search method receiving a &str query and a number of rows to return (i32).
     # The method returns a Result, where the Ok variant is a bincode-serialized
@@ -3059,7 +3101,7 @@ def write_diesel_table_names_enumeration(
         )
 
         for table in tables:
-            if search_indices.has_table(table.name):
+            if table.is_searchable():
                 document.write(
                     f"            web_common::database::Table::{table.camel_cased()} => {table.richest_struct_name()}::{similarity_method}_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),\n"
                 )
@@ -3076,7 +3118,7 @@ def write_diesel_table_names_enumeration(
         )
 
         for table in tables:
-            if search_indices.has_table(table.name):
+            if table.is_searchable():
                 if table.has_associated_roles() and table.name != "users":
                     document.write(
                         f"            web_common::database::Table::{table.camel_cased()} => {table.richest_struct_name()}::{similarity_method}_search_editables(user_id, query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),\n"

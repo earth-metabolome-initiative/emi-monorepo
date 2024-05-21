@@ -1055,18 +1055,35 @@ def handle_missing_row_to_searchable_badge_implementation(
 
         # We retrieve the textual columns of the struct, and we check which of
         # them appear in the index arguments.
-        search_columns = [
-            column
-            for column in (
-                struct.get_attribute_by_name("inner").raw_data_type().attributes
-                if struct.is_nested()
-                else struct.attributes
+        if index.is_gin() or index.is_gist():
+            search_columns = [
+                column
+                for column in (
+                    struct.get_attribute_by_name("inner").raw_data_type().attributes
+                    if struct.is_nested()
+                    else struct.attributes
+                )
+                if column.data_type() in TEXTUAL_DATA_TYPES
+                and column.name in index.arguments
+            ]
+        elif index.is_btree():
+            search_columns = [
+                column
+                for column in (
+                    struct.get_attribute_by_name("inner").raw_data_type().attributes
+                    if struct.is_nested()
+                    else struct.attributes
+                )
+                if column.data_type() in TEXTUAL_DATA_TYPES or column in struct.get_primary_keys()
+            ]
+        else:
+            raise RuntimeError(
+                f"The index {index.name} is not supported for the {struct.table_name} table."
             )
-            if column.data_type() in TEXTUAL_DATA_TYPES
-            and column.name in index.arguments
-        ]
 
-        assert len(search_columns) > 0
+        assert len(search_columns) > 0, (
+            f"The struct {struct.name} does not contain any searchable columns. "
+        )
 
         directory_name = os.path.dirname(path)
         os.makedirs(directory_name, exist_ok=True)
@@ -1082,8 +1099,8 @@ def handle_missing_row_to_searchable_badge_implementation(
 
             document.write(
                 f"impl RowToSearchableBadge for {struct.name} {{\n"
-                "    fn to_datalist_badge(&self, query: &str) -> Html \n"
-                "        html! \n"
+                "    fn to_datalist_badge(&self, query: &str) -> Html {\n"
+                "        html! {\n"
                 "            <div>\n"
                 "                <p>\n"
             )

@@ -86,6 +86,7 @@ def get_desinences(table_name: str) -> List[str]:
         f"create_{table_name}_parent_circularity_trigger",
         f"populate_{table_name}_table",
         f"create_{table_name}_gin_index",
+        f"create_{table_name}_btree_index",
     ]
 
 def get_tables() -> List[str]:

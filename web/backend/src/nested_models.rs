@@ -141,7 +141,6 @@ impl From<NestedBioOttRank> for web_common::database::nested_models::NestedBioOt
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedBioOttTaxonItem {
     pub inner: BioOttTaxonItem,
-    pub color: Color,
     pub ott_rank: NestedBioOttRank,
     pub domain: Option<BioOttTaxonItem>,
     pub kingdom: Option<BioOttTaxonItem>,
@@ -152,6 +151,7 @@ pub struct NestedBioOttTaxonItem {
     pub genus: Option<BioOttTaxonItem>,
     pub parent: BioOttTaxonItem,
     pub icon: FontAwesomeIcon,
+    pub color: Color,
 }
 
 impl NestedBioOttTaxonItem {
@@ -165,7 +165,6 @@ impl NestedBioOttTaxonItem {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            color: Color::get(flat_variant.color_id, connection)?,
             ott_rank: NestedBioOttRank::get(flat_variant.ott_rank_id, connection)?,
             domain: flat_variant.domain_id.map(|flat_variant| BioOttTaxonItem::get(flat_variant, connection)).transpose()?,
             kingdom: flat_variant.kingdom_id.map(|flat_variant| BioOttTaxonItem::get(flat_variant, connection)).transpose()?,
@@ -176,6 +175,7 @@ impl NestedBioOttTaxonItem {
             genus: flat_variant.genus_id.map(|flat_variant| BioOttTaxonItem::get(flat_variant, connection)).transpose()?,
             parent: BioOttTaxonItem::get(flat_variant.parent_id, connection)?,
             icon: FontAwesomeIcon::get(flat_variant.icon_id, connection)?,
+            color: Color::get(flat_variant.color_id, connection)?,
                 inner: flat_variant,
         })
     }
@@ -271,7 +271,6 @@ impl From<web_common::database::nested_models::NestedBioOttTaxonItem> for Nested
     fn from(item: web_common::database::nested_models::NestedBioOttTaxonItem) -> Self {
         Self {
             inner: item.inner.into(),
-            color: item.color.into(),
             ott_rank: item.ott_rank.into(),
             domain: item.domain.map(|item| item.into()),
             kingdom: item.kingdom.map(|item| item.into()),
@@ -282,6 +281,7 @@ impl From<web_common::database::nested_models::NestedBioOttTaxonItem> for Nested
             genus: item.genus.map(|item| item.into()),
             parent: item.parent.into(),
             icon: item.icon.into(),
+            color: item.color.into(),
         }
     }
 }
@@ -289,7 +289,6 @@ impl From<NestedBioOttTaxonItem> for web_common::database::nested_models::Nested
     fn from(item: NestedBioOttTaxonItem) -> Self {
         Self {
             inner: item.inner.into(),
-            color: item.color.into(),
             ott_rank: item.ott_rank.into(),
             domain: item.domain.map(|item| item.into()),
             kingdom: item.kingdom.map(|item| item.into()),
@@ -300,6 +299,7 @@ impl From<NestedBioOttTaxonItem> for web_common::database::nested_models::Nested
             genus: item.genus.map(|item| item.into()),
             parent: item.parent.into(),
             icon: item.icon.into(),
+            color: item.color.into(),
         }
     }
 }
@@ -2309,6 +2309,96 @@ impl NestedSampledIndividual {
        SampledIndividual::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
+impl NestedSampledIndividual {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       SampledIndividual::similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+    }
+}
+impl NestedSampledIndividual {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The user id.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn similarity_search_editables(
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       SampledIndividual::similarity_search_editables(author_user_id, query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+    }
+}
+impl NestedSampledIndividual {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       SampledIndividual::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+    }
+}
+impl NestedSampledIndividual {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The user id.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn word_similarity_search_editables(
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       SampledIndividual::word_similarity_search_editables(author_user_id, query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+    }
+}
+impl NestedSampledIndividual {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn strict_word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       SampledIndividual::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+    }
+}
+impl NestedSampledIndividual {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The user id.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn strict_word_similarity_search_editables(
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       SampledIndividual::strict_word_similarity_search_editables(author_user_id, query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+    }
+}
 impl From<web_common::database::nested_models::NestedSampledIndividual> for NestedSampledIndividual {
     fn from(item: web_common::database::nested_models::NestedSampledIndividual) -> Self {
         Self {
@@ -2898,14 +2988,104 @@ impl NestedSample {
     /// Get the nested struct from the provided primary key.
     ///
     /// # Arguments
-    /// * `id` - The primary key(s) of the row.
+    /// * `barcode_id` - The primary key(s) of the row.
     /// * `connection` - The database connection.
     pub fn get(
-        id: Uuid,
+        barcode_id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       Sample::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
+       Sample::get(barcode_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
+    }
+}
+impl NestedSample {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       Sample::similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+    }
+}
+impl NestedSample {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The user id.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn similarity_search_editables(
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       Sample::similarity_search_editables(author_user_id, query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+    }
+}
+impl NestedSample {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       Sample::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+    }
+}
+impl NestedSample {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The user id.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn word_similarity_search_editables(
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       Sample::word_similarity_search_editables(author_user_id, query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+    }
+}
+impl NestedSample {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn strict_word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       Sample::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+    }
+}
+impl NestedSample {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The user id.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn strict_word_similarity_search_editables(
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       Sample::strict_word_similarity_search_editables(author_user_id, query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
     }
 }
 impl From<web_common::database::nested_models::NestedSample> for NestedSample {
@@ -4244,11 +4424,11 @@ impl From<NestedTeamState> for web_common::database::nested_models::NestedTeamSt
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedTeam {
     pub inner: Team,
-    pub icon: FontAwesomeIcon,
     pub color: Color,
     pub parent_team: Option<Team>,
     pub created_by: User,
     pub updated_by: User,
+    pub icon: FontAwesomeIcon,
 }
 
 impl NestedTeam {
@@ -4262,11 +4442,11 @@ impl NestedTeam {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
-            icon: FontAwesomeIcon::get(flat_variant.icon_id, connection)?,
             color: Color::get(flat_variant.color_id, connection)?,
             parent_team: flat_variant.parent_team_id.map(|flat_variant| Team::get(flat_variant, connection)).transpose()?,
             created_by: User::get(flat_variant.created_by, connection)?,
             updated_by: User::get(flat_variant.updated_by, connection)?,
+            icon: FontAwesomeIcon::get(flat_variant.icon_id, connection)?,
                 inner: flat_variant,
         })
     }
@@ -4474,11 +4654,11 @@ impl From<web_common::database::nested_models::NestedTeam> for NestedTeam {
     fn from(item: web_common::database::nested_models::NestedTeam) -> Self {
         Self {
             inner: item.inner.into(),
-            icon: item.icon.into(),
             color: item.color.into(),
             parent_team: item.parent_team.map(|item| item.into()),
             created_by: item.created_by.into(),
             updated_by: item.updated_by.into(),
+            icon: item.icon.into(),
         }
     }
 }
@@ -4486,11 +4666,11 @@ impl From<NestedTeam> for web_common::database::nested_models::NestedTeam {
     fn from(item: NestedTeam) -> Self {
         Self {
             inner: item.inner.into(),
-            icon: item.icon.into(),
             color: item.color.into(),
             parent_team: item.parent_team.map(|item| item.into()),
             created_by: item.created_by.into(),
             updated_by: item.updated_by.into(),
+            icon: item.icon.into(),
         }
     }
 }

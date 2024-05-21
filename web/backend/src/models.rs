@@ -209,10 +209,10 @@ impl BioOttRank {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = bio_ott_taxon_items)]
-#[diesel(belongs_to(Color, foreign_key = color_id))]
 #[diesel(belongs_to(BioOttRank, foreign_key = ott_rank_id))]
 #[diesel(belongs_to(BioOttTaxonItem, foreign_key = domain_id))]
 #[diesel(belongs_to(FontAwesomeIcon, foreign_key = icon_id))]
+#[diesel(belongs_to(Color, foreign_key = color_id))]
 #[diesel(primary_key(id))]
 pub struct BioOttTaxonItem {
     pub id: i32,
@@ -306,9 +306,6 @@ impl BioOttTaxonItem {
         use crate::schema::bio_ott_taxon_items;
         let mut query = bio_ott_taxon_items::dsl::bio_ott_taxon_items
             .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.color_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::color_id.eq(value));
-        }
         if let Some(value) = filter.and_then(|f| f.ott_rank_id) {
             query = query.filter(bio_ott_taxon_items::dsl::ott_rank_id.eq(value));
         }
@@ -338,6 +335,9 @@ impl BioOttTaxonItem {
         }
         if let Some(value) = filter.and_then(|f| f.icon_id) {
             query = query.filter(bio_ott_taxon_items::dsl::icon_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.color_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::color_id.eq(value));
         }
         query
             .offset(offset.unwrap_or(0))
@@ -2463,7 +2463,8 @@ impl Project {
         let similarity_query = concat!(
             "SELECT id, name, description, public, state_id, icon_id, color_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date FROM projects ",
             "WHERE $1 % f_concat_projects_name_description(name, description) ",
-            "AND projects.created_by = $3 ",
+"AND ",
+             "projects.created_by = $3 ",
             "OR projects.id IN ",
             "(SELECT projects_users_roles.table FROM projects_users_roles ",
             "WHERE projects_users_roles.user_id = $3 AND projects_users_roles.role_id <= 2) ",
@@ -2533,7 +2534,8 @@ impl Project {
         let similarity_query = concat!(
             "SELECT id, name, description, public, state_id, icon_id, color_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date FROM projects ",
             "WHERE $1 <% f_concat_projects_name_description(name, description) ",
-            "AND projects.created_by = $3 ",
+"AND ",
+             "projects.created_by = $3 ",
             "OR projects.id IN ",
             "(SELECT projects_users_roles.table FROM projects_users_roles ",
             "WHERE projects_users_roles.user_id = $3 AND projects_users_roles.role_id <= 2) ",
@@ -2603,7 +2605,8 @@ impl Project {
         let similarity_query = concat!(
             "SELECT id, name, description, public, state_id, icon_id, color_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date FROM projects ",
             "WHERE $1 <<% f_concat_projects_name_description(name, description) ",
-            "AND projects.created_by = $3 ",
+"AND ",
+             "projects.created_by = $3 ",
             "OR projects.id IN ",
             "(SELECT projects_users_roles.table FROM projects_users_roles ",
             "WHERE projects_users_roles.user_id = $3 AND projects_users_roles.role_id <= 2) ",
@@ -4106,6 +4109,219 @@ impl SampledIndividual {
             .filter(sampled_individuals::dsl::id.eq(id))
             .first::<Self>(connection)
     }
+    /// Search for the struct by a given string by Postgres's `similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all(None, Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, created_by, created_at, updated_by, updated_at, tagged FROM sampled_individuals ",
+            "WHERE id LIKE $1% ",
+            "LIMIT $2;"
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the editable struct by a given string by Postgres's `similarity`.
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_editables(
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_editables(author_user_id, None, Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, created_by, created_at, updated_by, updated_at, tagged FROM sampled_individuals ",
+            "WHERE id LIKE $1% ",
+"AND ",
+             "sampled_individuals.created_by = $3 ",
+            "OR sampled_individuals.id IN ",
+            "(SELECT sampled_individuals_users_roles.table FROM sampled_individuals_users_roles ",
+            "WHERE sampled_individuals_users_roles.user_id = $3 AND sampled_individuals_users_roles.role_id <= 2) ",
+            "OR sampled_individuals.id IN ",
+            "(SELECT sampled_individuals_teams_roles.table_id FROM sampled_individuals_teams_roles ",
+            "WHERE sampled_individuals_teams_roles.role_id <= 2 AND sampled_individuals_teams_roles.table_id IN ",
+            "(SELECT teams_users_roles.table_id FROM teams_users_roles ",
+            "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2)) ",
+            "LIMIT $2;"
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Integer, _>(author_user_id)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all(None, Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, created_by, created_at, updated_by, updated_at, tagged FROM sampled_individuals ",
+            "WHERE id LIKE $1% ",
+            "LIMIT $2;"
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the editable struct by a given string by Postgres's `word_similarity`.
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_editables(
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_editables(author_user_id, None, Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, created_by, created_at, updated_by, updated_at, tagged FROM sampled_individuals ",
+            "WHERE id LIKE $1% ",
+"AND ",
+             "sampled_individuals.created_by = $3 ",
+            "OR sampled_individuals.id IN ",
+            "(SELECT sampled_individuals_users_roles.table FROM sampled_individuals_users_roles ",
+            "WHERE sampled_individuals_users_roles.user_id = $3 AND sampled_individuals_users_roles.role_id <= 2) ",
+            "OR sampled_individuals.id IN ",
+            "(SELECT sampled_individuals_teams_roles.table_id FROM sampled_individuals_teams_roles ",
+            "WHERE sampled_individuals_teams_roles.role_id <= 2 AND sampled_individuals_teams_roles.table_id IN ",
+            "(SELECT teams_users_roles.table_id FROM teams_users_roles ",
+            "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2)) ",
+            "LIMIT $2;"
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Integer, _>(author_user_id)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all(None, Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, created_by, created_at, updated_by, updated_at, tagged FROM sampled_individuals ",
+            "WHERE id LIKE $1% ",
+            "LIMIT $2;"
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the editable struct by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_editables(
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_editables(author_user_id, None, Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, created_by, created_at, updated_by, updated_at, tagged FROM sampled_individuals ",
+            "WHERE id LIKE $1% ",
+"AND ",
+             "sampled_individuals.created_by = $3 ",
+            "OR sampled_individuals.id IN ",
+            "(SELECT sampled_individuals_users_roles.table FROM sampled_individuals_users_roles ",
+            "WHERE sampled_individuals_users_roles.user_id = $3 AND sampled_individuals_users_roles.role_id <= 2) ",
+            "OR sampled_individuals.id IN ",
+            "(SELECT sampled_individuals_teams_roles.table_id FROM sampled_individuals_teams_roles ",
+            "WHERE sampled_individuals_teams_roles.role_id <= 2 AND sampled_individuals_teams_roles.table_id IN ",
+            "(SELECT teams_users_roles.table_id FROM teams_users_roles ",
+            "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2)) ",
+            "LIMIT $2;"
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Integer, _>(author_user_id)
+            .load(connection)
+}
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sampled_individuals_teams_role_invitations)]
@@ -4654,9 +4870,9 @@ impl SampledIndividualsUsersRole {
 #[diesel(table_name = samples)]
 #[diesel(belongs_to(User, foreign_key = created_by))]
 #[diesel(belongs_to(SampleState, foreign_key = state))]
-#[diesel(primary_key(id))]
+#[diesel(primary_key(barcode_id))]
 pub struct Sample {
-    pub id: Uuid,
+    pub barcode_id: Uuid,
     pub created_by: i32,
     pub sampled_by: i32,
     pub created_at: NaiveDateTime,
@@ -4668,7 +4884,7 @@ pub struct Sample {
 impl From<Sample> for web_common::database::tables::Sample {
     fn from(item: Sample) -> Self {
         Self {
-            id: item.id,
+            barcode_id: item.barcode_id,
             created_by: item.created_by,
             sampled_by: item.sampled_by,
             created_at: item.created_at,
@@ -4682,7 +4898,7 @@ impl From<Sample> for web_common::database::tables::Sample {
 impl From<web_common::database::tables::Sample> for Sample {
     fn from(item: web_common::database::tables::Sample) -> Self {
         Self {
-            id: item.id,
+            barcode_id: item.barcode_id,
             created_by: item.created_by,
             sampled_by: item.sampled_by,
             created_at: item.created_at,
@@ -4697,23 +4913,23 @@ impl Sample {
     /// Check whether the user has a role with a role_id less than or equal to the provided role_id.
     ///
     /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `barcode_id` - The primary key(s) of the struct to delete.
     /// * `author_user_id` - The ID of the user to check.
     /// * `role_id` - The role_id to check against.
     /// * `connection` - The connection to the database.
     ///
     pub fn has_role_by_id(
-        id: Uuid,
+        barcode_id: Uuid,
         author_user_id: i32,
         role_id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<bool, diesel::result::Error> {
         diesel::select(diesel::dsl::exists(samples::dsl::samples
-            .filter(samples::dsl::id.eq(id))
+            .filter(samples::dsl::barcode_id.eq(barcode_id))
            .filter(samples::dsl::created_by.eq(author_user_id))
             .or_filter(
-               samples::dsl::id.eq(id)
-                   .and(samples::dsl::id.eq_any(
+               samples::dsl::barcode_id.eq(barcode_id)
+                   .and(samples::dsl::barcode_id.eq_any(
                        samples_users_roles::table
                            .select(samples_users_roles::dsl::table_id)
                            .filter(samples_users_roles::dsl::user_id.eq(author_user_id)
@@ -4722,8 +4938,8 @@ impl Sample {
                )
          )
                     .or_filter(
-                       samples::dsl::id.eq(id)
-                           .and(samples::dsl::id.eq_any(
+                       samples::dsl::barcode_id.eq(barcode_id)
+                           .and(samples::dsl::barcode_id.eq_any(
                                samples_teams_roles::table
                                    .select(samples_teams_roles::dsl::table_id)
                                    .filter(samples_teams_roles::dsl::role_id.le(role_id))
@@ -4749,7 +4965,7 @@ impl Sample {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<bool, diesel::result::Error> {
         Self::is_viewer_by_id(
-            self.id,
+            self.barcode_id,
             author_user_id,
             connection,
         )
@@ -4757,17 +4973,17 @@ impl Sample {
     /// Check whether the user is a Viewer (role_id >= 3) for the provided primary key(s).
     ///
     /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `barcode_id` - The primary key(s) of the struct to delete.
     /// * `author_user_id` - The ID of the user to check.
     /// * `connection` - The connection to the database.
     ///
     pub fn is_viewer_by_id(
-        id: Uuid,
+        barcode_id: Uuid,
         author_user_id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<bool, diesel::result::Error> {
         Self::has_role_by_id(
-            id,
+            barcode_id,
             author_user_id,
             3,
             connection,
@@ -4785,7 +5001,7 @@ impl Sample {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<bool, diesel::result::Error> {
         Self::is_editor_by_id(
-            self.id,
+            self.barcode_id,
             author_user_id,
             connection,
         )
@@ -4793,17 +5009,17 @@ impl Sample {
     /// Check whether the user is an Editor (role_id >= 2).
     ///
     /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `barcode_id` - The primary key(s) of the struct to delete.
     /// * `author_user_id` - The ID of the user to check.
     /// * `connection` - The connection to the database.
     ///
     pub fn is_editor_by_id(
-        id: Uuid,
+        barcode_id: Uuid,
         author_user_id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<bool, diesel::result::Error> {
         Self::has_role_by_id(
-            id,
+            barcode_id,
             author_user_id,
             2,
             connection,
@@ -4821,7 +5037,7 @@ impl Sample {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<bool, diesel::result::Error> {
         Self::is_admin_by_id(
-            self.id,
+            self.barcode_id,
             author_user_id,
             connection,
         )
@@ -4829,17 +5045,17 @@ impl Sample {
     /// Check whether the user is an Admin (role_id == 1).
     ///
     /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `barcode_id` - The primary key(s) of the struct to delete.
     /// * `author_user_id` - The ID of the user to check.
     /// * `connection` - The connection to the database.
     ///
     pub fn is_admin_by_id(
-        id: Uuid,
+        barcode_id: Uuid,
         author_user_id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<bool, diesel::result::Error> {
         Self::has_role_by_id(
-            id,
+            barcode_id,
             author_user_id,
             1,
             connection,
@@ -4899,7 +5115,7 @@ impl Sample {
         let mut query = samples::dsl::samples
            .filter(samples::dsl::created_by.eq(author_user_id))
             .or_filter(
-               samples::dsl::id.eq_any(
+               samples::dsl::barcode_id.eq_any(
                    samples_users_roles::table
                        .select(samples_users_roles::dsl::table_id)
                        .filter(samples_users_roles::dsl::user_id.eq(author_user_id)
@@ -4907,7 +5123,7 @@ impl Sample {
                )),
             )
                 .or_filter(
-                   samples::dsl::id.eq_any(
+                   samples::dsl::barcode_id.eq_any(
                        samples_teams_roles::table
                            .select(samples_teams_roles::dsl::table_id)
                            .filter(samples_teams_roles::dsl::role_id.le(2))
@@ -4982,42 +5198,255 @@ impl Sample {
         author_user_id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(self.id, author_user_id, connection)
+        Self::delete_by_id(self.barcode_id, author_user_id, connection)
     }
     /// Delete the struct from the database by its ID.
     ///
     /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `barcode_id` - The primary key(s) of the struct to delete.
     /// * `author_user_id` - The ID of the user who is deleting the struct.
     /// * `connection` - The connection to the database.
     ///
     pub fn delete_by_id(
-       id: Uuid,
+       barcode_id: Uuid,
         author_user_id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<usize, diesel::result::Error> {
-        if !Self::is_admin_by_id(id, author_user_id, connection)? {
+        if !Self::is_admin_by_id(barcode_id, author_user_id, connection)? {
             return Err(diesel::result::Error::NotFound);
         }
         diesel::delete(samples::dsl::samples
-            .filter(samples::dsl::id.eq(id))
+            .filter(samples::dsl::barcode_id.eq(barcode_id))
         ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
-    /// * `id` - The primary key(s) of the struct to get.
+    /// * `barcode_id` - The primary key(s) of the struct to get.
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-       id: Uuid,
+       barcode_id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         use crate::schema::samples;
         samples::dsl::samples
-            .filter(samples::dsl::id.eq(id))
+            .filter(samples::dsl::barcode_id.eq(barcode_id))
             .first::<Self>(connection)
     }
+    /// Search for the struct by a given string by Postgres's `similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all(None, Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT barcode_id, created_by, sampled_by, created_at, updated_by, updated_at, state FROM samples ",
+            "WHERE barcode_id LIKE $1% ",
+            "LIMIT $2;"
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the editable struct by a given string by Postgres's `similarity`.
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_editables(
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_editables(author_user_id, None, Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT barcode_id, created_by, sampled_by, created_at, updated_by, updated_at, state FROM samples ",
+            "WHERE barcode_id LIKE $1% ",
+"AND ",
+             "samples.created_by = $3 ",
+            "OR samples.id IN ",
+            "(SELECT samples_users_roles.table FROM samples_users_roles ",
+            "WHERE samples_users_roles.user_id = $3 AND samples_users_roles.role_id <= 2) ",
+            "OR samples.id IN ",
+            "(SELECT samples_teams_roles.table_id FROM samples_teams_roles ",
+            "WHERE samples_teams_roles.role_id <= 2 AND samples_teams_roles.table_id IN ",
+            "(SELECT teams_users_roles.table_id FROM teams_users_roles ",
+            "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2)) ",
+            "LIMIT $2;"
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Integer, _>(author_user_id)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all(None, Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT barcode_id, created_by, sampled_by, created_at, updated_by, updated_at, state FROM samples ",
+            "WHERE barcode_id LIKE $1% ",
+            "LIMIT $2;"
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the editable struct by a given string by Postgres's `word_similarity`.
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_editables(
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_editables(author_user_id, None, Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT barcode_id, created_by, sampled_by, created_at, updated_by, updated_at, state FROM samples ",
+            "WHERE barcode_id LIKE $1% ",
+"AND ",
+             "samples.created_by = $3 ",
+            "OR samples.id IN ",
+            "(SELECT samples_users_roles.table FROM samples_users_roles ",
+            "WHERE samples_users_roles.user_id = $3 AND samples_users_roles.role_id <= 2) ",
+            "OR samples.id IN ",
+            "(SELECT samples_teams_roles.table_id FROM samples_teams_roles ",
+            "WHERE samples_teams_roles.role_id <= 2 AND samples_teams_roles.table_id IN ",
+            "(SELECT teams_users_roles.table_id FROM teams_users_roles ",
+            "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2)) ",
+            "LIMIT $2;"
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Integer, _>(author_user_id)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all(None, Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT barcode_id, created_by, sampled_by, created_at, updated_by, updated_at, state FROM samples ",
+            "WHERE barcode_id LIKE $1% ",
+            "LIMIT $2;"
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the editable struct by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_editables(
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_editables(author_user_id, None, Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT barcode_id, created_by, sampled_by, created_at, updated_by, updated_at, state FROM samples ",
+            "WHERE barcode_id LIKE $1% ",
+"AND ",
+             "samples.created_by = $3 ",
+            "OR samples.id IN ",
+            "(SELECT samples_users_roles.table FROM samples_users_roles ",
+            "WHERE samples_users_roles.user_id = $3 AND samples_users_roles.role_id <= 2) ",
+            "OR samples.id IN ",
+            "(SELECT samples_teams_roles.table_id FROM samples_teams_roles ",
+            "WHERE samples_teams_roles.role_id <= 2 AND samples_teams_roles.table_id IN ",
+            "(SELECT teams_users_roles.table_id FROM teams_users_roles ",
+            "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2)) ",
+            "LIMIT $2;"
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Integer, _>(author_user_id)
+            .load(connection)
+}
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = samples_teams_role_invitations)]
@@ -6747,10 +7176,10 @@ impl TeamState {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = teams)]
-#[diesel(belongs_to(FontAwesomeIcon, foreign_key = icon_id))]
 #[diesel(belongs_to(Color, foreign_key = color_id))]
 #[diesel(belongs_to(Team, foreign_key = parent_team_id))]
 #[diesel(belongs_to(User, foreign_key = created_by))]
+#[diesel(belongs_to(FontAwesomeIcon, foreign_key = icon_id))]
 #[diesel(primary_key(id))]
 pub struct Team {
     pub id: i32,
@@ -6955,9 +7384,6 @@ impl Team {
         use crate::schema::teams;
         let mut query = teams::dsl::teams
             .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.icon_id) {
-            query = query.filter(teams::dsl::icon_id.eq(value));
-        }
         if let Some(value) = filter.and_then(|f| f.color_id) {
             query = query.filter(teams::dsl::color_id.eq(value));
         }
@@ -6969,6 +7395,9 @@ impl Team {
         }
         if let Some(value) = filter.and_then(|f| f.updated_by) {
             query = query.filter(teams::dsl::updated_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(teams::dsl::icon_id.eq(value));
         }
         query
             .offset(offset.unwrap_or(0))
@@ -7003,9 +7432,6 @@ impl Team {
                )),
             )
             .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.icon_id) {
-            query = query.filter(teams::dsl::icon_id.eq(value));
-        }
         if let Some(value) = filter.and_then(|f| f.color_id) {
             query = query.filter(teams::dsl::color_id.eq(value));
         }
@@ -7017,6 +7443,9 @@ impl Team {
         }
         if let Some(value) = filter.and_then(|f| f.updated_by) {
             query = query.filter(teams::dsl::updated_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(teams::dsl::icon_id.eq(value));
         }
         query
             .offset(offset.unwrap_or(0))
@@ -7040,9 +7469,6 @@ impl Team {
         use crate::schema::teams;
         let mut query = teams::dsl::teams
             .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.icon_id) {
-            query = query.filter(teams::dsl::icon_id.eq(value));
-        }
         if let Some(value) = filter.and_then(|f| f.color_id) {
             query = query.filter(teams::dsl::color_id.eq(value));
         }
@@ -7054,6 +7480,9 @@ impl Team {
         }
         if let Some(value) = filter.and_then(|f| f.updated_by) {
             query = query.filter(teams::dsl::updated_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(teams::dsl::icon_id.eq(value));
         }
         query
             .order_by(teams::dsl::updated_at.desc())
@@ -7206,7 +7635,8 @@ impl Team {
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id, parent_team_id, created_by, created_at, updated_by, updated_at FROM teams ",
             "WHERE $1 % f_concat_teams_name_description(name, description) ",
-            "AND teams.created_by = $3 ",
+"AND ",
+             "teams.created_by = $3 ",
             "OR teams.id IN ",
             "(SELECT teams_users_roles.table FROM teams_users_roles ",
             "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2) ",
@@ -7276,7 +7706,8 @@ impl Team {
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id, parent_team_id, created_by, created_at, updated_by, updated_at FROM teams ",
             "WHERE $1 <% f_concat_teams_name_description(name, description) ",
-            "AND teams.created_by = $3 ",
+"AND ",
+             "teams.created_by = $3 ",
             "OR teams.id IN ",
             "(SELECT teams_users_roles.table FROM teams_users_roles ",
             "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2) ",
@@ -7346,7 +7777,8 @@ impl Team {
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id, parent_team_id, created_by, created_at, updated_by, updated_at FROM teams ",
             "WHERE $1 <<% f_concat_teams_name_description(name, description) ",
-            "AND teams.created_by = $3 ",
+"AND ",
+             "teams.created_by = $3 ",
             "OR teams.id IN ",
             "(SELECT teams_users_roles.table FROM teams_users_roles ",
             "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2) ",

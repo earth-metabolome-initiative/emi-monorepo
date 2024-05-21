@@ -298,12 +298,17 @@ def write_frontend_router_page(builders: List[StructMetadata]):
         if builder.is_junktion_table():
             continue
 
+        properties = []
+
+        for primary_key in primary_keys:
+            properties.append(f"{primary_key.name} = {{{primary_key.name}}}")
+
         document.write(
             f"        AppRoute::{builder.get_capitalized_table_name()} => {{\n"
             f"            html! {{ <BasicList<{richest_variant.name}> /> }}\n"
             f"        }}\n"
             f"        AppRoute::{builder.get_capitalized_table_name()}View{{{flat_variant.get_formatted_primary_keys(include_prefix=False, include_parenthesis=False)}}} => {{\n"
-            f"            html! {{ <{flat_variant.name}Page id={{{flat_variant.get_formatted_primary_keys(include_prefix=False)}}} /> }}\n"
+            f"            html! {{ <{flat_variant.name}Page {' '.join(properties)} /> }}\n"
             f"        }}\n"
         )
 

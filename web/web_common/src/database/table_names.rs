@@ -960,9 +960,9 @@ impl Table {
             Table::SampledIndividualsUsersRoles => unimplemented!("Update not implemented for sampled_individuals_users_roles."),
             Table::Samples => {
                 let update_row: super::NewSample = bincode::deserialize::<super::NewSample>(&update_row).map_err(crate::api::ApiError::from)?;
-                let id = update_row.id;
+                let barcode_id = update_row.barcode_id;
                 update_row.update(user_id, connection).await?;
-                let updated_row: super::Sample = super::Sample::get(id, connection).await?.unwrap();
+                let updated_row: super::Sample = super::Sample::get(barcode_id, connection).await?.unwrap();
                 let nested_row = super::NestedSample::from_flat(updated_row, connection).await?;
                  bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
             },

@@ -193,3 +193,7 @@ class TableStructMetadata:
     def get_filter_variant(self) -> StructMetadata:
         """Returns the filter variant of the table."""
         return self.flat_variant.get_filter_variant()
+
+    def is_searchable(self) -> bool:
+        """Returns whether the table is searchable."""
+        return self.flat_variant.is_searchable()

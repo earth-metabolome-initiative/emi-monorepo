@@ -94,7 +94,6 @@ impl NestedBioOttRank {
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedBioOttTaxonItem {
     pub inner: BioOttTaxonItem,
-    pub color: Color,
     pub ott_rank: NestedBioOttRank,
     pub domain: Option<BioOttTaxonItem>,
     pub kingdom: Option<BioOttTaxonItem>,
@@ -105,6 +104,7 @@ pub struct NestedBioOttTaxonItem {
     pub genus: Option<BioOttTaxonItem>,
     pub parent: BioOttTaxonItem,
     pub icon: FontAwesomeIcon,
+    pub color: Color,
 }
 
 impl Tabular for NestedBioOttTaxonItem {
@@ -125,7 +125,6 @@ impl NestedBioOttTaxonItem {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            color: Color::get(flat_variant.color_id, connection).await?.unwrap(),
             ott_rank: NestedBioOttRank::get(flat_variant.ott_rank_id, connection).await?.unwrap(),
             domain: if let Some(domain_id) = flat_variant.domain_id { BioOttTaxonItem::get(domain_id, connection).await? } else { None },
             kingdom: if let Some(kingdom_id) = flat_variant.kingdom_id { BioOttTaxonItem::get(kingdom_id, connection).await? } else { None },
@@ -136,6 +135,7 @@ impl NestedBioOttTaxonItem {
             genus: if let Some(genus_id) = flat_variant.genus_id { BioOttTaxonItem::get(genus_id, connection).await? } else { None },
             parent: BioOttTaxonItem::get(flat_variant.parent_id, connection).await?.unwrap(),
             icon: FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap(),
+            color: Color::get(flat_variant.color_id, connection).await?.unwrap(),
             inner: flat_variant,
         })
     }
@@ -188,7 +188,6 @@ impl NestedBioOttTaxonItem {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         self.inner.update_or_insert(connection).await?;
-        self.color.update_or_insert(connection).await?;
         self.ott_rank.update_or_insert(connection).await?;
         if let Some(domain) = self.domain {
             domain.update_or_insert(connection).await?;
@@ -213,6 +212,7 @@ impl NestedBioOttTaxonItem {
         }
         self.parent.update_or_insert(connection).await?;
         self.icon.update_or_insert(connection).await?;
+        self.color.update_or_insert(connection).await?;
         Ok(())
     }
 }
@@ -2402,15 +2402,15 @@ impl NestedSample {
     /// Get the nested struct from the provided primary key.
     ///
     /// # Arguments
-    /// * `id` - The primary key(s) of the row.
+    /// * `barcode_id` - The primary key(s) of the row.
     /// * `connection` - The database connection.
     pub async fn get<C>(
-        id: Uuid,
+        barcode_id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-       let flat_variant = Sample::get(id, connection).await?;        match flat_variant {
+       let flat_variant = Sample::get(barcode_id, connection).await?;        match flat_variant {
             Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
             None => Ok(None),
         }
@@ -3834,11 +3834,11 @@ impl NestedTeamState {
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedTeam {
     pub inner: Team,
-    pub icon: FontAwesomeIcon,
     pub color: Color,
     pub parent_team: Option<Team>,
     pub created_by: User,
     pub updated_by: User,
+    pub icon: FontAwesomeIcon,
 }
 
 impl Tabular for NestedTeam {
@@ -3859,11 +3859,11 @@ impl NestedTeam {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            icon: FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap(),
             color: Color::get(flat_variant.color_id, connection).await?.unwrap(),
             parent_team: if let Some(parent_team_id) = flat_variant.parent_team_id { Team::get(parent_team_id, connection).await? } else { None },
             created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
             updated_by: User::get(flat_variant.updated_by, connection).await?.unwrap(),
+            icon: FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap(),
             inner: flat_variant,
         })
     }
@@ -3938,13 +3938,13 @@ impl NestedTeam {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         self.inner.update_or_insert(connection).await?;
-        self.icon.update_or_insert(connection).await?;
         self.color.update_or_insert(connection).await?;
         if let Some(parent_team) = self.parent_team {
             parent_team.update_or_insert(connection).await?;
         }
         self.created_by.update_or_insert(connection).await?;
         self.updated_by.update_or_insert(connection).await?;
+        self.icon.update_or_insert(connection).await?;
         Ok(())
     }
 }

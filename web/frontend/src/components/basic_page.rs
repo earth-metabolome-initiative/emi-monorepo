@@ -109,15 +109,15 @@ impl PageLike for NestedSampledIndividual {
 
 impl PageLike for NestedSample {
     fn title(&self) -> String {
-        format!("{}", self.inner.id)
+        format!("{}", self.inner.barcode_id)
     }
 
     fn id(&self) -> PrimaryKey {
-        self.inner.id.into()
+        self.inner.barcode_id.into()
     }
 
     fn update_path(&self) -> Option<AppRoute> {
-        Some(AppRoute::SamplesUpdate { id: self.inner.id })
+        Some(AppRoute::SamplesUpdate { barcode_id: self.inner.barcode_id })
     }
 
     fn create_path() -> Option<AppRoute> {

@@ -640,7 +640,7 @@ impl InsertRow for web_common::database::NewSampledIndividualsUsersRole {
 #[diesel(table_name = samples)]
 pub(super) struct IntermediateNewSample {
     created_by: i32,
-    id: Uuid,
+    barcode_id: Uuid,
     sampled_by: i32,
     state: i32,
     updated_by: i32,
@@ -653,7 +653,7 @@ impl InsertRow for web_common::database::NewSample {
     fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
         IntermediateNewSample {
             created_by: user_id,
-            id: self.id,
+            barcode_id: self.barcode_id,
             sampled_by: self.sampled_by,
             state: self.state,
             updated_by: user_id,

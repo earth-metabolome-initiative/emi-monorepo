@@ -10,7 +10,7 @@ impl RowToBadge for NestedSample {
                 // Print out sample id
                 <div class="sample-info">
                     <span>{"Sample ID: "}</span>
-                    <Link<AppRoute> to={AppRoute::SamplesView{ id: self.inner.id }}>{self.title()}</Link<AppRoute>>
+                    <Link<AppRoute> to={AppRoute::SamplesView{ barcode_id: self.inner.barcode_id }}>{self.title()}</Link<AppRoute>>
                 </div>
 
                 // Print out the sample state, procedure, sampled by

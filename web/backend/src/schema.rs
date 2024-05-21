@@ -326,8 +326,8 @@ diesel::table! {
 }
 
 diesel::table! {
-    samples (id) {
-        id -> Uuid,
+    samples (barcode_id) {
+        barcode_id -> Uuid,
         created_by -> Int4,
         sampled_by -> Int4,
         created_at -> Timestamp,

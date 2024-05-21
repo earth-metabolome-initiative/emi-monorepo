@@ -38,3 +38,5 @@ pub trait RowToSearchableBadge {
     fn description(&self) -> &str;
 }
 pub mod roles;
+pub mod samples;
+pub mod sampled_individuals;

@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS sample_bio_ott_taxon_items (
     DELETE
         CASCADE,
         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        sample_id UUID NOT NULL REFERENCES samples(id) ON
+        sample_id UUID NOT NULL REFERENCES samples(barcode_id) ON
     DELETE
         CASCADE,
         taxon_id INTEGER NOT NULL REFERENCES bio_ott_taxon_items(id) ON

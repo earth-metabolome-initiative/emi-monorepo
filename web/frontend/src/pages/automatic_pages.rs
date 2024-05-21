@@ -62,34 +62,34 @@ pub fn sampled_individual_page(props: &SampledIndividualPageProp) -> Html {
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct SamplePageProp {
-    pub id: Uuid,
+    pub barcode_id: Uuid,
 }
 
 impl From<&SamplePageProp> for PrimaryKey {
     fn from(prop: &SamplePageProp) -> Self {
-        prop.id.into()
+        prop.barcode_id.into()
     }
 }
 
 impl SamplePageProp {
     fn filter_spectra_collections_by_sample_id(&self) -> SpectraCollectionFilter {
         let mut filter = SpectraCollectionFilter::default();
-        filter.sample_id = Some(self.id);
+        filter.sample_id = Some(self.barcode_id);
         filter
     }
     fn filter_derived_samples_by_parent_sample_id(&self) -> DerivedSampleFilter {
         let mut filter = DerivedSampleFilter::default();
-        filter.parent_sample_id = Some(self.id);
+        filter.parent_sample_id = Some(self.barcode_id);
         filter
     }
     fn filter_derived_samples_by_child_sample_id(&self) -> DerivedSampleFilter {
         let mut filter = DerivedSampleFilter::default();
-        filter.child_sample_id = Some(self.id);
+        filter.child_sample_id = Some(self.barcode_id);
         filter
     }
     fn filter_sample_bio_ott_taxon_items_by_sample_id(&self) -> SampleBioOttTaxonItemFilter {
         let mut filter = SampleBioOttTaxonItemFilter::default();
-        filter.sample_id = Some(self.id);
+        filter.sample_id = Some(self.barcode_id);
         filter
     }
 }

@@ -88,10 +88,28 @@ impl Searchable<false> for NestedSampleState {
         )
     }
 }
+impl Searchable<false> for NestedSampledIndividual {
+    fn search_task(query: String, limit: u32) -> super::Select {
+        super::Select::search(
+             Table::SampledIndividuals,
+              query,
+              limit,
+        )
+    }
+}
 impl Searchable<true> for NestedSampledIndividual {
     fn search_task(query: String, limit: u32) -> super::Select {
         super::Select::search_editables(
              Table::SampledIndividuals,
+              query,
+              limit,
+        )
+    }
+}
+impl Searchable<false> for NestedSample {
+    fn search_task(query: String, limit: u32) -> super::Select {
+        super::Select::search(
+             Table::Samples,
               query,
               limit,
         )
@@ -250,10 +268,28 @@ impl Searchable<false> for SampleState {
         )
     }
 }
+impl Searchable<false> for SampledIndividual {
+    fn search_task(query: String, limit: u32) -> super::Select {
+        super::Select::search(
+             Table::SampledIndividuals,
+              query,
+              limit,
+        )
+    }
+}
 impl Searchable<true> for SampledIndividual {
     fn search_task(query: String, limit: u32) -> super::Select {
         super::Select::search_editables(
              Table::SampledIndividuals,
+              query,
+              limit,
+        )
+    }
+}
+impl Searchable<false> for Sample {
+    fn search_task(query: String, limit: u32) -> super::Select {
+        super::Select::search(
+             Table::Samples,
               query,
               limit,
         )

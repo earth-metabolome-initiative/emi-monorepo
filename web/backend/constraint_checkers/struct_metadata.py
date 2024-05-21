@@ -4,7 +4,7 @@ from typing import List, Optional, Union, Tuple, Dict
 import re
 from functools import cache
 from constraint_checkers.find_foreign_keys import TableMetadata, find_foreign_keys
-from constraint_checkers.indices import PGIndices, find_pg_trgm_indices
+from constraint_checkers.indices import PGIndices, find_search_indices
 
 
 class AttributeMetadata:
@@ -42,7 +42,11 @@ class AttributeMetadata:
     def as_option(self) -> "AttributeMetadata":
         """Returns the attribute as an option."""
         return AttributeMetadata(
-            self.original_name, self.name, self._data_type, True, reference=self.reference
+            self.original_name,
+            self.name,
+            self._data_type,
+            True,
+            reference=self.reference,
         )
 
     def is_undefined_nested_dependencies(self) -> bool:
@@ -236,7 +240,7 @@ class StructMetadata:
         if StructMetadata.table_metadata is None:
             StructMetadata.table_metadata = find_foreign_keys()
         if StructMetadata.pg_indices is None:
-            StructMetadata.pg_indices = find_pg_trgm_indices(
+            StructMetadata.pg_indices = find_search_indices(
                 tables_metadata=StructMetadata.table_metadata
             )
 
@@ -918,7 +922,14 @@ class StructMetadata:
         -----------------------
         A struct is searchable if it has a trigram index on the table.
         """
-        return StructMetadata.pg_indices.has_table(self.table_name)
+        if StructMetadata.pg_indices.has_table(self.table_name):
+            index = StructMetadata.pg_indices.get_table(self.table_name)
+            if index.is_btree():
+                return self.has_uuid_primary_key()
+            return True
+        else:
+            return False
+
 
     def get_opaque_foreign_keys(self) -> List[AttributeMetadata]:
         """Returns list of foreign keys that are not searchable.

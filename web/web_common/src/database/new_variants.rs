@@ -253,7 +253,7 @@ impl Tabular for NewSampledIndividualsUsersRole {
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewSample {
-    pub id: Uuid,
+    pub barcode_id: Uuid,
     pub sampled_by: i32,
     pub state: i32,
 }
@@ -266,7 +266,7 @@ impl NewSample {
     pub fn into_row(self, created_by: i32) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
             gluesql::core::ast_builder::num(created_by),
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
+            gluesql::core::ast_builder::uuid(self.barcode_id.to_string()),
             gluesql::core::ast_builder::num(self.sampled_by),
             gluesql::core::ast_builder::num(self.state),
             gluesql::core::ast_builder::num(created_by),
@@ -289,10 +289,10 @@ impl NewSample {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
-        let id = self.id;
+        let barcode_id = self.barcode_id;
         table("samples")
             .insert()
-            .columns("created_by,id,sampled_by,state,updated_by")
+            .columns("created_by,barcode_id,sampled_by,state,updated_by")
             .values(vec![self.into_row(created_by)])
             .execute(connection)
             .await
@@ -300,7 +300,7 @@ impl NewSample {
                  gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
                  _ => unreachable!("Payload must be an Insert"),
              })?;
-        super::Sample::get(id, connection).await.map(|maybe_row| maybe_row.unwrap())
+        super::Sample::get(barcode_id, connection).await.map(|maybe_row| maybe_row.unwrap())
     }
 
     /// Update the struct in the database.
@@ -321,7 +321,7 @@ impl NewSample {
         use gluesql::core::ast_builder::*;
         table("samples")
             .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
+.set("barcode_id", gluesql::core::ast_builder::uuid(self.barcode_id.to_string()))        
 .set("sampled_by", gluesql::core::ast_builder::num(self.sampled_by))        
 .set("state", gluesql::core::ast_builder::num(self.state))        
 .set("updated_by", gluesql::core::ast_builder::num(user_id))            .execute(connection)

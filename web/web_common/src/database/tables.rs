@@ -6903,7 +6903,7 @@ impl SampledIndividualsUsersRole {
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct Sample {
-    pub id: Uuid,
+    pub barcode_id: Uuid,
     pub created_by: i32,
     pub sampled_by: i32,
     pub created_at: NaiveDateTime,
@@ -6923,7 +6923,7 @@ impl Filtrable for Sample {
 impl Sample {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
+            gluesql::core::ast_builder::uuid(self.barcode_id.to_string()),
             gluesql::core::ast_builder::num(self.created_by),
             gluesql::core::ast_builder::num(self.sampled_by),
             gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
@@ -6949,7 +6949,7 @@ impl Sample {
         use gluesql::core::ast_builder::*;
         table("samples")
             .insert()
-            .columns("id, created_by, sampled_by, created_at, updated_by, updated_at, state")
+            .columns("barcode_id, created_by, sampled_by, created_at, updated_by, updated_at, state")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -6962,11 +6962,11 @@ impl Sample {
     /// Get Sample from the database by its ID.
     ///
     /// # Arguments
-    /// * `id` - The primary key(s) of the struct to get.
+    /// * `barcode_id` - The primary key(s) of the struct to get.
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        barcode_id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -6974,8 +6974,8 @@ impl Sample {
         use gluesql::core::ast_builder::*;
         let select_row = table("samples")
             .select()
-            .filter(col("id").eq(id.to_string()))
-            .project("id, created_by, sampled_by, created_at, updated_by, updated_at, state")
+            .filter(col("barcode_id").eq(barcode_id.to_string()))
+            .project("barcode_id, created_by, sampled_by, created_at, updated_by, updated_at, state")
             .limit(1)
             .execute(connection)
             .await?;
@@ -6989,13 +6989,13 @@ impl Sample {
     /// Delete Sample from the database.
     ///
     /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `barcode_id` - The primary key(s) of the struct to delete.
     /// * `connection` - The connection to the database.
     ///
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        barcode_id: Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -7003,7 +7003,7 @@ impl Sample {
         use gluesql::core::ast_builder::*;
         table("samples")
             .delete()
-            .filter(col("id").eq(id.to_string()))
+            .filter(col("barcode_id").eq(barcode_id.to_string()))
             .execute(connection)
             .await
              .map(|payload| match payload {
@@ -7025,7 +7025,7 @@ impl Sample {
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        Self::delete_from_id(self.id, connection).await
+        Self::delete_from_id(self.barcode_id, connection).await
     }
     /// Update the struct in the database.
     ///
@@ -7043,7 +7043,7 @@ impl Sample {
         use gluesql::core::ast_builder::*;
         table("samples")
             .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
+.set("barcode_id", gluesql::core::ast_builder::uuid(self.barcode_id.to_string()))        
 .set("created_by", gluesql::core::ast_builder::num(self.created_by))        
 .set("sampled_by", gluesql::core::ast_builder::num(self.sampled_by))        
 .set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
@@ -7097,7 +7097,7 @@ impl Sample {
         let select_row = table("samples")
             .select()
             .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
-           .project("id, created_by, sampled_by, created_at, updated_by, updated_at, state")
+           .project("barcode_id, created_by, sampled_by, created_at, updated_by, updated_at, state")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -7127,7 +7127,7 @@ impl Sample {
         let select_row = table("samples")
             .select()
             .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
-           .project("id, created_by, sampled_by, created_at, updated_by, updated_at, state")
+           .project("barcode_id, created_by, sampled_by, created_at, updated_by, updated_at, state")
             .order_by("updated_at desc")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -7140,8 +7140,8 @@ impl Sample {
     }
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
-            id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
+            barcode_id: match row.get("barcode_id").unwrap() {
+                gluesql::prelude::Value::Uuid(barcode_id) => Uuid::from_u128(*barcode_id),
                 _ => unreachable!("Expected Uuid"),
             },
             created_by: match row.get("created_by").unwrap() {

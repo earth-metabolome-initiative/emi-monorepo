@@ -118,8 +118,8 @@ impl FormBuilder for DerivedSampleBuilder {
 impl From<DerivedSampleBuilder> for NewDerivedSample {
     fn from(builder: DerivedSampleBuilder) -> Self {
         Self {
-            parent_sample_id: builder.parent_sample.as_ref().map(|parent_sample| parent_sample.inner.id).unwrap(),
-            child_sample_id: builder.child_sample.as_ref().map(|child_sample| child_sample.inner.id).unwrap(),
+            parent_sample_id: builder.parent_sample.as_ref().map(|parent_sample| parent_sample.inner.barcode_id).unwrap(),
+            child_sample_id: builder.child_sample.as_ref().map(|child_sample| child_sample.inner.barcode_id).unwrap(),
         }
     }
 }
@@ -141,16 +141,22 @@ impl FormBuildable for NewDerivedSample {
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct CreateDerivedSampleFormProp {
-    pub parent_sample_id: Uuid,
-    pub child_sample_id: Uuid,
+     #[prop_or_default]
+    pub parent_sample_id: Option<Uuid>,
+     #[prop_or_default]
+    pub child_sample_id: Option<Uuid>,
 }
 
 #[function_component(CreateDerivedSampleForm)]
 pub fn create_derived_sample_form(props: &CreateDerivedSampleFormProp) -> Html {
      let mut named_requests: Vec<ComponentMessage> = Vec::new();
     let (builder_store, builder_dispatch) = use_store::<DerivedSampleBuilder>();
-    named_requests.push(ComponentMessage::get_named::<&str, Sample>("parent_sample", props.parent_sample_id.into()));
-    named_requests.push(ComponentMessage::get_named::<&str, Sample>("child_sample", props.child_sample_id.into()));
+   if let Some(parent_sample_id) = props.parent_sample_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Sample>("parent_sample", parent_sample_id.into()));
+    }
+   if let Some(child_sample_id) = props.child_sample_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Sample>("child_sample", child_sample_id.into()));
+    }
     let set_parent_sample = builder_dispatch.apply_callback(|parent_sample: Option<NestedSample>| DerivedSampleActions::SetParentSample(parent_sample));
     let set_child_sample = builder_dispatch.apply_callback(|child_sample: Option<NestedSample>| DerivedSampleActions::SetChildSample(child_sample));
     html! {
@@ -158,16 +164,8 @@ pub fn create_derived_sample_form(props: &CreateDerivedSampleFormProp) -> Html {
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-if let Some(parent_sample) = builder_store.parent_sample.as_ref() {
-    <span>{"TODO Selected parent_sample"}</span>
-} else {
-    <></>
-}
-if let Some(child_sample) = builder_store.child_sample.as_ref() {
-    <span>{"TODO Selected child_sample"}</span>
-} else {
-    <></>
-}
+            <Datalist<NestedSample, true> builder={set_parent_sample} optional={false} errors={builder_store.errors_parent_sample.clone()} value={builder_store.parent_sample.clone()} label="Parent sample" />
+            <Datalist<NestedSample, true> builder={set_child_sample} optional={false} errors={builder_store.errors_child_sample.clone()} value={builder_store.child_sample.clone()} label="Child sample" />
         </BasicForm<NewDerivedSample>>
     }
 }
@@ -1871,7 +1869,7 @@ impl FormBuilder for SampleBioOttTaxonItemBuilder {
 impl From<SampleBioOttTaxonItemBuilder> for NewSampleBioOttTaxonItem {
     fn from(builder: SampleBioOttTaxonItemBuilder) -> Self {
         Self {
-            sample_id: builder.sample.as_ref().map(|sample| sample.inner.id).unwrap(),
+            sample_id: builder.sample.as_ref().map(|sample| sample.inner.barcode_id).unwrap(),
             taxon_id: builder.taxon.as_ref().map(|taxon| taxon.inner.id).unwrap(),
         }
     }
@@ -1894,7 +1892,8 @@ impl FormBuildable for NewSampleBioOttTaxonItem {
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct CreateSampleBioOttTaxonItemFormProp {
-    pub sample_id: Uuid,
+     #[prop_or_default]
+    pub sample_id: Option<Uuid>,
      #[prop_or_default]
     pub taxon_id: Option<i32>,
 }
@@ -1903,7 +1902,9 @@ pub struct CreateSampleBioOttTaxonItemFormProp {
 pub fn create_sample_bio_ott_taxon_item_form(props: &CreateSampleBioOttTaxonItemFormProp) -> Html {
      let mut named_requests: Vec<ComponentMessage> = Vec::new();
     let (builder_store, builder_dispatch) = use_store::<SampleBioOttTaxonItemBuilder>();
-    named_requests.push(ComponentMessage::get_named::<&str, Sample>("sample", props.sample_id.into()));
+   if let Some(sample_id) = props.sample_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Sample>("sample", sample_id.into()));
+    }
    if let Some(taxon_id) = props.taxon_id {
          named_requests.push(ComponentMessage::get_named::<&str, BioOttTaxonItem>("taxon", taxon_id.into()));
     }
@@ -1914,11 +1915,7 @@ pub fn create_sample_bio_ott_taxon_item_form(props: &CreateSampleBioOttTaxonItem
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-if let Some(sample) = builder_store.sample.as_ref() {
-    <span>{"TODO Selected sample"}</span>
-} else {
-    <></>
-}
+            <Datalist<NestedSample, true> builder={set_sample} optional={false} errors={builder_store.errors_sample.clone()} value={builder_store.sample.clone()} label="Sample" />
             <Datalist<NestedBioOttTaxonItem, false> builder={set_taxon} optional={false} errors={builder_store.errors_taxon.clone()} value={builder_store.taxon.clone()} label="Taxon" />
         </BasicForm<NewSampleBioOttTaxonItem>>
     }
@@ -2046,7 +2043,8 @@ impl FormBuildable for NewSampledIndividualBioOttTaxonItem {
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct CreateSampledIndividualBioOttTaxonItemFormProp {
-    pub sampled_individual_id: Uuid,
+     #[prop_or_default]
+    pub sampled_individual_id: Option<Uuid>,
      #[prop_or_default]
     pub taxon_id: Option<i32>,
 }
@@ -2055,7 +2053,9 @@ pub struct CreateSampledIndividualBioOttTaxonItemFormProp {
 pub fn create_sampled_individual_bio_ott_taxon_item_form(props: &CreateSampledIndividualBioOttTaxonItemFormProp) -> Html {
      let mut named_requests: Vec<ComponentMessage> = Vec::new();
     let (builder_store, builder_dispatch) = use_store::<SampledIndividualBioOttTaxonItemBuilder>();
-    named_requests.push(ComponentMessage::get_named::<&str, SampledIndividual>("sampled_individual", props.sampled_individual_id.into()));
+   if let Some(sampled_individual_id) = props.sampled_individual_id {
+         named_requests.push(ComponentMessage::get_named::<&str, SampledIndividual>("sampled_individual", sampled_individual_id.into()));
+    }
    if let Some(taxon_id) = props.taxon_id {
          named_requests.push(ComponentMessage::get_named::<&str, BioOttTaxonItem>("taxon", taxon_id.into()));
     }
@@ -2066,11 +2066,7 @@ pub fn create_sampled_individual_bio_ott_taxon_item_form(props: &CreateSampledIn
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-if let Some(sampled_individual) = builder_store.sampled_individual.as_ref() {
-    <span>{"TODO Selected sampled_individual"}</span>
-} else {
-    <></>
-}
+            <Datalist<NestedSampledIndividual, true> builder={set_sampled_individual} optional={false} errors={builder_store.errors_sampled_individual.clone()} value={builder_store.sampled_individual.clone()} label="Sampled individual" />
             <Datalist<NestedBioOttTaxonItem, false> builder={set_taxon} optional={false} errors={builder_store.errors_taxon.clone()} value={builder_store.taxon.clone()} label="Taxon" />
         </BasicForm<NewSampledIndividualBioOttTaxonItem>>
     }
@@ -2353,7 +2349,8 @@ impl FormBuildable for NewSampledIndividualsTeamsRoleInvitation {
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct CreateSampledIndividualsTeamsRoleInvitationFormProp {
-    pub table_id: Uuid,
+     #[prop_or_default]
+    pub table_id: Option<Uuid>,
      #[prop_or_default]
     pub team_id: Option<i32>,
      #[prop_or_default]
@@ -2364,7 +2361,9 @@ pub struct CreateSampledIndividualsTeamsRoleInvitationFormProp {
 pub fn create_sampled_individuals_teams_role_invitation_form(props: &CreateSampledIndividualsTeamsRoleInvitationFormProp) -> Html {
      let mut named_requests: Vec<ComponentMessage> = Vec::new();
     let (builder_store, builder_dispatch) = use_store::<SampledIndividualsTeamsRoleInvitationBuilder>();
-    named_requests.push(ComponentMessage::get_named::<&str, SampledIndividual>("table", props.table_id.into()));
+   if let Some(table_id) = props.table_id {
+         named_requests.push(ComponentMessage::get_named::<&str, SampledIndividual>("table", table_id.into()));
+    }
    if let Some(team_id) = props.team_id {
          named_requests.push(ComponentMessage::get_named::<&str, Team>("team", team_id.into()));
     }
@@ -2379,11 +2378,7 @@ pub fn create_sampled_individuals_teams_role_invitation_form(props: &CreateSampl
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-if let Some(table) = builder_store.table.as_ref() {
-    <span>{"TODO Selected table"}</span>
-} else {
-    <></>
-}
+            <Datalist<NestedSampledIndividual, true> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" />
             <Datalist<NestedTeam, true> builder={set_team} optional={false} errors={builder_store.errors_team.clone()} value={builder_store.team.clone()} label="Team" />
             <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
         </BasicForm<NewSampledIndividualsTeamsRoleInvitation>>
@@ -2535,7 +2530,8 @@ impl FormBuildable for NewSampledIndividualsTeamsRoleRequest {
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct CreateSampledIndividualsTeamsRoleRequestFormProp {
-    pub table_id: Uuid,
+     #[prop_or_default]
+    pub table_id: Option<Uuid>,
      #[prop_or_default]
     pub team_id: Option<i32>,
      #[prop_or_default]
@@ -2546,7 +2542,9 @@ pub struct CreateSampledIndividualsTeamsRoleRequestFormProp {
 pub fn create_sampled_individuals_teams_role_request_form(props: &CreateSampledIndividualsTeamsRoleRequestFormProp) -> Html {
      let mut named_requests: Vec<ComponentMessage> = Vec::new();
     let (builder_store, builder_dispatch) = use_store::<SampledIndividualsTeamsRoleRequestBuilder>();
-    named_requests.push(ComponentMessage::get_named::<&str, SampledIndividual>("table", props.table_id.into()));
+   if let Some(table_id) = props.table_id {
+         named_requests.push(ComponentMessage::get_named::<&str, SampledIndividual>("table", table_id.into()));
+    }
    if let Some(team_id) = props.team_id {
          named_requests.push(ComponentMessage::get_named::<&str, Team>("team", team_id.into()));
     }
@@ -2561,11 +2559,7 @@ pub fn create_sampled_individuals_teams_role_request_form(props: &CreateSampledI
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-if let Some(table) = builder_store.table.as_ref() {
-    <span>{"TODO Selected table"}</span>
-} else {
-    <></>
-}
+            <Datalist<NestedSampledIndividual, true> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" />
             <Datalist<NestedTeam, true> builder={set_team} optional={false} errors={builder_store.errors_team.clone()} value={builder_store.team.clone()} label="Team" />
             <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
         </BasicForm<NewSampledIndividualsTeamsRoleRequest>>
@@ -2717,7 +2711,8 @@ impl FormBuildable for NewSampledIndividualsTeamsRole {
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct CreateSampledIndividualsTeamsRoleFormProp {
-    pub table_id: Uuid,
+     #[prop_or_default]
+    pub table_id: Option<Uuid>,
      #[prop_or_default]
     pub team_id: Option<i32>,
      #[prop_or_default]
@@ -2728,7 +2723,9 @@ pub struct CreateSampledIndividualsTeamsRoleFormProp {
 pub fn create_sampled_individuals_teams_role_form(props: &CreateSampledIndividualsTeamsRoleFormProp) -> Html {
      let mut named_requests: Vec<ComponentMessage> = Vec::new();
     let (builder_store, builder_dispatch) = use_store::<SampledIndividualsTeamsRoleBuilder>();
-    named_requests.push(ComponentMessage::get_named::<&str, SampledIndividual>("table", props.table_id.into()));
+   if let Some(table_id) = props.table_id {
+         named_requests.push(ComponentMessage::get_named::<&str, SampledIndividual>("table", table_id.into()));
+    }
    if let Some(team_id) = props.team_id {
          named_requests.push(ComponentMessage::get_named::<&str, Team>("team", team_id.into()));
     }
@@ -2743,11 +2740,7 @@ pub fn create_sampled_individuals_teams_role_form(props: &CreateSampledIndividua
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-if let Some(table) = builder_store.table.as_ref() {
-    <span>{"TODO Selected table"}</span>
-} else {
-    <></>
-}
+            <Datalist<NestedSampledIndividual, true> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" />
             <Datalist<NestedTeam, true> builder={set_team} optional={false} errors={builder_store.errors_team.clone()} value={builder_store.team.clone()} label="Team" />
             <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
         </BasicForm<NewSampledIndividualsTeamsRole>>
@@ -2899,7 +2892,8 @@ impl FormBuildable for NewSampledIndividualsUsersRoleInvitation {
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct CreateSampledIndividualsUsersRoleInvitationFormProp {
-    pub table_id: Uuid,
+     #[prop_or_default]
+    pub table_id: Option<Uuid>,
      #[prop_or_default]
     pub user_id: Option<i32>,
      #[prop_or_default]
@@ -2910,7 +2904,9 @@ pub struct CreateSampledIndividualsUsersRoleInvitationFormProp {
 pub fn create_sampled_individuals_users_role_invitation_form(props: &CreateSampledIndividualsUsersRoleInvitationFormProp) -> Html {
      let mut named_requests: Vec<ComponentMessage> = Vec::new();
     let (builder_store, builder_dispatch) = use_store::<SampledIndividualsUsersRoleInvitationBuilder>();
-    named_requests.push(ComponentMessage::get_named::<&str, SampledIndividual>("table", props.table_id.into()));
+   if let Some(table_id) = props.table_id {
+         named_requests.push(ComponentMessage::get_named::<&str, SampledIndividual>("table", table_id.into()));
+    }
    if let Some(user_id) = props.user_id {
          named_requests.push(ComponentMessage::get_named::<&str, User>("user", user_id.into()));
     }
@@ -2925,11 +2921,7 @@ pub fn create_sampled_individuals_users_role_invitation_form(props: &CreateSampl
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-if let Some(table) = builder_store.table.as_ref() {
-    <span>{"TODO Selected table"}</span>
-} else {
-    <></>
-}
+            <Datalist<NestedSampledIndividual, true> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" />
             <Datalist<User, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" />
             <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
         </BasicForm<NewSampledIndividualsUsersRoleInvitation>>
@@ -3081,7 +3073,8 @@ impl FormBuildable for NewSampledIndividualsUsersRoleRequest {
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct CreateSampledIndividualsUsersRoleRequestFormProp {
-    pub table_id: Uuid,
+     #[prop_or_default]
+    pub table_id: Option<Uuid>,
      #[prop_or_default]
     pub user_id: Option<i32>,
      #[prop_or_default]
@@ -3092,7 +3085,9 @@ pub struct CreateSampledIndividualsUsersRoleRequestFormProp {
 pub fn create_sampled_individuals_users_role_request_form(props: &CreateSampledIndividualsUsersRoleRequestFormProp) -> Html {
      let mut named_requests: Vec<ComponentMessage> = Vec::new();
     let (builder_store, builder_dispatch) = use_store::<SampledIndividualsUsersRoleRequestBuilder>();
-    named_requests.push(ComponentMessage::get_named::<&str, SampledIndividual>("table", props.table_id.into()));
+   if let Some(table_id) = props.table_id {
+         named_requests.push(ComponentMessage::get_named::<&str, SampledIndividual>("table", table_id.into()));
+    }
    if let Some(user_id) = props.user_id {
          named_requests.push(ComponentMessage::get_named::<&str, User>("user", user_id.into()));
     }
@@ -3107,11 +3102,7 @@ pub fn create_sampled_individuals_users_role_request_form(props: &CreateSampledI
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-if let Some(table) = builder_store.table.as_ref() {
-    <span>{"TODO Selected table"}</span>
-} else {
-    <></>
-}
+            <Datalist<NestedSampledIndividual, true> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" />
             <Datalist<User, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" />
             <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
         </BasicForm<NewSampledIndividualsUsersRoleRequest>>
@@ -3263,7 +3254,8 @@ impl FormBuildable for NewSampledIndividualsUsersRole {
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct CreateSampledIndividualsUsersRoleFormProp {
-    pub table_id: Uuid,
+     #[prop_or_default]
+    pub table_id: Option<Uuid>,
      #[prop_or_default]
     pub user_id: Option<i32>,
      #[prop_or_default]
@@ -3274,7 +3266,9 @@ pub struct CreateSampledIndividualsUsersRoleFormProp {
 pub fn create_sampled_individuals_users_role_form(props: &CreateSampledIndividualsUsersRoleFormProp) -> Html {
      let mut named_requests: Vec<ComponentMessage> = Vec::new();
     let (builder_store, builder_dispatch) = use_store::<SampledIndividualsUsersRoleBuilder>();
-    named_requests.push(ComponentMessage::get_named::<&str, SampledIndividual>("table", props.table_id.into()));
+   if let Some(table_id) = props.table_id {
+         named_requests.push(ComponentMessage::get_named::<&str, SampledIndividual>("table", table_id.into()));
+    }
    if let Some(user_id) = props.user_id {
          named_requests.push(ComponentMessage::get_named::<&str, User>("user", user_id.into()));
     }
@@ -3289,11 +3283,7 @@ pub fn create_sampled_individuals_users_role_form(props: &CreateSampledIndividua
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-if let Some(table) = builder_store.table.as_ref() {
-    <span>{"TODO Selected table"}</span>
-} else {
-    <></>
-}
+            <Datalist<NestedSampledIndividual, true> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" />
             <Datalist<User, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" />
             <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
         </BasicForm<NewSampledIndividualsUsersRole>>
@@ -3302,7 +3292,7 @@ if let Some(table) = builder_store.table.as_ref() {
 #[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct SampleBuilder {
-    pub id: Option<Uuid>,
+    pub barcode_id: Option<Uuid>,
     pub sampled_by: Option<User>,
     pub state: Option<NestedSampleState>,
     pub errors_sampled_by: Vec<ApiError>,
@@ -3313,7 +3303,7 @@ pub struct SampleBuilder {
 impl Default for SampleBuilder {
     fn default() -> Self {
         Self {
-            id: None,
+            barcode_id: None,
             sampled_by: None,
             state: None,
             errors_sampled_by: Default::default(),
@@ -3385,7 +3375,7 @@ impl FormBuilder for SampleBuilder {
     }
 
     fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
-        dispatcher.reduce_mut(|state| {state.id = Some(richest_variant.inner.id);});
+        dispatcher.reduce_mut(|state| {state.barcode_id = Some(richest_variant.inner.barcode_id);});
         dispatcher.apply(SampleActions::SetSampledBy(Some(richest_variant.sampled_by)));
         dispatcher.apply(SampleActions::SetState(Some(richest_variant.state)));
         vec![]
@@ -3402,7 +3392,7 @@ impl FormBuilder for SampleBuilder {
 impl From<SampleBuilder> for NewSample {
     fn from(builder: SampleBuilder) -> Self {
         Self {
-            id: builder.id.unwrap_or_else(Uuid::new_v4),
+            barcode_id: builder.barcode_id.unwrap_or_else(Uuid::new_v4),
             sampled_by: builder.sampled_by.unwrap().id,
             state: builder.state.unwrap().inner.id,
         }
@@ -3456,7 +3446,7 @@ pub fn create_sample_form(props: &CreateSampleFormProp) -> Html {
 }
 #[derive(Clone, PartialEq, Properties)]
 pub struct UpdateSampleFormProp {
-    pub id: Uuid,
+    pub barcode_id: Uuid,
 }
 
 #[function_component(UpdateSampleForm)]
@@ -3465,7 +3455,7 @@ pub fn update_sample_form(props: &UpdateSampleFormProp) -> Html {
     let (builder_store, builder_dispatch) = use_store::<SampleBuilder>();
     // We push the ID of the row to the named requests.
     let props = props.clone();
-   named_requests.push(ComponentMessage::get::<NewSample>(props.id.into()));
+   named_requests.push(ComponentMessage::get::<NewSample>(props.barcode_id.into()));
     let set_sampled_by = builder_dispatch.apply_callback(|sampled_by: Option<User>| SampleActions::SetSampledBy(sampled_by));
     let set_state = builder_dispatch.apply_callback(|state: Option<NestedSampleState>| SampleActions::SetState(state));
     html! {
@@ -3600,7 +3590,7 @@ impl FormBuilder for SamplesTeamsRoleInvitationBuilder {
 impl From<SamplesTeamsRoleInvitationBuilder> for NewSamplesTeamsRoleInvitation {
     fn from(builder: SamplesTeamsRoleInvitationBuilder) -> Self {
         Self {
-            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
+            table_id: builder.table.as_ref().map(|table| table.inner.barcode_id).unwrap(),
             team_id: builder.team.as_ref().map(|team| team.inner.id).unwrap(),
             role_id: builder.role.unwrap().inner.id,
         }
@@ -3624,7 +3614,8 @@ impl FormBuildable for NewSamplesTeamsRoleInvitation {
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct CreateSamplesTeamsRoleInvitationFormProp {
-    pub table_id: Uuid,
+     #[prop_or_default]
+    pub table_id: Option<Uuid>,
      #[prop_or_default]
     pub team_id: Option<i32>,
      #[prop_or_default]
@@ -3635,7 +3626,9 @@ pub struct CreateSamplesTeamsRoleInvitationFormProp {
 pub fn create_samples_teams_role_invitation_form(props: &CreateSamplesTeamsRoleInvitationFormProp) -> Html {
      let mut named_requests: Vec<ComponentMessage> = Vec::new();
     let (builder_store, builder_dispatch) = use_store::<SamplesTeamsRoleInvitationBuilder>();
-    named_requests.push(ComponentMessage::get_named::<&str, Sample>("table", props.table_id.into()));
+   if let Some(table_id) = props.table_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Sample>("table", table_id.into()));
+    }
    if let Some(team_id) = props.team_id {
          named_requests.push(ComponentMessage::get_named::<&str, Team>("team", team_id.into()));
     }
@@ -3650,11 +3643,7 @@ pub fn create_samples_teams_role_invitation_form(props: &CreateSamplesTeamsRoleI
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-if let Some(table) = builder_store.table.as_ref() {
-    <span>{"TODO Selected table"}</span>
-} else {
-    <></>
-}
+            <Datalist<NestedSample, true> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" />
             <Datalist<NestedTeam, true> builder={set_team} optional={false} errors={builder_store.errors_team.clone()} value={builder_store.team.clone()} label="Team" />
             <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
         </BasicForm<NewSamplesTeamsRoleInvitation>>
@@ -3782,7 +3771,7 @@ impl FormBuilder for SamplesTeamsRoleRequestBuilder {
 impl From<SamplesTeamsRoleRequestBuilder> for NewSamplesTeamsRoleRequest {
     fn from(builder: SamplesTeamsRoleRequestBuilder) -> Self {
         Self {
-            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
+            table_id: builder.table.as_ref().map(|table| table.inner.barcode_id).unwrap(),
             team_id: builder.team.as_ref().map(|team| team.inner.id).unwrap(),
             role_id: builder.role.unwrap().inner.id,
         }
@@ -3806,7 +3795,8 @@ impl FormBuildable for NewSamplesTeamsRoleRequest {
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct CreateSamplesTeamsRoleRequestFormProp {
-    pub table_id: Uuid,
+     #[prop_or_default]
+    pub table_id: Option<Uuid>,
      #[prop_or_default]
     pub team_id: Option<i32>,
      #[prop_or_default]
@@ -3817,7 +3807,9 @@ pub struct CreateSamplesTeamsRoleRequestFormProp {
 pub fn create_samples_teams_role_request_form(props: &CreateSamplesTeamsRoleRequestFormProp) -> Html {
      let mut named_requests: Vec<ComponentMessage> = Vec::new();
     let (builder_store, builder_dispatch) = use_store::<SamplesTeamsRoleRequestBuilder>();
-    named_requests.push(ComponentMessage::get_named::<&str, Sample>("table", props.table_id.into()));
+   if let Some(table_id) = props.table_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Sample>("table", table_id.into()));
+    }
    if let Some(team_id) = props.team_id {
          named_requests.push(ComponentMessage::get_named::<&str, Team>("team", team_id.into()));
     }
@@ -3832,11 +3824,7 @@ pub fn create_samples_teams_role_request_form(props: &CreateSamplesTeamsRoleRequ
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-if let Some(table) = builder_store.table.as_ref() {
-    <span>{"TODO Selected table"}</span>
-} else {
-    <></>
-}
+            <Datalist<NestedSample, true> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" />
             <Datalist<NestedTeam, true> builder={set_team} optional={false} errors={builder_store.errors_team.clone()} value={builder_store.team.clone()} label="Team" />
             <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
         </BasicForm<NewSamplesTeamsRoleRequest>>
@@ -3964,7 +3952,7 @@ impl FormBuilder for SamplesTeamsRoleBuilder {
 impl From<SamplesTeamsRoleBuilder> for NewSamplesTeamsRole {
     fn from(builder: SamplesTeamsRoleBuilder) -> Self {
         Self {
-            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
+            table_id: builder.table.as_ref().map(|table| table.inner.barcode_id).unwrap(),
             team_id: builder.team.as_ref().map(|team| team.inner.id).unwrap(),
             role_id: builder.role.unwrap().inner.id,
         }
@@ -3988,7 +3976,8 @@ impl FormBuildable for NewSamplesTeamsRole {
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct CreateSamplesTeamsRoleFormProp {
-    pub table_id: Uuid,
+     #[prop_or_default]
+    pub table_id: Option<Uuid>,
      #[prop_or_default]
     pub team_id: Option<i32>,
      #[prop_or_default]
@@ -3999,7 +3988,9 @@ pub struct CreateSamplesTeamsRoleFormProp {
 pub fn create_samples_teams_role_form(props: &CreateSamplesTeamsRoleFormProp) -> Html {
      let mut named_requests: Vec<ComponentMessage> = Vec::new();
     let (builder_store, builder_dispatch) = use_store::<SamplesTeamsRoleBuilder>();
-    named_requests.push(ComponentMessage::get_named::<&str, Sample>("table", props.table_id.into()));
+   if let Some(table_id) = props.table_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Sample>("table", table_id.into()));
+    }
    if let Some(team_id) = props.team_id {
          named_requests.push(ComponentMessage::get_named::<&str, Team>("team", team_id.into()));
     }
@@ -4014,11 +4005,7 @@ pub fn create_samples_teams_role_form(props: &CreateSamplesTeamsRoleFormProp) ->
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-if let Some(table) = builder_store.table.as_ref() {
-    <span>{"TODO Selected table"}</span>
-} else {
-    <></>
-}
+            <Datalist<NestedSample, true> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" />
             <Datalist<NestedTeam, true> builder={set_team} optional={false} errors={builder_store.errors_team.clone()} value={builder_store.team.clone()} label="Team" />
             <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
         </BasicForm<NewSamplesTeamsRole>>
@@ -4146,7 +4133,7 @@ impl FormBuilder for SamplesUsersRoleInvitationBuilder {
 impl From<SamplesUsersRoleInvitationBuilder> for NewSamplesUsersRoleInvitation {
     fn from(builder: SamplesUsersRoleInvitationBuilder) -> Self {
         Self {
-            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
+            table_id: builder.table.as_ref().map(|table| table.inner.barcode_id).unwrap(),
             user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
             role_id: builder.role.unwrap().inner.id,
         }
@@ -4170,7 +4157,8 @@ impl FormBuildable for NewSamplesUsersRoleInvitation {
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct CreateSamplesUsersRoleInvitationFormProp {
-    pub table_id: Uuid,
+     #[prop_or_default]
+    pub table_id: Option<Uuid>,
      #[prop_or_default]
     pub user_id: Option<i32>,
      #[prop_or_default]
@@ -4181,7 +4169,9 @@ pub struct CreateSamplesUsersRoleInvitationFormProp {
 pub fn create_samples_users_role_invitation_form(props: &CreateSamplesUsersRoleInvitationFormProp) -> Html {
      let mut named_requests: Vec<ComponentMessage> = Vec::new();
     let (builder_store, builder_dispatch) = use_store::<SamplesUsersRoleInvitationBuilder>();
-    named_requests.push(ComponentMessage::get_named::<&str, Sample>("table", props.table_id.into()));
+   if let Some(table_id) = props.table_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Sample>("table", table_id.into()));
+    }
    if let Some(user_id) = props.user_id {
          named_requests.push(ComponentMessage::get_named::<&str, User>("user", user_id.into()));
     }
@@ -4196,11 +4186,7 @@ pub fn create_samples_users_role_invitation_form(props: &CreateSamplesUsersRoleI
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-if let Some(table) = builder_store.table.as_ref() {
-    <span>{"TODO Selected table"}</span>
-} else {
-    <></>
-}
+            <Datalist<NestedSample, true> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" />
             <Datalist<User, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" />
             <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
         </BasicForm<NewSamplesUsersRoleInvitation>>
@@ -4328,7 +4314,7 @@ impl FormBuilder for SamplesUsersRoleRequestBuilder {
 impl From<SamplesUsersRoleRequestBuilder> for NewSamplesUsersRoleRequest {
     fn from(builder: SamplesUsersRoleRequestBuilder) -> Self {
         Self {
-            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
+            table_id: builder.table.as_ref().map(|table| table.inner.barcode_id).unwrap(),
             user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
             role_id: builder.role.unwrap().inner.id,
         }
@@ -4352,7 +4338,8 @@ impl FormBuildable for NewSamplesUsersRoleRequest {
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct CreateSamplesUsersRoleRequestFormProp {
-    pub table_id: Uuid,
+     #[prop_or_default]
+    pub table_id: Option<Uuid>,
      #[prop_or_default]
     pub user_id: Option<i32>,
      #[prop_or_default]
@@ -4363,7 +4350,9 @@ pub struct CreateSamplesUsersRoleRequestFormProp {
 pub fn create_samples_users_role_request_form(props: &CreateSamplesUsersRoleRequestFormProp) -> Html {
      let mut named_requests: Vec<ComponentMessage> = Vec::new();
     let (builder_store, builder_dispatch) = use_store::<SamplesUsersRoleRequestBuilder>();
-    named_requests.push(ComponentMessage::get_named::<&str, Sample>("table", props.table_id.into()));
+   if let Some(table_id) = props.table_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Sample>("table", table_id.into()));
+    }
    if let Some(user_id) = props.user_id {
          named_requests.push(ComponentMessage::get_named::<&str, User>("user", user_id.into()));
     }
@@ -4378,11 +4367,7 @@ pub fn create_samples_users_role_request_form(props: &CreateSamplesUsersRoleRequ
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-if let Some(table) = builder_store.table.as_ref() {
-    <span>{"TODO Selected table"}</span>
-} else {
-    <></>
-}
+            <Datalist<NestedSample, true> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" />
             <Datalist<User, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" />
             <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
         </BasicForm<NewSamplesUsersRoleRequest>>
@@ -4510,7 +4495,7 @@ impl FormBuilder for SamplesUsersRoleBuilder {
 impl From<SamplesUsersRoleBuilder> for NewSamplesUsersRole {
     fn from(builder: SamplesUsersRoleBuilder) -> Self {
         Self {
-            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
+            table_id: builder.table.as_ref().map(|table| table.inner.barcode_id).unwrap(),
             user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
             role_id: builder.role.unwrap().inner.id,
         }
@@ -4534,7 +4519,8 @@ impl FormBuildable for NewSamplesUsersRole {
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct CreateSamplesUsersRoleFormProp {
-    pub table_id: Uuid,
+     #[prop_or_default]
+    pub table_id: Option<Uuid>,
      #[prop_or_default]
     pub user_id: Option<i32>,
      #[prop_or_default]
@@ -4545,7 +4531,9 @@ pub struct CreateSamplesUsersRoleFormProp {
 pub fn create_samples_users_role_form(props: &CreateSamplesUsersRoleFormProp) -> Html {
      let mut named_requests: Vec<ComponentMessage> = Vec::new();
     let (builder_store, builder_dispatch) = use_store::<SamplesUsersRoleBuilder>();
-    named_requests.push(ComponentMessage::get_named::<&str, Sample>("table", props.table_id.into()));
+   if let Some(table_id) = props.table_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Sample>("table", table_id.into()));
+    }
    if let Some(user_id) = props.user_id {
          named_requests.push(ComponentMessage::get_named::<&str, User>("user", user_id.into()));
     }
@@ -4560,11 +4548,7 @@ pub fn create_samples_users_role_form(props: &CreateSamplesUsersRoleFormProp) ->
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-if let Some(table) = builder_store.table.as_ref() {
-    <span>{"TODO Selected table"}</span>
-} else {
-    <></>
-}
+            <Datalist<NestedSample, true> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" />
             <Datalist<User, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" />
             <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" />
         </BasicForm<NewSamplesUsersRole>>
@@ -4651,7 +4635,7 @@ impl FormBuilder for SpectraCollectionBuilder {
 impl From<SpectraCollectionBuilder> for NewSpectraCollection {
     fn from(builder: SpectraCollectionBuilder) -> Self {
         Self {
-            sample_id: builder.sample.unwrap().inner.id,
+            sample_id: builder.sample.unwrap().inner.barcode_id,
         }
     }
 }
@@ -4659,7 +4643,7 @@ impl From<SpectraCollectionBuilder> for UpdateSpectraCollection {
     fn from(builder: SpectraCollectionBuilder) -> Self {
         Self {
             id: builder.id.unwrap(),
-            sample_id: builder.sample.unwrap().inner.id,
+            sample_id: builder.sample.unwrap().inner.barcode_id,
         }
     }
 }
@@ -4697,25 +4681,24 @@ impl FormBuildable for UpdateSpectraCollection {
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct CreateSpectraCollectionFormProp {
-    pub sample_id: Uuid,
+     #[prop_or_default]
+    pub sample_id: Option<Uuid>,
 }
 
 #[function_component(CreateSpectraCollectionForm)]
 pub fn create_spectra_collection_form(props: &CreateSpectraCollectionFormProp) -> Html {
      let mut named_requests: Vec<ComponentMessage> = Vec::new();
     let (builder_store, builder_dispatch) = use_store::<SpectraCollectionBuilder>();
-    named_requests.push(ComponentMessage::get_named::<&str, Sample>("sample", props.sample_id.into()));
+   if let Some(sample_id) = props.sample_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Sample>("sample", sample_id.into()));
+    }
     let set_sample = builder_dispatch.apply_callback(|sample: Option<NestedSample>| SpectraCollectionActions::SetSample(sample));
     html! {
         <BasicForm<NewSpectraCollection>
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-if let Some(sample) = builder_store.sample.as_ref() {
-    <span>{"TODO Selected sample"}</span>
-} else {
-    <></>
-}
+            <Datalist<NestedSample, true> builder={set_sample} optional={false} errors={builder_store.errors_sample.clone()} value={builder_store.sample.clone()} label="Sample" />
         </BasicForm<NewSpectraCollection>>
     }
 }
@@ -4737,7 +4720,7 @@ pub fn update_spectra_collection_form(props: &UpdateSpectraCollectionFormProp) -
             method={FormMethod::PUT}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-<p>{"Sample id has to be selected with a ScannerInput, which is not yet available."}</p>
+            <Datalist<NestedSample, true> builder={set_sample} optional={false} errors={builder_store.errors_sample.clone()} value={builder_store.sample.clone()} label="Sample" />
         </BasicForm<UpdateSpectraCollection>>
     }
 }
@@ -5839,14 +5822,14 @@ pub struct TeamBuilder {
     pub id: Option<i32>,
     pub name: Option<String>,
     pub description: Option<String>,
-    pub icon: Option<FontAwesomeIcon>,
     pub color: Option<Color>,
     pub parent_team: Option<NestedTeam>,
+    pub icon: Option<FontAwesomeIcon>,
     pub errors_name: Vec<ApiError>,
     pub errors_description: Vec<ApiError>,
-    pub errors_icon: Vec<ApiError>,
     pub errors_color: Vec<ApiError>,
     pub errors_parent_team: Vec<ApiError>,
+    pub errors_icon: Vec<ApiError>,
     pub form_updated_at: NaiveDateTime,
 }
 
@@ -5856,14 +5839,14 @@ impl Default for TeamBuilder {
             id: None,
             name: None,
             description: None,
-            icon: Default::default(),
             color: Default::default(),
             parent_team: Default::default(),
+            icon: Default::default(),
             errors_name: Default::default(),
             errors_description: Default::default(),
-            errors_icon: Default::default(),
             errors_color: Default::default(),
             errors_parent_team: Default::default(),
+            errors_icon: Default::default(),
             form_updated_at: Default::default(),
         }
     }
@@ -5873,17 +5856,17 @@ impl Default for TeamBuilder {
 pub(super) enum TeamActions {
     SetName(Option<String>),
     SetDescription(Option<String>),
-    SetIcon(Option<FontAwesomeIcon>),
     SetColor(Option<Color>),
     SetParentTeam(Option<NestedTeam>),
+    SetIcon(Option<FontAwesomeIcon>),
 }
 
 impl FromOperation for TeamActions {
     fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
         match operation.as_ref() {
-            "icon" => TeamActions::SetIcon(Some(bincode::deserialize(&row).unwrap())),
             "color" => TeamActions::SetColor(Some(bincode::deserialize(&row).unwrap())),
             "parent_team" => TeamActions::SetParentTeam(Some(bincode::deserialize(&row).unwrap())),
+            "icon" => TeamActions::SetIcon(Some(bincode::deserialize(&row).unwrap())),
             operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
         }
     }
@@ -5939,20 +5922,6 @@ impl Reducer<TeamBuilder> for TeamActions {
                 // yet handling more corner cases, we always use the break here.
                 break 'description;
             }
-            TeamActions::SetIcon(icon) => 'icon: {
-                state_mut.errors_icon.clear();
-        if icon.is_none() {
-            state_mut.errors_icon.push(ApiError::BadRequest(vec![
-                "The Icon field is required.".to_string()
-             ]));
-            state_mut.icon = None;
-             break 'icon;
-        }
-                state_mut.icon = icon;
-                // To avoid having a codesmell relative to the cases where we are not
-                // yet handling more corner cases, we always use the break here.
-                break 'icon;
-            }
             TeamActions::SetColor(color) => 'color: {
                 state_mut.errors_color.clear();
         if color.is_none() {
@@ -5986,6 +5955,20 @@ impl Reducer<TeamBuilder> for TeamActions {
                 // yet handling more corner cases, we always use the break here.
                 break 'parent_team;
             }
+            TeamActions::SetIcon(icon) => 'icon: {
+                state_mut.errors_icon.clear();
+        if icon.is_none() {
+            state_mut.errors_icon.push(ApiError::BadRequest(vec![
+                "The Icon field is required.".to_string()
+             ]));
+            state_mut.icon = None;
+             break 'icon;
+        }
+                state_mut.icon = icon;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'icon;
+            }
         }
         state
     }
@@ -5996,15 +5979,15 @@ impl FormBuilder for TeamBuilder {
     type RichVariant = NestedTeam;
 
     fn has_errors(&self) -> bool {
-!self.errors_name.is_empty() || !self.errors_description.is_empty() || !self.errors_icon.is_empty() || !self.errors_color.is_empty() || !self.errors_parent_team.is_empty()
+!self.errors_name.is_empty() || !self.errors_description.is_empty() || !self.errors_color.is_empty() || !self.errors_parent_team.is_empty() || !self.errors_icon.is_empty()
     }
 
     fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
         dispatcher.reduce_mut(|state| {state.id = Some(richest_variant.inner.id);});
     dispatcher.apply(TeamActions::SetName(Some(richest_variant.inner.name.to_string())));
     dispatcher.apply(TeamActions::SetDescription(Some(richest_variant.inner.description.to_string())));
-        dispatcher.apply(TeamActions::SetIcon(Some(richest_variant.icon)));
         dispatcher.apply(TeamActions::SetColor(Some(richest_variant.color)));
+        dispatcher.apply(TeamActions::SetIcon(Some(richest_variant.icon)));
         let mut named_requests = Vec::new();
         if let Some(parent_team_id) = richest_variant.inner.parent_team_id {
     named_requests.push(ComponentMessage::get_named::<&str, Team>("parent_team", parent_team_id.into()));
@@ -6018,8 +6001,8 @@ impl FormBuilder for TeamBuilder {
         !self.has_errors()
         && self.name.is_some()
         && self.description.is_some()
-        && self.icon.is_some()
         && self.color.is_some()
+        && self.icon.is_some()
     }
 
 }
@@ -6082,31 +6065,31 @@ impl FormBuildable for UpdateTeam {
 #[derive(Clone, PartialEq, Properties)]
 pub struct CreateTeamFormProp {
      #[prop_or_default]
-    pub icon_id: Option<i32>,
-     #[prop_or_default]
     pub color_id: Option<i32>,
      #[prop_or_default]
     pub parent_team_id: Option<i32>,
+     #[prop_or_default]
+    pub icon_id: Option<i32>,
 }
 
 #[function_component(CreateTeamForm)]
 pub fn create_team_form(props: &CreateTeamFormProp) -> Html {
      let mut named_requests: Vec<ComponentMessage> = Vec::new();
     let (builder_store, builder_dispatch) = use_store::<TeamBuilder>();
-   if let Some(icon_id) = props.icon_id {
-         named_requests.push(ComponentMessage::get_named::<&str, FontAwesomeIcon>("icon", icon_id.into()));
-    }
    if let Some(color_id) = props.color_id {
          named_requests.push(ComponentMessage::get_named::<&str, Color>("color", color_id.into()));
     }
    if let Some(parent_team_id) = props.parent_team_id {
          named_requests.push(ComponentMessage::get_named::<&str, Team>("parent_team", parent_team_id.into()));
     }
+   if let Some(icon_id) = props.icon_id {
+         named_requests.push(ComponentMessage::get_named::<&str, FontAwesomeIcon>("icon", icon_id.into()));
+    }
     let set_name = builder_dispatch.apply_callback(|name: Option<String>| TeamActions::SetName(name));
     let set_description = builder_dispatch.apply_callback(|description: Option<String>| TeamActions::SetDescription(description));
-    let set_icon = builder_dispatch.apply_callback(|icon: Option<FontAwesomeIcon>| TeamActions::SetIcon(icon));
     let set_color = builder_dispatch.apply_callback(|color: Option<Color>| TeamActions::SetColor(color));
     let set_parent_team = builder_dispatch.apply_callback(|parent_team: Option<NestedTeam>| TeamActions::SetParentTeam(parent_team));
+    let set_icon = builder_dispatch.apply_callback(|icon: Option<FontAwesomeIcon>| TeamActions::SetIcon(icon));
     html! {
         <BasicForm<NewTeam>
             method={FormMethod::POST}
@@ -6114,9 +6097,9 @@ pub fn create_team_form(props: &CreateTeamFormProp) -> Html {
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Name" optional={false} errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
             <BasicInput<String> label="Description" optional={false} errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
-            <Datalist<FontAwesomeIcon, false> builder={set_icon} optional={false} errors={builder_store.errors_icon.clone()} value={builder_store.icon.clone()} label="Icon" />
             <Datalist<Color, false> builder={set_color} optional={false} errors={builder_store.errors_color.clone()} value={builder_store.color.clone()} label="Color" />
             <Datalist<NestedTeam, true> builder={set_parent_team} optional={true} errors={builder_store.errors_parent_team.clone()} value={builder_store.parent_team.clone()} label="Parent team" />
+            <Datalist<FontAwesomeIcon, false> builder={set_icon} optional={false} errors={builder_store.errors_icon.clone()} value={builder_store.icon.clone()} label="Icon" />
         </BasicForm<NewTeam>>
     }
 }
@@ -6134,9 +6117,9 @@ pub fn update_team_form(props: &UpdateTeamFormProp) -> Html {
    named_requests.push(ComponentMessage::get::<UpdateTeam>(props.id.into()));
     let set_name = builder_dispatch.apply_callback(|name: Option<String>| TeamActions::SetName(name));
     let set_description = builder_dispatch.apply_callback(|description: Option<String>| TeamActions::SetDescription(description));
-    let set_icon = builder_dispatch.apply_callback(|icon: Option<FontAwesomeIcon>| TeamActions::SetIcon(icon));
     let set_color = builder_dispatch.apply_callback(|color: Option<Color>| TeamActions::SetColor(color));
     let set_parent_team = builder_dispatch.apply_callback(|parent_team: Option<NestedTeam>| TeamActions::SetParentTeam(parent_team));
+    let set_icon = builder_dispatch.apply_callback(|icon: Option<FontAwesomeIcon>| TeamActions::SetIcon(icon));
     html! {
         <BasicForm<UpdateTeam>
             method={FormMethod::PUT}
@@ -6144,9 +6127,9 @@ pub fn update_team_form(props: &UpdateTeamFormProp) -> Html {
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Name" optional={false} errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
             <BasicInput<String> label="Description" optional={false} errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
-            <Datalist<FontAwesomeIcon, false> builder={set_icon} optional={false} errors={builder_store.errors_icon.clone()} value={builder_store.icon.clone()} label="Icon" />
             <Datalist<Color, false> builder={set_color} optional={false} errors={builder_store.errors_color.clone()} value={builder_store.color.clone()} label="Color" />
             <Datalist<NestedTeam, true> builder={set_parent_team} optional={true} errors={builder_store.errors_parent_team.clone()} value={builder_store.parent_team.clone()} label="Parent team" />
+            <Datalist<FontAwesomeIcon, false> builder={set_icon} optional={false} errors={builder_store.errors_icon.clone()} value={builder_store.icon.clone()} label="Icon" />
         </BasicForm<UpdateTeam>>
     }
 }
