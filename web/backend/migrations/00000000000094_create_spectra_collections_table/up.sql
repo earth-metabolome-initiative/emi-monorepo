@@ -1,6 +1,7 @@
 -- Your SQL goes here
 CREATE TABLE IF NOT EXISTS spectra_collections (
     id INTEGER PRIMARY KEY,
+    notes TEXT,
     sample_id UUID REFERENCES samples(barcode_id) ON DELETE CASCADE NOT NULL,
     created_by INTEGER REFERENCES users(id) ON DELETE CASCADE NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

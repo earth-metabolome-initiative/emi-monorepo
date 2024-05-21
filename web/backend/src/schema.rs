@@ -257,6 +257,7 @@ diesel::table! {
 diesel::table! {
     sampled_individuals (id) {
         id -> Uuid,
+        notes -> Nullable<Text>,
         created_by -> Int4,
         created_at -> Timestamp,
         updated_by -> Int4,
@@ -328,6 +329,7 @@ diesel::table! {
 diesel::table! {
     samples (barcode_id) {
         barcode_id -> Uuid,
+        notes -> Nullable<Text>,
         created_by -> Int4,
         sampled_by -> Int4,
         created_at -> Timestamp,
@@ -400,6 +402,7 @@ diesel::table! {
 diesel::table! {
     spectra (id) {
         id -> Int4,
+        notes -> Nullable<Text>,
         spectra_collection_id -> Int4,
     }
 }
@@ -407,6 +410,7 @@ diesel::table! {
 diesel::table! {
     spectra_collections (id) {
         id -> Int4,
+        notes -> Nullable<Text>,
         sample_id -> Uuid,
         created_by -> Int4,
         created_at -> Timestamp,
@@ -564,9 +568,10 @@ diesel::table! {
 diesel::table! {
     users (id) {
         id -> Int4,
-        first_name -> Varchar,
-        middle_name -> Nullable<Varchar>,
-        last_name -> Varchar,
+        first_name -> Text,
+        middle_name -> Nullable<Text>,
+        last_name -> Text,
+        description -> Nullable<Text>,
         profile_picture -> Bytea,
         created_at -> Timestamp,
         updated_at -> Timestamp,

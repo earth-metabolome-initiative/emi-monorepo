@@ -2365,36 +2365,6 @@ impl Project {
             .filter(projects::dsl::id.eq(id))
             .first::<Self>(connection)
     }
-    /// Get the struct from the database by its color_id.
-    ///
-    /// # Arguments
-    /// * `color_id` - The color_id of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn from_color_id(
-        color_id: &i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::projects;
-        projects::dsl::projects
-            .filter(projects::dsl::color_id.eq(color_id))
-            .first::<Self>(connection)
-    }
-    /// Get the struct from the database by its icon_id.
-    ///
-    /// # Arguments
-    /// * `icon_id` - The icon_id of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn from_icon_id(
-        icon_id: &i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::projects;
-        projects::dsl::projects
-            .filter(projects::dsl::icon_id.eq(icon_id))
-            .first::<Self>(connection)
-    }
     /// Get the struct from the database by its name.
     ///
     /// # Arguments
@@ -3769,6 +3739,7 @@ impl SampledIndividualBioOttTaxonItem {
 #[diesel(primary_key(id))]
 pub struct SampledIndividual {
     pub id: Uuid,
+    pub notes: Option<String>,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
     pub updated_by: i32,
@@ -3780,6 +3751,7 @@ impl From<SampledIndividual> for web_common::database::tables::SampledIndividual
     fn from(item: SampledIndividual) -> Self {
         Self {
             id: item.id,
+            notes: item.notes,
             created_by: item.created_by,
             created_at: item.created_at,
             updated_by: item.updated_by,
@@ -3793,6 +3765,7 @@ impl From<web_common::database::tables::SampledIndividual> for SampledIndividual
     fn from(item: web_common::database::tables::SampledIndividual) -> Self {
         Self {
             id: item.id,
+            notes: item.notes,
             created_by: item.created_by,
             created_at: item.created_at,
             updated_by: item.updated_by,
@@ -4129,7 +4102,7 @@ impl SampledIndividual {
             return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, created_by, created_at, updated_by, updated_at, tagged FROM sampled_individuals ",
+            "SELECT id, notes, created_by, created_at, updated_by, updated_at, tagged FROM sampled_individuals ",
             "WHERE id LIKE $1% ",
             "LIMIT $2;"
         );
@@ -4160,7 +4133,7 @@ impl SampledIndividual {
             return Self::all_editables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, created_by, created_at, updated_by, updated_at, tagged FROM sampled_individuals ",
+            "SELECT id, notes, created_by, created_at, updated_by, updated_at, tagged FROM sampled_individuals ",
             "WHERE id LIKE $1% ",
 "AND ",
              "sampled_individuals.created_by = $3 ",
@@ -4200,7 +4173,7 @@ impl SampledIndividual {
             return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, created_by, created_at, updated_by, updated_at, tagged FROM sampled_individuals ",
+            "SELECT id, notes, created_by, created_at, updated_by, updated_at, tagged FROM sampled_individuals ",
             "WHERE id LIKE $1% ",
             "LIMIT $2;"
         );
@@ -4231,7 +4204,7 @@ impl SampledIndividual {
             return Self::all_editables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, created_by, created_at, updated_by, updated_at, tagged FROM sampled_individuals ",
+            "SELECT id, notes, created_by, created_at, updated_by, updated_at, tagged FROM sampled_individuals ",
             "WHERE id LIKE $1% ",
 "AND ",
              "sampled_individuals.created_by = $3 ",
@@ -4271,7 +4244,7 @@ impl SampledIndividual {
             return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, created_by, created_at, updated_by, updated_at, tagged FROM sampled_individuals ",
+            "SELECT id, notes, created_by, created_at, updated_by, updated_at, tagged FROM sampled_individuals ",
             "WHERE id LIKE $1% ",
             "LIMIT $2;"
         );
@@ -4302,7 +4275,7 @@ impl SampledIndividual {
             return Self::all_editables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, created_by, created_at, updated_by, updated_at, tagged FROM sampled_individuals ",
+            "SELECT id, notes, created_by, created_at, updated_by, updated_at, tagged FROM sampled_individuals ",
             "WHERE id LIKE $1% ",
 "AND ",
              "sampled_individuals.created_by = $3 ",
@@ -4873,6 +4846,7 @@ impl SampledIndividualsUsersRole {
 #[diesel(primary_key(barcode_id))]
 pub struct Sample {
     pub barcode_id: Uuid,
+    pub notes: Option<String>,
     pub created_by: i32,
     pub sampled_by: i32,
     pub created_at: NaiveDateTime,
@@ -4885,6 +4859,7 @@ impl From<Sample> for web_common::database::tables::Sample {
     fn from(item: Sample) -> Self {
         Self {
             barcode_id: item.barcode_id,
+            notes: item.notes,
             created_by: item.created_by,
             sampled_by: item.sampled_by,
             created_at: item.created_at,
@@ -4899,6 +4874,7 @@ impl From<web_common::database::tables::Sample> for Sample {
     fn from(item: web_common::database::tables::Sample) -> Self {
         Self {
             barcode_id: item.barcode_id,
+            notes: item.notes,
             created_by: item.created_by,
             sampled_by: item.sampled_by,
             created_at: item.created_at,
@@ -5254,7 +5230,7 @@ impl Sample {
             return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT barcode_id, created_by, sampled_by, created_at, updated_by, updated_at, state FROM samples ",
+            "SELECT barcode_id, notes, created_by, sampled_by, created_at, updated_by, updated_at, state FROM samples ",
             "WHERE barcode_id LIKE $1% ",
             "LIMIT $2;"
         );
@@ -5285,7 +5261,7 @@ impl Sample {
             return Self::all_editables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT barcode_id, created_by, sampled_by, created_at, updated_by, updated_at, state FROM samples ",
+            "SELECT barcode_id, notes, created_by, sampled_by, created_at, updated_by, updated_at, state FROM samples ",
             "WHERE barcode_id LIKE $1% ",
 "AND ",
              "samples.created_by = $3 ",
@@ -5325,7 +5301,7 @@ impl Sample {
             return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT barcode_id, created_by, sampled_by, created_at, updated_by, updated_at, state FROM samples ",
+            "SELECT barcode_id, notes, created_by, sampled_by, created_at, updated_by, updated_at, state FROM samples ",
             "WHERE barcode_id LIKE $1% ",
             "LIMIT $2;"
         );
@@ -5356,7 +5332,7 @@ impl Sample {
             return Self::all_editables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT barcode_id, created_by, sampled_by, created_at, updated_by, updated_at, state FROM samples ",
+            "SELECT barcode_id, notes, created_by, sampled_by, created_at, updated_by, updated_at, state FROM samples ",
             "WHERE barcode_id LIKE $1% ",
 "AND ",
              "samples.created_by = $3 ",
@@ -5396,7 +5372,7 @@ impl Sample {
             return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT barcode_id, created_by, sampled_by, created_at, updated_by, updated_at, state FROM samples ",
+            "SELECT barcode_id, notes, created_by, sampled_by, created_at, updated_by, updated_at, state FROM samples ",
             "WHERE barcode_id LIKE $1% ",
             "LIMIT $2;"
         );
@@ -5427,7 +5403,7 @@ impl Sample {
             return Self::all_editables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT barcode_id, created_by, sampled_by, created_at, updated_by, updated_at, state FROM samples ",
+            "SELECT barcode_id, notes, created_by, sampled_by, created_at, updated_by, updated_at, state FROM samples ",
             "WHERE barcode_id LIKE $1% ",
 "AND ",
              "samples.created_by = $3 ",
@@ -5997,6 +5973,7 @@ impl SamplesUsersRole {
 #[diesel(primary_key(id))]
 pub struct Spectra {
     pub id: i32,
+    pub notes: Option<String>,
     pub spectra_collection_id: i32,
 }
 
@@ -6004,6 +5981,7 @@ impl From<Spectra> for web_common::database::tables::Spectra {
     fn from(item: Spectra) -> Self {
         Self {
             id: item.id,
+            notes: item.notes,
             spectra_collection_id: item.spectra_collection_id,
         }
     }
@@ -6013,6 +5991,7 @@ impl From<web_common::database::tables::Spectra> for Spectra {
     fn from(item: web_common::database::tables::Spectra) -> Self {
         Self {
             id: item.id,
+            notes: item.notes,
             spectra_collection_id: item.spectra_collection_id,
         }
     }
@@ -6067,6 +6046,7 @@ impl Spectra {
 #[diesel(primary_key(id))]
 pub struct SpectraCollection {
     pub id: i32,
+    pub notes: Option<String>,
     pub sample_id: Uuid,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
@@ -6078,6 +6058,7 @@ impl From<SpectraCollection> for web_common::database::tables::SpectraCollection
     fn from(item: SpectraCollection) -> Self {
         Self {
             id: item.id,
+            notes: item.notes,
             sample_id: item.sample_id,
             created_by: item.created_by,
             created_at: item.created_at,
@@ -6091,6 +6072,7 @@ impl From<web_common::database::tables::SpectraCollection> for SpectraCollection
     fn from(item: web_common::database::tables::SpectraCollection) -> Self {
         Self {
             id: item.id,
+            notes: item.notes,
             sample_id: item.sample_id,
             created_by: item.created_by,
             created_at: item.created_at,
@@ -7176,10 +7158,10 @@ impl TeamState {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = teams)]
+#[diesel(belongs_to(FontAwesomeIcon, foreign_key = icon_id))]
 #[diesel(belongs_to(Color, foreign_key = color_id))]
 #[diesel(belongs_to(Team, foreign_key = parent_team_id))]
 #[diesel(belongs_to(User, foreign_key = created_by))]
-#[diesel(belongs_to(FontAwesomeIcon, foreign_key = icon_id))]
 #[diesel(primary_key(id))]
 pub struct Team {
     pub id: i32,
@@ -7384,6 +7366,9 @@ impl Team {
         use crate::schema::teams;
         let mut query = teams::dsl::teams
             .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(teams::dsl::icon_id.eq(value));
+        }
         if let Some(value) = filter.and_then(|f| f.color_id) {
             query = query.filter(teams::dsl::color_id.eq(value));
         }
@@ -7395,9 +7380,6 @@ impl Team {
         }
         if let Some(value) = filter.and_then(|f| f.updated_by) {
             query = query.filter(teams::dsl::updated_by.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.icon_id) {
-            query = query.filter(teams::dsl::icon_id.eq(value));
         }
         query
             .offset(offset.unwrap_or(0))
@@ -7432,6 +7414,9 @@ impl Team {
                )),
             )
             .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(teams::dsl::icon_id.eq(value));
+        }
         if let Some(value) = filter.and_then(|f| f.color_id) {
             query = query.filter(teams::dsl::color_id.eq(value));
         }
@@ -7443,9 +7428,6 @@ impl Team {
         }
         if let Some(value) = filter.and_then(|f| f.updated_by) {
             query = query.filter(teams::dsl::updated_by.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.icon_id) {
-            query = query.filter(teams::dsl::icon_id.eq(value));
         }
         query
             .offset(offset.unwrap_or(0))
@@ -7469,6 +7451,9 @@ impl Team {
         use crate::schema::teams;
         let mut query = teams::dsl::teams
             .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(teams::dsl::icon_id.eq(value));
+        }
         if let Some(value) = filter.and_then(|f| f.color_id) {
             query = query.filter(teams::dsl::color_id.eq(value));
         }
@@ -7480,9 +7465,6 @@ impl Team {
         }
         if let Some(value) = filter.and_then(|f| f.updated_by) {
             query = query.filter(teams::dsl::updated_by.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.icon_id) {
-            query = query.filter(teams::dsl::icon_id.eq(value));
         }
         query
             .order_by(teams::dsl::updated_at.desc())
@@ -7535,36 +7517,6 @@ impl Team {
         use crate::schema::teams;
         teams::dsl::teams
             .filter(teams::dsl::id.eq(id))
-            .first::<Self>(connection)
-    }
-    /// Get the struct from the database by its color_id.
-    ///
-    /// # Arguments
-    /// * `color_id` - The color_id of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn from_color_id(
-        color_id: &i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::teams;
-        teams::dsl::teams
-            .filter(teams::dsl::color_id.eq(color_id))
-            .first::<Self>(connection)
-    }
-    /// Get the struct from the database by its icon_id.
-    ///
-    /// # Arguments
-    /// * `icon_id` - The icon_id of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn from_icon_id(
-        icon_id: &i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::teams;
-        teams::dsl::teams
-            .filter(teams::dsl::icon_id.eq(icon_id))
             .first::<Self>(connection)
     }
     /// Get the struct from the database by its name.
@@ -8436,6 +8388,7 @@ pub struct User {
     pub first_name: String,
     pub middle_name: Option<String>,
     pub last_name: String,
+    pub description: Option<String>,
     pub profile_picture: Vec<u8>,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
@@ -8448,6 +8401,7 @@ impl From<User> for web_common::database::tables::User {
             first_name: item.first_name,
             middle_name: item.middle_name,
             last_name: item.last_name,
+            description: item.description,
             profile_picture: item.profile_picture,
             created_at: item.created_at,
             updated_at: item.updated_at,
@@ -8462,6 +8416,7 @@ impl From<web_common::database::tables::User> for User {
             first_name: item.first_name,
             middle_name: item.middle_name,
             last_name: item.last_name,
+            description: item.description,
             profile_picture: item.profile_picture,
             created_at: item.created_at,
             updated_at: item.updated_at,
@@ -8542,9 +8497,9 @@ impl User {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, first_name, middle_name, last_name, profile_picture, created_at, updated_at FROM users ",
-            "WHERE $1 % f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text) ",
-            "ORDER BY similarity($1, f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text)) DESC LIMIT $2",
+            "SELECT id, first_name, middle_name, last_name, description, profile_picture, created_at, updated_at FROM users ",
+            "WHERE $1 % f_concat_users_name(first_name, middle_name, last_name) ",
+            "ORDER BY similarity($1, f_concat_users_name(first_name, middle_name, last_name)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -8571,9 +8526,9 @@ impl User {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, first_name, middle_name, last_name, profile_picture, created_at, updated_at FROM users ",
-            "WHERE $1 <% f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text) ",
-            "ORDER BY word_similarity($1, f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text)) DESC LIMIT $2",
+            "SELECT id, first_name, middle_name, last_name, description, profile_picture, created_at, updated_at FROM users ",
+            "WHERE $1 <% f_concat_users_name(first_name, middle_name, last_name) ",
+            "ORDER BY word_similarity($1, f_concat_users_name(first_name, middle_name, last_name)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -8600,9 +8555,9 @@ impl User {
             return Self::all(Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, first_name, middle_name, last_name, profile_picture, created_at, updated_at FROM users ",
-            "WHERE $1 <<% f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text) ",
-            "ORDER BY strict_word_similarity($1, f_concat_users_name((first_name)::text, (middle_name)::text, (last_name)::text)) DESC LIMIT $2",
+            "SELECT id, first_name, middle_name, last_name, description, profile_picture, created_at, updated_at FROM users ",
+            "WHERE $1 <<% f_concat_users_name(first_name, middle_name, last_name) ",
+            "ORDER BY strict_word_similarity($1, f_concat_users_name(first_name, middle_name, last_name)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)

@@ -3834,11 +3834,11 @@ impl NestedTeamState {
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedTeam {
     pub inner: Team,
+    pub icon: FontAwesomeIcon,
     pub color: Color,
     pub parent_team: Option<Team>,
     pub created_by: User,
     pub updated_by: User,
-    pub icon: FontAwesomeIcon,
 }
 
 impl Tabular for NestedTeam {
@@ -3859,11 +3859,11 @@ impl NestedTeam {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
+            icon: FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap(),
             color: Color::get(flat_variant.color_id, connection).await?.unwrap(),
             parent_team: if let Some(parent_team_id) = flat_variant.parent_team_id { Team::get(parent_team_id, connection).await? } else { None },
             created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
             updated_by: User::get(flat_variant.updated_by, connection).await?.unwrap(),
-            icon: FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap(),
             inner: flat_variant,
         })
     }
@@ -3938,13 +3938,13 @@ impl NestedTeam {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         self.inner.update_or_insert(connection).await?;
+        self.icon.update_or_insert(connection).await?;
         self.color.update_or_insert(connection).await?;
         if let Some(parent_team) = self.parent_team {
             parent_team.update_or_insert(connection).await?;
         }
         self.created_by.update_or_insert(connection).await?;
         self.updated_by.update_or_insert(connection).await?;
-        self.icon.update_or_insert(connection).await?;
         Ok(())
     }
 }

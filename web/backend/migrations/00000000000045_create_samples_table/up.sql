@@ -1,6 +1,7 @@
 -- UP MIGRATION
 CREATE TABLE IF NOT EXISTS samples (
     barcode_id UUID PRIMARY KEY,
+    notes TEXT,
     created_by INTEGER NOT NULL REFERENCES users(id) ON
     DELETE CASCADE,
     sampled_by INTEGER NOT NULL REFERENCES users(id) ON

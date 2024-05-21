@@ -6,7 +6,6 @@ use crate::stores::user_state::UserState;
 use crate::workers::ws_worker::{ComponentMessage, WebsocketMessage};
 use crate::workers::WebsocketWorker;
 use serde::de::DeserializeOwned;
-use serde::Serialize;
 use web_common::api::form_traits::FormMethod;
 use web_common::database::PrimaryKey;
 use web_common::database::*;
@@ -28,6 +27,8 @@ pub trait PageLike: DeserializeOwned + PartialEq + Clone + Tabular + 'static {
         section
     }
 
+    fn description(&self) -> Option<&str>;
+
     fn id(&self) -> PrimaryKey;
 
     fn update_path(&self) -> Option<AppRoute>;
@@ -38,6 +39,10 @@ pub trait PageLike: DeserializeOwned + PartialEq + Clone + Tabular + 'static {
 impl PageLike for NestedProject {
     fn title(&self) -> String {
         self.inner.name.clone()
+    }
+
+    fn description(&self) -> Option<&str> {
+        Some(&self.inner.description)
     }
 
     fn id(&self) -> PrimaryKey {
@@ -58,6 +63,10 @@ impl PageLike for NestedSpectraCollection {
         format!("Spectra collection {}", self.inner.id)
     }
 
+    fn description(&self) -> Option<&str> {
+        self.inner.notes.as_deref()
+    }
+
     fn id(&self) -> PrimaryKey {
         self.inner.id.into()
     }
@@ -74,6 +83,10 @@ impl PageLike for NestedSpectraCollection {
 impl PageLike for NestedSpectra {
     fn title(&self) -> String {
         format!("Spectra {}", self.inner.id)
+    }
+
+    fn description(&self) -> Option<&str> {
+        self.inner.notes.as_deref()
     }
 
     fn id(&self) -> PrimaryKey {
@@ -94,6 +107,10 @@ impl PageLike for NestedSampledIndividual {
         format!("Sampled individual {}", self.inner.id)
     }
 
+    fn description(&self) -> Option<&str> {
+        self.inner.notes.as_deref()
+    }
+
     fn id(&self) -> PrimaryKey {
         self.inner.id.into()
     }
@@ -110,6 +127,10 @@ impl PageLike for NestedSampledIndividual {
 impl PageLike for NestedSample {
     fn title(&self) -> String {
         format!("{}", self.inner.barcode_id)
+    }
+
+    fn description(&self) -> Option<&str> {
+        self.inner.notes.as_deref()
     }
 
     fn id(&self) -> PrimaryKey {
@@ -130,6 +151,10 @@ impl PageLike for User {
         self.full_name()
     }
 
+    fn description(&self) -> Option<&str> {
+        self.description.as_deref()
+    }
+
     fn id(&self) -> PrimaryKey {
         self.id.into()
     }
@@ -146,6 +171,10 @@ impl PageLike for User {
 impl PageLike for NestedTeam {
     fn title(&self) -> String {
         self.inner.name.clone()
+    }
+
+    fn description(&self) -> Option<&str> {
+        Some(self.inner.description.as_str())
     }
 
     fn id(&self) -> PrimaryKey {
@@ -294,13 +323,14 @@ impl<Page: PageLike> Component for InnerBasicPage<Page> {
             html! {
                 <div class="page">
                     <h2>{ page.title() }</h2>
+                    if let Some(description) = page.description() {
+                        <p>{ description }</p>
+                    }
                     if self.can_update {
                         <Link<AppRoute> classes={"button-like update"} to={page.update_path().unwrap()}>
                             <i class={FormMethod::PUT.font_awesome_icon()}></i>
                             <span>{"Update"}</span>
                         </Link<AppRoute>>
-                    } else {
-                        <></>
                     }
                     if self.can_delete {
                         <Link<AppRoute> classes={"button-like delete"} to={page.update_path().unwrap()}>

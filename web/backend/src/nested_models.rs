@@ -1107,34 +1107,6 @@ impl NestedProject {
     }
 }
 impl NestedProject {
-    /// Get the nested struct from the provided color_id.
-    ///
-    /// # Arguments
-    /// * `color_id` - The color_id of the row.
-    /// * `connection` - The database connection.
-    pub fn from_color_id(
-        color_id: &i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-        Project::from_color_id(color_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
-}
-impl NestedProject {
-    /// Get the nested struct from the provided icon_id.
-    ///
-    /// # Arguments
-    /// * `icon_id` - The icon_id of the row.
-    /// * `connection` - The database connection.
-    pub fn from_icon_id(
-        icon_id: &i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-        Project::from_icon_id(icon_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
-}
-impl NestedProject {
     /// Get the nested struct from the provided name.
     ///
     /// # Arguments
@@ -4424,11 +4396,11 @@ impl From<NestedTeamState> for web_common::database::nested_models::NestedTeamSt
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedTeam {
     pub inner: Team,
+    pub icon: FontAwesomeIcon,
     pub color: Color,
     pub parent_team: Option<Team>,
     pub created_by: User,
     pub updated_by: User,
-    pub icon: FontAwesomeIcon,
 }
 
 impl NestedTeam {
@@ -4442,11 +4414,11 @@ impl NestedTeam {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
+            icon: FontAwesomeIcon::get(flat_variant.icon_id, connection)?,
             color: Color::get(flat_variant.color_id, connection)?,
             parent_team: flat_variant.parent_team_id.map(|flat_variant| Team::get(flat_variant, connection)).transpose()?,
             created_by: User::get(flat_variant.created_by, connection)?,
             updated_by: User::get(flat_variant.updated_by, connection)?,
-            icon: FontAwesomeIcon::get(flat_variant.icon_id, connection)?,
                 inner: flat_variant,
         })
     }
@@ -4516,34 +4488,6 @@ impl NestedTeam {
     ) -> Result<Self, diesel::result::Error>
     {
        Team::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
-}
-impl NestedTeam {
-    /// Get the nested struct from the provided color_id.
-    ///
-    /// # Arguments
-    /// * `color_id` - The color_id of the row.
-    /// * `connection` - The database connection.
-    pub fn from_color_id(
-        color_id: &i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-        Team::from_color_id(color_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
-}
-impl NestedTeam {
-    /// Get the nested struct from the provided icon_id.
-    ///
-    /// # Arguments
-    /// * `icon_id` - The icon_id of the row.
-    /// * `connection` - The database connection.
-    pub fn from_icon_id(
-        icon_id: &i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-        Team::from_icon_id(icon_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl NestedTeam {
@@ -4654,11 +4598,11 @@ impl From<web_common::database::nested_models::NestedTeam> for NestedTeam {
     fn from(item: web_common::database::nested_models::NestedTeam) -> Self {
         Self {
             inner: item.inner.into(),
+            icon: item.icon.into(),
             color: item.color.into(),
             parent_team: item.parent_team.map(|item| item.into()),
             created_by: item.created_by.into(),
             updated_by: item.updated_by.into(),
-            icon: item.icon.into(),
         }
     }
 }
@@ -4666,11 +4610,11 @@ impl From<NestedTeam> for web_common::database::nested_models::NestedTeam {
     fn from(item: NestedTeam) -> Self {
         Self {
             inner: item.inner.into(),
+            icon: item.icon.into(),
             color: item.color.into(),
             parent_team: item.parent_team.map(|item| item.into()),
             created_by: item.created_by.into(),
             updated_by: item.updated_by.into(),
-            icon: item.icon.into(),
         }
     }
 }

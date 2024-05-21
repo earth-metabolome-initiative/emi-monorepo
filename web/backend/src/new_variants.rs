@@ -396,6 +396,7 @@ impl InsertRow for web_common::database::NewSampledIndividualBioOttTaxonItem {
 pub(super) struct IntermediateNewSampledIndividual {
     created_by: i32,
     id: Uuid,
+    notes: Option<String>,
     tagged: bool,
     updated_by: i32,
 }
@@ -408,6 +409,7 @@ impl InsertRow for web_common::database::NewSampledIndividual {
         IntermediateNewSampledIndividual {
             created_by: user_id,
             id: self.id,
+            notes: self.notes,
             tagged: self.tagged,
             updated_by: user_id,
         }
@@ -641,6 +643,7 @@ impl InsertRow for web_common::database::NewSampledIndividualsUsersRole {
 pub(super) struct IntermediateNewSample {
     created_by: i32,
     barcode_id: Uuid,
+    notes: Option<String>,
     sampled_by: i32,
     state: i32,
     updated_by: i32,
@@ -654,6 +657,7 @@ impl InsertRow for web_common::database::NewSample {
         IntermediateNewSample {
             created_by: user_id,
             barcode_id: self.barcode_id,
+            notes: self.notes,
             sampled_by: self.sampled_by,
             state: self.state,
             updated_by: user_id,
@@ -887,6 +891,7 @@ impl InsertRow for web_common::database::NewSamplesUsersRole {
 #[diesel(table_name = spectra_collections)]
 pub(super) struct IntermediateNewSpectraCollection {
     created_by: i32,
+    notes: Option<String>,
     sample_id: Uuid,
     updated_by: i32,
 }
@@ -898,6 +903,7 @@ impl InsertRow for web_common::database::NewSpectraCollection {
     fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
         IntermediateNewSpectraCollection {
             created_by: user_id,
+            notes: self.notes,
             sample_id: self.sample_id,
             updated_by: user_id,
         }
@@ -1348,6 +1354,7 @@ pub(super) struct IntermediateNewUser {
     first_name: String,
     middle_name: Option<String>,
     last_name: String,
+    description: Option<String>,
     profile_picture: Vec<u8>,
 }
 
@@ -1360,6 +1367,7 @@ impl InsertRow for web_common::database::NewUser {
             first_name: self.first_name,
             middle_name: self.middle_name,
             last_name: self.last_name,
+            description: self.description,
             profile_picture: self.profile_picture,
         }
     }

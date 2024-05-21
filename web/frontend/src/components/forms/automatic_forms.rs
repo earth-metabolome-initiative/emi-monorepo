@@ -2075,7 +2075,9 @@ pub fn create_sampled_individual_bio_ott_taxon_item_form(props: &CreateSampledIn
 #[store(storage = "local", storage_tab_sync)]
 pub struct SampledIndividualBuilder {
     pub id: Option<Uuid>,
+    pub notes: Option<String>,
     pub tagged: Option<bool>,
+    pub errors_notes: Vec<ApiError>,
     pub errors_tagged: Vec<ApiError>,
     pub form_updated_at: NaiveDateTime,
 }
@@ -2084,7 +2086,9 @@ impl Default for SampledIndividualBuilder {
     fn default() -> Self {
         Self {
             id: None,
+            notes: None,
             tagged: Some(false),
+            errors_notes: Default::default(),
             errors_tagged: Default::default(),
             form_updated_at: Default::default(),
         }
@@ -2093,6 +2097,7 @@ impl Default for SampledIndividualBuilder {
 
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum SampledIndividualActions {
+    SetNotes(Option<String>),
     SetTagged(Option<bool>),
 }
 
@@ -2106,6 +2111,22 @@ impl Reducer<SampledIndividualBuilder> for SampledIndividualActions {
     fn apply(self, mut state: std::rc::Rc<SampledIndividualBuilder>) -> std::rc::Rc<SampledIndividualBuilder> {
         let state_mut = Rc::make_mut(&mut state);
         match self {
+            SampledIndividualActions::SetNotes(notes) => 'notes: {
+                state_mut.errors_notes.clear();
+                if let Some(value) = notes.as_ref() {
+                    if value.is_empty() {
+                        state_mut.errors_notes.push(ApiError::BadRequest(vec![
+                            "The Notes field cannot be left empty.".to_string()
+                        ]));
+                         state_mut.notes = None;
+                          break 'notes;
+                    }
+                }
+                state_mut.notes = notes;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'notes;
+            }
             SampledIndividualActions::SetTagged(tagged) => 'tagged: {
                 state_mut.errors_tagged.clear();
         if tagged.is_none() {
@@ -2130,11 +2151,12 @@ impl FormBuilder for SampledIndividualBuilder {
     type RichVariant = NestedSampledIndividual;
 
     fn has_errors(&self) -> bool {
-!self.errors_tagged.is_empty()
+!self.errors_notes.is_empty() || !self.errors_tagged.is_empty()
     }
 
     fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
         dispatcher.reduce_mut(|state| {state.id = Some(richest_variant.inner.id);});
+    dispatcher.apply(SampledIndividualActions::SetNotes(richest_variant.inner.notes.map(|notes| notes.to_string())));
         dispatcher.apply(SampledIndividualActions::SetTagged(Some(richest_variant.inner.tagged)));        vec![]
     }
 
@@ -2149,6 +2171,7 @@ impl From<SampledIndividualBuilder> for NewSampledIndividual {
     fn from(builder: SampledIndividualBuilder) -> Self {
         Self {
             id: builder.id.unwrap_or_else(Uuid::new_v4),
+            notes: builder.notes,
             tagged: builder.tagged.unwrap(),
         }
     }
@@ -2172,11 +2195,13 @@ impl FormBuildable for NewSampledIndividual {
 #[function_component(CreateSampledIndividualForm)]
 pub fn create_sampled_individual_form() -> Html {
     let (builder_store, builder_dispatch) = use_store::<SampledIndividualBuilder>();
+    let set_notes = builder_dispatch.apply_callback(|notes: Option<String>| SampledIndividualActions::SetNotes(notes));
     let set_tagged = builder_dispatch.apply_callback(|tagged: bool| SampledIndividualActions::SetTagged(Some(tagged)));
     html! {
         <BasicForm<NewSampledIndividual>
             method={FormMethod::POST}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+            <BasicInput<String> label="Notes" optional={true} errors={builder_store.errors_notes.clone()} builder={set_notes} value={builder_store.notes.clone()} />
             <Checkbox label="Tagged" errors={builder_store.errors_tagged.clone()} builder={set_tagged} value={builder_store.tagged.unwrap_or(false)} />
         </BasicForm<NewSampledIndividual>>
     }
@@ -2193,12 +2218,14 @@ pub fn update_sampled_individual_form(props: &UpdateSampledIndividualFormProp) -
     // We push the ID of the row to the named requests.
     let props = props.clone();
    named_requests.push(ComponentMessage::get::<NewSampledIndividual>(props.id.into()));
+    let set_notes = builder_dispatch.apply_callback(|notes: Option<String>| SampledIndividualActions::SetNotes(notes));
     let set_tagged = builder_dispatch.apply_callback(|tagged: bool| SampledIndividualActions::SetTagged(Some(tagged)));
     html! {
         <BasicForm<NewSampledIndividual>
             method={FormMethod::PUT}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+            <BasicInput<String> label="Notes" optional={true} errors={builder_store.errors_notes.clone()} builder={set_notes} value={builder_store.notes.clone()} />
             <Checkbox label="Tagged" errors={builder_store.errors_tagged.clone()} builder={set_tagged} value={builder_store.tagged.unwrap_or(false)} />
         </BasicForm<NewSampledIndividual>>
     }
@@ -3293,8 +3320,10 @@ pub fn create_sampled_individuals_users_role_form(props: &CreateSampledIndividua
 #[store(storage = "local", storage_tab_sync)]
 pub struct SampleBuilder {
     pub barcode_id: Option<Uuid>,
+    pub notes: Option<String>,
     pub sampled_by: Option<User>,
     pub state: Option<NestedSampleState>,
+    pub errors_notes: Vec<ApiError>,
     pub errors_sampled_by: Vec<ApiError>,
     pub errors_state: Vec<ApiError>,
     pub form_updated_at: NaiveDateTime,
@@ -3304,8 +3333,10 @@ impl Default for SampleBuilder {
     fn default() -> Self {
         Self {
             barcode_id: None,
+            notes: None,
             sampled_by: None,
             state: None,
+            errors_notes: Default::default(),
             errors_sampled_by: Default::default(),
             errors_state: Default::default(),
             form_updated_at: Default::default(),
@@ -3315,6 +3346,7 @@ impl Default for SampleBuilder {
 
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum SampleActions {
+    SetNotes(Option<String>),
     SetSampledBy(Option<User>),
     SetState(Option<NestedSampleState>),
 }
@@ -3333,6 +3365,22 @@ impl Reducer<SampleBuilder> for SampleActions {
     fn apply(self, mut state: std::rc::Rc<SampleBuilder>) -> std::rc::Rc<SampleBuilder> {
         let state_mut = Rc::make_mut(&mut state);
         match self {
+            SampleActions::SetNotes(notes) => 'notes: {
+                state_mut.errors_notes.clear();
+                if let Some(value) = notes.as_ref() {
+                    if value.is_empty() {
+                        state_mut.errors_notes.push(ApiError::BadRequest(vec![
+                            "The Notes field cannot be left empty.".to_string()
+                        ]));
+                         state_mut.notes = None;
+                          break 'notes;
+                    }
+                }
+                state_mut.notes = notes;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'notes;
+            }
             SampleActions::SetSampledBy(sampled_by) => 'sampled_by: {
                 state_mut.errors_sampled_by.clear();
         if sampled_by.is_none() {
@@ -3371,11 +3419,12 @@ impl FormBuilder for SampleBuilder {
     type RichVariant = NestedSample;
 
     fn has_errors(&self) -> bool {
-!self.errors_sampled_by.is_empty() || !self.errors_state.is_empty()
+!self.errors_notes.is_empty() || !self.errors_sampled_by.is_empty() || !self.errors_state.is_empty()
     }
 
     fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
         dispatcher.reduce_mut(|state| {state.barcode_id = Some(richest_variant.inner.barcode_id);});
+    dispatcher.apply(SampleActions::SetNotes(richest_variant.inner.notes.map(|notes| notes.to_string())));
         dispatcher.apply(SampleActions::SetSampledBy(Some(richest_variant.sampled_by)));
         dispatcher.apply(SampleActions::SetState(Some(richest_variant.state)));
         vec![]
@@ -3393,6 +3442,7 @@ impl From<SampleBuilder> for NewSample {
     fn from(builder: SampleBuilder) -> Self {
         Self {
             barcode_id: builder.barcode_id.unwrap_or_else(Uuid::new_v4),
+            notes: builder.notes,
             sampled_by: builder.sampled_by.unwrap().id,
             state: builder.state.unwrap().inner.id,
         }
@@ -3432,6 +3482,7 @@ pub fn create_sample_form(props: &CreateSampleFormProp) -> Html {
    if let Some(state) = props.state {
          named_requests.push(ComponentMessage::get_named::<&str, SampleState>("state", state.into()));
     }
+    let set_notes = builder_dispatch.apply_callback(|notes: Option<String>| SampleActions::SetNotes(notes));
     let set_sampled_by = builder_dispatch.apply_callback(|sampled_by: Option<User>| SampleActions::SetSampledBy(sampled_by));
     let set_state = builder_dispatch.apply_callback(|state: Option<NestedSampleState>| SampleActions::SetState(state));
     html! {
@@ -3439,6 +3490,7 @@ pub fn create_sample_form(props: &CreateSampleFormProp) -> Html {
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+            <BasicInput<String> label="Notes" optional={true} errors={builder_store.errors_notes.clone()} builder={set_notes} value={builder_store.notes.clone()} />
             <Datalist<User, false> builder={set_sampled_by} optional={false} errors={builder_store.errors_sampled_by.clone()} value={builder_store.sampled_by.clone()} label="Sampled by" />
             <Datalist<NestedSampleState, false> builder={set_state} optional={false} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" />
         </BasicForm<NewSample>>
@@ -3456,6 +3508,7 @@ pub fn update_sample_form(props: &UpdateSampleFormProp) -> Html {
     // We push the ID of the row to the named requests.
     let props = props.clone();
    named_requests.push(ComponentMessage::get::<NewSample>(props.barcode_id.into()));
+    let set_notes = builder_dispatch.apply_callback(|notes: Option<String>| SampleActions::SetNotes(notes));
     let set_sampled_by = builder_dispatch.apply_callback(|sampled_by: Option<User>| SampleActions::SetSampledBy(sampled_by));
     let set_state = builder_dispatch.apply_callback(|state: Option<NestedSampleState>| SampleActions::SetState(state));
     html! {
@@ -3463,6 +3516,7 @@ pub fn update_sample_form(props: &UpdateSampleFormProp) -> Html {
             method={FormMethod::PUT}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+            <BasicInput<String> label="Notes" optional={true} errors={builder_store.errors_notes.clone()} builder={set_notes} value={builder_store.notes.clone()} />
             <Datalist<User, false> builder={set_sampled_by} optional={false} errors={builder_store.errors_sampled_by.clone()} value={builder_store.sampled_by.clone()} label="Sampled by" />
             <Datalist<NestedSampleState, false> builder={set_state} optional={false} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" />
         </BasicForm<NewSample>>
@@ -4558,7 +4612,9 @@ pub fn create_samples_users_role_form(props: &CreateSamplesUsersRoleFormProp) ->
 #[store(storage = "local", storage_tab_sync)]
 pub struct SpectraCollectionBuilder {
     pub id: Option<i32>,
+    pub notes: Option<String>,
     pub sample: Option<NestedSample>,
+    pub errors_notes: Vec<ApiError>,
     pub errors_sample: Vec<ApiError>,
     pub form_updated_at: NaiveDateTime,
 }
@@ -4567,7 +4623,9 @@ impl Default for SpectraCollectionBuilder {
     fn default() -> Self {
         Self {
             id: None,
+            notes: None,
             sample: Default::default(),
+            errors_notes: Default::default(),
             errors_sample: Default::default(),
             form_updated_at: Default::default(),
         }
@@ -4576,6 +4634,7 @@ impl Default for SpectraCollectionBuilder {
 
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum SpectraCollectionActions {
+    SetNotes(Option<String>),
     SetSample(Option<NestedSample>),
 }
 
@@ -4592,6 +4651,22 @@ impl Reducer<SpectraCollectionBuilder> for SpectraCollectionActions {
     fn apply(self, mut state: std::rc::Rc<SpectraCollectionBuilder>) -> std::rc::Rc<SpectraCollectionBuilder> {
         let state_mut = Rc::make_mut(&mut state);
         match self {
+            SpectraCollectionActions::SetNotes(notes) => 'notes: {
+                state_mut.errors_notes.clear();
+                if let Some(value) = notes.as_ref() {
+                    if value.is_empty() {
+                        state_mut.errors_notes.push(ApiError::BadRequest(vec![
+                            "The Notes field cannot be left empty.".to_string()
+                        ]));
+                         state_mut.notes = None;
+                          break 'notes;
+                    }
+                }
+                state_mut.notes = notes;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'notes;
+            }
             SpectraCollectionActions::SetSample(sample) => 'sample: {
                 state_mut.errors_sample.clear();
         if sample.is_none() {
@@ -4616,11 +4691,12 @@ impl FormBuilder for SpectraCollectionBuilder {
     type RichVariant = NestedSpectraCollection;
 
     fn has_errors(&self) -> bool {
-!self.errors_sample.is_empty()
+!self.errors_notes.is_empty() || !self.errors_sample.is_empty()
     }
 
     fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
         dispatcher.reduce_mut(|state| {state.id = Some(richest_variant.inner.id);});
+    dispatcher.apply(SpectraCollectionActions::SetNotes(richest_variant.inner.notes.map(|notes| notes.to_string())));
         dispatcher.apply(SpectraCollectionActions::SetSample(Some(richest_variant.sample)));
         vec![]
     }
@@ -4635,6 +4711,7 @@ impl FormBuilder for SpectraCollectionBuilder {
 impl From<SpectraCollectionBuilder> for NewSpectraCollection {
     fn from(builder: SpectraCollectionBuilder) -> Self {
         Self {
+            notes: builder.notes,
             sample_id: builder.sample.unwrap().inner.barcode_id,
         }
     }
@@ -4643,6 +4720,7 @@ impl From<SpectraCollectionBuilder> for UpdateSpectraCollection {
     fn from(builder: SpectraCollectionBuilder) -> Self {
         Self {
             id: builder.id.unwrap(),
+            notes: builder.notes,
             sample_id: builder.sample.unwrap().inner.barcode_id,
         }
     }
@@ -4692,12 +4770,14 @@ pub fn create_spectra_collection_form(props: &CreateSpectraCollectionFormProp) -
    if let Some(sample_id) = props.sample_id {
          named_requests.push(ComponentMessage::get_named::<&str, Sample>("sample", sample_id.into()));
     }
+    let set_notes = builder_dispatch.apply_callback(|notes: Option<String>| SpectraCollectionActions::SetNotes(notes));
     let set_sample = builder_dispatch.apply_callback(|sample: Option<NestedSample>| SpectraCollectionActions::SetSample(sample));
     html! {
         <BasicForm<NewSpectraCollection>
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+            <BasicInput<String> label="Notes" optional={true} errors={builder_store.errors_notes.clone()} builder={set_notes} value={builder_store.notes.clone()} />
             <Datalist<NestedSample, true> builder={set_sample} optional={false} errors={builder_store.errors_sample.clone()} value={builder_store.sample.clone()} label="Sample" />
         </BasicForm<NewSpectraCollection>>
     }
@@ -4714,12 +4794,14 @@ pub fn update_spectra_collection_form(props: &UpdateSpectraCollectionFormProp) -
     // We push the ID of the row to the named requests.
     let props = props.clone();
    named_requests.push(ComponentMessage::get::<UpdateSpectraCollection>(props.id.into()));
+    let set_notes = builder_dispatch.apply_callback(|notes: Option<String>| SpectraCollectionActions::SetNotes(notes));
     let set_sample = builder_dispatch.apply_callback(|sample: Option<NestedSample>| SpectraCollectionActions::SetSample(sample));
     html! {
         <BasicForm<UpdateSpectraCollection>
             method={FormMethod::PUT}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+            <BasicInput<String> label="Notes" optional={true} errors={builder_store.errors_notes.clone()} builder={set_notes} value={builder_store.notes.clone()} />
             <Datalist<NestedSample, true> builder={set_sample} optional={false} errors={builder_store.errors_sample.clone()} value={builder_store.sample.clone()} label="Sample" />
         </BasicForm<UpdateSpectraCollection>>
     }
@@ -5822,14 +5904,14 @@ pub struct TeamBuilder {
     pub id: Option<i32>,
     pub name: Option<String>,
     pub description: Option<String>,
+    pub icon: Option<FontAwesomeIcon>,
     pub color: Option<Color>,
     pub parent_team: Option<NestedTeam>,
-    pub icon: Option<FontAwesomeIcon>,
     pub errors_name: Vec<ApiError>,
     pub errors_description: Vec<ApiError>,
+    pub errors_icon: Vec<ApiError>,
     pub errors_color: Vec<ApiError>,
     pub errors_parent_team: Vec<ApiError>,
-    pub errors_icon: Vec<ApiError>,
     pub form_updated_at: NaiveDateTime,
 }
 
@@ -5839,14 +5921,14 @@ impl Default for TeamBuilder {
             id: None,
             name: None,
             description: None,
+            icon: Default::default(),
             color: Default::default(),
             parent_team: Default::default(),
-            icon: Default::default(),
             errors_name: Default::default(),
             errors_description: Default::default(),
+            errors_icon: Default::default(),
             errors_color: Default::default(),
             errors_parent_team: Default::default(),
-            errors_icon: Default::default(),
             form_updated_at: Default::default(),
         }
     }
@@ -5856,17 +5938,17 @@ impl Default for TeamBuilder {
 pub(super) enum TeamActions {
     SetName(Option<String>),
     SetDescription(Option<String>),
+    SetIcon(Option<FontAwesomeIcon>),
     SetColor(Option<Color>),
     SetParentTeam(Option<NestedTeam>),
-    SetIcon(Option<FontAwesomeIcon>),
 }
 
 impl FromOperation for TeamActions {
     fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
         match operation.as_ref() {
+            "icon" => TeamActions::SetIcon(Some(bincode::deserialize(&row).unwrap())),
             "color" => TeamActions::SetColor(Some(bincode::deserialize(&row).unwrap())),
             "parent_team" => TeamActions::SetParentTeam(Some(bincode::deserialize(&row).unwrap())),
-            "icon" => TeamActions::SetIcon(Some(bincode::deserialize(&row).unwrap())),
             operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
         }
     }
@@ -5922,6 +6004,20 @@ impl Reducer<TeamBuilder> for TeamActions {
                 // yet handling more corner cases, we always use the break here.
                 break 'description;
             }
+            TeamActions::SetIcon(icon) => 'icon: {
+                state_mut.errors_icon.clear();
+        if icon.is_none() {
+            state_mut.errors_icon.push(ApiError::BadRequest(vec![
+                "The Icon field is required.".to_string()
+             ]));
+            state_mut.icon = None;
+             break 'icon;
+        }
+                state_mut.icon = icon;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'icon;
+            }
             TeamActions::SetColor(color) => 'color: {
                 state_mut.errors_color.clear();
         if color.is_none() {
@@ -5955,20 +6051,6 @@ impl Reducer<TeamBuilder> for TeamActions {
                 // yet handling more corner cases, we always use the break here.
                 break 'parent_team;
             }
-            TeamActions::SetIcon(icon) => 'icon: {
-                state_mut.errors_icon.clear();
-        if icon.is_none() {
-            state_mut.errors_icon.push(ApiError::BadRequest(vec![
-                "The Icon field is required.".to_string()
-             ]));
-            state_mut.icon = None;
-             break 'icon;
-        }
-                state_mut.icon = icon;
-                // To avoid having a codesmell relative to the cases where we are not
-                // yet handling more corner cases, we always use the break here.
-                break 'icon;
-            }
         }
         state
     }
@@ -5979,15 +6061,15 @@ impl FormBuilder for TeamBuilder {
     type RichVariant = NestedTeam;
 
     fn has_errors(&self) -> bool {
-!self.errors_name.is_empty() || !self.errors_description.is_empty() || !self.errors_color.is_empty() || !self.errors_parent_team.is_empty() || !self.errors_icon.is_empty()
+!self.errors_name.is_empty() || !self.errors_description.is_empty() || !self.errors_icon.is_empty() || !self.errors_color.is_empty() || !self.errors_parent_team.is_empty()
     }
 
     fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
         dispatcher.reduce_mut(|state| {state.id = Some(richest_variant.inner.id);});
     dispatcher.apply(TeamActions::SetName(Some(richest_variant.inner.name.to_string())));
     dispatcher.apply(TeamActions::SetDescription(Some(richest_variant.inner.description.to_string())));
-        dispatcher.apply(TeamActions::SetColor(Some(richest_variant.color)));
         dispatcher.apply(TeamActions::SetIcon(Some(richest_variant.icon)));
+        dispatcher.apply(TeamActions::SetColor(Some(richest_variant.color)));
         let mut named_requests = Vec::new();
         if let Some(parent_team_id) = richest_variant.inner.parent_team_id {
     named_requests.push(ComponentMessage::get_named::<&str, Team>("parent_team", parent_team_id.into()));
@@ -6001,8 +6083,8 @@ impl FormBuilder for TeamBuilder {
         !self.has_errors()
         && self.name.is_some()
         && self.description.is_some()
-        && self.color.is_some()
         && self.icon.is_some()
+        && self.color.is_some()
     }
 
 }
@@ -6064,32 +6146,28 @@ impl FormBuildable for UpdateTeam {
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct CreateTeamFormProp {
-     #[prop_or_default]
-    pub color_id: Option<i32>,
+     #[prop_or(1387)]
+     pub icon_id: i32,
+     #[prop_or(15)]
+     pub color_id: i32,
      #[prop_or_default]
     pub parent_team_id: Option<i32>,
-     #[prop_or_default]
-    pub icon_id: Option<i32>,
 }
 
 #[function_component(CreateTeamForm)]
 pub fn create_team_form(props: &CreateTeamFormProp) -> Html {
      let mut named_requests: Vec<ComponentMessage> = Vec::new();
     let (builder_store, builder_dispatch) = use_store::<TeamBuilder>();
-   if let Some(color_id) = props.color_id {
-         named_requests.push(ComponentMessage::get_named::<&str, Color>("color", color_id.into()));
-    }
+    named_requests.push(ComponentMessage::get_named::<&str, FontAwesomeIcon>("icon", props.icon_id.into()));
+    named_requests.push(ComponentMessage::get_named::<&str, Color>("color", props.color_id.into()));
    if let Some(parent_team_id) = props.parent_team_id {
          named_requests.push(ComponentMessage::get_named::<&str, Team>("parent_team", parent_team_id.into()));
     }
-   if let Some(icon_id) = props.icon_id {
-         named_requests.push(ComponentMessage::get_named::<&str, FontAwesomeIcon>("icon", icon_id.into()));
-    }
     let set_name = builder_dispatch.apply_callback(|name: Option<String>| TeamActions::SetName(name));
     let set_description = builder_dispatch.apply_callback(|description: Option<String>| TeamActions::SetDescription(description));
+    let set_icon = builder_dispatch.apply_callback(|icon: Option<FontAwesomeIcon>| TeamActions::SetIcon(icon));
     let set_color = builder_dispatch.apply_callback(|color: Option<Color>| TeamActions::SetColor(color));
     let set_parent_team = builder_dispatch.apply_callback(|parent_team: Option<NestedTeam>| TeamActions::SetParentTeam(parent_team));
-    let set_icon = builder_dispatch.apply_callback(|icon: Option<FontAwesomeIcon>| TeamActions::SetIcon(icon));
     html! {
         <BasicForm<NewTeam>
             method={FormMethod::POST}
@@ -6097,9 +6175,9 @@ pub fn create_team_form(props: &CreateTeamFormProp) -> Html {
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Name" optional={false} errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
             <BasicInput<String> label="Description" optional={false} errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
+            <Datalist<FontAwesomeIcon, false> builder={set_icon} optional={false} errors={builder_store.errors_icon.clone()} value={builder_store.icon.clone()} label="Icon" />
             <Datalist<Color, false> builder={set_color} optional={false} errors={builder_store.errors_color.clone()} value={builder_store.color.clone()} label="Color" />
             <Datalist<NestedTeam, true> builder={set_parent_team} optional={true} errors={builder_store.errors_parent_team.clone()} value={builder_store.parent_team.clone()} label="Parent team" />
-            <Datalist<FontAwesomeIcon, false> builder={set_icon} optional={false} errors={builder_store.errors_icon.clone()} value={builder_store.icon.clone()} label="Icon" />
         </BasicForm<NewTeam>>
     }
 }
@@ -6117,9 +6195,9 @@ pub fn update_team_form(props: &UpdateTeamFormProp) -> Html {
    named_requests.push(ComponentMessage::get::<UpdateTeam>(props.id.into()));
     let set_name = builder_dispatch.apply_callback(|name: Option<String>| TeamActions::SetName(name));
     let set_description = builder_dispatch.apply_callback(|description: Option<String>| TeamActions::SetDescription(description));
+    let set_icon = builder_dispatch.apply_callback(|icon: Option<FontAwesomeIcon>| TeamActions::SetIcon(icon));
     let set_color = builder_dispatch.apply_callback(|color: Option<Color>| TeamActions::SetColor(color));
     let set_parent_team = builder_dispatch.apply_callback(|parent_team: Option<NestedTeam>| TeamActions::SetParentTeam(parent_team));
-    let set_icon = builder_dispatch.apply_callback(|icon: Option<FontAwesomeIcon>| TeamActions::SetIcon(icon));
     html! {
         <BasicForm<UpdateTeam>
             method={FormMethod::PUT}
@@ -6127,9 +6205,9 @@ pub fn update_team_form(props: &UpdateTeamFormProp) -> Html {
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Name" optional={false} errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
             <BasicInput<String> label="Description" optional={false} errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
+            <Datalist<FontAwesomeIcon, false> builder={set_icon} optional={false} errors={builder_store.errors_icon.clone()} value={builder_store.icon.clone()} label="Icon" />
             <Datalist<Color, false> builder={set_color} optional={false} errors={builder_store.errors_color.clone()} value={builder_store.color.clone()} label="Color" />
             <Datalist<NestedTeam, true> builder={set_parent_team} optional={true} errors={builder_store.errors_parent_team.clone()} value={builder_store.parent_team.clone()} label="Parent team" />
-            <Datalist<FontAwesomeIcon, false> builder={set_icon} optional={false} errors={builder_store.errors_icon.clone()} value={builder_store.icon.clone()} label="Icon" />
         </BasicForm<UpdateTeam>>
     }
 }
@@ -6864,10 +6942,12 @@ pub struct UserBuilder {
     pub first_name: Option<String>,
     pub middle_name: Option<String>,
     pub last_name: Option<String>,
+    pub description: Option<String>,
     pub profile_picture: Option<Vec<u8>>,
     pub errors_first_name: Vec<ApiError>,
     pub errors_middle_name: Vec<ApiError>,
     pub errors_last_name: Vec<ApiError>,
+    pub errors_description: Vec<ApiError>,
     pub errors_profile_picture: Vec<ApiError>,
     pub form_updated_at: NaiveDateTime,
 }
@@ -6879,10 +6959,12 @@ impl Default for UserBuilder {
             first_name: None,
             middle_name: None,
             last_name: None,
+            description: None,
             profile_picture: None,
             errors_first_name: Default::default(),
             errors_middle_name: Default::default(),
             errors_last_name: Default::default(),
+            errors_description: Default::default(),
             errors_profile_picture: Default::default(),
             form_updated_at: Default::default(),
         }
@@ -6894,6 +6976,7 @@ pub(super) enum UserActions {
     SetFirstName(Option<String>),
     SetMiddleName(Option<String>),
     SetLastName(Option<String>),
+    SetDescription(Option<String>),
     SetProfilePicture(Option<Vec<u8>>),
 }
 
@@ -6969,6 +7052,22 @@ impl Reducer<UserBuilder> for UserActions {
                 // yet handling more corner cases, we always use the break here.
                 break 'last_name;
             }
+            UserActions::SetDescription(description) => 'description: {
+                state_mut.errors_description.clear();
+                if let Some(value) = description.as_ref() {
+                    if value.is_empty() {
+                        state_mut.errors_description.push(ApiError::BadRequest(vec![
+                            "The Description field cannot be left empty.".to_string()
+                        ]));
+                         state_mut.description = None;
+                          break 'description;
+                    }
+                }
+                state_mut.description = description;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'description;
+            }
             UserActions::SetProfilePicture(profile_picture) => 'profile_picture: {
                 state_mut.errors_profile_picture.clear();
         if profile_picture.is_none() {
@@ -6993,7 +7092,7 @@ impl FormBuilder for UserBuilder {
     type RichVariant = User;
 
     fn has_errors(&self) -> bool {
-!self.errors_first_name.is_empty() || !self.errors_middle_name.is_empty() || !self.errors_last_name.is_empty() || !self.errors_profile_picture.is_empty()
+!self.errors_first_name.is_empty() || !self.errors_middle_name.is_empty() || !self.errors_last_name.is_empty() || !self.errors_description.is_empty() || !self.errors_profile_picture.is_empty()
     }
 
     fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
@@ -7001,6 +7100,7 @@ impl FormBuilder for UserBuilder {
         dispatcher.apply(UserActions::SetFirstName(Some(richest_variant.first_name)));
         dispatcher.apply(UserActions::SetMiddleName(richest_variant.middle_name));
         dispatcher.apply(UserActions::SetLastName(Some(richest_variant.last_name)));
+        dispatcher.apply(UserActions::SetDescription(richest_variant.description));
         dispatcher.apply(UserActions::SetProfilePicture(Some(richest_variant.profile_picture)));
         vec![]
     }
@@ -7020,6 +7120,7 @@ impl From<UserBuilder> for NewUser {
             first_name: builder.first_name.unwrap(),
             middle_name: builder.middle_name,
             last_name: builder.last_name.unwrap(),
+            description: builder.description,
             profile_picture: builder.profile_picture.unwrap(),
         }
     }
@@ -7031,6 +7132,7 @@ impl From<UserBuilder> for UpdateUser {
             first_name: builder.first_name.unwrap(),
             middle_name: builder.middle_name,
             last_name: builder.last_name.unwrap(),
+            description: builder.description,
             profile_picture: builder.profile_picture.unwrap(),
         }
     }
@@ -7073,6 +7175,7 @@ pub fn create_user_form() -> Html {
     let set_first_name = builder_dispatch.apply_callback(|first_name: Option<String>| UserActions::SetFirstName(first_name));
     let set_middle_name = builder_dispatch.apply_callback(|middle_name: Option<String>| UserActions::SetMiddleName(middle_name));
     let set_last_name = builder_dispatch.apply_callback(|last_name: Option<String>| UserActions::SetLastName(last_name));
+    let set_description = builder_dispatch.apply_callback(|description: Option<String>| UserActions::SetDescription(description));
     let set_profile_picture = builder_dispatch.apply_callback(|profile_picture: Option<Image>| UserActions::SetProfilePicture(profile_picture.map(|profile_picture| profile_picture.into())));
     html! {
         <BasicForm<NewUser>
@@ -7081,6 +7184,7 @@ pub fn create_user_form() -> Html {
             <BasicInput<String> label="First name" optional={false} errors={builder_store.errors_first_name.clone()} builder={set_first_name} value={builder_store.first_name.clone()} />
             <BasicInput<String> label="Middle name" optional={true} errors={builder_store.errors_middle_name.clone()} builder={set_middle_name} value={builder_store.middle_name.clone()} />
             <BasicInput<String> label="Last name" optional={false} errors={builder_store.errors_last_name.clone()} builder={set_last_name} value={builder_store.last_name.clone()} />
+            <BasicInput<String> label="Description" optional={true} errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
             <FileInput<Image> label="Profile picture" optional={false} errors={builder_store.errors_profile_picture.clone()} builder={set_profile_picture} allowed_formats={vec![GenericFileFormat::Image]} value={builder_store.profile_picture.clone().map(|profile_picture| profile_picture.into())} />
         </BasicForm<NewUser>>
     }
@@ -7100,6 +7204,7 @@ pub fn update_user_form(props: &UpdateUserFormProp) -> Html {
     let set_first_name = builder_dispatch.apply_callback(|first_name: Option<String>| UserActions::SetFirstName(first_name));
     let set_middle_name = builder_dispatch.apply_callback(|middle_name: Option<String>| UserActions::SetMiddleName(middle_name));
     let set_last_name = builder_dispatch.apply_callback(|last_name: Option<String>| UserActions::SetLastName(last_name));
+    let set_description = builder_dispatch.apply_callback(|description: Option<String>| UserActions::SetDescription(description));
     let set_profile_picture = builder_dispatch.apply_callback(|profile_picture: Option<Image>| UserActions::SetProfilePicture(profile_picture.map(|profile_picture| profile_picture.into())));
     html! {
         <BasicForm<UpdateUser>
@@ -7109,6 +7214,7 @@ pub fn update_user_form(props: &UpdateUserFormProp) -> Html {
             <BasicInput<String> label="First name" optional={false} errors={builder_store.errors_first_name.clone()} builder={set_first_name} value={builder_store.first_name.clone()} />
             <BasicInput<String> label="Middle name" optional={true} errors={builder_store.errors_middle_name.clone()} builder={set_middle_name} value={builder_store.middle_name.clone()} />
             <BasicInput<String> label="Last name" optional={false} errors={builder_store.errors_last_name.clone()} builder={set_last_name} value={builder_store.last_name.clone()} />
+            <BasicInput<String> label="Description" optional={true} errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
             <FileInput<Image> label="Profile picture" optional={false} errors={builder_store.errors_profile_picture.clone()} builder={set_profile_picture} allowed_formats={vec![GenericFileFormat::Image]} value={builder_store.profile_picture.clone().map(|profile_picture| profile_picture.into())} />
         </BasicForm<UpdateUser>>
     }

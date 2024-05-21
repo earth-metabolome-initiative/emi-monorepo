@@ -48,6 +48,7 @@ pub(crate) fn create_user(
     let new_user = NewUser {
         first_name: "".to_string(),
         middle_name: None,
+        description: None,
         last_name: "".to_string(),
         profile_picture: png_buffer,
     };

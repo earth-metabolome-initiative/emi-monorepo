@@ -89,6 +89,7 @@ impl UpdateRow for web_common::database::UpdateProject {
 pub(super) struct IntermediateUpdateSpectraCollection {
     updated_by: i32,
     id: i32,
+    notes: Option<String>,
     sample_id: Uuid,
 }
 
@@ -100,6 +101,7 @@ impl UpdateRow for web_common::database::UpdateSpectraCollection {
         IntermediateUpdateSpectraCollection {
             updated_by: user_id,
             id: self.id,
+            notes: self.notes,
             sample_id: self.sample_id,
         }
     }
@@ -165,6 +167,7 @@ pub(super) struct IntermediateUpdateUser {
     first_name: String,
     middle_name: Option<String>,
     last_name: String,
+    description: Option<String>,
     profile_picture: Vec<u8>,
 }
 
@@ -178,6 +181,7 @@ impl UpdateRow for web_common::database::UpdateUser {
             first_name: self.first_name,
             middle_name: self.middle_name,
             last_name: self.last_name,
+            description: self.description,
             profile_picture: self.profile_picture,
         }
     }
@@ -200,6 +204,7 @@ impl UpdateRow for web_common::database::UpdateUser {
 pub(super) struct IntermediateNewSampledIndividual {
     updated_by: i32,
     id: Uuid,
+    notes: Option<String>,
     tagged: bool,
 }
 
@@ -211,6 +216,7 @@ impl UpdateRow for web_common::database::NewSampledIndividual {
         IntermediateNewSampledIndividual {
             updated_by: user_id,
             id: self.id,
+            notes: self.notes,
             tagged: self.tagged,
         }
     }
@@ -233,6 +239,7 @@ impl UpdateRow for web_common::database::NewSampledIndividual {
 pub(super) struct IntermediateNewSample {
     updated_by: i32,
     barcode_id: Uuid,
+    notes: Option<String>,
     sampled_by: i32,
     state: i32,
 }
@@ -245,6 +252,7 @@ impl UpdateRow for web_common::database::NewSample {
         IntermediateNewSample {
             updated_by: user_id,
             barcode_id: self.barcode_id,
+            notes: self.notes,
             sampled_by: self.sampled_by,
             state: self.state,
         }

@@ -115,6 +115,7 @@ impl UpdateProject {
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct UpdateSpectraCollection {
     pub id: i32,
+    pub notes: Option<String>,
     pub sample_id: Uuid,
 }
 
@@ -127,6 +128,10 @@ impl UpdateSpectraCollection {
         vec![
             gluesql::core::ast_builder::num(updated_by),
             gluesql::core::ast_builder::num(self.id),
+            match self.notes {
+                Some(notes) => gluesql::core::ast_builder::text(notes),
+                None => gluesql::core::ast_builder::null(),
+            },
             gluesql::core::ast_builder::uuid(self.sample_id.to_string()),
         ]
     }
@@ -147,11 +152,15 @@ impl UpdateSpectraCollection {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
-        table("spectra_collections")
+        let mut update_row = table("spectra_collections")
             .update()        
 .set("id", gluesql::core::ast_builder::num(self.id))        
 .set("sample_id", gluesql::core::ast_builder::uuid(self.sample_id.to_string()))        
-.set("updated_by", gluesql::core::ast_builder::num(user_id))            .execute(connection)
+.set("updated_by", gluesql::core::ast_builder::num(user_id));
+        if let Some(notes) = self.notes {
+            update_row = update_row.set("notes", gluesql::core::ast_builder::text(notes));
+        }
+            update_row.execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -232,6 +241,7 @@ pub struct UpdateUser {
     pub first_name: String,
     pub middle_name: Option<String>,
     pub last_name: String,
+    pub description: Option<String>,
     pub profile_picture: Vec<u8>,
 }
 
@@ -249,6 +259,10 @@ impl UpdateUser {
                 None => gluesql::core::ast_builder::null(),
             },
             gluesql::core::ast_builder::text(self.last_name),
+            match self.description {
+                Some(description) => gluesql::core::ast_builder::text(description),
+                None => gluesql::core::ast_builder::null(),
+            },
             gluesql::core::ast_builder::bytea(self.profile_picture),
         ]
     }
@@ -275,6 +289,9 @@ impl UpdateUser {
 .set("profile_picture", gluesql::core::ast_builder::bytea(self.profile_picture));
         if let Some(middle_name) = self.middle_name {
             update_row = update_row.set("middle_name", gluesql::core::ast_builder::text(middle_name));
+        }
+        if let Some(description) = self.description {
+            update_row = update_row.set("description", gluesql::core::ast_builder::text(description));
         }
             update_row.execute(connection)
             .await

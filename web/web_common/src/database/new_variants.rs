@@ -115,6 +115,7 @@ impl Tabular for NewSampledIndividualBioOttTaxonItem {
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewSampledIndividual {
     pub id: Uuid,
+    pub notes: Option<String>,
     pub tagged: bool,
 }
 
@@ -127,6 +128,10 @@ impl NewSampledIndividual {
         vec![
             gluesql::core::ast_builder::num(created_by),
             gluesql::core::ast_builder::uuid(self.id.to_string()),
+            match self.notes {
+                Some(notes) => gluesql::core::ast_builder::text(notes),
+                None => gluesql::core::ast_builder::null(),
+            },
             (self.tagged.into()),
             gluesql::core::ast_builder::num(created_by),
         ]
@@ -151,7 +156,7 @@ impl NewSampledIndividual {
         let id = self.id;
         table("sampled_individuals")
             .insert()
-            .columns("created_by,id,tagged,updated_by")
+            .columns("created_by,id,notes,tagged,updated_by")
             .values(vec![self.into_row(created_by)])
             .execute(connection)
             .await
@@ -178,11 +183,15 @@ impl NewSampledIndividual {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
-        table("sampled_individuals")
+        let mut update_row = table("sampled_individuals")
             .update()        
 .set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
 .set("tagged", self.tagged)        
-.set("updated_by", gluesql::core::ast_builder::num(user_id))            .execute(connection)
+.set("updated_by", gluesql::core::ast_builder::num(user_id));
+        if let Some(notes) = self.notes {
+            update_row = update_row.set("notes", gluesql::core::ast_builder::text(notes));
+        }
+            update_row.execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -254,6 +263,7 @@ impl Tabular for NewSampledIndividualsUsersRole {
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewSample {
     pub barcode_id: Uuid,
+    pub notes: Option<String>,
     pub sampled_by: i32,
     pub state: i32,
 }
@@ -267,6 +277,10 @@ impl NewSample {
         vec![
             gluesql::core::ast_builder::num(created_by),
             gluesql::core::ast_builder::uuid(self.barcode_id.to_string()),
+            match self.notes {
+                Some(notes) => gluesql::core::ast_builder::text(notes),
+                None => gluesql::core::ast_builder::null(),
+            },
             gluesql::core::ast_builder::num(self.sampled_by),
             gluesql::core::ast_builder::num(self.state),
             gluesql::core::ast_builder::num(created_by),
@@ -292,7 +306,7 @@ impl NewSample {
         let barcode_id = self.barcode_id;
         table("samples")
             .insert()
-            .columns("created_by,barcode_id,sampled_by,state,updated_by")
+            .columns("created_by,barcode_id,notes,sampled_by,state,updated_by")
             .values(vec![self.into_row(created_by)])
             .execute(connection)
             .await
@@ -319,12 +333,16 @@ impl NewSample {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
-        table("samples")
+        let mut update_row = table("samples")
             .update()        
 .set("barcode_id", gluesql::core::ast_builder::uuid(self.barcode_id.to_string()))        
 .set("sampled_by", gluesql::core::ast_builder::num(self.sampled_by))        
 .set("state", gluesql::core::ast_builder::num(self.state))        
-.set("updated_by", gluesql::core::ast_builder::num(user_id))            .execute(connection)
+.set("updated_by", gluesql::core::ast_builder::num(user_id));
+        if let Some(notes) = self.notes {
+            update_row = update_row.set("notes", gluesql::core::ast_builder::text(notes));
+        }
+            update_row.execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -395,6 +413,7 @@ impl Tabular for NewSamplesUsersRole {
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewSpectraCollection {
+    pub notes: Option<String>,
     pub sample_id: Uuid,
 }
 
@@ -528,6 +547,7 @@ pub struct NewUser {
     pub first_name: String,
     pub middle_name: Option<String>,
     pub last_name: String,
+    pub description: Option<String>,
     pub profile_picture: Vec<u8>,
 }
 
