@@ -49,6 +49,10 @@ class AttributeMetadata:
             reference=self.reference,
         )
 
+    def is_image_blob(self) -> bool:
+        """Returns whether the attribute is an image blob."""
+        return "picture" in self.name and self.data_type() == "Vec<u8>"
+
     def is_undefined_nested_dependencies(self) -> bool:
         return not self.has_struct_data_type() and self.data_type().startswith("Nested")
 
@@ -801,6 +805,61 @@ class StructMetadata:
         a combination of foreign keys.
         """
         return len(self.get_primary_keys()) > 1
+
+    def get_editability_determinant_column(self) -> Optional[AttributeMetadata]:
+        """Returns the column that determines the editability of the struct.
+
+        Implementation details
+        -----------------------
+        The column that determines the editability of the struct is the
+        column that is a foreign key to the users table.
+        """
+        if self._flat_variant is not None:
+            return self._flat_variant.get_editability_determinant_column()
+
+        if not self.has_foreign_keys():
+            return None
+        
+        for attribute in self.get_foreign_keys():
+            # We retrieve the table name associated to the foreign key.
+            foreign_key_table = StructMetadata.table_metadata.get_foreign_key_table_name(
+                self.table_name, attribute.name
+            )
+            if foreign_key_table in ("projects",):
+                return attribute
+        
+        return None
+
+    def editability_may_depend_on_parent_column(self) -> bool:
+        """Returns whether the editability of the struct may depend on the parent column.
+
+        Implementation details
+        -----------------------
+        The editability of the struct may depend on the parent column if the
+        struct is a child variant and the parent variant is a new variant.
+        """
+        if self._flat_variant is not None:
+            return self._flat_variant.editability_may_depend_on_parent_column()
+
+        return self.get_editability_determinant_column() is not None
+
+    def editability_always_depend_on_parent_column(self) -> bool:
+        """Returns whether the editability of the struct depends on the parent column.
+
+        Implementation details
+        -----------------------
+        The editability of the struct depends on the parent column if the
+        struct is a child variant and the parent variant is not a new variant.
+        """
+        if self._flat_variant is not None:
+            return self._flat_variant.editability_always_depend_on_parent_column()
+
+        determinant_column = self.get_editability_determinant_column()
+
+        if determinant_column is None:
+            return False
+
+        return not determinant_column.optional
 
     def get_formatted_primary_keys(
         self,

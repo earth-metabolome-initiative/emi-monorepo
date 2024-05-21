@@ -28,6 +28,11 @@ pub fn sidebar(props: &SidebarProps) -> Html {
         <div class={sidebar_class}>
             <div class="sidebar-content">
                 <ul>
+                    <li class={if route == AppRoute::Observations { "active" } else { "" }}>
+                        <Link<AppRoute> to={AppRoute::Observations}>
+                            {"Observations"}
+                        </Link<AppRoute>>
+                    </li>
                     <li class={if route == AppRoute::Projects { "active" } else { "" }}>
                         <Link<AppRoute> to={AppRoute::Projects}>
                             {"Projects"}

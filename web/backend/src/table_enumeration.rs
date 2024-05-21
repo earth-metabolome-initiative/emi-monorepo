@@ -127,6 +127,7 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::FontAwesomeIcons => FontAwesomeIcon::similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::LoginProviders => unimplemented!("Table `login_providers` does not have a GIN similarity index."),
             web_common::database::Table::Notifications => unimplemented!("Table `notifications` does not have a GIN similarity index."),
+            web_common::database::Table::Observations => NestedObservation::similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::Organizations => NestedOrganization::similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::ProjectStates => NestedProjectState::similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::Projects => NestedProject::similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
@@ -141,12 +142,6 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::SampleStates => NestedSampleState::similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SampledIndividualBioOttTaxonItems => unimplemented!("Table `sampled_individual_bio_ott_taxon_items` does not have a GIN similarity index."),
             web_common::database::Table::SampledIndividuals => NestedSampledIndividual::similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::SampledIndividualsTeamsRoleInvitations => unimplemented!("Table `sampled_individuals_teams_role_invitations` does not have a GIN similarity index."),
-            web_common::database::Table::SampledIndividualsTeamsRoleRequests => unimplemented!("Table `sampled_individuals_teams_role_requests` does not have a GIN similarity index."),
-            web_common::database::Table::SampledIndividualsTeamsRoles => unimplemented!("Table `sampled_individuals_teams_roles` does not have a GIN similarity index."),
-            web_common::database::Table::SampledIndividualsUsersRoleInvitations => unimplemented!("Table `sampled_individuals_users_role_invitations` does not have a GIN similarity index."),
-            web_common::database::Table::SampledIndividualsUsersRoleRequests => unimplemented!("Table `sampled_individuals_users_role_requests` does not have a GIN similarity index."),
-            web_common::database::Table::SampledIndividualsUsersRoles => unimplemented!("Table `sampled_individuals_users_roles` does not have a GIN similarity index."),
             web_common::database::Table::Samples => NestedSample::similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SamplesTeamsRoleInvitations => unimplemented!("Table `samples_teams_role_invitations` does not have a GIN similarity index."),
             web_common::database::Table::SamplesTeamsRoleRequests => unimplemented!("Table `samples_teams_role_requests` does not have a GIN similarity index."),
@@ -187,6 +182,7 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::FontAwesomeIcons => unimplemented!("Table `font_awesome_icons` does not have associated roles."),
             web_common::database::Table::LoginProviders => unimplemented!("Table `login_providers` does not have a GIN similarity index."),
             web_common::database::Table::Notifications => unimplemented!("Table `notifications` does not have a GIN similarity index."),
+            web_common::database::Table::Observations => unimplemented!("Table `observations` does not have associated roles."),
             web_common::database::Table::Organizations => unimplemented!("Table `organizations` does not have associated roles."),
             web_common::database::Table::ProjectStates => unimplemented!("Table `project_states` does not have associated roles."),
             web_common::database::Table::Projects => NestedProject::similarity_search_editables(user_id, query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
@@ -200,13 +196,7 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Table `sample_bio_ott_taxon_items` does not have a GIN similarity index."),
             web_common::database::Table::SampleStates => unimplemented!("Table `sample_states` does not have associated roles."),
             web_common::database::Table::SampledIndividualBioOttTaxonItems => unimplemented!("Table `sampled_individual_bio_ott_taxon_items` does not have a GIN similarity index."),
-            web_common::database::Table::SampledIndividuals => NestedSampledIndividual::similarity_search_editables(user_id, query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::SampledIndividualsTeamsRoleInvitations => unimplemented!("Table `sampled_individuals_teams_role_invitations` does not have a GIN similarity index."),
-            web_common::database::Table::SampledIndividualsTeamsRoleRequests => unimplemented!("Table `sampled_individuals_teams_role_requests` does not have a GIN similarity index."),
-            web_common::database::Table::SampledIndividualsTeamsRoles => unimplemented!("Table `sampled_individuals_teams_roles` does not have a GIN similarity index."),
-            web_common::database::Table::SampledIndividualsUsersRoleInvitations => unimplemented!("Table `sampled_individuals_users_role_invitations` does not have a GIN similarity index."),
-            web_common::database::Table::SampledIndividualsUsersRoleRequests => unimplemented!("Table `sampled_individuals_users_role_requests` does not have a GIN similarity index."),
-            web_common::database::Table::SampledIndividualsUsersRoles => unimplemented!("Table `sampled_individuals_users_roles` does not have a GIN similarity index."),
+            web_common::database::Table::SampledIndividuals => unimplemented!("Table `sampled_individuals` does not have associated roles."),
             web_common::database::Table::Samples => NestedSample::similarity_search_editables(user_id, query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SamplesTeamsRoleInvitations => unimplemented!("Table `samples_teams_role_invitations` does not have a GIN similarity index."),
             web_common::database::Table::SamplesTeamsRoleRequests => unimplemented!("Table `samples_teams_role_requests` does not have a GIN similarity index."),
@@ -247,6 +237,7 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::FontAwesomeIcons => FontAwesomeIcon::word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::LoginProviders => unimplemented!("Table `login_providers` does not have a GIN similarity index."),
             web_common::database::Table::Notifications => unimplemented!("Table `notifications` does not have a GIN similarity index."),
+            web_common::database::Table::Observations => NestedObservation::word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::Organizations => NestedOrganization::word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::ProjectStates => NestedProjectState::word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::Projects => NestedProject::word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
@@ -261,12 +252,6 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::SampleStates => NestedSampleState::word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SampledIndividualBioOttTaxonItems => unimplemented!("Table `sampled_individual_bio_ott_taxon_items` does not have a GIN similarity index."),
             web_common::database::Table::SampledIndividuals => NestedSampledIndividual::word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::SampledIndividualsTeamsRoleInvitations => unimplemented!("Table `sampled_individuals_teams_role_invitations` does not have a GIN similarity index."),
-            web_common::database::Table::SampledIndividualsTeamsRoleRequests => unimplemented!("Table `sampled_individuals_teams_role_requests` does not have a GIN similarity index."),
-            web_common::database::Table::SampledIndividualsTeamsRoles => unimplemented!("Table `sampled_individuals_teams_roles` does not have a GIN similarity index."),
-            web_common::database::Table::SampledIndividualsUsersRoleInvitations => unimplemented!("Table `sampled_individuals_users_role_invitations` does not have a GIN similarity index."),
-            web_common::database::Table::SampledIndividualsUsersRoleRequests => unimplemented!("Table `sampled_individuals_users_role_requests` does not have a GIN similarity index."),
-            web_common::database::Table::SampledIndividualsUsersRoles => unimplemented!("Table `sampled_individuals_users_roles` does not have a GIN similarity index."),
             web_common::database::Table::Samples => NestedSample::word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SamplesTeamsRoleInvitations => unimplemented!("Table `samples_teams_role_invitations` does not have a GIN similarity index."),
             web_common::database::Table::SamplesTeamsRoleRequests => unimplemented!("Table `samples_teams_role_requests` does not have a GIN similarity index."),
@@ -307,6 +292,7 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::FontAwesomeIcons => unimplemented!("Table `font_awesome_icons` does not have associated roles."),
             web_common::database::Table::LoginProviders => unimplemented!("Table `login_providers` does not have a GIN similarity index."),
             web_common::database::Table::Notifications => unimplemented!("Table `notifications` does not have a GIN similarity index."),
+            web_common::database::Table::Observations => unimplemented!("Table `observations` does not have associated roles."),
             web_common::database::Table::Organizations => unimplemented!("Table `organizations` does not have associated roles."),
             web_common::database::Table::ProjectStates => unimplemented!("Table `project_states` does not have associated roles."),
             web_common::database::Table::Projects => NestedProject::word_similarity_search_editables(user_id, query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
@@ -320,13 +306,7 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Table `sample_bio_ott_taxon_items` does not have a GIN similarity index."),
             web_common::database::Table::SampleStates => unimplemented!("Table `sample_states` does not have associated roles."),
             web_common::database::Table::SampledIndividualBioOttTaxonItems => unimplemented!("Table `sampled_individual_bio_ott_taxon_items` does not have a GIN similarity index."),
-            web_common::database::Table::SampledIndividuals => NestedSampledIndividual::word_similarity_search_editables(user_id, query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::SampledIndividualsTeamsRoleInvitations => unimplemented!("Table `sampled_individuals_teams_role_invitations` does not have a GIN similarity index."),
-            web_common::database::Table::SampledIndividualsTeamsRoleRequests => unimplemented!("Table `sampled_individuals_teams_role_requests` does not have a GIN similarity index."),
-            web_common::database::Table::SampledIndividualsTeamsRoles => unimplemented!("Table `sampled_individuals_teams_roles` does not have a GIN similarity index."),
-            web_common::database::Table::SampledIndividualsUsersRoleInvitations => unimplemented!("Table `sampled_individuals_users_role_invitations` does not have a GIN similarity index."),
-            web_common::database::Table::SampledIndividualsUsersRoleRequests => unimplemented!("Table `sampled_individuals_users_role_requests` does not have a GIN similarity index."),
-            web_common::database::Table::SampledIndividualsUsersRoles => unimplemented!("Table `sampled_individuals_users_roles` does not have a GIN similarity index."),
+            web_common::database::Table::SampledIndividuals => unimplemented!("Table `sampled_individuals` does not have associated roles."),
             web_common::database::Table::Samples => NestedSample::word_similarity_search_editables(user_id, query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SamplesTeamsRoleInvitations => unimplemented!("Table `samples_teams_role_invitations` does not have a GIN similarity index."),
             web_common::database::Table::SamplesTeamsRoleRequests => unimplemented!("Table `samples_teams_role_requests` does not have a GIN similarity index."),
@@ -367,6 +347,7 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::FontAwesomeIcons => FontAwesomeIcon::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::LoginProviders => unimplemented!("Table `login_providers` does not have a GIN similarity index."),
             web_common::database::Table::Notifications => unimplemented!("Table `notifications` does not have a GIN similarity index."),
+            web_common::database::Table::Observations => NestedObservation::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::Organizations => NestedOrganization::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::ProjectStates => NestedProjectState::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::Projects => NestedProject::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
@@ -381,12 +362,6 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::SampleStates => NestedSampleState::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SampledIndividualBioOttTaxonItems => unimplemented!("Table `sampled_individual_bio_ott_taxon_items` does not have a GIN similarity index."),
             web_common::database::Table::SampledIndividuals => NestedSampledIndividual::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::SampledIndividualsTeamsRoleInvitations => unimplemented!("Table `sampled_individuals_teams_role_invitations` does not have a GIN similarity index."),
-            web_common::database::Table::SampledIndividualsTeamsRoleRequests => unimplemented!("Table `sampled_individuals_teams_role_requests` does not have a GIN similarity index."),
-            web_common::database::Table::SampledIndividualsTeamsRoles => unimplemented!("Table `sampled_individuals_teams_roles` does not have a GIN similarity index."),
-            web_common::database::Table::SampledIndividualsUsersRoleInvitations => unimplemented!("Table `sampled_individuals_users_role_invitations` does not have a GIN similarity index."),
-            web_common::database::Table::SampledIndividualsUsersRoleRequests => unimplemented!("Table `sampled_individuals_users_role_requests` does not have a GIN similarity index."),
-            web_common::database::Table::SampledIndividualsUsersRoles => unimplemented!("Table `sampled_individuals_users_roles` does not have a GIN similarity index."),
             web_common::database::Table::Samples => NestedSample::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SamplesTeamsRoleInvitations => unimplemented!("Table `samples_teams_role_invitations` does not have a GIN similarity index."),
             web_common::database::Table::SamplesTeamsRoleRequests => unimplemented!("Table `samples_teams_role_requests` does not have a GIN similarity index."),
@@ -427,6 +402,7 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::FontAwesomeIcons => unimplemented!("Table `font_awesome_icons` does not have associated roles."),
             web_common::database::Table::LoginProviders => unimplemented!("Table `login_providers` does not have a GIN similarity index."),
             web_common::database::Table::Notifications => unimplemented!("Table `notifications` does not have a GIN similarity index."),
+            web_common::database::Table::Observations => unimplemented!("Table `observations` does not have associated roles."),
             web_common::database::Table::Organizations => unimplemented!("Table `organizations` does not have associated roles."),
             web_common::database::Table::ProjectStates => unimplemented!("Table `project_states` does not have associated roles."),
             web_common::database::Table::Projects => NestedProject::strict_word_similarity_search_editables(user_id, query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
@@ -440,13 +416,7 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Table `sample_bio_ott_taxon_items` does not have a GIN similarity index."),
             web_common::database::Table::SampleStates => unimplemented!("Table `sample_states` does not have associated roles."),
             web_common::database::Table::SampledIndividualBioOttTaxonItems => unimplemented!("Table `sampled_individual_bio_ott_taxon_items` does not have a GIN similarity index."),
-            web_common::database::Table::SampledIndividuals => NestedSampledIndividual::strict_word_similarity_search_editables(user_id, query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
-            web_common::database::Table::SampledIndividualsTeamsRoleInvitations => unimplemented!("Table `sampled_individuals_teams_role_invitations` does not have a GIN similarity index."),
-            web_common::database::Table::SampledIndividualsTeamsRoleRequests => unimplemented!("Table `sampled_individuals_teams_role_requests` does not have a GIN similarity index."),
-            web_common::database::Table::SampledIndividualsTeamsRoles => unimplemented!("Table `sampled_individuals_teams_roles` does not have a GIN similarity index."),
-            web_common::database::Table::SampledIndividualsUsersRoleInvitations => unimplemented!("Table `sampled_individuals_users_role_invitations` does not have a GIN similarity index."),
-            web_common::database::Table::SampledIndividualsUsersRoleRequests => unimplemented!("Table `sampled_individuals_users_role_requests` does not have a GIN similarity index."),
-            web_common::database::Table::SampledIndividualsUsersRoles => unimplemented!("Table `sampled_individuals_users_roles` does not have a GIN similarity index."),
+            web_common::database::Table::SampledIndividuals => unimplemented!("Table `sampled_individuals` does not have associated roles."),
             web_common::database::Table::Samples => NestedSample::strict_word_similarity_search_editables(user_id, query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SamplesTeamsRoleInvitations => unimplemented!("Table `samples_teams_role_invitations` does not have a GIN similarity index."),
             web_common::database::Table::SamplesTeamsRoleRequests => unimplemented!("Table `samples_teams_role_requests` does not have a GIN similarity index."),
@@ -511,6 +481,7 @@ impl IdentifiableTable for web_common::database::Table {
             web_common::database::Table::FontAwesomeIcons => bincode::serialize(&FontAwesomeIcon::get(primary_key.into(), connection)?)?,
             web_common::database::Table::LoginProviders => bincode::serialize(&NestedLoginProvider::get(primary_key.into(), connection)?)?,
             web_common::database::Table::Notifications => bincode::serialize(&NestedNotification::get(primary_key.into(), connection)?)?,
+            web_common::database::Table::Observations => bincode::serialize(&NestedObservation::get(primary_key.into(), connection)?)?,
             web_common::database::Table::Organizations => bincode::serialize(&NestedOrganization::get(primary_key.into(), connection)?)?,
             web_common::database::Table::ProjectStates => bincode::serialize(&NestedProjectState::get(primary_key.into(), connection)?)?,
             web_common::database::Table::Projects => bincode::serialize(&NestedProject::get(primary_key.into(), connection)?)?,
@@ -525,12 +496,6 @@ impl IdentifiableTable for web_common::database::Table {
             web_common::database::Table::SampleStates => bincode::serialize(&NestedSampleState::get(primary_key.into(), connection)?)?,
             web_common::database::Table::SampledIndividualBioOttTaxonItems => bincode::serialize(&NestedSampledIndividualBioOttTaxonItem::get(primary_key.into(), connection)?)?,
             web_common::database::Table::SampledIndividuals => bincode::serialize(&NestedSampledIndividual::get(primary_key.into(), connection)?)?,
-            web_common::database::Table::SampledIndividualsTeamsRoleInvitations => bincode::serialize(&NestedSampledIndividualsTeamsRoleInvitation::get(primary_key.into(), connection)?)?,
-            web_common::database::Table::SampledIndividualsTeamsRoleRequests => bincode::serialize(&NestedSampledIndividualsTeamsRoleRequest::get(primary_key.into(), connection)?)?,
-            web_common::database::Table::SampledIndividualsTeamsRoles => bincode::serialize(&NestedSampledIndividualsTeamsRole::get(primary_key.into(), connection)?)?,
-            web_common::database::Table::SampledIndividualsUsersRoleInvitations => bincode::serialize(&NestedSampledIndividualsUsersRoleInvitation::get(primary_key.into(), connection)?)?,
-            web_common::database::Table::SampledIndividualsUsersRoleRequests => bincode::serialize(&NestedSampledIndividualsUsersRoleRequest::get(primary_key.into(), connection)?)?,
-            web_common::database::Table::SampledIndividualsUsersRoles => bincode::serialize(&NestedSampledIndividualsUsersRole::get(primary_key.into(), connection)?)?,
             web_common::database::Table::Samples => bincode::serialize(&NestedSample::get(primary_key.into(), connection)?)?,
             web_common::database::Table::SamplesTeamsRoleInvitations => bincode::serialize(&NestedSamplesTeamsRoleInvitation::get(primary_key.into(), connection)?)?,
             web_common::database::Table::SamplesTeamsRoleRequests => bincode::serialize(&NestedSamplesTeamsRoleRequest::get(primary_key.into(), connection)?)?,
@@ -598,6 +563,7 @@ impl ViewableTable for web_common::database::Table {
             web_common::database::Table::FontAwesomeIcons => true,
             web_common::database::Table::LoginProviders => true,
             web_common::database::Table::Notifications => true,
+            web_common::database::Table::Observations => true,
             web_common::database::Table::Organizations => true,
             web_common::database::Table::ProjectStates => true,
             web_common::database::Table::Projects => {
@@ -615,12 +581,6 @@ impl ViewableTable for web_common::database::Table {
             web_common::database::Table::SampleStates => true,
             web_common::database::Table::SampledIndividualBioOttTaxonItems => true,
             web_common::database::Table::SampledIndividuals => true,
-            web_common::database::Table::SampledIndividualsTeamsRoleInvitations => true,
-            web_common::database::Table::SampledIndividualsTeamsRoleRequests => true,
-            web_common::database::Table::SampledIndividualsTeamsRoles => true,
-            web_common::database::Table::SampledIndividualsUsersRoleInvitations => true,
-            web_common::database::Table::SampledIndividualsUsersRoleRequests => true,
-            web_common::database::Table::SampledIndividualsUsersRoles => true,
             web_common::database::Table::Samples => true,
             web_common::database::Table::SamplesTeamsRoleInvitations => true,
             web_common::database::Table::SamplesTeamsRoleRequests => true,
@@ -688,6 +648,7 @@ impl EditableTable for web_common::database::Table {
             web_common::database::Table::FontAwesomeIcons => false,
             web_common::database::Table::LoginProviders => false,
             web_common::database::Table::Notifications => false,
+            web_common::database::Table::Observations => false,
             web_common::database::Table::Organizations => false,
             web_common::database::Table::ProjectStates => false,
             web_common::database::Table::Projects => Project::is_editor_by_id(primary_key.into(), user_id, connection)?,
@@ -701,13 +662,7 @@ impl EditableTable for web_common::database::Table {
             web_common::database::Table::SampleBioOttTaxonItems => false,
             web_common::database::Table::SampleStates => false,
             web_common::database::Table::SampledIndividualBioOttTaxonItems => false,
-            web_common::database::Table::SampledIndividuals => SampledIndividual::is_editor_by_id(primary_key.into(), user_id, connection)?,
-            web_common::database::Table::SampledIndividualsTeamsRoleInvitations => false,
-            web_common::database::Table::SampledIndividualsTeamsRoleRequests => false,
-            web_common::database::Table::SampledIndividualsTeamsRoles => false,
-            web_common::database::Table::SampledIndividualsUsersRoleInvitations => false,
-            web_common::database::Table::SampledIndividualsUsersRoleRequests => false,
-            web_common::database::Table::SampledIndividualsUsersRoles => false,
+            web_common::database::Table::SampledIndividuals => false,
             web_common::database::Table::Samples => Sample::is_editor_by_id(primary_key.into(), user_id, connection)?,
             web_common::database::Table::SamplesTeamsRoleInvitations => false,
             web_common::database::Table::SamplesTeamsRoleRequests => false,
@@ -794,6 +749,7 @@ impl DeletableTable for web_common::database::Table {
             web_common::database::Table::FontAwesomeIcons => false,
             web_common::database::Table::LoginProviders => false,
             web_common::database::Table::Notifications => false,
+            web_common::database::Table::Observations => false,
             web_common::database::Table::Organizations => false,
             web_common::database::Table::ProjectStates => false,
             web_common::database::Table::Projects => Project::is_admin_by_id(primary_key.into(), user_id, connection)?,
@@ -807,13 +763,7 @@ impl DeletableTable for web_common::database::Table {
             web_common::database::Table::SampleBioOttTaxonItems => false,
             web_common::database::Table::SampleStates => false,
             web_common::database::Table::SampledIndividualBioOttTaxonItems => false,
-            web_common::database::Table::SampledIndividuals => SampledIndividual::is_admin_by_id(primary_key.into(), user_id, connection)?,
-            web_common::database::Table::SampledIndividualsTeamsRoleInvitations => false,
-            web_common::database::Table::SampledIndividualsTeamsRoleRequests => false,
-            web_common::database::Table::SampledIndividualsTeamsRoles => false,
-            web_common::database::Table::SampledIndividualsUsersRoleInvitations => false,
-            web_common::database::Table::SampledIndividualsUsersRoleRequests => false,
-            web_common::database::Table::SampledIndividualsUsersRoles => false,
+            web_common::database::Table::SampledIndividuals => false,
             web_common::database::Table::Samples => Sample::is_admin_by_id(primary_key.into(), user_id, connection)?,
             web_common::database::Table::SamplesTeamsRoleInvitations => false,
             web_common::database::Table::SamplesTeamsRoleRequests => false,
@@ -862,6 +812,7 @@ impl DeletableTable for web_common::database::Table {
             web_common::database::Table::FontAwesomeIcons => unimplemented!("Delete not implemented for font_awesome_icons."),
             web_common::database::Table::LoginProviders => unimplemented!("Delete not implemented for login_providers."),
             web_common::database::Table::Notifications => unimplemented!("Delete not implemented for notifications."),
+            web_common::database::Table::Observations => unimplemented!("Delete not implemented for observations."),
             web_common::database::Table::Organizations => unimplemented!("Delete not implemented for organizations."),
             web_common::database::Table::ProjectStates => unimplemented!("Delete not implemented for project_states."),
             web_common::database::Table::Projects => Project::delete_by_id(primary_key.into(), author_user_id, connection)?,
@@ -875,13 +826,7 @@ impl DeletableTable for web_common::database::Table {
             web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Delete not implemented for sample_bio_ott_taxon_items."),
             web_common::database::Table::SampleStates => unimplemented!("Delete not implemented for sample_states."),
             web_common::database::Table::SampledIndividualBioOttTaxonItems => unimplemented!("Delete not implemented for sampled_individual_bio_ott_taxon_items."),
-            web_common::database::Table::SampledIndividuals => SampledIndividual::delete_by_id(primary_key.into(), author_user_id, connection)?,
-            web_common::database::Table::SampledIndividualsTeamsRoleInvitations => unimplemented!("Delete not implemented for sampled_individuals_teams_role_invitations."),
-            web_common::database::Table::SampledIndividualsTeamsRoleRequests => unimplemented!("Delete not implemented for sampled_individuals_teams_role_requests."),
-            web_common::database::Table::SampledIndividualsTeamsRoles => unimplemented!("Delete not implemented for sampled_individuals_teams_roles."),
-            web_common::database::Table::SampledIndividualsUsersRoleInvitations => unimplemented!("Delete not implemented for sampled_individuals_users_role_invitations."),
-            web_common::database::Table::SampledIndividualsUsersRoleRequests => unimplemented!("Delete not implemented for sampled_individuals_users_role_requests."),
-            web_common::database::Table::SampledIndividualsUsersRoles => unimplemented!("Delete not implemented for sampled_individuals_users_roles."),
+            web_common::database::Table::SampledIndividuals => unimplemented!("Delete not implemented for sampled_individuals."),
             web_common::database::Table::Samples => Sample::delete_by_id(primary_key.into(), author_user_id, connection)?,
             web_common::database::Table::SamplesTeamsRoleInvitations => unimplemented!("Delete not implemented for samples_teams_role_invitations."),
             web_common::database::Table::SamplesTeamsRoleRequests => unimplemented!("Delete not implemented for samples_teams_role_requests."),
@@ -970,6 +915,9 @@ NestedLoginProvider::all(filter.as_ref(), limit, offset, connection)?.iter().map
             web_common::database::Table::Notifications => {let filter: Option<web_common::database::NotificationFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::NotificationFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
 NestedNotification::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
 },
+            web_common::database::Table::Observations => {let filter: Option<web_common::database::ObservationFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::ObservationFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedObservation::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
             web_common::database::Table::Organizations => {let filter: Option<web_common::database::OrganizationFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::OrganizationFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
 NestedOrganization::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
 },
@@ -1011,24 +959,6 @@ NestedSampledIndividualBioOttTaxonItem::all(filter.as_ref(), limit, offset, conn
 },
             web_common::database::Table::SampledIndividuals => {let filter: Option<web_common::database::SampledIndividualFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SampledIndividualFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
 NestedSampledIndividual::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
-},
-            web_common::database::Table::SampledIndividualsTeamsRoleInvitations => {let filter: Option<web_common::database::SampledIndividualsTeamsRoleInvitationFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SampledIndividualsTeamsRoleInvitationFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
-NestedSampledIndividualsTeamsRoleInvitation::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
-},
-            web_common::database::Table::SampledIndividualsTeamsRoleRequests => {let filter: Option<web_common::database::SampledIndividualsTeamsRoleRequestFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SampledIndividualsTeamsRoleRequestFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
-NestedSampledIndividualsTeamsRoleRequest::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
-},
-            web_common::database::Table::SampledIndividualsTeamsRoles => {let filter: Option<web_common::database::SampledIndividualsTeamsRoleFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SampledIndividualsTeamsRoleFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
-NestedSampledIndividualsTeamsRole::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
-},
-            web_common::database::Table::SampledIndividualsUsersRoleInvitations => {let filter: Option<web_common::database::SampledIndividualsUsersRoleInvitationFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SampledIndividualsUsersRoleInvitationFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
-NestedSampledIndividualsUsersRoleInvitation::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
-},
-            web_common::database::Table::SampledIndividualsUsersRoleRequests => {let filter: Option<web_common::database::SampledIndividualsUsersRoleRequestFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SampledIndividualsUsersRoleRequestFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
-NestedSampledIndividualsUsersRoleRequest::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
-},
-            web_common::database::Table::SampledIndividualsUsersRoles => {let filter: Option<web_common::database::SampledIndividualsUsersRoleFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SampledIndividualsUsersRoleFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
-NestedSampledIndividualsUsersRole::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
 },
             web_common::database::Table::Samples => {let filter: Option<web_common::database::SampleFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SampleFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
 NestedSample::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
@@ -1154,6 +1084,9 @@ impl AllByUpdatedAtTable for web_common::database::Table {
             web_common::database::Table::FontAwesomeIcons => unimplemented!("all_by_updated_at not implemented for font_awesome_icons."),
             web_common::database::Table::LoginProviders => unimplemented!("all_by_updated_at not implemented for login_providers."),
             web_common::database::Table::Notifications => unimplemented!("all_by_updated_at not implemented for notifications."),
+            web_common::database::Table::Observations => {let filter: Option<web_common::database::ObservationFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::ObservationFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedObservation::all_by_updated_at(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
             web_common::database::Table::Organizations => unimplemented!("all_by_updated_at not implemented for organizations."),
             web_common::database::Table::ProjectStates => unimplemented!("all_by_updated_at not implemented for project_states."),
             web_common::database::Table::Projects => {let filter: Option<web_common::database::ProjectFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::ProjectFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
@@ -1172,12 +1105,6 @@ NestedProject::all_by_updated_at(filter.as_ref(), limit, offset, connection)?.it
             web_common::database::Table::SampledIndividuals => {let filter: Option<web_common::database::SampledIndividualFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SampledIndividualFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
 NestedSampledIndividual::all_by_updated_at(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
 },
-            web_common::database::Table::SampledIndividualsTeamsRoleInvitations => unimplemented!("all_by_updated_at not implemented for sampled_individuals_teams_role_invitations."),
-            web_common::database::Table::SampledIndividualsTeamsRoleRequests => unimplemented!("all_by_updated_at not implemented for sampled_individuals_teams_role_requests."),
-            web_common::database::Table::SampledIndividualsTeamsRoles => unimplemented!("all_by_updated_at not implemented for sampled_individuals_teams_roles."),
-            web_common::database::Table::SampledIndividualsUsersRoleInvitations => unimplemented!("all_by_updated_at not implemented for sampled_individuals_users_role_invitations."),
-            web_common::database::Table::SampledIndividualsUsersRoleRequests => unimplemented!("all_by_updated_at not implemented for sampled_individuals_users_role_requests."),
-            web_common::database::Table::SampledIndividualsUsersRoles => unimplemented!("all_by_updated_at not implemented for sampled_individuals_users_roles."),
             web_common::database::Table::Samples => {let filter: Option<web_common::database::SampleFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SampleFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
 NestedSample::all_by_updated_at(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
 },
@@ -1253,6 +1180,12 @@ impl InsertableTable for web_common::database::Table {
             web_common::database::Table::FontAwesomeIcons => unreachable!("Table `font_awesome_icons` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::LoginProviders => unreachable!("Table `login_providers` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::Notifications => unreachable!("Table `notifications` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::Observations => {
+                let row: web_common::database::NewObservation = bincode::deserialize::<web_common::database::NewObservation>(&row).map_err(web_common::api::ApiError::from)?;
+                let inserted_row: crate::models::Observation = <web_common::database::NewObservation as InsertRow>::insert(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedObservation::from_flat(inserted_row, connection)?;
+                 bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
+            },
             web_common::database::Table::Organizations => unreachable!("Table `organizations` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::ProjectStates => unreachable!("Table `project_states` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::Projects => {
@@ -1277,12 +1210,6 @@ impl InsertableTable for web_common::database::Table {
                 let nested_row = crate::nested_models::NestedSampledIndividual::from_flat(inserted_row, connection)?;
                  bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
             },
-            web_common::database::Table::SampledIndividualsTeamsRoleInvitations => unreachable!("Table `sampled_individuals_teams_role_invitations` is not insertable as it does not have a known column associated to a creator user id."),
-            web_common::database::Table::SampledIndividualsTeamsRoleRequests => unreachable!("Table `sampled_individuals_teams_role_requests` is not insertable as it does not have a known column associated to a creator user id."),
-            web_common::database::Table::SampledIndividualsTeamsRoles => unreachable!("Table `sampled_individuals_teams_roles` is not insertable as it does not have a known column associated to a creator user id."),
-            web_common::database::Table::SampledIndividualsUsersRoleInvitations => unreachable!("Table `sampled_individuals_users_role_invitations` is not insertable as it does not have a known column associated to a creator user id."),
-            web_common::database::Table::SampledIndividualsUsersRoleRequests => unreachable!("Table `sampled_individuals_users_role_requests` is not insertable as it does not have a known column associated to a creator user id."),
-            web_common::database::Table::SampledIndividualsUsersRoles => unreachable!("Table `sampled_individuals_users_roles` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::Samples => {
                 let row: web_common::database::NewSample = bincode::deserialize::<web_common::database::NewSample>(&row).map_err(web_common::api::ApiError::from)?;
                 let inserted_row: crate::models::Sample = <web_common::database::NewSample as InsertRow>::insert(row, user_id, connection)?;
@@ -1374,6 +1301,12 @@ impl UpdatableTable for web_common::database::Table {
             web_common::database::Table::FontAwesomeIcons => unreachable!("Table `font_awesome_icons` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::LoginProviders => unreachable!("Table `login_providers` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::Notifications => unreachable!("Table `notifications` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::Observations => {
+                let row: web_common::database::NewObservation = bincode::deserialize::<web_common::database::NewObservation>(&row).map_err(web_common::api::ApiError::from)?;
+                let updated_row: crate::models::Observation = <web_common::database::NewObservation as UpdateRow>::update(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedObservation::from_flat(updated_row, connection)?;
+                 bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
+            },
             web_common::database::Table::Organizations => unreachable!("Table `organizations` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::ProjectStates => unreachable!("Table `project_states` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::Projects => {
@@ -1398,12 +1331,6 @@ impl UpdatableTable for web_common::database::Table {
                 let nested_row = crate::nested_models::NestedSampledIndividual::from_flat(updated_row, connection)?;
                  bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
             },
-            web_common::database::Table::SampledIndividualsTeamsRoleInvitations => unreachable!("Table `sampled_individuals_teams_role_invitations` is not updatable as it does not have a known column associated to an updater user id."),
-            web_common::database::Table::SampledIndividualsTeamsRoleRequests => unreachable!("Table `sampled_individuals_teams_role_requests` is not updatable as it does not have a known column associated to an updater user id."),
-            web_common::database::Table::SampledIndividualsTeamsRoles => unreachable!("Table `sampled_individuals_teams_roles` is not updatable as it does not have a known column associated to an updater user id."),
-            web_common::database::Table::SampledIndividualsUsersRoleInvitations => unreachable!("Table `sampled_individuals_users_role_invitations` is not updatable as it does not have a known column associated to an updater user id."),
-            web_common::database::Table::SampledIndividualsUsersRoleRequests => unreachable!("Table `sampled_individuals_users_role_requests` is not updatable as it does not have a known column associated to an updater user id."),
-            web_common::database::Table::SampledIndividualsUsersRoles => unreachable!("Table `sampled_individuals_users_roles` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::Samples => {
                 let row: web_common::database::NewSample = bincode::deserialize::<web_common::database::NewSample>(&row).map_err(web_common::api::ApiError::from)?;
                 let updated_row: crate::models::Sample = <web_common::database::NewSample as UpdateRow>::update(row, user_id, connection)?;
@@ -1511,6 +1438,11 @@ impl FromFlatStrTable for web_common::database::Table {
                 let richest_row = crate::nested_models::NestedNotification::from_flat(flat_row, connection)?;
                  bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
             },
+            web_common::database::Table::Observations => {
+                let flat_row: crate::models::Observation = serde_json::from_str::<crate::models::Observation>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedObservation::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
             web_common::database::Table::Organizations => {
                 let flat_row: crate::models::Organization = serde_json::from_str::<crate::models::Organization>(row).map_err(web_common::api::ApiError::from)?;
                 let richest_row = crate::nested_models::NestedOrganization::from_flat(flat_row, connection)?;
@@ -1579,36 +1511,6 @@ impl FromFlatStrTable for web_common::database::Table {
             web_common::database::Table::SampledIndividuals => {
                 let flat_row: crate::models::SampledIndividual = serde_json::from_str::<crate::models::SampledIndividual>(row).map_err(web_common::api::ApiError::from)?;
                 let richest_row = crate::nested_models::NestedSampledIndividual::from_flat(flat_row, connection)?;
-                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
-            },
-            web_common::database::Table::SampledIndividualsTeamsRoleInvitations => {
-                let flat_row: crate::models::SampledIndividualsTeamsRoleInvitation = serde_json::from_str::<crate::models::SampledIndividualsTeamsRoleInvitation>(row).map_err(web_common::api::ApiError::from)?;
-                let richest_row = crate::nested_models::NestedSampledIndividualsTeamsRoleInvitation::from_flat(flat_row, connection)?;
-                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
-            },
-            web_common::database::Table::SampledIndividualsTeamsRoleRequests => {
-                let flat_row: crate::models::SampledIndividualsTeamsRoleRequest = serde_json::from_str::<crate::models::SampledIndividualsTeamsRoleRequest>(row).map_err(web_common::api::ApiError::from)?;
-                let richest_row = crate::nested_models::NestedSampledIndividualsTeamsRoleRequest::from_flat(flat_row, connection)?;
-                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
-            },
-            web_common::database::Table::SampledIndividualsTeamsRoles => {
-                let flat_row: crate::models::SampledIndividualsTeamsRole = serde_json::from_str::<crate::models::SampledIndividualsTeamsRole>(row).map_err(web_common::api::ApiError::from)?;
-                let richest_row = crate::nested_models::NestedSampledIndividualsTeamsRole::from_flat(flat_row, connection)?;
-                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
-            },
-            web_common::database::Table::SampledIndividualsUsersRoleInvitations => {
-                let flat_row: crate::models::SampledIndividualsUsersRoleInvitation = serde_json::from_str::<crate::models::SampledIndividualsUsersRoleInvitation>(row).map_err(web_common::api::ApiError::from)?;
-                let richest_row = crate::nested_models::NestedSampledIndividualsUsersRoleInvitation::from_flat(flat_row, connection)?;
-                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
-            },
-            web_common::database::Table::SampledIndividualsUsersRoleRequests => {
-                let flat_row: crate::models::SampledIndividualsUsersRoleRequest = serde_json::from_str::<crate::models::SampledIndividualsUsersRoleRequest>(row).map_err(web_common::api::ApiError::from)?;
-                let richest_row = crate::nested_models::NestedSampledIndividualsUsersRoleRequest::from_flat(flat_row, connection)?;
-                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
-            },
-            web_common::database::Table::SampledIndividualsUsersRoles => {
-                let flat_row: crate::models::SampledIndividualsUsersRole = serde_json::from_str::<crate::models::SampledIndividualsUsersRole>(row).map_err(web_common::api::ApiError::from)?;
-                let richest_row = crate::nested_models::NestedSampledIndividualsUsersRole::from_flat(flat_row, connection)?;
                  bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
             },
             web_common::database::Table::Samples => {

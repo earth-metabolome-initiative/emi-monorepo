@@ -2,6 +2,7 @@
 
 from typing import List
 import os
+import shutil
 from tqdm.auto import tqdm
 from userinput import userinput
 from insert_migration import insert_migration
@@ -18,6 +19,13 @@ class MissingRolesTable(Exception):
         self.referring_table_name = referring_table_name
         super().__init__(f"Table {table_name}_{referring_table_name}_roles is missing.")
 
+class UnexpectedRolesTable(Exception):
+    """Exception raised when a roles table is unexpected."""
+
+    def __init__(self, table_name: str, referring_table_name: str):
+        self.table_name = table_name
+        self.referring_table_name = referring_table_name
+        super().__init__(f"Table {table_name}_{referring_table_name}_roles is unexpected.")
 
 class MissingRoleInvitationsTable(Exception):
     """Exception raised when a role invitations table is missing."""
@@ -30,6 +38,16 @@ class MissingRoleInvitationsTable(Exception):
         )
 
 
+class UnexpectedRoleInvitationsTable(Exception):
+    """Exception raised when a role invitations table is unexpected."""
+
+    def __init__(self, table_name: str, referring_table_name: str):
+        self.table_name = table_name
+        self.referring_table_name = referring_table_name
+        super().__init__(
+            f"Table {table_name}_{referring_table_name}_role_invitations is unexpected."
+        )
+
 class MissingRoleRequestsTable(Exception):
     """Exception raised when a role requests table is missing."""
 
@@ -40,6 +58,68 @@ class MissingRoleRequestsTable(Exception):
             f"Table {table_name}_{referring_table_name}_role_requests is missing."
         )
 
+class UnexpectedRoleRequestsTable(Exception):
+    """Exception raised when a role requests table is unexpected."""
+
+    def __init__(self, table_name: str, referring_table_name: str):
+        self.table_name = table_name
+        self.referring_table_name = referring_table_name
+        super().__init__(
+            f"Table {table_name}_{referring_table_name}_role_requests is unexpected."
+        )
+
+def handle_unexpected_roles_table(
+    table_name: str,
+    referring_table_name: str,
+    desinence: str = "roles",
+):
+    """Handle the unexpected user roles table.
+
+    Parameters
+    ----------
+    table_name : str
+        The table name.
+    referring_table_name: str
+        The referring table name.
+    desinence : str
+        The desinence to use for the table name.
+        Can be either "roles" or "role_requests" or "role_invitations".
+    """
+    assert isinstance(table_name, str)
+    assert isinstance(referring_table_name, str)
+    assert isinstance(desinence, str)
+
+    if referring_table_name not in ("users", "teams"):
+        raise ValueError(f"Referring table name {referring_table_name} is not valid.")
+
+    if desinence not in ("roles", "role_requests", "role_invitations"):
+        raise ValueError(f"Desinence {desinence} is not valid.")
+
+    expected_table_name = f"{table_name}_{referring_table_name}_{desinence}"
+
+    drop_table = userinput(
+        f"Table {expected_table_name} is unexpected. Do you want to drop it? (yes/no)",
+        label="{name}",
+        default=False,
+        validator="human_bool",
+        sanitizer="human_bool",
+    )
+
+    if drop_table:
+        # We revert all migrations.
+        status = os.system("diesel migration revert --all")
+
+        if status != 0:
+            raise RuntimeError("Could not revert all migrations.")
+
+        # We delete all migrations associated to the table.
+        desinences = get_desinences(expected_table_name)
+        for migration in os.listdir("migrations"):
+            if not os.path.isdir(f"migrations/{migration}"):
+                continue
+            _number, desinence = migration.split("_", 1)
+            if desinence in desinences:
+                shutil.rmtree(f"migrations/{migration}")
 
 def handle_missing_roles_table(
     table_name: str,
@@ -163,7 +243,7 @@ def ensure_updatable_tables_have_role_requests_tables(
         unit="table",
         leave=False,
     ):
-        if table.is_updatable() and not table.is_junktion_table():
+        if table.is_updatable() and not table.editability_always_depend_on_parent_column():
             if not table_metadata.is_table(f"{table.name}_users_role_requests"):
                 handle_missing_roles_table(
                     table.name, "users", table_metadata, "role_requests"
@@ -174,6 +254,17 @@ def ensure_updatable_tables_have_role_requests_tables(
                     table.name, "teams", table_metadata, "role_requests"
                 )
                 raise MissingRoleRequestsTable(table.name, "teams")
+        else:
+            if table_metadata.is_table(f"{table.name}_users_role_requests"):
+                handle_unexpected_roles_table(
+                    table.name, "users", "role_requests"
+                )
+                raise UnexpectedRoleRequestsTable(table.name, "users")
+            if table_metadata.is_table(f"{table.name}_teams_role_requests") and table.name not in ("users", "teams"):
+                handle_unexpected_roles_table(
+                    table.name, "teams", "role_requests"
+                )
+                raise UnexpectedRoleRequestsTable(table.name, "teams")
 
 
 def ensure_updatable_tables_have_role_invitations_tables(
@@ -203,7 +294,7 @@ def ensure_updatable_tables_have_role_invitations_tables(
         unit="table",
         leave=False,
     ):
-        if table.is_updatable() and not table.is_junktion_table():
+        if table.is_updatable() and not table.editability_always_depend_on_parent_column():
             if not table_metadata.is_table(f"{table.name}_users_role_invitations"):
                 handle_missing_roles_table(
                     table.name, "users", table_metadata, "role_invitations"
@@ -214,6 +305,18 @@ def ensure_updatable_tables_have_role_invitations_tables(
                     table.name, "teams", table_metadata, "role_invitations"
                 )
                 raise MissingRoleInvitationsTable(table.name, "teams")
+        else:
+            if table_metadata.is_table(f"{table.name}_users_role_invitations"):
+                handle_unexpected_roles_table(
+                    table.name, "users", "role_invitations"
+                )
+                raise UnexpectedRoleInvitationsTable(table.name, "users")
+            if table_metadata.is_table(f"{table.name}_teams_role_invitations") and table.name not in ("users", "teams"):
+                handle_unexpected_roles_table(
+                    table.name, "teams", "role_invitations"
+                )
+                raise UnexpectedRoleInvitationsTable(table.name, "teams")
+        
 
 
 def ensure_updatable_tables_have_roles_tables(
@@ -245,7 +348,7 @@ def ensure_updatable_tables_have_roles_tables(
         unit="table",
         leave=False,
     ):
-        if table.is_updatable() and not table.is_junktion_table():
+        if table.is_updatable() and not table.editability_always_depend_on_parent_column():
             if not table_metadata.is_table(f"{table.name}_users_roles"):
                 handle_missing_roles_table(table.name, "users", table_metadata)
                 raise MissingRolesTable(table.name, "users")
@@ -254,3 +357,10 @@ def ensure_updatable_tables_have_roles_tables(
             ) and table.name not in ("users", "teams"):
                 handle_missing_roles_table(table.name, "teams", table_metadata)
                 raise MissingRolesTable(table.name, "teams")
+        else:
+            if table_metadata.is_table(f"{table.name}_users_roles"):
+                handle_unexpected_roles_table(table.name, "users", "roles")
+                raise UnexpectedRolesTable(table.name, "users")
+            if table_metadata.is_table(f"{table.name}_teams_roles") and table.name not in ("users", "teams"):
+                handle_unexpected_roles_table(table.name, "teams", "roles")
+                raise UnexpectedRolesTable(table.name, "teams")

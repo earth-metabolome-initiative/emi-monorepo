@@ -61,6 +61,47 @@ impl InsertRow for web_common::database::NewDerivedSample {
     }
 }
 
+/// Intermediate representation of the new variant NewObservation.
+#[derive(Insertable)]
+#[diesel(table_name = observations)]
+pub(super) struct IntermediateNewObservation {
+    created_by: i32,
+    id: Uuid,
+    project_id: i32,
+    individual_id: Option<Uuid>,
+    notes: Option<String>,
+    picture: Vec<u8>,
+    updated_by: i32,
+}
+
+impl InsertRow for web_common::database::NewObservation {
+    type Intermediate = IntermediateNewObservation;
+    type Flat = Observation;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewObservation {
+            created_by: user_id,
+            id: self.id,
+            project_id: self.project_id,
+            individual_id: self.individual_id,
+            notes: self.notes,
+            picture: self.picture,
+            updated_by: user_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::observations;
+        diesel::insert_into(observations::dsl::observations)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
 /// Intermediate representation of the new variant NewProject.
 #[derive(Insertable)]
 #[diesel(table_name = projects)]
@@ -397,7 +438,9 @@ pub(super) struct IntermediateNewSampledIndividual {
     created_by: i32,
     id: Uuid,
     notes: Option<String>,
+    project_id: i32,
     tagged: bool,
+    picture: Vec<u8>,
     updated_by: i32,
 }
 
@@ -410,7 +453,9 @@ impl InsertRow for web_common::database::NewSampledIndividual {
             created_by: user_id,
             id: self.id,
             notes: self.notes,
+            project_id: self.project_id,
             tagged: self.tagged,
+            picture: self.picture,
             updated_by: user_id,
         }
     }
@@ -422,216 +467,6 @@ impl InsertRow for web_common::database::NewSampledIndividual {
     ) -> Result<Self::Flat, diesel::result::Error> {
         use crate::schema::sampled_individuals;
         diesel::insert_into(sampled_individuals::dsl::sampled_individuals)
-            .values(self.to_intermediate(user_id))
-            .get_result(connection)
-    }
-}
-
-/// Intermediate representation of the new variant NewSampledIndividualsTeamsRoleInvitation.
-#[derive(Insertable)]
-#[diesel(table_name = sampled_individuals_teams_role_invitations)]
-pub(super) struct IntermediateNewSampledIndividualsTeamsRoleInvitation {
-    created_by: i32,
-    table_id: Uuid,
-    team_id: i32,
-    role_id: i32,
-}
-
-impl InsertRow for web_common::database::NewSampledIndividualsTeamsRoleInvitation {
-    type Intermediate = IntermediateNewSampledIndividualsTeamsRoleInvitation;
-    type Flat = SampledIndividualsTeamsRoleInvitation;
-
-    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
-        IntermediateNewSampledIndividualsTeamsRoleInvitation {
-            created_by: user_id,
-            table_id: self.table_id,
-            team_id: self.team_id,
-            role_id: self.role_id,
-        }
-    }
-
-    fn insert(
-        self,
-       user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self::Flat, diesel::result::Error> {
-        use crate::schema::sampled_individuals_teams_role_invitations;
-        diesel::insert_into(sampled_individuals_teams_role_invitations::dsl::sampled_individuals_teams_role_invitations)
-            .values(self.to_intermediate(user_id))
-            .get_result(connection)
-    }
-}
-
-/// Intermediate representation of the new variant NewSampledIndividualsTeamsRoleRequest.
-#[derive(Insertable)]
-#[diesel(table_name = sampled_individuals_teams_role_requests)]
-pub(super) struct IntermediateNewSampledIndividualsTeamsRoleRequest {
-    created_by: i32,
-    table_id: Uuid,
-    team_id: i32,
-    role_id: i32,
-}
-
-impl InsertRow for web_common::database::NewSampledIndividualsTeamsRoleRequest {
-    type Intermediate = IntermediateNewSampledIndividualsTeamsRoleRequest;
-    type Flat = SampledIndividualsTeamsRoleRequest;
-
-    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
-        IntermediateNewSampledIndividualsTeamsRoleRequest {
-            created_by: user_id,
-            table_id: self.table_id,
-            team_id: self.team_id,
-            role_id: self.role_id,
-        }
-    }
-
-    fn insert(
-        self,
-       user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self::Flat, diesel::result::Error> {
-        use crate::schema::sampled_individuals_teams_role_requests;
-        diesel::insert_into(sampled_individuals_teams_role_requests::dsl::sampled_individuals_teams_role_requests)
-            .values(self.to_intermediate(user_id))
-            .get_result(connection)
-    }
-}
-
-/// Intermediate representation of the new variant NewSampledIndividualsTeamsRole.
-#[derive(Insertable)]
-#[diesel(table_name = sampled_individuals_teams_roles)]
-pub(super) struct IntermediateNewSampledIndividualsTeamsRole {
-    created_by: i32,
-    table_id: Uuid,
-    team_id: i32,
-    role_id: i32,
-}
-
-impl InsertRow for web_common::database::NewSampledIndividualsTeamsRole {
-    type Intermediate = IntermediateNewSampledIndividualsTeamsRole;
-    type Flat = SampledIndividualsTeamsRole;
-
-    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
-        IntermediateNewSampledIndividualsTeamsRole {
-            created_by: user_id,
-            table_id: self.table_id,
-            team_id: self.team_id,
-            role_id: self.role_id,
-        }
-    }
-
-    fn insert(
-        self,
-       user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self::Flat, diesel::result::Error> {
-        use crate::schema::sampled_individuals_teams_roles;
-        diesel::insert_into(sampled_individuals_teams_roles::dsl::sampled_individuals_teams_roles)
-            .values(self.to_intermediate(user_id))
-            .get_result(connection)
-    }
-}
-
-/// Intermediate representation of the new variant NewSampledIndividualsUsersRoleInvitation.
-#[derive(Insertable)]
-#[diesel(table_name = sampled_individuals_users_role_invitations)]
-pub(super) struct IntermediateNewSampledIndividualsUsersRoleInvitation {
-    created_by: i32,
-    table_id: Uuid,
-    user_id: i32,
-    role_id: i32,
-}
-
-impl InsertRow for web_common::database::NewSampledIndividualsUsersRoleInvitation {
-    type Intermediate = IntermediateNewSampledIndividualsUsersRoleInvitation;
-    type Flat = SampledIndividualsUsersRoleInvitation;
-
-    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
-        IntermediateNewSampledIndividualsUsersRoleInvitation {
-            created_by: user_id,
-            table_id: self.table_id,
-            user_id: self.user_id,
-            role_id: self.role_id,
-        }
-    }
-
-    fn insert(
-        self,
-       user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self::Flat, diesel::result::Error> {
-        use crate::schema::sampled_individuals_users_role_invitations;
-        diesel::insert_into(sampled_individuals_users_role_invitations::dsl::sampled_individuals_users_role_invitations)
-            .values(self.to_intermediate(user_id))
-            .get_result(connection)
-    }
-}
-
-/// Intermediate representation of the new variant NewSampledIndividualsUsersRoleRequest.
-#[derive(Insertable)]
-#[diesel(table_name = sampled_individuals_users_role_requests)]
-pub(super) struct IntermediateNewSampledIndividualsUsersRoleRequest {
-    created_by: i32,
-    table_id: Uuid,
-    user_id: i32,
-    role_id: i32,
-}
-
-impl InsertRow for web_common::database::NewSampledIndividualsUsersRoleRequest {
-    type Intermediate = IntermediateNewSampledIndividualsUsersRoleRequest;
-    type Flat = SampledIndividualsUsersRoleRequest;
-
-    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
-        IntermediateNewSampledIndividualsUsersRoleRequest {
-            created_by: user_id,
-            table_id: self.table_id,
-            user_id: self.user_id,
-            role_id: self.role_id,
-        }
-    }
-
-    fn insert(
-        self,
-       user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self::Flat, diesel::result::Error> {
-        use crate::schema::sampled_individuals_users_role_requests;
-        diesel::insert_into(sampled_individuals_users_role_requests::dsl::sampled_individuals_users_role_requests)
-            .values(self.to_intermediate(user_id))
-            .get_result(connection)
-    }
-}
-
-/// Intermediate representation of the new variant NewSampledIndividualsUsersRole.
-#[derive(Insertable)]
-#[diesel(table_name = sampled_individuals_users_roles)]
-pub(super) struct IntermediateNewSampledIndividualsUsersRole {
-    created_by: i32,
-    table_id: Uuid,
-    user_id: i32,
-    role_id: i32,
-}
-
-impl InsertRow for web_common::database::NewSampledIndividualsUsersRole {
-    type Intermediate = IntermediateNewSampledIndividualsUsersRole;
-    type Flat = SampledIndividualsUsersRole;
-
-    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
-        IntermediateNewSampledIndividualsUsersRole {
-            created_by: user_id,
-            table_id: self.table_id,
-            user_id: self.user_id,
-            role_id: self.role_id,
-        }
-    }
-
-    fn insert(
-        self,
-       user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self::Flat, diesel::result::Error> {
-        use crate::schema::sampled_individuals_users_roles;
-        diesel::insert_into(sampled_individuals_users_roles::dsl::sampled_individuals_users_roles)
             .values(self.to_intermediate(user_id))
             .get_result(connection)
     }

@@ -194,6 +194,40 @@ impl NotificationFilter {
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct ObservationFilter {
+    pub created_by: Option<i32>,
+    pub updated_by: Option<i32>,
+    pub project_id: Option<i32>,
+    pub individual_id: Option<Uuid>,
+}
+
+
+#[cfg(feature = "frontend")]
+impl ObservationFilter {
+
+    pub fn as_filter_expression(&self) -> gluesql::core::ast_builder::ExprNode<'_> {
+        let mut filter: gluesql::core::ast_builder::ExprNode<'_> = gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
+        if let Some(created_by) = &self.created_by {
+            filter = filter.and(gluesql::core::ast_builder::col("observations.created_by").eq(created_by.to_string()));
+        }
+
+        if let Some(updated_by) = &self.updated_by {
+            filter = filter.and(gluesql::core::ast_builder::col("observations.updated_by").eq(updated_by.to_string()));
+        }
+
+        if let Some(project_id) = &self.project_id {
+            filter = filter.and(gluesql::core::ast_builder::col("observations.project_id").eq(project_id.to_string()));
+        }
+
+        if let Some(individual_id) = &self.individual_id {
+            filter = filter.and(gluesql::core::ast_builder::col("observations.individual_id").eq(individual_id.to_string()));
+        }
+
+        filter
+    }
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct OrganizationFilter {
     pub country_id: Option<i32>,
 }
@@ -592,6 +626,7 @@ impl SampledIndividualBioOttTaxonItemFilter {
 
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct SampledIndividualFilter {
+    pub project_id: Option<i32>,
     pub created_by: Option<i32>,
     pub updated_by: Option<i32>,
 }
@@ -602,216 +637,16 @@ impl SampledIndividualFilter {
 
     pub fn as_filter_expression(&self) -> gluesql::core::ast_builder::ExprNode<'_> {
         let mut filter: gluesql::core::ast_builder::ExprNode<'_> = gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
+        if let Some(project_id) = &self.project_id {
+            filter = filter.and(gluesql::core::ast_builder::col("sampled_individuals.project_id").eq(project_id.to_string()));
+        }
+
         if let Some(created_by) = &self.created_by {
             filter = filter.and(gluesql::core::ast_builder::col("sampled_individuals.created_by").eq(created_by.to_string()));
         }
 
         if let Some(updated_by) = &self.updated_by {
             filter = filter.and(gluesql::core::ast_builder::col("sampled_individuals.updated_by").eq(updated_by.to_string()));
-        }
-
-        filter
-    }
-}
-
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct SampledIndividualsTeamsRoleInvitationFilter {
-    pub table_id: Option<Uuid>,
-    pub team_id: Option<i32>,
-    pub role_id: Option<i32>,
-    pub created_by: Option<i32>,
-}
-
-
-#[cfg(feature = "frontend")]
-impl SampledIndividualsTeamsRoleInvitationFilter {
-
-    pub fn as_filter_expression(&self) -> gluesql::core::ast_builder::ExprNode<'_> {
-        let mut filter: gluesql::core::ast_builder::ExprNode<'_> = gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
-        if let Some(table_id) = &self.table_id {
-            filter = filter.and(gluesql::core::ast_builder::col("sampled_individuals_teams_role_invitations.table_id").eq(table_id.to_string()));
-        }
-
-        if let Some(team_id) = &self.team_id {
-            filter = filter.and(gluesql::core::ast_builder::col("sampled_individuals_teams_role_invitations.team_id").eq(team_id.to_string()));
-        }
-
-        if let Some(role_id) = &self.role_id {
-            filter = filter.and(gluesql::core::ast_builder::col("sampled_individuals_teams_role_invitations.role_id").eq(role_id.to_string()));
-        }
-
-        if let Some(created_by) = &self.created_by {
-            filter = filter.and(gluesql::core::ast_builder::col("sampled_individuals_teams_role_invitations.created_by").eq(created_by.to_string()));
-        }
-
-        filter
-    }
-}
-
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct SampledIndividualsTeamsRoleRequestFilter {
-    pub table_id: Option<Uuid>,
-    pub team_id: Option<i32>,
-    pub role_id: Option<i32>,
-    pub created_by: Option<i32>,
-}
-
-
-#[cfg(feature = "frontend")]
-impl SampledIndividualsTeamsRoleRequestFilter {
-
-    pub fn as_filter_expression(&self) -> gluesql::core::ast_builder::ExprNode<'_> {
-        let mut filter: gluesql::core::ast_builder::ExprNode<'_> = gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
-        if let Some(table_id) = &self.table_id {
-            filter = filter.and(gluesql::core::ast_builder::col("sampled_individuals_teams_role_requests.table_id").eq(table_id.to_string()));
-        }
-
-        if let Some(team_id) = &self.team_id {
-            filter = filter.and(gluesql::core::ast_builder::col("sampled_individuals_teams_role_requests.team_id").eq(team_id.to_string()));
-        }
-
-        if let Some(role_id) = &self.role_id {
-            filter = filter.and(gluesql::core::ast_builder::col("sampled_individuals_teams_role_requests.role_id").eq(role_id.to_string()));
-        }
-
-        if let Some(created_by) = &self.created_by {
-            filter = filter.and(gluesql::core::ast_builder::col("sampled_individuals_teams_role_requests.created_by").eq(created_by.to_string()));
-        }
-
-        filter
-    }
-}
-
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct SampledIndividualsTeamsRoleFilter {
-    pub table_id: Option<Uuid>,
-    pub team_id: Option<i32>,
-    pub role_id: Option<i32>,
-    pub created_by: Option<i32>,
-}
-
-
-#[cfg(feature = "frontend")]
-impl SampledIndividualsTeamsRoleFilter {
-
-    pub fn as_filter_expression(&self) -> gluesql::core::ast_builder::ExprNode<'_> {
-        let mut filter: gluesql::core::ast_builder::ExprNode<'_> = gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
-        if let Some(table_id) = &self.table_id {
-            filter = filter.and(gluesql::core::ast_builder::col("sampled_individuals_teams_roles.table_id").eq(table_id.to_string()));
-        }
-
-        if let Some(team_id) = &self.team_id {
-            filter = filter.and(gluesql::core::ast_builder::col("sampled_individuals_teams_roles.team_id").eq(team_id.to_string()));
-        }
-
-        if let Some(role_id) = &self.role_id {
-            filter = filter.and(gluesql::core::ast_builder::col("sampled_individuals_teams_roles.role_id").eq(role_id.to_string()));
-        }
-
-        if let Some(created_by) = &self.created_by {
-            filter = filter.and(gluesql::core::ast_builder::col("sampled_individuals_teams_roles.created_by").eq(created_by.to_string()));
-        }
-
-        filter
-    }
-}
-
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct SampledIndividualsUsersRoleInvitationFilter {
-    pub table_id: Option<Uuid>,
-    pub user_id: Option<i32>,
-    pub role_id: Option<i32>,
-    pub created_by: Option<i32>,
-}
-
-
-#[cfg(feature = "frontend")]
-impl SampledIndividualsUsersRoleInvitationFilter {
-
-    pub fn as_filter_expression(&self) -> gluesql::core::ast_builder::ExprNode<'_> {
-        let mut filter: gluesql::core::ast_builder::ExprNode<'_> = gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
-        if let Some(table_id) = &self.table_id {
-            filter = filter.and(gluesql::core::ast_builder::col("sampled_individuals_users_role_invitations.table_id").eq(table_id.to_string()));
-        }
-
-        if let Some(user_id) = &self.user_id {
-            filter = filter.and(gluesql::core::ast_builder::col("sampled_individuals_users_role_invitations.user_id").eq(user_id.to_string()));
-        }
-
-        if let Some(role_id) = &self.role_id {
-            filter = filter.and(gluesql::core::ast_builder::col("sampled_individuals_users_role_invitations.role_id").eq(role_id.to_string()));
-        }
-
-        if let Some(created_by) = &self.created_by {
-            filter = filter.and(gluesql::core::ast_builder::col("sampled_individuals_users_role_invitations.created_by").eq(created_by.to_string()));
-        }
-
-        filter
-    }
-}
-
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct SampledIndividualsUsersRoleRequestFilter {
-    pub table_id: Option<Uuid>,
-    pub user_id: Option<i32>,
-    pub role_id: Option<i32>,
-    pub created_by: Option<i32>,
-}
-
-
-#[cfg(feature = "frontend")]
-impl SampledIndividualsUsersRoleRequestFilter {
-
-    pub fn as_filter_expression(&self) -> gluesql::core::ast_builder::ExprNode<'_> {
-        let mut filter: gluesql::core::ast_builder::ExprNode<'_> = gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
-        if let Some(table_id) = &self.table_id {
-            filter = filter.and(gluesql::core::ast_builder::col("sampled_individuals_users_role_requests.table_id").eq(table_id.to_string()));
-        }
-
-        if let Some(user_id) = &self.user_id {
-            filter = filter.and(gluesql::core::ast_builder::col("sampled_individuals_users_role_requests.user_id").eq(user_id.to_string()));
-        }
-
-        if let Some(role_id) = &self.role_id {
-            filter = filter.and(gluesql::core::ast_builder::col("sampled_individuals_users_role_requests.role_id").eq(role_id.to_string()));
-        }
-
-        if let Some(created_by) = &self.created_by {
-            filter = filter.and(gluesql::core::ast_builder::col("sampled_individuals_users_role_requests.created_by").eq(created_by.to_string()));
-        }
-
-        filter
-    }
-}
-
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct SampledIndividualsUsersRoleFilter {
-    pub table_id: Option<Uuid>,
-    pub user_id: Option<i32>,
-    pub role_id: Option<i32>,
-    pub created_by: Option<i32>,
-}
-
-
-#[cfg(feature = "frontend")]
-impl SampledIndividualsUsersRoleFilter {
-
-    pub fn as_filter_expression(&self) -> gluesql::core::ast_builder::ExprNode<'_> {
-        let mut filter: gluesql::core::ast_builder::ExprNode<'_> = gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
-        if let Some(table_id) = &self.table_id {
-            filter = filter.and(gluesql::core::ast_builder::col("sampled_individuals_users_roles.table_id").eq(table_id.to_string()));
-        }
-
-        if let Some(user_id) = &self.user_id {
-            filter = filter.and(gluesql::core::ast_builder::col("sampled_individuals_users_roles.user_id").eq(user_id.to_string()));
-        }
-
-        if let Some(role_id) = &self.role_id {
-            filter = filter.and(gluesql::core::ast_builder::col("sampled_individuals_users_roles.role_id").eq(role_id.to_string()));
-        }
-
-        if let Some(created_by) = &self.created_by {
-            filter = filter.and(gluesql::core::ast_builder::col("sampled_individuals_users_roles.created_by").eq(created_by.to_string()));
         }
 
         filter

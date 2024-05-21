@@ -2,9 +2,38 @@
 
 from typing import List
 from tqdm import tqdm
-from constraint_checkers.struct_metadata import StructMetadata
+from constraint_checkers.struct_metadata import StructMetadata, AttributeMetadata
 from constraint_checkers.gluesql_types_mapping import GLUESQL_TYPES_MAPPING
 from constraint_checkers.write_update_method_for_gluesql import write_update_method_for_gluesql
+
+def write_image_as_url_getter_method(
+    attribute: AttributeMetadata,
+    document: "TextIO"
+):
+    """Writes the method to get the image contained in the provided attribute as a URL.
+
+    Parameters
+    ----------
+    struct : StructMetadata
+        The struct containing the attribute.
+
+    attribute : AttributeMetadata
+        The attribute containing the image.
+    """
+    assert attribute.is_image_blob()
+
+    if attribute.optional:
+        document.write(
+            f"    pub fn get_{attribute.name}_as_url(&self) -> Option<String> {{\n"
+            f"        self.{attribute.name}.as_ref().map(|blob| blob.guess_image_url().unwrap())\n"
+            "    }\n\n"
+        )
+    else:
+        document.write(
+            f"    pub fn get_{attribute.name}_as_url(&self) -> String {{\n"
+            f"        self.{attribute.name}.guess_image_url().unwrap()\n"
+            "    }\n\n"
+        )
 
 
 def write_web_common_flat_variants(
@@ -29,6 +58,7 @@ def write_web_common_flat_variants(
         "use uuid::Uuid;",
         "use chrono::NaiveDateTime;",
         "use crate::database::*;",
+        "use crate::traits::GuessImageFormat;"
     ]
 
     document = open(f"../web_common/src/database/{target}.rs", "w", encoding="utf8")
@@ -86,6 +116,11 @@ def write_web_common_flat_variants(
         # to create yet again another duplicate of the struct.
         document.write('#[cfg(feature = "frontend")]\n')
         document.write(f"impl {struct.name} {{\n")
+
+        for attribute in struct.attributes:
+            if attribute.is_image_blob():
+                write_image_as_url_getter_method(attribute, document)
+
         columns = ", ".join([attribute.name for attribute in struct.attributes])
 
         # As first thing, we implement the `into_row` method for the struct. This method

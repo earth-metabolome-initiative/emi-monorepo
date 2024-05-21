@@ -469,9 +469,18 @@ where
             }
         );
 
+        let label_classes = format!(
+            "input-label{}",
+            if props.optional {
+                ""
+            } else {
+                " input-label-mandatory"
+            }
+        );
+
         html! {
             <div class={classes} onclick={on_click} ondrop={on_drop} ondragover={ondragover} ondragleave={ondragleave.clone()} ondragend={ondragleave}>
-                <label for={props.normalized_label()}>{format!("{}:", props.label())}</label>
+                <label class={label_classes} for={props.normalized_label()}>{format!("{}:", props.label())}</label>
                 <input
                     type="file"
                     id={uuid}

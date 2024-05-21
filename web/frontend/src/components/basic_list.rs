@@ -109,7 +109,7 @@ impl<Page: Filtrable + PageLike + RowToBadge> Component for BasicList<Page> {
                     <></>
                 }
                 </ul>
-                if let Some(create_path) = Page::create_path() {
+                if let Some(create_path) = Page::create_path(ctx.props().filters.as_ref()) {
                     <Link<AppRoute> classes={"button-like create"} to={create_path}>
                         <i class={FormMethod::POST.font_awesome_icon()}></i>
                         <span>{"New"}</span>

@@ -1517,6 +1517,229 @@ impl Notification {
     }
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
+#[diesel(table_name = observations)]
+#[diesel(belongs_to(User, foreign_key = created_by))]
+#[diesel(belongs_to(Project, foreign_key = project_id))]
+#[diesel(belongs_to(SampledIndividual, foreign_key = individual_id))]
+#[diesel(primary_key(id))]
+pub struct Observation {
+    pub id: Uuid,
+    pub created_by: i32,
+    pub created_at: Option<NaiveDateTime>,
+    pub updated_by: i32,
+    pub updated_at: Option<NaiveDateTime>,
+    pub project_id: i32,
+    pub individual_id: Option<Uuid>,
+    pub notes: Option<String>,
+    pub picture: Vec<u8>,
+}
+
+impl From<Observation> for web_common::database::tables::Observation {
+    fn from(item: Observation) -> Self {
+        Self {
+            id: item.id,
+            created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
+            project_id: item.project_id,
+            individual_id: item.individual_id,
+            notes: item.notes,
+            picture: item.picture,
+        }
+    }
+}
+
+impl From<web_common::database::tables::Observation> for Observation {
+    fn from(item: web_common::database::tables::Observation) -> Self {
+        Self {
+            id: item.id,
+            created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
+            project_id: item.project_id,
+            individual_id: item.individual_id,
+            notes: item.notes,
+            picture: item.picture,
+        }
+    }
+}
+
+impl Observation {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        filter: Option<&web_common::database::ObservationFilter>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::observations;
+        let mut query = observations::dsl::observations
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(observations::dsl::created_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(observations::dsl::updated_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.project_id) {
+            query = query.filter(observations::dsl::project_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.individual_id) {
+            query = query.filter(observations::dsl::individual_id.eq(value));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the structs from the database ordered by the updated_at column.
+    ///
+    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_by_updated_at(
+        filter: Option<&web_common::database::ObservationFilter>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::observations;
+        let mut query = observations::dsl::observations
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(observations::dsl::created_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(observations::dsl::updated_by.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.project_id) {
+            query = query.filter(observations::dsl::project_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.individual_id) {
+            query = query.filter(observations::dsl::individual_id.eq(value));
+        }
+        query
+            .order_by(observations::dsl::updated_at.desc())
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn get(
+       id: Uuid,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::observations;
+        observations::dsl::observations
+            .filter(observations::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+    /// Search for the struct by a given string by Postgres's `similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all(None, Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, created_by, created_at, updated_by, updated_at, project_id, individual_id, notes, picture FROM observations ",
+            "WHERE id LIKE $1% ",
+            "LIMIT $2;"
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all(None, Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, created_by, created_at, updated_by, updated_at, project_id, individual_id, notes, picture FROM observations ",
+            "WHERE id LIKE $1% ",
+            "LIMIT $2;"
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all(None, Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, created_by, created_at, updated_by, updated_at, project_id, individual_id, notes, picture FROM observations ",
+            "WHERE id LIKE $1% ",
+            "LIMIT $2;"
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+}
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = organizations)]
 #[diesel(belongs_to(Country, foreign_key = country_id))]
 #[diesel(primary_key(id))]
@@ -3735,16 +3958,19 @@ impl SampledIndividualBioOttTaxonItem {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sampled_individuals)]
+#[diesel(belongs_to(Project, foreign_key = project_id))]
 #[diesel(belongs_to(User, foreign_key = created_by))]
 #[diesel(primary_key(id))]
 pub struct SampledIndividual {
     pub id: Uuid,
     pub notes: Option<String>,
+    pub project_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
     pub updated_by: i32,
     pub updated_at: NaiveDateTime,
     pub tagged: bool,
+    pub picture: Vec<u8>,
 }
 
 impl From<SampledIndividual> for web_common::database::tables::SampledIndividual {
@@ -3752,11 +3978,13 @@ impl From<SampledIndividual> for web_common::database::tables::SampledIndividual
         Self {
             id: item.id,
             notes: item.notes,
+            project_id: item.project_id,
             created_by: item.created_by,
             created_at: item.created_at,
             updated_by: item.updated_by,
             updated_at: item.updated_at,
             tagged: item.tagged,
+            picture: item.picture,
         }
     }
 }
@@ -3766,167 +3994,18 @@ impl From<web_common::database::tables::SampledIndividual> for SampledIndividual
         Self {
             id: item.id,
             notes: item.notes,
+            project_id: item.project_id,
             created_by: item.created_by,
             created_at: item.created_at,
             updated_by: item.updated_by,
             updated_at: item.updated_at,
             tagged: item.tagged,
+            picture: item.picture,
         }
     }
 }
 
 impl SampledIndividual {
-    /// Check whether the user has a role with a role_id less than or equal to the provided role_id.
-    ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `role_id` - The role_id to check against.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn has_role_by_id(
-        id: Uuid,
-        author_user_id: i32,
-        role_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<bool, diesel::result::Error> {
-        diesel::select(diesel::dsl::exists(sampled_individuals::dsl::sampled_individuals
-            .filter(sampled_individuals::dsl::id.eq(id))
-           .filter(sampled_individuals::dsl::created_by.eq(author_user_id))
-            .or_filter(
-               sampled_individuals::dsl::id.eq(id)
-                   .and(sampled_individuals::dsl::id.eq_any(
-                       sampled_individuals_users_roles::table
-                           .select(sampled_individuals_users_roles::dsl::table_id)
-                           .filter(sampled_individuals_users_roles::dsl::user_id.eq(author_user_id)
-                           .and(sampled_individuals_users_roles::dsl::role_id.le(role_id)),
-                    )),
-               )
-         )
-                    .or_filter(
-                       sampled_individuals::dsl::id.eq(id)
-                           .and(sampled_individuals::dsl::id.eq_any(
-                               sampled_individuals_teams_roles::table
-                                   .select(sampled_individuals_teams_roles::dsl::table_id)
-                                   .filter(sampled_individuals_teams_roles::dsl::role_id.le(role_id))
-                                   .inner_join(teams_users_roles::table.on(
-                                       sampled_individuals_teams_roles::dsl::team_id.eq(teams_users_roles::dsl::table_id)
-                                           .and(teams_users_roles::dsl::user_id.eq(author_user_id))
-                                           .and(teams_users_roles::dsl::role_id.le(role_id)),
-                                   )),
-                              ))
-                       )
-            ))
-         .get_result::<bool>(connection)
-    }
-    /// Check whether the user is a Viewer (role_id >= 3).
-    ///
-    /// # Arguments
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn is_viewer(
-        &self,
-        author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<bool, diesel::result::Error> {
-        Self::is_viewer_by_id(
-            self.id,
-            author_user_id,
-            connection,
-        )
-    }
-    /// Check whether the user is a Viewer (role_id >= 3) for the provided primary key(s).
-    ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn is_viewer_by_id(
-        id: Uuid,
-        author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<bool, diesel::result::Error> {
-        Self::has_role_by_id(
-            id,
-            author_user_id,
-            3,
-            connection,
-        )
-    }
-    /// Check whether the user is an Editor (role_id >= 2).
-    ///
-    /// # Arguments
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn is_editor(
-        &self,
-        author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<bool, diesel::result::Error> {
-        Self::is_editor_by_id(
-            self.id,
-            author_user_id,
-            connection,
-        )
-    }
-    /// Check whether the user is an Editor (role_id >= 2).
-    ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn is_editor_by_id(
-        id: Uuid,
-        author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<bool, diesel::result::Error> {
-        Self::has_role_by_id(
-            id,
-            author_user_id,
-            2,
-            connection,
-        )
-    }
-    /// Check whether the user is an Admin (role_id == 1).
-    ///
-    /// # Arguments
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn is_admin(
-        &self,
-        author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<bool, diesel::result::Error> {
-        Self::is_admin_by_id(
-            self.id,
-            author_user_id,
-            connection,
-        )
-    }
-    /// Check whether the user is an Admin (role_id == 1).
-    ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn is_admin_by_id(
-        id: Uuid,
-        author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<bool, diesel::result::Error> {
-        Self::has_role_by_id(
-            id,
-            author_user_id,
-            1,
-            connection,
-        )
-    }
     /// Get all of the structs from the database.
     ///
     /// # Arguments
@@ -3944,57 +4023,9 @@ impl SampledIndividual {
         use crate::schema::sampled_individuals;
         let mut query = sampled_individuals::dsl::sampled_individuals
             .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.created_by) {
-            query = query.filter(sampled_individuals::dsl::created_by.eq(value));
+        if let Some(value) = filter.and_then(|f| f.project_id) {
+            query = query.filter(sampled_individuals::dsl::project_id.eq(value));
         }
-        if let Some(value) = filter.and_then(|f| f.updated_by) {
-            query = query.filter(sampled_individuals::dsl::updated_by.eq(value));
-        }
-        query
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-    }
-    /// Get all of the editable structs from the database.
-    ///
-    /// # Arguments
-    /// * `author_user_id` - The ID of the user who is performing the search.
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
-    /// * `offset` - The number of structs to skip. By default, this is 0.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn all_editables(
-        author_user_id: i32,
-        filter: Option<&web_common::database::SampledIndividualFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::sampled_individuals;
-        let mut query = sampled_individuals::dsl::sampled_individuals
-           .filter(sampled_individuals::dsl::created_by.eq(author_user_id))
-            .or_filter(
-               sampled_individuals::dsl::id.eq_any(
-                   sampled_individuals_users_roles::table
-                       .select(sampled_individuals_users_roles::dsl::table_id)
-                       .filter(sampled_individuals_users_roles::dsl::user_id.eq(author_user_id)
-                       .and(sampled_individuals_users_roles::dsl::role_id.le(2)),
-               )),
-            )
-                .or_filter(
-                   sampled_individuals::dsl::id.eq_any(
-                       sampled_individuals_teams_roles::table
-                           .select(sampled_individuals_teams_roles::dsl::table_id)
-                           .filter(sampled_individuals_teams_roles::dsl::role_id.le(2))
-                           .inner_join(teams_users_roles::table.on(
-                               sampled_individuals_teams_roles::dsl::team_id.eq(teams_users_roles::dsl::table_id)
-                                   .and(teams_users_roles::dsl::user_id.eq(author_user_id))
-                                   .and(teams_users_roles::dsl::role_id.le(2)),
-                           )),
-                   ),
-            )
-            .into_boxed();
         if let Some(value) = filter.and_then(|f| f.created_by) {
             query = query.filter(sampled_individuals::dsl::created_by.eq(value));
         }
@@ -4023,6 +4054,9 @@ impl SampledIndividual {
         use crate::schema::sampled_individuals;
         let mut query = sampled_individuals::dsl::sampled_individuals
             .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.project_id) {
+            query = query.filter(sampled_individuals::dsl::project_id.eq(value));
+        }
         if let Some(value) = filter.and_then(|f| f.created_by) {
             query = query.filter(sampled_individuals::dsl::created_by.eq(value));
         }
@@ -4034,38 +4068,6 @@ impl SampledIndividual {
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
-    }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `author_user_id` - The ID of the user who is deleting the struct.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(self.id, author_user_id, connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
-    /// * `author_user_id` - The ID of the user who is deleting the struct.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       id: Uuid,
-        author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        if !Self::is_admin_by_id(id, author_user_id, connection)? {
-            return Err(diesel::result::Error::NotFound);
-        }
-        diesel::delete(sampled_individuals::dsl::sampled_individuals
-            .filter(sampled_individuals::dsl::id.eq(id))
-        ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -4102,55 +4104,13 @@ impl SampledIndividual {
             return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, notes, created_by, created_at, updated_by, updated_at, tagged FROM sampled_individuals ",
+            "SELECT id, notes, project_id, created_by, created_at, updated_by, updated_at, tagged, picture FROM sampled_individuals ",
             "WHERE id LIKE $1% ",
             "LIMIT $2;"
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
-            .load(connection)
-}
-    /// Search for the editable struct by a given string by Postgres's `similarity`.
-    ///
-    /// # Arguments
-    /// * `author_user_id` - The ID of the user who is performing the search.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn similarity_search_editables(
-        author_user_id: i32,
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        let limit = limit.unwrap_or(10);
-        // If the query string is empty, we run an all query with the
-        // limit parameter provided instead of a more complex similarity
-        // search.
-        if query.is_empty() {
-            return Self::all_editables(author_user_id, None, Some(limit as i64), None, connection);
-        }
-        let similarity_query = concat!(
-            "SELECT id, notes, created_by, created_at, updated_by, updated_at, tagged FROM sampled_individuals ",
-            "WHERE id LIKE $1% ",
-"AND ",
-             "sampled_individuals.created_by = $3 ",
-            "OR sampled_individuals.id IN ",
-            "(SELECT sampled_individuals_users_roles.table FROM sampled_individuals_users_roles ",
-            "WHERE sampled_individuals_users_roles.user_id = $3 AND sampled_individuals_users_roles.role_id <= 2) ",
-            "OR sampled_individuals.id IN ",
-            "(SELECT sampled_individuals_teams_roles.table_id FROM sampled_individuals_teams_roles ",
-            "WHERE sampled_individuals_teams_roles.role_id <= 2 AND sampled_individuals_teams_roles.table_id IN ",
-            "(SELECT teams_users_roles.table_id FROM teams_users_roles ",
-            "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2)) ",
-            "LIMIT $2;"
-        );
-        diesel::sql_query(similarity_query)
-            .bind::<diesel::sql_types::Text, _>(query)
-            .bind::<diesel::sql_types::Integer, _>(limit)
-            .bind::<diesel::sql_types::Integer, _>(author_user_id)
             .load(connection)
 }
     /// Search for the struct by a given string by Postgres's `word_similarity`.
@@ -4173,55 +4133,13 @@ impl SampledIndividual {
             return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, notes, created_by, created_at, updated_by, updated_at, tagged FROM sampled_individuals ",
+            "SELECT id, notes, project_id, created_by, created_at, updated_by, updated_at, tagged, picture FROM sampled_individuals ",
             "WHERE id LIKE $1% ",
             "LIMIT $2;"
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
-            .load(connection)
-}
-    /// Search for the editable struct by a given string by Postgres's `word_similarity`.
-    ///
-    /// # Arguments
-    /// * `author_user_id` - The ID of the user who is performing the search.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn word_similarity_search_editables(
-        author_user_id: i32,
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        let limit = limit.unwrap_or(10);
-        // If the query string is empty, we run an all query with the
-        // limit parameter provided instead of a more complex similarity
-        // search.
-        if query.is_empty() {
-            return Self::all_editables(author_user_id, None, Some(limit as i64), None, connection);
-        }
-        let similarity_query = concat!(
-            "SELECT id, notes, created_by, created_at, updated_by, updated_at, tagged FROM sampled_individuals ",
-            "WHERE id LIKE $1% ",
-"AND ",
-             "sampled_individuals.created_by = $3 ",
-            "OR sampled_individuals.id IN ",
-            "(SELECT sampled_individuals_users_roles.table FROM sampled_individuals_users_roles ",
-            "WHERE sampled_individuals_users_roles.user_id = $3 AND sampled_individuals_users_roles.role_id <= 2) ",
-            "OR sampled_individuals.id IN ",
-            "(SELECT sampled_individuals_teams_roles.table_id FROM sampled_individuals_teams_roles ",
-            "WHERE sampled_individuals_teams_roles.role_id <= 2 AND sampled_individuals_teams_roles.table_id IN ",
-            "(SELECT teams_users_roles.table_id FROM teams_users_roles ",
-            "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2)) ",
-            "LIMIT $2;"
-        );
-        diesel::sql_query(similarity_query)
-            .bind::<diesel::sql_types::Text, _>(query)
-            .bind::<diesel::sql_types::Integer, _>(limit)
-            .bind::<diesel::sql_types::Integer, _>(author_user_id)
             .load(connection)
 }
     /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
@@ -4244,7 +4162,7 @@ impl SampledIndividual {
             return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, notes, created_by, created_at, updated_by, updated_at, tagged FROM sampled_individuals ",
+            "SELECT id, notes, project_id, created_by, created_at, updated_by, updated_at, tagged, picture FROM sampled_individuals ",
             "WHERE id LIKE $1% ",
             "LIMIT $2;"
         );
@@ -4253,591 +4171,6 @@ impl SampledIndividual {
             .bind::<diesel::sql_types::Integer, _>(limit)
             .load(connection)
 }
-    /// Search for the editable struct by a given string by Postgres's `strict_word_similarity`.
-    ///
-    /// # Arguments
-    /// * `author_user_id` - The ID of the user who is performing the search.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn strict_word_similarity_search_editables(
-        author_user_id: i32,
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        let limit = limit.unwrap_or(10);
-        // If the query string is empty, we run an all query with the
-        // limit parameter provided instead of a more complex similarity
-        // search.
-        if query.is_empty() {
-            return Self::all_editables(author_user_id, None, Some(limit as i64), None, connection);
-        }
-        let similarity_query = concat!(
-            "SELECT id, notes, created_by, created_at, updated_by, updated_at, tagged FROM sampled_individuals ",
-            "WHERE id LIKE $1% ",
-"AND ",
-             "sampled_individuals.created_by = $3 ",
-            "OR sampled_individuals.id IN ",
-            "(SELECT sampled_individuals_users_roles.table FROM sampled_individuals_users_roles ",
-            "WHERE sampled_individuals_users_roles.user_id = $3 AND sampled_individuals_users_roles.role_id <= 2) ",
-            "OR sampled_individuals.id IN ",
-            "(SELECT sampled_individuals_teams_roles.table_id FROM sampled_individuals_teams_roles ",
-            "WHERE sampled_individuals_teams_roles.role_id <= 2 AND sampled_individuals_teams_roles.table_id IN ",
-            "(SELECT teams_users_roles.table_id FROM teams_users_roles ",
-            "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2)) ",
-            "LIMIT $2;"
-        );
-        diesel::sql_query(similarity_query)
-            .bind::<diesel::sql_types::Text, _>(query)
-            .bind::<diesel::sql_types::Integer, _>(limit)
-            .bind::<diesel::sql_types::Integer, _>(author_user_id)
-            .load(connection)
-}
-}
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
-#[diesel(table_name = sampled_individuals_teams_role_invitations)]
-#[diesel(belongs_to(SampledIndividual, foreign_key = table_id))]
-#[diesel(belongs_to(Team, foreign_key = team_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
-#[diesel(belongs_to(User, foreign_key = created_by))]
-#[diesel(primary_key(table_id, team_id))]
-pub struct SampledIndividualsTeamsRoleInvitation {
-    pub table_id: Uuid,
-    pub team_id: i32,
-    pub role_id: i32,
-    pub created_by: i32,
-    pub created_at: NaiveDateTime,
-}
-
-impl From<SampledIndividualsTeamsRoleInvitation> for web_common::database::tables::SampledIndividualsTeamsRoleInvitation {
-    fn from(item: SampledIndividualsTeamsRoleInvitation) -> Self {
-        Self {
-            table_id: item.table_id,
-            team_id: item.team_id,
-            role_id: item.role_id,
-            created_by: item.created_by,
-            created_at: item.created_at,
-        }
-    }
-}
-
-impl From<web_common::database::tables::SampledIndividualsTeamsRoleInvitation> for SampledIndividualsTeamsRoleInvitation {
-    fn from(item: web_common::database::tables::SampledIndividualsTeamsRoleInvitation) -> Self {
-        Self {
-            table_id: item.table_id,
-            team_id: item.team_id,
-            role_id: item.role_id,
-            created_by: item.created_by,
-            created_at: item.created_at,
-        }
-    }
-}
-
-impl SampledIndividualsTeamsRoleInvitation {
-    /// Get all of the structs from the database.
-    ///
-    /// # Arguments
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
-    /// * `offset` - The number of structs to skip. By default, this is 0.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn all(
-        filter: Option<&web_common::database::SampledIndividualsTeamsRoleInvitationFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::sampled_individuals_teams_role_invitations;
-        let mut query = sampled_individuals_teams_role_invitations::dsl::sampled_individuals_teams_role_invitations
-            .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.table_id) {
-            query = query.filter(sampled_individuals_teams_role_invitations::dsl::table_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.team_id) {
-            query = query.filter(sampled_individuals_teams_role_invitations::dsl::team_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.role_id) {
-            query = query.filter(sampled_individuals_teams_role_invitations::dsl::role_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.created_by) {
-            query = query.filter(sampled_individuals_teams_role_invitations::dsl::created_by.eq(value));
-        }
-        query
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-    }
-    /// Get the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, team_id )` - The primary key(s) of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn get(
-       ( table_id, team_id ): ( Uuid, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::sampled_individuals_teams_role_invitations;
-        sampled_individuals_teams_role_invitations::dsl::sampled_individuals_teams_role_invitations
-            .filter(sampled_individuals_teams_role_invitations::dsl::table_id.eq(table_id))
-            .filter(sampled_individuals_teams_role_invitations::dsl::team_id.eq(team_id))
-            .first::<Self>(connection)
-    }
-}
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
-#[diesel(table_name = sampled_individuals_teams_role_requests)]
-#[diesel(belongs_to(SampledIndividual, foreign_key = table_id))]
-#[diesel(belongs_to(Team, foreign_key = team_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
-#[diesel(belongs_to(User, foreign_key = created_by))]
-#[diesel(primary_key(table_id, team_id))]
-pub struct SampledIndividualsTeamsRoleRequest {
-    pub table_id: Uuid,
-    pub team_id: i32,
-    pub role_id: i32,
-    pub created_by: i32,
-    pub created_at: NaiveDateTime,
-}
-
-impl From<SampledIndividualsTeamsRoleRequest> for web_common::database::tables::SampledIndividualsTeamsRoleRequest {
-    fn from(item: SampledIndividualsTeamsRoleRequest) -> Self {
-        Self {
-            table_id: item.table_id,
-            team_id: item.team_id,
-            role_id: item.role_id,
-            created_by: item.created_by,
-            created_at: item.created_at,
-        }
-    }
-}
-
-impl From<web_common::database::tables::SampledIndividualsTeamsRoleRequest> for SampledIndividualsTeamsRoleRequest {
-    fn from(item: web_common::database::tables::SampledIndividualsTeamsRoleRequest) -> Self {
-        Self {
-            table_id: item.table_id,
-            team_id: item.team_id,
-            role_id: item.role_id,
-            created_by: item.created_by,
-            created_at: item.created_at,
-        }
-    }
-}
-
-impl SampledIndividualsTeamsRoleRequest {
-    /// Get all of the structs from the database.
-    ///
-    /// # Arguments
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
-    /// * `offset` - The number of structs to skip. By default, this is 0.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn all(
-        filter: Option<&web_common::database::SampledIndividualsTeamsRoleRequestFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::sampled_individuals_teams_role_requests;
-        let mut query = sampled_individuals_teams_role_requests::dsl::sampled_individuals_teams_role_requests
-            .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.table_id) {
-            query = query.filter(sampled_individuals_teams_role_requests::dsl::table_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.team_id) {
-            query = query.filter(sampled_individuals_teams_role_requests::dsl::team_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.role_id) {
-            query = query.filter(sampled_individuals_teams_role_requests::dsl::role_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.created_by) {
-            query = query.filter(sampled_individuals_teams_role_requests::dsl::created_by.eq(value));
-        }
-        query
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-    }
-    /// Get the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, team_id )` - The primary key(s) of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn get(
-       ( table_id, team_id ): ( Uuid, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::sampled_individuals_teams_role_requests;
-        sampled_individuals_teams_role_requests::dsl::sampled_individuals_teams_role_requests
-            .filter(sampled_individuals_teams_role_requests::dsl::table_id.eq(table_id))
-            .filter(sampled_individuals_teams_role_requests::dsl::team_id.eq(team_id))
-            .first::<Self>(connection)
-    }
-}
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
-#[diesel(table_name = sampled_individuals_teams_roles)]
-#[diesel(belongs_to(SampledIndividual, foreign_key = table_id))]
-#[diesel(belongs_to(Team, foreign_key = team_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
-#[diesel(belongs_to(User, foreign_key = created_by))]
-#[diesel(primary_key(table_id, team_id))]
-pub struct SampledIndividualsTeamsRole {
-    pub table_id: Uuid,
-    pub team_id: i32,
-    pub role_id: i32,
-    pub created_by: i32,
-    pub created_at: NaiveDateTime,
-}
-
-impl From<SampledIndividualsTeamsRole> for web_common::database::tables::SampledIndividualsTeamsRole {
-    fn from(item: SampledIndividualsTeamsRole) -> Self {
-        Self {
-            table_id: item.table_id,
-            team_id: item.team_id,
-            role_id: item.role_id,
-            created_by: item.created_by,
-            created_at: item.created_at,
-        }
-    }
-}
-
-impl From<web_common::database::tables::SampledIndividualsTeamsRole> for SampledIndividualsTeamsRole {
-    fn from(item: web_common::database::tables::SampledIndividualsTeamsRole) -> Self {
-        Self {
-            table_id: item.table_id,
-            team_id: item.team_id,
-            role_id: item.role_id,
-            created_by: item.created_by,
-            created_at: item.created_at,
-        }
-    }
-}
-
-impl SampledIndividualsTeamsRole {
-    /// Get all of the structs from the database.
-    ///
-    /// # Arguments
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
-    /// * `offset` - The number of structs to skip. By default, this is 0.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn all(
-        filter: Option<&web_common::database::SampledIndividualsTeamsRoleFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::sampled_individuals_teams_roles;
-        let mut query = sampled_individuals_teams_roles::dsl::sampled_individuals_teams_roles
-            .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.table_id) {
-            query = query.filter(sampled_individuals_teams_roles::dsl::table_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.team_id) {
-            query = query.filter(sampled_individuals_teams_roles::dsl::team_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.role_id) {
-            query = query.filter(sampled_individuals_teams_roles::dsl::role_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.created_by) {
-            query = query.filter(sampled_individuals_teams_roles::dsl::created_by.eq(value));
-        }
-        query
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-    }
-    /// Get the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, team_id )` - The primary key(s) of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn get(
-       ( table_id, team_id ): ( Uuid, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::sampled_individuals_teams_roles;
-        sampled_individuals_teams_roles::dsl::sampled_individuals_teams_roles
-            .filter(sampled_individuals_teams_roles::dsl::table_id.eq(table_id))
-            .filter(sampled_individuals_teams_roles::dsl::team_id.eq(team_id))
-            .first::<Self>(connection)
-    }
-}
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
-#[diesel(table_name = sampled_individuals_users_role_invitations)]
-#[diesel(belongs_to(SampledIndividual, foreign_key = table_id))]
-#[diesel(belongs_to(User, foreign_key = user_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
-#[diesel(primary_key(table_id, user_id))]
-pub struct SampledIndividualsUsersRoleInvitation {
-    pub table_id: Uuid,
-    pub user_id: i32,
-    pub role_id: i32,
-    pub created_by: i32,
-    pub created_at: NaiveDateTime,
-}
-
-impl From<SampledIndividualsUsersRoleInvitation> for web_common::database::tables::SampledIndividualsUsersRoleInvitation {
-    fn from(item: SampledIndividualsUsersRoleInvitation) -> Self {
-        Self {
-            table_id: item.table_id,
-            user_id: item.user_id,
-            role_id: item.role_id,
-            created_by: item.created_by,
-            created_at: item.created_at,
-        }
-    }
-}
-
-impl From<web_common::database::tables::SampledIndividualsUsersRoleInvitation> for SampledIndividualsUsersRoleInvitation {
-    fn from(item: web_common::database::tables::SampledIndividualsUsersRoleInvitation) -> Self {
-        Self {
-            table_id: item.table_id,
-            user_id: item.user_id,
-            role_id: item.role_id,
-            created_by: item.created_by,
-            created_at: item.created_at,
-        }
-    }
-}
-
-impl SampledIndividualsUsersRoleInvitation {
-    /// Get all of the structs from the database.
-    ///
-    /// # Arguments
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
-    /// * `offset` - The number of structs to skip. By default, this is 0.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn all(
-        filter: Option<&web_common::database::SampledIndividualsUsersRoleInvitationFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::sampled_individuals_users_role_invitations;
-        let mut query = sampled_individuals_users_role_invitations::dsl::sampled_individuals_users_role_invitations
-            .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.table_id) {
-            query = query.filter(sampled_individuals_users_role_invitations::dsl::table_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.user_id) {
-            query = query.filter(sampled_individuals_users_role_invitations::dsl::user_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.role_id) {
-            query = query.filter(sampled_individuals_users_role_invitations::dsl::role_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.created_by) {
-            query = query.filter(sampled_individuals_users_role_invitations::dsl::created_by.eq(value));
-        }
-        query
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-    }
-    /// Get the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, user_id )` - The primary key(s) of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn get(
-       ( table_id, user_id ): ( Uuid, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::sampled_individuals_users_role_invitations;
-        sampled_individuals_users_role_invitations::dsl::sampled_individuals_users_role_invitations
-            .filter(sampled_individuals_users_role_invitations::dsl::table_id.eq(table_id))
-            .filter(sampled_individuals_users_role_invitations::dsl::user_id.eq(user_id))
-            .first::<Self>(connection)
-    }
-}
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
-#[diesel(table_name = sampled_individuals_users_role_requests)]
-#[diesel(belongs_to(SampledIndividual, foreign_key = table_id))]
-#[diesel(belongs_to(User, foreign_key = user_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
-#[diesel(primary_key(table_id, user_id))]
-pub struct SampledIndividualsUsersRoleRequest {
-    pub table_id: Uuid,
-    pub user_id: i32,
-    pub role_id: i32,
-    pub created_by: i32,
-    pub created_at: NaiveDateTime,
-}
-
-impl From<SampledIndividualsUsersRoleRequest> for web_common::database::tables::SampledIndividualsUsersRoleRequest {
-    fn from(item: SampledIndividualsUsersRoleRequest) -> Self {
-        Self {
-            table_id: item.table_id,
-            user_id: item.user_id,
-            role_id: item.role_id,
-            created_by: item.created_by,
-            created_at: item.created_at,
-        }
-    }
-}
-
-impl From<web_common::database::tables::SampledIndividualsUsersRoleRequest> for SampledIndividualsUsersRoleRequest {
-    fn from(item: web_common::database::tables::SampledIndividualsUsersRoleRequest) -> Self {
-        Self {
-            table_id: item.table_id,
-            user_id: item.user_id,
-            role_id: item.role_id,
-            created_by: item.created_by,
-            created_at: item.created_at,
-        }
-    }
-}
-
-impl SampledIndividualsUsersRoleRequest {
-    /// Get all of the structs from the database.
-    ///
-    /// # Arguments
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
-    /// * `offset` - The number of structs to skip. By default, this is 0.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn all(
-        filter: Option<&web_common::database::SampledIndividualsUsersRoleRequestFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::sampled_individuals_users_role_requests;
-        let mut query = sampled_individuals_users_role_requests::dsl::sampled_individuals_users_role_requests
-            .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.table_id) {
-            query = query.filter(sampled_individuals_users_role_requests::dsl::table_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.user_id) {
-            query = query.filter(sampled_individuals_users_role_requests::dsl::user_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.role_id) {
-            query = query.filter(sampled_individuals_users_role_requests::dsl::role_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.created_by) {
-            query = query.filter(sampled_individuals_users_role_requests::dsl::created_by.eq(value));
-        }
-        query
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-    }
-    /// Get the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, user_id )` - The primary key(s) of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn get(
-       ( table_id, user_id ): ( Uuid, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::sampled_individuals_users_role_requests;
-        sampled_individuals_users_role_requests::dsl::sampled_individuals_users_role_requests
-            .filter(sampled_individuals_users_role_requests::dsl::table_id.eq(table_id))
-            .filter(sampled_individuals_users_role_requests::dsl::user_id.eq(user_id))
-            .first::<Self>(connection)
-    }
-}
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
-#[diesel(table_name = sampled_individuals_users_roles)]
-#[diesel(belongs_to(SampledIndividual, foreign_key = table_id))]
-#[diesel(belongs_to(User, foreign_key = user_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
-#[diesel(primary_key(table_id, user_id))]
-pub struct SampledIndividualsUsersRole {
-    pub table_id: Uuid,
-    pub user_id: i32,
-    pub role_id: i32,
-    pub created_by: i32,
-    pub created_at: NaiveDateTime,
-}
-
-impl From<SampledIndividualsUsersRole> for web_common::database::tables::SampledIndividualsUsersRole {
-    fn from(item: SampledIndividualsUsersRole) -> Self {
-        Self {
-            table_id: item.table_id,
-            user_id: item.user_id,
-            role_id: item.role_id,
-            created_by: item.created_by,
-            created_at: item.created_at,
-        }
-    }
-}
-
-impl From<web_common::database::tables::SampledIndividualsUsersRole> for SampledIndividualsUsersRole {
-    fn from(item: web_common::database::tables::SampledIndividualsUsersRole) -> Self {
-        Self {
-            table_id: item.table_id,
-            user_id: item.user_id,
-            role_id: item.role_id,
-            created_by: item.created_by,
-            created_at: item.created_at,
-        }
-    }
-}
-
-impl SampledIndividualsUsersRole {
-    /// Get all of the structs from the database.
-    ///
-    /// # Arguments
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
-    /// * `offset` - The number of structs to skip. By default, this is 0.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn all(
-        filter: Option<&web_common::database::SampledIndividualsUsersRoleFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::sampled_individuals_users_roles;
-        let mut query = sampled_individuals_users_roles::dsl::sampled_individuals_users_roles
-            .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.table_id) {
-            query = query.filter(sampled_individuals_users_roles::dsl::table_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.user_id) {
-            query = query.filter(sampled_individuals_users_roles::dsl::user_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.role_id) {
-            query = query.filter(sampled_individuals_users_roles::dsl::role_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.created_by) {
-            query = query.filter(sampled_individuals_users_roles::dsl::created_by.eq(value));
-        }
-        query
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-    }
-    /// Get the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, user_id )` - The primary key(s) of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn get(
-       ( table_id, user_id ): ( Uuid, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::sampled_individuals_users_roles;
-        sampled_individuals_users_roles::dsl::sampled_individuals_users_roles
-            .filter(sampled_individuals_users_roles::dsl::table_id.eq(table_id))
-            .filter(sampled_individuals_users_roles::dsl::user_id.eq(user_id))
-            .first::<Self>(connection)
-    }
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = samples)]

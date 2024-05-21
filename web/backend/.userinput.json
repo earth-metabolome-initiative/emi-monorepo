@@ -39,5 +39,16 @@
     "Table spectra_collections_users_role_requests is missing. Do you want to create it? (yes/no)": "yes",
     "Table spectra_collections_teams_role_requests is missing. Do you want to create it? (yes/no)": "yes",
     "Table teams_users_role_requests is missing. Do you want to create it? (yes/no)": "yes",
-    "Table users_users_role_requests is missing. Do you want to create it? (yes/no)": "yes"
+    "Table users_users_role_requests is missing. Do you want to create it? (yes/no)": "yes",
+    "Table observations_users_role_invitations is missing. Do you want to create it? (yes/no)": "yes",
+    "Table observations_teams_role_invitations is missing. Do you want to create it? (yes/no)": "yes",
+    "Table observations_users_roles is missing. Do you want to create it? (yes/no)": "no",
+    "Table observations_users_role_invitations is unexpected. Do you want to drop it? (yes/no)": "yes",
+    "Table observations_teams_role_invitations is unexpected. Do you want to drop it? (yes/no)": "yes",
+    "Table sampled_individuals_users_role_invitations is unexpected. Do you want to drop it? (yes/no)": "yes",
+    "Table sampled_individuals_teams_role_invitations is unexpected. Do you want to drop it? (yes/no)": "yes",
+    "Table sampled_individuals_users_role_requests is unexpected. Do you want to drop it? (yes/no)": "yes",
+    "Table sampled_individuals_teams_role_requests is unexpected. Do you want to drop it? (yes/no)": "yes",
+    "Table sampled_individuals_users_roles is unexpected. Do you want to drop it? (yes/no)": "yes",
+    "Table sampled_individuals_teams_roles is unexpected. Do you want to drop it? (yes/no)": "yes"
 }

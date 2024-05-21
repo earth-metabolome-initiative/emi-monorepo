@@ -4,18 +4,17 @@
 CREATE TABLE IF NOT EXISTS sampled_individuals (
   id UUID PRIMARY KEY,
   notes TEXT,
-  created_by INTEGER NOT NULL REFERENCES users(id) ON
-  DELETE
-    CASCADE,
+  project_id INTEGER NOT NULL REFERENCES projects(id),
+  created_by INTEGER NOT NULL REFERENCES users(id),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by INTEGER NOT NULL REFERENCES users(id) ON
   DELETE
     CASCADE,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     -- Whether the individual has been tagged physically.
-    tagged BOOLEAN NOT NULL DEFAULT FALSE
+    tagged BOOLEAN NOT NULL DEFAULT FALSE,
     -- Path to the image of the individual.
-    -- image_path TEXT, TODO!
+    picture BYTEA NOT NULL
     -- Geographic coordinates of the individual.
     -- geolocation COORDINATES NOT NULL : TODO!
 );

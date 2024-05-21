@@ -1,2 +1,166 @@
 //! SCSS code for the badges that is not covered by the default
 //! styles in the forms/standard.scss file.
+
+.tiny-badge {
+    border-radius: 0.5rem;
+    border: 1px solid;
+    width: auto;
+    box-sizing: border-box;
+    padding: 0.25rem;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.badge {
+    border-radius: 0.5rem;
+    border: 1px solid;
+    width: auto;
+    box-sizing: border-box;
+    padding: 0.25rem;
+    transition: background-color 0.3s, color 0.3s;
+
+    img {
+        width: 1.7rem;
+        height: 1.7rem;
+        margin-right: 0.5rem;
+        border-radius: 0.5rem;
+        display: inline;
+        vertical-align:middle;
+    }
+
+    a {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    p {
+        margin: 0;
+        padding: 0;
+        font-size: 1rem;
+    }
+
+    &.blue {
+        border-color: $blue;
+        color: $blue;
+        &:hover {
+            color: white;
+            background-color: $blue;
+        }
+    }
+
+    &.orange {
+        border-color: $orange;
+        color: $orange;
+        &:hover {
+            color: white;
+            background-color: $orange;
+        }
+    }
+
+    &.red {
+        border-color: $red;
+        color: $red;
+        &:hover {
+            color: white;
+            background-color: $red;
+        }
+    }
+
+    &.teal {
+        border-color: $teal;
+        color: $teal;
+        &:hover {
+            color: white;
+            background-color: $teal;
+        }
+    }
+
+    &.green {
+        border-color: $green;
+        color: $green;
+        &:hover {
+            color: white;
+            background-color: $green;
+        }
+    }
+
+    &.yellow {
+        border-color: $yellow;
+        color: $yellow;
+        &:hover {
+            color: white;
+            background-color: $yellow;
+        }
+    }
+
+    &.purple {
+        border-color: $purple;
+        color: $purple;
+        &:hover {
+            color: white;
+            background-color: $purple;
+        }
+    }
+
+    &.pink {
+        border-color: $pink;
+        color: $pink;
+        &:hover {
+            color: white;
+            background-color: $pink;
+        }
+    }
+
+    &.brown {
+        border-color: $brown;
+        color: $brown;
+        &:hover {
+            color: white;
+            background-color: $brown;
+        }
+    }
+
+    &.grey {
+        border-color: $grey;
+        color: $grey;
+        &:hover {
+            color: white;
+            background-color: $grey;
+        }
+    }
+
+    &.black {
+        border-color: $black;
+        color: $black;
+        &:hover {
+            color: white;
+            background-color: $black;
+        }
+    }
+
+    &.near-black {
+        border-color: $near_black;
+        color: $near_black;
+        &:hover {
+            color: white;
+            background-color: $near_black;
+        }
+    }
+
+    &.grey {
+        border-color: $grey;
+        color: $grey;
+        &:hover {
+            color: white;
+            background-color: $grey;
+        }
+    }
+
+    &.primary {
+        border-color: $primary;
+        color: $primary;
+        &:hover {
+            color: white;
+            background-color: $primary;
+        }
+    }
+}

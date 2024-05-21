@@ -196,6 +196,45 @@ impl UpdateRow for web_common::database::UpdateUser {
     }
 }
 
+/// Intermediate representation of the update variant NewObservation.
+#[derive(Identifiable, AsChangeset)]
+#[diesel(table_name = observations)]
+#[diesel(treat_none_as_null = true)]
+#[diesel(primary_key(id))]
+pub(super) struct IntermediateNewObservation {
+    updated_by: i32,
+    id: Uuid,
+    project_id: i32,
+    individual_id: Option<Uuid>,
+    notes: Option<String>,
+    picture: Vec<u8>,
+}
+
+impl UpdateRow for web_common::database::NewObservation {
+    type Intermediate = IntermediateNewObservation;
+    type Flat = Observation;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewObservation {
+            updated_by: user_id,
+            id: self.id,
+            project_id: self.project_id,
+            individual_id: self.individual_id,
+            notes: self.notes,
+            picture: self.picture,
+        }
+    }
+
+    fn update(
+        self,
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        self.to_intermediate(user_id)
+            .save_changes(connection)
+    }
+}
+
 /// Intermediate representation of the update variant NewSampledIndividual.
 #[derive(Identifiable, AsChangeset)]
 #[diesel(table_name = sampled_individuals)]
@@ -205,7 +244,9 @@ pub(super) struct IntermediateNewSampledIndividual {
     updated_by: i32,
     id: Uuid,
     notes: Option<String>,
+    project_id: i32,
     tagged: bool,
+    picture: Vec<u8>,
 }
 
 impl UpdateRow for web_common::database::NewSampledIndividual {
@@ -217,7 +258,9 @@ impl UpdateRow for web_common::database::NewSampledIndividual {
             updated_by: user_id,
             id: self.id,
             notes: self.notes,
+            project_id: self.project_id,
             tagged: self.tagged,
+            picture: self.picture,
         }
     }
 

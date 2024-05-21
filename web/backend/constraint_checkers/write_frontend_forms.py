@@ -648,10 +648,8 @@ def write_frontend_form_builder_implementation(
             "        Self {\n"
         )
 
-        if variant.is_new_variant() and variant.is_update_variant():
-            assert len(primary_keys) == 1
+        if variant.is_new_variant() and variant.has_uuid_primary_key():
             primary_key = primary_keys[0]
-            assert primary_key.data_type() == "Uuid"
             document.write(
                 f"            {primary_key.name}: builder.{primary_key.name}.unwrap_or_else(Uuid::new_v4),\n"
             )

@@ -197,3 +197,7 @@ class TableStructMetadata:
     def is_searchable(self) -> bool:
         """Returns whether the table is searchable."""
         return self.flat_variant.is_searchable()
+    
+    def editability_always_depend_on_parent_column(self) -> bool:
+        """Returns whether the editability of the table depends on the parent column."""
+        return self.flat_variant.editability_always_depend_on_parent_column()

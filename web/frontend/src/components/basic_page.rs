@@ -16,7 +16,7 @@ use yew_router::hooks::use_navigator;
 use yew_router::prelude::Link;
 use yewdux::Dispatch;
 
-pub trait PageLike: DeserializeOwned + PartialEq + Clone + Tabular + 'static {
+pub trait PageLike: DeserializeOwned + Filtrable + PartialEq + Clone + Tabular + 'static {
     fn title(&self) -> String;
 
     fn section() -> String {
@@ -33,7 +33,11 @@ pub trait PageLike: DeserializeOwned + PartialEq + Clone + Tabular + 'static {
 
     fn update_path(&self) -> Option<AppRoute>;
 
-    fn create_path() -> Option<AppRoute>;
+    /// Create a path to create a new item.
+    ///
+    /// # Arguments
+    /// * `filter` - The filter to apply to the path.
+    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute>;
 }
 
 impl PageLike for NestedProject {
@@ -53,8 +57,43 @@ impl PageLike for NestedProject {
         Some(AppRoute::ProjectsUpdate { id: self.inner.id })
     }
 
-    fn create_path() -> Option<AppRoute> {
-        Some(AppRoute::ProjectsNew)
+    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
+        filter
+            .and_then(|f| {
+                f.parent_project_id.map(|parent_project_id| AppRoute::ProjectsNewWithParentProject {
+                    parent_project_id,
+                })
+            })
+            .or(Some(AppRoute::ProjectsNew))
+    }
+}
+
+impl PageLike for NestedObservation {
+    fn title(&self) -> String {
+        format!("Observation {}", self.inner.id)
+    }
+
+    fn description(&self) -> Option<&str> {
+        self.inner.notes.as_deref()
+    }
+
+    fn id(&self) -> PrimaryKey {
+        self.inner.id.into()
+    }
+
+    fn update_path(&self) -> Option<AppRoute> {
+        None
+    }
+
+    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
+        filter
+            .and_then(|f| {
+                f.project_id.map(|project_id| {
+                    AppRoute::ObservationsNewWithProject { project_id }
+                })
+            })
+            .or(Some(AppRoute::ObservationsNew))
+    
     }
 }
 
@@ -75,8 +114,15 @@ impl PageLike for NestedSpectraCollection {
         Some(AppRoute::SpectraCollectionsUpdate { id: self.inner.id })
     }
 
-    fn create_path() -> Option<AppRoute> {
-        Some(AppRoute::SpectraCollectionsNew)
+    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
+        filter
+            .and_then(|f| {
+                f.sample_id.map(|sample_id| {
+                    AppRoute::SpectraCollectionsNewWithSample { sample_id }
+                })
+            })
+            .or(Some(AppRoute::SpectraCollectionsNew))
+    
     }
 }
 
@@ -97,7 +143,14 @@ impl PageLike for NestedSpectra {
         None
     }
 
-    fn create_path() -> Option<AppRoute> {
+    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
+        // filter
+        //     .and_then(|f| {
+        //         f.spectra_collection_id.map(|spectra_collection_id| {
+        //             AppRoute::SpectraNewWithSpectraCollection { spectra_collection_id }
+        //         })
+        //     })
+        //     .or(Some(AppRoute::SpectraNew))
         None
     }
 }
@@ -119,8 +172,14 @@ impl PageLike for NestedSampledIndividual {
         Some(AppRoute::SampledIndividualsUpdate { id: self.inner.id })
     }
 
-    fn create_path() -> Option<AppRoute> {
-        Some(AppRoute::SampledIndividualsNew)
+    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
+        filter
+            .and_then(|f| {
+                f.project_id.map(|project_id| {
+                    AppRoute::SampledIndividualsNewWithProject { project_id }
+                })
+            })
+            .or(Some(AppRoute::SampledIndividualsNew))
     }
 }
 
@@ -138,11 +197,20 @@ impl PageLike for NestedSample {
     }
 
     fn update_path(&self) -> Option<AppRoute> {
-        Some(AppRoute::SamplesUpdate { barcode_id: self.inner.barcode_id })
+        Some(AppRoute::SamplesUpdate {
+            barcode_id: self.inner.barcode_id,
+        })
     }
 
-    fn create_path() -> Option<AppRoute> {
-        Some(AppRoute::SamplesNew)
+    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
+        filter
+            .and_then(|f| {
+                f.sampled_by.map(|sampled_by| {
+                    AppRoute::SamplesNewWithSampledBy { sampled_by }
+                })
+            })
+            .or(Some(AppRoute::SamplesNew))
+    
     }
 }
 
@@ -163,7 +231,7 @@ impl PageLike for User {
         Some(AppRoute::UsersUpdate { id: self.id })
     }
 
-    fn create_path() -> Option<AppRoute> {
+    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
         None
     }
 }
@@ -185,8 +253,13 @@ impl PageLike for NestedTeam {
         Some(AppRoute::TeamsUpdate { id: self.inner.id })
     }
 
-    fn create_path() -> Option<AppRoute> {
-        Some(AppRoute::TeamsNew)
+    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
+        filter
+            .and_then(|f| {
+                f.parent_team_id.map(|parent_team_id| AppRoute::TeamsNewWithParentTeam { parent_team_id })
+            })
+            .or(Some(AppRoute::TeamsNew))
+    
     }
 }
 

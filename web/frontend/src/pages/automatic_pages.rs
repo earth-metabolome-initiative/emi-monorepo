@@ -4,6 +4,29 @@ use web_common::database::*;
 use crate::components::*;
 
 #[derive(Clone, PartialEq, Properties)]
+pub struct ObservationPageProp {
+    pub id: Uuid,
+}
+
+impl From<&ObservationPageProp> for PrimaryKey {
+    fn from(prop: &ObservationPageProp) -> Self {
+        prop.id.into()
+    }
+}
+
+impl ObservationPageProp {
+}
+
+#[function_component(ObservationPage)]
+pub fn observation_page(props: &ObservationPageProp) -> Html {
+    html! {
+        <BasicPage<NestedObservation> id={PrimaryKey::from(props)}>
+            <span>{"No content available yet."}</span>
+        </BasicPage<NestedObservation>>
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
 pub struct ProjectPageProp {
     pub id: i32,
 }
@@ -20,6 +43,16 @@ impl ProjectPageProp {
         filter.parent_project_id = Some(self.id);
         filter
     }
+    fn filter_sampled_individuals_by_project_id(&self) -> SampledIndividualFilter {
+        let mut filter = SampledIndividualFilter::default();
+        filter.project_id = Some(self.id);
+        filter
+    }
+    fn filter_observations_by_project_id(&self) -> ObservationFilter {
+        let mut filter = ObservationFilter::default();
+        filter.project_id = Some(self.id);
+        filter
+    }
 }
 
 #[function_component(ProjectPage)]
@@ -28,6 +61,10 @@ pub fn project_page(props: &ProjectPageProp) -> Html {
         <BasicPage<NestedProject> id={PrimaryKey::from(props)}>
             // Linked with foreign key projects.parent_project_id
             <BasicList<NestedProject> filters={props.filter_projects_by_parent_project_id()}/>
+            // Linked with foreign key sampled_individuals.project_id
+            <BasicList<NestedSampledIndividual> filters={props.filter_sampled_individuals_by_project_id()}/>
+            // Linked with foreign key observations.project_id
+            <BasicList<NestedObservation> filters={props.filter_observations_by_project_id()}/>
         </BasicPage<NestedProject>>
     }
 }
@@ -44,6 +81,11 @@ impl From<&SampledIndividualPageProp> for PrimaryKey {
 }
 
 impl SampledIndividualPageProp {
+    fn filter_observations_by_individual_id(&self) -> ObservationFilter {
+        let mut filter = ObservationFilter::default();
+        filter.individual_id = Some(self.id);
+        filter
+    }
     fn filter_sampled_individual_bio_ott_taxon_items_by_sampled_individual_id(&self) -> SampledIndividualBioOttTaxonItemFilter {
         let mut filter = SampledIndividualBioOttTaxonItemFilter::default();
         filter.sampled_individual_id = Some(self.id);
@@ -55,7 +97,8 @@ impl SampledIndividualPageProp {
 pub fn sampled_individual_page(props: &SampledIndividualPageProp) -> Html {
     html! {
         <BasicPage<NestedSampledIndividual> id={PrimaryKey::from(props)}>
-            <span>{"No content available yet."}</span>
+            // Linked with foreign key observations.individual_id
+            <BasicList<NestedObservation> filters={props.filter_observations_by_individual_id()}/>
         </BasicPage<NestedSampledIndividual>>
     }
 }
@@ -179,6 +222,16 @@ impl UserPageProp {
         filter.created_by = Some(self.id);
         filter
     }
+    fn filter_observations_by_created_by(&self) -> ObservationFilter {
+        let mut filter = ObservationFilter::default();
+        filter.created_by = Some(self.id);
+        filter
+    }
+    fn filter_observations_by_updated_by(&self) -> ObservationFilter {
+        let mut filter = ObservationFilter::default();
+        filter.updated_by = Some(self.id);
+        filter
+    }
     fn filter_projects_by_created_by(&self) -> ProjectFilter {
         let mut filter = ProjectFilter::default();
         filter.created_by = Some(self.id);
@@ -250,6 +303,10 @@ impl UserPageProp {
 pub fn user_page(props: &UserPageProp) -> Html {
     html! {
         <BasicPage<User> id={PrimaryKey::from(props)}>
+            // Linked with foreign key observations.created_by
+            <BasicList<NestedObservation> filters={props.filter_observations_by_created_by()}/>
+            // Linked with foreign key observations.updated_by
+            <BasicList<NestedObservation> filters={props.filter_observations_by_updated_by()}/>
             // Linked with foreign key projects.created_by
             <BasicList<NestedProject> filters={props.filter_projects_by_created_by()}/>
             // Linked with foreign key projects.updated_by

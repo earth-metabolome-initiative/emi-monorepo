@@ -11,6 +11,18 @@ use crate::components::forms::automatic_forms::*;
 
 #[derive(Debug, Clone, Copy, PartialEq, Routable)]
 pub enum AppRoute {
+    #[at("/observations")]
+    Observations,
+    #[at("/observations/:id")]
+    ObservationsView{id: Uuid},
+    #[at("/observations/new")]
+    ObservationsNew,
+    #[at("/observations/new/project/:project_id")]
+    ObservationsNewWithProject{project_id: i32},
+    #[at("/observations/new/individual/:individual_id")]
+    ObservationsNewWithIndividual{individual_id: Uuid},
+    #[at("/observations/:id/update")]
+    ObservationsUpdate{id: Uuid},
     #[at("/projects")]
     Projects,
     #[at("/projects/:id")]
@@ -27,6 +39,8 @@ pub enum AppRoute {
     SampledIndividualsView{id: Uuid},
     #[at("/sampled_individuals/new")]
     SampledIndividualsNew,
+    #[at("/sampled_individuals/new/project/:project_id")]
+    SampledIndividualsNewWithProject{project_id: i32},
     #[at("/sampled_individuals/:id/update")]
     SampledIndividualsUpdate{id: Uuid},
     #[at("/samples")]
@@ -83,6 +97,24 @@ pub enum AppRoute {
 ///
 pub fn switch(route: AppRoute) -> Html {
     match route {
+        AppRoute::Observations => {
+            html! { <BasicList<NestedObservation> /> }
+        }
+        AppRoute::ObservationsView{id} => {
+            html! { <ObservationPage id = {id} /> }
+        }
+        AppRoute::ObservationsNew => {
+            html! { <CreateObservationForm /> }
+        }
+        AppRoute::ObservationsNewWithProject{project_id} => {
+            html! { <CreateObservationForm project_id={project_id} /> }
+        }
+        AppRoute::ObservationsNewWithIndividual{individual_id} => {
+            html! { <CreateObservationForm individual_id={individual_id} /> }
+        }
+        AppRoute::ObservationsUpdate{id} => {
+            html! { <UpdateObservationForm id={id} /> }
+        }
         AppRoute::Projects => {
             html! { <BasicList<NestedProject> /> }
         }
@@ -106,6 +138,9 @@ pub fn switch(route: AppRoute) -> Html {
         }
         AppRoute::SampledIndividualsNew => {
             html! { <CreateSampledIndividualForm /> }
+        }
+        AppRoute::SampledIndividualsNewWithProject{project_id} => {
+            html! { <CreateSampledIndividualForm project_id={project_id} /> }
         }
         AppRoute::SampledIndividualsUpdate{id} => {
             html! { <UpdateSampledIndividualForm id={id} /> }
