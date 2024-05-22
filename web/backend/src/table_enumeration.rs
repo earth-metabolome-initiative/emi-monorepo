@@ -139,6 +139,8 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::ProjectsUsersRoles => unimplemented!("Table `projects_users_roles` does not have a GIN similarity index."),
             web_common::database::Table::Roles => NestedRole::similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Table `sample_bio_ott_taxon_items` does not have a GIN similarity index."),
+            web_common::database::Table::SampleContainerCategories => NestedSampleContainerCategory::similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::SampleContainers => NestedSampleContainer::similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SampleStates => NestedSampleState::similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SampledIndividualBioOttTaxonItems => unimplemented!("Table `sampled_individual_bio_ott_taxon_items` does not have a GIN similarity index."),
             web_common::database::Table::SampledIndividuals => NestedSampledIndividual::similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
@@ -194,6 +196,8 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::ProjectsUsersRoles => unimplemented!("Table `projects_users_roles` does not have a GIN similarity index."),
             web_common::database::Table::Roles => unimplemented!("Table `roles` does not have associated roles."),
             web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Table `sample_bio_ott_taxon_items` does not have a GIN similarity index."),
+            web_common::database::Table::SampleContainerCategories => unimplemented!("Table `sample_container_categories` does not have associated roles."),
+            web_common::database::Table::SampleContainers => unimplemented!("Table `sample_containers` does not have associated roles."),
             web_common::database::Table::SampleStates => unimplemented!("Table `sample_states` does not have associated roles."),
             web_common::database::Table::SampledIndividualBioOttTaxonItems => unimplemented!("Table `sampled_individual_bio_ott_taxon_items` does not have a GIN similarity index."),
             web_common::database::Table::SampledIndividuals => unimplemented!("Table `sampled_individuals` does not have associated roles."),
@@ -249,6 +253,8 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::ProjectsUsersRoles => unimplemented!("Table `projects_users_roles` does not have a GIN similarity index."),
             web_common::database::Table::Roles => NestedRole::word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Table `sample_bio_ott_taxon_items` does not have a GIN similarity index."),
+            web_common::database::Table::SampleContainerCategories => NestedSampleContainerCategory::word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::SampleContainers => NestedSampleContainer::word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SampleStates => NestedSampleState::word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SampledIndividualBioOttTaxonItems => unimplemented!("Table `sampled_individual_bio_ott_taxon_items` does not have a GIN similarity index."),
             web_common::database::Table::SampledIndividuals => NestedSampledIndividual::word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
@@ -304,6 +310,8 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::ProjectsUsersRoles => unimplemented!("Table `projects_users_roles` does not have a GIN similarity index."),
             web_common::database::Table::Roles => unimplemented!("Table `roles` does not have associated roles."),
             web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Table `sample_bio_ott_taxon_items` does not have a GIN similarity index."),
+            web_common::database::Table::SampleContainerCategories => unimplemented!("Table `sample_container_categories` does not have associated roles."),
+            web_common::database::Table::SampleContainers => unimplemented!("Table `sample_containers` does not have associated roles."),
             web_common::database::Table::SampleStates => unimplemented!("Table `sample_states` does not have associated roles."),
             web_common::database::Table::SampledIndividualBioOttTaxonItems => unimplemented!("Table `sampled_individual_bio_ott_taxon_items` does not have a GIN similarity index."),
             web_common::database::Table::SampledIndividuals => unimplemented!("Table `sampled_individuals` does not have associated roles."),
@@ -359,6 +367,8 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::ProjectsUsersRoles => unimplemented!("Table `projects_users_roles` does not have a GIN similarity index."),
             web_common::database::Table::Roles => NestedRole::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Table `sample_bio_ott_taxon_items` does not have a GIN similarity index."),
+            web_common::database::Table::SampleContainerCategories => NestedSampleContainerCategory::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
+            web_common::database::Table::SampleContainers => NestedSampleContainer::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SampleStates => NestedSampleState::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::SampledIndividualBioOttTaxonItems => unimplemented!("Table `sampled_individual_bio_ott_taxon_items` does not have a GIN similarity index."),
             web_common::database::Table::SampledIndividuals => NestedSampledIndividual::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
@@ -414,6 +424,8 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::ProjectsUsersRoles => unimplemented!("Table `projects_users_roles` does not have a GIN similarity index."),
             web_common::database::Table::Roles => unimplemented!("Table `roles` does not have associated roles."),
             web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Table `sample_bio_ott_taxon_items` does not have a GIN similarity index."),
+            web_common::database::Table::SampleContainerCategories => unimplemented!("Table `sample_container_categories` does not have associated roles."),
+            web_common::database::Table::SampleContainers => unimplemented!("Table `sample_containers` does not have associated roles."),
             web_common::database::Table::SampleStates => unimplemented!("Table `sample_states` does not have associated roles."),
             web_common::database::Table::SampledIndividualBioOttTaxonItems => unimplemented!("Table `sampled_individual_bio_ott_taxon_items` does not have a GIN similarity index."),
             web_common::database::Table::SampledIndividuals => unimplemented!("Table `sampled_individuals` does not have associated roles."),
@@ -493,6 +505,8 @@ impl IdentifiableTable for web_common::database::Table {
             web_common::database::Table::ProjectsUsersRoles => bincode::serialize(&NestedProjectsUsersRole::get(primary_key.into(), connection)?)?,
             web_common::database::Table::Roles => bincode::serialize(&NestedRole::get(primary_key.into(), connection)?)?,
             web_common::database::Table::SampleBioOttTaxonItems => bincode::serialize(&NestedSampleBioOttTaxonItem::get(primary_key.into(), connection)?)?,
+            web_common::database::Table::SampleContainerCategories => bincode::serialize(&NestedSampleContainerCategory::get(primary_key.into(), connection)?)?,
+            web_common::database::Table::SampleContainers => bincode::serialize(&NestedSampleContainer::get(primary_key.into(), connection)?)?,
             web_common::database::Table::SampleStates => bincode::serialize(&NestedSampleState::get(primary_key.into(), connection)?)?,
             web_common::database::Table::SampledIndividualBioOttTaxonItems => bincode::serialize(&NestedSampledIndividualBioOttTaxonItem::get(primary_key.into(), connection)?)?,
             web_common::database::Table::SampledIndividuals => bincode::serialize(&NestedSampledIndividual::get(primary_key.into(), connection)?)?,
@@ -578,6 +592,8 @@ impl ViewableTable for web_common::database::Table {
             web_common::database::Table::ProjectsUsersRoles => true,
             web_common::database::Table::Roles => true,
             web_common::database::Table::SampleBioOttTaxonItems => true,
+            web_common::database::Table::SampleContainerCategories => true,
+            web_common::database::Table::SampleContainers => true,
             web_common::database::Table::SampleStates => true,
             web_common::database::Table::SampledIndividualBioOttTaxonItems => true,
             web_common::database::Table::SampledIndividuals => true,
@@ -660,6 +676,8 @@ impl EditableTable for web_common::database::Table {
             web_common::database::Table::ProjectsUsersRoles => false,
             web_common::database::Table::Roles => false,
             web_common::database::Table::SampleBioOttTaxonItems => false,
+            web_common::database::Table::SampleContainerCategories => false,
+            web_common::database::Table::SampleContainers => false,
             web_common::database::Table::SampleStates => false,
             web_common::database::Table::SampledIndividualBioOttTaxonItems => false,
             web_common::database::Table::SampledIndividuals => false,
@@ -761,6 +779,8 @@ impl DeletableTable for web_common::database::Table {
             web_common::database::Table::ProjectsUsersRoles => false,
             web_common::database::Table::Roles => false,
             web_common::database::Table::SampleBioOttTaxonItems => false,
+            web_common::database::Table::SampleContainerCategories => false,
+            web_common::database::Table::SampleContainers => false,
             web_common::database::Table::SampleStates => false,
             web_common::database::Table::SampledIndividualBioOttTaxonItems => false,
             web_common::database::Table::SampledIndividuals => false,
@@ -824,6 +844,8 @@ impl DeletableTable for web_common::database::Table {
             web_common::database::Table::ProjectsUsersRoles => unimplemented!("Delete not implemented for projects_users_roles."),
             web_common::database::Table::Roles => unimplemented!("Delete not implemented for roles."),
             web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Delete not implemented for sample_bio_ott_taxon_items."),
+            web_common::database::Table::SampleContainerCategories => unimplemented!("Delete not implemented for sample_container_categories."),
+            web_common::database::Table::SampleContainers => unimplemented!("Delete not implemented for sample_containers."),
             web_common::database::Table::SampleStates => unimplemented!("Delete not implemented for sample_states."),
             web_common::database::Table::SampledIndividualBioOttTaxonItems => unimplemented!("Delete not implemented for sampled_individual_bio_ott_taxon_items."),
             web_common::database::Table::SampledIndividuals => unimplemented!("Delete not implemented for sampled_individuals."),
@@ -950,6 +972,12 @@ NestedRole::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bi
 },
             web_common::database::Table::SampleBioOttTaxonItems => {let filter: Option<web_common::database::SampleBioOttTaxonItemFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SampleBioOttTaxonItemFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
 NestedSampleBioOttTaxonItem::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::SampleContainerCategories => {let filter: Option<web_common::database::SampleContainerCategoryFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SampleContainerCategoryFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedSampleContainerCategory::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::SampleContainers => {let filter: Option<web_common::database::SampleContainerFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SampleContainerFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedSampleContainer::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
 },
             web_common::database::Table::SampleStates => {let filter: Option<web_common::database::SampleStateFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SampleStateFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
 NestedSampleState::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
@@ -1100,6 +1128,8 @@ NestedProject::all_by_updated_at(filter.as_ref(), limit, offset, connection)?.it
             web_common::database::Table::ProjectsUsersRoles => unimplemented!("all_by_updated_at not implemented for projects_users_roles."),
             web_common::database::Table::Roles => unimplemented!("all_by_updated_at not implemented for roles."),
             web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("all_by_updated_at not implemented for sample_bio_ott_taxon_items."),
+            web_common::database::Table::SampleContainerCategories => unimplemented!("all_by_updated_at not implemented for sample_container_categories."),
+            web_common::database::Table::SampleContainers => unimplemented!("all_by_updated_at not implemented for sample_containers."),
             web_common::database::Table::SampleStates => unimplemented!("all_by_updated_at not implemented for sample_states."),
             web_common::database::Table::SampledIndividualBioOttTaxonItems => unimplemented!("all_by_updated_at not implemented for sampled_individual_bio_ott_taxon_items."),
             web_common::database::Table::SampledIndividuals => {let filter: Option<web_common::database::SampledIndividualFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::SampledIndividualFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
@@ -1202,6 +1232,13 @@ impl InsertableTable for web_common::database::Table {
             web_common::database::Table::ProjectsUsersRoles => unreachable!("Table `projects_users_roles` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::Roles => unreachable!("Table `roles` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::SampleBioOttTaxonItems => unreachable!("Table `sample_bio_ott_taxon_items` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::SampleContainerCategories => unreachable!("Table `sample_container_categories` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::SampleContainers => {
+                let row: web_common::database::NewSampleContainer = bincode::deserialize::<web_common::database::NewSampleContainer>(&row).map_err(web_common::api::ApiError::from)?;
+                let inserted_row: crate::models::SampleContainer = <web_common::database::NewSampleContainer as InsertRow>::insert(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedSampleContainer::from_flat(inserted_row, connection)?;
+                 bincode::serialize(&nested_row).map_err(web_common::api::ApiError::from)?
+            },
             web_common::database::Table::SampleStates => unreachable!("Table `sample_states` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::SampledIndividualBioOttTaxonItems => unreachable!("Table `sampled_individual_bio_ott_taxon_items` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::SampledIndividuals => {
@@ -1323,6 +1360,8 @@ impl UpdatableTable for web_common::database::Table {
             web_common::database::Table::ProjectsUsersRoles => unreachable!("Table `projects_users_roles` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::Roles => unreachable!("Table `roles` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::SampleBioOttTaxonItems => unreachable!("Table `sample_bio_ott_taxon_items` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::SampleContainerCategories => unreachable!("Table `sample_container_categories` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::SampleContainers => unreachable!("Table `sample_containers` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::SampleStates => unreachable!("Table `sample_states` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::SampledIndividualBioOttTaxonItems => unreachable!("Table `sampled_individual_bio_ott_taxon_items` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::SampledIndividuals => {
@@ -1496,6 +1535,16 @@ impl FromFlatStrTable for web_common::database::Table {
             web_common::database::Table::SampleBioOttTaxonItems => {
                 let flat_row: crate::models::SampleBioOttTaxonItem = serde_json::from_str::<crate::models::SampleBioOttTaxonItem>(row).map_err(web_common::api::ApiError::from)?;
                 let richest_row = crate::nested_models::NestedSampleBioOttTaxonItem::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::SampleContainerCategories => {
+                let flat_row: crate::models::SampleContainerCategory = serde_json::from_str::<crate::models::SampleContainerCategory>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedSampleContainerCategory::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::SampleContainers => {
+                let flat_row: crate::models::SampleContainer = serde_json::from_str::<crate::models::SampleContainer>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedSampleContainer::from_flat(flat_row, connection)?;
                  bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
             },
             web_common::database::Table::SampleStates => {

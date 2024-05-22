@@ -572,6 +572,54 @@ impl SampleBioOttTaxonItemFilter {
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct SampleContainerCategoryFilter {
+    pub icon_id: Option<i32>,
+    pub color_id: Option<i32>,
+}
+
+
+#[cfg(feature = "frontend")]
+impl SampleContainerCategoryFilter {
+
+    pub fn as_filter_expression(&self) -> gluesql::core::ast_builder::ExprNode<'_> {
+        let mut filter: gluesql::core::ast_builder::ExprNode<'_> = gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
+        if let Some(icon_id) = &self.icon_id {
+            filter = filter.and(gluesql::core::ast_builder::col("sample_container_categories.icon_id").eq(icon_id.to_string()));
+        }
+
+        if let Some(color_id) = &self.color_id {
+            filter = filter.and(gluesql::core::ast_builder::col("sample_container_categories.color_id").eq(color_id.to_string()));
+        }
+
+        filter
+    }
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct SampleContainerFilter {
+    pub category_id: Option<i32>,
+    pub created_by: Option<i32>,
+}
+
+
+#[cfg(feature = "frontend")]
+impl SampleContainerFilter {
+
+    pub fn as_filter_expression(&self) -> gluesql::core::ast_builder::ExprNode<'_> {
+        let mut filter: gluesql::core::ast_builder::ExprNode<'_> = gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
+        if let Some(category_id) = &self.category_id {
+            filter = filter.and(gluesql::core::ast_builder::col("sample_containers.category_id").eq(category_id.to_string()));
+        }
+
+        if let Some(created_by) = &self.created_by {
+            filter = filter.and(gluesql::core::ast_builder::col("sample_containers.created_by").eq(created_by.to_string()));
+        }
+
+        filter
+    }
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct SampleStateFilter {
     pub icon_id: Option<i32>,
     pub color_id: Option<i32>,
@@ -655,6 +703,7 @@ impl SampledIndividualFilter {
 
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct SampleFilter {
+    pub container_id: Option<i32>,
     pub created_by: Option<i32>,
     pub sampled_by: Option<i32>,
     pub updated_by: Option<i32>,
@@ -667,6 +716,10 @@ impl SampleFilter {
 
     pub fn as_filter_expression(&self) -> gluesql::core::ast_builder::ExprNode<'_> {
         let mut filter: gluesql::core::ast_builder::ExprNode<'_> = gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
+        if let Some(container_id) = &self.container_id {
+            filter = filter.and(gluesql::core::ast_builder::col("samples.container_id").eq(container_id.to_string()));
+        }
+
         if let Some(created_by) = &self.created_by {
             filter = filter.and(gluesql::core::ast_builder::col("samples.created_by").eq(created_by.to_string()));
         }

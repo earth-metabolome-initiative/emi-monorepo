@@ -250,6 +250,27 @@ diesel::table! {
 }
 
 diesel::table! {
+    sample_container_categories (id) {
+        id -> Int4,
+        brand -> Text,
+        volume -> Text,
+        description -> Text,
+        icon_id -> Int4,
+        color_id -> Int4,
+    }
+}
+
+diesel::table! {
+    sample_containers (id) {
+        id -> Int4,
+        barcode -> Text,
+        category_id -> Int4,
+        created_by -> Int4,
+        created_at -> Timestamp,
+    }
+}
+
+diesel::table! {
     sample_states (id) {
         id -> Int4,
         name -> Text,
@@ -283,8 +304,9 @@ diesel::table! {
 }
 
 diesel::table! {
-    samples (barcode_id) {
-        barcode_id -> Uuid,
+    samples (id) {
+        id -> Uuid,
+        container_id -> Int4,
         notes -> Nullable<Text>,
         created_by -> Int4,
         sampled_by -> Int4,
@@ -606,12 +628,17 @@ diesel::joinable!(roles -> font_awesome_icons (icon_id));
 diesel::joinable!(sample_bio_ott_taxon_items -> bio_ott_taxon_items (taxon_id));
 diesel::joinable!(sample_bio_ott_taxon_items -> samples (sample_id));
 diesel::joinable!(sample_bio_ott_taxon_items -> users (created_by));
+diesel::joinable!(sample_container_categories -> colors (color_id));
+diesel::joinable!(sample_container_categories -> font_awesome_icons (icon_id));
+diesel::joinable!(sample_containers -> sample_container_categories (category_id));
+diesel::joinable!(sample_containers -> users (created_by));
 diesel::joinable!(sample_states -> colors (color_id));
 diesel::joinable!(sample_states -> font_awesome_icons (icon_id));
 diesel::joinable!(sampled_individual_bio_ott_taxon_items -> bio_ott_taxon_items (taxon_id));
 diesel::joinable!(sampled_individual_bio_ott_taxon_items -> sampled_individuals (sampled_individual_id));
 diesel::joinable!(sampled_individual_bio_ott_taxon_items -> users (created_by));
 diesel::joinable!(sampled_individuals -> projects (project_id));
+diesel::joinable!(samples -> sample_containers (container_id));
 diesel::joinable!(samples -> sample_states (state));
 diesel::joinable!(samples_teams_role_invitations -> roles (role_id));
 diesel::joinable!(samples_teams_role_invitations -> samples (table_id));
@@ -691,6 +718,8 @@ diesel::allow_tables_to_appear_in_same_query!(
     projects_users_roles,
     roles,
     sample_bio_ott_taxon_items,
+    sample_container_categories,
+    sample_containers,
     sample_states,
     sampled_individual_bio_ott_taxon_items,
     sampled_individuals,

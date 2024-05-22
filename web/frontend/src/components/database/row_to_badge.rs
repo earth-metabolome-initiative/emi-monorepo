@@ -1,11 +1,12 @@
 //! Submodule defining a trait to be implemented by types that can be converted to a badge.
 
+pub mod observations;
+pub mod project_state;
 pub mod projects;
+pub mod sample_container;
 pub mod samples;
 pub mod teams;
 pub mod users;
-pub mod project_state;
-pub mod observations;
 
 use web_common::database::*;
 

@@ -9,7 +9,7 @@ impl RowToSearchableBadge for NestedSample {
             <div>
                 <p>
                 <i class="fas fa-question grey"></i>
-                    <span>{self.inner.barcode_id.format_match(query)}</span>
+                    <span>{self.inner.id.format_match(query)}</span>
                 </p>
             </div>
         }
@@ -20,18 +20,18 @@ impl RowToSearchableBadge for NestedSample {
             <div>
                 <p>
                 <i class="fas fa-question grey"></i>
-                <span>{self.inner.barcode_id.to_string()}</span>
+                <span>{self.inner.id.to_string()}</span>
                 </p>
             </div>
         }
     }
     fn similarity_score(&self, query: &str) -> isize {
-        self.inner.barcode_id.similarity_score(query)
+        self.inner.id.similarity_score(query)
     }
-fn primary_color_class(&self) -> &str {
+    fn primary_color_class(&self) -> &str {
         "grey"
     }
-fn description(&self) -> &str {
+    fn description(&self) -> &str {
         ""
     }
 }

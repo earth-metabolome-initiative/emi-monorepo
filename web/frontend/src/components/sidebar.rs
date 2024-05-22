@@ -44,6 +44,13 @@ pub fn sidebar(props: &SidebarProps) -> Html {
                             <span>{NestedProject::section()}</span>
                         </Link<AppRoute>>
                     </li>
+                    <li class={if route == AppRoute::SampleContainers { "active" } else { "" }}>
+                        <Link<AppRoute> to={AppRoute::SampleContainers}>
+                            <i class={format!("fas fa-{}", NestedSampleContainer::icon())}></i>
+                             {'\u{00a0}'}
+                            <span>{NestedSampleContainer::section()}</span>
+                        </Link<AppRoute>>
+                    </li>
                     <li class={if route == AppRoute::SampledIndividuals { "active" } else { "" }}>
                         <Link<AppRoute> to={AppRoute::SampledIndividuals}>
                             <i class={format!("fas fa-{}", NestedSampledIndividual::icon())}></i>

@@ -40,3 +40,5 @@ pub trait RowToSearchableBadge {
 pub mod roles;
 pub mod samples;
 pub mod sampled_individuals;
+pub mod sample_container_categories;
+pub mod sample_containers;

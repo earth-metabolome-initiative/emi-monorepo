@@ -33,6 +33,12 @@ pub enum AppRoute {
     ProjectsNewWithParentProject{parent_project_id: i32},
     #[at("/projects/:id/update")]
     ProjectsUpdate{id: i32},
+    #[at("/sample_containers")]
+    SampleContainers,
+    #[at("/sample_containers/:id")]
+    SampleContainersView{id: i32},
+    #[at("/sample_containers/new")]
+    SampleContainersNew,
     #[at("/sampled_individuals")]
     SampledIndividuals,
     #[at("/sampled_individuals/:id")]
@@ -45,14 +51,14 @@ pub enum AppRoute {
     SampledIndividualsUpdate{id: Uuid},
     #[at("/samples")]
     Samples,
-    #[at("/samples/:barcode_id")]
-    SamplesView{barcode_id: Uuid},
+    #[at("/samples/:id")]
+    SamplesView{id: Uuid},
     #[at("/samples/new")]
     SamplesNew,
     #[at("/samples/new/sampled_by/:sampled_by")]
     SamplesNewWithSampledBy{sampled_by: i32},
-    #[at("/samples/:barcode_id/update")]
-    SamplesUpdate{barcode_id: Uuid},
+    #[at("/samples/:id/update")]
+    SamplesUpdate{id: Uuid},
     #[at("/spectra_collections")]
     SpectraCollections,
     #[at("/spectra_collections/:id")]
@@ -130,6 +136,15 @@ pub fn switch(route: AppRoute) -> Html {
         AppRoute::ProjectsUpdate{id} => {
             html! { <UpdateProjectForm id={id} /> }
         }
+        AppRoute::SampleContainers => {
+            html! { <BasicList<NestedSampleContainer> /> }
+        }
+        AppRoute::SampleContainersView{id} => {
+            html! { <SampleContainerPage id = {id} /> }
+        }
+        AppRoute::SampleContainersNew => {
+            html! { <CreateSampleContainerForm /> }
+        }
         AppRoute::SampledIndividuals => {
             html! { <BasicList<NestedSampledIndividual> /> }
         }
@@ -148,8 +163,8 @@ pub fn switch(route: AppRoute) -> Html {
         AppRoute::Samples => {
             html! { <BasicList<NestedSample> /> }
         }
-        AppRoute::SamplesView{barcode_id} => {
-            html! { <SamplePage barcode_id = {barcode_id} /> }
+        AppRoute::SamplesView{id} => {
+            html! { <SamplePage id = {id} /> }
         }
         AppRoute::SamplesNew => {
             html! { <CreateSampleForm /> }
@@ -157,8 +172,8 @@ pub fn switch(route: AppRoute) -> Html {
         AppRoute::SamplesNewWithSampledBy{sampled_by} => {
             html! { <CreateSampleForm sampled_by={sampled_by} /> }
         }
-        AppRoute::SamplesUpdate{barcode_id} => {
-            html! { <UpdateSampleForm barcode_id={barcode_id} /> }
+        AppRoute::SamplesUpdate{id} => {
+            html! { <UpdateSampleForm id={id} /> }
         }
         AppRoute::SpectraCollections => {
             html! { <BasicList<NestedSpectraCollection> /> }

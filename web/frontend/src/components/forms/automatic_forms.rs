@@ -118,8 +118,8 @@ impl FormBuilder for DerivedSampleBuilder {
 impl From<DerivedSampleBuilder> for NewDerivedSample {
     fn from(builder: DerivedSampleBuilder) -> Self {
         Self {
-            parent_sample_id: builder.parent_sample.as_ref().map(|parent_sample| parent_sample.inner.barcode_id).unwrap(),
-            child_sample_id: builder.child_sample.as_ref().map(|child_sample| child_sample.inner.barcode_id).unwrap(),
+            parent_sample_id: builder.parent_sample.as_ref().map(|parent_sample| parent_sample.inner.id).unwrap(),
+            child_sample_id: builder.child_sample.as_ref().map(|child_sample| child_sample.inner.id).unwrap(),
         }
     }
 }
@@ -2092,7 +2092,7 @@ impl FormBuilder for SampleBioOttTaxonItemBuilder {
 impl From<SampleBioOttTaxonItemBuilder> for NewSampleBioOttTaxonItem {
     fn from(builder: SampleBioOttTaxonItemBuilder) -> Self {
         Self {
-            sample_id: builder.sample.as_ref().map(|sample| sample.inner.barcode_id).unwrap(),
+            sample_id: builder.sample.as_ref().map(|sample| sample.inner.id).unwrap(),
             taxon_id: builder.taxon.as_ref().map(|taxon| taxon.inner.id).unwrap(),
         }
     }
@@ -2141,6 +2141,163 @@ pub fn create_sample_bio_ott_taxon_item_form(props: &CreateSampleBioOttTaxonItem
             <Datalist<NestedSample, true> builder={set_sample} optional={false} errors={builder_store.errors_sample.clone()} value={builder_store.sample.clone()} label="Sample" />
             <Datalist<NestedBioOttTaxonItem, false> builder={set_taxon} optional={false} errors={builder_store.errors_taxon.clone()} value={builder_store.taxon.clone()} label="Taxon" />
         </BasicForm<NewSampleBioOttTaxonItem>>
+    }
+}
+#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
+pub struct SampleContainerBuilder {
+    pub id: Option<i32>,
+    pub barcode: Option<String>,
+    pub category: Option<NestedSampleContainerCategory>,
+    pub errors_barcode: Vec<ApiError>,
+    pub errors_category: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for SampleContainerBuilder {
+    fn default() -> Self {
+        Self {
+            id: None,
+            barcode: None,
+            category: Default::default(),
+            errors_barcode: Default::default(),
+            errors_category: Default::default(),
+            form_updated_at: Default::default(),
+        }
+    }
+}
+
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub(super) enum SampleContainerActions {
+    SetBarcode(Option<String>),
+    SetCategory(Option<NestedSampleContainerCategory>),
+}
+
+impl FromOperation for SampleContainerActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "category" => SampleContainerActions::SetCategory(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
+}
+
+impl Reducer<SampleContainerBuilder> for SampleContainerActions {
+    fn apply(self, mut state: std::rc::Rc<SampleContainerBuilder>) -> std::rc::Rc<SampleContainerBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            SampleContainerActions::SetBarcode(barcode) => 'barcode: {
+                state_mut.errors_barcode.clear();
+        if barcode.is_none() {
+            state_mut.errors_barcode.push(ApiError::BadRequest(vec![
+                "The Barcode field is required.".to_string()
+             ]));
+            state_mut.barcode = None;
+             break 'barcode;
+        }
+                if let Some(value) = barcode.as_ref() {
+                    if value.is_empty() {
+                        state_mut.errors_barcode.push(ApiError::BadRequest(vec![
+                            "The Barcode field cannot be left empty.".to_string()
+                        ]));
+                         state_mut.barcode = None;
+                          break 'barcode;
+                    }
+                }
+                state_mut.barcode = barcode;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'barcode;
+            }
+            SampleContainerActions::SetCategory(category) => 'category: {
+                state_mut.errors_category.clear();
+        if category.is_none() {
+            state_mut.errors_category.push(ApiError::BadRequest(vec![
+                "The Category field is required.".to_string()
+             ]));
+            state_mut.category = None;
+             break 'category;
+        }
+                state_mut.category = category;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'category;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for SampleContainerBuilder {
+    type Actions = SampleContainerActions;
+
+    type RichVariant = NestedSampleContainer;
+
+    fn has_errors(&self) -> bool {
+!self.errors_barcode.is_empty() || !self.errors_category.is_empty()
+    }
+
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.reduce_mut(|state| {state.id = Some(richest_variant.inner.id);});
+    dispatcher.apply(SampleContainerActions::SetBarcode(Some(richest_variant.inner.barcode.to_string())));
+        dispatcher.apply(SampleContainerActions::SetCategory(Some(richest_variant.category)));
+        vec![]
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.barcode.is_some()
+        && self.category.is_some()
+    }
+
+}
+
+impl From<SampleContainerBuilder> for NewSampleContainer {
+    fn from(builder: SampleContainerBuilder) -> Self {
+        Self {
+            barcode: builder.barcode.unwrap(),
+            category_id: builder.category.unwrap().inner.id,
+        }
+    }
+}
+impl FormBuildable for NewSampleContainer {
+    type Builder = SampleContainerBuilder;
+    fn title() -> &'static str {
+        "Sample container"
+    }
+    fn task_target() -> &'static str {
+        "Sample container"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        false
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateSampleContainerFormProp {
+     #[prop_or_default]
+    pub category_id: Option<i32>,
+}
+
+#[function_component(CreateSampleContainerForm)]
+pub fn create_sample_container_form(props: &CreateSampleContainerFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<SampleContainerBuilder>();
+   if let Some(category_id) = props.category_id {
+         named_requests.push(ComponentMessage::get_named::<&str, SampleContainerCategory>("category", category_id.into()));
+    }
+    let set_barcode = builder_dispatch.apply_callback(|barcode: Option<String>| SampleContainerActions::SetBarcode(barcode));
+    let set_category = builder_dispatch.apply_callback(|category: Option<NestedSampleContainerCategory>| SampleContainerActions::SetCategory(category));
+    html! {
+        <BasicForm<NewSampleContainer>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+            <BasicInput<String> label="Barcode" optional={false} errors={builder_store.errors_barcode.clone()} builder={set_barcode} value={builder_store.barcode.clone()} />
+            <Datalist<NestedSampleContainerCategory, false> builder={set_category} optional={false} errors={builder_store.errors_category.clone()} value={builder_store.category.clone()} label="Category" />
+        </BasicForm<NewSampleContainer>>
     }
 }
 #[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
@@ -2521,11 +2678,13 @@ pub fn update_sampled_individual_form(props: &UpdateSampledIndividualFormProp) -
 #[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct SampleBuilder {
-    pub barcode_id: Option<Uuid>,
+    pub id: Option<Uuid>,
     pub notes: Option<String>,
+    pub container: Option<NestedSampleContainer>,
     pub sampled_by: Option<User>,
     pub state: Option<NestedSampleState>,
     pub errors_notes: Vec<ApiError>,
+    pub errors_container: Vec<ApiError>,
     pub errors_sampled_by: Vec<ApiError>,
     pub errors_state: Vec<ApiError>,
     pub form_updated_at: NaiveDateTime,
@@ -2534,11 +2693,13 @@ pub struct SampleBuilder {
 impl Default for SampleBuilder {
     fn default() -> Self {
         Self {
-            barcode_id: None,
+            id: None,
             notes: None,
+            container: Default::default(),
             sampled_by: None,
             state: None,
             errors_notes: Default::default(),
+            errors_container: Default::default(),
             errors_sampled_by: Default::default(),
             errors_state: Default::default(),
             form_updated_at: Default::default(),
@@ -2549,6 +2710,7 @@ impl Default for SampleBuilder {
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum SampleActions {
     SetNotes(Option<String>),
+    SetContainer(Option<NestedSampleContainer>),
     SetSampledBy(Option<User>),
     SetState(Option<NestedSampleState>),
 }
@@ -2556,6 +2718,7 @@ pub(super) enum SampleActions {
 impl FromOperation for SampleActions {
     fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
         match operation.as_ref() {
+            "container" => SampleActions::SetContainer(Some(bincode::deserialize(&row).unwrap())),
             "sampled_by" => SampleActions::SetSampledBy(Some(bincode::deserialize(&row).unwrap())),
             "state" => SampleActions::SetState(Some(bincode::deserialize(&row).unwrap())),
             operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
@@ -2582,6 +2745,20 @@ impl Reducer<SampleBuilder> for SampleActions {
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'notes;
+            }
+            SampleActions::SetContainer(container) => 'container: {
+                state_mut.errors_container.clear();
+        if container.is_none() {
+            state_mut.errors_container.push(ApiError::BadRequest(vec![
+                "The Container field is required.".to_string()
+             ]));
+            state_mut.container = None;
+             break 'container;
+        }
+                state_mut.container = container;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'container;
             }
             SampleActions::SetSampledBy(sampled_by) => 'sampled_by: {
                 state_mut.errors_sampled_by.clear();
@@ -2621,12 +2798,13 @@ impl FormBuilder for SampleBuilder {
     type RichVariant = NestedSample;
 
     fn has_errors(&self) -> bool {
-!self.errors_notes.is_empty() || !self.errors_sampled_by.is_empty() || !self.errors_state.is_empty()
+!self.errors_notes.is_empty() || !self.errors_container.is_empty() || !self.errors_sampled_by.is_empty() || !self.errors_state.is_empty()
     }
 
     fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
-        dispatcher.reduce_mut(|state| {state.barcode_id = Some(richest_variant.inner.barcode_id);});
+        dispatcher.reduce_mut(|state| {state.id = Some(richest_variant.inner.id);});
     dispatcher.apply(SampleActions::SetNotes(richest_variant.inner.notes.map(|notes| notes.to_string())));
+        dispatcher.apply(SampleActions::SetContainer(Some(richest_variant.container)));
         dispatcher.apply(SampleActions::SetSampledBy(Some(richest_variant.sampled_by)));
         dispatcher.apply(SampleActions::SetState(Some(richest_variant.state)));
         vec![]
@@ -2634,6 +2812,7 @@ impl FormBuilder for SampleBuilder {
 
     fn can_submit(&self) -> bool {
         !self.has_errors()
+        && self.container.is_some()
         && self.sampled_by.is_some()
         && self.state.is_some()
     }
@@ -2643,7 +2822,8 @@ impl FormBuilder for SampleBuilder {
 impl From<SampleBuilder> for NewSample {
     fn from(builder: SampleBuilder) -> Self {
         Self {
-            barcode_id: builder.barcode_id.unwrap_or_else(Uuid::new_v4),
+            id: builder.id.unwrap_or_else(Uuid::new_v4),
+            container_id: builder.container.unwrap().inner.id,
             notes: builder.notes,
             sampled_by: builder.sampled_by.unwrap().id,
             state: builder.state.unwrap().inner.id,
@@ -2669,6 +2849,8 @@ impl FormBuildable for NewSample {
 #[derive(Clone, PartialEq, Properties)]
 pub struct CreateSampleFormProp {
      #[prop_or_default]
+    pub container_id: Option<i32>,
+     #[prop_or_default]
     pub sampled_by: Option<i32>,
      #[prop_or_default]
     pub state: Option<i32>,
@@ -2678,6 +2860,9 @@ pub struct CreateSampleFormProp {
 pub fn create_sample_form(props: &CreateSampleFormProp) -> Html {
      let mut named_requests: Vec<ComponentMessage> = Vec::new();
     let (builder_store, builder_dispatch) = use_store::<SampleBuilder>();
+   if let Some(container_id) = props.container_id {
+         named_requests.push(ComponentMessage::get_named::<&str, SampleContainer>("container", container_id.into()));
+    }
    if let Some(sampled_by) = props.sampled_by {
          named_requests.push(ComponentMessage::get_named::<&str, User>("sampled_by", sampled_by.into()));
     }
@@ -2685,6 +2870,7 @@ pub fn create_sample_form(props: &CreateSampleFormProp) -> Html {
          named_requests.push(ComponentMessage::get_named::<&str, SampleState>("state", state.into()));
     }
     let set_notes = builder_dispatch.apply_callback(|notes: Option<String>| SampleActions::SetNotes(notes));
+    let set_container = builder_dispatch.apply_callback(|container: Option<NestedSampleContainer>| SampleActions::SetContainer(container));
     let set_sampled_by = builder_dispatch.apply_callback(|sampled_by: Option<User>| SampleActions::SetSampledBy(sampled_by));
     let set_state = builder_dispatch.apply_callback(|state: Option<NestedSampleState>| SampleActions::SetState(state));
     html! {
@@ -2693,6 +2879,7 @@ pub fn create_sample_form(props: &CreateSampleFormProp) -> Html {
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Notes" optional={true} errors={builder_store.errors_notes.clone()} builder={set_notes} value={builder_store.notes.clone()} />
+            <Datalist<NestedSampleContainer, false> builder={set_container} optional={false} errors={builder_store.errors_container.clone()} value={builder_store.container.clone()} label="Container" />
             <Datalist<User, false> builder={set_sampled_by} optional={false} errors={builder_store.errors_sampled_by.clone()} value={builder_store.sampled_by.clone()} label="Sampled by" />
             <Datalist<NestedSampleState, false> builder={set_state} optional={false} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" />
         </BasicForm<NewSample>>
@@ -2700,7 +2887,7 @@ pub fn create_sample_form(props: &CreateSampleFormProp) -> Html {
 }
 #[derive(Clone, PartialEq, Properties)]
 pub struct UpdateSampleFormProp {
-    pub barcode_id: Uuid,
+    pub id: Uuid,
 }
 
 #[function_component(UpdateSampleForm)]
@@ -2709,8 +2896,9 @@ pub fn update_sample_form(props: &UpdateSampleFormProp) -> Html {
     let (builder_store, builder_dispatch) = use_store::<SampleBuilder>();
     // We push the ID of the row to the named requests.
     let props = props.clone();
-   named_requests.push(ComponentMessage::get::<NewSample>(props.barcode_id.into()));
+   named_requests.push(ComponentMessage::get::<NewSample>(props.id.into()));
     let set_notes = builder_dispatch.apply_callback(|notes: Option<String>| SampleActions::SetNotes(notes));
+    let set_container = builder_dispatch.apply_callback(|container: Option<NestedSampleContainer>| SampleActions::SetContainer(container));
     let set_sampled_by = builder_dispatch.apply_callback(|sampled_by: Option<User>| SampleActions::SetSampledBy(sampled_by));
     let set_state = builder_dispatch.apply_callback(|state: Option<NestedSampleState>| SampleActions::SetState(state));
     html! {
@@ -2719,6 +2907,7 @@ pub fn update_sample_form(props: &UpdateSampleFormProp) -> Html {
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Notes" optional={true} errors={builder_store.errors_notes.clone()} builder={set_notes} value={builder_store.notes.clone()} />
+            <Datalist<NestedSampleContainer, false> builder={set_container} optional={false} errors={builder_store.errors_container.clone()} value={builder_store.container.clone()} label="Container" />
             <Datalist<User, false> builder={set_sampled_by} optional={false} errors={builder_store.errors_sampled_by.clone()} value={builder_store.sampled_by.clone()} label="Sampled by" />
             <Datalist<NestedSampleState, false> builder={set_state} optional={false} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" />
         </BasicForm<NewSample>>
@@ -2846,7 +3035,7 @@ impl FormBuilder for SamplesTeamsRoleInvitationBuilder {
 impl From<SamplesTeamsRoleInvitationBuilder> for NewSamplesTeamsRoleInvitation {
     fn from(builder: SamplesTeamsRoleInvitationBuilder) -> Self {
         Self {
-            table_id: builder.table.as_ref().map(|table| table.inner.barcode_id).unwrap(),
+            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
             team_id: builder.team.as_ref().map(|team| team.inner.id).unwrap(),
             role_id: builder.role.unwrap().inner.id,
         }
@@ -3027,7 +3216,7 @@ impl FormBuilder for SamplesTeamsRoleRequestBuilder {
 impl From<SamplesTeamsRoleRequestBuilder> for NewSamplesTeamsRoleRequest {
     fn from(builder: SamplesTeamsRoleRequestBuilder) -> Self {
         Self {
-            table_id: builder.table.as_ref().map(|table| table.inner.barcode_id).unwrap(),
+            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
             team_id: builder.team.as_ref().map(|team| team.inner.id).unwrap(),
             role_id: builder.role.unwrap().inner.id,
         }
@@ -3208,7 +3397,7 @@ impl FormBuilder for SamplesTeamsRoleBuilder {
 impl From<SamplesTeamsRoleBuilder> for NewSamplesTeamsRole {
     fn from(builder: SamplesTeamsRoleBuilder) -> Self {
         Self {
-            table_id: builder.table.as_ref().map(|table| table.inner.barcode_id).unwrap(),
+            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
             team_id: builder.team.as_ref().map(|team| team.inner.id).unwrap(),
             role_id: builder.role.unwrap().inner.id,
         }
@@ -3389,7 +3578,7 @@ impl FormBuilder for SamplesUsersRoleInvitationBuilder {
 impl From<SamplesUsersRoleInvitationBuilder> for NewSamplesUsersRoleInvitation {
     fn from(builder: SamplesUsersRoleInvitationBuilder) -> Self {
         Self {
-            table_id: builder.table.as_ref().map(|table| table.inner.barcode_id).unwrap(),
+            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
             user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
             role_id: builder.role.unwrap().inner.id,
         }
@@ -3570,7 +3759,7 @@ impl FormBuilder for SamplesUsersRoleRequestBuilder {
 impl From<SamplesUsersRoleRequestBuilder> for NewSamplesUsersRoleRequest {
     fn from(builder: SamplesUsersRoleRequestBuilder) -> Self {
         Self {
-            table_id: builder.table.as_ref().map(|table| table.inner.barcode_id).unwrap(),
+            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
             user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
             role_id: builder.role.unwrap().inner.id,
         }
@@ -3751,7 +3940,7 @@ impl FormBuilder for SamplesUsersRoleBuilder {
 impl From<SamplesUsersRoleBuilder> for NewSamplesUsersRole {
     fn from(builder: SamplesUsersRoleBuilder) -> Self {
         Self {
-            table_id: builder.table.as_ref().map(|table| table.inner.barcode_id).unwrap(),
+            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
             user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
             role_id: builder.role.unwrap().inner.id,
         }
@@ -3914,7 +4103,7 @@ impl From<SpectraCollectionBuilder> for NewSpectraCollection {
     fn from(builder: SpectraCollectionBuilder) -> Self {
         Self {
             notes: builder.notes,
-            sample_id: builder.sample.unwrap().inner.barcode_id,
+            sample_id: builder.sample.unwrap().inner.id,
         }
     }
 }
@@ -3923,7 +4112,7 @@ impl From<SpectraCollectionBuilder> for UpdateSpectraCollection {
         Self {
             id: builder.id.unwrap(),
             notes: builder.notes,
-            sample_id: builder.sample.unwrap().inner.barcode_id,
+            sample_id: builder.sample.unwrap().inner.id,
         }
     }
 }

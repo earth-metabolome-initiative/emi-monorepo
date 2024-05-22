@@ -203,6 +203,15 @@ impl Tabular for NewSampleBioOttTaxonItem {
     const TABLE: Table = Table::SampleBioOttTaxonItems;
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewSampleContainer {
+    pub barcode: String,
+    pub category_id: i32,
+}
+
+impl Tabular for NewSampleContainer {
+    const TABLE: Table = Table::SampleContainers;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewSampledIndividualBioOttTaxonItem {
     pub sampled_individual_id: Uuid,
     pub taxon_id: i32,
@@ -307,7 +316,8 @@ impl NewSampledIndividual {
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewSample {
-    pub barcode_id: Uuid,
+    pub id: Uuid,
+    pub container_id: i32,
     pub notes: Option<String>,
     pub sampled_by: i32,
     pub state: i32,
@@ -321,7 +331,8 @@ impl NewSample {
     pub fn into_row(self, created_by: i32) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
             gluesql::core::ast_builder::num(created_by),
-            gluesql::core::ast_builder::uuid(self.barcode_id.to_string()),
+            gluesql::core::ast_builder::uuid(self.id.to_string()),
+            gluesql::core::ast_builder::num(self.container_id),
             match self.notes {
                 Some(notes) => gluesql::core::ast_builder::text(notes),
                 None => gluesql::core::ast_builder::null(),
@@ -348,10 +359,10 @@ impl NewSample {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
-        let barcode_id = self.barcode_id;
+        let id = self.id;
         table("samples")
             .insert()
-            .columns("created_by,barcode_id,notes,sampled_by,state,updated_by")
+            .columns("created_by,id,container_id,notes,sampled_by,state,updated_by")
             .values(vec![self.into_row(created_by)])
             .execute(connection)
             .await
@@ -359,7 +370,7 @@ impl NewSample {
                  gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
                  _ => unreachable!("Payload must be an Insert"),
              })?;
-        super::Sample::get(barcode_id, connection).await.map(|maybe_row| maybe_row.unwrap())
+        super::Sample::get(id, connection).await.map(|maybe_row| maybe_row.unwrap())
     }
 
     /// Update the struct in the database.
@@ -380,7 +391,8 @@ impl NewSample {
         use gluesql::core::ast_builder::*;
         let mut update_row = table("samples")
             .update()        
-.set("barcode_id", gluesql::core::ast_builder::uuid(self.barcode_id.to_string()))        
+.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
+.set("container_id", gluesql::core::ast_builder::num(self.container_id))        
 .set("sampled_by", gluesql::core::ast_builder::num(self.sampled_by))        
 .set("state", gluesql::core::ast_builder::num(self.state))        
 .set("updated_by", gluesql::core::ast_builder::num(user_id));

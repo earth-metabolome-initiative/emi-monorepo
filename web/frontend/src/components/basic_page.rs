@@ -63,8 +63,8 @@ impl PageLike for NestedProject {
     fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
         filter
             .and_then(|f| {
-                f.parent_project_id.map(|parent_project_id| AppRoute::ProjectsNewWithParentProject {
-                    parent_project_id,
+                f.parent_project_id.map(|parent_project_id| {
+                    AppRoute::ProjectsNewWithParentProject { parent_project_id }
                 })
             })
             .or(Some(AppRoute::ProjectsNew))
@@ -95,12 +95,10 @@ impl PageLike for NestedObservation {
     fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
         filter
             .and_then(|f| {
-                f.project_id.map(|project_id| {
-                    AppRoute::ObservationsNewWithProject { project_id }
-                })
+                f.project_id
+                    .map(|project_id| AppRoute::ObservationsNewWithProject { project_id })
             })
             .or(Some(AppRoute::ObservationsNew))
-    
     }
 
     fn icon() -> &'static str {
@@ -128,12 +126,10 @@ impl PageLike for NestedSpectraCollection {
     fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
         filter
             .and_then(|f| {
-                f.sample_id.map(|sample_id| {
-                    AppRoute::SpectraCollectionsNewWithSample { sample_id }
-                })
+                f.sample_id
+                    .map(|sample_id| AppRoute::SpectraCollectionsNewWithSample { sample_id })
             })
             .or(Some(AppRoute::SpectraCollectionsNew))
-    
     }
 
     fn icon() -> &'static str {
@@ -194,9 +190,8 @@ impl PageLike for NestedSampledIndividual {
     fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
         filter
             .and_then(|f| {
-                f.project_id.map(|project_id| {
-                    AppRoute::SampledIndividualsNewWithProject { project_id }
-                })
+                f.project_id
+                    .map(|project_id| AppRoute::SampledIndividualsNewWithProject { project_id })
             })
             .or(Some(AppRoute::SampledIndividualsNew))
     }
@@ -208,7 +203,7 @@ impl PageLike for NestedSampledIndividual {
 
 impl PageLike for NestedSample {
     fn title(&self) -> String {
-        format!("{}", self.inner.barcode_id)
+        format!("{}", self.inner.id)
     }
 
     fn description(&self) -> Option<&str> {
@@ -216,24 +211,20 @@ impl PageLike for NestedSample {
     }
 
     fn id(&self) -> PrimaryKey {
-        self.inner.barcode_id.into()
+        self.inner.id.into()
     }
 
     fn update_path(&self) -> Option<AppRoute> {
-        Some(AppRoute::SamplesUpdate {
-            barcode_id: self.inner.barcode_id,
-        })
+        Some(AppRoute::SamplesUpdate { id: self.inner.id })
     }
 
     fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
         filter
             .and_then(|f| {
-                f.sampled_by.map(|sampled_by| {
-                    AppRoute::SamplesNewWithSampledBy { sampled_by }
-                })
+                f.sampled_by
+                    .map(|sampled_by| AppRoute::SamplesNewWithSampledBy { sampled_by })
             })
             .or(Some(AppRoute::SamplesNew))
-    
     }
 
     fn icon() -> &'static str {
@@ -287,14 +278,40 @@ impl PageLike for NestedTeam {
     fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
         filter
             .and_then(|f| {
-                f.parent_team_id.map(|parent_team_id| AppRoute::TeamsNewWithParentTeam { parent_team_id })
+                f.parent_team_id
+                    .map(|parent_team_id| AppRoute::TeamsNewWithParentTeam { parent_team_id })
             })
             .or(Some(AppRoute::TeamsNew))
-    
     }
 
     fn icon() -> &'static str {
-        "people-group" 
+        "people-group"
+    }
+}
+
+impl PageLike for NestedSampleContainer {
+    fn title(&self) -> String {
+        self.inner.barcode.clone()
+    }
+
+    fn description(&self) -> Option<&str> {
+        None
+    }
+
+    fn id(&self) -> PrimaryKey {
+        self.inner.id.into()
+    }
+
+    fn update_path(&self) -> Option<AppRoute> {
+        None
+    }
+
+    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
+        Some(AppRoute::SampleContainersNew)
+    }
+
+    fn icon() -> &'static str {
+        "box"
     }
 }
 

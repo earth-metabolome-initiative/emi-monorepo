@@ -8,8 +8,8 @@ and harder to logically follow. This method ensures that the migrations are regr
 in such a way that all the migrations relative to a table are grouped together.
 """
 
-from typing import List, Dict
 import os
+from typing import Dict, List
 
 WHITE_LISTED_MIGRATIONS = [
     "00000000000000_diesel_initial_setup",
@@ -152,15 +152,19 @@ def table_dependencies() -> Dict[str, List[str]]:
                     continue
                 for table in tables:
                     needles = (f" {table}(", f" {table} (")
-                    if any(needle in line for needle in needles) and table != current_table:
+                    if (
+                        any(needle in line for needle in needles)
+                        and table != current_table
+                    ):
                         if table not in dependencies[current_table]:
                             dependencies[current_table].append(table)
 
     return dependencies
 
+
 def get_sort_tables_by_dependencies() -> List[str]:
     """Returns list of tables sorted by dependencies.
-    
+
     Implementative details
     ----------------------
     The tables are sorted by dependencies using a topological sort algorithm.
@@ -179,11 +183,10 @@ def get_sort_tables_by_dependencies() -> List[str]:
                         dependencies[other_table].remove(table)
                 break
         else:
-            raise RuntimeError(
-                f"Circular dependency detected in the tables {tables}"
-            )
+            raise RuntimeError(f"Circular dependency detected in the tables {tables}")
 
     return sorted_tables
+
 
 def regroup_tables():
     """Regroup the tables."""

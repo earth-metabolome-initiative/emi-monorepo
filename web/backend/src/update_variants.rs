@@ -278,10 +278,11 @@ impl UpdateRow for web_common::database::NewSampledIndividual {
 #[derive(Identifiable, AsChangeset)]
 #[diesel(table_name = samples)]
 #[diesel(treat_none_as_null = true)]
-#[diesel(primary_key(barcode_id))]
+#[diesel(primary_key(id))]
 pub(super) struct IntermediateNewSample {
     updated_by: i32,
-    barcode_id: Uuid,
+    id: Uuid,
+    container_id: i32,
     notes: Option<String>,
     sampled_by: i32,
     state: i32,
@@ -294,7 +295,8 @@ impl UpdateRow for web_common::database::NewSample {
     fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
         IntermediateNewSample {
             updated_by: user_id,
-            barcode_id: self.barcode_id,
+            id: self.id,
+            container_id: self.container_id,
             notes: self.notes,
             sampled_by: self.sampled_by,
             state: self.state,

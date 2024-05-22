@@ -88,6 +88,24 @@ impl Searchable<false> for NestedRole {
         )
     }
 }
+impl Searchable<false> for NestedSampleContainerCategory {
+    fn search_task(query: String, limit: u32) -> super::Select {
+        super::Select::search(
+             Table::SampleContainerCategories,
+              query,
+              limit,
+        )
+    }
+}
+impl Searchable<false> for NestedSampleContainer {
+    fn search_task(query: String, limit: u32) -> super::Select {
+        super::Select::search(
+             Table::SampleContainers,
+              query,
+              limit,
+        )
+    }
+}
 impl Searchable<false> for NestedSampleState {
     fn search_task(query: String, limit: u32) -> super::Select {
         super::Select::search(
@@ -263,6 +281,24 @@ impl Searchable<false> for Role {
     fn search_task(query: String, limit: u32) -> super::Select {
         super::Select::search(
              Table::Roles,
+              query,
+              limit,
+        )
+    }
+}
+impl Searchable<false> for SampleContainerCategory {
+    fn search_task(query: String, limit: u32) -> super::Select {
+        super::Select::search(
+             Table::SampleContainerCategories,
+              query,
+              limit,
+        )
+    }
+}
+impl Searchable<false> for SampleContainer {
+    fn search_task(query: String, limit: u32) -> super::Select {
+        super::Select::search(
+             Table::SampleContainers,
               query,
               limit,
         )

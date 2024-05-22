@@ -3674,6 +3674,407 @@ impl SampleBioOttTaxonItem {
     }
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
+#[diesel(table_name = sample_container_categories)]
+#[diesel(belongs_to(FontAwesomeIcon, foreign_key = icon_id))]
+#[diesel(belongs_to(Color, foreign_key = color_id))]
+#[diesel(primary_key(id))]
+pub struct SampleContainerCategory {
+    pub id: i32,
+    pub brand: String,
+    pub volume: String,
+    pub description: String,
+    pub icon_id: i32,
+    pub color_id: i32,
+}
+
+impl From<SampleContainerCategory> for web_common::database::tables::SampleContainerCategory {
+    fn from(item: SampleContainerCategory) -> Self {
+        Self {
+            id: item.id,
+            brand: item.brand,
+            volume: item.volume,
+            description: item.description,
+            icon_id: item.icon_id,
+            color_id: item.color_id,
+        }
+    }
+}
+
+impl From<web_common::database::tables::SampleContainerCategory> for SampleContainerCategory {
+    fn from(item: web_common::database::tables::SampleContainerCategory) -> Self {
+        Self {
+            id: item.id,
+            brand: item.brand,
+            volume: item.volume,
+            description: item.description,
+            icon_id: item.icon_id,
+            color_id: item.color_id,
+        }
+    }
+}
+
+impl SampleContainerCategory {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        filter: Option<&web_common::database::SampleContainerCategoryFilter>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::sample_container_categories;
+        let mut query = sample_container_categories::dsl::sample_container_categories
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(sample_container_categories::dsl::icon_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.color_id) {
+            query = query.filter(sample_container_categories::dsl::color_id.eq(value));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn get(
+       id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::sample_container_categories;
+        sample_container_categories::dsl::sample_container_categories
+            .filter(sample_container_categories::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+    /// Get the struct from the database by its color_id.
+    ///
+    /// # Arguments
+    /// * `color_id` - The color_id of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_color_id(
+        color_id: &i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::sample_container_categories;
+        sample_container_categories::dsl::sample_container_categories
+            .filter(sample_container_categories::dsl::color_id.eq(color_id))
+            .first::<Self>(connection)
+    }
+    /// Get the struct from the database by its description.
+    ///
+    /// # Arguments
+    /// * `description` - The description of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_description(
+        description: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::sample_container_categories;
+        sample_container_categories::dsl::sample_container_categories
+            .filter(sample_container_categories::dsl::description.eq(description))
+            .first::<Self>(connection)
+    }
+    /// Get the struct from the database by its icon_id.
+    ///
+    /// # Arguments
+    /// * `icon_id` - The icon_id of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_icon_id(
+        icon_id: &i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::sample_container_categories;
+        sample_container_categories::dsl::sample_container_categories
+            .filter(sample_container_categories::dsl::icon_id.eq(icon_id))
+            .first::<Self>(connection)
+    }
+    /// Search for the struct by a given string by Postgres's `similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all(None, Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, brand, volume, description, icon_id, color_id FROM sample_container_categories ",
+            "WHERE $1 % f_concat_sample_container_categories_brand(brand, description) ",
+            "ORDER BY similarity($1, f_concat_sample_container_categories_brand(brand, description)) DESC LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all(None, Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, brand, volume, description, icon_id, color_id FROM sample_container_categories ",
+            "WHERE $1 <% f_concat_sample_container_categories_brand(brand, description) ",
+            "ORDER BY word_similarity($1, f_concat_sample_container_categories_brand(brand, description)) DESC LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all(None, Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, brand, volume, description, icon_id, color_id FROM sample_container_categories ",
+            "WHERE $1 <<% f_concat_sample_container_categories_brand(brand, description) ",
+            "ORDER BY strict_word_similarity($1, f_concat_sample_container_categories_brand(brand, description)) DESC LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+}
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
+#[diesel(table_name = sample_containers)]
+#[diesel(belongs_to(SampleContainerCategory, foreign_key = category_id))]
+#[diesel(belongs_to(User, foreign_key = created_by))]
+#[diesel(primary_key(id))]
+pub struct SampleContainer {
+    pub id: i32,
+    pub barcode: String,
+    pub category_id: i32,
+    pub created_by: i32,
+    pub created_at: NaiveDateTime,
+}
+
+impl From<SampleContainer> for web_common::database::tables::SampleContainer {
+    fn from(item: SampleContainer) -> Self {
+        Self {
+            id: item.id,
+            barcode: item.barcode,
+            category_id: item.category_id,
+            created_by: item.created_by,
+            created_at: item.created_at,
+        }
+    }
+}
+
+impl From<web_common::database::tables::SampleContainer> for SampleContainer {
+    fn from(item: web_common::database::tables::SampleContainer) -> Self {
+        Self {
+            id: item.id,
+            barcode: item.barcode,
+            category_id: item.category_id,
+            created_by: item.created_by,
+            created_at: item.created_at,
+        }
+    }
+}
+
+impl SampleContainer {
+    /// Get all of the structs from the database.
+    ///
+    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all(
+        filter: Option<&web_common::database::SampleContainerFilter>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::sample_containers;
+        let mut query = sample_containers::dsl::sample_containers
+            .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.category_id) {
+            query = query.filter(sample_containers::dsl::category_id.eq(value));
+        }
+        if let Some(value) = filter.and_then(|f| f.created_by) {
+            query = query.filter(sample_containers::dsl::created_by.eq(value));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn get(
+       id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::sample_containers;
+        sample_containers::dsl::sample_containers
+            .filter(sample_containers::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+    /// Get the struct from the database by its barcode.
+    ///
+    /// # Arguments
+    /// * `barcode` - The barcode of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_barcode(
+        barcode: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::sample_containers;
+        sample_containers::dsl::sample_containers
+            .filter(sample_containers::dsl::barcode.eq(barcode))
+            .first::<Self>(connection)
+    }
+    /// Search for the struct by a given string by Postgres's `similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all(None, Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, barcode, category_id, created_by, created_at FROM sample_containers ",
+            "WHERE $1 % barcode ",
+            "ORDER BY similarity($1, barcode) DESC LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all(None, Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, barcode, category_id, created_by, created_at FROM sample_containers ",
+            "WHERE $1 <% barcode ",
+            "ORDER BY word_similarity($1, barcode) DESC LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        let limit = limit.unwrap_or(10);
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all(None, Some(limit as i64), None, connection);
+        }
+        let similarity_query = concat!(
+            "SELECT id, barcode, category_id, created_by, created_at FROM sample_containers ",
+            "WHERE $1 <<% barcode ",
+            "ORDER BY strict_word_similarity($1, barcode) DESC LIMIT $2",
+        );
+        diesel::sql_query(similarity_query)
+            .bind::<diesel::sql_types::Text, _>(query)
+            .bind::<diesel::sql_types::Integer, _>(limit)
+            .load(connection)
+}
+}
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sample_states)]
 #[diesel(belongs_to(FontAwesomeIcon, foreign_key = icon_id))]
 #[diesel(belongs_to(Color, foreign_key = color_id))]
@@ -4174,11 +4575,13 @@ impl SampledIndividual {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = samples)]
+#[diesel(belongs_to(SampleContainer, foreign_key = container_id))]
 #[diesel(belongs_to(User, foreign_key = created_by))]
 #[diesel(belongs_to(SampleState, foreign_key = state))]
-#[diesel(primary_key(barcode_id))]
+#[diesel(primary_key(id))]
 pub struct Sample {
-    pub barcode_id: Uuid,
+    pub id: Uuid,
+    pub container_id: i32,
     pub notes: Option<String>,
     pub created_by: i32,
     pub sampled_by: i32,
@@ -4191,7 +4594,8 @@ pub struct Sample {
 impl From<Sample> for web_common::database::tables::Sample {
     fn from(item: Sample) -> Self {
         Self {
-            barcode_id: item.barcode_id,
+            id: item.id,
+            container_id: item.container_id,
             notes: item.notes,
             created_by: item.created_by,
             sampled_by: item.sampled_by,
@@ -4206,7 +4610,8 @@ impl From<Sample> for web_common::database::tables::Sample {
 impl From<web_common::database::tables::Sample> for Sample {
     fn from(item: web_common::database::tables::Sample) -> Self {
         Self {
-            barcode_id: item.barcode_id,
+            id: item.id,
+            container_id: item.container_id,
             notes: item.notes,
             created_by: item.created_by,
             sampled_by: item.sampled_by,
@@ -4222,23 +4627,23 @@ impl Sample {
     /// Check whether the user has a role with a role_id less than or equal to the provided role_id.
     ///
     /// # Arguments
-    /// * `barcode_id` - The primary key(s) of the struct to delete.
+    /// * `id` - The primary key(s) of the struct to delete.
     /// * `author_user_id` - The ID of the user to check.
     /// * `role_id` - The role_id to check against.
     /// * `connection` - The connection to the database.
     ///
     pub fn has_role_by_id(
-        barcode_id: Uuid,
+        id: Uuid,
         author_user_id: i32,
         role_id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<bool, diesel::result::Error> {
         diesel::select(diesel::dsl::exists(samples::dsl::samples
-            .filter(samples::dsl::barcode_id.eq(barcode_id))
+            .filter(samples::dsl::id.eq(id))
            .filter(samples::dsl::created_by.eq(author_user_id))
             .or_filter(
-               samples::dsl::barcode_id.eq(barcode_id)
-                   .and(samples::dsl::barcode_id.eq_any(
+               samples::dsl::id.eq(id)
+                   .and(samples::dsl::id.eq_any(
                        samples_users_roles::table
                            .select(samples_users_roles::dsl::table_id)
                            .filter(samples_users_roles::dsl::user_id.eq(author_user_id)
@@ -4247,8 +4652,8 @@ impl Sample {
                )
          )
                     .or_filter(
-                       samples::dsl::barcode_id.eq(barcode_id)
-                           .and(samples::dsl::barcode_id.eq_any(
+                       samples::dsl::id.eq(id)
+                           .and(samples::dsl::id.eq_any(
                                samples_teams_roles::table
                                    .select(samples_teams_roles::dsl::table_id)
                                    .filter(samples_teams_roles::dsl::role_id.le(role_id))
@@ -4274,7 +4679,7 @@ impl Sample {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<bool, diesel::result::Error> {
         Self::is_viewer_by_id(
-            self.barcode_id,
+            self.id,
             author_user_id,
             connection,
         )
@@ -4282,17 +4687,17 @@ impl Sample {
     /// Check whether the user is a Viewer (role_id >= 3) for the provided primary key(s).
     ///
     /// # Arguments
-    /// * `barcode_id` - The primary key(s) of the struct to delete.
+    /// * `id` - The primary key(s) of the struct to delete.
     /// * `author_user_id` - The ID of the user to check.
     /// * `connection` - The connection to the database.
     ///
     pub fn is_viewer_by_id(
-        barcode_id: Uuid,
+        id: Uuid,
         author_user_id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<bool, diesel::result::Error> {
         Self::has_role_by_id(
-            barcode_id,
+            id,
             author_user_id,
             3,
             connection,
@@ -4310,7 +4715,7 @@ impl Sample {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<bool, diesel::result::Error> {
         Self::is_editor_by_id(
-            self.barcode_id,
+            self.id,
             author_user_id,
             connection,
         )
@@ -4318,17 +4723,17 @@ impl Sample {
     /// Check whether the user is an Editor (role_id >= 2).
     ///
     /// # Arguments
-    /// * `barcode_id` - The primary key(s) of the struct to delete.
+    /// * `id` - The primary key(s) of the struct to delete.
     /// * `author_user_id` - The ID of the user to check.
     /// * `connection` - The connection to the database.
     ///
     pub fn is_editor_by_id(
-        barcode_id: Uuid,
+        id: Uuid,
         author_user_id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<bool, diesel::result::Error> {
         Self::has_role_by_id(
-            barcode_id,
+            id,
             author_user_id,
             2,
             connection,
@@ -4346,7 +4751,7 @@ impl Sample {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<bool, diesel::result::Error> {
         Self::is_admin_by_id(
-            self.barcode_id,
+            self.id,
             author_user_id,
             connection,
         )
@@ -4354,17 +4759,17 @@ impl Sample {
     /// Check whether the user is an Admin (role_id == 1).
     ///
     /// # Arguments
-    /// * `barcode_id` - The primary key(s) of the struct to delete.
+    /// * `id` - The primary key(s) of the struct to delete.
     /// * `author_user_id` - The ID of the user to check.
     /// * `connection` - The connection to the database.
     ///
     pub fn is_admin_by_id(
-        barcode_id: Uuid,
+        id: Uuid,
         author_user_id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<bool, diesel::result::Error> {
         Self::has_role_by_id(
-            barcode_id,
+            id,
             author_user_id,
             1,
             connection,
@@ -4387,6 +4792,9 @@ impl Sample {
         use crate::schema::samples;
         let mut query = samples::dsl::samples
             .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.container_id) {
+            query = query.filter(samples::dsl::container_id.eq(value));
+        }
         if let Some(value) = filter.and_then(|f| f.created_by) {
             query = query.filter(samples::dsl::created_by.eq(value));
         }
@@ -4424,7 +4832,7 @@ impl Sample {
         let mut query = samples::dsl::samples
            .filter(samples::dsl::created_by.eq(author_user_id))
             .or_filter(
-               samples::dsl::barcode_id.eq_any(
+               samples::dsl::id.eq_any(
                    samples_users_roles::table
                        .select(samples_users_roles::dsl::table_id)
                        .filter(samples_users_roles::dsl::user_id.eq(author_user_id)
@@ -4432,7 +4840,7 @@ impl Sample {
                )),
             )
                 .or_filter(
-                   samples::dsl::barcode_id.eq_any(
+                   samples::dsl::id.eq_any(
                        samples_teams_roles::table
                            .select(samples_teams_roles::dsl::table_id)
                            .filter(samples_teams_roles::dsl::role_id.le(2))
@@ -4444,6 +4852,9 @@ impl Sample {
                    ),
             )
             .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.container_id) {
+            query = query.filter(samples::dsl::container_id.eq(value));
+        }
         if let Some(value) = filter.and_then(|f| f.created_by) {
             query = query.filter(samples::dsl::created_by.eq(value));
         }
@@ -4478,6 +4889,9 @@ impl Sample {
         use crate::schema::samples;
         let mut query = samples::dsl::samples
             .into_boxed();
+        if let Some(value) = filter.and_then(|f| f.container_id) {
+            query = query.filter(samples::dsl::container_id.eq(value));
+        }
         if let Some(value) = filter.and_then(|f| f.created_by) {
             query = query.filter(samples::dsl::created_by.eq(value));
         }
@@ -4507,40 +4921,40 @@ impl Sample {
         author_user_id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(self.barcode_id, author_user_id, connection)
+        Self::delete_by_id(self.id, author_user_id, connection)
     }
     /// Delete the struct from the database by its ID.
     ///
     /// # Arguments
-    /// * `barcode_id` - The primary key(s) of the struct to delete.
+    /// * `id` - The primary key(s) of the struct to delete.
     /// * `author_user_id` - The ID of the user who is deleting the struct.
     /// * `connection` - The connection to the database.
     ///
     pub fn delete_by_id(
-       barcode_id: Uuid,
+       id: Uuid,
         author_user_id: i32,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<usize, diesel::result::Error> {
-        if !Self::is_admin_by_id(barcode_id, author_user_id, connection)? {
+        if !Self::is_admin_by_id(id, author_user_id, connection)? {
             return Err(diesel::result::Error::NotFound);
         }
         diesel::delete(samples::dsl::samples
-            .filter(samples::dsl::barcode_id.eq(barcode_id))
+            .filter(samples::dsl::id.eq(id))
         ).execute(connection)
     }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
-    /// * `barcode_id` - The primary key(s) of the struct to get.
+    /// * `id` - The primary key(s) of the struct to get.
     /// * `connection` - The connection to the database.
     ///
     pub fn get(
-       barcode_id: Uuid,
+       id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Self, diesel::result::Error> {
         use crate::schema::samples;
         samples::dsl::samples
-            .filter(samples::dsl::barcode_id.eq(barcode_id))
+            .filter(samples::dsl::id.eq(id))
             .first::<Self>(connection)
     }
     /// Search for the struct by a given string by Postgres's `similarity`.
@@ -4563,8 +4977,8 @@ impl Sample {
             return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT barcode_id, notes, created_by, sampled_by, created_at, updated_by, updated_at, state FROM samples ",
-            "WHERE barcode_id LIKE $1% ",
+            "SELECT id, container_id, notes, created_by, sampled_by, created_at, updated_by, updated_at, state FROM samples ",
+            "WHERE id LIKE $1% ",
             "LIMIT $2;"
         );
         diesel::sql_query(similarity_query)
@@ -4594,8 +5008,8 @@ impl Sample {
             return Self::all_editables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT barcode_id, notes, created_by, sampled_by, created_at, updated_by, updated_at, state FROM samples ",
-            "WHERE barcode_id LIKE $1% ",
+            "SELECT id, container_id, notes, created_by, sampled_by, created_at, updated_by, updated_at, state FROM samples ",
+            "WHERE id LIKE $1% ",
 "AND ",
              "samples.created_by = $3 ",
             "OR samples.id IN ",
@@ -4634,8 +5048,8 @@ impl Sample {
             return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT barcode_id, notes, created_by, sampled_by, created_at, updated_by, updated_at, state FROM samples ",
-            "WHERE barcode_id LIKE $1% ",
+            "SELECT id, container_id, notes, created_by, sampled_by, created_at, updated_by, updated_at, state FROM samples ",
+            "WHERE id LIKE $1% ",
             "LIMIT $2;"
         );
         diesel::sql_query(similarity_query)
@@ -4665,8 +5079,8 @@ impl Sample {
             return Self::all_editables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT barcode_id, notes, created_by, sampled_by, created_at, updated_by, updated_at, state FROM samples ",
-            "WHERE barcode_id LIKE $1% ",
+            "SELECT id, container_id, notes, created_by, sampled_by, created_at, updated_by, updated_at, state FROM samples ",
+            "WHERE id LIKE $1% ",
 "AND ",
              "samples.created_by = $3 ",
             "OR samples.id IN ",
@@ -4705,8 +5119,8 @@ impl Sample {
             return Self::all(None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT barcode_id, notes, created_by, sampled_by, created_at, updated_by, updated_at, state FROM samples ",
-            "WHERE barcode_id LIKE $1% ",
+            "SELECT id, container_id, notes, created_by, sampled_by, created_at, updated_by, updated_at, state FROM samples ",
+            "WHERE id LIKE $1% ",
             "LIMIT $2;"
         );
         diesel::sql_query(similarity_query)
@@ -4736,8 +5150,8 @@ impl Sample {
             return Self::all_editables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT barcode_id, notes, created_by, sampled_by, created_at, updated_by, updated_at, state FROM samples ",
-            "WHERE barcode_id LIKE $1% ",
+            "SELECT id, container_id, notes, created_by, sampled_by, created_at, updated_by, updated_at, state FROM samples ",
+            "WHERE id LIKE $1% ",
 "AND ",
              "samples.created_by = $3 ",
             "OR samples.id IN ",

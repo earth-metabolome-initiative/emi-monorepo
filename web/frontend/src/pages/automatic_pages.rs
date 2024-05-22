@@ -70,6 +70,35 @@ pub fn project_page(props: &ProjectPageProp) -> Html {
 }
 
 #[derive(Clone, PartialEq, Properties)]
+pub struct SampleContainerPageProp {
+    pub id: i32,
+}
+
+impl From<&SampleContainerPageProp> for PrimaryKey {
+    fn from(prop: &SampleContainerPageProp) -> Self {
+        prop.id.into()
+    }
+}
+
+impl SampleContainerPageProp {
+    fn filter_samples_by_container_id(&self) -> SampleFilter {
+        let mut filter = SampleFilter::default();
+        filter.container_id = Some(self.id);
+        filter
+    }
+}
+
+#[function_component(SampleContainerPage)]
+pub fn sample_container_page(props: &SampleContainerPageProp) -> Html {
+    html! {
+        <BasicPage<NestedSampleContainer> id={PrimaryKey::from(props)}>
+            // Linked with foreign key samples.container_id
+            <BasicList<NestedSample> filters={props.filter_samples_by_container_id()}/>
+        </BasicPage<NestedSampleContainer>>
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
 pub struct SampledIndividualPageProp {
     pub id: Uuid,
 }
@@ -105,34 +134,34 @@ pub fn sampled_individual_page(props: &SampledIndividualPageProp) -> Html {
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct SamplePageProp {
-    pub barcode_id: Uuid,
+    pub id: Uuid,
 }
 
 impl From<&SamplePageProp> for PrimaryKey {
     fn from(prop: &SamplePageProp) -> Self {
-        prop.barcode_id.into()
+        prop.id.into()
     }
 }
 
 impl SamplePageProp {
     fn filter_spectra_collections_by_sample_id(&self) -> SpectraCollectionFilter {
         let mut filter = SpectraCollectionFilter::default();
-        filter.sample_id = Some(self.barcode_id);
+        filter.sample_id = Some(self.id);
         filter
     }
     fn filter_derived_samples_by_parent_sample_id(&self) -> DerivedSampleFilter {
         let mut filter = DerivedSampleFilter::default();
-        filter.parent_sample_id = Some(self.barcode_id);
+        filter.parent_sample_id = Some(self.id);
         filter
     }
     fn filter_derived_samples_by_child_sample_id(&self) -> DerivedSampleFilter {
         let mut filter = DerivedSampleFilter::default();
-        filter.child_sample_id = Some(self.barcode_id);
+        filter.child_sample_id = Some(self.id);
         filter
     }
     fn filter_sample_bio_ott_taxon_items_by_sample_id(&self) -> SampleBioOttTaxonItemFilter {
         let mut filter = SampleBioOttTaxonItemFilter::default();
-        filter.sample_id = Some(self.barcode_id);
+        filter.sample_id = Some(self.id);
         filter
     }
 }
@@ -247,6 +276,11 @@ impl UserPageProp {
         filter.created_by = Some(self.id);
         filter
     }
+    fn filter_sample_containers_by_created_by(&self) -> SampleContainerFilter {
+        let mut filter = SampleContainerFilter::default();
+        filter.created_by = Some(self.id);
+        filter
+    }
     fn filter_sampled_individual_bio_ott_taxon_items_by_created_by(&self) -> SampledIndividualBioOttTaxonItemFilter {
         let mut filter = SampledIndividualBioOttTaxonItemFilter::default();
         filter.created_by = Some(self.id);
@@ -311,6 +345,8 @@ pub fn user_page(props: &UserPageProp) -> Html {
             <BasicList<NestedProject> filters={props.filter_projects_by_created_by()}/>
             // Linked with foreign key projects.updated_by
             <BasicList<NestedProject> filters={props.filter_projects_by_updated_by()}/>
+            // Linked with foreign key sample_containers.created_by
+            <BasicList<NestedSampleContainer> filters={props.filter_sample_containers_by_created_by()}/>
             // Linked with foreign key sampled_individuals.created_by
             <BasicList<NestedSampledIndividual> filters={props.filter_sampled_individuals_by_created_by()}/>
             // Linked with foreign key sampled_individuals.updated_by

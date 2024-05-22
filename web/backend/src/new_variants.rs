@@ -398,6 +398,39 @@ impl InsertRow for web_common::database::NewSampleBioOttTaxonItem {
     }
 }
 
+/// Intermediate representation of the new variant NewSampleContainer.
+#[derive(Insertable)]
+#[diesel(table_name = sample_containers)]
+pub(super) struct IntermediateNewSampleContainer {
+    created_by: i32,
+    barcode: String,
+    category_id: i32,
+}
+
+impl InsertRow for web_common::database::NewSampleContainer {
+    type Intermediate = IntermediateNewSampleContainer;
+    type Flat = SampleContainer;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewSampleContainer {
+            created_by: user_id,
+            barcode: self.barcode,
+            category_id: self.category_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::sample_containers;
+        diesel::insert_into(sample_containers::dsl::sample_containers)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
 /// Intermediate representation of the new variant NewSampledIndividualBioOttTaxonItem.
 #[derive(Insertable)]
 #[diesel(table_name = sampled_individual_bio_ott_taxon_items)]
@@ -477,7 +510,8 @@ impl InsertRow for web_common::database::NewSampledIndividual {
 #[diesel(table_name = samples)]
 pub(super) struct IntermediateNewSample {
     created_by: i32,
-    barcode_id: Uuid,
+    id: Uuid,
+    container_id: i32,
     notes: Option<String>,
     sampled_by: i32,
     state: i32,
@@ -491,7 +525,8 @@ impl InsertRow for web_common::database::NewSample {
     fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
         IntermediateNewSample {
             created_by: user_id,
-            barcode_id: self.barcode_id,
+            id: self.id,
+            container_id: self.container_id,
             notes: self.notes,
             sampled_by: self.sampled_by,
             state: self.state,

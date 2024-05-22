@@ -2111,6 +2111,292 @@ impl From<NestedSampleBioOttTaxonItem> for web_common::database::nested_models::
     }
 }
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+pub struct NestedSampleContainerCategory {
+    pub inner: SampleContainerCategory,
+    pub icon: FontAwesomeIcon,
+    pub color: Color,
+}
+
+impl NestedSampleContainerCategory {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_variant` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_variant: SampleContainerCategory,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            icon: FontAwesomeIcon::get(flat_variant.icon_id, connection)?,
+            color: Color::get(flat_variant.color_id, connection)?,
+                inner: flat_variant,
+        })
+    }
+}
+impl NestedSampleContainerCategory {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `filter` - The filter to apply to the results.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
+    /// * `connection` - The database connection.
+    pub fn all(
+        filter: Option<&web_common::database::SampleContainerCategoryFilter>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        SampleContainerCategory::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+    }
+}
+impl NestedSampleContainerCategory {
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `id` - The primary key(s) of the row.
+    /// * `connection` - The database connection.
+    pub fn get(
+        id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+       SampleContainerCategory::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
+    }
+}
+impl NestedSampleContainerCategory {
+    /// Get the nested struct from the provided color_id.
+    ///
+    /// # Arguments
+    /// * `color_id` - The color_id of the row.
+    /// * `connection` - The database connection.
+    pub fn from_color_id(
+        color_id: &i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+        SampleContainerCategory::from_color_id(color_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
+    }
+}
+impl NestedSampleContainerCategory {
+    /// Get the nested struct from the provided description.
+    ///
+    /// # Arguments
+    /// * `description` - The description of the row.
+    /// * `connection` - The database connection.
+    pub fn from_description(
+        description: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+        SampleContainerCategory::from_description(description, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
+    }
+}
+impl NestedSampleContainerCategory {
+    /// Get the nested struct from the provided icon_id.
+    ///
+    /// # Arguments
+    /// * `icon_id` - The icon_id of the row.
+    /// * `connection` - The database connection.
+    pub fn from_icon_id(
+        icon_id: &i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+        SampleContainerCategory::from_icon_id(icon_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
+    }
+}
+impl NestedSampleContainerCategory {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       SampleContainerCategory::similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+    }
+}
+impl NestedSampleContainerCategory {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       SampleContainerCategory::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+    }
+}
+impl NestedSampleContainerCategory {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn strict_word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       SampleContainerCategory::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+    }
+}
+impl From<web_common::database::nested_models::NestedSampleContainerCategory> for NestedSampleContainerCategory {
+    fn from(item: web_common::database::nested_models::NestedSampleContainerCategory) -> Self {
+        Self {
+            inner: item.inner.into(),
+            icon: item.icon.into(),
+            color: item.color.into(),
+        }
+    }
+}
+impl From<NestedSampleContainerCategory> for web_common::database::nested_models::NestedSampleContainerCategory {
+    fn from(item: NestedSampleContainerCategory) -> Self {
+        Self {
+            inner: item.inner.into(),
+            icon: item.icon.into(),
+            color: item.color.into(),
+        }
+    }
+}
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+pub struct NestedSampleContainer {
+    pub inner: SampleContainer,
+    pub category: NestedSampleContainerCategory,
+    pub created_by: User,
+}
+
+impl NestedSampleContainer {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_variant` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_variant: SampleContainer,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            category: NestedSampleContainerCategory::get(flat_variant.category_id, connection)?,
+            created_by: User::get(flat_variant.created_by, connection)?,
+                inner: flat_variant,
+        })
+    }
+}
+impl NestedSampleContainer {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `filter` - The filter to apply to the results.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
+    /// * `connection` - The database connection.
+    pub fn all(
+        filter: Option<&web_common::database::SampleContainerFilter>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        SampleContainer::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+    }
+}
+impl NestedSampleContainer {
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `id` - The primary key(s) of the row.
+    /// * `connection` - The database connection.
+    pub fn get(
+        id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+       SampleContainer::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
+    }
+}
+impl NestedSampleContainer {
+    /// Get the nested struct from the provided barcode.
+    ///
+    /// # Arguments
+    /// * `barcode` - The barcode of the row.
+    /// * `connection` - The database connection.
+    pub fn from_barcode(
+        barcode: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+        SampleContainer::from_barcode(barcode, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
+    }
+}
+impl NestedSampleContainer {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       SampleContainer::similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+    }
+}
+impl NestedSampleContainer {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       SampleContainer::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+    }
+}
+impl NestedSampleContainer {
+    /// Search the table by the query.
+    ///
+    /// # Arguments
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results, by default `10`.
+    pub fn strict_word_similarity_search(
+        query: &str,
+        limit: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+       SampleContainer::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+    }
+}
+impl From<web_common::database::nested_models::NestedSampleContainer> for NestedSampleContainer {
+    fn from(item: web_common::database::nested_models::NestedSampleContainer) -> Self {
+        Self {
+            inner: item.inner.into(),
+            category: item.category.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+impl From<NestedSampleContainer> for web_common::database::nested_models::NestedSampleContainer {
+    fn from(item: NestedSampleContainer) -> Self {
+        Self {
+            inner: item.inner.into(),
+            category: item.category.into(),
+            created_by: item.created_by.into(),
+        }
+    }
+}
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedSampleState {
     pub inner: SampleState,
     pub icon: FontAwesomeIcon,
@@ -2469,6 +2755,7 @@ impl From<NestedSampledIndividual> for web_common::database::nested_models::Nest
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedSample {
     pub inner: Sample,
+    pub container: NestedSampleContainer,
     pub created_by: User,
     pub sampled_by: User,
     pub updated_by: User,
@@ -2486,6 +2773,7 @@ impl NestedSample {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
+            container: NestedSampleContainer::get(flat_variant.container_id, connection)?,
             created_by: User::get(flat_variant.created_by, connection)?,
             sampled_by: User::get(flat_variant.sampled_by, connection)?,
             updated_by: User::get(flat_variant.updated_by, connection)?,
@@ -2551,14 +2839,14 @@ impl NestedSample {
     /// Get the nested struct from the provided primary key.
     ///
     /// # Arguments
-    /// * `barcode_id` - The primary key(s) of the row.
+    /// * `id` - The primary key(s) of the row.
     /// * `connection` - The database connection.
     pub fn get(
-        barcode_id: Uuid,
+        id: Uuid,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error>
     {
-       Sample::get(barcode_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
+       Sample::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl NestedSample {
@@ -2655,6 +2943,7 @@ impl From<web_common::database::nested_models::NestedSample> for NestedSample {
     fn from(item: web_common::database::nested_models::NestedSample) -> Self {
         Self {
             inner: item.inner.into(),
+            container: item.container.into(),
             created_by: item.created_by.into(),
             sampled_by: item.sampled_by.into(),
             updated_by: item.updated_by.into(),
@@ -2666,6 +2955,7 @@ impl From<NestedSample> for web_common::database::nested_models::NestedSample {
     fn from(item: NestedSample) -> Self {
         Self {
             inner: item.inner.into(),
+            container: item.container.into(),
             created_by: item.created_by.into(),
             sampled_by: item.sampled_by.into(),
             updated_by: item.updated_by.into(),
