@@ -38,6 +38,9 @@ pub trait PageLike: DeserializeOwned + Filtrable + PartialEq + Clone + Tabular +
     /// # Arguments
     /// * `filter` - The filter to apply to the path.
     fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute>;
+
+    /// Returns font-awesome icon associated with the page type.
+    fn icon() -> &'static str;
 }
 
 impl PageLike for NestedProject {
@@ -65,6 +68,10 @@ impl PageLike for NestedProject {
                 })
             })
             .or(Some(AppRoute::ProjectsNew))
+    }
+
+    fn icon() -> &'static str {
+        "diagram-project"
     }
 }
 
@@ -95,6 +102,10 @@ impl PageLike for NestedObservation {
             .or(Some(AppRoute::ObservationsNew))
     
     }
+
+    fn icon() -> &'static str {
+        "tower-observation"
+    }
 }
 
 impl PageLike for NestedSpectraCollection {
@@ -123,6 +134,10 @@ impl PageLike for NestedSpectraCollection {
             })
             .or(Some(AppRoute::SpectraCollectionsNew))
     
+    }
+
+    fn icon() -> &'static str {
+        "flask-vial"
     }
 }
 
@@ -153,6 +168,10 @@ impl PageLike for NestedSpectra {
         //     .or(Some(AppRoute::SpectraNew))
         None
     }
+
+    fn icon() -> &'static str {
+        "vials"
+    }
 }
 
 impl PageLike for NestedSampledIndividual {
@@ -180,6 +199,10 @@ impl PageLike for NestedSampledIndividual {
                 })
             })
             .or(Some(AppRoute::SampledIndividualsNew))
+    }
+
+    fn icon() -> &'static str {
+        "dna"
     }
 }
 
@@ -212,6 +235,10 @@ impl PageLike for NestedSample {
             .or(Some(AppRoute::SamplesNew))
     
     }
+
+    fn icon() -> &'static str {
+        "vial"
+    }
 }
 
 impl PageLike for User {
@@ -233,6 +260,10 @@ impl PageLike for User {
 
     fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
         None
+    }
+
+    fn icon() -> &'static str {
+        "users"
     }
 }
 
@@ -260,6 +291,10 @@ impl PageLike for NestedTeam {
             })
             .or(Some(AppRoute::TeamsNew))
     
+    }
+
+    fn icon() -> &'static str {
+        "people-group" 
     }
 }
 

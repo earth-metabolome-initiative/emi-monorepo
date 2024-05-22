@@ -97,9 +97,17 @@ impl<Page: Filtrable + PageLike + RowToBadge> Component for BasicList<Page> {
         html! {
             <div class="section_explorer">
                 if ctx.props().filters.is_some() {
-                    <h3>{Page::section()}</h3>
+                    <h3>
+                        <i class={format!("fas fa-{}", Page::icon())}></i>
+                        {'\u{00a0}'}
+                        <span>{Page::section()}</span>
+                    </h3>
                 } else {
-                    <h2>{Page::section()}</h2>
+                    <h2>
+                        <i class={format!("fas fa-{}", Page::icon())}></i>
+                        {'\u{00a0}'}
+                        <span>{Page::section()}</span>
+                    </h2>
                 }
                 <ul>
                 { for self.pages.iter().map(|page| html!{<li>{page.to_badge()}</li>}) }
