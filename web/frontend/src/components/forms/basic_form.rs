@@ -112,8 +112,8 @@ pub struct InnerBasicForm<Data> {
     validate_timeout: Option<Timeout>,
     errors: Vec<ApiError>,
     user_state: Rc<UserState>,
-    loading_operations: usize,
     _dispatcher: Dispatch<UserState>,
+    loading_operations: usize,
     _phantom: std::marker::PhantomData<Data>,
 }
 

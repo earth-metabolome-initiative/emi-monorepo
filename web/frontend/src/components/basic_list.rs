@@ -9,6 +9,9 @@ use yew::prelude::*;
 use yew_agent::prelude::WorkerBridgeHandle;
 use yew_agent::scope_ext::AgentScopeExt;
 use yew_router::prelude::Link;
+use crate::stores::user_state::UserState;
+use yewdux::prelude::*;
+use std::rc::Rc;
 
 use super::database::row_to_badge::RowToBadge;
 
@@ -25,11 +28,14 @@ pub struct BasicList<Page> {
     pages: Vec<Page>,
     no_more_pages: bool,
     request_is_ongoing: bool,
+    user_state: Rc<UserState>,
+    _dispatcher: Dispatch<UserState>,
 }
 
 pub enum PagesMessage {
     Backend(WebsocketMessage),
     LoadMore,
+    UserState(Rc<UserState>),
 }
 
 impl<Page: Filtrable + PageLike + RowToBadge> Component for BasicList<Page> {
@@ -37,6 +43,10 @@ impl<Page: Filtrable + PageLike + RowToBadge> Component for BasicList<Page> {
     type Properties = BasicListProps<Page>;
 
     fn create(ctx: &Context<Self>) -> Self {
+        let user_dispatch =
+            Dispatch::<UserState>::global().subscribe(ctx.link().callback(PagesMessage::UserState));
+        let user_state = user_dispatch.get();
+
         Self {
             websocket: ctx.link().bridge_worker(Callback::from({
                 let link = ctx.link().clone();
@@ -44,6 +54,8 @@ impl<Page: Filtrable + PageLike + RowToBadge> Component for BasicList<Page> {
                     link.send_message(PagesMessage::Backend(message));
                 }
             })),
+            user_state,
+            _dispatcher: user_dispatch,
             no_more_pages: false,
             request_is_ongoing: false,
             pages: Vec::new(),
@@ -58,6 +70,10 @@ impl<Page: Filtrable + PageLike + RowToBadge> Component for BasicList<Page> {
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
+            PagesMessage::UserState(user_state) => {
+                self.user_state = user_state;
+                true
+            }
             PagesMessage::Backend(message) => match message {
                 WebsocketMessage::AllTable(rows) => {
                     log::info!("Received {} rows", rows.len());
@@ -115,12 +131,14 @@ impl<Page: Filtrable + PageLike + RowToBadge> Component for BasicList<Page> {
                     <li>{"There are no more entries to load"}</li>
                 }
                 </ul>
-                if let Some(create_path) = Page::create_path(ctx.props().filters.as_ref()) {
-                    <Link<AppRoute> classes={"button-like create"} to={create_path}>
-                        <i class={FormMethod::POST.font_awesome_icon()}></i>
-                        {'\u{00a0}'}
-                        <span>{"New"}</span>
-                    </Link<AppRoute>>
+                if self.user_state.has_user() {
+                    if let Some(create_path) = Page::create_path(ctx.props().filters.as_ref()) {
+                        <Link<AppRoute> classes={"button-like create"} to={create_path}>
+                            <i class={FormMethod::POST.font_awesome_icon()}></i>
+                            {'\u{00a0}'}
+                            <span>{"New"}</span>
+                        </Link<AppRoute>>
+                    }
                 }
                 <button class="retrieve" onclick={ctx.link().callback(|_| PagesMessage::LoadMore)} disabled={self.request_is_ongoing}>
                     if self.request_is_ongoing {
