@@ -437,16 +437,16 @@ impl<Page: PageLike> Component for InnerBasicPage<Page> {
                     if self.can_update {
                         <Link<AppRoute> classes={"button-like update"} to={page.update_path().unwrap()}>
                             <i class={FormMethod::PUT.font_awesome_icon()}></i>
+                            {'\u{00a0}'}
                             <span>{"Update"}</span>
                         </Link<AppRoute>>
                     }
                     if self.can_delete {
                         <Link<AppRoute> classes={"button-like delete"} to={page.update_path().unwrap()}>
                             <i class={FormMethod::DELETE.font_awesome_icon()}></i>
+                            {'\u{00a0}'}
                             <span>{"Delete"}</span>
                         </Link<AppRoute>>
-                    } else {
-                        <></>
                     }
                     <div class="clear"></div>
                     { ctx.props().children.clone() }

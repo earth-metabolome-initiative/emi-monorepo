@@ -24,7 +24,9 @@ pub fn logout() -> Html {
     };
 
     html! {
-        <button onclick={on_logout} class="btn btn-primary">
+        <button onclick={on_logout} class="btn btn-primary logout">
+            <i class="fas fa-right-from-bracket"></i>
+            {'\u{00a0}'}
             {"Logout"}
         </button>
     }

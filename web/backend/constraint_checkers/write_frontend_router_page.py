@@ -35,8 +35,10 @@ def write_frontend_sidebar(builders: List[StructMetadata]):
         "use yew::prelude::*;",
         "use yew_router::prelude::*;",
         "use yewdux::use_store;",
+        "use web_common::database::*;",
         "use crate::router::AppRoute;",
         "use super::logout::Logout;",
+        "use crate::components::basic_page::PageLike;",
         "use crate::stores::user_state::UserState;",
     ]
 
@@ -87,10 +89,14 @@ def write_frontend_sidebar(builders: List[StructMetadata]):
         if builder.is_junktion_table():
             continue
 
+        rich_variant = builder.get_richest_variant()
+
         document.write(
             f'                    <li class={{if route == AppRoute::{builder.get_capitalized_table_name()} {{ "active" }} else {{ "" }}}}>\n'
             f"                        <Link<AppRoute> to={{AppRoute::{builder.get_capitalized_table_name()}}}>\n"
-            f'                            {{"{builder.capitalized_human_readable_table_name()}"}}\n'
+            f"                            <i class={{format!(\"fas fa-{{}}\", {rich_variant.name}::icon())}}></i>\n"
+            "                             {'\\u{00a0}'}\n"
+            f'                            <span>{{{rich_variant.name}::section()}}</span>\n'
             "                        </Link<AppRoute>>\n"
             "                    </li>\n"
         )
@@ -104,7 +110,9 @@ def write_frontend_sidebar(builders: List[StructMetadata]):
         "                        html! {\n"
         "                            <li>\n"
         "                                <Link<AppRoute> to={AppRoute::Login}>\n"
-        '                                    {"Login"}\n'
+        '                                    <i class="fas fa-right-to-bracket"></i>\n'
+        "                                     {'\\u{00a0}'}\n"
+        '                                    <span>{"Login"}</span>\n'
         "                                </Link<AppRoute>>\n"
         "                            </li>\n"
         "                        }\n"

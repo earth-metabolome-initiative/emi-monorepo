@@ -113,17 +113,14 @@ impl<Page: Filtrable + PageLike + RowToBadge> Component for BasicList<Page> {
                 { for self.pages.iter().map(|page| html!{<li>{page.to_badge()}</li>}) }
                 if self.no_more_pages {
                     <li>{"There are no more entries to load"}</li>
-                } else {
-                    <></>
                 }
                 </ul>
                 if let Some(create_path) = Page::create_path(ctx.props().filters.as_ref()) {
                     <Link<AppRoute> classes={"button-like create"} to={create_path}>
                         <i class={FormMethod::POST.font_awesome_icon()}></i>
+                        {'\u{00a0}'}
                         <span>{"New"}</span>
                     </Link<AppRoute>>
-                } else {
-                    <></>
                 }
                 <button class="retrieve" onclick={ctx.link().callback(|_| PagesMessage::LoadMore)} disabled={self.request_is_ongoing}>
                     if self.request_is_ongoing {
@@ -131,6 +128,7 @@ impl<Page: Filtrable + PageLike + RowToBadge> Component for BasicList<Page> {
                     } else {
                         <i class="fas fa-arrows-rotate"></i>
                     }
+                    {'\u{00a0}'}
                     <span>{"Load more entries"}</span>
                 </button>
                 <div class="clear"></div>

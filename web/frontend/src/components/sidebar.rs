@@ -4,8 +4,10 @@
 use yew::prelude::*;
 use yew_router::prelude::*;
 use yewdux::use_store;
+use web_common::database::*;
 use crate::router::AppRoute;
 use super::logout::Logout;
+use crate::components::basic_page::PageLike;
 use crate::stores::user_state::UserState;
 
 #[derive(Properties, Clone, PartialEq, Debug)]
@@ -30,37 +32,51 @@ pub fn sidebar(props: &SidebarProps) -> Html {
                 <ul>
                     <li class={if route == AppRoute::Observations { "active" } else { "" }}>
                         <Link<AppRoute> to={AppRoute::Observations}>
-                            {"Observations"}
+                            <i class={format!("fas fa-{}", NestedObservation::icon())}></i>
+                             {'\u{00a0}'}
+                            <span>{NestedObservation::section()}</span>
                         </Link<AppRoute>>
                     </li>
                     <li class={if route == AppRoute::Projects { "active" } else { "" }}>
                         <Link<AppRoute> to={AppRoute::Projects}>
-                            {"Projects"}
+                            <i class={format!("fas fa-{}", NestedProject::icon())}></i>
+                             {'\u{00a0}'}
+                            <span>{NestedProject::section()}</span>
                         </Link<AppRoute>>
                     </li>
                     <li class={if route == AppRoute::SampledIndividuals { "active" } else { "" }}>
                         <Link<AppRoute> to={AppRoute::SampledIndividuals}>
-                            {"Sampled individuals"}
+                            <i class={format!("fas fa-{}", NestedSampledIndividual::icon())}></i>
+                             {'\u{00a0}'}
+                            <span>{NestedSampledIndividual::section()}</span>
                         </Link<AppRoute>>
                     </li>
                     <li class={if route == AppRoute::Samples { "active" } else { "" }}>
                         <Link<AppRoute> to={AppRoute::Samples}>
-                            {"Samples"}
+                            <i class={format!("fas fa-{}", NestedSample::icon())}></i>
+                             {'\u{00a0}'}
+                            <span>{NestedSample::section()}</span>
                         </Link<AppRoute>>
                     </li>
                     <li class={if route == AppRoute::SpectraCollections { "active" } else { "" }}>
                         <Link<AppRoute> to={AppRoute::SpectraCollections}>
-                            {"Spectra collections"}
+                            <i class={format!("fas fa-{}", NestedSpectraCollection::icon())}></i>
+                             {'\u{00a0}'}
+                            <span>{NestedSpectraCollection::section()}</span>
                         </Link<AppRoute>>
                     </li>
                     <li class={if route == AppRoute::Teams { "active" } else { "" }}>
                         <Link<AppRoute> to={AppRoute::Teams}>
-                            {"Teams"}
+                            <i class={format!("fas fa-{}", NestedTeam::icon())}></i>
+                             {'\u{00a0}'}
+                            <span>{NestedTeam::section()}</span>
                         </Link<AppRoute>>
                     </li>
                     <li class={if route == AppRoute::Users { "active" } else { "" }}>
                         <Link<AppRoute> to={AppRoute::Users}>
-                            {"Users"}
+                            <i class={format!("fas fa-{}", User::icon())}></i>
+                             {'\u{00a0}'}
+                            <span>{User::section()}</span>
                         </Link<AppRoute>>
                     </li>
                     {if user.has_user() {
@@ -71,7 +87,9 @@ pub fn sidebar(props: &SidebarProps) -> Html {
                         html! {
                             <li>
                                 <Link<AppRoute> to={AppRoute::Login}>
-                                    {"Login"}
+                                    <i class="fas fa-right-to-bracket"></i>
+                                     {'\u{00a0}'}
+                                    <span>{"Login"}</span>
                                 </Link<AppRoute>>
                             </li>
                         }

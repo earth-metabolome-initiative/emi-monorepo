@@ -160,10 +160,18 @@ impl Component for Navigator {
                         if user.has_complete_profile() {
                             {user.to_badge()}
                         } else {
-                            <Link<AppRoute> classes="right_nav_button" to={AppRoute::UsersUpdate { id: user.id }}>{"Complete profile"}</Link<AppRoute>>
+                            <Link<AppRoute> classes="right_nav_button" to={AppRoute::UsersUpdate { id: user.id }}>
+                                <i class="fas fa-clipboard-check"></i>
+                                {'\u{00a0}'}
+                                <span>{"Complete profile"}</span>
+                            </Link<AppRoute>>
                         }
                     } else {
-                        <Link<AppRoute> classes="right_nav_button" to={AppRoute::Login}>{"Login"}</Link<AppRoute>>
+                        <Link<AppRoute> classes="right_nav_button" to={AppRoute::Login}>
+                            <i class="fas fa-right-to-bracket"></i>
+                            {'\u{00a0}'}
+                            <span>{"Login"}</span>
+                        </Link<AppRoute>>
                     }
                 </nav>
                 <Sidebar visible={self.sidebar_open()} />
